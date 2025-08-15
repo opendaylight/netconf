@@ -18,7 +18,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.google.common.util.concurrent.SettableFuture;
 import io.netty.util.Timeout;
 import io.netty.util.TimerTask;
 import java.util.concurrent.CancellationException;
@@ -58,32 +57,27 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     // 2 minutes keepalive delay by default
     private static final long DEFAULT_DELAY = TimeUnit.MINUTES.toSeconds(2);
 
-    // 1 minute transaction timeout by default
-    private static final long DEFAULT_TRANSACTION_TIMEOUT_MILLI = TimeUnit.MILLISECONDS.toMillis(60000);
-
     private final RemoteDeviceHandler deviceHandler;
     private final RemoteDeviceId deviceId;
     private final NetconfTimer timer;
     private final long keepaliveDelaySeconds;
-    private final long timeoutNanos;
     private final long delayNanos;
 
     private volatile NetconfDeviceCommunicator listener;
     private volatile KeepaliveTask task;
 
     public KeepaliveSalFacade(final RemoteDeviceId deviceId, final RemoteDeviceHandler deviceHandler,
-            final NetconfTimer timer, final long keepaliveDelaySeconds, final long requestTimeoutMillis) {
+            final NetconfTimer timer, final long keepaliveDelaySeconds) {
         this.deviceId = requireNonNull(deviceId);
         this.deviceHandler = requireNonNull(deviceHandler);
         this.timer = requireNonNull(timer);
         this.keepaliveDelaySeconds = keepaliveDelaySeconds;
         delayNanos = TimeUnit.SECONDS.toNanos(keepaliveDelaySeconds);
-        timeoutNanos = TimeUnit.MILLISECONDS.toNanos(requestTimeoutMillis);
     }
 
     public KeepaliveSalFacade(final RemoteDeviceId deviceId, final RemoteDeviceHandler deviceHandler,
             final NetconfTimer timer) {
-        this(deviceId, deviceHandler, timer, DEFAULT_DELAY, DEFAULT_TRANSACTION_TIMEOUT_MILLI);
+        this(deviceId, deviceHandler, timer, DEFAULT_DELAY);
     }
 
     /**
@@ -183,17 +177,6 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         deviceHandler.close();
     }
 
-    private <T> @NonNull ListenableFuture<T> scheduleTimeout(final ListenableFuture<T> invokeFuture) {
-        final var timeout = new RequestTimeoutTask<>(invokeFuture);
-        scheduleTimeout(invokeFuture, timeout);
-        return timeout.userFuture;
-    }
-
-    private void scheduleTimeout(final ListenableFuture<?> future, final TimeoutTask timeoutTask) {
-        final var timeout = timer.newTimeout(timeoutTask, timeoutNanos, TimeUnit.NANOSECONDS);
-        future.addListener(() -> timeout.cancel(), MoreExecutors.directExecutor());
-    }
-
     /**
      * Invoke keepalive RPC and check the response. In case of any received response the keepalive
      * is considered successful and schedules next keepalive with a fixed delay. If the response is unsuccessful (no
@@ -272,7 +255,6 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
             final var deviceFuture = devRpc.invokeNetconf(GetConfig.QNAME, KEEPALIVE_PAYLOAD);
             lastActivity = now;
 
-            scheduleTimeout(deviceFuture, new TimeoutTask(deviceFuture));
             Futures.addCallback(deviceFuture, this, MoreExecutors.directExecutor());
         }
 
@@ -307,7 +289,6 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
             } else {
                 LOG.warn("{}: Keepalive RPC failed. Reconnecting netconf session.", deviceId, throwable);
             }
-            disconnect();
         }
 
         private void reschedule() {
@@ -316,54 +297,6 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         private void reschedule(final long delay) {
             timer.newTimeout(this, delay, TimeUnit.NANOSECONDS);
-        }
-    }
-
-    private static class TimeoutTask implements TimerTask {
-        private final ListenableFuture<?> future;
-
-        TimeoutTask(final ListenableFuture<?> future) {
-            this.future = requireNonNull(future);
-        }
-
-        @Override
-        public final void run(final Timeout timeout) {
-            future.cancel(true);
-        }
-    }
-
-    /*
-     * Request timeout task is called once the requestTimeoutMillis is reached. At that moment, if the request is not
-     * yet finished, we cancel it.
-     */
-    private final class RequestTimeoutTask<V> extends TimeoutTask implements FutureCallback<V> {
-        private final @NonNull SettableFuture<V> userFuture = SettableFuture.create();
-
-        RequestTimeoutTask(final ListenableFuture<V> rpcResultFuture) {
-            super(rpcResultFuture);
-            // Note: this will also wire run() to onFailure()
-            Futures.addCallback(rpcResultFuture, this, MoreExecutors.directExecutor());
-        }
-
-        @Override
-        public void onSuccess(final V result) {
-            // No matter what response we got,
-            // rpc-reply or rpc-error, we got it from device so the netconf session is OK.
-            userFuture.set(result);
-            enableKeepalive();
-        }
-
-        @Override
-        public void onFailure(final Throwable throwable) {
-            // User/Application RPC failed (The RPC did not reach the remote device or it has timeed out)
-            if (throwable instanceof CancellationException) {
-                LOG.warn("{}: RPC timed out. Reconnecting netconf session", deviceId);
-            } else {
-                LOG.warn("{}: RPC failed. Reconnecting netconf session", deviceId, throwable);
-            }
-            userFuture.setException(throwable);
-            // There is no point in keeping this session. Reconnect.
-            disconnect();
         }
     }
 
@@ -384,7 +317,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         public ListenableFuture<? extends DOMRpcResult> invokeNetconf(final QName type, final ContainerNode input) {
             // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
             disableKeepalive();
-            return scheduleTimeout(delegate.invokeNetconf(type, input));
+            final var invokeRpc = delegate.invokeNetconf(type, input);
+            return Futures.transform(invokeRpc, result -> {
+                enableKeepalive();
+                return result;
+            }, MoreExecutors.directExecutor());
         }
 
         @Override
@@ -404,7 +341,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
             // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
             disableKeepalive();
-            return scheduleTimeout(delegate.invokeRpc(type, input));
+            final var invokeRpc = delegate.invokeRpc(type, input);
+            return Futures.transform(invokeRpc, result -> {
+                enableKeepalive();
+                return result;
+            }, MoreExecutors.directExecutor());
         }
 
         @Override
@@ -431,7 +372,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         public ListenableFuture<? extends DOMRpcResult> invokeNetconf(final QName type, final ContainerNode input) {
             // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
             disableKeepalive();
-            return scheduleTimeout(delegate.invokeNetconf(type, input));
+            final var invokeRpc = delegate.invokeNetconf(type, input);
+            return Futures.transform(invokeRpc, result -> {
+                enableKeepalive();
+                return result;
+            }, MoreExecutors.directExecutor());
         }
 
         @Override
@@ -451,7 +396,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         public ListenableFuture<? extends DOMSource> invokeRpc(final QName type, final DOMSource payload) {
             // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
             disableKeepalive();
-            return scheduleTimeout(delegate.invokeRpc(type, payload));
+            final var invokeRpc = delegate.invokeRpc(type, payload);
+            return Futures.transform(invokeRpc, result -> {
+                enableKeepalive();
+                return result;
+            }, MoreExecutors.directExecutor());
         }
     }
 }
