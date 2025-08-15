@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8077dcf5_b62051d8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-08-15T05:44:02Z",
+      "side": 1,
+      "message": "probably just: curl -v --http2 --parallel \u003cURL1\u003e \u003cURL2\u003e",
+      "revId": "fc5680d1719b8d187d4472bedd250ca5dbf23d24",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
