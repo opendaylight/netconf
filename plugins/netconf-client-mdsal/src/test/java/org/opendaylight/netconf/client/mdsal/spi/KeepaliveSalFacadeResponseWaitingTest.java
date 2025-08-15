@@ -70,7 +70,7 @@ class KeepaliveSalFacadeResponseWaitingTest {
         timer = new DefaultNetconfTimerWrapper();
 
         underlyingSalFacade = new LocalNetconfSalFacade();
-        keepaliveSalFacade = new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, timer, 2L, 10000L);
+        keepaliveSalFacade = new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, timer, 2L);
         keepaliveSalFacade.setListener(listener);
     }
 
