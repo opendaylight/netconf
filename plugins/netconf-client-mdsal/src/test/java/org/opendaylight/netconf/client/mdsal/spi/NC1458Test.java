@@ -51,6 +51,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
+import org.opendaylight.netconf.client.mdsal.api.RpcsTimeoutAndRecoveryHandler.NormalizedTimeoutRpcs;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
@@ -75,7 +76,7 @@ class NC1458Test {
     @Mock
     private RemoteDeviceHandler underlyingSalFacade;
     @Mock
-    private RemoteDeviceServices.Rpcs.Normalized deviceRpc;
+    private NormalizedTimeoutRpcs deviceRpc;
     @Mock
     private DOMRpcService deviceDomRpc;
     @Mock
@@ -91,7 +92,7 @@ class NC1458Test {
             InetSocketAddress.createUnresolved("localhost", 22)), mockDevice, RPC_MESSAGE_LIMIT);
 
         final var timer = new DefaultNetconfTimer();
-        keepaliveSalFacade = new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, timer, 1L, 10000L);
+        keepaliveSalFacade = new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, timer, 1L);
         keepaliveSalFacade.setListener(communicator);
         doReturn(deviceDomRpc).when(deviceRpc).domRpcService();
 
