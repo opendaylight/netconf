@@ -107,7 +107,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         LOG.debug("{}: Session to remote device established with {}", id, remoteSessionCapabilities);
 
         final var baseSchema = baseSchemaProvider.baseSchemaForCapabilities(remoteSessionCapabilities);
-        final var initRpc = new NetconfDeviceRpc(baseSchema.modelContext(), listener,
+        final var initRpc = new NetconfDeviceRpc(baseSchema.modelContext(), listener.copyWithoutRpcLimit(),
             new NetconfMessageTransformer(baseSchema.databind(), false, baseSchema));
 
         final var deviceSchema = deviceSchemaProvider.deviceNetconfSchemaFor(id, remoteSessionCapabilities, initRpc,

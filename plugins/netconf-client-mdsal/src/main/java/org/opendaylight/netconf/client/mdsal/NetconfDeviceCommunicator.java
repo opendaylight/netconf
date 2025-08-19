@@ -71,13 +71,12 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     protected final RemoteDevice<NetconfDeviceCommunicator> remoteDevice;
     private final @Nullable UserPreferences overrideNetconfCapabilities;
     protected final RemoteDeviceId id;
-    // Note: fair to balance sendRequest() and processMessage()
-    private final ReentrantLock sessionLock = new ReentrantLock(true);
 
+    private final ReentrantLock sessionLock;
     private final Semaphore semaphore;
     private final int concurentRpcMsgs;
+    private final Queue<Request> requests;
 
-    private final Queue<Request> requests = new ArrayDeque<>();
     private NetconfClientSession currentSession;
 
     // isSessionClosing indicates a close operation on the session is issued and tearDown will surely be called later
@@ -105,7 +104,33 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         this.id = id;
         this.remoteDevice = remoteDevice;
         this.overrideNetconfCapabilities = overrideNetconfCapabilities;
+        requests = new ArrayDeque<>();
+        // Note: fair to balance sendRequest() and processMessage()
+        sessionLock = new ReentrantLock(true);
         semaphore = rpcMessageLimit > 0 ? new Semaphore(rpcMessageLimit) : null;
+    }
+
+    private NetconfDeviceCommunicator(final NetconfDeviceCommunicator original) {
+        id = original.id;
+        remoteDevice = original.remoteDevice;
+        overrideNetconfCapabilities = original.overrideNetconfCapabilities;
+        concurentRpcMsgs = original.concurentRpcMsgs;
+        currentSession = original.currentSession;
+        requests = original.requests;
+        sessionLock = original.sessionLock;
+        closing = original.closing;
+        semaphore = null;
+    }
+
+    /**
+     * Creates a copy of the current instance that has the {@code concurrent-rpc-limit} removed, which is enforced
+     * by a semaphore attribute. This copy should only be used for requests created to fetch schema sources during
+     * the device connection process.
+     *
+     * @return a new {@link NetconfDeviceCommunicator} without the {@code concurrent-rpc-limit}.
+     */
+    NetconfDeviceCommunicator copyWithoutRpcLimit() {
+        return new NetconfDeviceCommunicator(this);
     }
 
     @Override
