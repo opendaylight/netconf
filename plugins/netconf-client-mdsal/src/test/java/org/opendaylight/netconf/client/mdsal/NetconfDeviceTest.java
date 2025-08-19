@@ -170,6 +170,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
     @Test
     void testNetconfDeviceReconnect() {
         doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any());
+        doReturn(listener).when(listener).copyWithoutRpcLimit();
 
         final var device = new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
@@ -228,6 +229,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
         doReturn(schemaFuture).when(schemaFactory).createEffectiveModelContext(anyCollection());
 
         doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any());
+        doReturn(listener).when(listener).copyWithoutRpcLimit();
 
         final var device = new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
@@ -260,6 +262,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
     @Test
     void testNetconfDeviceAvailableCapabilitiesBuilding() {
         doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any());
+        doReturn(listener).when(listener).copyWithoutRpcLimit();
 
         final var netconfSpy = spy(new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
