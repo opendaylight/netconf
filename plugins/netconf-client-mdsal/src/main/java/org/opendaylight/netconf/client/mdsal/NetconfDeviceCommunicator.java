@@ -72,12 +72,12 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     protected final RemoteDevice<NetconfDeviceCommunicator> remoteDevice;
     private final @Nullable UserPreferences overrideNetconfCapabilities;
     protected final RemoteDeviceId id;
-    private final Lock sessionLock = new ReentrantLock();
+    private final Lock sessionLock;
 
     private final Semaphore semaphore;
     private final int concurentRpcMsgs;
+    private final Queue<Request> requests;
 
-    private final Queue<Request> requests = new ArrayDeque<>();
     private NetconfClientSession currentSession;
 
     // isSessionClosing indicates a close operation on the session is issued and tearDown will surely be called later
@@ -106,7 +106,34 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         this.id = id;
         this.remoteDevice = remoteDevice;
         this.overrideNetconfCapabilities = overrideNetconfCapabilities;
+        requests = new ArrayDeque<>();
+        sessionLock = new ReentrantLock();
         semaphore = rpcMessageLimit > 0 ? new Semaphore(rpcMessageLimit) : null;
+    }
+
+    private NetconfDeviceCommunicator(final NetconfDeviceCommunicator original) {
+        this.id = original.id;
+        this.remoteDevice = original.remoteDevice;
+        this.overrideNetconfCapabilities = original.overrideNetconfCapabilities;
+        this.concurentRpcMsgs = original.concurentRpcMsgs;
+
+        // The key part: copy the session and nullify the semaphore.
+        this.currentSession = original.currentSession;
+        this.semaphore = null;
+
+        // The following fields should also be copied to create a true 'state copy'.
+        // This includes the queue of requests, which is important for the session state.
+        // Copying the requests queue ensures that any pending RPCs are still managed
+        // in the new instance.
+        // Note: The requests themselves are not deep-copied.
+        // It's a shallow copy of the Request objects, which is sufficient here.
+        this.requests = original.requests;
+        this.sessionLock = original.sessionLock;
+        this.closing = original.closing;
+    }
+
+    NetconfDeviceCommunicator copyForInitialDeviceRequest() {
+        return new NetconfDeviceCommunicator(this);
     }
 
     @Override
