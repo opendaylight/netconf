@@ -103,12 +103,7 @@ class NetconfDeviceCommunicatorTest {
     @SuppressWarnings("unchecked")
     private ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final String messageID,
             final boolean doLastTest) {
-        final var doc = UntrustedXML.newDocumentBuilder().newDocument();
-        final var element = doc.createElement("request");
-        element.setAttribute("message-id", messageID);
-        doc.appendChild(element);
-        final var message = new NetconfMessage(doc);
-
+        final var message = createTestMessage(messageID);
         doReturn(mockChannelFuture).when(mockChannelFuture)
                 .addListener(any(GenericFutureListener.class));
         doReturn(mockChannelFuture).when(spySession).sendMessage(same(message));
@@ -121,15 +116,8 @@ class NetconfDeviceCommunicatorTest {
     }
 
     private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithoutMocking(final String messageID,
-        final boolean doLastTest) {
-        final var doc = UntrustedXML.newDocumentBuilder().newDocument();
-        final var element = doc.createElement("request");
-        element.setAttribute("message-id", messageID);
-        doc.appendChild(element);
-        final var message = new NetconfMessage(doc);
-
-        final var resultFuture =
-            communicator.sendRequest(message);
+            final boolean doLastTest) {
+        final var resultFuture = communicator.sendRequest(createTestMessage(messageID));
         if (doLastTest) {
             assertNotNull(resultFuture, "ListenableFuture is null");
         }
@@ -436,6 +424,22 @@ class NetconfDeviceCommunicatorTest {
         assertNotNull(resultFuture, "ListenableFuture is null");
     }
 
+    @Test
+    void testNoConcurrentMessageLimitWithCopyInstance() {
+        setupSession();
+        doReturn(mockChannelFuture).when(mockChannelFuture).addListener(any(GenericFutureListener.class));
+        final var netconfMessage = createTestMessage(UUID.randomUUID().toString());
+        doReturn(mockChannelFuture).when(spySession).sendMessage(netconfMessage);
+
+        final var deviceCommunicator = communicator.copyWithoutRpcLimit();
+        for (int i = 0; i < RPC_MESSAGE_LIMIT; i++) {
+            final var resultFuture = deviceCommunicator.sendRequest(netconfMessage);
+            assertInstanceOf(UncancellableFuture.class, resultFuture, "ListenableFuture is null");
+        }
+        var resultFuture = deviceCommunicator.sendRequest(netconfMessage);
+        assertInstanceOf(UncancellableFuture.class, resultFuture, "ListenableFuture is null");
+    }
+
     private static NetconfMessage createMultiErrorResponseMessage(final String messageID) throws Exception {
         // multiple rpc-errors which simulate actual response like in NETCONF-666
         final var xmlStr = "<nc:rpc-reply xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" "
@@ -485,6 +489,14 @@ class NetconfDeviceCommunicatorTest {
 
         final var bis = new ByteArrayInputStream(xmlStr.getBytes());
         final var doc = UntrustedXML.newDocumentBuilder().parse(bis);
+        return new NetconfMessage(doc);
+    }
+
+    private static NetconfMessage createTestMessage(final String messageID) {
+        final var doc = UntrustedXML.newDocumentBuilder().newDocument();
+        final var element = doc.createElement("request");
+        element.setAttribute("message-id", messageID);
+        doc.appendChild(element);
         return new NetconfMessage(doc);
     }
 
