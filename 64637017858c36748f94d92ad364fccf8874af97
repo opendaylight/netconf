@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fada7d81_9dbbb14f",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-20T09:30:12Z",
+      "side": 1,
+      "message": "should be moved on line above",
+      "revId": "64637017858c36748f94d92ad364fccf8874af97",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1749ffd4_b20ec6ec",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-20T09:30:12Z",
+      "side": 1,
+      "message": "updateReceiversState",
+      "revId": "64637017858c36748f94d92ad364fccf8874af97",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65096b31_884b20f3",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-20T09:30:12Z",
+      "side": 1,
+      "message": "extra line",
+      "revId": "64637017858c36748f94d92ad364fccf8874af97",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5b3767c_60e8993d",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 845,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-20T09:30:12Z",
+      "side": 1,
+      "message": "Can be renamed to `publishSubscriptionSuspendedStateNotification`, describing what is proceeding inside",
+      "revId": "64637017858c36748f94d92ad364fccf8874af97",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
