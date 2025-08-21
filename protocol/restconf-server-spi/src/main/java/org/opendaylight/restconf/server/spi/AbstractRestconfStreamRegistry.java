@@ -54,6 +54,7 @@ import org.opendaylight.restconf.server.spi.Subscriber.Rfc8639Subscriber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.InsufficientResources;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
@@ -110,6 +111,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         private @Nullable EventStreamFilter filter;
         private @Nullable String filterName;
+        private @Nullable AnydataNode<?> inlineSubtreeSpec;
 
         DynSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName, final String streamName,
                 final String receiverName, final TransportSession session, final @Nullable EventStreamFilter filter,
@@ -349,12 +351,20 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             filterName = newFilterName;
         }
 
+        void setInlineSubtreeSpec(final AnydataNode<?> spec) {
+            inlineSubtreeSpec = spec;
+        }
+
+        @Nullable AnydataNode<?> inlineSubtreeSpec() {
+            return inlineSubtreeSpec;
+        }
+
         @Override
         protected @Nullable EventStreamFilter filter() {
             return filter;
         }
 
-        protected @Nullable String filterName() {
+        @Nullable String filterName() {
             return filterName;
         }
 
@@ -527,6 +537,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      */
     protected final synchronized void updateModelContext(final @NonNull EffectiveModelContext ctx) {
         modelContext = requireNonNull(ctx);
+        recompileAllFilters();
         LOG.debug("Model context updated to: {}", ctx);
     }
 
@@ -656,6 +667,23 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 public void onSuccess(final Void result) {
                     final var subscription = new DynSubscription(id, encoding, encodingName, streamName, receiverName,
                         session, filterImpl, filterName, stopTime);
+                    // remember original user-provided spec for future recompiles
+                    switch (filter) {
+                        case SubscriptionFilter.Reference ref -> subscription.setFilterName(ref.filterName());
+                        case SubscriptionFilter.SubtreeDefinition sub ->
+                            subscription.setInlineSubtreeSpec(sub.document());
+                        case SubscriptionFilter.XPathDefinition xp -> {
+                            LOG.warn("Subscription {}: XPath filters are not supported yet.", subscription.id());
+                        }
+                        case null -> {
+                            LOG.debug("Subscription {}: no filter provided", subscription.id());
+                        }
+                        default -> {
+                            LOG.warn("Subscription {}: unknown SubscriptionFilter type {} — leaving stored specs "
+                                    + "unchanged.",
+                                subscription.id(), filter.getClass().getName());
+                        }
+                    }
                     subscriptions.put(id, subscription);
                     if (stopTime != null) {
                         initiateStopTime(id, stopTime);
@@ -707,6 +735,22 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         Futures.addCallback(modifySubscriptionParameters(id, filter, stopTime), new FutureCallback<>() {
             @Override
             public void onSuccess(final Void result) {
+                switch (filter) {
+                    case SubscriptionFilter.Reference ref -> subscription.setFilterName(ref.filterName());
+                    case SubscriptionFilter.SubtreeDefinition sub ->
+                        subscription.setInlineSubtreeSpec(sub.document());
+                    case SubscriptionFilter.XPathDefinition xp -> {
+                        LOG.warn("Subscription {}: XPath filters are not supported yet.", subscription.id());
+                    }
+                    case null -> {
+                        LOG.debug("Subscription {}: no filter provided", subscription.id());
+                    }
+                    default -> {
+                        LOG.warn("Subscription {}: unknown SubscriptionFilter type {} — leaving stored specs "
+                                + "unchanged.",
+                            subscription.id(), filter.getClass().getName());
+                    }
+                }
                 subscription.setFilter(filterImpl);
                 subscription.setFilterName(newFilterName);
                 subscription.updateStopTime(stopTime);
@@ -878,6 +922,51 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         return NodeIdentifierWithPredicates.of(Receiver.QNAME, NAME_QNAME, receiverName);
     }
 
+    protected final void recompileAllFilters() {
+        filterLock.lock();
+        try {
+            // suspend everyone while we rebuild
+            subscriptions.values().forEach(s -> s.suspendSubscription(InsufficientResources.QNAME));
+
+            // rebuild named filter specs and refresh subscriptions referencing them
+            rebuildFiltersLocked(filterSpecs.keySet());
+
+            // resume named-filter subs which compiled OK, leave others suspended
+            final var workingNames = filters.getAcquire().keySet();
+
+            for (var sub : subscriptions.values()) {
+                final var name = sub.filterName();
+                if (name != null) {
+                    if (workingNames.contains(name)) {
+                        // 'refreshSubscriptions()' already swapped in the compiled filter
+                        sub.resumeSubscription();
+                    } else {
+                        // keep suspended; its filter failed to compile or disappeared
+                        LOG.debug("Keeping subscription {} suspended, filter '{}' not valid", sub.id(), name);
+                    }
+                    continue;
+                }
+                // Inline subtree filter
+                final var inlineAny = sub.inlineSubtreeSpec();
+                if (inlineAny != null) {
+                    try {
+                        final var newFilter = parseSubtreeFilter(inlineAny);
+                        sub.setFilter(newFilter);
+                        sub.resumeSubscription();
+                    } catch (RequestException e) {
+                        LOG.warn("Inline subtree filter recompile failed for subscription {}", sub.id(), e);
+                        sub.suspendSubscription(QName.create("Filter no longer valid"));
+                    }
+                    continue;
+                }
+                // No filter at all, safe to resume
+                sub.resumeSubscription();
+            }
+        } finally {
+            filterLock.unlock();
+        }
+    }
+
     /** Returns an immutable snapshot of current specs. */
     protected final Map<String, ChoiceNode> snapshotFilterSpecs() {
         filterLock.lock();
@@ -961,7 +1050,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                         subscription.resumeSubscription();
                     }
                 } else {
-                    subscription.suspendSubscription(qnameOf("insufficient-resources"));
+                    subscription.suspendSubscription(InsufficientResources.QNAME);
                 }
             }
         }
