@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2efe3206_70661719",
+        "filename": "protocol/restconf-server-spi/src/test/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilterTest.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-22T08:20:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb7e6cbf_471ca8fa",
+      "range": {
+        "startLine": 89,
+        "startChar": 14,
+        "endLine": 89,
+        "endChar": 20
+      },
+      "revId": "2d201d9985696c782f2ce6116daf4779d3fa1dd7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7be46c29_82236946",
@@ -37,6 +61,30 @@
       "writtenOn": "2025-08-22T06:59:10Z",
       "side": 1,
       "message": "var",
+      "range": {
+        "startLine": 102,
+        "startChar": 14,
+        "endLine": 102,
+        "endChar": 29
+      },
+      "revId": "2d201d9985696c782f2ce6116daf4779d3fa1dd7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1509867a_c1c4cb40",
+        "filename": "protocol/restconf-server-spi/src/test/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilterTest.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-08-22T08:20:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7be46c29_82236946",
       "range": {
         "startLine": 102,
         "startChar": 14,
