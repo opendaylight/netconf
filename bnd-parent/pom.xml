@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.opendaylight.controller</groupId>
         <artifactId>bnd-parent</artifactId>
-        <version>11.0.0</version>
+        <version>11.0.1</version>
         <relativePath/>
     </parent>
 
@@ -39,14 +39,14 @@
             <dependency>
                 <groupId>org.opendaylight.infrautils</groupId>
                 <artifactId>infrautils-artifacts</artifactId>
-                <version>7.1.4</version>
+                <version>7.1.5</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.aaa</groupId>
                 <artifactId>aaa-artifacts</artifactId>
-                <version>0.21.0</version>
+                <version>0.21.1-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
