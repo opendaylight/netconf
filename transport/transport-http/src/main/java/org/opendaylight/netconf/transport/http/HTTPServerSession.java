@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -97,7 +98,7 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
     @Override
     public void handlerAdded(final ChannelHandlerContext ctx) {
         final var channel = ctx.channel();
-        executor = new ServerRequestExecutor(channel.remoteAddress().toString());
+        executor = new ServerRequestExecutor(channel.remoteAddress().toString(), this);
         LOG.debug("Threadpools for {} started", channel);
 
         responseWriter = new ResponseWriter();
@@ -272,13 +273,13 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
     protected abstract PreparedRequest prepareRequest(ImplementedMethod method, URI targetUri, HttpHeaders headers);
 
     @NonNullByDefault
-    static final void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
+    protected ChannelFuture respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
             final HttpResponse response) {
         requireNonNull(response);
         if (streamId != null) {
             response.headers().setInt(STREAM_ID, streamId);
         }
-        ctx.writeAndFlush(response);
+        return ctx.writeAndFlush(response);
     }
 
     public ResponseWriter responseWriter() {
