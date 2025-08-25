@@ -202,13 +202,13 @@ public final class ResponseBodyOutputStream extends OutputStream {
             LOG.debug("Closing response with empty body");
             final var response = new DefaultFullHttpResponse(version, status, Unpooled.EMPTY_BUFFER);
             headers.forEach(entry -> response.headers().add(entry.getKey(), entry.getValue()));
-            HTTPServerSession.respond(ctx, streamId, response);
+            session.respond(ctx, streamId, response);
             return Closed.INSTANCE;
         }
 
         @Override
         Closed handleError(final Exception exception) {
-            HTTPServerSession.respond(ctx, streamId, formatException(exception, ctx, version));
+            session.respond(ctx, streamId, formatException(exception, ctx, version));
             return Closed.INSTANCE;
         }
 
@@ -329,13 +329,13 @@ public final class ResponseBodyOutputStream extends OutputStream {
         Closed close(final ReadOnlyHttpHeaders trailers) {
             final var response = new DefaultFullHttpResponse(version, status, buffer);
             response.headers().add(headers).add(trailers);
-            HTTPServerSession.respond(ctx, streamId, response);
+            session.respond(ctx, streamId, response);
             return Closed.INSTANCE;
         }
 
         @Override
         Closed handleError(final Exception exception) {
-            HTTPServerSession.respond(ctx, streamId, formatException(exception, ctx, version));
+            session.respond(ctx, streamId, formatException(exception, ctx, version));
             return Closed.INSTANCE;
         }
 
