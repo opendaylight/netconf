@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
@@ -53,8 +54,10 @@ final class ServerRequestExecutor implements PendingRequestListener {
     private final ConcurrentHashMap<PendingRequest<?>, RequestContext> pendingRequests = new ConcurrentHashMap<>();
     private final ExecutorService reqExecutor;
     private final ExecutorService respExecutor;
+    private final @NonNull HTTPServerSession session;
 
-    ServerRequestExecutor(final String threadNamePrefix) {
+    ServerRequestExecutor(final String threadNamePrefix, final HTTPServerSession session) {
+        this.session = requireNonNull(session);
         reqExecutor = Executors.newThreadPerTaskExecutor(Thread.ofVirtual()
             .name(threadNamePrefix + "-http-server-req-", 0)
             .inheritInheritableThreadLocals(false)
@@ -108,7 +111,7 @@ final class ServerRequestExecutor implements PendingRequestListener {
         LOG.warn("Internal error while processing {}", request, cause);
         final var req = pendingRequests.remove(request);
         if (req != null) {
-            HTTPServerSession.respond(req.ctx, req.streamId, formatException(cause, req.ctx(), req.version()));
+            session.respond(req.ctx, req.streamId, formatException(cause, req.ctx(), req.version()));
         } else {
             LOG.warn("Cannot pair request, not sending response", new Throwable());
         }
@@ -118,9 +121,9 @@ final class ServerRequestExecutor implements PendingRequestListener {
     void respond(final ChannelHandlerContext ctx, final @Nullable Integer streamId, final HttpVersion version,
             final Response response) {
         switch (response) {
-            case ReadyResponse resp -> HTTPServerSession.respond(ctx, streamId, resp.toHttpResponse(version));
+            case ReadyResponse resp -> session.respond(ctx, streamId, resp.toHttpResponse(version));
             case FiniteResponse resp -> respond(ctx, streamId, version, resp);
-            case EventStreamResponse resp -> HTTPServerSession.respond(ctx, streamId,
+            case EventStreamResponse resp -> session.respond(ctx, streamId,
                 resp.start(ctx, streamId, version));
         }
     }
