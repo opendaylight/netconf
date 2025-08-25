@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.mdsal;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Closeable;
+import java.util.List;
 import java.util.function.Supplier;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
@@ -45,7 +46,7 @@ final class DefaultNotificationSource extends AbstractNotificationSource impleme
             .flatMap(module -> module.streamEffectiveSubstatements(NotificationEffectiveStatement.class))
             .map(notification -> SchemaNodeIdentifier.Absolute.of(notification.argument()))
             .toList();
-        return reg = notificationService.registerNotificationListener(new Listener(sink, context), notifications);
+        return reg = notificationService.registerNotificationListener(new Listener(sink, context), List.of());
     }
 
     @Override
