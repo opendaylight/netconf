@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d310cb69_7e0ed6b9",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-08-27T13:40:13Z",
+      "side": 1,
+      "message": "modelContext \u003d requreNonNull(ctx);",
+      "revId": "fcc43489e6c61dfc6bbc81c8443a2881c415009f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4bb1c21_f64fbb66",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 474,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-08-27T13:40:13Z",
+      "side": 1,
+      "message": "modelContext \u003d requireNonNull(ctx);\n        LOG.debug(\"Model context updated: {}\", ctx);",
+      "revId": "fcc43489e6c61dfc6bbc81c8443a2881c415009f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
