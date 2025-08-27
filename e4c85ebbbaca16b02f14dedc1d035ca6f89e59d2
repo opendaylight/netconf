@@ -52,6 +52,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35fde663_813386e4",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/OperationsRequestProcessorTest.java",
+        "patchSetId": 52
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-08-27T12:18:19Z",
+      "side": 1,
+      "message": "we need mock session only when we call dispatchWithAlloc(), on line 103 that happens only when output is not null, otherwise we get \"Unnecessary stubbings detected\"",
+      "parentUuid": "88b71363_e0fbfe92",
+      "revId": "e4c85ebbbaca16b02f14dedc1d035ca6f89e59d2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "26d47fbd_2fbd5016",
@@ -69,6 +87,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "57c8d331_49fa7451",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 52
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-08-27T12:18:19Z",
+      "side": 1,
+      "message": "Just one.\nremoved unnecessary conditions",
+      "parentUuid": "26d47fbd_2fbd5016",
+      "revId": "e4c85ebbbaca16b02f14dedc1d035ca6f89e59d2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4ec48a14_67d74fec",
@@ -82,6 +118,24 @@
       "writtenOn": "2025-08-26T13:26:41Z",
       "side": 1,
       "message": "I would expect these would move somewhere where they can be private.",
+      "revId": "e4c85ebbbaca16b02f14dedc1d035ca6f89e59d2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba2963ef_0a5462cb",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 52
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-08-27T12:18:19Z",
+      "side": 1,
+      "message": "Moved them to ResponseBodyOutputStream",
+      "parentUuid": "4ec48a14_67d74fec",
       "revId": "e4c85ebbbaca16b02f14dedc1d035ca6f89e59d2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
