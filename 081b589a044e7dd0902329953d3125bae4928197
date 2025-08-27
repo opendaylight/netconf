@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6a81172_14ac55a2",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-08-27T14:17:13Z",
+      "side": 1,
+      "message": "@VisibleForTesting?",
+      "revId": "081b589a044e7dd0902329953d3125bae4928197",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
