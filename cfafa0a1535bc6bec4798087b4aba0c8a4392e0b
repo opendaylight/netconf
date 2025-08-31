@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34819f2d_f49991bf",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfRestconfStrategy.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-08-31T19:16:32Z",
+      "side": 1,
+      "message": "request, and it is always the first argument: please keep the code consistent, please.",
+      "range": {
+        "startLine": 170,
+        "startChar": 67,
+        "endLine": 170,
+        "endChar": 77
+      },
+      "revId": "cfafa0a1535bc6bec4798087b4aba0c8a4392e0b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35bae077_bdc0510d",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/AsyncGetDataProcessor.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-08-31T19:16:32Z",
+      "side": 1,
+      "message": "nullable?",
+      "range": {
+        "startLine": 67,
+        "startChar": 13,
+        "endLine": 67,
+        "endChar": 17
+      },
+      "revId": "cfafa0a1535bc6bec4798087b4aba0c8a4392e0b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49a5b091_5296aad1",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/AsyncGetDataProcessor.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-08-31T19:16:32Z",
+      "side": 1,
+      "message": "switch()",
+      "range": {
+        "startLine": 137,
+        "startChar": 12,
+        "endLine": 137,
+        "endChar": 20
+      },
+      "revId": "cfafa0a1535bc6bec4798087b4aba0c8a4392e0b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d532ebf5_bd205b69",
+        "filename": "plugins/restconf-mdsal-spi/src/main/java/org/opendaylight/restconf/mdsal/spi/data/AsyncGetDataProcessor.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-08-31T19:16:32Z",
+      "side": 1,
+      "message": "switch",
+      "range": {
+        "startLine": 175,
+        "startChar": 16,
+        "endLine": 175,
+        "endChar": 21
+      },
+      "revId": "cfafa0a1535bc6bec4798087b4aba0c8a4392e0b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
