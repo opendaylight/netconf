@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e2e370e_769da4fc",
+        "filename": "apps/sal-remote-impl/src/test/java/org/opendaylight/netconf/sal/remote/impl/CreateDataChangeEventSubscriptionRpcTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-01T10:26:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31e1cde4_15160cdb",
+      "range": {
+        "startLine": 68,
+        "startChar": 8,
+        "endLine": 68,
+        "endChar": 15
+      },
+      "revId": "c139ad6a5b44356fce76961b56c9bb9629373b9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "106e7ea3_1fc37719",
@@ -37,6 +61,30 @@
       "writtenOn": "2025-09-01T09:21:16Z",
       "side": 1,
       "message": "invoked twice?",
+      "range": {
+        "startLine": 199,
+        "startChar": 94,
+        "endLine": 199,
+        "endChar": 110
+      },
+      "revId": "c139ad6a5b44356fce76961b56c9bb9629373b9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e29c9fe1_8c563bad",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-01T10:26:50Z",
+      "side": 1,
+      "message": "Call to \u0027super()\u0027 must be first statement in constructor body, so cannot create variable for it before calling super",
+      "parentUuid": "106e7ea3_1fc37719",
       "range": {
         "startLine": 199,
         "startChar": 94,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "feb57f21_4206c2bb",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-01T10:26:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8092ba73_596f4e38",
+      "range": {
+        "startLine": 444,
+        "startChar": 48,
+        "endLine": 444,
+        "endChar": 60
+      },
+      "revId": "c139ad6a5b44356fce76961b56c9bb9629373b9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "987114f4_22ca2e6f",
@@ -83,6 +155,30 @@
       "writtenOn": "2025-09-01T09:21:16Z",
       "side": 1,
       "message": "undocumented",
+      "range": {
+        "startLine": 473,
+        "startChar": 38,
+        "endLine": 473,
+        "endChar": 56
+      },
+      "revId": "c139ad6a5b44356fce76961b56c9bb9629373b9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3655b24b_9647a133",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-01T10:26:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "987114f4_22ca2e6f",
       "range": {
         "startLine": 473,
         "startChar": 38,
