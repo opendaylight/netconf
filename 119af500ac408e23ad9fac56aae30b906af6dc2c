@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30cd6c12_4d77c67b",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeMatcher.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-01T08:08:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e422fee9_e2ab6179",
+      "range": {
+        "startLine": 57,
+        "startChar": 8,
+        "endLine": 57,
+        "endChar": 19
+      },
+      "revId": "119af500ac408e23ad9fac56aae30b906af6dc2c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5273a6c8_88206d36",
@@ -54,6 +78,30 @@
       "writtenOn": "2025-08-28T12:53:43Z",
       "side": 1,
       "message": "are you sure this can not end up being null?",
+      "range": {
+        "startLine": 60,
+        "startChar": 41,
+        "endLine": 60,
+        "endChar": 48
+      },
+      "revId": "119af500ac408e23ad9fac56aae30b906af6dc2c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f885f138_423d5baa",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeMatcher.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-01T08:08:42Z",
+      "side": 1,
+      "message": "It should not. tailForPath() is only called after SubtreeEventStreamFilter#permitsPath has returned true.",
+      "parentUuid": "5273a6c8_88206d36",
       "range": {
         "startLine": 60,
         "startChar": 41,
