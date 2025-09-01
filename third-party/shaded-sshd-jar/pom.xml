@@ -46,9 +46,8 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>net.i2p.crypto</groupId>
-            <artifactId>eddsa</artifactId>
-            <version>0.3.0</version>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
         </dependency>
     </dependencies>
 
@@ -71,7 +70,6 @@
                             <artifactSet>
                                 <includes>
                                     <include>org.apache.sshd</include>
-                                    <include>net.i2p.crypto</include>
                                 </includes>
                             </artifactSet>
                             <filters>
@@ -95,10 +93,9 @@
                                 <relocation>
                                     <pattern>org.apache.sshd</pattern>
                                     <shadedPattern>org.opendaylight.netconf.shaded.sshd</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>net.i2p.crypto.eddsa</pattern>
-                                    <shadedPattern>org.opendaylight.netconf.shaded.eddsa</shadedPattern>
+                                    <excludes>
+                                        <exclude>org.apache.sshd.common.util.security.eddsa.*</exclude>
+                                    </excludes>
                                 </relocation>
                             </relocations>
                             <transformers>
