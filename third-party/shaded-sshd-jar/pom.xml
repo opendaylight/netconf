@@ -32,26 +32,18 @@
         <dependency>
             <groupId>org.apache.sshd</groupId>
             <artifactId>sshd-osgi</artifactId>
-            <version>2.15.0</version>
+            <version>2.16.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.sshd</groupId>
             <artifactId>sshd-netty</artifactId>
-            <version>2.15.0</version>
+            <version>2.16.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.sshd</groupId>
                     <artifactId>sshd-core</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <!--
-            Replacement for net.i2p.crypto:eddsa@0.3.0 due to https://www.cve.org/CVERecord?id=CVE-2020-36843
-        -->
-        <dependency>
-            <groupId>com.bloxbean.cardano</groupId>
-            <artifactId>net-i2p-crypto-eddsa</artifactId>
-            <version>0.3.1</version>
         </dependency>
     </dependencies>
 
@@ -73,7 +65,6 @@
                             <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
                             <artifactSet>
                                 <includes>
-                                    <include>com.bloxbean.cardano</include>
                                     <include>org.apache.sshd</include>
                                 </includes>
                             </artifactSet>
@@ -98,10 +89,6 @@
                                 <relocation>
                                     <pattern>org.apache.sshd</pattern>
                                     <shadedPattern>org.opendaylight.netconf.shaded.sshd</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>net.i2p.crypto.eddsa</pattern>
-                                    <shadedPattern>org.opendaylight.netconf.shaded.eddsa</shadedPattern>
                                 </relocation>
                             </relocations>
                             <transformers>
