@@ -9,56 +9,91 @@ package org.opendaylight.restconf.server;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
+import static org.opendaylight.restconf.server.AbstractRequestProcessorTest.BASE_PATH;
+import static org.opendaylight.restconf.server.AbstractRequestProcessorTest.DATA_PATH;
+import static org.opendaylight.restconf.server.AbstractRequestProcessorTest.PRETTY_PRINT;
+import static org.opendaylight.restconf.server.AbstractRequestProcessorTest.WELL_KNOWN;
+import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
 import static org.opendaylight.restconf.server.TestUtils.buildRequest;
-import static org.opendaylight.restconf.server.TestUtils.formattableBody;
 
-import io.netty.channel.DefaultEventLoop;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.local.LocalAddress;
 import io.netty.handler.codec.http.HttpMethod;
-import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import org.awaitility.Awaitility;
+import io.netty.util.concurrent.ImmediateEventExecutor;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.stubbing.Answer;
-import org.opendaylight.restconf.server.api.ConfigurationMetadata;
-import org.opendaylight.restconf.server.api.DataGetResult;
-import org.opendaylight.restconf.server.api.ServerRequest;
+import org.mockito.Mock;
+import org.opendaylight.netconf.transport.http.HTTPScheme;
+import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.impl.EndpointInvariants;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 
-class PipeliningTest extends AbstractRequestProcessorTest {
+class PipeliningTest {
+
+    @Mock
+    private RestconfServer server;
+    @Mock
+    private PrincipalService principalService;
+    @Mock
+    private ChannelHandlerContext ctx;
+    @Mock
+    private Channel channel;
+    @Mock
+    private ChannelPipeline pipeline;
+    @Mock
+    private RestconfStream.Registry streamRegistry;
+
+    private RestconfSession session;
+
+    @BeforeEach
+    void beforeEach() {
+        session = new RestconfSession(HTTPScheme.HTTP, new LocalAddress("test"),
+            new EndpointRoot(principalService, WELL_KNOWN, Map.of(BASE_PATH.substring(1),
+                new APIResource(new EndpointInvariants(server, PRETTY_PRINT, ERROR_TAG_MAPPING, MessageEncoding.JSON,
+                    URI.create("/rests/")),
+                    List.of(), 1000, Integer.MAX_VALUE, streamRegistry))));
+        doReturn(channel).when(ctx).channel();
+        doReturn(pipeline).when(ctx).pipeline();
+        doReturn(pipeline).when(pipeline).addBefore(any(), isNull(), any());
+        doReturn(new InetSocketAddress(0)).when(channel).remoteAddress();
+        session.handlerAdded(ctx);
+        when(ctx.executor()).thenReturn(ImmediateEventExecutor.INSTANCE);
+    }
 
     @Test
     void testPipeliningQueue() {
-        mockSession();
-        mockExecutor(new DefaultEventLoop());
-
-        final var result = new DataGetResult(
-            formattableBody(TestUtils.TestEncoding.JSON, JSON_CONTENT),
-            new ConfigurationMetadata.EntityTag(Long.toHexString(System.currentTimeMillis()), true), Instant.now());
-        doAnswer(answerWithDelay(result)).when(server).dataGET(any());
-
         final var request1 = buildRequest(HttpMethod.GET, DATA_PATH, TestUtils.TestEncoding.JSON, null);
         final var request2 = buildRequest(HttpMethod.GET, DATA_PATH, TestUtils.TestEncoding.JSON, null);
         final var request3 = buildRequest(HttpMethod.GET, DATA_PATH, TestUtils.TestEncoding.JSON, null);
 
-        dispatchWithAlloc(request1);
-        dispatch(request2);
-        dispatch(request3);
+        // Dispatch all requests manually
+        session.channelRead0(ctx, request1);
+        session.channelRead0(ctx, request2);
+        session.channelRead0(ctx, request3);
 
-        // We expect 2 of requests are in queue until first one is finished
+        // At this point, all requests are queued
+        assertEquals(3, blockedRequestsSize());
+
+        // Manually finish each request to simulate pipeline processing
+        session.notifyRequestFinished(ctx);
         assertEquals(2, blockedRequestsSize());
-        // After short delay we expect that all requests were addressed and queue is empty
-        Awaitility.await().atMost(2, TimeUnit.SECONDS).until(() -> blockedRequestsSize() == 0);
+        session.notifyRequestFinished(ctx);
+        assertEquals(1, blockedRequestsSize());
+        session.notifyRequestFinished(ctx);
+        assertEquals(0, blockedRequestsSize());
     }
 
-    private static Answer<Void> answerWithDelay(final DataGetResult result) {
-        return invocation -> {
-            final var request = invocation.<ServerRequest<DataGetResult>>getArgument(0);
-            CompletableFuture.runAsync(
-                () -> request.completeWith(result),
-                CompletableFuture.delayedExecutor(200, TimeUnit.MILLISECONDS)
-            );
-            return null;
-        };
+    int blockedRequestsSize() {
+        return session.blockedRequestsSize();
     }
+
 }
