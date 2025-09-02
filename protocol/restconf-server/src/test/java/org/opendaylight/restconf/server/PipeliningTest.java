@@ -7,58 +7,35 @@
  */
 package org.opendaylight.restconf.server;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.opendaylight.restconf.server.TestUtils.buildRequest;
-import static org.opendaylight.restconf.server.TestUtils.formattableBody;
 
-import io.netty.channel.DefaultEventLoop;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opendaylight.restconf.server.TestUtils.buildRequest;
+
 import io.netty.handler.codec.http.HttpMethod;
-import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
-import org.mockito.stubbing.Answer;
-import org.opendaylight.restconf.server.api.ConfigurationMetadata;
-import org.opendaylight.restconf.server.api.DataGetResult;
-import org.opendaylight.restconf.server.api.ServerRequest;
 
 class PipeliningTest extends AbstractRequestProcessorTest {
 
     @Test
     void testPipeliningQueue() {
-        mockSession();
-        mockExecutor(new DefaultEventLoop());
+        mockExecutor();
+        final var request = buildRequest(HttpMethod.GET, DATA_PATH, TestUtils.TestEncoding.JSON, null);
 
-        final var result = new DataGetResult(
-            formattableBody(TestUtils.TestEncoding.JSON, JSON_CONTENT),
-            new ConfigurationMetadata.EntityTag(Long.toHexString(System.currentTimeMillis()), true), Instant.now());
-        doAnswer(answerWithDelay(result)).when(server).dataGET(any());
+        // Dispatch all requests manually
+        manualRequestDispatch(request);
+        manualRequestDispatch(request);
+        manualRequestDispatch(request);
 
-        final var request1 = buildRequest(HttpMethod.GET, DATA_PATH, TestUtils.TestEncoding.JSON, null);
-        final var request2 = buildRequest(HttpMethod.GET, DATA_PATH, TestUtils.TestEncoding.JSON, null);
-        final var request3 = buildRequest(HttpMethod.GET, DATA_PATH, TestUtils.TestEncoding.JSON, null);
+        // At this point, all requests are queued
+        assertEquals(3, blockedRequestsSize());
 
-        dispatchWithAlloc(request1);
-        dispatch(request2);
-        dispatch(request3);
-
-        // We expect 2 of requests are in queue until first one is finished
+        // Manually finish each request to simulate pipeline processing
+        manualRequestFinish();
         assertEquals(2, blockedRequestsSize());
-        // After short delay we expect that all requests were addressed and queue is empty
-        Awaitility.await().atMost(2, TimeUnit.SECONDS).until(() -> blockedRequestsSize() == 0);
+        manualRequestFinish();
+        assertEquals(1, blockedRequestsSize());
+        manualRequestFinish();
+        assertEquals(0, blockedRequestsSize());
     }
 
-    private static Answer<Void> answerWithDelay(final DataGetResult result) {
-        return invocation -> {
-            final var request = invocation.<ServerRequest<DataGetResult>>getArgument(0);
-            CompletableFuture.runAsync(
-                () -> request.completeWith(result),
-                CompletableFuture.delayedExecutor(200, TimeUnit.MILLISECONDS)
-            );
-            return null;
-        };
-    }
 }

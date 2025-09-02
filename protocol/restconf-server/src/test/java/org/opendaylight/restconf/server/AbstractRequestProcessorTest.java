@@ -14,7 +14,6 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
 
 import io.netty.buffer.UnpooledByteBufAllocator;
@@ -27,7 +26,6 @@ import io.netty.handler.codec.http.DefaultLastHttpContent;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpObject;
-import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.ImmediateEventExecutor;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -54,8 +52,7 @@ import org.opendaylight.restconf.server.spi.RestconfStream;
 
 @ExtendWith(MockitoExtension.class)
 class AbstractRequestProcessorTest {
-    private static final PrettyPrintParam PRETTY_PRINT = PrettyPrintParam.FALSE;
-
+    protected static final PrettyPrintParam PRETTY_PRINT = PrettyPrintParam.FALSE;
     protected static final String BASE_PATH = "/rests";
     protected static final String HOST = "somehost:1234";
     protected static final URI BASE_URI = URI.create("http://" + HOST + BASE_PATH);
@@ -66,6 +63,7 @@ class AbstractRequestProcessorTest {
     protected static final TestEncoding DEFAULT_ENCODING = TestEncoding.JSON;
     protected static final String XML_CONTENT = "xml-content";
     protected static final String JSON_CONTENT = "json-content";
+    protected static final WellKnownResources WELL_KNOWN = new WellKnownResources(BASE_PATH);
 
     protected static final ApiPath API_PATH;
     protected static final ApiPath NEW_API_PATH;
@@ -80,8 +78,6 @@ class AbstractRequestProcessorTest {
             throw new ExceptionInInitializerError(e);
         }
     }
-
-    private static final WellKnownResources WELL_KNOWN = new WellKnownResources(BASE_PATH);
 
     @Mock
     protected RestconfServer server;
@@ -115,16 +111,27 @@ class AbstractRequestProcessorTest {
         doReturn(new InetSocketAddress(0)).when(channel).remoteAddress();
         session.handlerAdded(ctx);
         doReturn(null).when(principalService).acquirePrincipal(any());
-        doReturn(new DefaultChannelPromise(channel, ImmediateEventExecutor.INSTANCE).setSuccess())
-            .when(ctx).writeAndFlush(any());
     }
 
     void mockSession() {
         doReturn(session).when(pipeline).get(HTTPServerSession.class);
     }
 
-    void mockExecutor(final EventExecutor executor) {
-        when(ctx.executor()).thenReturn(executor);
+    void mockExecutor() {
+        doReturn(ImmediateEventExecutor.INSTANCE).when(ctx).executor();
+    }
+
+    void mockWriteAndFlush() {
+        doReturn(new DefaultChannelPromise(channel, ImmediateEventExecutor.INSTANCE).setSuccess())
+            .when(ctx).writeAndFlush(any());
+    }
+
+    void manualRequestDispatch(final FullHttpRequest request) {
+        session.channelRead0(ctx, request);
+    }
+
+    void manualRequestFinish() {
+        session.notifyRequestFinished(ctx);
     }
 
     void writableResponseWriter() {
