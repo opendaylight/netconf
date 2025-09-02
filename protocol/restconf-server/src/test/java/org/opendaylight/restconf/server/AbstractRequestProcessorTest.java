@@ -130,4 +130,8 @@ class AbstractRequestProcessorTest {
             Arguments.of(TestEncoding.XML, XML_CONTENT)
         );
     }
+
+    protected int blockedRequestsSize() {
+        return session.blockedRequestsSize();
+    }
 }
