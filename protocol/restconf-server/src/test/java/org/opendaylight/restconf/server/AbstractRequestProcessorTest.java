@@ -84,9 +84,9 @@ class AbstractRequestProcessorTest {
     @Mock
     protected RestconfServer server;
     @Mock
-    private PrincipalService principalService;
+    protected ChannelHandlerContext ctx;
     @Mock
-    private ChannelHandlerContext ctx;
+    private PrincipalService principalService;
     @Mock
     private Channel channel;
     @Mock
@@ -165,5 +165,9 @@ class AbstractRequestProcessorTest {
             Arguments.of(TestEncoding.JSON, JSON_CONTENT),
             Arguments.of(TestEncoding.XML, XML_CONTENT)
         );
+    }
+
+    int blockedRequestsSize() {
+        return session.blockedRequestsSize();
     }
 }
