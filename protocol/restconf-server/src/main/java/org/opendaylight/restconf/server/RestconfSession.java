@@ -106,4 +106,9 @@ final class RestconfSession extends PipelinedHTTPServerSession {
     @NonNull TransportSession transportSession() {
         return transportSession;
     }
+
+    @VisibleForTesting
+    int blockedRequestsSize() {
+        return blockedRequests.size();
+    }
 }
