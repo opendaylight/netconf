@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -55,6 +56,13 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
     private CharSource source;
     @Mock
     private ByteSource byteSource;
+
+    @BeforeEach
+    @Override
+    void beforeEach() {
+        super.beforeEach();
+        mockWriteAndFlush();
+    }
 
     @ParameterizedTest
     @ValueSource(strings = {YANG_LIBRARY_VERSION_URI, MODULES_PATH, MODULE_URI, MODULE_URI_WITH_MOUNT})
