@@ -46,6 +46,30 @@
       },
       "revId": "f6dfbbfc353725f22be9d830fe58a5142d96be1e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cde03f0a_13fd8c5b",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportIoService.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-09-02T15:21:15Z",
+      "side": 1,
+      "message": "yeah, but I mean the overhead of having a group instance. wouldn\u0027t it be easier to just not use NettyIoService?",
+      "parentUuid": "95b81c80_64870d77",
+      "range": {
+        "startLine": 18,
+        "startChar": 85,
+        "endLine": 18,
+        "endChar": 110
+      },
+      "revId": "f6dfbbfc353725f22be9d830fe58a5142d96be1e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
