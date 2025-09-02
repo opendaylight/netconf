@@ -49,6 +49,7 @@ class OperationsRequestProcessorTest extends AbstractRequestProcessorTest {
 
     @Test
     void optionsRoot() {
+        mockWriteAndFlush();
         final var request = newOptionsRequest(OPERATIONS_PATH);
         assertOptionsResponse(dispatch(request), "GET, HEAD, OPTIONS");
     }

@@ -59,6 +59,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
     @ParameterizedTest
     @ValueSource(strings = {YANG_LIBRARY_VERSION_URI, MODULES_PATH, MODULE_URI, MODULE_URI_WITH_MOUNT})
     void options(final String uri) {
+        mockWriteAndFlush();
         final var request = newOptionsRequest(uri);
         assertOptionsResponse(dispatch(request), "GET, HEAD, OPTIONS");
     }
@@ -125,6 +126,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
     @ParameterizedTest
     @MethodSource("moduleErrorEncodings")
     void noFilenameError(final TestEncoding encoding, final TestEncoding errorEncoding) {
+        mockWriteAndFlush();
         final var request = buildRequest(HttpMethod.GET, MODULES_PATH, encoding, null);
         final var response = dispatch(request);
         assertEquals(HttpResponseStatus.NOT_FOUND, response.status());
@@ -134,6 +136,7 @@ class ModulesRequestProcessorTest extends AbstractRequestProcessorTest {
     @MethodSource("moduleErrorEncodings")
     void sourceReadFailure(final TestEncoding encoding, final TestEncoding errorEncoding) throws IOException {
         mockSession();
+        mockWriteAndFlush();
         final var errorMessage = "source-read-failure";
         doReturn(byteSource).when(source).asByteSource(any());
         doThrow(new IOException(errorMessage)).when(byteSource).copyTo(any(OutputStream.class));
