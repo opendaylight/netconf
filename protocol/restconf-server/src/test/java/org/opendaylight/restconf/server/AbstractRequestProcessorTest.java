@@ -14,6 +14,7 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -129,5 +130,9 @@ class AbstractRequestProcessorTest {
             Arguments.of(TestEncoding.JSON, JSON_CONTENT),
             Arguments.of(TestEncoding.XML, XML_CONTENT)
         );
+    }
+
+    protected int blockedRequestsSize() {
+        return session.blockedRequestsSize();
     }
 }
