@@ -22,6 +22,30 @@
       },
       "revId": "f6dfbbfc353725f22be9d830fe58a5142d96be1e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95b81c80_64870d77",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportIoService.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-02T13:13:52Z",
+      "side": 1,
+      "message": "yes, overhead would to store Channels in Sets, we can prevent it by overriding NettyIoService#registerChannel",
+      "parentUuid": "3f5d8cd4_b9d52867",
+      "range": {
+        "startLine": 18,
+        "startChar": 85,
+        "endLine": 18,
+        "endChar": 110
+      },
+      "revId": "f6dfbbfc353725f22be9d830fe58a5142d96be1e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
