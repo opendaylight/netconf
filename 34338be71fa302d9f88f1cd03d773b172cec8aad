@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee7ba3f9_8cb9d4b1",
+        "filename": "third-party/shaded-sshd-jar/pom.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-09-02T09:50:25Z",
+      "side": 1,
+      "message": "why is this needed?",
+      "range": {
+        "startLine": 50,
+        "startChar": 24,
+        "endLine": 50,
+        "endChar": 38
+      },
+      "revId": "34338be71fa302d9f88f1cd03d773b172cec8aad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9bb2dab_49e1d5e3",
+        "filename": "third-party/shaded-sshd/pom.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-09-02T09:50:25Z",
+      "side": 1,
+      "message": "optional import, as this can be satisfied by other means",
+      "range": {
+        "startLine": 108,
+        "startChar": 28,
+        "endLine": 108,
+        "endChar": 52
+      },
+      "revId": "34338be71fa302d9f88f1cd03d773b172cec8aad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
