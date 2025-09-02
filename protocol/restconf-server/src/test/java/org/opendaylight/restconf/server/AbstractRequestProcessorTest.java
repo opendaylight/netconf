@@ -14,6 +14,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
 
 import io.netty.buffer.UnpooledByteBufAllocator;
@@ -26,6 +27,7 @@ import io.netty.handler.codec.http.DefaultLastHttpContent;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpObject;
+import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.ImmediateEventExecutor;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -121,6 +123,10 @@ class AbstractRequestProcessorTest {
         doReturn(session).when(pipeline).get(HTTPServerSession.class);
     }
 
+    void mockExecutor(final EventExecutor executor) {
+        when(ctx.executor()).thenReturn(executor);
+    }
+
     void writableResponseWriter() {
         mockSession();
         doReturn(true).when(channel).isWritable();
@@ -165,5 +171,9 @@ class AbstractRequestProcessorTest {
             Arguments.of(TestEncoding.JSON, JSON_CONTENT),
             Arguments.of(TestEncoding.XML, XML_CONTENT)
         );
+    }
+
+    int blockedRequestsSize() {
+        return session.blockedRequestsSize();
     }
 }
