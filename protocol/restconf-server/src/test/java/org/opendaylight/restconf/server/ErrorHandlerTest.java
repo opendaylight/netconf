@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -43,6 +44,12 @@ class ErrorHandlerTest extends AbstractRequestProcessorTest {
     @Mock
     private FormattableBody body;
 
+    @BeforeEach
+    @Override
+    void beforeEach() {
+        super.beforeEach();
+        mockWriteAndFlush();
+    }
 
     @ParameterizedTest
     @MethodSource
