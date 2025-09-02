@@ -16,6 +16,24 @@
       "message": "Are we going to remove CompatChannelGroup?",
       "revId": "2741b3dbb2f1b0224d51392a5e6bfc8d14aa0d41",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44e669bd_c3710b58",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportIoService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-02T08:15:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e51d04cc_6066e3a1",
+      "revId": "2741b3dbb2f1b0224d51392a5e6bfc8d14aa0d41",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
