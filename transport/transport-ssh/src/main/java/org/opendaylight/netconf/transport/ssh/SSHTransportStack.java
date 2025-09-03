@@ -132,7 +132,8 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     SSHTransportStack(final TransportChannelListener<? super SSHTransportChannel> listener,
             final FactoryManager factoryManager, final IoHandler handler) {
         super(listener);
-        ioService = new TransportIoService(factoryManager, handler);
+        // iohandler works on iosession
+        ioService = new TransportIoService(handler);
         factoryManager.addSessionListener(new Listener());
     }
 
@@ -142,7 +143,8 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         // Acquire underlying channel, create a TransportIoSession and attach its handler to this channel -- which takes
         // care of routing bytes between the underlay channel and SSHD's network-facing side.
         final var channel = underlayChannel.channel();
-        final var ioSession = ioService.createSession(channel.localAddress());
+        final var ioSession = ioService.createSession(//pass address for iosession);
+        // we need adapter from iosession here to route trafficc from socket to Transport SSH client/server
         channel.pipeline().addLast(ioSession.handler());
 
         // we now have an attached underlay, but it needs further processing before we expose it to the end user
