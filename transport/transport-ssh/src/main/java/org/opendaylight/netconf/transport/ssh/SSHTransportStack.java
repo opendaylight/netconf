@@ -24,6 +24,8 @@ import org.opendaylight.netconf.shaded.sshd.common.SshConstants;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionListener;
+import org.opendaylight.netconf.shaded.sshd.netty.NettyIoConnector;
+import org.opendaylight.netconf.shaded.sshd.netty.NettyIoService;
 import org.opendaylight.netconf.transport.api.AbstractOverlayTransportStack;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -129,12 +131,14 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     private final Map<Long, TransportChannel> underlays = new ConcurrentHashMap<>();
     private final Map<Long, Session> sessions = new ConcurrentHashMap<>();
 
-    private final TransportIoService ioService;
+    private final IoHandler handler;
+    private final NettyIoService service;
 
     SSHTransportStack(final TransportChannelListener<? super SSHTransportChannel> listener,
             final FactoryManager factoryManager, final IoHandler handler) {
         super(listener);
-        ioService = new TransportIoService(factoryManager, handler);
+        this.handler = requireNonNull(handler);
+        this.service = new NettyIoConnector(factoryManager, handler);
         factoryManager.addSessionListener(new Listener());
     }
 
@@ -144,7 +148,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         // Acquire underlying channel, create a TransportIoSession and attach its handler to this channel -- which takes
         // care of routing bytes between the underlay channel and SSHD's network-facing side.
         final var channel = underlayChannel.channel();
-        final var ioSession = ioService.createSession(channel.localAddress());
+        final var ioSession = new TransportIoSession(service, handler, channel.localAddress());
         channel.pipeline().addLast(ioSession.handler());
 
         // we now have an attached underlay, but it needs further processing before we expose it to the end user
