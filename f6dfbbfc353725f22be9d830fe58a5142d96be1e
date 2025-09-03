@@ -70,6 +70,30 @@
       },
       "revId": "f6dfbbfc353725f22be9d830fe58a5142d96be1e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89a5aed0_514b1a28",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportIoService.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-03T05:35:32Z",
+      "side": 1,
+      "message": "it wasn\u0027t that easy .. let\u0027s try again 😊",
+      "parentUuid": "cde03f0a_13fd8c5b",
+      "range": {
+        "startLine": 18,
+        "startChar": 85,
+        "endLine": 18,
+        "endChar": 110
+      },
+      "revId": "f6dfbbfc353725f22be9d830fe58a5142d96be1e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
