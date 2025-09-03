@@ -94,6 +94,30 @@
       },
       "revId": "f6dfbbfc353725f22be9d830fe58a5142d96be1e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df95fee5_1676e6fe",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportIoService.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-03T07:48:54Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/117844",
+      "parentUuid": "89a5aed0_514b1a28",
+      "range": {
+        "startLine": 18,
+        "startChar": 85,
+        "endLine": 18,
+        "endChar": 110
+      },
+      "revId": "f6dfbbfc353725f22be9d830fe58a5142d96be1e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
