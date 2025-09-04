@@ -35,6 +35,10 @@
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
             <artifactId>netty-transport</artifactId>
         </dependency>
         <dependency>
@@ -51,4 +55,64 @@
             <artifactId>netconf-api</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- netty:netty-common is incorrectly reported as Non-test scoped test only dependency. Even though
+             it is required in this project's module-info file. For instance, the MessageEncoder class uses
+             ChannelHandlerContext, which extends io.netty.util.AttributeMap from netty-common. Setting netty-common
+             to test scope causes Compilation failure. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>analyze-declarations</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <ignoredNonTestScopedDependencies>
+                                <ignoredNonTestScopedDependency>io.netty:netty-common</ignoredNonTestScopedDependency>
+                            </ignoredNonTestScopedDependencies>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- It is required to isolate NC1505Test to ensure it is the first to initialize
+             ResourceLeakDetectorFactory. If any other test initializes it before, NC1505Test will not be able to set
+             its own testing TestResourceLeakDetectorFactory implementation -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/NC1505Test.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>run-isolated-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/NC1505Test.java</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -152,7 +152,8 @@ public final class ChunkedFrameDecoder extends FrameDecoder {
                     final byte b = in.readByte();
                     checkNewLine(b,"Malformed chunk footer encountered (byte 3)");
                     state = State.HEADER_ONE;
-                    out.add(chunk);
+                    out.add(chunk.copy());
+                    chunk.release();
                     chunk = null;
                     break;
                 }
