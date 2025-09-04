@@ -22,6 +22,6 @@ public abstract class ClientFactoryManagerConfigurator {
      * @param factoryManager client factory manager instance
      * @throws UnsupportedConfigurationException if the configuration is not acceptable
      */
-    protected abstract void configureClientFactoryManager(@NonNull ClientFactoryManager factoryManager)
+    public abstract void configureClientFactoryManager(@NonNull ClientFactoryManager factoryManager)
         throws UnsupportedConfigurationException;
 }

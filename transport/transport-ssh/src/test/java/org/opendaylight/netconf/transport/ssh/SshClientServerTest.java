@@ -277,7 +277,7 @@ class SshClientServerTest extends AbstractClientServerTest {
     private static ClientFactoryManagerConfigurator clientConfigurator() {
         return new ClientFactoryManagerConfigurator() {
             @Override
-            protected void configureClientFactoryManager(final ClientFactoryManager factoryManager) {
+            public void configureClientFactoryManager(final ClientFactoryManager factoryManager) {
                 factoryManager.setPasswordIdentityProvider(PasswordIdentityProvider.wrapPasswords(PASSWORD));
                 factoryManager.setUserAuthFactories(List.of(
                     new org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory()));

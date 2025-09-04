@@ -130,7 +130,7 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             sshParamsBuilder.setClientIdentity(new ClientIdentityBuilder().setUsername(keyBased.getUsername()).build());
             confBuilder.withSshConfigurator(new ClientFactoryManagerConfigurator() {
                 @Override
-                protected void configureClientFactoryManager(final ClientFactoryManager factoryManager) {
+                public void configureClientFactoryManager(final ClientFactoryManager factoryManager) {
                     factoryManager.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPair));
                     factoryManager.setUserAuthFactories(
                         List.of(new UserAuthPublicKeyFactory(factoryManager.getSignatureFactories())));

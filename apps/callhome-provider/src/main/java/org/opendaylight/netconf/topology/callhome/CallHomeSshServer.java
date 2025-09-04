@@ -73,7 +73,7 @@ public final class CallHomeSshServer implements AutoCloseable {
             new ClientIdentityBuilder().setUsername("ignored").build()).build();
         final var configurator = new ClientFactoryManagerConfigurator() {
             @Override
-            protected void configureClientFactoryManager(final ClientFactoryManager factoryManager) {
+            public void configureClientFactoryManager(final ClientFactoryManager factoryManager) {
                 factoryManager.setServerKeyVerifier((clientSession, remoteAddress, serverKey)
                     -> verifyServerKey(clientSession, remoteAddress, serverKey));
                 factoryManager.addSessionListener(createSessionListener());
