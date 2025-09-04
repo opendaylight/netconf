@@ -196,7 +196,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         updateCounters = Executors.newSingleThreadScheduledExecutor(TF);
 
         // FIXME: the source should be handling its own updates and we should only call start() once
-        notificationSource = new DefaultNotificationSource(notificationService, super.modelContext());
+        notificationSource = new DefaultNotificationSource(notificationService, this::modelContext);
         start(notificationSource);
         sclReg = schemaService.registerSchemaContextListener(this::onModelContextUpdated);
 
@@ -297,11 +297,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     @VisibleForTesting
     synchronized void onModelContextUpdated(final EffectiveModelContext context) {
         super.updateModelContext(context);
-        if (notificationSource != null) {
-            notificationSource.close();
-        }
-        notificationSource = new DefaultNotificationSource(notificationService, context);
-        start(notificationSource);
     }
 
     @NonNullByDefault
