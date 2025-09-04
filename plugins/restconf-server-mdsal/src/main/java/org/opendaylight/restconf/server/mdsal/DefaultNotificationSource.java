@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.mdsal;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Closeable;
+import java.util.function.Supplier;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
@@ -26,11 +27,12 @@ import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier;
  */
 final class DefaultNotificationSource extends AbstractNotificationSource implements Closeable {
     private final @NonNull DOMNotificationService notificationService;
-    private final @NonNull EffectiveModelContext context;
+    private final @NonNull Supplier<EffectiveModelContext> context;
 
     private Registration reg;
 
-    DefaultNotificationSource(final DOMNotificationService notificationService, final EffectiveModelContext context) {
+    DefaultNotificationSource(final DOMNotificationService notificationService,
+            final Supplier<EffectiveModelContext> context) {
         super(NotificationSource.ENCODINGS);
         this.notificationService = requireNonNull(notificationService);
         this.context = requireNonNull(context);
@@ -38,11 +40,12 @@ final class DefaultNotificationSource extends AbstractNotificationSource impleme
 
     @Override
     protected @NonNull Registration start(final Sink<DOMNotification> sink) {
-        final var notifications = context.getModuleStatements().values().stream()
+        final var modelContext = context.get();
+        final var notifications = modelContext.getModuleStatements().values().stream()
             .flatMap(module -> module.streamEffectiveSubstatements(NotificationEffectiveStatement.class))
             .map(notification -> SchemaNodeIdentifier.Absolute.of(notification.argument()))
             .toList();
-        return reg = notificationService.registerNotificationListener(new Listener(sink, () -> context), notifications);
+        return reg = notificationService.registerNotificationListener(new Listener(sink, context::get), notifications);
     }
 
     @Override
