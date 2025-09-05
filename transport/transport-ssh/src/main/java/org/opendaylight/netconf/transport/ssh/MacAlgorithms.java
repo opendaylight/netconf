@@ -68,7 +68,7 @@ final class MacAlgorithms {
         if (mac != null) {
             final var macAlg = mac.getMacAlg();
             if (macAlg != null && !macAlg.isEmpty()) {
-                return TransportUtils.mapValues(BY_YANG, macAlg, "Unsupported MAC algorithm %s");
+                return ConfigUtils.mapValues(BY_YANG, macAlg, "Unsupported MAC algorithm %s");
             }
         }
         return DEFAULT_FACTORIES;
