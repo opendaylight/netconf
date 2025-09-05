@@ -95,6 +95,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d458700a_06aa1c62",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-05T10:08:07Z",
+      "side": 1,
+      "message": "used context stored in parent class, so it will be the same object",
+      "parentUuid": "e29c9fe1_8c563bad",
+      "range": {
+        "startLine": 199,
+        "startChar": 94,
+        "endLine": 199,
+        "endChar": 110
+      },
+      "revId": "c139ad6a5b44356fce76961b56c9bb9629373b9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8092ba73_596f4e38",
