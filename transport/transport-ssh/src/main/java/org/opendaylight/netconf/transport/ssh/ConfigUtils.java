@@ -222,4 +222,17 @@ final class ConfigUtils {
             throws UnsupportedConfigurationException {
         return sshHostKeys == null ? List.of() : extractPublicKeys(sshHostKeys.getInlineOrTruststore());
     }
+
+    static <K, V> @NonNull List<V> mapValues(final Map<K, ? extends V> map, final List<K> values,
+            final String errorTemplate) throws UnsupportedConfigurationException {
+        final var builder = ImmutableList.<V>builderWithExpectedSize(values.size());
+        for (var value : values) {
+            final var mapped = map.get(value);
+            if (mapped == null) {
+                throw new UnsupportedOperationException(String.format(errorTemplate, value));
+            }
+            builder.add(mapped);
+        }
+        return builder.build();
+    }
 }
