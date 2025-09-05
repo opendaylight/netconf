@@ -7,15 +7,12 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.netty.channel.ChannelHandlerContext;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.jdt.annotation.Nullable;
@@ -266,14 +263,6 @@ final class TransportUtils {
             .SshPublicKeyAlgorithm wrap(final SshPublicKeyAlgorithm alg) {
         return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
             .SshPublicKeyAlgorithm(alg);
-    }
-
-    static <T> T checkCast(final Class<T> clazz, final Object obj) throws IOException {
-        try {
-            return clazz.cast(requireNonNull(obj));
-        } catch (ClassCastException e) {
-            throw new IOException(e);
-        }
     }
 
     @FunctionalInterface
