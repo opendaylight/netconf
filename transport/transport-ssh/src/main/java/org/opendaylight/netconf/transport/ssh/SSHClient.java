@@ -131,6 +131,6 @@ public final class SSHClient extends SSHTransportStack {
     }
 
     private static TransportClientSession cast(final Session session) throws IOException {
-        return TransportUtils.checkCast(TransportClientSession.class, session);
+        return checkCast(TransportClientSession.class, session);
     }
 }

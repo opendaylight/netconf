@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.channel.ChannelHandlerContext;
 import java.io.EOFException;
@@ -190,6 +192,14 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
 
     static final @NonNull Long sessionId(final Session session) {
         return session.getIoSession().getId();
+    }
+
+    static final <T> T checkCast(final Class<T> clazz, final Object obj) throws IOException {
+        try {
+            return clazz.cast(requireNonNull(obj));
+        } catch (ClassCastException e) {
+            throw new IOException(e);
+        }
     }
 
     @VisibleForTesting
