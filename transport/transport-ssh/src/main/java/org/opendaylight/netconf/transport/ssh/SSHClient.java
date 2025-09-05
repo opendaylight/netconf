@@ -130,7 +130,7 @@ public final class SSHClient extends SSHTransportStack {
         }, MoreExecutors.directExecutor());
     }
 
-    private static TransportClientSession cast(final Session session) throws IOException {
-        return TransportUtils.checkCast(TransportClientSession.class, session);
+    private static @NonNull TransportClientSession cast(final Session session) throws IOException {
+        return checkCast(TransportClientSession.class, session);
     }
 }

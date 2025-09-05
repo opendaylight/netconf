@@ -94,7 +94,7 @@ public final class SSHServer extends SSHTransportStack {
         }, MoreExecutors.directExecutor());
     }
 
-    private static TransportServerSession cast(final Session session) throws IOException {
-        return TransportUtils.checkCast(TransportServerSession.class, session);
+    private static @NonNull TransportServerSession cast(final Session session) throws IOException {
+        return checkCast(TransportServerSession.class, session);
     }
 }
