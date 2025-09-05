@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fd51a4f7_2793f26e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-05T11:32:47Z",
+      "side": 1,
+      "message": "We want to be able to override it",
+      "parentUuid": "6ec8bc4e_a247a866",
+      "range": {
+        "startLine": 7,
+        "startChar": 13,
+        "endLine": 7,
+        "endChar": 23
+      },
+      "revId": "4fa9599d2a98f80a0e625b9aa4c970e19e72f50f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9597410c_86c0666f",
         "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerRequestExecutor.java",
         "patchSetId": 3
@@ -37,6 +61,30 @@
       "writtenOn": "2025-09-05T07:35:49Z",
       "side": 1,
       "message": "if session is null, you will end up with two unclosed executors",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 9
+      },
+      "revId": "4fa9599d2a98f80a0e625b9aa4c970e19e72f50f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfcee019_0af1e4c8",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerRequestExecutor.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-05T11:32:47Z",
+      "side": 1,
+      "message": "Moved it before executors are created",
+      "parentUuid": "9597410c_86c0666f",
       "range": {
         "startLine": 72,
         "startChar": 0,
