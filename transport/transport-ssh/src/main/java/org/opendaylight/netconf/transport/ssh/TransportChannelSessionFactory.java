@@ -29,6 +29,6 @@ final class TransportChannelSessionFactory implements ChannelFactory {
 
     @Override
     public TransportChannelSession createChannel(final Session session) throws IOException {
-        return new TransportChannelSession(TransportUtils.checkCast(TransportServerSession.class, session));
+        return new TransportChannelSession(SSHTransportStack.checkCast(TransportServerSession.class, session));
     }
 }
