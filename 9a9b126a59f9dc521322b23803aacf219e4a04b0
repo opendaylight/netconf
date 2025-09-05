@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ff3e1c4_5a8352f7",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/PipeliningIT.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-05T07:37:28Z",
+      "side": 1,
+      "message": "JUnit 5 does not require classes and test to be public",
+      "revId": "9a9b126a59f9dc521322b23803aacf219e4a04b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa0dee62_2e938a71",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/PipeliningIT.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-05T07:37:28Z",
+      "side": 1,
+      "message": "why public?",
+      "revId": "9a9b126a59f9dc521322b23803aacf219e4a04b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c8ea5e9_1850068f",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-05T07:37:28Z",
+      "side": 1,
+      "message": "why do we need this when we have protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/AbstractRequestProcessorTest.java?",
+      "revId": "9a9b126a59f9dc521322b23803aacf219e4a04b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dff9258_92d8f499",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/PipeliningTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-05T07:37:28Z",
+      "side": 1,
+      "message": "2025 is approaching its end 🎉",
+      "revId": "9a9b126a59f9dc521322b23803aacf219e4a04b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c05045a7_093bab35",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/PipeliningTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-05T07:37:28Z",
+      "side": 1,
+      "message": "no need to be public",
+      "revId": "9a9b126a59f9dc521322b23803aacf219e4a04b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "980a4a8b_fbf65f8e",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/PipeliningTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-05T07:37:28Z",
+      "side": 1,
+      "message": "add one empty line",
+      "revId": "9a9b126a59f9dc521322b23803aacf219e4a04b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e952c03d_485e742a",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/PipeliningTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-05T07:37:28Z",
+      "side": 1,
+      "message": "private?",
+      "revId": "9a9b126a59f9dc521322b23803aacf219e4a04b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b7c18526_a46a80bc",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/PipeliningTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-05T07:37:28Z",
+      "side": 1,
+      "message": "do not use sleep in tests",
+      "revId": "9a9b126a59f9dc521322b23803aacf219e4a04b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
