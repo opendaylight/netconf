@@ -25,6 +25,12 @@
             <artifactId>bcpkix-jdk18on</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker-qual</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.aaa</groupId>
             <artifactId>aaa-encrypt-service</artifactId>
         </dependency>
