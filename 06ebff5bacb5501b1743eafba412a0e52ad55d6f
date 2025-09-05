@@ -52,6 +52,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e4a3ce9_14865577",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceRpc.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-05T15:16:40Z",
+      "side": 1,
+      "message": "We still need to walk children, because augments can introduce descendants from a different module than the parent. Mapper may leave the parent QName unchanged while some child QNames must be rewritten. The leaf/anyxml cases are safe to early-return because they have no children.",
+      "parentUuid": "75768720_5806f9f8",
+      "revId": "06ebff5bacb5501b1743eafba412a0e52ad55d6f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "396af603_bd92390d",
@@ -65,6 +83,24 @@
       "writtenOn": "2025-09-05T12:21:42Z",
       "side": 1,
       "message": "Bad formating, two spaces between newId and \u003d",
+      "revId": "06ebff5bacb5501b1743eafba412a0e52ad55d6f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f84de5b_234a6f2e",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceRpc.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-05T15:16:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "396af603_bd92390d",
       "revId": "06ebff5bacb5501b1743eafba412a0e52ad55d6f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
