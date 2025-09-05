@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 final class TransportServerSubsystem extends AbstractCommandSupport
-        implements AsyncCommand, ChannelSessionAware, ChannelDataReceiver {
+        implements AsyncCommand, ChannelSessionAware, ChannelDataReceiver, TransportSubsystem {
     private static final Logger LOG = LoggerFactory.getLogger(TransportServerSubsystem.class);
 
     private final TransportChannel underlay;
@@ -57,7 +57,7 @@ final class TransportServerSubsystem extends AbstractCommandSupport
 
     @Override
     public void setIoOutputStream(final IoOutputStream out) {
-        head = TransportUtils.attachUnderlay(out, underlay, () -> onExit(0));
+        head = attachToUnderlay(out, underlay);
     }
 
     @Override
@@ -74,6 +74,11 @@ final class TransportServerSubsystem extends AbstractCommandSupport
             head.fireChannelRead(Unpooled.copiedBuffer(buf, start, len));
         }
         return len;
+    }
+
+    @Override
+    public void substemChannelInactive() {
+        onExit(0);
     }
 
     @Override
