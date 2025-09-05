@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A {@link ChannelSubsystem} bound to a {@link SSHClient} and a Netty channel.
  */
-final class TransportClientSubsystem extends ChannelSubsystem {
+final class TransportClientSubsystem extends ChannelSubsystem implements TransportSubsystem {
     private static final Logger LOG = LoggerFactory.getLogger(TransportClientSubsystem.class);
 
     private ChannelHandlerContext head;
@@ -45,7 +45,7 @@ final class TransportClientSubsystem extends ChannelSubsystem {
         final var ret = SettableFuture.<ChannelHandlerContext>create();
         super.open().addListener(future -> {
             if (future.isOpened()) {
-                head = TransportUtils.attachUnderlay(getAsyncIn(), underlay, this::close);
+                head = attachToUnderlay(asyncIn, underlay);
                 ret.set(head);
             } else {
                 final var ex = future.getException();
@@ -81,5 +81,10 @@ final class TransportClientSubsystem extends ChannelSubsystem {
         if (len > 0) {
             getLocalWindow().release(len);
         }
+    }
+
+    @Override
+    public void substemChannelInactive() throws IOException {
+        close();
     }
 }
