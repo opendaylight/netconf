@@ -102,7 +102,7 @@ final class PublicKeyAlgorithms {
         if (hostKey != null) {
             final var hostKeyAlg = hostKey.getHostKeyAlg();
             if (hostKeyAlg != null && hostKeyAlg.isEmpty()) {
-                return TransportUtils.mapValues(BY_YANG, hostKeyAlg, "Unsupported Host Key algorithm %s");
+                return ConfigUtils.mapValues(BY_YANG, hostKeyAlg, "Unsupported Host Key algorithm %s");
             }
         }
         return DEFAULT_SIGNATURES;

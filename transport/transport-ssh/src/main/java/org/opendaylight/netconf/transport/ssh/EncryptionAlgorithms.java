@@ -115,7 +115,7 @@ final class EncryptionAlgorithms {
         if (encryption != null) {
             final var encAlg = encryption.getEncryptionAlg();
             if (encAlg != null && !encAlg.isEmpty()) {
-                return TransportUtils.mapValues(BY_YANG, encAlg, "Unsupported Encryption algorithm %s");
+                return ConfigUtils.mapValues(BY_YANG, encAlg, "Unsupported Encryption algorithm %s");
             }
         }
         return DEFAULT_FACTORIES;
