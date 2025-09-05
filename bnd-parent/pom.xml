@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.opendaylight.mdsal</groupId>
         <artifactId>bnd-parent</artifactId>
-        <version>14.0.14</version>
+        <version>14.0.16</version>
         <relativePath/>
     </parent>
 
@@ -35,21 +35,21 @@
             <dependency>
                 <groupId>org.opendaylight.infrautils</groupId>
                 <artifactId>infrautils-artifacts</artifactId>
-                <version>7.1.5</version>
+                <version>7.1.6</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.aaa</groupId>
                 <artifactId>aaa-artifacts</artifactId>
-                <version>0.20.10</version>
+                <version>0.20.11</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.controller</groupId>
                 <artifactId>bundle-parent</artifactId>
-                <version>10.0.11</version>
+                <version>10.0.12</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
