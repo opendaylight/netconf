@@ -42,14 +42,14 @@ import org.opendaylight.netconf.shaded.sshd.common.signature.BuiltinSignatures;
 class BuiltinCoverageTest {
     @Test
     void coveredBuiltinCiphers() {
-        assertAllAsValue(TransportUtils.CIPHERS, BuiltinCiphers.values(),
+        assertAllAsValue(EncryptionAlgorithms.BY_YANG, BuiltinCiphers.values(),
             // FIXME: these seem to indicate a gap in our coverage
             BuiltinCiphers.cc20p1305_openssh);
     }
 
     @Test
     void coveredBuiltinMacs() {
-        assertAllAsValue(TransportUtils.MACS, BuiltinMacs.values(),
+        assertAllAsValue(MacAlgorithms.BY_YANG, BuiltinMacs.values(),
             // These three are Encrypt-then-MAC modes as described in https://api.libssh.org/rfc/PROTOCOL
             // FIXME: we should provide these extensions
             BuiltinMacs.hmacsha1etm,
@@ -60,7 +60,7 @@ class BuiltinCoverageTest {
     @Test
     @SuppressWarnings("deprecation")
     void coveredBuiltinSignatures() {
-        assertAllAsValue(TransportUtils.SIGNATURES, BuiltinSignatures.values(),
+        assertAllAsValue(PublicKeyAlgorithms.BY_YANG, BuiltinSignatures.values(),
             // FIXME: explain these omissions and consider providing them, if possible
             BuiltinSignatures.dsa_cert,
             BuiltinSignatures.rsa_cert,
@@ -117,7 +117,7 @@ class BuiltinCoverageTest {
 
     private static List<Arguments> coveredBuiltinDHFactories() {
         return List.of(
-            arguments(named("client KEXs", TransportUtils.CLIENT_KEXS)),
-            arguments(named("server KEXs", TransportUtils.SERVER_KEXS)));
+            arguments(named("client KEXs", KeyExchangeAlgorithms.CLIENT_BY_YANG)),
+            arguments(named("server KEXs", KeyExchangeAlgorithms.SERVER_BY_YANG)));
     }
 }
