@@ -13,7 +13,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.DoNotCall;
 import java.security.KeyPair;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.List;
@@ -31,11 +30,14 @@ import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.UserAuthPublicKey
 import org.opendaylight.netconf.shaded.sshd.server.forward.DirectTcpipFactory;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.Inline;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ClientAuthentication;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.Keepalives;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ServerIdentity;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.server.identity.HostKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.server.identity.host.key.host.key.type.Certificate;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.server.identity.host.key.host.key.type.PublicKey;
 
 /**
  * Our internal-use {@link SshServer}. We reuse all the properties and logic of an {@link SshServer}, but we never allow
@@ -192,14 +194,10 @@ final class TransportSshServer extends SshServer {
                 throws UnsupportedConfigurationException {
             var listBuilder = ImmutableList.<KeyPair>builder();
             for (var hostKey : serverHostKeys) {
-                if (hostKey.getHostKeyType()
-                        instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010
-                        .ssh.server.grouping.server.identity.host.key.host.key.type.PublicKey publicKey
+                if (hostKey.getHostKeyType() instanceof PublicKey publicKey
                         && publicKey.getPublicKey() != null) {
                     listBuilder.add(ConfigUtils.extractKeyPair(publicKey.getPublicKey().getInlineOrKeystore()));
-                } else if (hostKey.getHostKeyType()
-                        instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010
-                        .ssh.server.grouping.server.identity.host.key.host.key.type.Certificate certificate
+                } else if (hostKey.getHostKeyType() instanceof Certificate certificate
                         && certificate.getCertificate() != null) {
                     listBuilder.add(extractCertificateEntry(certificate.getCertificate()).getKey());
                 }
@@ -209,9 +207,7 @@ final class TransportSshServer extends SshServer {
 
         private static Map.Entry<KeyPair, List<X509Certificate>> extractCertificateEntry(
                 final InlineOrKeystoreEndEntityCertWithKeyGrouping input) throws UnsupportedConfigurationException {
-            final var inline = ConfigUtils.ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore
-                .rev241010.inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.Inline.class,
-                input.getInlineOrKeystore());
+            final var inline = ConfigUtils.ofType(Inline.class, input.getInlineOrKeystore());
             final var inlineDef = inline.getInlineDefinition();
             if (inlineDef == null) {
                 throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
@@ -236,8 +232,8 @@ final class TransportSshServer extends SshServer {
             final var userMap = users.getUser();
             if (userMap != null) {
                 final var passwordMapBuilder = ImmutableMap.<String, String>builder();
-                final var hostBasedMapBuilder = ImmutableMap.<String, List<PublicKey>>builder();
-                final var publicKeyMapBuilder = ImmutableMap.<String, List<PublicKey>>builder();
+                final var hostBasedMapBuilder = ImmutableMap.<String, List<java.security.PublicKey>>builder();
+                final var publicKeyMapBuilder = ImmutableMap.<String, List<java.security.PublicKey>>builder();
                 for (var entry : userMap.entrySet()) {
                     final var username = entry.getKey().getName();
                     final var value = entry.getValue();
