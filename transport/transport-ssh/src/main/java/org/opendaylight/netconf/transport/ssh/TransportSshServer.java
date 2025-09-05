@@ -12,8 +12,11 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.DoNotCall;
-import java.security.PublicKey;
+import java.security.KeyPair;
+import java.security.cert.X509Certificate;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.netconf.shaded.sshd.common.channel.ChannelFactory;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyPairProvider;
@@ -26,10 +29,15 @@ import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswor
 import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.UserAuthPublicKeyFactory;
 import org.opendaylight.netconf.shaded.sshd.server.forward.DirectTcpipFactory;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.Inline;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ClientAuthentication;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.Keepalives;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ServerIdentity;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.server.identity.HostKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.server.identity.host.key.host.key.type.Certificate;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.server.identity.host.key.host.key.type.PublicKey;
 
 /**
  * Our internal-use {@link SshServer}. We reuse all the properties and logic of an {@link SshServer}, but we never allow
@@ -176,10 +184,43 @@ final class TransportSshServer extends SshServer {
             if (hostKey == null || hostKey.isEmpty()) {
                 throw new UnsupportedConfigurationException("Host keys is missing in server identity configuration");
             }
-            final var serverHostKeyPairs = ConfigUtils.extractServerHostKeys(hostKey);
+            final var serverHostKeyPairs = extractServerHostKeys(hostKey);
             if (!serverHostKeyPairs.isEmpty()) {
                 server.setKeyPairProvider(KeyPairProvider.wrap(serverHostKeyPairs));
             }
+        }
+
+        private static List<KeyPair> extractServerHostKeys(final List<HostKey> serverHostKeys)
+                throws UnsupportedConfigurationException {
+            var listBuilder = ImmutableList.<KeyPair>builder();
+            for (var hostKey : serverHostKeys) {
+                if (hostKey.getHostKeyType() instanceof PublicKey publicKey
+                        && publicKey.getPublicKey() != null) {
+                    listBuilder.add(KeyUtils.extractKeyPair(publicKey.getPublicKey().getInlineOrKeystore()));
+                } else if (hostKey.getHostKeyType() instanceof Certificate certificate
+                        && certificate.getCertificate() != null) {
+                    listBuilder.add(extractCertificateEntry(certificate.getCertificate()).getKey());
+                }
+            }
+            return listBuilder.build();
+        }
+
+        private static Map.Entry<KeyPair, List<X509Certificate>> extractCertificateEntry(
+                final InlineOrKeystoreEndEntityCertWithKeyGrouping input) throws UnsupportedConfigurationException {
+            final var inline = ConfigUtils.ofType(Inline.class, input.getInlineOrKeystore());
+            final var inlineDef = inline.getInlineDefinition();
+            if (inlineDef == null) {
+                throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
+            }
+            final var keyPair = KeyUtils.extractKeyPair(inlineDef);
+            final var certificate = KeyUtils.buildX509Certificate(inlineDef.requireCertData().getValue());
+            /*
+              ietf-crypto-types:asymmetric-key-pair-with-cert-grouping
+              "A private/public key pair and an associated certificate.
+              Implementations SHOULD assert that certificates contain the matching public key."
+             */
+            KeyUtils.validatePublicKey(keyPair.getPublic(), certificate);
+            return new SimpleImmutableEntry<>(keyPair, List.of(certificate));
         }
 
         private static void setClientAuthentication(final TransportSshServer server,
@@ -191,8 +232,8 @@ final class TransportSshServer extends SshServer {
             final var userMap = users.getUser();
             if (userMap != null) {
                 final var passwordMapBuilder = ImmutableMap.<String, String>builder();
-                final var hostBasedMapBuilder = ImmutableMap.<String, List<PublicKey>>builder();
-                final var publicKeyMapBuilder = ImmutableMap.<String, List<PublicKey>>builder();
+                final var hostBasedMapBuilder = ImmutableMap.<String, List<java.security.PublicKey>>builder();
+                final var publicKeyMapBuilder = ImmutableMap.<String, List<java.security.PublicKey>>builder();
                 for (var entry : userMap.entrySet()) {
                     final var username = entry.getKey().getName();
                     final var value = entry.getValue();
