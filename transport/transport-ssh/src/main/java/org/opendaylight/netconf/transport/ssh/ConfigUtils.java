@@ -11,7 +11,6 @@ import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.security.KeyPair;
 import java.security.PublicKey;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -33,7 +32,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.type
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.TransportParamsGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.KeyExchange;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststoreCertsGrouping;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint8;
 
@@ -143,25 +141,6 @@ final class ConfigUtils {
         return new KeyPair(publicKey, privateKey);
     }
 
-    static List<Certificate> extractCertificates(final @Nullable InlineOrTruststoreCertsGrouping input)
-            throws UnsupportedConfigurationException {
-        if (input == null) {
-            return List.of();
-        }
-        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore
-                        .rev241010.inline.or.truststore.certs.grouping.inline.or.truststore.Inline.class,
-                input.getInlineOrTruststore());
-        final var inlineDef = inline.getInlineDefinition();
-        if (inlineDef == null) {
-            throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
-        }
-        final var listBuilder = ImmutableList.<Certificate>builder();
-        for (var cert : inlineDef.nonnullCertificate().values()) {
-            listBuilder.add(KeyUtils.buildX509Certificate(cert.requireCertData().getValue()));
-        }
-        return listBuilder.build();
-    }
-
     private static Map.Entry<KeyPair, List<X509Certificate>> extractCertificateEntry(
             final InlineOrKeystoreEndEntityCertWithKeyGrouping input) throws UnsupportedConfigurationException {
         final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
@@ -182,8 +161,7 @@ final class ConfigUtils {
         return new SimpleImmutableEntry<>(keyPair, List.of(certificate));
     }
 
-    private static <T> T ofType(final Class<T> expectedType, final Object obj)
-            throws UnsupportedConfigurationException {
+    static <T> T ofType(final Class<T> expectedType, final Object obj) throws UnsupportedConfigurationException {
         if (!expectedType.isInstance(obj)) {
             throw new UnsupportedConfigurationException("Expected type: " + expectedType
                     + " actual: " + obj.getClass());
