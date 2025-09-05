@@ -15,6 +15,7 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.client.ClientBuilder;
 import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 import org.opendaylight.netconf.shaded.sshd.client.auth.UserAuthFactory;
@@ -32,6 +33,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.Keepalives;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ServerAuthentication;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.TransportParamsGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststoreCertsGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.inline.or.truststore.certs.grouping.inline.or.truststore.Inline;
 
 /**
  * Our internal-use {@link SshClient}. We reuse all the properties and logic of an {@link SshClient}, but we never allow
@@ -103,8 +106,8 @@ final class TransportSshClient extends SshClient {
             final ServerKeyVerifier newVerifier;
             if (serverAuthentication != null) {
                 final var certificatesList = ImmutableList.<Certificate>builder()
-                    .addAll(ConfigUtils.extractCertificates(serverAuthentication.getCaCerts()))
-                    .addAll(ConfigUtils.extractCertificates(serverAuthentication.getEeCerts()))
+                    .addAll(extractCertificates(serverAuthentication.getCaCerts()))
+                    .addAll(extractCertificates(serverAuthentication.getEeCerts()))
                     .build();
                 final var sshHostKeys = serverAuthentication.getSshHostKeys();
                 final var publicKeys = sshHostKeys == null ? List.<PublicKey>of()
@@ -121,6 +124,23 @@ final class TransportSshClient extends SshClient {
 
             serverKeyVerifier(newVerifier);
             return this;
+        }
+
+        private static List<Certificate> extractCertificates(final @Nullable InlineOrTruststoreCertsGrouping input)
+                throws UnsupportedConfigurationException {
+            if (input == null) {
+                return List.of();
+            }
+            final var inline = ConfigUtils.ofType(Inline.class, input.getInlineOrTruststore());
+            final var inlineDef = inline.getInlineDefinition();
+            if (inlineDef == null) {
+                throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
+            }
+            final var listBuilder = ImmutableList.<Certificate>builder();
+            for (var cert : inlineDef.nonnullCertificate().values()) {
+                listBuilder.add(KeyUtils.buildX509Certificate(cert.requireCertData().getValue()));
+            }
+            return listBuilder.build();
         }
 
         Builder configurator(final ClientFactoryManagerConfigurator newConfigurator) {
