@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -41,34 +42,60 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.KeyExchange;
 
 final class TransportUtils {
-    private static final Map<
+    @VisibleForTesting
+    static final Map<
         org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshEncryptionAlgorithm,
         NamedFactory<Cipher>> CIPHERS = ImmutableMap.<
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshEncryptionAlgorithm,
             NamedFactory<Cipher>>builder()
-                .put(wrap(SshEncryptionAlgorithm.AEADAES128GCM), BuiltinCiphers.aes128gcm)
-                .put(wrap(SshEncryptionAlgorithm.AEADAES256GCM), BuiltinCiphers.aes256cbc)
-                .put(wrap(SshEncryptionAlgorithm.Aes128Cbc), BuiltinCiphers.aes128cbc)
-                .put(wrap(SshEncryptionAlgorithm.Aes128Ctr), BuiltinCiphers.aes128ctr)
-                .put(wrap(SshEncryptionAlgorithm.Aes192Cbc), BuiltinCiphers.aes192cbc)
-                .put(wrap(SshEncryptionAlgorithm.Aes192Ctr), BuiltinCiphers.aes192ctr)
+                // Keep the same order as in iana-ssh-encryption-algs.yang
+                .put(wrap(SshEncryptionAlgorithm._3desCbc), BuiltinCiphers.tripledescbc)
+                .put(wrap(SshEncryptionAlgorithm.BlowfishCbc), BuiltinCiphers.blowfishcbc)
+                // SshEncryptionAlgorithm.Twofish256Cbc
+                // SshEncryptionAlgorithm.TwofishCbc
+                // SshEncryptionAlgorithm.Twofish192Cbc
+                // SshEncryptionAlgorithm.Twofish128Cbc
                 .put(wrap(SshEncryptionAlgorithm.Aes256Cbc), BuiltinCiphers.aes256cbc)
-                .put(wrap(SshEncryptionAlgorithm.Aes256Ctr), BuiltinCiphers.aes256ctr)
+                .put(wrap(SshEncryptionAlgorithm.Aes192Cbc), BuiltinCiphers.aes192cbc)
+                .put(wrap(SshEncryptionAlgorithm.Aes128Cbc), BuiltinCiphers.aes128cbc)
+                // SshEncryptionAlgorithm.Serpent256Cbc
+                // SshEncryptionAlgorithm.Serpent192Cbc
+                // SshEncryptionAlgorithm.Serpent128Cbc
+                // SshEncryptionAlgorithm.Arcfour
+                // SshEncryptionAlgorithm.IdeaCbc
+                // SshEncryptionAlgorithm.Cast128Cbc
+                .put(wrap(SshEncryptionAlgorithm.None), BuiltinCiphers.none)
+                // SshEncryptionAlgorithm.DesCbc
                 .put(wrap(SshEncryptionAlgorithm.Arcfour128), BuiltinCiphers.arcfour128)
                 .put(wrap(SshEncryptionAlgorithm.Arcfour256), BuiltinCiphers.arcfour256)
-                .put(wrap(SshEncryptionAlgorithm.BlowfishCbc), BuiltinCiphers.blowfishcbc)
-                .put(wrap(SshEncryptionAlgorithm._3desCbc), BuiltinCiphers.tripledescbc)
-                .put(wrap(SshEncryptionAlgorithm.None), BuiltinCiphers.none)
+                .put(wrap(SshEncryptionAlgorithm.Aes128Ctr), BuiltinCiphers.aes128ctr)
+                .put(wrap(SshEncryptionAlgorithm.Aes192Ctr), BuiltinCiphers.aes192ctr)
+                .put(wrap(SshEncryptionAlgorithm.Aes256Ctr), BuiltinCiphers.aes256ctr)
+                // SshEncryptionAlgorithm._3desCtr
+                // SshEncryptionAlgorithm.BlowfishCtr
+                // SshEncryptionAlgorithm.Twofish128Ctr
+                // SshEncryptionAlgorithm.Twofish192Ctr
+                // SshEncryptionAlgorithm.Twofish256Ctr
+                // SshEncryptionAlgorithm.Serpent128Ctr
+                // SshEncryptionAlgorithm.Serpent192Ctr
+                // SshEncryptionAlgorithm.Serpent256Ctr
+                // SshEncryptionAlgorithm.IdeaCtr
+                // SshEncryptionAlgorithm.Cast128Ctr
+                .put(wrap(SshEncryptionAlgorithm.AEADAES128GCM), BuiltinCiphers.aes128gcm)
+                .put(wrap(SshEncryptionAlgorithm.AEADAES256GCM), BuiltinCiphers.aes256cbc)
+                // FIXME: SshEncryptionAlgorithm.Chacha20Poly1305 == cc20p1305_openssh ?
                 .build();
 
     private static final List<NamedFactory<Cipher>> DEFAULT_CIPHERS = ImmutableList.<NamedFactory<Cipher>>builder()
         .addAll(BaseBuilder.DEFAULT_CIPHERS_PREFERENCE)
         .build();
 
-    private static final Map<
+    @VisibleForTesting
+    static final Map<
         org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
         KeyExchangeFactory> CLIENT_KEXS;
-    private static final ImmutableMap<
+    @VisibleForTesting
+    static final Map<
         org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
         KeyExchangeFactory> SERVER_KEXS;
     private static final List<KeyExchangeFactory> DEFAULT_CLIENT_KEXS;
@@ -78,8 +105,9 @@ final class TransportUtils {
         final var factories = Maps.filterValues(ImmutableMap.<
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
             BuiltinDHFactories>builder()
-                .put(wrap(SshKeyExchangeAlgorithm.Curve25519Sha256), BuiltinDHFactories.curve25519)
-                .put(wrap(SshKeyExchangeAlgorithm.Curve448Sha512), BuiltinDHFactories.curve448)
+                // Keep the same order as in iana-ssh-key-exchange-algs.yang
+                .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroupExchangeSha1), BuiltinDHFactories.dhgex)
+                .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroupExchangeSha256), BuiltinDHFactories.dhgex256)
                 .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroup1Sha1), BuiltinDHFactories.dhg1)
                 .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroup14Sha1), BuiltinDHFactories.dhg14)
                 .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroup14Sha256), BuiltinDHFactories.dhg14_256)
@@ -87,25 +115,188 @@ final class TransportUtils {
                 .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroup16Sha512), BuiltinDHFactories.dhg16_512)
                 .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroup17Sha512), BuiltinDHFactories.dhg17_512)
                 .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroup18Sha512), BuiltinDHFactories.dhg18_512)
-                .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroupExchangeSha1), BuiltinDHFactories.dhgex)
-                .put(wrap(SshKeyExchangeAlgorithm.DiffieHellmanGroupExchangeSha256), BuiltinDHFactories.dhgex256)
-                // .put(SshKeyExchangeAlgorithm.EcdhSha21284010045311, null)
-                // .put(SshKeyExchangeAlgorithm.EcdhSha213132016, null)
-                // .put(SshKeyExchangeAlgorithm.EcdhSha21313201, null)
-                // .put(SshKeyExchangeAlgorithm.EcdhSha213132026, null)
-                // .put(SshKeyExchangeAlgorithm.EcdhSha213132027, null)
-                // .put(SshKeyExchangeAlgorithm.EcdhSha213132033, null)
-                // .put(SshKeyExchangeAlgorithm.EcdhSha213132036, null)
-                // .put(SshKeyExchangeAlgorithm.EcdhSha213132037, null)
-                // .put(SshKeyExchangeAlgorithm.EcdhSha213132038, null)
                 .put(wrap(SshKeyExchangeAlgorithm.EcdhSha2Nistp256), BuiltinDHFactories.ecdhp256)
                 .put(wrap(SshKeyExchangeAlgorithm.EcdhSha2Nistp384), BuiltinDHFactories.ecdhp384)
                 .put(wrap(SshKeyExchangeAlgorithm.EcdhSha2Nistp521), BuiltinDHFactories.ecdhp521)
-                // TODO: provide solution for remaining (commented out) KEX algorithms missing in BuiltinDHFactories
-                // .put(SshKeyExchangeAlgorithm.EcmqvSha2, null)
-                // .put(SshKeyExchangeAlgorithm.ExtInfoC, null)
-                // .put(SshKeyExchangeAlgorithm.ExtInfoS, null)
-                //  Gss*
+                // FIXME: audit from the below and provide solution for remaining (commented out) KEX algorithms missing
+                //        in BuiltinDHFactories
+                // SshKeyExchangeAlgorithm.EcdhSha21313201
+                // SshKeyExchangeAlgorithm.EcdhSha21284010045311
+                // SshKeyExchangeAlgorithm.EcdhSha213132033
+                // SshKeyExchangeAlgorithm.EcdhSha213132026
+                // SshKeyExchangeAlgorithm.EcdhSha213132027
+                // SshKeyExchangeAlgorithm.EcdhSha213132016
+                // SshKeyExchangeAlgorithm.EcdhSha213132036
+                // SshKeyExchangeAlgorithm.EcdhSha213132037
+                // SshKeyExchangeAlgorithm.EcdhSha213132038
+                // SshKeyExchangeAlgorithm.EcmqvSha2
+                // SshKeyExchangeAlgorithm.GssGroup1Sha1Nistp256
+                // SshKeyExchangeAlgorithm.GssGroup1Sha1Nistp384
+                // SshKeyExchangeAlgorithm.GssGroup1Sha1Nistp521
+                // SshKeyExchangeAlgorithm.GssGroup1Sha11313201
+                // SshKeyExchangeAlgorithm.GssGroup1Sha11284010045311
+                // SshKeyExchangeAlgorithm.GssGroup1Sha113132033
+                // SshKeyExchangeAlgorithm.GssGroup1Sha113132026
+                // SshKeyExchangeAlgorithm.GssGroup1Sha113132027
+                // SshKeyExchangeAlgorithm.GssGroup1Sha113132016
+                // SshKeyExchangeAlgorithm.GssGroup1Sha113132036
+                // SshKeyExchangeAlgorithm.GssGroup1Sha113132037
+                // SshKeyExchangeAlgorithm.GssGroup1Sha113132038
+                // SshKeyExchangeAlgorithm.GssGroup14Sha1Nistp256
+                // SshKeyExchangeAlgorithm.GssGroup14Sha1Nistp384
+                // SshKeyExchangeAlgorithm.GssGroup14Sha1Nistp521
+                // SshKeyExchangeAlgorithm.GssGroup14Sha11313201
+                // SshKeyExchangeAlgorithm.GssGroup14Sha11284010045311
+                // SshKeyExchangeAlgorithm.GssGroup14Sha113132033
+                // SshKeyExchangeAlgorithm.GssGroup14Sha113132026
+                // SshKeyExchangeAlgorithm.GssGroup14Sha113132027
+                // SshKeyExchangeAlgorithm.GssGroup14Sha113132016
+                // SshKeyExchangeAlgorithm.GssGroup14Sha113132036
+                // SshKeyExchangeAlgorithm.GssGroup14Sha113132037
+                // SshKeyExchangeAlgorithm.GssGroup14Sha113132038
+                // SshKeyExchangeAlgorithm.GssGexSha1Nistp256
+                // SshKeyExchangeAlgorithm.GssGexSha1Nistp384
+                // SshKeyExchangeAlgorithm.GssGexSha1Nistp521
+                // SshKeyExchangeAlgorithm.GssGexSha11313201
+                // SshKeyExchangeAlgorithm.GssGexSha11284010045311
+                // SshKeyExchangeAlgorithm.GssGexSha113132033
+                // SshKeyExchangeAlgorithm.GssGexSha113132026
+                // SshKeyExchangeAlgorithm.GssGexSha113132027
+                // SshKeyExchangeAlgorithm.GssGexSha113132016
+                // SshKeyExchangeAlgorithm.GssGexSha113132036
+                // SshKeyExchangeAlgorithm.GssGexSha113132037
+                // SshKeyExchangeAlgorithm.GssGexSha113132038
+                // SshKeyExchangeAlgorithm.Gss
+                // SshKeyExchangeAlgorithm.Rsa1024Sha1
+                // SshKeyExchangeAlgorithm.Rsa2048Sha256
+                // SshKeyExchangeAlgorithm.ExtInfoS
+                // SshKeyExchangeAlgorithm.ExtInfoC
+                // SshKeyExchangeAlgorithm.GssGroup14Sha256Nistp256
+                // SshKeyExchangeAlgorithm.GssGroup14Sha256Nistp384
+                // SshKeyExchangeAlgorithm.GssGroup14Sha256Nistp521
+                // SshKeyExchangeAlgorithm.GssGroup14Sha2561313201
+                // SshKeyExchangeAlgorithm.GssGroup14Sha2561284010045311
+                // SshKeyExchangeAlgorithm.GssGroup14Sha25613132033
+                // SshKeyExchangeAlgorithm.GssGroup14Sha25613132026
+                // SshKeyExchangeAlgorithm.GssGroup14Sha25613132027
+                // SshKeyExchangeAlgorithm.GssGroup14Sha25613132016
+                // SshKeyExchangeAlgorithm.GssGroup14Sha25613132036
+                // SshKeyExchangeAlgorithm.GssGroup14Sha25613132037
+                // SshKeyExchangeAlgorithm.GssGroup14Sha25613132038
+                // SshKeyExchangeAlgorithm.GssGroup15Sha512Nistp256
+                // SshKeyExchangeAlgorithm.GssGroup15Sha512Nistp384
+                // SshKeyExchangeAlgorithm.GssGroup15Sha512Nistp521
+                // SshKeyExchangeAlgorithm.GssGroup15Sha5121313201
+                // SshKeyExchangeAlgorithm.GssGroup15Sha5121284010045311
+                // SshKeyExchangeAlgorithm.GssGroup15Sha51213132033
+                // SshKeyExchangeAlgorithm.GssGroup15Sha51213132026
+                // SshKeyExchangeAlgorithm.GssGroup15Sha51213132027
+                // SshKeyExchangeAlgorithm.GssGroup15Sha51213132016
+                // SshKeyExchangeAlgorithm.GssGroup15Sha51213132036
+                // SshKeyExchangeAlgorithm.GssGroup15Sha51213132037
+                // SshKeyExchangeAlgorithm.GssGroup15Sha51213132038
+                // SshKeyExchangeAlgorithm.GssGroup16Sha512Nistp256
+                // SshKeyExchangeAlgorithm.GssGroup16Sha512Nistp384
+                // SshKeyExchangeAlgorithm.GssGroup16Sha512Nistp521
+                // SshKeyExchangeAlgorithm.GssGroup16Sha5121313201
+                // SshKeyExchangeAlgorithm.GssGroup16Sha5121284010045311
+                // SshKeyExchangeAlgorithm.GssGroup16Sha51213132033
+                // SshKeyExchangeAlgorithm.GssGroup16Sha51213132026
+                // SshKeyExchangeAlgorithm.GssGroup16Sha51213132027
+                // SshKeyExchangeAlgorithm.GssGroup16Sha51213132016
+                // SshKeyExchangeAlgorithm.GssGroup16Sha51213132036
+                // SshKeyExchangeAlgorithm.GssGroup16Sha51213132037
+                // SshKeyExchangeAlgorithm.GssGroup16Sha51213132038
+                // SshKeyExchangeAlgorithm.GssGroup17Sha512Nistp256
+                // SshKeyExchangeAlgorithm.GssGroup17Sha512Nistp384
+                // SshKeyExchangeAlgorithm.GssGroup17Sha512Nistp521
+                // SshKeyExchangeAlgorithm.GssGroup17Sha5121313201
+                // SshKeyExchangeAlgorithm.GssGroup17Sha5121284010045311
+                // SshKeyExchangeAlgorithm.GssGroup17Sha51213132033
+                // SshKeyExchangeAlgorithm.GssGroup17Sha51213132026
+                // SshKeyExchangeAlgorithm.GssGroup17Sha51213132027
+                // SshKeyExchangeAlgorithm.GssGroup17Sha51213132016
+                // SshKeyExchangeAlgorithm.GssGroup17Sha51213132036
+                // SshKeyExchangeAlgorithm.GssGroup17Sha51213132037
+                // SshKeyExchangeAlgorithm.GssGroup17Sha51213132038
+                // SshKeyExchangeAlgorithm.GssGroup18Sha512Nistp256
+                // SshKeyExchangeAlgorithm.GssGroup18Sha512Nistp384
+                // SshKeyExchangeAlgorithm.GssGroup18Sha512Nistp521
+                // SshKeyExchangeAlgorithm.GssGroup18Sha5121313201
+                // SshKeyExchangeAlgorithm.GssGroup18Sha5121284010045311
+                // SshKeyExchangeAlgorithm.GssGroup18Sha51213132033
+                // SshKeyExchangeAlgorithm.GssGroup18Sha51213132026
+                // SshKeyExchangeAlgorithm.GssGroup18Sha51213132027
+                // SshKeyExchangeAlgorithm.GssGroup18Sha51213132016
+                // SshKeyExchangeAlgorithm.GssGroup18Sha51213132036
+                // SshKeyExchangeAlgorithm.GssGroup18Sha51213132037
+                // SshKeyExchangeAlgorithm.GssGroup18Sha51213132038
+                // SshKeyExchangeAlgorithm.GssNistp256Sha256Nistp256
+                // SshKeyExchangeAlgorithm.GssNistp256Sha256Nistp384
+                // SshKeyExchangeAlgorithm.GssNistp256Sha256Nistp521
+                // SshKeyExchangeAlgorithm.GssNistp256Sha2561313201
+                // SshKeyExchangeAlgorithm.GssNistp256Sha2561284010045311
+                // SshKeyExchangeAlgorithm.GssNistp256Sha25613132033
+                // SshKeyExchangeAlgorithm.GssNistp256Sha25613132026
+                // SshKeyExchangeAlgorithm.GssNistp256Sha25613132027
+                // SshKeyExchangeAlgorithm.GssNistp256Sha25613132016
+                // SshKeyExchangeAlgorithm.GssNistp256Sha25613132036
+                // SshKeyExchangeAlgorithm.GssNistp256Sha25613132037
+                // SshKeyExchangeAlgorithm.GssNistp256Sha25613132038
+                // SshKeyExchangeAlgorithm.GssNistp384Sha384Nistp256
+                // SshKeyExchangeAlgorithm.GssNistp384Sha384Nistp384
+                // SshKeyExchangeAlgorithm.GssNistp384Sha384Nistp521
+                // SshKeyExchangeAlgorithm.GssNistp384Sha3841313201
+                // SshKeyExchangeAlgorithm.GssNistp384Sha3841284010045311
+                // SshKeyExchangeAlgorithm.GssNistp384Sha38413132033
+                // SshKeyExchangeAlgorithm.GssNistp384Sha38413132026
+                // SshKeyExchangeAlgorithm.GssNistp384Sha38413132027
+                // SshKeyExchangeAlgorithm.GssNistp384Sha38413132016
+                // SshKeyExchangeAlgorithm.GssNistp384Sha38413132036
+                // SshKeyExchangeAlgorithm.GssNistp384Sha38413132037
+                // SshKeyExchangeAlgorithm.GssNistp384Sha38413132038
+                // SshKeyExchangeAlgorithm.GssNistp521Sha512Nistp256
+                // SshKeyExchangeAlgorithm.GssNistp521Sha512Nistp384
+                // SshKeyExchangeAlgorithm.GssNistp521Sha512Nistp521
+                // SshKeyExchangeAlgorithm.GssNistp521Sha5121313201
+                // SshKeyExchangeAlgorithm.GssNistp521Sha5121284010045311
+                // SshKeyExchangeAlgorithm.GssNistp521Sha51213132033
+                // SshKeyExchangeAlgorithm.GssNistp521Sha51213132026
+                // SshKeyExchangeAlgorithm.GssNistp521Sha51213132027
+                // SshKeyExchangeAlgorithm.GssNistp521Sha51213132016
+                // SshKeyExchangeAlgorithm.GssNistp521Sha51213132036
+                // SshKeyExchangeAlgorithm.GssNistp521Sha51213132037
+                // SshKeyExchangeAlgorithm.GssNistp521Sha51213132038
+                // SshKeyExchangeAlgorithm.GssCurve25519Sha256Nistp256
+                // SshKeyExchangeAlgorithm.GssCurve25519Sha256Nistp384
+                // SshKeyExchangeAlgorithm.GssCurve25519Sha256Nistp521
+                // SshKeyExchangeAlgorithm.GssCurve25519Sha2561313201
+                // SshKeyExchangeAlgorithm.GssCurve25519Sha2561284010045311
+                // SshKeyExchangeAlgorithm.GssCurve25519Sha25613132033
+                // SshKeyExchangeAlgorithm.GssCurve25519Sha25613132026
+                // SshKeyExchangeAlgorithm.GssCurve25519Sha25613132027
+                // SshKeyExchangeAlgorithm.GssCurve25519Sha25613132016
+                // SshKeyExchangeAlgorithm.GssCurve25519Sha25613132036
+                // SshKeyExchangeAlgorithm.GssCurve25519Sha25613132037
+                // SshKeyExchangeAlgorithm.GssCurve25519Sha25613132038
+                // SshKeyExchangeAlgorithm.GssCurve448Sha512Nistp256
+                // SshKeyExchangeAlgorithm.GssCurve448Sha512Nistp384
+                // SshKeyExchangeAlgorithm.GssCurve448Sha512Nistp521
+                // SshKeyExchangeAlgorithm.GssCurve448Sha5121313201
+                // SshKeyExchangeAlgorithm.GssCurve448Sha5121284010045311
+                // SshKeyExchangeAlgorithm.GssCurve448Sha51213132033
+                // SshKeyExchangeAlgorithm.GssCurve448Sha51213132026
+                // SshKeyExchangeAlgorithm.GssCurve448Sha51213132027
+                // SshKeyExchangeAlgorithm.GssCurve448Sha51213132016
+                // SshKeyExchangeAlgorithm.GssCurve448Sha51213132036
+                // SshKeyExchangeAlgorithm.GssCurve448Sha51213132037
+                // SshKeyExchangeAlgorithm.GssCurve448Sha51213132038
+                .put(wrap(SshKeyExchangeAlgorithm.Curve25519Sha256), BuiltinDHFactories.curve25519)
+                .put(wrap(SshKeyExchangeAlgorithm.Curve448Sha512), BuiltinDHFactories.curve448)
+                // FIXME: SshKeyExchangeAlgorithm.Sntrup761x25519Sha512 = sntrup761x25519 or sntrup761x25519_openssh?
+                // FIXME: SshKeyExchangeAlgorithm.Mlkem768nistp256Sha256 = mlkem768nistp256 ?
+                // FIXME: SshKeyExchangeAlgorithm.Mlkem1024nistp384Sha384 = mlkem1024nistp384 ?
+                // FIXME: SshKeyExchangeAlgorithm.Mlkem768x25519Sha256 = mlkem768x25519 ?
                 .build(), BuiltinDHFactories::isSupported);
 
         CLIENT_KEXS = ImmutableMap.copyOf(Maps.transformValues(factories, ClientBuilder.DH2KEX::apply));
@@ -116,55 +307,77 @@ final class TransportUtils {
             ImmutableList.copyOf(Lists.transform(BaseBuilder.DEFAULT_KEX_PREFERENCE, ServerBuilder.DH2KEX::apply));
     }
 
-    private static final ImmutableMap<
+    @VisibleForTesting
+    static final ImmutableMap<
         org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm,
         NamedFactory<Mac>> MACS = ImmutableMap.<
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm,
             NamedFactory<Mac>>builder()
-                .put(wrap(SshMacAlgorithm.HmacMd5), BuiltinMacs.hmacmd5)
-                .put(wrap(SshMacAlgorithm.HmacMd596), BuiltinMacs.hmacmd596)
+                // Keep the same order as in iana-ssh-mac-algs.yang
                 .put(wrap(SshMacAlgorithm.HmacSha1), BuiltinMacs.hmacsha1)
                 .put(wrap(SshMacAlgorithm.HmacSha196), BuiltinMacs.hmacsha196)
+                .put(wrap(SshMacAlgorithm.HmacMd5), BuiltinMacs.hmacmd5)
+                .put(wrap(SshMacAlgorithm.HmacMd596), BuiltinMacs.hmacmd596)
+                // FIXME: provide a solution for these:
+                // SshMacAlgorithm.None
+                // SshMacAlgorithm.AEADAES128GCM
+                // SshMacAlgorithm.AEADAES256GCM
                 .put(wrap(SshMacAlgorithm.HmacSha2256), BuiltinMacs.hmacsha256)
                 .put(wrap(SshMacAlgorithm.HmacSha2512), BuiltinMacs.hmacsha512)
-                // TODO: provide solution for remaining (commented out) macs missing in BuiltinMacs
-                // SshMacAlgorithm.AeadAes128Gcm
-                // SshMacAlgorithm.AeadAes256Gcm
-                // SshMacAlgorithm.None
-                // openssh ETM extensions
                 .build();
     private static final List<NamedFactory<Mac>> DEFAULT_MACS =
             ImmutableList.<NamedFactory<Mac>>builder().addAll(BaseBuilder.DEFAULT_MAC_PREFERENCE).build();
 
+    @VisibleForTesting
     static final Map<
         org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm,
         NamedFactory<Signature>> SIGNATURES = ImmutableMap.<
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm,
             NamedFactory<Signature>>builder()
-                    .put(wrap(SshPublicKeyAlgorithm.EcdsaSha2Nistp256), BuiltinSignatures.nistp256)
-                    .put(wrap(SshPublicKeyAlgorithm.EcdsaSha2Nistp384), BuiltinSignatures.nistp384)
-                    .put(wrap(SshPublicKeyAlgorithm.EcdsaSha2Nistp521), BuiltinSignatures.nistp521)
-                    .put(wrap(SshPublicKeyAlgorithm.RsaSha2512), BuiltinSignatures.rsaSHA512)
-                    // .put(wrap(SshPublicKeyAlgorithm.PgpSignDss), null)
-                    // .put(wrap(SshPublicKeyAlgorithm.PgpSignRsa), null)
-                    .put(wrap(SshPublicKeyAlgorithm.RsaSha2256), BuiltinSignatures.rsaSHA256)
-                    // .put(wrap(SshPublicKeyAlgorithm.SpkiSignRsa), null)
-                    // .put(wrap(SshPublicKeyAlgorithm.SpkiSignDss), null)
-                    .put(wrap(SshPublicKeyAlgorithm.SshDss), BuiltinSignatures.dsa)
-                    // .put(wrap(SshPublicKeyAlgorithm.SshEd448), null)
-                    .put(wrap(SshPublicKeyAlgorithm.SshEd25519), BuiltinSignatures.ed25519)
-                    .put(wrap(SshPublicKeyAlgorithm.SshRsa), BuiltinSignatures.rsa)
-                    // TODO: provide solution for remaining (commented out) signatures missing in BuiltinSignatures
-                    // .put(wrap(SshPublicKeyAlgorithm.X509v3EcdsaSha2Nistp256), null)
-                    // .put(wrap(SshPublicKeyAlgorithm.X509v3EcdsaSha2Nistp384), null)
-                    // .put(wrap(SshPublicKeyAlgorithm.X509v3EcdsaSha2Nistp521), null)
-                    // .put(wrap(SshPublicKeyAlgorithm.X509v3Rsa2048Sha256), null)
-                    // .put(wrap(SshPublicKeyAlgorithm.X509v3SshDss), null)
-                    // .put(wrap(SshPublicKeyAlgorithm.X509v3SshRsa), null)
-                    // .put(wrap(SshPublicKeyAlgorithm.Null), null)
-                    .build();
+                // Keep the same order as in iana-ssh-public-key-algs.yang
+                .put(wrap(SshPublicKeyAlgorithm.SshDss), BuiltinSignatures.dsa)
+                .put(wrap(SshPublicKeyAlgorithm.SshRsa), BuiltinSignatures.rsa)
+                .put(wrap(SshPublicKeyAlgorithm.RsaSha2256), BuiltinSignatures.rsaSHA256)
+                .put(wrap(SshPublicKeyAlgorithm.RsaSha2512), BuiltinSignatures.rsaSHA512)
+                // FIXME: audit from the below and provide solution for remaining (commented out) algorithms missing
+                //        in BuiltinSignatures
+                // SshPublicKeyAlgorithm.SpkiSignRsa
+                // SshPublicKeyAlgorithm.SpkiSignDss
+                // SshPublicKeyAlgorithm.PgpSignRsa
+                // SshPublicKeyAlgorithm.PgpSignDss
+                // SshPublicKeyAlgorithm.Null
+                .put(wrap(SshPublicKeyAlgorithm.EcdsaSha2Nistp256), BuiltinSignatures.nistp256)
+                .put(wrap(SshPublicKeyAlgorithm.EcdsaSha2Nistp384), BuiltinSignatures.nistp384)
+                .put(wrap(SshPublicKeyAlgorithm.EcdsaSha2Nistp521), BuiltinSignatures.nistp521)
+                // SshPublicKeyAlgorithm.EcdsaSha21313201
+                // SshPublicKeyAlgorithm.EcdsaSha21284010045311
+                // SshPublicKeyAlgorithm.EcdsaSha213132033
+                // SshPublicKeyAlgorithm.EcdsaSha213132026
+                // SshPublicKeyAlgorithm.EcdsaSha213132027
+                // SshPublicKeyAlgorithm.EcdsaSha213132016
+                // SshPublicKeyAlgorithm.EcdsaSha213132036
+                // SshPublicKeyAlgorithm.EcdsaSha213132037
+                // SshPublicKeyAlgorithm.EcdsaSha213132038
+                // SshPublicKeyAlgorithm.X509v3SshDss
+                // SshPublicKeyAlgorithm.X509v3SshRsa
+                // SshPublicKeyAlgorithm.X509v3Rsa2048Sha256
+                // SshPublicKeyAlgorithm.X509v3EcdsaSha2Nistp256
+                // SshPublicKeyAlgorithm.X509v3EcdsaSha2Nistp384
+                // SshPublicKeyAlgorithm.X509v3EcdsaSha2Nistp521
+                // SshPublicKeyAlgorithm.X509v3EcdsaSha21313201
+                // SshPublicKeyAlgorithm.X509v3EcdsaSha21284010045311
+                // SshPublicKeyAlgorithm.X509v3EcdsaSha213132033
+                // SshPublicKeyAlgorithm.X509v3EcdsaSha213132026
+                // SshPublicKeyAlgorithm.X509v3EcdsaSha213132027
+                // SshPublicKeyAlgorithm.X509v3EcdsaSha213132016
+                // SshPublicKeyAlgorithm.X509v3EcdsaSha213132036
+                // SshPublicKeyAlgorithm.X509v3EcdsaSha213132037
+                // SshPublicKeyAlgorithm.X509v3EcdsaSha213132038
+                .put(wrap(SshPublicKeyAlgorithm.SshEd25519), BuiltinSignatures.ed25519)
+                // SshPublicKeyAlgorithm.SshEd448
+                .build();
 
-    static final List<NamedFactory<Signature>> DEFAULT_SIGNATURES =
+    private static final List<NamedFactory<Signature>> DEFAULT_SIGNATURES =
             ImmutableList.<NamedFactory<Signature>>builder().addAll(BaseBuilder.DEFAULT_SIGNATURE_PREFERENCE).build();
 
     private TransportUtils() {
@@ -241,25 +454,29 @@ final class TransportUtils {
         return builder.build();
     }
 
-    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
+    @VisibleForTesting
+    static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
             .SshEncryptionAlgorithm wrap(final SshEncryptionAlgorithm alg) {
         return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
             .SshEncryptionAlgorithm(alg);
     }
 
-    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
+    @VisibleForTesting
+    static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
             .SshKeyExchangeAlgorithm wrap(final SshKeyExchangeAlgorithm alg) {
         return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
             .SshKeyExchangeAlgorithm(alg);
     }
 
-    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
+    @VisibleForTesting
+    static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
             .SshMacAlgorithm wrap(final SshMacAlgorithm alg) {
         return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
             .SshMacAlgorithm(alg);
     }
 
-    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
+    @VisibleForTesting
+    static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
             .SshPublicKeyAlgorithm wrap(final SshPublicKeyAlgorithm alg) {
         return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
             .SshPublicKeyAlgorithm(alg);
