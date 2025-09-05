@@ -94,8 +94,7 @@ final class EncryptionAlgorithms {
             // defined in https://www.rfc-editor.org/rfc/rfc5647
             // negotiated as per https://datatracker.ietf.org/doc/draft-miller-sshm-aes-gcm/
             entry(SshEncryptionAlgorithm.AEADAES128GCM, BuiltinCiphers.aes128gcm),
-            // FIXME: bad value!
-            entry(SshEncryptionAlgorithm.AEADAES256GCM, BuiltinCiphers.aes256cbc)
+            entry(SshEncryptionAlgorithm.AEADAES256GCM, BuiltinCiphers.aes256gcm)
 
             // defined in https://datatracker.ietf.org/doc/draft-josefsson-ssh-chacha20-poly1305-openssh/01/
             // FIXME: does this equal to BuiltinCiphers.cc20p1305_openssh? we need to read up on the drafts to
