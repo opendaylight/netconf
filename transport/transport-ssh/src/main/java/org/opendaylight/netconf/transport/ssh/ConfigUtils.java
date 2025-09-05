@@ -9,7 +9,6 @@ package org.opendaylight.netconf.transport.ssh;
 
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.security.KeyPair;
 import java.security.PublicKey;
 import java.time.Duration;
 import java.util.List;
@@ -21,16 +20,11 @@ import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.kex.KeyExchangeFactory;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatController;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.AsymmetricKeyPairGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.EcPrivateKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.RsaPrivateKeyFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SshPublicKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SubjectPublicKeyInfoFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010._private.key.grouping._private.key.type.CleartextPrivateKey;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.TransportParamsGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.KeyExchange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.inline.or.truststore._public.keys.grouping.InlineOrTruststore;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.inline.or.truststore._public.keys.grouping.inline.or.truststore.Inline;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint8;
 
@@ -66,55 +60,6 @@ final class ConfigUtils {
         factoryMgr.setSessionHeartbeat(SessionHeartbeatController.HeartbeatType.IGNORE, Duration.ofSeconds(maxWait));
     }
 
-    static KeyPair extractKeyPair(final InlineOrKeystore input) throws UnsupportedConfigurationException {
-        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
-                .inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.Inline.class, input);
-        final var inlineDef = inline.getInlineDefinition();
-        if (inlineDef == null) {
-            throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
-        }
-        return extractKeyPair(inlineDef);
-    }
-
-    static KeyPair extractKeyPair(final AsymmetricKeyPairGrouping input) throws UnsupportedConfigurationException {
-        final var keyFormat = input.getPrivateKeyFormat();
-        final String privateKeyAlgorithm;
-        if (EcPrivateKeyFormat.VALUE.equals(keyFormat)) {
-            privateKeyAlgorithm = KeyUtils.EC_ALGORITHM;
-        } else if (RsaPrivateKeyFormat.VALUE.equals(input.getPrivateKeyFormat())) {
-            privateKeyAlgorithm = KeyUtils.RSA_ALGORITHM;
-        } else {
-            throw new UnsupportedConfigurationException("Unsupported private key format " + keyFormat);
-        }
-        final byte[] privateKeyBytes;
-        if (!(input.getPrivateKeyType() instanceof CleartextPrivateKey clearText)) {
-            throw new UnsupportedConfigurationException("Unsupported private key type " + input.getPrivateKeyType());
-        }
-        privateKeyBytes = clearText.requireCleartextPrivateKey();
-
-        final var publicKeyFormat = input.getPublicKeyFormat();
-        final var publicKeyBytes = input.getPublicKey();
-        final boolean isSshPublicKey;
-        if (SubjectPublicKeyInfoFormat.VALUE.equals(publicKeyFormat)) {
-            isSshPublicKey = false;
-        } else if (SshPublicKeyFormat.VALUE.equals(publicKeyFormat)) {
-            isSshPublicKey = true;
-        } else {
-            throw new UnsupportedConfigurationException("Unsupported public key format " + publicKeyFormat);
-        }
-
-        final var privateKey = KeyUtils.buildPrivateKey(privateKeyAlgorithm, privateKeyBytes);
-        final var publicKey = isSshPublicKey ? KeyUtils.buildPublicKeyFromSshEncoding(publicKeyBytes)
-                : KeyUtils.buildX509PublicKey(privateKeyAlgorithm, publicKeyBytes);
-        /*
-            ietf-crypto-types:grouping asymmetric-key-pair-grouping
-            "A private key and its associated public key.  Implementations
-            SHOULD ensure that the two keys are a matching pair."
-         */
-        KeyUtils.validateKeyPair(publicKey, privateKey);
-        return new KeyPair(publicKey, privateKey);
-    }
-
     static <T> T ofType(final Class<T> expectedType, final Object obj) throws UnsupportedConfigurationException {
         if (!expectedType.isInstance(obj)) {
             throw new UnsupportedConfigurationException("Expected type: " + expectedType
@@ -124,8 +69,7 @@ final class ConfigUtils {
     }
 
     static List<PublicKey> extractPublicKeys(final InlineOrTruststore input) throws UnsupportedConfigurationException {
-        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
-                .inline.or.truststore._public.keys.grouping.inline.or.truststore.Inline.class, input);
+        final var inline = ofType(Inline.class, input);
         final var inlineDef = inline.getInlineDefinition();
         if (inlineDef == null) {
             throw new UnsupportedConfigurationException("Missing inline definition in " + inline);

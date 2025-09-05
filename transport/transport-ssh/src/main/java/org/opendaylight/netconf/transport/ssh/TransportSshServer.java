@@ -196,7 +196,7 @@ final class TransportSshServer extends SshServer {
             for (var hostKey : serverHostKeys) {
                 if (hostKey.getHostKeyType() instanceof PublicKey publicKey
                         && publicKey.getPublicKey() != null) {
-                    listBuilder.add(ConfigUtils.extractKeyPair(publicKey.getPublicKey().getInlineOrKeystore()));
+                    listBuilder.add(KeyUtils.extractKeyPair(publicKey.getPublicKey().getInlineOrKeystore()));
                 } else if (hostKey.getHostKeyType() instanceof Certificate certificate
                         && certificate.getCertificate() != null) {
                     listBuilder.add(extractCertificateEntry(certificate.getCertificate()).getKey());
@@ -212,7 +212,7 @@ final class TransportSshServer extends SshServer {
             if (inlineDef == null) {
                 throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
             }
-            final var keyPair = ConfigUtils.extractKeyPair(inlineDef);
+            final var keyPair = KeyUtils.extractKeyPair(inlineDef);
             final var certificate = KeyUtils.buildX509Certificate(inlineDef.requireCertData().getValue());
             /*
               ietf-crypto-types:asymmetric-key-pair-with-cert-grouping

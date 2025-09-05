@@ -228,7 +228,7 @@ final class TransportSshClient extends SshClient {
             }
             final var hostBased = clientIdentity.getHostbased();
             if (hostBased != null) {
-                var keyPair = ConfigUtils.extractKeyPair(hostBased.getInlineOrKeystore());
+                var keyPair = KeyUtils.extractKeyPair(hostBased.getInlineOrKeystore());
                 var factory = new UserAuthHostBasedFactory();
                 factory.setClientHostKeys(HostKeyIdentityProvider.wrap(keyPair));
                 factory.setClientUsername(clientIdentity.getUsername());
@@ -239,7 +239,7 @@ final class TransportSshClient extends SshClient {
             }
             final var publicKey = clientIdentity.getPublicKey();
             if (publicKey != null) {
-                final var keyPairs = ConfigUtils.extractKeyPair(publicKey.getInlineOrKeystore());
+                final var keyPairs = KeyUtils.extractKeyPair(publicKey.getInlineOrKeystore());
                 client.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPairs));
                 authFactoriesListBuilder.add(new UserAuthPublicKeyFactory(client.getSignatureFactories()));
             }
