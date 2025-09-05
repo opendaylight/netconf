@@ -11,7 +11,9 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.DoNotCall;
+import java.security.PublicKey;
 import java.security.cert.Certificate;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.netconf.shaded.sshd.client.ClientBuilder;
 import org.opendaylight.netconf.shaded.sshd.client.SshClient;
@@ -104,7 +106,10 @@ final class TransportSshClient extends SshClient {
                     .addAll(ConfigUtils.extractCertificates(serverAuthentication.getCaCerts()))
                     .addAll(ConfigUtils.extractCertificates(serverAuthentication.getEeCerts()))
                     .build();
-                final var publicKeys = ConfigUtils.extractPublicKeys(serverAuthentication.getSshHostKeys());
+                final var sshHostKeys = serverAuthentication.getSshHostKeys();
+                final var publicKeys = sshHostKeys == null ? List.<PublicKey>of()
+                    : ConfigUtils.extractPublicKeys(sshHostKeys.getInlineOrTruststore());
+
                 if (certificatesList.isEmpty() && publicKeys.isEmpty()) {
                     throw new UnsupportedConfigurationException(
                         "Server authentication should contain either ssh-host-keys, or ca-certs, or ee-certs");
