@@ -307,7 +307,7 @@ final class KeyExchangeAlgorithms {
             final var kexAlg = keyExchange.getKeyExchangeAlg();
             if (kexAlg != null && !kexAlg.isEmpty()) {
                 // FIXME: this logic does not allow us to configure aliases like '@libssh.org', etc.
-                return TransportUtils.mapValues(map, kexAlg, "Unsupported Key Exchange algorithm %s");
+                return ConfigUtils.mapValues(map, kexAlg, "Unsupported Key Exchange algorithm %s");
             }
         }
         return defaultResult;
