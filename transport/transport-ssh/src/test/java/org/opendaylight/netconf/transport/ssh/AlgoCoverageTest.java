@@ -44,7 +44,7 @@ import org.opendaylight.yangtools.binding.TypeObject;
 class AlgoCoverageTest {
     @Test
     void coveredSshEncryptionAlgorithm() {
-        assertAllAsKey(TransportUtils.CIPHERS, TransportUtils::wrap, SshEncryptionAlgorithm.values(),
+        assertAllAsKey(EncryptionAlgorithms.BY_YANG, EncryptionAlgorithms::keyOf, SshEncryptionAlgorithm.values(),
             // FIXME: provide reasons for exclusion
             SshEncryptionAlgorithm.Twofish256Cbc,
             SshEncryptionAlgorithm.TwofishCbc,
@@ -72,7 +72,7 @@ class AlgoCoverageTest {
 
     @Test
     void coveredSshMacAlgorithm() {
-        assertAllAsKey(TransportUtils.MACS, TransportUtils::wrap, SshMacAlgorithm.values(),
+        assertAllAsKey(MacAlgorithms.BY_YANG, MacAlgorithms::keyOf, SshMacAlgorithm.values(),
             // FIXME: provide reasons for exclusion
             SshMacAlgorithm.None,
             SshMacAlgorithm.AEADAES128GCM,
@@ -81,7 +81,7 @@ class AlgoCoverageTest {
 
     @Test
     void coveredPublicKeyAlgorithm() {
-        assertAllAsKey(TransportUtils.SIGNATURES, TransportUtils::wrap, SshPublicKeyAlgorithm.values(),
+        assertAllAsKey(PublicKeyAlgorithms.BY_YANG, PublicKeyAlgorithms::keyOf, SshPublicKeyAlgorithm.values(),
             // FIXME: provide reasons for exclusion
             SshPublicKeyAlgorithm.SpkiSignRsa,
             SshPublicKeyAlgorithm.SpkiSignDss,
@@ -120,7 +120,7 @@ class AlgoCoverageTest {
     void coveredSshKeyExchangeAlgorithm(final Map<
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
             ?> map) {
-        assertAllAsKey(map, TransportUtils::wrap, SshKeyExchangeAlgorithm.values(),
+        assertAllAsKey(map, KeyExchangeAlgorithms::keyOf, SshKeyExchangeAlgorithm.values(),
             // FIXME: provide reasons for exclusion
             SshKeyExchangeAlgorithm.EcdhSha21313201,
             SshKeyExchangeAlgorithm.EcdhSha21284010045311,
@@ -301,8 +301,8 @@ class AlgoCoverageTest {
 
     private static List<Arguments> coveredSshKeyExchangeAlgorithm() {
         return List.of(
-            arguments(named("client KEXs", TransportUtils.CLIENT_KEXS)),
-            arguments(named("server KEXs", TransportUtils.SERVER_KEXS)));
+            arguments(named("client KEXs", KeyExchangeAlgorithms.CLIENT_BY_YANG)),
+            arguments(named("server KEXs", KeyExchangeAlgorithms.SERVER_BY_YANG)));
     }
 
     // The meat of assertions. Yes we could use Parameterized tests, but this way is less meta.
