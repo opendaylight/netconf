@@ -11,9 +11,7 @@ import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.security.KeyPair;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.time.Duration;
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
@@ -29,7 +27,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.type
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SshPublicKeyFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SubjectPublicKeyInfoFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010._private.key.grouping._private.key.type.CleartextPrivateKey;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.TransportParamsGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.KeyExchange;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -80,8 +77,7 @@ final class ConfigUtils {
         return extractKeyPair(inlineDef);
     }
 
-    private static KeyPair extractKeyPair(final AsymmetricKeyPairGrouping input)
-            throws UnsupportedConfigurationException {
+    static KeyPair extractKeyPair(final AsymmetricKeyPairGrouping input) throws UnsupportedConfigurationException {
         final var keyFormat = input.getPrivateKeyFormat();
         final String privateKeyAlgorithm;
         if (EcPrivateKeyFormat.VALUE.equals(keyFormat)) {
@@ -118,26 +114,6 @@ final class ConfigUtils {
          */
         KeyUtils.validateKeyPair(publicKey, privateKey);
         return new KeyPair(publicKey, privateKey);
-    }
-
-    static Map.Entry<KeyPair, List<X509Certificate>> extractCertificateEntry(
-            final InlineOrKeystoreEndEntityCertWithKeyGrouping input) throws UnsupportedConfigurationException {
-        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
-                        .inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.Inline.class,
-                input.getInlineOrKeystore());
-        final var inlineDef = inline.getInlineDefinition();
-        if (inlineDef == null) {
-            throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
-        }
-        final var keyPair = extractKeyPair(inlineDef);
-        final var certificate = KeyUtils.buildX509Certificate(inlineDef.requireCertData().getValue());
-        /*
-          ietf-crypto-types:asymmetric-key-pair-with-cert-grouping
-          "A private/public key pair and an associated certificate.
-          Implementations SHOULD assert that certificates contain the matching public key."
-         */
-        KeyUtils.validatePublicKey(keyPair.getPublic(), certificate);
-        return new SimpleImmutableEntry<>(keyPair, List.of(certificate));
     }
 
     static <T> T ofType(final Class<T> expectedType, final Object obj) throws UnsupportedConfigurationException {
