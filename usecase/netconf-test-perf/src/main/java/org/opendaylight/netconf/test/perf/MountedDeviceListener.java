@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentMap;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -123,7 +123,7 @@ public final class MountedDeviceListener implements DOMMountPointListener {
             inputNode);
         Futures.addCallback(resultFuture, new FutureCallback<DOMRpcResult>() {
             @Override
-            public void onSuccess(@Nullable final DOMRpcResult rpcResult) {
+            public void onSuccess(final DOMRpcResult rpcResult) {
                 LOG.info("Notification stream subscription succesfully completed");
             }
 
