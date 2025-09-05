@@ -67,27 +67,6 @@ final class ConfigUtils {
         factoryMgr.setSessionHeartbeat(SessionHeartbeatController.HeartbeatType.IGNORE, Duration.ofSeconds(maxWait));
     }
 
-    static List<KeyPair> extractServerHostKeys(
-            final List<org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010
-                    .ssh.server.grouping.server.identity.HostKey> serverHostKeys)
-            throws UnsupportedConfigurationException {
-        var listBuilder = ImmutableList.<KeyPair>builder();
-        for (var hostKey : serverHostKeys) {
-            if (hostKey.getHostKeyType()
-                    instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010
-                    .ssh.server.grouping.server.identity.host.key.host.key.type.PublicKey publicKey
-                    && publicKey.getPublicKey() != null) {
-                listBuilder.add(extractKeyPair(publicKey.getPublicKey().getInlineOrKeystore()));
-            } else if (hostKey.getHostKeyType()
-                    instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010
-                    .ssh.server.grouping.server.identity.host.key.host.key.type.Certificate certificate
-                    && certificate.getCertificate() != null) {
-                listBuilder.add(extractCertificateEntry(certificate.getCertificate()).getKey());
-            }
-        }
-        return listBuilder.build();
-    }
-
     static KeyPair extractKeyPair(
             final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
                     .inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore input)
@@ -141,7 +120,7 @@ final class ConfigUtils {
         return new KeyPair(publicKey, privateKey);
     }
 
-    private static Map.Entry<KeyPair, List<X509Certificate>> extractCertificateEntry(
+    static Map.Entry<KeyPair, List<X509Certificate>> extractCertificateEntry(
             final InlineOrKeystoreEndEntityCertWithKeyGrouping input) throws UnsupportedConfigurationException {
         final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
                         .inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.Inline.class,
