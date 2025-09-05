@@ -61,6 +61,7 @@
       <groupId>org.checkerframework</groupId>
       <artifactId>checker-qual</artifactId>
       <scope>provided</scope>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
