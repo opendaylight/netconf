@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.DoNotCall;
+import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -30,6 +31,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ClientAuthentication;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.Keepalives;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ServerIdentity;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.server.identity.HostKey;
 
 /**
  * Our internal-use {@link SshServer}. We reuse all the properties and logic of an {@link SshServer}, but we never allow
@@ -176,10 +178,29 @@ final class TransportSshServer extends SshServer {
             if (hostKey == null || hostKey.isEmpty()) {
                 throw new UnsupportedConfigurationException("Host keys is missing in server identity configuration");
             }
-            final var serverHostKeyPairs = ConfigUtils.extractServerHostKeys(hostKey);
+            final var serverHostKeyPairs = extractServerHostKeys(hostKey);
             if (!serverHostKeyPairs.isEmpty()) {
                 server.setKeyPairProvider(KeyPairProvider.wrap(serverHostKeyPairs));
             }
+        }
+
+        private static List<KeyPair> extractServerHostKeys(final List<HostKey> serverHostKeys)
+                throws UnsupportedConfigurationException {
+            var listBuilder = ImmutableList.<KeyPair>builder();
+            for (var hostKey : serverHostKeys) {
+                if (hostKey.getHostKeyType()
+                        instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010
+                        .ssh.server.grouping.server.identity.host.key.host.key.type.PublicKey publicKey
+                        && publicKey.getPublicKey() != null) {
+                    listBuilder.add(ConfigUtils.extractKeyPair(publicKey.getPublicKey().getInlineOrKeystore()));
+                } else if (hostKey.getHostKeyType()
+                        instanceof org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010
+                        .ssh.server.grouping.server.identity.host.key.host.key.type.Certificate certificate
+                        && certificate.getCertificate() != null) {
+                    listBuilder.add(ConfigUtils.extractCertificateEntry(certificate.getCertificate()).getKey());
+                }
+            }
+            return listBuilder.build();
         }
 
         private static void setClientAuthentication(final TransportSshServer server,
