@@ -39,8 +39,13 @@ import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint8;
 
 final class ConfigUtils {
+    @FunctionalInterface
+    interface KexFactoryProvider {
 
-    private static final int KEEP_ALIVE_DEFAULT_MAX_WAIT = 30; // seconds
+        List<KeyExchangeFactory> factoriesFor(KeyExchange input) throws UnsupportedConfigurationException;
+    }
+
+    private static final int KEEP_ALIVE_DEFAULT_MAX_WAIT_SECONDS = 30;
     private static final int KEEP_ALIVE_DEFAULT_ATTEMPTS = 3;
 
     private ConfigUtils() {
@@ -51,10 +56,10 @@ final class ConfigUtils {
             final @Nullable TransportParamsGrouping params, final @NonNull KexFactoryProvider kexProvider)
             throws UnsupportedConfigurationException {
         builder
-            .cipherFactories(TransportUtils.getCipherFactories(params == null ? null : params.getEncryption()))
-            .signatureFactories(TransportUtils.getSignatureFactories(params == null ? null : params.getHostKey()))
-            .keyExchangeFactories(kexProvider.getKexFactories(params == null ? null : params.getKeyExchange()))
-            .macFactories(TransportUtils.getMacFactories(params == null ? null : params.getMac()));
+            .cipherFactories(EncryptionAlgorithms.factoriesFor(params == null ? null : params.getEncryption()))
+            .signatureFactories(PublicKeyAlgorithms.factoriesFor(params == null ? null : params.getHostKey()))
+            .keyExchangeFactories(kexProvider.factoriesFor(params == null ? null : params.getKeyExchange()))
+            .macFactories(MacAlgorithms.factoriesFor(params == null ? null : params.getMac()));
     }
 
     @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "maxAttempts usage need clarification")
@@ -62,7 +67,7 @@ final class ConfigUtils {
             final @Nullable Uint8 cfgMaxAttempts) {
         // FIXME: utilize max attempts
         final var maxAttempts = cfgMaxAttempts == null ? KEEP_ALIVE_DEFAULT_ATTEMPTS : cfgMaxAttempts.intValue();
-        final var maxWait = cfgMaxWait == null ? KEEP_ALIVE_DEFAULT_MAX_WAIT : cfgMaxWait.intValue();
+        final var maxWait = cfgMaxWait == null ? KEEP_ALIVE_DEFAULT_MAX_WAIT_SECONDS : cfgMaxWait.intValue();
         factoryMgr.setSessionHeartbeat(SessionHeartbeatController.HeartbeatType.IGNORE, Duration.ofSeconds(maxWait));
     }
 
@@ -112,11 +117,10 @@ final class ConfigUtils {
             throw new UnsupportedConfigurationException("Unsupported private key format " + keyFormat);
         }
         final byte[] privateKeyBytes;
-        if (input.getPrivateKeyType() instanceof CleartextPrivateKey clearText) {
-            privateKeyBytes = clearText.requireCleartextPrivateKey();
-        } else {
+        if (!(input.getPrivateKeyType() instanceof CleartextPrivateKey clearText)) {
             throw new UnsupportedConfigurationException("Unsupported private key type " + input.getPrivateKeyType());
         }
+        privateKeyBytes = clearText.requireCleartextPrivateKey();
 
         final var publicKeyFormat = input.getPublicKeyFormat();
         final var publicKeyBytes = input.getPublicKey();
@@ -218,10 +222,5 @@ final class ConfigUtils {
     static List<PublicKey> extractPublicKeys(final @Nullable SshHostKeys sshHostKeys)
             throws UnsupportedConfigurationException {
         return sshHostKeys == null ? List.of() : extractPublicKeys(sshHostKeys.getInlineOrTruststore());
-    }
-
-    @FunctionalInterface
-    interface KexFactoryProvider {
-        List<KeyExchangeFactory> getKexFactories(KeyExchange input) throws UnsupportedConfigurationException;
     }
 }
