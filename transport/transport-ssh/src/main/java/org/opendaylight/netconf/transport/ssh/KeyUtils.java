@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -35,11 +36,18 @@ import org.bouncycastle.crypto.util.OpenSSHPublicKeyUtil;
 import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.AsymmetricKeyPairGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.EcPrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.RsaPrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SshPublicKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SubjectPublicKeyInfoFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010._private.key.grouping._private.key.type.CleartextPrivateKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.Inline;
 
 final class KeyUtils {
-
-    static final String RSA_ALGORITHM = "RSA";
-    static final String EC_ALGORITHM = "EC";
+    private static final String RSA_ALGORITHM = "RSA";
+    private static final String EC_ALGORITHM = "EC";
     private static final String BC = BouncyCastleProvider.PROVIDER_NAME;
 
     static {
@@ -93,7 +101,55 @@ final class KeyUtils {
         }
     }
 
-    static void validateKeyPair(final PublicKey publicKey, final PrivateKey privateKey)
+    static KeyPair extractKeyPair(final InlineOrKeystore input) throws UnsupportedConfigurationException {
+        final var inline = ConfigUtils.ofType(Inline.class, input);
+        final var inlineDef = inline.getInlineDefinition();
+        if (inlineDef == null) {
+            throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
+        }
+        return extractKeyPair(inlineDef);
+    }
+
+    static KeyPair extractKeyPair(final AsymmetricKeyPairGrouping input) throws UnsupportedConfigurationException {
+        final var keyFormat = input.getPrivateKeyFormat();
+        final String privateKeyAlgorithm;
+        if (EcPrivateKeyFormat.VALUE.equals(keyFormat)) {
+            privateKeyAlgorithm = EC_ALGORITHM;
+        } else if (RsaPrivateKeyFormat.VALUE.equals(keyFormat)) {
+            privateKeyAlgorithm = RSA_ALGORITHM;
+        } else {
+            throw new UnsupportedConfigurationException("Unsupported private key format " + keyFormat);
+        }
+        final byte[] privateKeyBytes;
+        if (!(input.getPrivateKeyType() instanceof CleartextPrivateKey clearText)) {
+            throw new UnsupportedConfigurationException("Unsupported private key type " + input.getPrivateKeyType());
+        }
+        privateKeyBytes = clearText.requireCleartextPrivateKey();
+
+        final var publicKeyFormat = input.getPublicKeyFormat();
+        final var publicKeyBytes = input.getPublicKey();
+        final boolean isSshPublicKey;
+        if (SubjectPublicKeyInfoFormat.VALUE.equals(publicKeyFormat)) {
+            isSshPublicKey = false;
+        } else if (SshPublicKeyFormat.VALUE.equals(publicKeyFormat)) {
+            isSshPublicKey = true;
+        } else {
+            throw new UnsupportedConfigurationException("Unsupported public key format " + publicKeyFormat);
+        }
+
+        final var privateKey = KeyUtils.buildPrivateKey(privateKeyAlgorithm, privateKeyBytes);
+        final var publicKey = isSshPublicKey ? KeyUtils.buildPublicKeyFromSshEncoding(publicKeyBytes)
+                : KeyUtils.buildX509PublicKey(privateKeyAlgorithm, publicKeyBytes);
+        /*
+            ietf-crypto-types:grouping asymmetric-key-pair-grouping
+            "A private key and its associated public key.  Implementations
+            SHOULD ensure that the two keys are a matching pair."
+         */
+        validateKeyPair(publicKey, privateKey);
+        return new KeyPair(publicKey, privateKey);
+    }
+
+    private static void validateKeyPair(final PublicKey publicKey, final PrivateKey privateKey)
             throws UnsupportedConfigurationException {
         final String signAlgorithm;
         if (privateKey instanceof RSAPrivateKey) {
