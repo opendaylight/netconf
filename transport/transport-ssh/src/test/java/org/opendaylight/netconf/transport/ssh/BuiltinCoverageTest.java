@@ -42,9 +42,7 @@ import org.opendaylight.netconf.shaded.sshd.common.signature.BuiltinSignatures;
 class BuiltinCoverageTest {
     @Test
     void coveredBuiltinCiphers() {
-        assertAllAsValue(EncryptionAlgorithms.BY_YANG, BuiltinCiphers.values(),
-            // FIXME: these seem to indicate a gap in our coverage
-            BuiltinCiphers.cc20p1305_openssh);
+        assertAllAsValue(EncryptionAlgorithms.BY_YANG, BuiltinCiphers.values());
     }
 
     @Test
