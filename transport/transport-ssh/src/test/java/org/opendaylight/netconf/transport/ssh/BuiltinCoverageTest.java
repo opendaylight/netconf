@@ -93,11 +93,7 @@ class BuiltinCoverageTest {
     void coveredBuiltinDHFactories(final Map<?, KeyExchangeFactory> map) {
         final var unsuppressed = new HashSet<>(List.of(
             // FIXME: explain these omissions and consider providing them, if possible
-            // https://www.libssh.org/2013/11/03/openssh-introduces-curve25519-sha256libssh-org-key-exchange/
-            BuiltinDHFactories.curve25519_libssh,
-            BuiltinDHFactories.mlkem768x25519,
-            BuiltinDHFactories.mlkem768nistp256,
-            BuiltinDHFactories.mlkem1024nistp384));
+            BuiltinDHFactories.curve25519_libssh));
 
         final var unmatched = new ArrayList<BuiltinDHFactories>();
 
