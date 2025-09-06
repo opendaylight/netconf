@@ -97,9 +97,7 @@ class BuiltinCoverageTest {
             BuiltinDHFactories.curve25519_libssh,
             BuiltinDHFactories.mlkem768x25519,
             BuiltinDHFactories.mlkem768nistp256,
-            BuiltinDHFactories.mlkem1024nistp384,
-            BuiltinDHFactories.sntrup761x25519,
-            BuiltinDHFactories.sntrup761x25519_openssh));
+            BuiltinDHFactories.mlkem1024nistp384));
 
         final var unmatched = new ArrayList<BuiltinDHFactories>();
 

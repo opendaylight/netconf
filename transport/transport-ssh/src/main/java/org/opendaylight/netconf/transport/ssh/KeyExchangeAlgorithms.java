@@ -261,13 +261,11 @@ final class KeyExchangeAlgorithms {
             // SshKeyExchangeAlgorithm.GssCurve448Sha51213132038
 
             entry(SshKeyExchangeAlgorithm.Curve25519Sha256, BuiltinDHFactories.curve25519),
-            entry(SshKeyExchangeAlgorithm.Curve448Sha512, BuiltinDHFactories.curve448)
+            entry(SshKeyExchangeAlgorithm.Curve448Sha512, BuiltinDHFactories.curve448),
 
-            // defined in https://datatracker.ietf.org/doc/draft-josefsson-ntruprime-ssh/02/
-            // FIXME: does this match any of the following
-            //        BuiltinDHFactories.sntrup761x25519
-            //        BuiltinDHFactories.sntrup761x25519_openssh
-            // SshKeyExchangeAlgorithm.Sntrup761x25519Sha512
+            // informational in https://datatracker.ietf.org/doc/draft-ietf-sshm-ntruprime-ssh/
+            entry(SshKeyExchangeAlgorithm.Sntrup761x25519Sha512, BuiltinDHFactories.sntrup761x25519),
+            entry(BuiltinDHFactories.sntrup761x25519_openssh)
 
             // defined in https://datatracker.ietf.org/doc/draft-kampanakis-curdle-ssh-pq-ke/04/
             // FIXME: do these match, in order:
@@ -310,6 +308,7 @@ final class KeyExchangeAlgorithms {
         if (keyExchange != null) {
             final var kexAlg = keyExchange.getKeyExchangeAlg();
             if (kexAlg != null && !kexAlg.isEmpty()) {
+                // FIXME: this logic does not allow us to configure aliases like '@libssh.org', etc.
                 return TransportUtils.mapValues(map, kexAlg, "Unsupported Key Exchange algorithm %s");
             }
         }
@@ -320,6 +319,13 @@ final class KeyExchangeAlgorithms {
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
             DHFactory> entry(final SshKeyExchangeAlgorithm alg, final DHFactory factory) {
         return Map.entry(keyOf(alg), factory);
+    }
+
+    private static Entry<
+            org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
+            DHFactory> entry(final DHFactory factory) {
+        return Map.entry(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010
+            .SshKeyExchangeAlgorithm(factory.getName()), factory);
     }
 
     @VisibleForTesting
