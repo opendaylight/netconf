@@ -11,25 +11,25 @@ import com.google.common.annotations.VisibleForTesting;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.common.BaseBuilder;
 import org.opendaylight.netconf.shaded.sshd.common.NamedFactory;
 import org.opendaylight.netconf.shaded.sshd.common.signature.BuiltinSignatures;
 import org.opendaylight.netconf.shaded.sshd.common.signature.Signature;
 import org.opendaylight.netconf.shaded.sshd.common.signature.SignatureFactory;
-import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh._public.key.algs.rev241016.SshPublicKeyAlgorithm;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.HostKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.TransportParamsGrouping;
 
 /**
  * Mapping of supported public key algorithms, mostly as maintained by IANA in
  * <a href="https://www.iana.org/assignments/ssh-parameters/ssh-parameters.xhtml">Public Key Algorithm Names</a>.
  */
-final class PublicKeyAlgorithms {
+final class SignatureSupport extends AlgorithmSupport<
+        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm,
+        NamedFactory<Signature>> {
     @VisibleForTesting
     static final Map<
         org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm,
-        SignatureFactory> BY_YANG = Map.ofEntries(
+        NamedFactory<Signature>> BY_YANG = Map.ofEntries(
             // Keep the same order as in iana-ssh-public-key-algs.yang
 
             // FIXME: audit commented-out algorithms missing in BuiltinSignatures or provide justification for exclusion
@@ -92,21 +92,32 @@ final class PublicKeyAlgorithms {
     private static final List<NamedFactory<Signature>> DEFAULT_SIGNATURES =
         List.copyOf(BaseBuilder.DEFAULT_SIGNATURE_PREFERENCE);
 
-
-    private PublicKeyAlgorithms() {
-        // Hidden on purpose
+    private SignatureSupport(final List<NamedFactory<Signature>> defaultFactories) {
+        super(BY_YANG, defaultFactories);
     }
 
-    static List<NamedFactory<Signature>> factoriesFor(final @Nullable HostKey hostKey)
-            throws UnsupportedConfigurationException {
-        if (hostKey != null) {
-            final var hostKeyAlg = hostKey.getHostKeyAlg();
-            if (hostKeyAlg != null && hostKeyAlg.isEmpty()) {
-                return ConfigUtils.mapValues(BY_YANG, hostKeyAlg, "Unsupported Host Key algorithm %s");
-            }
-        }
-        return DEFAULT_SIGNATURES;
+    @Override
+    List<org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm>
+            algsOf(final TransportParamsGrouping params) {
+        final var hostKey = params.getHostKey();
+        return hostKey == null ? null : hostKey.getHostKeyAlg();
     }
+
+    @Override
+    void setFactories(final BaseBuilder<?, ?> builder, final List<NamedFactory<Signature>> factories) {
+        builder.signatureFactories(factories);
+    }
+//
+//    static List<NamedFactory<Signature>> factoriesFor(final @Nullable HostKey hostKey)
+//            throws UnsupportedConfigurationException {
+//        if (hostKey != null) {
+//            final var hostKeyAlg = hostKey.getHostKeyAlg();
+//            if (hostKeyAlg != null && hostKeyAlg.isEmpty()) {
+//                return ConfigUtils.mapValues(BY_YANG, hostKeyAlg, "Unsupported Host Key algorithm %s");
+//            }
+//        }
+//        return DEFAULT_SIGNATURES;
+//    }
 
     private static Entry<
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm,

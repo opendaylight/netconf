@@ -87,7 +87,7 @@ final class TransportSshClient extends SshClient {
         }
 
         Builder transportParams(final TransportParamsGrouping params) throws UnsupportedConfigurationException {
-            ConfigUtils.setTransportParams(this, params, KeyExchangeAlgorithms::clientFactoriesFor);
+            KeyExchangeAlgorithms.CLIENT_SUPPORT.setTransportParams(this, params);
             return this;
         }
 

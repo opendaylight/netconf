@@ -17,11 +17,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.common.BaseBuilder;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
-import org.opendaylight.netconf.shaded.sshd.common.kex.KeyExchangeFactory;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatController;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SshPublicKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.TransportParamsGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.KeyExchange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.inline.or.truststore._public.keys.grouping.InlineOrTruststore;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.inline.or.truststore._public.keys.grouping.inline.or.truststore.Inline;
@@ -31,7 +29,9 @@ import org.opendaylight.yangtools.yang.common.Uint8;
 final class ConfigUtils {
     @FunctionalInterface
     interface KexFactoryProvider {
-        List<KeyExchangeFactory> getKexFactories(KeyExchange input) throws UnsupportedConfigurationException;
+
+        void configureBuilder(@NonNull BaseBuilder<?, ?> builder, @Nullable KeyExchange keyExchange)
+            throws UnsupportedConfigurationException;
     }
 
     private static final int KEEP_ALIVE_DEFAULT_MAX_WAIT_SECONDS = 30;
@@ -41,15 +41,13 @@ final class ConfigUtils {
         // utility class
     }
 
-    static void setTransportParams(final @NonNull BaseBuilder<?, ?> builder,
-            final @Nullable TransportParamsGrouping params, final @NonNull KexFactoryProvider kexProvider)
-            throws UnsupportedConfigurationException {
-        builder
-            .cipherFactories(EncryptionAlgorithms.factoriesFor(params == null ? null : params.getEncryption()))
-            .signatureFactories(PublicKeyAlgorithms.factoriesFor(params == null ? null : params.getHostKey()))
-            .keyExchangeFactories(kexProvider.getKexFactories(params == null ? null : params.getKeyExchange()))
-            .macFactories(MacAlgorithms.factoriesFor(params == null ? null : params.getMac()));
-    }
+//    static void setTransportParams(final @NonNull BaseBuilder<?, ?> builder,
+//            final @Nullable TransportParamsGrouping params, final @NonNull KexFactoryProvider kexProvider)
+//            throws UnsupportedConfigurationException {
+//        EncryptionAlgorithms.configureBuilder(builder, params == null ? null : params.getEncryption());
+//        kexProvider.configureBuilder(builder, params == null ? null : params.getKeyExchange());
+//        MacAlgorithms.configureBuilder(builder, params == null ? null : params.getMac());
+//    }
 
     @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "maxAttempts usage need clarification")
     static void setKeepAlives(final @NonNull FactoryManager factoryMgr, final @Nullable Uint16 cfgMaxWait,

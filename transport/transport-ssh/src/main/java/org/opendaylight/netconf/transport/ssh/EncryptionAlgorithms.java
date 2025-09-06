@@ -106,15 +106,29 @@ final class EncryptionAlgorithms {
         // Hidden on purpose
     }
 
-    static @NonNull List<NamedFactory<Cipher>> factoriesFor(final @Nullable Encryption encryption)
+
+    static void configureBuilder(final @NonNull BaseBuilder<?, ?> builder, final @Nullable Encryption encryption)
             throws UnsupportedConfigurationException {
-        if (encryption != null) {
-            final var encAlg = encryption.getEncryptionAlg();
-            if (encAlg != null && !encAlg.isEmpty()) {
-                return ConfigUtils.mapValues(BY_YANG, encAlg, "Unsupported Encryption algorithm %s");
-            }
+        if (encryption == null) {
+            builder.cipherFactories(DEFAULT_FACTORIES);
+            return;
         }
-        return DEFAULT_FACTORIES;
+        final var algs = encryption.getEncryptionAlg();
+        if (algs == null || algs.isEmpty()) {
+            builder.cipherFactories(DEFAULT_FACTORIES);
+            return;
+        }
+
+        final var ciphers = new NamedFactory[algs.size()];
+        int i = 0;
+        for (var alg : algs) {
+            final var factory = BY_YANG.get(alg);
+            if (factory == null) {
+                throw new UnsupportedOperationException("Unsupported Encryption algorithm " + alg);
+            }
+            ciphers[i++] = factory;
+        }
+        builder.cipherFactories(List.of(ciphers));
     }
 
     private static Entry<

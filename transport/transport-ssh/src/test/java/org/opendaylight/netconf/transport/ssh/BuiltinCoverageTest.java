@@ -58,7 +58,7 @@ class BuiltinCoverageTest {
     @Test
     @SuppressWarnings("deprecation")
     void coveredBuiltinSignatures() {
-        assertAllAsValue(PublicKeyAlgorithms.BY_YANG, BuiltinSignatures.values(),
+        assertAllAsValue(SignatureSupport.BY_YANG, BuiltinSignatures.values(),
             // FIXME: explain these omissions and consider providing them, if possible
             BuiltinSignatures.dsa_cert,
             BuiltinSignatures.rsa_cert,
@@ -107,7 +107,7 @@ class BuiltinCoverageTest {
 
     private static List<Arguments> coveredBuiltinDHFactories() {
         return List.of(
-            arguments(named("client KEXs", KeyExchangeAlgorithms.CLIENT_BY_YANG)),
-            arguments(named("server KEXs", KeyExchangeAlgorithms.SERVER_BY_YANG)));
+            arguments(named("client KEXs", KeyExchangeAlgorithms.CLIENT_SUPPORT)),
+            arguments(named("server KEXs", KeyExchangeAlgorithms.SERVER_SUPPORT)));
     }
 }

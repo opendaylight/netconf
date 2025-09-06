@@ -11,6 +11,7 @@ import com.google.common.annotations.VisibleForTesting;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.common.BaseBuilder;
 import org.opendaylight.netconf.shaded.sshd.common.NamedFactory;
@@ -65,15 +66,28 @@ final class MacAlgorithms {
         // Hidden on purpose
     }
 
-    static List<NamedFactory<org.opendaylight.netconf.shaded.sshd.common.mac.Mac>> factoriesFor(
-            final @Nullable Mac mac) throws UnsupportedConfigurationException {
-        if (mac != null) {
-            final var macAlg = mac.getMacAlg();
-            if (macAlg != null && !macAlg.isEmpty()) {
-                return ConfigUtils.mapValues(BY_YANG, macAlg, "Unsupported MAC algorithm %s");
-            }
+    static void configureBuilder(final @NonNull BaseBuilder<?, ?> builder, final @Nullable Mac mac)
+                throws UnsupportedConfigurationException {
+        if (mac == null) {
+            builder.macFactories(DEFAULT_FACTORIES);
+            return;
         }
-        return DEFAULT_FACTORIES;
+        final var algs = mac.getMacAlg();
+        if (algs == null || algs.isEmpty()) {
+            builder.macFactories(DEFAULT_FACTORIES);
+            return;
+        }
+
+        final var factories = new MacFactory[algs.size()];
+        int i = 0;
+        for (var alg : algs) {
+            final var factory = BY_YANG.get(alg);
+            if (factory == null) {
+                throw new UnsupportedOperationException("Unsupported MAC algorithm " + alg);
+            }
+            factories[i++] = factory;
+        }
+        builder.macFactories(List.of(factories));
     }
 
     private static Entry<
