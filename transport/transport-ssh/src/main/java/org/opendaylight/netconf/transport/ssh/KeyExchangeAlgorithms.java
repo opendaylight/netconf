@@ -260,8 +260,10 @@ final class KeyExchangeAlgorithms {
             // SshKeyExchangeAlgorithm.GssCurve448Sha51213132037
             // SshKeyExchangeAlgorithm.GssCurve448Sha51213132038
 
+            // defined in https://www.rfc-editor.org/rfc/rfc8731#section-3
             entry(SshKeyExchangeAlgorithm.Curve25519Sha256, BuiltinDHFactories.curve25519),
             entry(SshKeyExchangeAlgorithm.Curve448Sha512, BuiltinDHFactories.curve448),
+            entry(BuiltinDHFactories.curve25519_libssh),
 
             // informational in https://datatracker.ietf.org/doc/draft-ietf-sshm-ntruprime-ssh/
             entry(SshKeyExchangeAlgorithm.Sntrup761x25519Sha512, BuiltinDHFactories.sntrup761x25519),
