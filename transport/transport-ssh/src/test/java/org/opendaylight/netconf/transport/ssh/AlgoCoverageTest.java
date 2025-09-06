@@ -292,7 +292,6 @@ class AlgoCoverageTest {
             SshKeyExchangeAlgorithm.GssCurve448Sha51213132036,
             SshKeyExchangeAlgorithm.GssCurve448Sha51213132037,
             SshKeyExchangeAlgorithm.GssCurve448Sha51213132038,
-            SshKeyExchangeAlgorithm.Sntrup761x25519Sha512,
             SshKeyExchangeAlgorithm.Mlkem768nistp256Sha256,
             SshKeyExchangeAlgorithm.Mlkem1024nistp384Sha384,
             SshKeyExchangeAlgorithm.Mlkem768x25519Sha256);
