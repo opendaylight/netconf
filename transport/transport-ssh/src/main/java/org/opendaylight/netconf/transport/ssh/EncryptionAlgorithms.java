@@ -94,13 +94,10 @@ final class EncryptionAlgorithms {
             // defined in https://www.rfc-editor.org/rfc/rfc5647
             // negotiated as per https://www.ietf.org/archive/id/draft-miller-sshm-aes-gcm-00.html
             entry(SshEncryptionAlgorithm.AEADAES128GCM, BuiltinCiphers.aes128gcm),
-            entry(SshEncryptionAlgorithm.AEADAES256GCM, BuiltinCiphers.aes256gcm)
+            entry(SshEncryptionAlgorithm.AEADAES256GCM, BuiltinCiphers.aes256gcm),
 
             // defined in https://datatracker.ietf.org/doc/draft-josefsson-ssh-chacha20-poly1305-openssh/01/
-            // FIXME: does this equal to BuiltinCiphers.cc20p1305_openssh? we need to read up on the drafts to
-            //        determine that
-            // SshEncryptionAlgorithm.Chacha20Poly1305
-            );
+            entry(SshEncryptionAlgorithm.Chacha20Poly1305, BuiltinCiphers.cc20p1305_openssh));
 
     private static final @NonNull List<NamedFactory<Cipher>> DEFAULT_FACTORIES =
         List.copyOf(BaseBuilder.DEFAULT_CIPHERS_PREFERENCE);

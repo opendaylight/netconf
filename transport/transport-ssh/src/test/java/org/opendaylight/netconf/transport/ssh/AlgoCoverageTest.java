@@ -66,8 +66,7 @@ class AlgoCoverageTest {
             SshEncryptionAlgorithm.Serpent192Ctr,
             SshEncryptionAlgorithm.Serpent256Ctr,
             SshEncryptionAlgorithm.IdeaCtr,
-            SshEncryptionAlgorithm.Cast128Ctr,
-            SshEncryptionAlgorithm.Chacha20Poly1305);
+            SshEncryptionAlgorithm.Cast128Ctr);
     }
 
     @Test
