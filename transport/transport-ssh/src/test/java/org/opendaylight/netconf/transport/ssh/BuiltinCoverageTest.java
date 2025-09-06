@@ -91,10 +91,7 @@ class BuiltinCoverageTest {
     @ParameterizedTest(name = "{index}: {0}")
     @MethodSource
     void coveredBuiltinDHFactories(final Map<?, KeyExchangeFactory> map) {
-        final var unsuppressed = new HashSet<>(List.of(
-            // FIXME: explain these omissions and consider providing them, if possible
-            // https://git.libssh.org/projects/libssh.git/tree/doc/curve25519-sha256@libssh.org.txt
-            BuiltinDHFactories.curve25519_libssh));
+        final var unsuppressed = new HashSet<>(List.of());
 
         final var unmatched = new ArrayList<BuiltinDHFactories>();
 
