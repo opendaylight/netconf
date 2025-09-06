@@ -265,17 +265,13 @@ final class KeyExchangeAlgorithms {
 
             // informational in https://datatracker.ietf.org/doc/draft-ietf-sshm-ntruprime-ssh/
             entry(SshKeyExchangeAlgorithm.Sntrup761x25519Sha512, BuiltinDHFactories.sntrup761x25519),
-            entry(BuiltinDHFactories.sntrup761x25519_openssh)
+            entry(BuiltinDHFactories.sntrup761x25519_openssh),
 
-            // defined in https://datatracker.ietf.org/doc/draft-kampanakis-curdle-ssh-pq-ke/04/
-            // FIXME: do these match, in order:
-            //        BuiltinDHFactories.mlkem768nistp256
-            //        BuiltinDHFactories.mlkem1024nistp384
-            //        BuiltinDHFactories.mlkem768x25519
-            // SshKeyExchangeAlgorithm.Mlkem768nistp256Sha256
-            // SshKeyExchangeAlgorithm.Mlkem1024nistp384Sha384
-            // SshKeyExchangeAlgorithm.Mlkem768x25519Sha256
-            ), DHFactory::isSupported);
+            // experimental in https://datatracker.ietf.org/doc/draft-ietf-sshm-mlkem-hybrid-kex/
+            entry(SshKeyExchangeAlgorithm.Mlkem768nistp256Sha256, BuiltinDHFactories.mlkem768nistp256),
+            entry(SshKeyExchangeAlgorithm.Mlkem1024nistp384Sha384, BuiltinDHFactories.mlkem1024nistp384),
+            entry(SshKeyExchangeAlgorithm.Mlkem768x25519Sha256, BuiltinDHFactories.mlkem768x25519)),
+            DHFactory::isSupported);
 
         CLIENT_BY_YANG = Map.copyOf(Maps.transformValues(factories, ClientBuilder.DH2KEX::apply));
         SERVER_BY_YANG = Map.copyOf(Maps.transformValues(factories, ServerBuilder.DH2KEX::apply));
