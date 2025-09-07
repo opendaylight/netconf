@@ -96,7 +96,7 @@ final class EncryptionAlgorithms {
             entry(SshEncryptionAlgorithm.AEADAES128GCM, BuiltinCiphers.aes128gcm),
             entry(SshEncryptionAlgorithm.AEADAES256GCM, BuiltinCiphers.aes256gcm),
 
-            // defined in https://datatracker.ietf.org/doc/draft-josefsson-ssh-chacha20-poly1305-openssh/
+            // defined in https://datatracker.ietf.org/doc/draft-ietf-sshm-chacha20-poly1305/
             entry(SshEncryptionAlgorithm.Chacha20Poly1305, BuiltinCiphers.cc20p1305_openssh));
 
     private static final @NonNull List<NamedFactory<Cipher>> DEFAULT_FACTORIES =
