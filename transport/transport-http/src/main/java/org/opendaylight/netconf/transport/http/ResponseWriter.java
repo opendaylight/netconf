@@ -20,6 +20,7 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
 import java.util.ArrayDeque;
@@ -63,7 +64,14 @@ final class ResponseWriter extends ChannelInboundHandlerAdapter {
 
     @Override
     public synchronized void handlerAdded(final ChannelHandlerContext ctx) {
+        //ctx.pipeline().replace(HttpServerCodec.class, null, this);
+        ctx.pipeline().addFirst(this);
         state = ctx.channel().isWritable() ? new Writable(ctx) : new Unwritable();
+    }
+
+    @Override
+    public void handlerRemoved(final ChannelHandlerContext ctx) throws Exception {
+        //ctx.pipeline().replace(this, null, new HttpServerCodec());
     }
 
     @Override
