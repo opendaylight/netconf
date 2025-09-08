@@ -2,6 +2,7 @@ Secure Transport interface and implementations
 ==============================================
 Here we our various transport implementations layered on top of Netty:
 * [common API](transport-api)
+* [ietf-crypto-types support](transport-crypto)
 * [TCP transport](transport-tcp)
 * [UDP transport](transport-udp)
 * [SSH transport](transport-ssh) layered on top of TCP
