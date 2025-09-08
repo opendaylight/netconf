@@ -12,7 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.DoNotCall;
-import java.security.PublicKey;
+import java.security.KeyPair;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.netconf.shaded.sshd.common.channel.ChannelFactory;
@@ -30,6 +30,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ClientAuthentication;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.Keepalives;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ServerIdentity;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.server.identity.host.key.host.key.type.Certificate;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.server.identity.host.key.host.key.type.PublicKey;
 
 /**
  * Our internal-use {@link SshServer}. We reuse all the properties and logic of an {@link SshServer}, but we never allow
@@ -176,13 +178,33 @@ final class TransportSshServer extends SshServer {
 
         private static void setServerIdentity(final TransportSshServer server, final ServerIdentity serverIdentity)
                 throws UnsupportedConfigurationException {
-            final var hostKey = serverIdentity.getHostKey();
-            if (hostKey == null || hostKey.isEmpty()) {
+            final var hostKeys = serverIdentity.getHostKey();
+            if (hostKeys == null || hostKeys.isEmpty()) {
                 throw new UnsupportedConfigurationException("Host keys is missing in server identity configuration");
             }
-            final var serverHostKeyPairs = ConfigUtils.extractServerHostKeys(hostKey);
-            if (!serverHostKeyPairs.isEmpty()) {
-                server.setKeyPairProvider(KeyPairProvider.wrap(serverHostKeyPairs));
+
+            final var keyPairsBuilder = ImmutableList.<KeyPair>builderWithExpectedSize(hostKeys.size());
+            for (var hostKey : hostKeys) {
+                final var type = hostKey.getHostKeyType();
+                switch (type) {
+                    case PublicKey publicKeyType -> {
+                        final var publicKey = publicKeyType.getPublicKey();
+                        if (publicKey != null) {
+                            keyPairsBuilder.add(ConfigUtils.extractKeyPair(publicKey.getInlineOrKeystore()));
+                        }
+                    }
+                    case Certificate certificateType -> {
+                        final var certificate = certificateType.getCertificate();
+                        if (certificate != null) {
+                            keyPairsBuilder.add(ConfigUtils.extractCertificateEntry(certificate).getKey());
+                        }
+                    }
+                    default -> throw new UnsupportedConfigurationException("Unsupported server host key type " + type);
+                }
+            }
+            final var keyPairs = keyPairsBuilder.build();
+            if (!keyPairs.isEmpty()) {
+                server.setKeyPairProvider(KeyPairProvider.wrap(keyPairs));
             }
         }
 
@@ -195,8 +217,8 @@ final class TransportSshServer extends SshServer {
             final var userMap = users.getUser();
             if (userMap != null) {
                 final var passwordMapBuilder = ImmutableMap.<String, String>builder();
-                final var hostBasedMapBuilder = ImmutableMap.<String, List<PublicKey>>builder();
-                final var publicKeyMapBuilder = ImmutableMap.<String, List<PublicKey>>builder();
+                final var hostBasedMapBuilder = ImmutableMap.<String, List<java.security.PublicKey>>builder();
+                final var publicKeyMapBuilder = ImmutableMap.<String, List<java.security.PublicKey>>builder();
                 for (var entry : userMap.entrySet()) {
                     final var username = entry.getKey().getName();
                     final var value = entry.getValue();
