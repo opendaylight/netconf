@@ -12,7 +12,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.List;
@@ -22,6 +21,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatController;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.crypto.CMSCertificateParser;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.AsymmetricKeyPairGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.EcPrivateKeyFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.RsaPrivateKeyFormat;
@@ -116,12 +116,12 @@ final class ConfigUtils {
         }
         final var listBuilder = ImmutableList.<Certificate>builder();
         for (var cert : inlineDef.nonnullCertificate().values()) {
-            listBuilder.add(KeyUtils.buildX509Certificate(cert.requireCertData().getValue()));
+            listBuilder.add(CMSCertificateParser.parseCertificate(cert.requireCertData()));
         }
         return listBuilder.build();
     }
 
-    static Map.Entry<KeyPair, List<X509Certificate>> extractCertificateEntry(
+    static Map.Entry<KeyPair, List<Certificate>> extractCertificateEntry(
             final InlineOrKeystoreEndEntityCertWithKeyGrouping input) throws UnsupportedConfigurationException {
         final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
                         .inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.Inline.class,
@@ -131,7 +131,7 @@ final class ConfigUtils {
             throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
         }
         final var keyPair = extractKeyPair(inlineDef);
-        final var certificate = KeyUtils.buildX509Certificate(inlineDef.requireCertData().getValue());
+        final var certificate = CMSCertificateParser.parseCertificate(inlineDef.requireCertData());
         /*
           ietf-crypto-types:asymmetric-key-pair-with-cert-grouping
           "A private/public key pair and an associated certificate.

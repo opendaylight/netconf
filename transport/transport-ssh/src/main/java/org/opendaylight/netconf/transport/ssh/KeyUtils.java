@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -19,9 +18,6 @@ import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.InvalidKeySpecException;
@@ -48,14 +44,6 @@ final class KeyUtils {
 
     private KeyUtils() {
         // utility class
-    }
-
-    static X509Certificate buildX509Certificate(final byte[] bytes) throws UnsupportedConfigurationException {
-        try (var in = new ByteArrayInputStream(bytes)) {
-            return (X509Certificate) CertificateFactory.getInstance("X.509", BC).generateCertificate(in);
-        } catch (IOException | CertificateException | NoSuchProviderException e) {
-            throw new UnsupportedConfigurationException("Cannot read certificate", e);
-        }
     }
 
     static PrivateKey buildPrivateKey(final String keyAlgorithm, final byte[] bytes)
