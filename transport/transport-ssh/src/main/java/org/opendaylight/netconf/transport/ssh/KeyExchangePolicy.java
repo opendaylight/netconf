@@ -12,33 +12,29 @@ import com.google.common.collect.Maps;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.client.ClientBuilder;
 import org.opendaylight.netconf.shaded.sshd.common.BaseBuilder;
 import org.opendaylight.netconf.shaded.sshd.common.kex.BuiltinDHFactories;
 import org.opendaylight.netconf.shaded.sshd.common.kex.DHFactory;
 import org.opendaylight.netconf.shaded.sshd.common.kex.KeyExchangeFactory;
 import org.opendaylight.netconf.shaded.sshd.server.ServerBuilder;
-import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.TransportParamsGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.KeyExchange;
 
 /**
- * Mapping of supported key exchange algorithms, mostly as maintained by IANA in
+ * An {@link AlgorithmPolicy} determining how a {@link KeyExchange} maps to a {@link KeyExchangeFactory} preference.
+ * This permits most of everything maintained by IANA in
  * <a href="https://www.iana.org/assignments/ssh-parameters/ssh-parameters.xhtml">Key Exchange Method Names</a>.
  */
-final class KeyExchangeAlgorithms {
-    @VisibleForTesting
-    static final Map<
+final class KeyExchangePolicy extends AlgorithmPolicy<
         org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
-        KeyExchangeFactory> CLIENT_BY_YANG;
-    @VisibleForTesting
-    static final Map<
-        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
-        KeyExchangeFactory> SERVER_BY_YANG;
-    private static final List<KeyExchangeFactory> DEFAULT_CLIENT_KEXS;
-    private static final List<KeyExchangeFactory> DEFAULT_SERVER_KEXS;
+        KeyExchangeFactory> {
+    static final @NonNull KeyExchangePolicy CLIENT;
+    static final @NonNull KeyExchangePolicy SERVER;
 
     static {
         // Corresponds to Key Exchange Method Names in
@@ -275,42 +271,27 @@ final class KeyExchangeAlgorithms {
             entry(SshKeyExchangeAlgorithm.Mlkem768x25519Sha256, BuiltinDHFactories.mlkem768x25519)),
             DHFactory::isSupported);
 
-        CLIENT_BY_YANG = Map.copyOf(Maps.transformValues(factories, ClientBuilder.DH2KEX::apply));
-        SERVER_BY_YANG = Map.copyOf(Maps.transformValues(factories, ServerBuilder.DH2KEX::apply));
-        DEFAULT_CLIENT_KEXS = BaseBuilder.DEFAULT_KEX_PREFERENCE.stream()
-            .map(ClientBuilder.DH2KEX::apply)
-            .collect(Collectors.toUnmodifiableList());
-        DEFAULT_SERVER_KEXS = BaseBuilder.DEFAULT_KEX_PREFERENCE.stream()
-            .map(ServerBuilder.DH2KEX::apply)
-            .collect(Collectors.toUnmodifiableList());
+        CLIENT = new KeyExchangePolicy(ClientBuilder.DH2KEX, factories, BaseBuilder.DEFAULT_KEX_PREFERENCE);
+        SERVER = new KeyExchangePolicy(ServerBuilder.DH2KEX, factories, BaseBuilder.DEFAULT_KEX_PREFERENCE);
     }
 
-    private KeyExchangeAlgorithms() {
-        // Hidden on purpose
-    }
-
-    static List<KeyExchangeFactory> clientFactoriesFor(final @Nullable KeyExchange keyExchange)
-            throws UnsupportedConfigurationException {
-        return factoriesFor(keyExchange, CLIENT_BY_YANG, DEFAULT_CLIENT_KEXS);
-    }
-
-    static List<KeyExchangeFactory> serverFactoriesFor(final @Nullable KeyExchange keyExchange)
-            throws UnsupportedConfigurationException {
-        return factoriesFor(keyExchange, SERVER_BY_YANG, DEFAULT_SERVER_KEXS);
-    }
-
-    private static List<KeyExchangeFactory> factoriesFor(final @Nullable KeyExchange keyExchange, final Map<
+    private KeyExchangePolicy(final Function<DHFactory, KeyExchangeFactory> dh2kex, final Map<
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
-            KeyExchangeFactory> map, final List<KeyExchangeFactory> defaultResult)
-                    throws UnsupportedConfigurationException {
-        if (keyExchange != null) {
-            final var kexAlg = keyExchange.getKeyExchangeAlg();
-            if (kexAlg != null && !kexAlg.isEmpty()) {
-                // FIXME: this logic does not allow us to configure aliases like '@libssh.org', etc.
-                return ConfigUtils.mapValues(map, kexAlg, "Unsupported Key Exchange algorithm %s");
-            }
-        }
-        return defaultResult;
+            DHFactory> dhFactories, final List<? extends DHFactory> defaultDhFactories) {
+        super(Maps.transformValues(dhFactories, dh2kex::apply),
+            defaultDhFactories.stream().map(dh2kex).collect(Collectors.toUnmodifiableList()));
+    }
+
+    @Override
+    List<org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm>
+            algsOf(final TransportParamsGrouping params) {
+        final var exchange = params.getKeyExchange();
+        return exchange == null ? null : exchange.getKeyExchangeAlg();
+    }
+
+    @Override
+    void setFactories(final BaseBuilder<?, ?> builder, final List<KeyExchangeFactory> factories) {
+        builder.keyExchangeFactories(factories);
     }
 
     private static Entry<
