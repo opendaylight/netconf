@@ -23,6 +23,7 @@ module org.opendaylight.netconf.transport.tls {
     requires io.netty.buffer;
     requires io.netty.transport;
     requires org.bouncycastle.provider;
+    requires org.opendaylight.netconf.transport.crypto;
     requires org.opendaylight.netconf.transport.tcp;
     requires org.opendaylight.yang.gen.iana.tls.cipher.suite.algs;
     requires org.opendaylight.yang.gen.ietf.crypto.types.rfc9640;
