@@ -22,7 +22,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opendaylight.netconf.shaded.sshd.common.cipher.BuiltinCiphers;
 import org.opendaylight.netconf.shaded.sshd.common.kex.BuiltinDHFactories;
-import org.opendaylight.netconf.shaded.sshd.common.kex.KeyExchangeFactory;
 import org.opendaylight.netconf.shaded.sshd.common.mac.BuiltinMacs;
 import org.opendaylight.netconf.shaded.sshd.common.signature.BuiltinSignatures;
 
@@ -90,12 +89,12 @@ class BuiltinCoverageTest {
 
     @ParameterizedTest(name = "{index}: {0}")
     @MethodSource
-    void coveredBuiltinDHFactories(final Map<?, KeyExchangeFactory> map) {
+    void coveredBuiltinDHFactories(final BuiltinKeyExchangePolicy policy) {
         final var unsuppressed = new HashSet<>(List.of());
         final var unmatched = new ArrayList<BuiltinDHFactories>();
 
         for (var alg : BuiltinDHFactories.values()) {
-            if (map.values().stream().noneMatch(f -> alg.getName().equals(f.getName())) && !unsuppressed.remove(alg)) {
+            if (policy.allFactories().noneMatch(f -> alg.getName().equals(f.getName())) && !unsuppressed.remove(alg)) {
                 unmatched.add(alg);
             }
         }
@@ -106,7 +105,7 @@ class BuiltinCoverageTest {
 
     private static List<Arguments> coveredBuiltinDHFactories() {
         return List.of(
-            arguments(named("client KEXs", KeyExchangeAlgorithms.CLIENT_BY_YANG)),
-            arguments(named("server KEXs", KeyExchangeAlgorithms.SERVER_BY_YANG)));
+            arguments(named("client KEXs", BuiltinKeyExchangePolicy.CLIENT)),
+            arguments(named("server KEXs", BuiltinKeyExchangePolicy.SERVER)));
     }
 }

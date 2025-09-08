@@ -14,9 +14,8 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -44,7 +43,8 @@ import org.opendaylight.yangtools.binding.TypeObject;
 class AlgoCoverageTest {
     @Test
     void coveredSshEncryptionAlgorithm() {
-        assertAllAsKey(EncryptionAlgorithms.BY_YANG, EncryptionAlgorithms::keyOf, SshEncryptionAlgorithm.values(),
+        assertAll(alg -> EncryptionAlgorithms.BY_YANG.containsKey(EncryptionAlgorithms.keyOf(alg)),
+            SshEncryptionAlgorithm.values(),
             // FIXME: provide reasons for exclusion
             SshEncryptionAlgorithm.Twofish256Cbc,
             SshEncryptionAlgorithm.TwofishCbc,
@@ -71,7 +71,7 @@ class AlgoCoverageTest {
 
     @Test
     void coveredSshMacAlgorithm() {
-        assertAllAsKey(MacAlgorithms.BY_YANG, MacAlgorithms::keyOf, SshMacAlgorithm.values(),
+        assertAll(alg -> MacAlgorithms.BY_YANG.containsKey(MacAlgorithms.keyOf(alg)), SshMacAlgorithm.values(),
             SshMacAlgorithm.None,
             // forbidden in https://www.ietf.org/archive/id/draft-miller-sshm-aes-gcm-00.html#section-2
             SshMacAlgorithm.AEADAES128GCM,
@@ -80,7 +80,8 @@ class AlgoCoverageTest {
 
     @Test
     void coveredPublicKeyAlgorithm() {
-        assertAllAsKey(PublicKeyAlgorithms.BY_YANG, PublicKeyAlgorithms::keyOf, SshPublicKeyAlgorithm.values(),
+        assertAll(alg -> PublicKeyAlgorithms.BY_YANG.containsKey(PublicKeyAlgorithms.keyOf(alg)),
+                SshPublicKeyAlgorithm.values(),
             // FIXME: provide reasons for exclusion
             SshPublicKeyAlgorithm.SpkiSignRsa,
             SshPublicKeyAlgorithm.SpkiSignDss,
@@ -116,10 +117,8 @@ class AlgoCoverageTest {
 
     @ParameterizedTest(name = "{index}: {0}")
     @MethodSource
-    void coveredSshKeyExchangeAlgorithm(final Map<
-            org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
-            ?> map) {
-        assertAllAsKey(map, KeyExchangeAlgorithms::keyOf, SshKeyExchangeAlgorithm.values(),
+    void coveredSshKeyExchangeAlgorithm(final BuiltinKeyExchangePolicy policy) {
+        assertAll(alg -> policy.factoryFor(alg) != null, SshKeyExchangeAlgorithm.values(),
             // FIXME: provide reasons for exclusion
             SshKeyExchangeAlgorithm.EcdhSha21313201,
             SshKeyExchangeAlgorithm.EcdhSha21284010045311,
@@ -296,19 +295,19 @@ class AlgoCoverageTest {
 
     private static List<Arguments> coveredSshKeyExchangeAlgorithm() {
         return List.of(
-            arguments(named("client KEXs", KeyExchangeAlgorithms.CLIENT_BY_YANG)),
-            arguments(named("server KEXs", KeyExchangeAlgorithms.SERVER_BY_YANG)));
+            arguments(named("client KEXs", BuiltinKeyExchangePolicy.CLIENT)),
+            arguments(named("server KEXs", BuiltinKeyExchangePolicy.SERVER)));
     }
 
     // The meat of assertions. Yes we could use Parameterized tests, but this way is less meta.
     @SafeVarargs
-    private static <T extends TypeObject, K> void assertAllAsKey(final Map<K, ?> map, final Function<T, K> wrap,
-            final T[] values, final T... suppressions) {
+    private static <T extends TypeObject> void assertAll(final Predicate<T> predicate, final T[] values,
+            final T... suppressions) {
         final var unsuppressed = new HashSet<>(List.of(suppressions));
         final var unmatched = new ArrayList<T>();
 
         for (var alg : values) {
-            if (!map.containsKey(wrap.apply(alg)) && !unsuppressed.remove(alg)) {
+            if (!predicate.test(alg) && !unsuppressed.remove(alg)) {
                 unmatched.add(alg);
             }
         }
