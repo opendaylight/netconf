@@ -29,7 +29,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.type
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SubjectPublicKeyInfoFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010._private.key.grouping._private.key.type.CleartextPrivateKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststoreCertsGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.inline.or.truststore._public.keys.grouping.InlineOrTruststore;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint8;
 
@@ -50,10 +52,7 @@ final class ConfigUtils {
         factoryMgr.setSessionHeartbeat(SessionHeartbeatController.HeartbeatType.IGNORE, Duration.ofSeconds(maxWait));
     }
 
-    static KeyPair extractKeyPair(
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
-                    .inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore input)
-            throws UnsupportedConfigurationException {
+    static KeyPair extractKeyPair(final InlineOrKeystore input) throws UnsupportedConfigurationException {
         final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
                 .inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.Inline.class, input);
         final var inlineDef = inline.getInlineDefinition();
@@ -151,10 +150,7 @@ final class ConfigUtils {
         return expectedType.cast(obj);
     }
 
-    static List<PublicKey> extractPublicKeys(
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
-                    .inline.or.truststore._public.keys.grouping.InlineOrTruststore input)
-            throws UnsupportedConfigurationException {
+    static List<PublicKey> extractPublicKeys(final InlineOrTruststore input) throws UnsupportedConfigurationException {
         final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
                 .inline.or.truststore._public.keys.grouping.inline.or.truststore.Inline.class, input);
         final var inlineDef = inline.getInlineDefinition();
