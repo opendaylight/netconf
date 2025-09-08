@@ -21,7 +21,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.common.BaseBuilder;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
-import org.opendaylight.netconf.shaded.sshd.common.kex.KeyExchangeFactory;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatController;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.AsymmetricKeyPairGrouping;
@@ -33,17 +32,11 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.type
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.server.authentication.SshHostKeys;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.TransportParamsGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.KeyExchange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststoreCertsGrouping;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint8;
 
 final class ConfigUtils {
-    @FunctionalInterface
-    interface KexFactoryProvider {
-        List<KeyExchangeFactory> getKexFactories(KeyExchange input) throws UnsupportedConfigurationException;
-    }
-
     private static final int KEEP_ALIVE_DEFAULT_MAX_WAIT_SECONDS = 30;
     private static final int KEEP_ALIVE_DEFAULT_ATTEMPTS = 3;
 
@@ -52,13 +45,12 @@ final class ConfigUtils {
     }
 
     static void setTransportParams(final @NonNull BaseBuilder<?, ?> builder,
-            final @Nullable TransportParamsGrouping params, final @NonNull KexFactoryProvider kexProvider)
+            final @Nullable TransportParamsGrouping params, final @NonNull KeyExchangePolicy kexExchangePolicy)
             throws UnsupportedConfigurationException {
-        builder
-            .cipherFactories(EncryptionAlgorithms.factoriesFor(params == null ? null : params.getEncryption()))
-            .signatureFactories(PublicKeyAlgorithms.factoriesFor(params == null ? null : params.getHostKey()))
-            .keyExchangeFactories(kexProvider.getKexFactories(params == null ? null : params.getKeyExchange()))
-            .macFactories(MacAlgorithms.factoriesFor(params == null ? null : params.getMac()));
+        EncryptionPolicy.INSTANCE.setTransportParams(builder, params);
+        kexExchangePolicy.setTransportParams(builder, params);
+        MacPolicy.INSTANCE.setTransportParams(builder, params);
+        PublicKeyPolicy.INSTANCE.setTransportParams(builder, params);
     }
 
     @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "maxAttempts usage need clarification")
@@ -221,18 +213,5 @@ final class ConfigUtils {
     static List<PublicKey> extractPublicKeys(final @Nullable SshHostKeys sshHostKeys)
             throws UnsupportedConfigurationException {
         return sshHostKeys == null ? List.of() : extractPublicKeys(sshHostKeys.getInlineOrTruststore());
-    }
-
-    static <K, V> @NonNull List<V> mapValues(final Map<K, ? extends V> map, final List<K> values,
-            final String errorTemplate) throws UnsupportedConfigurationException {
-        final var builder = ImmutableList.<V>builderWithExpectedSize(values.size());
-        for (var value : values) {
-            final var mapped = map.get(value);
-            if (mapped == null) {
-                throw new UnsupportedOperationException(String.format(errorTemplate, value));
-            }
-            builder.add(mapped);
-        }
-        return builder.build();
     }
 }

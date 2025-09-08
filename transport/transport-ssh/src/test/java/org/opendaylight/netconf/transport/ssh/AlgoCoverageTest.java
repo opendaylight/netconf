@@ -14,7 +14,6 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
@@ -25,6 +24,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh._public
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.encryption.algs.rev241016.SshEncryptionAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.mac.algs.rev241016.SshMacAlgorithm;
+import org.opendaylight.yangtools.binding.EnumTypeObject;
 import org.opendaylight.yangtools.binding.TypeObject;
 
 /**
@@ -44,7 +44,7 @@ import org.opendaylight.yangtools.binding.TypeObject;
 class AlgoCoverageTest {
     @Test
     void coveredSshEncryptionAlgorithm() {
-        assertAllAsKey(EncryptionAlgorithms.BY_YANG, EncryptionAlgorithms::keyOf, SshEncryptionAlgorithm.values(),
+        assertAll(EncryptionPolicy.INSTANCE, EncryptionPolicy::keyOf, SshEncryptionAlgorithm.values(),
             // FIXME: provide reasons for exclusion
             SshEncryptionAlgorithm.Twofish256Cbc,
             SshEncryptionAlgorithm.TwofishCbc,
@@ -71,7 +71,7 @@ class AlgoCoverageTest {
 
     @Test
     void coveredSshMacAlgorithm() {
-        assertAllAsKey(MacAlgorithms.BY_YANG, MacAlgorithms::keyOf, SshMacAlgorithm.values(),
+        assertAll(MacPolicy.INSTANCE, MacPolicy::keyOf, SshMacAlgorithm.values(),
             SshMacAlgorithm.None,
             // forbidden in https://www.ietf.org/archive/id/draft-miller-sshm-aes-gcm-00.html#section-2
             SshMacAlgorithm.AEADAES128GCM,
@@ -80,7 +80,7 @@ class AlgoCoverageTest {
 
     @Test
     void coveredPublicKeyAlgorithm() {
-        assertAllAsKey(PublicKeyAlgorithms.BY_YANG, PublicKeyAlgorithms::keyOf, SshPublicKeyAlgorithm.values(),
+        assertAll(PublicKeyPolicy.INSTANCE, PublicKeyPolicy::keyOf, SshPublicKeyAlgorithm.values(),
             // FIXME: provide reasons for exclusion
             SshPublicKeyAlgorithm.SpkiSignRsa,
             SshPublicKeyAlgorithm.SpkiSignDss,
@@ -116,10 +116,8 @@ class AlgoCoverageTest {
 
     @ParameterizedTest(name = "{index}: {0}")
     @MethodSource
-    void coveredSshKeyExchangeAlgorithm(final Map<
-            org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
-            ?> map) {
-        assertAllAsKey(map, KeyExchangeAlgorithms::keyOf, SshKeyExchangeAlgorithm.values(),
+    void coveredSshKeyExchangeAlgorithm(final KeyExchangePolicy policy) {
+        assertAll(policy, KeyExchangePolicy::keyOf, SshKeyExchangeAlgorithm.values(),
             // FIXME: provide reasons for exclusion
             SshKeyExchangeAlgorithm.EcdhSha21313201,
             SshKeyExchangeAlgorithm.EcdhSha21284010045311,
@@ -296,19 +294,19 @@ class AlgoCoverageTest {
 
     private static List<Arguments> coveredSshKeyExchangeAlgorithm() {
         return List.of(
-            arguments(named("client KEXs", KeyExchangeAlgorithms.CLIENT_BY_YANG)),
-            arguments(named("server KEXs", KeyExchangeAlgorithms.SERVER_BY_YANG)));
+            arguments(named("client KEXs", KeyExchangePolicy.CLIENT)),
+            arguments(named("server KEXs", KeyExchangePolicy.SERVER)));
     }
 
     // The meat of assertions. Yes we could use Parameterized tests, but this way is less meta.
     @SafeVarargs
-    private static <T extends TypeObject, K> void assertAllAsKey(final Map<K, ?> map, final Function<T, K> wrap,
-            final T[] values, final T... suppressions) {
+    private static <E extends EnumTypeObject, T extends TypeObject> void assertAll(final AlgorithmPolicy<T, ?> policy,
+            final Function<E, T> enumToType, final E[] values, final E... suppressions) {
         final var unsuppressed = new HashSet<>(List.of(suppressions));
-        final var unmatched = new ArrayList<T>();
+        final var unmatched = new ArrayList<E>();
 
         for (var alg : values) {
-            if (!map.containsKey(wrap.apply(alg)) && !unsuppressed.remove(alg)) {
+            if (policy.factoryFor(enumToType.apply(alg)) == null && !unsuppressed.remove(alg)) {
                 unmatched.add(alg);
             }
         }
