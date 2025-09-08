@@ -7,15 +7,12 @@
  */
 package org.opendaylight.netconf.transport.tls;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
 import org.eclipse.jdt.annotation.NonNull;
@@ -78,20 +75,6 @@ final class KeyStoreUtils {
             return tmf;
         } catch (NoSuchAlgorithmException | KeyStoreException e) {
             throw new UnsupportedConfigurationException("Cannot instantiate trust manager", e);
-        }
-    }
-
-    /**
-     * Builds X509 Certificate instance.
-     *
-     * @param bytes certificate encoded
-     * @return certificate instance
-     * @throws CertificateException if certificate error occurs
-     * @throws IOException if input read error occurs
-     */
-    static Certificate buildX509Certificate(final byte[] bytes) throws CertificateException, IOException {
-        try (var in = new ByteArrayInputStream(bytes)) {
-            return CertificateFactory.getInstance("X.509").generateCertificate(in);
         }
     }
 }
