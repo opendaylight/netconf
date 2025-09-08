@@ -119,7 +119,7 @@ class AlgoCoverageTest {
     void coveredSshKeyExchangeAlgorithm(final Map<
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
             ?> map) {
-        assertAllAsKey(map, KeyExchangeAlgorithms::keyOf, SshKeyExchangeAlgorithm.values(),
+        assertAllAsKey(map, BuiltinKeyExchangePolicy::keyOf, SshKeyExchangeAlgorithm.values(),
             // FIXME: provide reasons for exclusion
             SshKeyExchangeAlgorithm.EcdhSha21313201,
             SshKeyExchangeAlgorithm.EcdhSha21284010045311,
@@ -296,8 +296,8 @@ class AlgoCoverageTest {
 
     private static List<Arguments> coveredSshKeyExchangeAlgorithm() {
         return List.of(
-            arguments(named("client KEXs", KeyExchangeAlgorithms.CLIENT_BY_YANG)),
-            arguments(named("server KEXs", KeyExchangeAlgorithms.SERVER_BY_YANG)));
+            arguments(named("client KEXs", BuiltinKeyExchangePolicy.CLIENT_BY_YANG)),
+            arguments(named("server KEXs", BuiltinKeyExchangePolicy.SERVER_BY_YANG)));
     }
 
     // The meat of assertions. Yes we could use Parameterized tests, but this way is less meta.

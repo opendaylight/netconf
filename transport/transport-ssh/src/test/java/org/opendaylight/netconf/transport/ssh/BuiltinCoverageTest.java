@@ -106,7 +106,7 @@ class BuiltinCoverageTest {
 
     private static List<Arguments> coveredBuiltinDHFactories() {
         return List.of(
-            arguments(named("client KEXs", KeyExchangeAlgorithms.CLIENT_BY_YANG)),
-            arguments(named("server KEXs", KeyExchangeAlgorithms.SERVER_BY_YANG)));
+            arguments(named("client KEXs", BuiltinKeyExchangePolicy.CLIENT_BY_YANG)),
+            arguments(named("server KEXs", BuiltinKeyExchangePolicy.SERVER_BY_YANG)));
     }
 }

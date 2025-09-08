@@ -89,7 +89,7 @@ final class TransportSshServer extends SshServer {
         Builder serverParams(final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
             if (serverParams != null) {
                 ConfigUtils.setTransportParams(this, serverParams.getTransportParams(),
-                    KeyExchangeAlgorithms::serverFactoriesFor);
+                    BuiltinKeyExchangePolicy.SERVER);
                 keepAlives = serverParams.getKeepalives();
                 serverIdentity = serverParams.getServerIdentity();
                 if (serverIdentity == null) {
