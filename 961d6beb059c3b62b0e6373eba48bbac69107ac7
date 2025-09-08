@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d255448d_a4fac6a6",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 655,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-08T07:14:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0449f377_136fc33e",
+      "revId": "961d6beb059c3b62b0e6373eba48bbac69107ac7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e3900b81_9e4a160e",
@@ -31,6 +49,30 @@
       "writtenOn": "2025-09-05T15:24:58Z",
       "side": 1,
       "message": "Missing space between \u003cString, @Nullable",
+      "range": {
+        "startLine": 884,
+        "startChar": 59,
+        "endLine": 884,
+        "endChar": 75
+      },
+      "revId": "961d6beb059c3b62b0e6373eba48bbac69107ac7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a9c1fbf_9887f86a",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 884,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-08T07:14:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e3900b81_9e4a160e",
       "range": {
         "startLine": 884,
         "startChar": 59,
