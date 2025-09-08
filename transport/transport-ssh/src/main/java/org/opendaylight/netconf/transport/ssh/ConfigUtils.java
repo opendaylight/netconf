@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.shaded.sshd.common.BaseBuilder;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatController;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -30,7 +29,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.type
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SubjectPublicKeyInfoFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010._private.key.grouping._private.key.type.CleartextPrivateKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.TransportParamsGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststoreCertsGrouping;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint8;
@@ -41,15 +39,6 @@ final class ConfigUtils {
 
     private ConfigUtils() {
         // utility class
-    }
-
-    static void setTransportParams(final @NonNull BaseBuilder<?, ?> builder,
-            final @Nullable TransportParamsGrouping params, final @NonNull KeyExchangePolicy kexExchangePolicy)
-            throws UnsupportedConfigurationException {
-        EncryptionPolicy.INSTANCE.setTransportParams(builder, params);
-        kexExchangePolicy.setTransportParams(builder, params);
-        MacPolicy.INSTANCE.setTransportParams(builder, params);
-        PublicKeyPolicy.INSTANCE.setTransportParams(builder, params);
     }
 
     @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "maxAttempts usage need clarification")
