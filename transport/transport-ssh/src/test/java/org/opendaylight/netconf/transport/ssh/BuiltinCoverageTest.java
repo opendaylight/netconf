@@ -14,7 +14,6 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,7 +21,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opendaylight.netconf.shaded.sshd.common.cipher.BuiltinCiphers;
 import org.opendaylight.netconf.shaded.sshd.common.kex.BuiltinDHFactories;
-import org.opendaylight.netconf.shaded.sshd.common.kex.KeyExchangeFactory;
 import org.opendaylight.netconf.shaded.sshd.common.mac.BuiltinMacs;
 import org.opendaylight.netconf.shaded.sshd.common.signature.BuiltinSignatures;
 
@@ -42,12 +40,12 @@ import org.opendaylight.netconf.shaded.sshd.common.signature.BuiltinSignatures;
 class BuiltinCoverageTest {
     @Test
     void coveredBuiltinCiphers() {
-        assertAllAsValue(EncryptionAlgorithms.BY_YANG, BuiltinCiphers.values());
+        assertAllAsValue(EncryptionPolicy.INSTANCE, BuiltinCiphers.values());
     }
 
     @Test
     void coveredBuiltinMacs() {
-        assertAllAsValue(MacAlgorithms.BY_YANG, BuiltinMacs.values(),
+        assertAllAsValue(MacPolicy.INSTANCE, BuiltinMacs.values(),
             // These three are Encrypt-then-MAC modes as described in https://api.libssh.org/rfc/PROTOCOL
             // FIXME: we should provide these extensions
             BuiltinMacs.hmacsha1etm,
@@ -58,7 +56,7 @@ class BuiltinCoverageTest {
     @Test
     @SuppressWarnings("deprecation")
     void coveredBuiltinSignatures() {
-        assertAllAsValue(PublicKeyAlgorithms.BY_YANG, BuiltinSignatures.values(),
+        assertAllAsValue(PublicKeyPolicy.INSTANCE, BuiltinSignatures.values(),
             // FIXME: explain these omissions and consider providing them, if possible
             BuiltinSignatures.dsa_cert,
             BuiltinSignatures.rsa_cert,
@@ -74,12 +72,13 @@ class BuiltinCoverageTest {
 
     // The meat of assertions. Yes we could use Parameterized tests, but this way is less meta.
     @SafeVarargs
-    private static <T> void assertAllAsValue(final Map<?, ? super T> map, final T[] values, final T... suppressions) {
+    private static <T> void assertAllAsValue(final AlgorithmPolicy<?, ? super T> map, final T[] values,
+            final T... suppressions) {
         final var unsuppressed = new HashSet<>(List.of(suppressions));
         final var unmatched = new ArrayList<T>();
 
         for (var alg : values) {
-            if (!map.containsValue(alg) && !unsuppressed.remove(alg)) {
+            if (map.allFactories().noneMatch(f -> f.equals(alg)) && !unsuppressed.remove(alg)) {
                 unmatched.add(alg);
             }
         }
@@ -90,12 +89,12 @@ class BuiltinCoverageTest {
 
     @ParameterizedTest(name = "{index}: {0}")
     @MethodSource
-    void coveredBuiltinDHFactories(final Map<?, KeyExchangeFactory> map) {
+    void coveredBuiltinDHFactories(final KeyExchangePolicy policy) {
         final var unsuppressed = new HashSet<>(List.of());
         final var unmatched = new ArrayList<BuiltinDHFactories>();
 
         for (var alg : BuiltinDHFactories.values()) {
-            if (map.values().stream().noneMatch(f -> alg.getName().equals(f.getName())) && !unsuppressed.remove(alg)) {
+            if (policy.allFactories().noneMatch(f -> alg.getName().equals(f.getName())) && !unsuppressed.remove(alg)) {
                 unmatched.add(alg);
             }
         }
@@ -106,7 +105,7 @@ class BuiltinCoverageTest {
 
     private static List<Arguments> coveredBuiltinDHFactories() {
         return List.of(
-            arguments(named("client KEXs", KeyExchangeAlgorithms.CLIENT_BY_YANG)),
-            arguments(named("server KEXs", KeyExchangeAlgorithms.SERVER_BY_YANG)));
+            arguments(named("client KEXs", KeyExchangePolicy.CLIENT)),
+            arguments(named("server KEXs", KeyExchangePolicy.SERVER)));
     }
 }
