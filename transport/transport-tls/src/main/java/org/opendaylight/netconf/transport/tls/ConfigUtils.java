@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.transport.tls;
 
-import static org.opendaylight.netconf.transport.tls.KeyStoreUtils.buildX509Certificate;
 import static org.opendaylight.netconf.transport.tls.KeyUtils.EC_ALGORITHM;
 import static org.opendaylight.netconf.transport.tls.KeyUtils.RSA_ALGORITHM;
 import static org.opendaylight.netconf.transport.tls.KeyUtils.buildPrivateKey;
@@ -17,16 +16,15 @@ import static org.opendaylight.netconf.transport.tls.KeyUtils.validateKeyPair;
 import static org.opendaylight.netconf.transport.tls.KeyUtils.validatePublicKey;
 
 import com.google.common.collect.ImmutableMap;
-import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.crypto.CMSCertificateSupport;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.AsymmetricKeyPairGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.EcPrivateKeyFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.RsaPrivateKeyFormat;
@@ -85,12 +83,8 @@ final class ConfigUtils {
         }
         final var mapBuilder = ImmutableMap.<String, Certificate>builder();
         for (var cert : inlineDef.nonnullCertificate().values()) {
-            try {
-                final var alias = aliasPrefix + cert.requireName();
-                mapBuilder.put(alias, buildX509Certificate(cert.requireCertData().getValue()));
-            } catch (IOException | CertificateException e) {
-                throw new UnsupportedConfigurationException("Failed to parse certificate " + cert, e);
-            }
+            final var alias = aliasPrefix + cert.requireName();
+            mapBuilder.put(alias, CMSCertificateSupport.parseCertificate(cert.requireCertData()));
         }
         return mapBuilder.build();
     }
@@ -146,12 +140,8 @@ final class ConfigUtils {
             throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
         }
         final var keyPair = extractKeyPair(inlineDef);
-        final Certificate certificate;
-        try {
-            certificate = buildX509Certificate(inlineDef.requireCertData().getValue());
-        } catch (IOException | CertificateException e) {
-            throw new UnsupportedConfigurationException("Failed to load certificate" + inlineDef, e);
-        }
+        final var certificate = CMSCertificateSupport.parseCertificate(inlineDef.requireCertData());
+
         // ietf-crypto-types:asymmetric-key-pair-with-cert-grouping
         // "A private/public key pair and an associated certificate.
         // Implementations SHOULD assert that certificates contain the matching public key."
@@ -168,7 +158,6 @@ final class ConfigUtils {
 
     private static KeyPair extractKeyPair(final AsymmetricKeyPairGrouping input)
             throws UnsupportedConfigurationException {
-
         final var privateKeyFormat = input.getPrivateKeyFormat();
         final String keyAlgorithm;
         if (EcPrivateKeyFormat.VALUE.equals(privateKeyFormat)) {
@@ -178,13 +167,10 @@ final class ConfigUtils {
         } else {
             throw new UnsupportedConfigurationException("Unsupported private key format " + privateKeyFormat);
         }
-        final byte[] privateKeyBytes;
-        if (input.getPrivateKeyType() instanceof CleartextPrivateKey clearText) {
-            privateKeyBytes = clearText.requireCleartextPrivateKey();
-        } else {
+        if (!(input.getPrivateKeyType() instanceof CleartextPrivateKey clearText)) {
             throw new UnsupportedConfigurationException("Unsupported private key type " + input.getPrivateKeyType());
         }
-        final var privateKey = buildPrivateKey(keyAlgorithm, privateKeyBytes);
+        final var privateKey = buildPrivateKey(keyAlgorithm, clearText.requireCleartextPrivateKey());
 
         final var publicKeyFormat = input.getPublicKeyFormat();
         final boolean isSshPublicKey;
