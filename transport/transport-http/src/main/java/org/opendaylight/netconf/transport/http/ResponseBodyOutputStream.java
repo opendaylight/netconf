@@ -26,7 +26,6 @@ import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -215,44 +214,12 @@ public final class ResponseBodyOutputStream extends OutputStream {
      */
     @NonNullByDefault
     private abstract static sealed class WithBody extends Open permits FirstChunk, FollowingChunk {
-        // Constants related to chunked encoding. We use unreleasable buffers so we do not have to worry about
-        // reference count. CRLF is not read-only because we always use it as a component in a read-only buffer.
-        private static final ByteBuf CRLF = Unpooled.unreleasableBuffer(
-            Unpooled.wrappedBuffer(new byte[] { '\r', '\n' }));
-        private static final ByteBuf LAST_CHUNK = Unpooled.unreleasableBuffer(
-            Unpooled.wrappedBuffer(new byte[] { '0', '\r', '\n' })).asReadOnly();
-
         final ByteBuf buffer;
 
         WithBody(final HTTPServerSession session, final ByteBufAllocator alloc, final int maxChunkSize,
                 final ByteBuf buffer) {
             super(session, alloc, maxChunkSize);
             this.buffer = requireNonNull(buffer);
-        }
-
-        /**
-         * Create a ByteBuf holding chunk data, formatted according to
-         * <a href="https://www.rfc-editor.org/rfc/rfc9112#name-chunked-transfer-coding">Chunked Transfer Coding</a>.
-         *
-         * @param chunkData chunk data
-         * @return A read-only {@link ByteBuf}
-         */
-        final ByteBuf createChunk(final ByteBuf chunkData) {
-            final var chunkSize = chunkData.readableBytes();
-            if (chunkSize == 0) {
-                // last-chunk     = 1*("0") [ chunk-ext ] CRLF
-                chunkData.release();
-                return LAST_CHUNK.slice();
-            }
-
-            // chunk          = chunk-size [ chunk-ext ] CRLF
-            //                  chunk-data CRLF
-            // chunk-size     = 1*HEXDIG
-            return alloc.compositeBuffer(4).addComponents(true,
-                Unpooled.wrappedBuffer(Integer.toHexString(chunkSize).getBytes(StandardCharsets.US_ASCII)),
-                CRLF.slice(),
-                chunkData,
-                CRLF.slice()).asReadOnly();
         }
 
         @Override
@@ -316,7 +283,7 @@ public final class ResponseBodyOutputStream extends OutputStream {
 
             LOG.debug("Response body exceeded {} bytes, sending first chunk", maxChunkSize);
             sendResponseStart(session, status, headers, version);
-            sendResponsePart(session, createChunk(buffer));
+            sendResponsePart(session, buffer.asReadOnly());
             return new FollowingChunk(session, alloc, maxChunkSize).writeByte(value);
         }
 
@@ -331,7 +298,7 @@ public final class ResponseBodyOutputStream extends OutputStream {
 
             LOG.debug("Response body exceeded {} bytes, sending first chunk", maxChunkSize);
             sendResponseStart(session, status, headers, version);
-            sendResponsePart(session, createChunk(buffer));
+            sendResponsePart(session, buffer.asReadOnly());
             return followingChunk().writeBytes(bytes, offset + accept, remaining);
         }
 
@@ -339,7 +306,7 @@ public final class ResponseBodyOutputStream extends OutputStream {
         FollowingChunk flush() throws IOException {
             LOG.debug("Forcing chunked response on flush");
             sendResponseStart(session, status, headers, version);
-            sendResponsePart(session, createChunk(buffer));
+            sendResponsePart(session, buffer.asReadOnly());
             return followingChunk();
         }
 
@@ -380,7 +347,7 @@ public final class ResponseBodyOutputStream extends OutputStream {
             }
 
             LOG.debug("Response chunk reached {} bytes, sending it", maxChunkSize);
-            sendResponsePart(session, createChunk(buffer));
+            sendResponsePart(session, buffer.asReadOnly());
             return new FollowingChunk(session, alloc, maxChunkSize);
         }
 
@@ -392,7 +359,7 @@ public final class ResponseBodyOutputStream extends OutputStream {
                 return this;
             }
             LOG.debug("Response chunk reached {} bytes, sending it", maxChunkSize);
-            sendResponsePart(session, createChunk(buffer));
+            sendResponsePart(session, buffer.asReadOnly());
             return new FollowingChunk(session, alloc, maxChunkSize).writeBytes(bytes, offset + accept, length - accept);
         }
 
@@ -404,13 +371,13 @@ public final class ResponseBodyOutputStream extends OutputStream {
             }
 
             LOG.debug("Flushing {}-byte chunk", size);
-            sendResponsePart(session, createChunk(buffer));
+            sendResponsePart(session, buffer.asReadOnly());
             return new FollowingChunk(session, alloc, maxChunkSize);
         }
 
         @Override
         Closed close(final ReadOnlyHttpHeaders trailers) throws IOException {
-            sendResponsePart(session, createChunk(buffer));
+            sendResponsePart(session, buffer.asReadOnly());
             sendResponseEnd(session, trailers);
             return Closed.INSTANCE;
         }
