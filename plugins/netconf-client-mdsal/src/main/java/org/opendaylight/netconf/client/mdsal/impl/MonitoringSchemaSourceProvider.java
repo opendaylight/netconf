@@ -82,7 +82,7 @@ final class MonitoringSchemaSourceProvider implements SchemaSourceProvider<YangT
 
                 LOG.warn("{}: YANG schema was not successfully retrieved for {}. Errors: {}", id, sourceIdentifier,
                     result.errors());
-                throw new IllegalStateException(String.format(
+                throw new MonitoringSchemaSourceException(String.format(
                     "%s: YANG schema was not successfully retrieved for %s. Errors: %s", id, sourceIdentifier,
                     result.errors()));
             }, MoreExecutors.directExecutor());
@@ -111,5 +111,14 @@ final class MonitoringSchemaSourceProvider implements SchemaSourceProvider<YangT
         final var dataNode = (Element) requireNonNull(wrappedNode.getNode());
 
         return Optional.of(dataNode.getTextContent().trim());
+    }
+
+    /**
+     * Exception used to distinguish schema source related issues.
+     */
+    static final class MonitoringSchemaSourceException extends RuntimeException {
+        MonitoringSchemaSourceException(final String message) {
+            super(message);
+        }
     }
 }

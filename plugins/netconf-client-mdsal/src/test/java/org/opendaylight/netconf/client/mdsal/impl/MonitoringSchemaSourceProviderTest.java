@@ -34,14 +34,18 @@ import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
+import org.opendaylight.netconf.client.mdsal.impl.MonitoringSchemaSourceProvider.MonitoringSchemaSourceException;
 import org.opendaylight.netconf.client.mdsal.spi.KeepaliveSalFacade;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.GetSchema;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcResult;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
@@ -111,6 +115,27 @@ class MonitoringSchemaSourceProviderTest {
         final var execException = assertThrows(ExecutionException.class,
             () -> provider.getSource(SOURCE_IDENTIFIER).get(3, TimeUnit.SECONDS));
         assertInstanceOf(CancellationException.class, execException.getCause());
+
+        // Verify RPC invocation
+        verify(spyRpc).invokeNetconf(GetSchema.QNAME,
+            MonitoringSchemaSourceProvider.createGetSchemaRequest("test", Revision.of("2016-02-08")));
+    }
+
+    @Test
+    void testGetSourceWithDisconnectedException() {
+        // Mock reply with provided RPC error.
+        final var rpcError = RpcResultBuilder.<NetconfMessage>failed()
+            .withError(ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED,
+                "The netconf session to TestDevice is disconnected")
+            .build();
+        doReturn(Futures.immediateFuture(rpcError)).when(communicator).sendRequest(message);
+        final var defaultDOMRpcResult = new DefaultDOMRpcResult(rpcError.getErrors().getFirst());
+        doReturn(defaultDOMRpcResult).when(transformer).toRpcResult(rpcError, GetSchema.QNAME);
+
+        // Assert that getSchemaSource failed with a MonitoringSchemaSourceException due to a disconnection.
+        final var execException = assertThrows(ExecutionException.class,
+            () -> provider.getSource(SOURCE_IDENTIFIER).get(3, TimeUnit.SECONDS));
+        assertInstanceOf(MonitoringSchemaSourceException.class, execException.getCause());
 
         // Verify RPC invocation
         verify(spyRpc).invokeNetconf(GetSchema.QNAME,
