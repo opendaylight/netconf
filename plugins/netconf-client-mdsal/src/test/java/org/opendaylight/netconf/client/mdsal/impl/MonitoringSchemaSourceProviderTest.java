@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -26,6 +27,8 @@ import javax.xml.transform.dom.DOMSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -35,14 +38,18 @@ import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
+import org.opendaylight.netconf.client.mdsal.impl.MonitoringSchemaSourceProvider.DisconnectedException;
 import org.opendaylight.netconf.client.mdsal.spi.KeepaliveSalFacade;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.GetSchema;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcResult;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
@@ -117,6 +124,35 @@ class MonitoringSchemaSourceProviderTest {
         // Verify RPC invocation
         verify(spyRpc).invokeNetconf(GetSchema.QNAME,
             MonitoringSchemaSourceProvider.createGetSchemaRequest("test", Revision.of("2016-02-08")));
+    }
+
+    @ParameterizedTest
+    @MethodSource("failedRpcResult")
+    void testGetSourceWithDisconnectedException(final RpcResult<NetconfMessage> rpcError) {
+        // Mock reply with provided RPC error.
+        doReturn(Futures.immediateFuture(rpcError)).when(communicator).sendRequest(message);
+        final var defaultDOMRpcResult = new DefaultDOMRpcResult(rpcError.getErrors().getFirst());
+        doReturn(defaultDOMRpcResult).when(transformer).toRpcResult(rpcError, GetSchema.QNAME);
+
+        // Assert that getSchemaSource failed with a DisconnectedException due to a disconnection or session closed.
+        final var execException = assertThrows(ExecutionException.class,
+            () -> provider.getSource(SOURCE_IDENTIFIER).get(3, TimeUnit.SECONDS));
+        assertInstanceOf(DisconnectedException.class, execException.getCause());
+
+        // Verify RPC invocation
+        verify(spyRpc).invokeNetconf(GetSchema.QNAME,
+            MonitoringSchemaSourceProvider.createGetSchemaRequest("test", Revision.of("2016-02-08")));
+    }
+
+    static List<RpcResult<NetconfMessage>> failedRpcResult() {
+        return List.of(
+            RpcResultBuilder.<NetconfMessage>failed()
+                .withError(ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED,
+                    "The netconf session to TestDevice is disconnected")
+                .build(),
+            RpcResultBuilder.<NetconfMessage>failed()
+                .withError(ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED, "Session closed")
+                .build());
     }
 
     private static ContainerNode getNode() {
