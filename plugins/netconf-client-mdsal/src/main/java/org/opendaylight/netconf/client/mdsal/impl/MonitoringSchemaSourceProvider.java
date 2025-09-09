@@ -16,11 +16,13 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.api.NetconfRpcService;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.GetSchema;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.get.schema.output.Data;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -82,10 +84,20 @@ final class MonitoringSchemaSourceProvider implements SchemaSourceProvider<YangT
 
                 LOG.warn("{}: YANG schema was not successfully retrieved for {}. Errors: {}", id, sourceIdentifier,
                     result.errors());
-                throw new IllegalStateException(String.format(
-                    "%s: YANG schema was not successfully retrieved for %s. Errors: %s", id, sourceIdentifier,
-                    result.errors()));
+                final var errorMessage = String.format("%s: YANG schema was not successfully retrieved for %s."
+                        + " Errors: %s", id, sourceIdentifier, result.errors());
+                if (isDisconnected(result)) {
+                    throw new DisconnectedException(errorMessage);
+                }
+
+                throw new IllegalStateException(errorMessage);
             }, MoreExecutors.directExecutor());
+    }
+
+    private static boolean isDisconnected(DOMRpcResult result) {
+        return result.errors().stream()
+            .filter(e -> ErrorType.TRANSPORT.equals(e.getErrorType()))
+            .anyMatch(e -> e.getMessage() != null && e.getMessage().contains("is disconnected"));
     }
 
     static @NonNull ContainerNode createGetSchemaRequest(final String moduleName, final @Nullable Revision revision) {
@@ -111,5 +123,11 @@ final class MonitoringSchemaSourceProvider implements SchemaSourceProvider<YangT
         final var dataNode = (Element) requireNonNull(wrappedNode.getNode());
 
         return Optional.of(dataNode.getTextContent().trim());
+    }
+
+    static class DisconnectedException extends RuntimeException {
+        DisconnectedException(final String message) {
+            super(message);
+        }
     }
 }

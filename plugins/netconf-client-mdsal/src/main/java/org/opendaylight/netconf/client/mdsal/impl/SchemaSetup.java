@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice.EmptySchemaContextException;
@@ -37,6 +38,7 @@ import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
+import org.opendaylight.netconf.client.mdsal.impl.MonitoringSchemaSourceProvider.DisconnectedException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.oper.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.oper.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.oper.unavailable.capabilities.UnavailableCapability;
@@ -62,6 +64,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     private final Set<AvailableCapability> nonModuleBasedCapabilities = new HashSet<>();
     private final Map<QName, FailureReason> unresolvedCapabilites = new HashMap<>();
     private final Set<AvailableCapability> resolvedCapabilities = new HashSet<>();
+    private final AtomicBoolean isDisconnected = new AtomicBoolean();
     private final RemoteDeviceId deviceId;
     private final NetconfDeviceSchemas deviceSchemas;
     private final Set<QName> deviceRequiredSources;
@@ -150,7 +153,9 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     }
 
     private void trySetupSchema() {
-        if (!requiredSources.isEmpty()) {
+        if (isDisconnected.get()) {
+            resultFuture.setException(new EmptySchemaContextException(deviceId + ": is disconnected"));
+        } else if (!requiredSources.isEmpty()) {
             // Initiate async resolution, drive it back based on the result
             LOG.trace("{}: Trying to build schema context from {}", deviceId, requiredSources);
             Futures.addCallback(contextFactory.createEffectiveModelContext(requiredSources), this,
@@ -166,14 +171,26 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
         return origSources.parallelStream()
             .filter(sourceId -> {
                 try {
+                    if (isDisconnected.get()) {
+                        return true;
+                    }
                     repository.getSchemaSource(sourceId, YangTextSource.class).get();
                     return false;
                 } catch (InterruptedException | ExecutionException e) {
                     LOG.debug("Failed to acquire source {}", sourceId, e);
+                    if (isDisconnectException(e)) {
+                        isDisconnected.set(true);
+                    }
                     return true;
                 }
             })
             .collect(Collectors.toList());
+    }
+
+    private static boolean isDisconnectException(final Exception ex) {
+        return ex instanceof ExecutionException executionEx
+            && executionEx.getCause() instanceof MissingSchemaSourceException miss
+            && miss.getCause() instanceof DisconnectedException;
     }
 
     private void addUnresolvedCapabilities(final Collection<QName> capabilities, final FailureReason reason) {
