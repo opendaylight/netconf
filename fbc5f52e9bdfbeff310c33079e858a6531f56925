@@ -16,6 +16,24 @@
       "message": "Now, this should be included back, IMO",
       "revId": "fbc5f52e9bdfbeff310c33079e858a6531f56925",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0062538d_e433f8ad",
+        "filename": "third-party/shaded-sshd-jar/pom.xml",
+        "patchSetId": 12
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-09T06:26:47Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "2e8777ea_4814ec29",
+      "revId": "fbc5f52e9bdfbeff310c33079e858a6531f56925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
