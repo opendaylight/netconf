@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d769e6c2_fbfac1d8",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/SubscriptionSuspensionTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-09T11:33:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7da6d89e_43261580",
+      "revId": "3d8b5697c94997af983ecccbb4fd93f29c0bef1c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9cba8220_fbd27333",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-08T15:14:17Z",
       "side": 1,
       "message": "public for testing?",
+      "revId": "3d8b5697c94997af983ecccbb4fd93f29c0bef1c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47ec8c86_3d3357ef",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-09T11:33:16Z",
+      "side": 1,
+      "message": "Annotated in declaration in RestconfStream",
+      "parentUuid": "9cba8220_fbd27333",
       "revId": "3d8b5697c94997af983ecccbb4fd93f29c0bef1c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
