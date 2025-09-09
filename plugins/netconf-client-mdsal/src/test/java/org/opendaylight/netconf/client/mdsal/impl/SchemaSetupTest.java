@@ -8,7 +8,9 @@
 package org.opendaylight.netconf.client.mdsal.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
@@ -22,12 +24,17 @@ import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.client.mdsal.AbstractTestModelTest;
+import org.opendaylight.netconf.client.mdsal.NetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.ProvidedSources;
@@ -123,5 +130,40 @@ class SchemaSetupTest extends AbstractTestModelTest {
             .setCapability("(test:namespace?revision=2013-07-22)test-module")
             .setCapabilityOrigin(CapabilityOrigin.DeviceAdvertised)
             .build()), result.capabilities().resolvedCapabilities());
+    }
+
+    @Test
+    void testNetconfDeviceReconnectWhileFetchingSources() throws Exception {
+        // Return exception with first call of getSchema on any source.
+        final var cancellationException = new MissingSchemaSourceException(TEST_SID,
+            "Request canceled, device is going to reconnect", new CancellationException("test message"));
+        doReturn(Futures.immediateFailedFuture(cancellationException))
+            .when(schemaRepository).getSchemaSource(any(SourceIdentifier.class), eq(YangTextSource.class));
+
+        // Call SchemaSetup with a single thread to simulate a scenario where all processor threads are already
+        // occupied. The next schema source fetch execution is waiting in a thread pool for execution by parallelStream.
+        // If an already processing source fails and flags reconnectingDevice as true, the next fetching source should
+        // be skipped.
+        final SchemaSetup setup;
+        try (var oneThread = new ForkJoinPool(1)) {
+            final var submit = oneThread.submit(() -> new SchemaSetup(schemaRepository, contextFactory, DEVICE_ID,
+                new NetconfDeviceSchemas(Set.of(TEST_QNAME, TEST_QNAME2), FeatureSet.builder().build(), Set.of(),
+                    List.of(new ProvidedSources<>(YangTextSource.class, sourceProvider,
+                        Set.of(TEST_QNAME, TEST_QNAME2)))),
+                NetconfSessionPreferences.fromStrings(Set.of())));
+            setup = submit.get(1, TimeUnit.SECONDS);
+        }
+
+        // Verify that creating the device schema fails because of a device reconnection.
+        final var executionEx = assertThrows(ExecutionException.class, () -> setup.startResolution()
+            .get(1, TimeUnit.SECONDS));
+        final var emptyContextEx = assertInstanceOf(NetconfDevice.EmptySchemaContextException.class,
+            executionEx.getCause());
+        assertEquals("RemoteDeviceId[name=someDevice, address=0.0.0.0/0.0.0.0:42]: Device is reconnecting",
+            emptyContextEx.getMessage());
+
+        // Verify that the second schema source fetch was not executed because the previous one failed,
+        // leading to device reconnection.
+        verify(schemaRepository, times(1)).getSchemaSource(any(SourceIdentifier.class), eq(YangTextSource.class));
     }
 }
