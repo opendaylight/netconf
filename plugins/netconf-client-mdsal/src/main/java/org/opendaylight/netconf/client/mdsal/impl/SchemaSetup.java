@@ -26,7 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice.EmptySchemaContextException;
@@ -91,6 +93,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     private final Set<QName> initialRequiredSources;
     private final SchemaRepository repository;
     private final EffectiveModelContextFactory contextFactory;
+    private final AtomicBoolean reconnectingDevice = new AtomicBoolean();
 
     private Collection<SourceIdentifier> requiredSources;
 
@@ -142,7 +145,10 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     }
 
     private void trySetupSchema() {
-        if (!requiredSources.isEmpty()) {
+        if (reconnectingDevice.get()) {
+            LOG.debug("{}: Device is reconnecting. Abort schema context build.", deviceId);
+            resultFuture.setException(new EmptySchemaContextException(deviceId + ": Device is reconnecting"));
+        } else if (!requiredSources.isEmpty()) {
             // Initiate async resolution, drive it back based on the result
             LOG.trace("{}: Trying to build schema context from {}", deviceId, requiredSources);
             Futures.addCallback(contextFactory.createEffectiveModelContext(requiredSources), this,
@@ -158,10 +164,18 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
         return origSources.parallelStream()
             .filter(sourceId -> {
                 try {
+                    if (reconnectingDevice.get()) {
+                        LOG.debug("Skip schema source {} fetch due to device reconnection.", sourceId);
+                        return true;
+                    }
                     repository.getSchemaSource(sourceId, YangTextSource.class).get();
                     return false;
                 } catch (InterruptedException | ExecutionException e) {
                     LOG.debug("Failed to acquire source {}", sourceId, e);
+                    // If the request is cancelled, the device is going to reconnect.
+                    if (!reconnectingDevice.get() && isRequestCancelledException(e)) {
+                        reconnectingDevice.set(true);
+                    }
                     return true;
                 }
             })
@@ -248,5 +262,11 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
         // return null since we cannot find the QName,
         // this capability will be removed from required sources and not reported as unresolved-capability
         return null;
+    }
+
+    private static boolean isRequestCancelledException(final Exception ex) {
+        return ex instanceof ExecutionException executionExc
+            && executionExc.getCause() instanceof MissingSchemaSourceException missExc
+            && missExc.getCause() instanceof CancellationException;
     }
 }
