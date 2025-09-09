@@ -142,6 +142,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d06228ec_1fc7afb7",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseBodyOutputStream.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-09T12:06:59Z",
+      "side": 1,
+      "message": "When that happens?",
+      "parentUuid": "2b059b8b_ff13b13a",
+      "revId": "3f8961fa66cc6c4b7576d1ce7b782c0839c237bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "58b6bc6e_5175efde",
         "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseBodyOutputStream.java",
         "patchSetId": 45
