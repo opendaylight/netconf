@@ -108,6 +108,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d4d694eb_d7a4b683",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-09T12:12:57Z",
+      "side": 1,
+      "message": "but we have also test implementation - do we need to change also production one?",
+      "parentUuid": "08b2ce2c_9cae29a3",
+      "revId": "9a9b126a59f9dc521322b23803aacf219e4a04b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4dff9258_92d8f499",
         "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/PipeliningTest.java",
         "patchSetId": 8
