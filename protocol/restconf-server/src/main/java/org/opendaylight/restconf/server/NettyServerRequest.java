@@ -11,9 +11,11 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.handler.codec.http.QueryStringDecoder;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.PendingRequestListener;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
+import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -44,6 +46,17 @@ final class NettyServerRequest<T> extends MappingServerRequest<T> {
     @Override
     public TransportSession session() {
         return request.session;
+    }
+
+    @Override
+    public @Nullable String contentEncoding() {
+        if (request instanceof PendingRequestWithBody<?, ?> prb) {
+            return switch (prb.contentEncoding) {
+                case JSON -> MediaTypes.APPLICATION_YANG_DATA_JSON;
+                case XML -> MediaTypes.APPLICATION_YANG_DATA_XML;
+            };
+        }
+        return null;
     }
 
     @Override

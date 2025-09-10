@@ -50,6 +50,10 @@ public sealed interface ServerRequest<R> extends Request<R> permits AbstractServ
 
     void completeWith(ErrorTag errorTag, FormattableBody body);
 
+    default @Nullable String contentEncoding() {
+        return null;
+    }
+
     @Override
     default <I> ServerRequest<I> transform(final Function<I, R> function) {
         return new TransformedServerRequest<>(this, function);
