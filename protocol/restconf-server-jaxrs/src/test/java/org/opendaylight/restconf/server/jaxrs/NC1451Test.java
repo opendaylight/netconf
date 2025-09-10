@@ -63,7 +63,7 @@ class NC1451Test extends AbstractRestconfTest {
     @Test
     void testGetSpecificLeafListJsonData() {
         // Send request to get a LeafSetEntryNode.
-        final var body = assertNormalizedBody(200, ar -> restconf.dataGET(API_PATH, uriInfo, sc, ar));
+        final var body = assertNormalizedBody(200, ar -> restconf.dataJsonGET(API_PATH, uriInfo, sc, ar));
 
         // Verify that the response is correctly mapped to JSON.
         assertFormat("""
@@ -77,7 +77,7 @@ class NC1451Test extends AbstractRestconfTest {
     @Test
     void testGetSpecificLeafListXmlData() {
         // Send request to get a LeafSetEntryNode.
-        final var body = assertNormalizedBody(200, ar -> restconf.dataGET(API_PATH, uriInfo, sc, ar));
+        final var body = assertNormalizedBody(200, ar -> restconf.dataXmlGET(API_PATH, uriInfo, sc, ar));
 
         // Verify that the response is correctly mapped to XML.
         assertFormat("""

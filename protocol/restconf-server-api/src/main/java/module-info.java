@@ -19,6 +19,7 @@ module org.opendaylight.restconf.server.api {
     requires transitive org.opendaylight.yangtools.yang.data.codec.xml;
     requires transitive org.opendaylight.yangtools.yang.data.util;
     requires transitive org.opendaylight.yangtools.yang.model.api;
+    requires transitive org.opendaylight.yang.gen.ietf.subscribed.notifications.rfc8639;
     requires transitive org.opendaylight.yang.gen.ietf.yang.patch.rfc8072;
     requires org.opendaylight.yang.gen.ietf.restconf.rfc8040;
     requires org.opendaylight.yangtools.yang.data.impl;

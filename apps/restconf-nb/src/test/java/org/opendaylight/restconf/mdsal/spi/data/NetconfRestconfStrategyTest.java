@@ -26,6 +26,7 @@ import com.google.common.util.concurrent.Futures;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -60,10 +61,12 @@ import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerModulesOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerMountPointResolver;
 import org.opendaylight.restconf.server.spi.NotSupportedServerRpcOperations;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -76,6 +79,33 @@ import org.w3c.dom.DOMException;
 
 @ExtendWith(MockitoExtension.class)
 final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
+    private static class TestServerRequest<T> extends MappingServerRequest<T> {
+        @NonNullByDefault
+        TestServerRequest(final QueryParameters queryParameters, final PrettyPrintParam defaultPrettyPrint) {
+            super(null, queryParameters, defaultPrettyPrint, ErrorTagMapping.RFC8040);
+        }
+
+        @Override
+        protected void onSuccess(final T result) {
+            // To be verified
+        }
+
+        @Override
+        protected void onFailure(final HttpStatusCode status, final FormattableBody body) {
+            // To be verified
+        }
+
+        @Override
+        public TransportSession session() {
+            return null;
+        }
+
+        @Override
+        public QName requestEncoding() {
+            return EncodeJson$I.QNAME;
+        }
+    }
+
     private final CompletingServerRequest<Empty> emptyRequest = new CompletingServerRequest<>();
 
     @Mock
@@ -270,25 +300,10 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(spyTx).read(SONG_LIST_PATH);
 
         // Inserting new song at 3rd position (aka as last element)
-        final var request = spy(new MappingServerRequest<DataPutResult>(null, QueryParameters.of(
+        final var request = spy(new TestServerRequest<DataPutResult>(QueryParameters.of(
             // insert new item after last existing item in list
             InsertParam.AFTER, PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")),
-            PrettyPrintParam.TRUE, ErrorTagMapping.RFC8040) {
-                @Override
-                protected void onSuccess(final DataPutResult result) {
-                    // To be verified
-                }
-
-                @Override
-                protected void onFailure(final HttpStatusCode status, final FormattableBody body) {
-                    // To be verified
-                }
-
-                @Override
-                public TransportSession session() {
-                    return null;
-                }
-        });
+            PrettyPrintParam.TRUE));
 
         final var spyStrategy = new MdsalServerStrategy(JUKEBOX_DATABIND, NotSupportedServerMountPointResolver.INSTANCE,
             NotSupportedServerActionOperations.INSTANCE, spyOperations, NotSupportedServerModulesOperations.INSTANCE,
@@ -339,24 +354,8 @@ final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(SONG3_PATH);
         doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(spyTx).read(SONG_LIST_PATH);
 
-        final var request = spy(new MappingServerRequest<DataPostResult>(null, QueryParameters.of(InsertParam.AFTER,
-            PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")), PrettyPrintParam.FALSE,
-            ErrorTagMapping.RFC8040) {
-                @Override
-                protected void onSuccess(final DataPostResult result) {
-                    // To be verified
-                }
-
-                @Override
-                protected void onFailure(final HttpStatusCode status, final FormattableBody body) {
-                    // To be verified
-                }
-
-                @Override
-                public TransportSession session() {
-                    return null;
-                }
-        });
+        final var request = spy(new TestServerRequest<DataPostResult>(QueryParameters.of(InsertParam.AFTER,
+            PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")), PrettyPrintParam.FALSE));
 
         final var spyStrategy = new MdsalServerStrategy(JUKEBOX_DATABIND, NotSupportedServerMountPointResolver.INSTANCE,
             NotSupportedServerActionOperations.INSTANCE, spyOperations, NotSupportedServerModulesOperations.INSTANCE,
