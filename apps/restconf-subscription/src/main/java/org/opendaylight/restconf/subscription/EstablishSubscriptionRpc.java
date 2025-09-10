@@ -88,9 +88,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         final var body = input.input();
         var encoding = leaf(body, ENCODING_NODEID, QName.class);
         if (encoding == null) {
-            // FIXME: derive from request
-            encoding = org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
-                .EncodeJson$I.QNAME;
+            encoding = request.contentEncoding();
         } else if (!SUPPORTED_ENCODINGS.contains(encoding)) {
             request.completeWith(new RequestException(EncodingUnsupported.VALUE.toString()));
             return;
