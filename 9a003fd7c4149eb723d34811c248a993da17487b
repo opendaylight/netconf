@@ -33,6 +33,24 @@
       "message": "why?",
       "revId": "9a003fd7c4149eb723d34811c248a993da17487b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86260dc3_f5e5756e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/rfc6415/HostMetaJson.java",
+        "patchSetId": 58
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-10T08:50:07Z",
+      "side": 1,
+      "message": "wasn\u0027t it originally protected?",
+      "parentUuid": "91186917_e52d954c",
+      "revId": "9a003fd7c4149eb723d34811c248a993da17487b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
