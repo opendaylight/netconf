@@ -18,6 +18,7 @@ import org.opendaylight.netconf.databind.AbstractRequest;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +66,12 @@ public abstract non-sealed class AbstractServerRequest<R> extends AbstractReques
     @Override
     public final QueryParameters queryParameters() {
         return queryParameters;
+    }
+
+    @Override
+    public @Nullable QName contentEncoding() {
+        // Default for transports or methods without a body
+        return null;
     }
 
     /**
