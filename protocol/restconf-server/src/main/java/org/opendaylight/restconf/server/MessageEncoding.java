@@ -18,6 +18,9 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
+import org.opendaylight.yangtools.yang.common.QName;
 
 /**
  * A RESTCONF message encoding, as defined in
@@ -30,7 +33,7 @@ public enum MessageEncoding {
      * <a href="https://www.rfc-editor.org/rfc/rfc7952#section-5.2">RFC7952, section 5.2</a>.
      */
     JSON(NettyMediaTypes.APPLICATION_YANG_DATA_JSON, NettyMediaTypes.APPLICATION_YANG_PATCH_JSON,
-            EncodingName.RFC8040_JSON, HttpHeaderValues.APPLICATION_JSON) {
+            EncodingName.RFC8040_JSON, EncodeJson$I.QNAME, HttpHeaderValues.APPLICATION_JSON) {
         @Override
         void formatBody(final FormattableBody body, final PrettyPrintParam prettyPrint, final OutputStream out)
                 throws IOException {
@@ -42,7 +45,7 @@ public enum MessageEncoding {
      * <a href="https://www.rfc-editor.org/rfc/rfc7952#section-5.1">RFC7952, section 5.1</a>.
      */
     XML(NettyMediaTypes.APPLICATION_YANG_DATA_XML, NettyMediaTypes.APPLICATION_YANG_PATCH_XML,
-            EncodingName.RFC8040_XML, HttpHeaderValues.APPLICATION_XML, NettyMediaTypes.TEXT_XML) {
+            EncodingName.RFC8040_XML, EncodeXml$I.QNAME, HttpHeaderValues.APPLICATION_XML, NettyMediaTypes.TEXT_XML) {
         @Override
         void formatBody(final FormattableBody body, final PrettyPrintParam prettyPrint, final OutputStream out)
                 throws IOException {
@@ -53,14 +56,35 @@ public enum MessageEncoding {
     private final AsciiString dataMediaType;
     private final AsciiString patchMediaType;
     private final EncodingName streamEncodingName;
+    private final QName subscriptionEncoding;
     private final Set<AsciiString> compatibleDataMediaTypes;
 
     MessageEncoding(final AsciiString dataMediaType, final AsciiString patchMediaType,
-            final EncodingName streamEncodingName, final AsciiString... compatibleMediaTypes) {
+            final EncodingName streamEncodingName, final QName subscriptionEncoding,
+            final AsciiString... compatibleMediaTypes) {
         this.dataMediaType = requireNonNull(dataMediaType);
         this.patchMediaType = requireNonNull(patchMediaType);
         this.streamEncodingName = requireNonNull(streamEncodingName);
+        this.subscriptionEncoding = requireNonNull(subscriptionEncoding);
         compatibleDataMediaTypes = Set.of(compatibleMediaTypes);
+    }
+
+    /**
+     * Return the stream encoding name {@code ietf-restconf.yang} assigns to this encoding.
+     *
+     * @return A stream {@link EncodingName}
+     */
+    public EncodingName streamEncodingName() {
+        return streamEncodingName;
+    }
+
+    /**
+     * Return the encoding identity {@code ietf-subscribed-notifications.yang} assigns to this encoding.
+     *
+     * @return A stream {@link EncodingName}
+     */
+    public QName subscriptionEncoding() {
+        return subscriptionEncoding;
     }
 
     /**
@@ -79,15 +103,6 @@ public enum MessageEncoding {
      */
     AsciiString patchMediaType() {
         return patchMediaType;
-    }
-
-    /**
-     * Return the stream encoding name {@code ietf-restconf.yang} assigns to this encoding.
-     *
-     * @return A stream {@link EncodingName}
-     */
-    EncodingName streamEncodingName() {
-        return streamEncodingName;
     }
 
     /**
