@@ -45,6 +45,30 @@
       },
       "revId": "b5bb33445ce140962537dc150fd3db3d8b8f0b75",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "614f5b56_9aea703d",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-10T09:52:02Z",
+      "side": 1,
+      "message": "Should NetconfDataTreeService use some factory method to instantiate either AbstractNetconfDataTreeService or ProxyNetconfDataTreeService if the constructor should be private?\n\nNetconfDataTreeService with ProxyNetconfDataTreeService implementation:\nhttps://github.com/opendaylight/netconf/blob/master/apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java#L168-L171\n\nhttps://github.com/opendaylight/netconf/blob/master/apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/SlaveSalFacade.java#L53-L57\n\nNetconfDataTreeService with AbstractNetconfDataTreeService implementation:\nhttps://github.com/opendaylight/netconf/blob/master/plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceSalFacade.java#L62-L67",
+      "parentUuid": "54b3acae_32aa6507",
+      "range": {
+        "startLine": 90,
+        "startChar": 28,
+        "endLine": 90,
+        "endChar": 32
+      },
+      "revId": "b5bb33445ce140962537dc150fd3db3d8b8f0b75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
