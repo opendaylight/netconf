@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "825f8ec0_90310d25",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseBodyOutputStream.java",
+        "patchSetId": 32
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-10T07:42:21Z",
+      "side": 1,
+      "message": "Resolved in https://git.opendaylight.org/gerrit/c/netconf/+/118019",
+      "parentUuid": "4d3bbae3_85db6411",
+      "revId": "5a10f5c242f5c6afa6833da3ff9085ed5a181f05",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4097ac74_8624cf47",
