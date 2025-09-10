@@ -69,6 +69,30 @@
       },
       "revId": "b5bb33445ce140962537dc150fd3db3d8b8f0b75",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8377da45_a8ee8de7",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-10T11:45:30Z",
+      "side": 1,
+      "message": "The ProxyNetconfDataTreeService is located in the netconf-topology-singleton module. Initializing this class in netconf-client-mdsal will require adding a dependency on netconf-topology-singleton.",
+      "parentUuid": "614f5b56_9aea703d",
+      "range": {
+        "startLine": 90,
+        "startChar": 28,
+        "endLine": 90,
+        "endChar": 32
+      },
+      "revId": "b5bb33445ce140962537dc150fd3db3d8b8f0b75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
