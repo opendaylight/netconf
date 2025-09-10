@@ -87,16 +87,8 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
     @Override
     public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input) {
         final var body = input.input();
-        var encoding = leaf(body, ENCODING_NODEID, QName.class);
-        if (encoding == null) {
-            // FIXME: derive from request
-            encoding = org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
-                .EncodeJson$I.QNAME;
-        } else if (!SUPPORTED_ENCODINGS.contains(encoding)) {
-            request.completeWith(new RequestException(EncodingUnsupported.VALUE.toString()));
-            return;
-        }
 
+        // check target
         final var target = (ChoiceNode) body.childByArg(TARGET_NODEID);
         if (target == null) {
             // means there is no stream information present
@@ -124,12 +116,21 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
             try {
                 stopInstant = Instant.parse(stopTime);
             } catch (DateTimeParseException e) {
-                request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
                     "Malformed stop-type", e));
                 return;
             }
         } else {
             stopInstant = null;
+        }
+
+        // check encoding
+        final var bodyEncoding = leaf(body, ENCODING_NODEID, QName.class);
+        final var encoding = bodyEncoding != null ? bodyEncoding : request.requestEncoding();
+        if (!SUPPORTED_ENCODINGS.contains(encoding)) {
+            // FIXME: this looks weird: we should be propagating the identity somewhere, right?
+            request.completeWith(new RequestException(EncodingUnsupported.VALUE.toString()));
+            return;
         }
 
         streamRegistry.establishSubscription(request.transform(subscriptionId -> ImmutableNodes.newContainerBuilder()
