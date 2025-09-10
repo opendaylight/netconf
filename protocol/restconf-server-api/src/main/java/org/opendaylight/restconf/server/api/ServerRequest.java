@@ -14,6 +14,7 @@ import org.opendaylight.netconf.databind.Request;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.QName;
 
 /**
  * A {@link Request} to {@link RestconfServer}. It contains state and binding established by whoever is performing the
@@ -45,6 +46,17 @@ public sealed interface ServerRequest<R> extends Request<R> permits AbstractServ
      * @return the request's {@link QueryParameters}
      */
     QueryParameters queryParameters();
+
+    /**
+     * Returns the wire-encoding of the original HTTP request body as a YANG {@link QName},
+     * derived from the <em>Content-Type</em> header. Implementations SHOULD map JSON bodies
+     * to {@code EncodeJson$I.QNAME} and XML bodies to {@code EncodeXml$I.QNAME}.
+     * <p>For requests without a body (e.g., GET/DELETE) or when the encoding is not applicable,
+     * this method MAY return {@code null}.
+     *
+     * @return the encoding {@link QName} for the request body, or {@code null} if not applicable
+     */
+    @Nullable QName contentEncoding();
 
     void completeWith(YangErrorsBody errors);
 
