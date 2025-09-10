@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.server.api.testlib;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import java.security.Principal;
@@ -23,7 +25,9 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.AbstractServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.YangErrorsBody;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +39,7 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
     private static final Logger LOG = LoggerFactory.getLogger(CompletingServerRequest.class);
 
     private final CompletableFuture<T> future = new CompletableFuture<>();
+    private final QName requestEncoding;
 
     public CompletingServerRequest() {
         this(PrettyPrintParam.TRUE);
@@ -54,7 +59,13 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
 
     public CompletingServerRequest(final @Nullable Principal principal, final QueryParameters queryParameters,
             final PrettyPrintParam defaultPrettyPrint) {
+        this(principal, queryParameters, defaultPrettyPrint, EncodeJson$I.QNAME);
+    }
+
+    public CompletingServerRequest(final @Nullable Principal principal, final QueryParameters queryParameters,
+            final PrettyPrintParam defaultPrettyPrint, final QName requestEncoding) {
         super(principal, queryParameters, defaultPrettyPrint);
+        this.requestEncoding = requireNonNull(requestEncoding);
     }
 
     public T getResult() throws RequestException, InterruptedException, TimeoutException {
@@ -73,6 +84,11 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
             Throwables.throwIfUnchecked(cause);
             throw new UncheckedExecutionException(cause);
         }
+    }
+
+    @Override
+    public QName requestEncoding() {
+        return requestEncoding;
     }
 
     @Override

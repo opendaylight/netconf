@@ -25,7 +25,7 @@ class Netconf822Test extends AbstractRestconfTest {
 
     @Test
     void testOperationsContent() {
-        final var body = assertFormattableBody(200, ar -> restconf.operationsGET(sc, ar));
+        final var body = assertFormattableBody(200, ar -> restconf.operationsJsonGET(sc, ar));
 
         assertFormat("""
             {
@@ -43,7 +43,7 @@ class Netconf822Test extends AbstractRestconfTest {
 
     @Test
     void testOperationsContentByIdentifier() {
-        final var body = assertFormattableBody(200, ar -> restconf.operationsGET(apiPath("foo:new1"), sc, ar));
+        final var body = assertFormattableBody(200, ar -> restconf.operationsXmlGET(apiPath("foo:new1"), sc, ar));
 
         assertFormat("""
             { "foo:new1" : [null] }""", body::formatToJSON, false);

@@ -32,6 +32,16 @@ abstract non-sealed class PendingRequestWithoutBody<T> extends AbstractPendingRe
     }
 
     @Override
+    MessageEncoding errorEncoding() {
+        return invariants.defaultEncoding();
+    }
+
+    @Override
+    MessageEncoding requestEncoding() {
+        return invariants.defaultEncoding();
+    }
+
+    @Override
     final void execute(final NettyServerRequest<T> request, final @Nullable InputStream body) {
         if (body != null) {
             closeBody(body);

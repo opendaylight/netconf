@@ -83,7 +83,7 @@ class RestconfDataGetTest extends AbstractRestconfTest {
         doReturn(immediateFluentFuture(Optional.empty()))
                 .when(tx).read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
 
-        final var body = assertNormalizedBody(200, ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, sc, ar));
+        final var body = assertNormalizedBody(200, ar -> restconf.dataXmlGET(JUKEBOX_API_PATH, uriInfo, sc, ar));
         assertEquals(EMPTY_JUKEBOX, body.data());
         assertFormat("""
             {
@@ -111,7 +111,7 @@ class RestconfDataGetTest extends AbstractRestconfTest {
                 .when(tx)
                 .read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of());
 
-        final var body = assertNormalizedBody(200, ar -> restconf.dataGET(uriInfo, sc, ar));
+        final var body = assertNormalizedBody(200, ar -> restconf.dataJsonGET(uriInfo, sc, ar));
         final var data = assertInstanceOf(ContainerNode.class, body.data());
         final var rootNodes = data.body();
         assertEquals(1, rootNodes.size());
@@ -167,7 +167,7 @@ class RestconfDataGetTest extends AbstractRestconfTest {
         doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
 
         // response must contain all child nodes from config and operational containers merged in one container
-        final var body = assertNormalizedBody(200, ar -> restconf.dataGET(
+        final var body = assertNormalizedBody(200, ar -> restconf.dataJsonGET(
             apiPath("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox"), uriInfo, sc, ar));
         final var data = assertInstanceOf(ContainerNode.class, body.data());
         assertEquals(3, data.size());
@@ -200,7 +200,7 @@ class RestconfDataGetTest extends AbstractRestconfTest {
         doReturn(immediateFluentFuture(Optional.empty()))
                 .when(tx).read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
 
-        final var error = assertError(409, ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, sc, ar));
+        final var error = assertError(409, ar -> restconf.dataJsonGET(JUKEBOX_API_PATH, uriInfo, sc, ar));
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.DATA_MISSING, error.tag());
         assertEquals(
@@ -221,7 +221,7 @@ class RestconfDataGetTest extends AbstractRestconfTest {
                 .read(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
 
         // response must contain only config data
-        final var body = assertNormalizedBody(200, ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, sc, ar));
+        final var body = assertNormalizedBody(200, ar -> restconf.dataXmlGET(JUKEBOX_API_PATH, uriInfo, sc, ar));
         final var data = assertInstanceOf(ContainerNode.class, body.data());
         // config data present
         assertNotNull(data.childByArg(CONT_PLAYER.name()));
@@ -259,7 +259,7 @@ class RestconfDataGetTest extends AbstractRestconfTest {
                 .read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
 
         // response must contain only operational data
-        final var body = assertNormalizedBody(200, ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, sc, ar));
+        final var body = assertNormalizedBody(200, ar -> restconf.dataXmlGET(JUKEBOX_API_PATH, uriInfo, sc, ar));
         final var data = assertInstanceOf(ContainerNode.class, body.data());
         // state data present
         assertNotNull(data.childByArg(CONT_PLAYER.name()));
@@ -301,7 +301,7 @@ class RestconfDataGetTest extends AbstractRestconfTest {
                 .build());
 
         final var body = assertNormalizedBody(200,
-            ar -> restconf.dataGET(apiPath("example-jukebox:jukebox/library/artist=IAmN0t"), uriInfo, sc, ar));
+            ar -> restconf.dataJsonGET(apiPath("example-jukebox:jukebox/library/artist=IAmN0t"), uriInfo, sc, ar));
         assertFormat("""
             {
               "example-jukebox:artist": [
