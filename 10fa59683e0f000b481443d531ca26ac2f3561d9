@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8853488d_39337e44",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/NetconfFieldsParamTest.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-10T18:16:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28b8596f_deff9362",
+      "range": {
+        "startLine": 36,
+        "startChar": 8,
+        "endLine": 37,
+        "endChar": 49
+      },
+      "revId": "10fa59683e0f000b481443d531ca26ac2f3561d9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d6fc3e81_f3b725e5",
@@ -54,6 +78,30 @@
       "writtenOn": "2025-09-10T03:07:39Z",
       "side": 1,
       "message": "nullability?",
+      "range": {
+        "startLine": 45,
+        "startChar": 24,
+        "endLine": 45,
+        "endChar": 35
+      },
+      "revId": "10fa59683e0f000b481443d531ca26ac2f3561d9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd54b986_7f635a6b",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-10T18:16:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d6fc3e81_f3b725e5",
       "range": {
         "startLine": 45,
         "startChar": 24,
