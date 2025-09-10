@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.subscription;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElse;
 
 import java.net.URI;
 import java.time.Instant;
@@ -22,6 +23,7 @@ import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodingUnsupported;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
@@ -88,9 +90,8 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         final var body = input.input();
         var encoding = leaf(body, ENCODING_NODEID, QName.class);
         if (encoding == null) {
-            // FIXME: derive from request
-            encoding = org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
-                .EncodeJson$I.QNAME;
+            final var requestEncoding = request.contentEncoding();
+            encoding = requireNonNullElse(requestEncoding, EncodeJson$I.QNAME);
         } else if (!SUPPORTED_ENCODINGS.contains(encoding)) {
             request.completeWith(new RequestException(EncodingUnsupported.VALUE.toString()));
             return;
