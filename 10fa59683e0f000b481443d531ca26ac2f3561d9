@@ -16,6 +16,52 @@
       "message": "recheck",
       "revId": "10fa59683e0f000b481443d531ca26ac2f3561d9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28b8596f_deff9362",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/NetconfFieldsParamTest.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-09-10T03:07:39Z",
+      "side": 1,
+      "message": "this is bad decomposition of usability:\n\nwe have all the arguments lined up, a static method is appropriate:\n\nFieldsParamParser.fieldsParamsToPaths(...)\n\nand make FieldsParamParser constructor private -- thus we have a stateful place and users do not care, as it\u0027s a transient implementation-side thing",
+      "range": {
+        "startLine": 36,
+        "startChar": 8,
+        "endLine": 37,
+        "endChar": 49
+      },
+      "revId": "10fa59683e0f000b481443d531ca26ac2f3561d9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6fc3e81_f3b725e5",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-09-10T03:07:39Z",
+      "side": 1,
+      "message": "nullability?",
+      "range": {
+        "startLine": 45,
+        "startChar": 24,
+        "endLine": 45,
+        "endChar": 35
+      },
+      "revId": "10fa59683e0f000b481443d531ca26ac2f3561d9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
