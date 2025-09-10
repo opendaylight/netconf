@@ -53,6 +53,11 @@ record TransformedServerRequest<I, R>(ServerRequest<R> delegate, Function<I, R> 
     }
 
     @Override
+    public @Nullable String contentEncoding() {
+        return delegate.contentEncoding();
+    }
+
+    @Override
     public void completeWith(final I result) {
         delegate.completeWith(function.apply(requireNonNull(result)));
     }

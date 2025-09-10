@@ -67,6 +67,12 @@ public abstract non-sealed class AbstractServerRequest<R> extends AbstractReques
         return queryParameters;
     }
 
+    @Override
+    public @Nullable String contentEncoding() {
+        // Default for transports or methods without a body
+        return null;
+    }
+
     /**
      * Return the effective {@link PrettyPrintParam}.
      *

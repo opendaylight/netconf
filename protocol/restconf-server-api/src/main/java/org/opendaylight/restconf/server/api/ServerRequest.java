@@ -46,6 +46,15 @@ public sealed interface ServerRequest<R> extends Request<R> permits AbstractServ
      */
     QueryParameters queryParameters();
 
+    /**
+     * Returns the media type of the original HTTP request body as a String, derived
+     * from the <em>Content-Type</em> header (e.g., {@code application/yang-patch+json})
+     * Implementations that do not carry a request body (e.g., GET/DELETE) may return {@code null}.
+     *
+     * @return the request body media type, or {@code null} if not applicable
+     */
+    @Nullable String contentEncoding();
+
     void completeWith(YangErrorsBody errors);
 
     void completeWith(ErrorTag errorTag, FormattableBody body);
