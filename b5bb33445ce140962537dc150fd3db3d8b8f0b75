@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "838e44d0_ef2fb2e9",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 54
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-10T18:17:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cc922c16_ee84032e",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 6
+      },
+      "revId": "b5bb33445ce140962537dc150fd3db3d8b8f0b75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "54b3acae_32aa6507",
