@@ -46,6 +46,10 @@
             <artifactId>rfc8072</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc8639</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>databind</artifactId>
         </dependency>
@@ -98,4 +102,23 @@
             <artifactId>yang-model-util</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <ignoredUnusedDeclaredDependencies>
+                        <!-- FIXME: AFAICT this should be necessary: we are 'requires transitive in module-info.java,
+                                    which is to say: this dependency is our explicit contract exposed downstream.
+                                    Diagnose the reason why maven-dependency-plugin is doing the wrong thing here and
+                                    either fix here (if it's our fault) or contribute a PR fix upstream (if its their
+                                    fault)
+                        -->
+                        <ignoredUnusedDeclaredDependency>org.opendaylight.ietf.model:rfc8639</ignoredUnusedDeclaredDependency>
+                    </ignoredUnusedDeclaredDependencies>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

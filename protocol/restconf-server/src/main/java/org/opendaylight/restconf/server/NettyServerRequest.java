@@ -20,6 +20,7 @@ import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
 import org.opendaylight.restconf.server.spi.MappingServerRequest;
+import org.opendaylight.yangtools.yang.common.QName;
 
 /**
  * The {@link ServerRequest}s implementation we are passing to {@link RestconfServer}. Completion callbacks are routed
@@ -44,6 +45,11 @@ final class NettyServerRequest<T> extends MappingServerRequest<T> {
     @Override
     public TransportSession session() {
         return request.session;
+    }
+
+    @Override
+    public QName requestEncoding() {
+        return request.requestEncoding().subscriptionEncoding();
     }
 
     @Override

@@ -72,13 +72,14 @@ abstract sealed class AbstractPendingRequest<T> extends PendingRequest<T>
     }
 
     /**
-     * Return the {@link MessageEncoding} to use with errors. Default implementation returns the default encoding.
-     *
-     * @return the {@link MessageEncoding} to use with errors
+     * {@return the {@link MessageEncoding} to use with errors}
      */
-    @NonNull MessageEncoding errorEncoding() {
-        return invariants.defaultEncoding();
-    }
+    abstract @NonNull MessageEncoding errorEncoding();
+
+    /**
+     * {@return the {@link MessageEncoding} to use as RFC8639's {code RPC encoding}}
+     */
+    abstract @NonNull MessageEncoding requestEncoding();
 
     /**
      * Return the absolute URI pointing at the root API resource, as seen from the perspective of specified request.
