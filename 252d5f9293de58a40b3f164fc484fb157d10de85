@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "12696145_cd964d77",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-10T08:53:07Z",
+      "side": 1,
+      "message": "Added more details to commit message.",
+      "parentUuid": "73b2a8f5_c011cfd4",
+      "revId": "252d5f9293de58a40b3f164fc484fb157d10de85",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "59a27c3e_b5d6cfd6",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-09T12:11:26Z",
       "side": 1,
       "message": "What if I use earlier data that now?",
+      "revId": "252d5f9293de58a40b3f164fc484fb157d10de85",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36243cc1_b53104fd",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-10T08:53:07Z",
+      "side": 1,
+      "message": "In that case it will not reach this, request is completed in AbstractRestconfStreamRegistry#modifySubscription with \"Stop-time must be in future.\" error",
+      "parentUuid": "59a27c3e_b5d6cfd6",
       "revId": "252d5f9293de58a40b3f164fc484fb157d10de85",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
