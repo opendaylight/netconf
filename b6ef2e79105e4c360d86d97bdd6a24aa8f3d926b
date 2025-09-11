@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e28b4e9_b054f09f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T07:46:56Z",
+      "side": 1,
+      "message": "needs manual rebase and review of the chain from beginning",
+      "revId": "b6ef2e79105e4c360d86d97bdd6a24aa8f3d926b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
