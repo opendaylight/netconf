@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "45932e11_c9c2373a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T13:04:32Z",
+      "side": 1,
+      "message": "IMO we would just remove no more valid filters, then we can resume any subscription.",
+      "revId": "b6ef2e79105e4c360d86d97bdd6a24aa8f3d926b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3e28b4e9_b054f09f",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 4
@@ -14,6 +31,23 @@
       "writtenOn": "2025-09-11T07:46:56Z",
       "side": 1,
       "message": "needs manual rebase and review of the chain from beginning",
+      "revId": "b6ef2e79105e4c360d86d97bdd6a24aa8f3d926b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddbb80a5_ed619a18",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 901,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T13:04:32Z",
+      "side": 1,
+      "message": "what\u0027s the relation to https://git.opendaylight.org/gerrit/c/netconf/+/117091?",
       "revId": "b6ef2e79105e4c360d86d97bdd6a24aa8f3d926b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
