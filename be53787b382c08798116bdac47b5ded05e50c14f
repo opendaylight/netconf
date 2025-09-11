@@ -54,6 +54,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "38e9e8e0_c86e24cc",
+        "filename": "apps/sal-remote-impl/src/test/java/org/opendaylight/netconf/sal/remote/impl/CreateDataChangeEventSubscriptionRpcTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-11T07:55:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "84ef2015_7d36f6fd",
+      "revId": "be53787b382c08798116bdac47b5ded05e50c14f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e2eb46a_0ace9d60",
