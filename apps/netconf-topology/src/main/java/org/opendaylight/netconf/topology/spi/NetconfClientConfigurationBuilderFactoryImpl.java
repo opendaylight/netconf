@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -29,7 +30,11 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.cli
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240814.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentity;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentityBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.TransportParams;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.TransportParamsBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.client.identity.PasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.KeyExchangeBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.credentials.KeyAuth;
@@ -40,26 +45,48 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 /**
  * Default implementation of NetconfClientConfigurationBuildFactory.
  */
-@Component
+@Component(service = NetconfClientConfigurationBuilderFactory.class,
+    configurationPid = "org.opendaylight.netconf.client")
 @Singleton
+@Designate(ocd = NetconfClientConfigurationBuilderFactoryImpl.Configuration.class)
 public final class NetconfClientConfigurationBuilderFactoryImpl implements NetconfClientConfigurationBuilderFactory {
+    @ObjectClassDefinition
+    public @interface Configuration {
+        @AttributeDefinition(description = "Client advertised key exchange algorithms.")
+        String Key$_$exchange() default "";
+    }
+
     private final SslContextFactoryProvider sslContextFactoryProvider;
     private final AAAEncryptionService encryptionService;
     private final CredentialProvider credentialProvider;
+    private TransportParams transportParams;
+
+    public NetconfClientConfigurationBuilderFactoryImpl(
+            final AAAEncryptionService encryptionService,
+            final CredentialProvider credentialProvider,
+            final SslContextFactoryProvider sslHandlerContextProvider) {
+        this.encryptionService = requireNonNull(encryptionService);
+        this.credentialProvider = requireNonNull(credentialProvider);
+        sslContextFactoryProvider = requireNonNull(sslHandlerContextProvider);
+    }
 
     @Inject
     @Activate
     public NetconfClientConfigurationBuilderFactoryImpl(
             @Reference final AAAEncryptionService encryptionService,
             @Reference final CredentialProvider credentialProvider,
-            @Reference final SslContextFactoryProvider sslHandlerContextProvider) {
+            @Reference final SslContextFactoryProvider sslHandlerContextProvider, final Configuration configuration) {
         this.encryptionService = requireNonNull(encryptionService);
         this.credentialProvider = requireNonNull(credentialProvider);
         sslContextFactoryProvider = requireNonNull(sslHandlerContextProvider);
+        parseConfig(configuration);
     }
 
     @Override
@@ -139,6 +166,9 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         } else {
             throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
         }
+        if (transportParams != null) {
+            sshParamsBuilder.setTransportParams(transportParams);
+        }
         confBuilder.withSshParameters(sshParamsBuilder.build());
     }
 
@@ -151,5 +181,20 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
                     .build())
                 .build())
             .build();
+    }
+
+    private void parseConfig(final Configuration configuration) {
+        final var kex = configuration.Key$_$exchange().isEmpty() ? new String[0]
+            : configuration.Key$_$exchange().split(",");
+        final var kexAlg = new ArrayList<SshKeyExchangeAlgorithm>();
+        final var kexBuilder = new KeyExchangeBuilder();
+        for (var alg : kex) {
+            kexAlg.add(new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh
+                .key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.ofName(alg)));
+        }
+        final var transportParamBuilder = new TransportParamsBuilder();
+        transportParamBuilder.setKeyExchange(kexBuilder.setKeyExchangeAlg(kexAlg).build());
+
+        transportParams = transportParamBuilder.build();
     }
 }

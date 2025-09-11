@@ -53,6 +53,10 @@
             <artifactId>mdsal-dom-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.iana</groupId>
+            <artifactId>iana-ssh-key-exchange-algs</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
             <artifactId>rfc6241</artifactId>
         </dependency>
@@ -71,6 +75,10 @@
         <dependency>
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
             <artifactId>rfc9644-ietf-ssh-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc9644-ietf-ssh-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
