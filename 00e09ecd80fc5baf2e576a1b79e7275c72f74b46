@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dad279f3_53cf07c0",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-11T11:42:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4910fd16_2efc5ad2",
+      "revId": "00e09ecd80fc5baf2e576a1b79e7275c72f74b46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "06cb7bac_ed1e0b1b",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-09-11T07:42:08Z",
       "side": 1,
       "message": "these ends with call to return updateSubscriptionReceivers(id(), createReceivers());",
+      "revId": "00e09ecd80fc5baf2e576a1b79e7275c72f74b46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f45da223_59cc916b",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-11T11:42:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "06cb7bac_ed1e0b1b",
       "revId": "00e09ecd80fc5baf2e576a1b79e7275c72f74b46",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d00b904_01a983d0",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-11T11:42:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "33c9ed12_74eaa488",
+      "revId": "00e09ecd80fc5baf2e576a1b79e7275c72f74b46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "224c662e_deef2179",
@@ -82,6 +136,24 @@
       "writtenOn": "2025-09-11T07:42:08Z",
       "side": 1,
       "message": "private",
+      "revId": "00e09ecd80fc5baf2e576a1b79e7275c72f74b46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9cd8544_9d7e9fb6",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-11T11:42:57Z",
+      "side": 1,
+      "message": "this is actually used from AbstractRestconfStreamRegistry.DynSubscription#publishStateNotif\nto publish state notifications, which are not filtered out when suspended",
+      "parentUuid": "224c662e_deef2179",
       "revId": "00e09ecd80fc5baf2e576a1b79e7275c72f74b46",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
