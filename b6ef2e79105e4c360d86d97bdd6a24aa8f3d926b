@@ -37,6 +37,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d538a9e4_cc0712e3",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 723,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T13:12:18Z",
+      "side": 1,
+      "message": "this should be at least logged",
+      "revId": "b6ef2e79105e4c360d86d97bdd6a24aa8f3d926b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16ecd72b_d5d9bf04",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 898,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T13:12:18Z",
+      "side": 1,
+      "message": "We have org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.InsufficientResources class.",
+      "revId": "b6ef2e79105e4c360d86d97bdd6a24aa8f3d926b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ddbb80a5_ed619a18",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
         "patchSetId": 4
