@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a5ca69b4_2dc2aba7",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T07:07:15Z",
+      "side": 1,
+      "message": "how to do know there are no other states? - prefer to use switch\nanyway - we are still in protocol, can we just use SubscriptionState?",
+      "revId": "bfcbdd5796f2d09ddd1f533e46bb8435af481c5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "469433d2_2986b336",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
         "patchSetId": 11
