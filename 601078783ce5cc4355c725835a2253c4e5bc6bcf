@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df3ab7f7_41bd4242",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NetconfBaseOpsTest.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T13:19:45Z",
+      "side": 1,
+      "message": "final or make it lowercase, one line separated from others",
+      "revId": "601078783ce5cc4355c725835a2253c4e5bc6bcf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6938f80f_ea4e2591",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceRpcTest.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T13:19:45Z",
+      "side": 1,
+      "message": "why not assertEquals?",
+      "revId": "601078783ce5cc4355c725835a2253c4e5bc6bcf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
