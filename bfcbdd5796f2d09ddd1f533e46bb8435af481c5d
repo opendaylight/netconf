@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2a445148_116cf0e1",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-11T08:44:03Z",
+      "side": 1,
+      "message": "SubscriptionState can be only SUSPENDED or ACTIVE here (ENDED is resolved at beginning of this method)\nSubscriber have Active and Suspended state (also Connecting and Disconnected that we do not support)\nwe could use SubscriptionState, but at some point we need to \"translate\" it to Subscriber state",
+      "parentUuid": "a5ca69b4_2dc2aba7",
+      "revId": "bfcbdd5796f2d09ddd1f533e46bb8435af481c5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "469433d2_2986b336",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
         "patchSetId": 11
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-11T06:38:53Z",
       "side": 1,
       "message": "can you make the order of fields the same as order of parameters in constructor?",
+      "revId": "bfcbdd5796f2d09ddd1f533e46bb8435af481c5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f33a6ff_037008dd",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-11T08:44:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "469433d2_2986b336",
       "revId": "bfcbdd5796f2d09ddd1f533e46bb8435af481c5d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14526d80_ca9eef32",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-11T08:44:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4182506c_0a111a6b",
+      "revId": "bfcbdd5796f2d09ddd1f533e46bb8435af481c5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0d6e546f_50c40311",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a46ac2c_cb10086a",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-11T08:44:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d6e546f_50c40311",
+      "revId": "bfcbdd5796f2d09ddd1f533e46bb8435af481c5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "210b28d8_14cd5afd",
@@ -82,6 +154,24 @@
       "writtenOn": "2025-09-11T06:38:53Z",
       "side": 1,
       "message": "requireNonNull",
+      "revId": "bfcbdd5796f2d09ddd1f533e46bb8435af481c5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e50e7d3_fca04819",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-11T08:44:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "210b28d8_14cd5afd",
       "revId": "bfcbdd5796f2d09ddd1f533e46bb8435af481c5d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
