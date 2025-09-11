@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb35444b_5e4e8688",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T06:31:43Z",
+      "side": 1,
+      "message": "redundant line",
+      "revId": "88034ec5e4fae351cb8d15b0a1b69c18cb8cc891",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
