@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e38dfe2f_b3f2f29f",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NetconfBaseOpsTest.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-11T13:55:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df3ab7f7_41bd4242",
+      "revId": "601078783ce5cc4355c725835a2253c4e5bc6bcf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6938f80f_ea4e2591",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-11T13:19:45Z",
       "side": 1,
       "message": "why not assertEquals?",
+      "revId": "601078783ce5cc4355c725835a2253c4e5bc6bcf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7d58585_7d23bb00",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceRpcTest.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-11T13:55:45Z",
+      "side": 1,
+      "message": "bc https://git.opendaylight.org/gerrit/c/netconf/+/116748/14/plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformer.java#407 create a new instance with the same content, but assertEquals compares addresses in memory",
+      "parentUuid": "6938f80f_ea4e2591",
       "revId": "601078783ce5cc4355c725835a2253c4e5bc6bcf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
