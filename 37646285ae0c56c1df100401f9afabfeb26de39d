@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ab26b33_46d45b18",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T08:00:06Z",
+      "side": 1,
+      "message": "no, never do this",
+      "revId": "37646285ae0c56c1df100401f9afabfeb26de39d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48f89569_0a3f7568",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T08:00:06Z",
+      "side": 1,
+      "message": "why is this s needed?",
+      "revId": "37646285ae0c56c1df100401f9afabfeb26de39d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e44267a_6824e73c",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/SubscriptionSuspensionTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T08:00:06Z",
+      "side": 1,
+      "message": "just package protected",
+      "revId": "37646285ae0c56c1df100401f9afabfeb26de39d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a55cc7d6_c8f67377",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/SubscriptionSuspensionTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T08:00:06Z",
+      "side": 1,
+      "message": "why do you need a static client when its overridden before each test?",
+      "revId": "37646285ae0c56c1df100401f9afabfeb26de39d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6858685e_1708ec9d",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/SubscriptionSuspensionTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T08:00:06Z",
+      "side": 1,
+      "message": "can we suspend one subscription twice? try to add some fine granular tests, too",
+      "revId": "37646285ae0c56c1df100401f9afabfeb26de39d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2c9636b_40a6b148",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/SubscriptionSuspensionTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T08:00:06Z",
+      "side": 1,
+      "message": "why do we need LENIENT?",
+      "revId": "37646285ae0c56c1df100401f9afabfeb26de39d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df3f7279_f79da935",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T08:00:06Z",
+      "side": 1,
+      "message": "this does not belong to this patch",
+      "revId": "37646285ae0c56c1df100401f9afabfeb26de39d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
