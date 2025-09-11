@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0cca8a52_561cb89a",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T07:42:08Z",
+      "side": 1,
+      "message": "suspendReceivers - what is the relationship to updateSubscriptionReceivers? Can we reuse some parts?\n\nI am afraid that notification is not send directly after subscribers are moved to suspended state, it seems we are doing this from multiple places.",
+      "revId": "00e09ecd80fc5baf2e576a1b79e7275c72f74b46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4910fd16_2efc5ad2",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T07:42:08Z",
+      "side": 1,
+      "message": "resumeReceivers",
+      "revId": "00e09ecd80fc5baf2e576a1b79e7275c72f74b46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06cb7bac_ed1e0b1b",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T07:42:08Z",
+      "side": 1,
+      "message": "these ends with call to return updateSubscriptionReceivers(id(), createReceivers());",
+      "revId": "00e09ecd80fc5baf2e576a1b79e7275c72f74b46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33c9ed12_74eaa488",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T07:42:08Z",
+      "side": 1,
+      "message": "document and add debug logging",
+      "revId": "00e09ecd80fc5baf2e576a1b79e7275c72f74b46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "224c662e_deef2179",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T07:42:08Z",
+      "side": 1,
+      "message": "private",
+      "revId": "00e09ecd80fc5baf2e576a1b79e7275c72f74b46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
