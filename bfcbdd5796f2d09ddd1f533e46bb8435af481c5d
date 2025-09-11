@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "469433d2_2986b336",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T06:38:53Z",
+      "side": 1,
+      "message": "can you make the order of fields the same as order of parameters in constructor?",
+      "revId": "bfcbdd5796f2d09ddd1f533e46bb8435af481c5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4182506c_0a111a6b",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T06:38:53Z",
+      "side": 1,
+      "message": "formatting",
+      "revId": "bfcbdd5796f2d09ddd1f533e46bb8435af481c5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d6e546f_50c40311",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T06:38:53Z",
+      "side": 1,
+      "message": "requireNonNull",
+      "revId": "bfcbdd5796f2d09ddd1f533e46bb8435af481c5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "210b28d8_14cd5afd",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-11T06:38:53Z",
+      "side": 1,
+      "message": "requireNonNull",
+      "revId": "bfcbdd5796f2d09ddd1f533e46bb8435af481c5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
