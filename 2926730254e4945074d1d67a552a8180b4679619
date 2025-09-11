@@ -33,6 +33,24 @@
       "message": "What\u0027s the reason behind using cluster singleton service in tests?",
       "revId": "2926730254e4945074d1d67a552a8180b4679619",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0b96663_c31adfae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-11T08:40:12Z",
+      "side": 1,
+      "message": "This is just to fill out the MdsalRestconfStreamRegistry constructor.",
+      "parentUuid": "5a9c9c30_9cb2e16a",
+      "revId": "2926730254e4945074d1d67a552a8180b4679619",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
