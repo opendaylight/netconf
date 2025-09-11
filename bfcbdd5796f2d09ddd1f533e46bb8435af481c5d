@@ -54,6 +54,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "623a4dce_89986c46",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-11T11:38:22Z",
+      "side": 1,
+      "message": "Replaced it with switch",
+      "parentUuid": "f8fdeb3e_d32caa23",
+      "revId": "bfcbdd5796f2d09ddd1f533e46bb8435af481c5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "469433d2_2986b336",
