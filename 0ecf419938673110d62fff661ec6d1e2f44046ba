@@ -16,6 +16,24 @@
       "message": "IDK should we store previous copyright?\n\nFYI: https://docs.opendaylight.org/en/latest/contributor-guides/copyright.html",
       "revId": "0ecf419938673110d62fff661ec6d1e2f44046ba",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc8636aa_519d86c9",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/netconf/CancelChangesRequest.java",
+        "patchSetId": 56
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-12T18:08:48Z",
+      "side": 1,
+      "message": "I can not affect how Gerrit presents this change. What I did was delete the DiscardChangesRequest class and create a new CancelChangesRequest class.",
+      "parentUuid": "b8ca731f_e9cd8198",
+      "revId": "0ecf419938673110d62fff661ec6d1e2f44046ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
