@@ -16,6 +16,24 @@
       "message": "12:49:24 Caused by: org.apache.felix.resolver.reason.ReasonException: Unable to resolve odl-netconf-transport/10.0.0.SNAPSHOT: missing requirement [odl-netconf-transport/10.0.0.SNAPSHOT] osgi.identity; osgi.identity\u003dorg.opendaylight.netconf.shaded-sshd; type\u003dosgi.bundle; version\u003d\"[10.0.0.SNAPSHOT,10.0.0.SNAPSHOT]\"; resolution:\u003dmandatory [caused by: Unable to resolve org.opendaylight.netconf.shaded-sshd/10.0.0.SNAPSHOT: missing requirement [org.opendaylight.netconf.shaded-sshd/10.0.0.SNAPSHOT] osgi.wiring.package; filter:\u003d\"(osgi.wiring.package\u003dnet.i2p.crypto.eddsa)\"]",
       "revId": "5dd5bbaa5f69e785331051b568362853a63f6caf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b175513_839fc221",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 14
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-12T12:36:28Z",
+      "side": 1,
+      "message": "Seems like: `We also remove dependency on the eddsa library, as SSHD no longer\nreferences it in its API.` is not going to work.",
+      "parentUuid": "58ec4f91_b23a76bc",
+      "revId": "5dd5bbaa5f69e785331051b568362853a63f6caf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
