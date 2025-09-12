@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af937287_c56b419e",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfBaseOps.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-12T12:56:04Z",
+      "side": 1,
+      "message": "Is identifier nullable?",
+      "revId": "7c548c6d53356ff4060839ec2430bd69e95b2ec7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6f13d84_c58b33d9",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformUtil.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-12T12:56:04Z",
+      "side": 1,
+      "message": "final var nodeEntry",
+      "revId": "7c548c6d53356ff4060839ec2430bd69e95b2ec7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cfc61db_b6825610",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/RpcStructureTransformer.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-12T12:56:04Z",
+      "side": 1,
+      "message": "there are two params, document both",
+      "revId": "7c548c6d53356ff4060839ec2430bd69e95b2ec7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ee89000_87b4e92b",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemalessRpcStructureTransformer.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-12T12:56:04Z",
+      "side": 1,
+      "message": "final var",
+      "revId": "7c548c6d53356ff4060839ec2430bd69e95b2ec7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa76d3ec_8f949cd8",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/Running.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-12T12:56:04Z",
+      "side": 1,
+      "message": "please document a need for linked map",
+      "revId": "7c548c6d53356ff4060839ec2430bd69e95b2ec7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
