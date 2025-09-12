@@ -16,6 +16,24 @@
       "message": "we can move futureChain assignment into isEmpty block and make it final",
       "revId": "1d4031bcd935e535d145672b9b65b8bf11e916e8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46af5df6_d1b9c549",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/DataOperationImpl.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-12T18:03:34Z",
+      "side": 1,
+      "message": "Probably not.\nThe futureChain is updated multiple times in the for loop, so it can not be final. The transformAsync is a little sensitive to multiple return statements. So I can not just return RPC_SUCCESS when listData.isEmpty(). This will lead to:\n```\nincompatible types: inference variable O has incompatible equality constraints capture#1 of ? extends org.opendaylight.mdsal.dom.api.DOMRpcResult,capture#2 of ? extends org.opendaylight.mdsal.dom.api.DOMRpcResult\n```",
+      "parentUuid": "e9fa754a_7f316dc1",
+      "revId": "1d4031bcd935e535d145672b9b65b8bf11e916e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
