@@ -16,6 +16,24 @@
       "message": "I would suggest to include RFC link to task or commit message so we do not need to check it by own.\n\nhttps://www.rfc-editor.org/rfc/rfc8639#section-2.4.2\n\n   o  An optional \"stop-time\" for the subscription.  If no \"stop-time\"\n      is present, notification messages will continue to be sent until\n      the subscription is terminated.",
       "revId": "dd7593a2f48f1972a37a6403b59434e75815a9c5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e490fecf_c413468a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-12T20:10:48Z",
+      "side": 1,
+      "message": "Please ignore this, I forgot to remove it.",
+      "parentUuid": "65ec0173_2954df1a",
+      "revId": "dd7593a2f48f1972a37a6403b59434e75815a9c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
