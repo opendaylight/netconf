@@ -16,6 +16,24 @@
       "message": "Based on RFC 8639\nhttps://www.rfc-editor.org/rfc/rfc8639#section-2.4.2\n```\nIf \u0027stop-time\u0027 is not\npresent, the notification messages will continue until the\nsubscription is terminated.\n```\n\nThis may suggest that it should continue until a `delete-subscription` or `kill-subscription` RPC is invoked. \n \nCan we keep the NullStopTimeTest to verify that if stop-time is removed by a DELETE operation, the subscription will not be terminated?",
       "revId": "ad42d20492e947e92652b8556650b182dad2460f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63be6161_4b4333e1",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-12T20:24:27Z",
+      "side": 0,
+      "message": "Seems like this can not be directly removed. Is there any other way how to remove stop-time once is set?",
+      "parentUuid": "7badf0fb_4b8adb8a",
+      "revId": "ad42d20492e947e92652b8556650b182dad2460f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
