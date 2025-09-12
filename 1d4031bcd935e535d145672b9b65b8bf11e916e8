@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9fa754a_7f316dc1",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/DataOperationImpl.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-12T12:59:40Z",
+      "side": 1,
+      "message": "we can move futureChain assignment into isEmpty block and make it final",
+      "revId": "1d4031bcd935e535d145672b9b65b8bf11e916e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
