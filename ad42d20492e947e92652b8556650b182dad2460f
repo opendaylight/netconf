@@ -52,6 +52,24 @@
       "parentUuid": "63be6161_4b4333e1",
       "revId": "ad42d20492e947e92652b8556650b182dad2460f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da4639b4_e1a4e903",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-16T08:52:49Z",
+      "side": 0,
+      "message": "Can we keep the NullStopTimeTest to verify that if stop-time is removed by a DELETE operation, the subscription will not be terminated?\n\nNo. We cannot. Dynamic subscription exists in operational only and are not configured by RESTCONF. You have to use RPCs only.",
+      "parentUuid": "b4e7f89f_cc6f6e9c",
+      "revId": "ad42d20492e947e92652b8556650b182dad2460f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
