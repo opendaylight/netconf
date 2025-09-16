@@ -109,7 +109,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         DynSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName, final String streamName,
                 final String receiverName, final TransportSession session, final @Nullable EventStreamFilter filter,
                 final @Nullable Instant stopTime) {
-            super(id, encoding, encodingName, streamName, receiverName, SubscriptionState.ACTIVE, session, stopTime);
+            super(id, encoding, encodingName, streamName, receiverName, session, stopTime);
             this.filter = filter;
         }
 
