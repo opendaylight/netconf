@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ab395171_010c4fdb",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-16T10:25:39Z",
+      "side": 1,
+      "message": "updateSubscriptionReceivers change state of receivers, it is used in AbstractRestconfStreamRegistry.DynSubscription#suspendSubscription and resumeSubscription,\nif that is successful these methods send suspended/resumed state notification\n\nWhen receivers are suspended, we change state of subscription and send these notifications",
+      "parentUuid": "0cca8a52_561cb89a",
+      "revId": "00e09ecd80fc5baf2e576a1b79e7275c72f74b46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4910fd16_2efc5ad2",
         "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
         "patchSetId": 16
@@ -172,6 +190,24 @@
       "side": 1,
       "message": "please document",
       "parentUuid": "f9cd8544_9d7e9fb6",
+      "revId": "00e09ecd80fc5baf2e576a1b79e7275c72f74b46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7a7742c_d15275df",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-16T10:25:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b2f5c0c5_d48a922d",
       "revId": "00e09ecd80fc5baf2e576a1b79e7275c72f74b46",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
