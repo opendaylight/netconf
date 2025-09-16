@@ -11,12 +11,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
 import java.net.SocketAddress;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
+import org.opendaylight.netconf.shaded.sshd.common.io.IoService;
+import org.opendaylight.netconf.shaded.sshd.netty.NettyIoService;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoSession;
 
 final class TransportIoSession extends NettyIoSession {
-    TransportIoSession(final TransportIoService service, final IoHandler handler,
+    TransportIoSession(final IoService service, final IoHandler handler,
             final SocketAddress acceptanceAddress) {
-        super(service, handler, acceptanceAddress);
+        super((NettyIoService) service, handler, acceptanceAddress);
     }
 
     ChannelInboundHandler handler() {
