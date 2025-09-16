@@ -88,6 +88,24 @@
       "parentUuid": "da4639b4_e1a4e903",
       "revId": "ad42d20492e947e92652b8556650b182dad2460f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57805232_978c54c4",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-16T10:17:34Z",
+      "side": 0,
+      "message": "That\u0027s something what original author had to discuss here: https://lf-opendaylight.atlassian.net/browse/NETCONF-1491",
+      "parentUuid": "4e27a7c1_69b721db",
+      "revId": "ad42d20492e947e92652b8556650b182dad2460f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
