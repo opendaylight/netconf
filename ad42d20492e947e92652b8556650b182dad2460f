@@ -70,6 +70,24 @@
       "parentUuid": "b4e7f89f_cc6f6e9c",
       "revId": "ad42d20492e947e92652b8556650b182dad2460f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e27a7c1_69b721db",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-16T09:24:40Z",
+      "side": 0,
+      "message": "Okay, I am fixing my initial question to: \u0027Can we keep the NullStopTimeTest to verify that if a nullable stop-time configuration is set to null, then the subscription is not self-terminated in initialization or after expiration of previously set stop-time replaced with null?\u0027\n\nBased on the RFC, I assume that if a subscription is created without a stop-time, it should work without any termination timer. My next assumption is that if a stop-time was set before, it should be allowed to set stop-time to null again to remove the termination timer. Am I correct?",
+      "parentUuid": "da4639b4_e1a4e903",
+      "revId": "ad42d20492e947e92652b8556650b182dad2460f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
