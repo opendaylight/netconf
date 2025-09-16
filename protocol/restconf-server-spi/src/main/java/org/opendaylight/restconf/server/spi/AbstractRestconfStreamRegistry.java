@@ -287,13 +287,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         void controlSessionClosed() {
             switch (state()) {
+                case ACTIVE, SUSPENDED -> {
+                    setState(SubscriptionState.END);
+                    channelClosed();
+                }
                 case END -> {
                     LOG.debug("Subscription id:{} already in END state during attempt to end it", id());
                     terminate(null, null);
-                }
-                default -> {
-                    setState(SubscriptionState.END);
-                    channelClosed();
                 }
             }
         }
