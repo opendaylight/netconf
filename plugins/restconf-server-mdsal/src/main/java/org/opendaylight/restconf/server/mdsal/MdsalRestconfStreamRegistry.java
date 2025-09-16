@@ -268,12 +268,11 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     private synchronized void updateSubscriptionCounters() {
-        final var receivers = currentReceivers();
         final var tx = txChain.newWriteOnlyTransaction();
-        for (var entry : receivers.entrySet()) {
+        currentReceivers().forEach(entry -> {
             tx.put(LogicalDatastoreType.OPERATIONAL,
                 subscriptionPath(entry.getKey()).node(RECEIVERS_NODEID).node(RECEIVER_NODEID), entry.getValue());
-        }
+        });
         tx.commit(new OnCommitFutureCallback() {
             @Override
             public void onSuccess(final CommitInfo commitInfo) {
@@ -547,6 +546,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         return new SubtreeEventStreamFilter(databindFilter);
     }
 
+    // FIXME: unused?
     @NonNullByDefault
     static YangInstanceIdentifier streamFilterPath(final Uint32 subscriptionId) {
         return YangInstanceIdentifier.of(SUBSCRIPTIONS_NODEID, SUBSCRIPTION_NODEID, subscriptionArg(subscriptionId),
@@ -554,7 +554,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     @NonNullByDefault
-    static YangInstanceIdentifier subscriptionPath(final Uint32 subscriptionId) {
+    private static YangInstanceIdentifier subscriptionPath(final Uint32 subscriptionId) {
         return subscriptionPath(subscriptionArg(subscriptionId));
     }
 

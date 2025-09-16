@@ -21,10 +21,10 @@ import java.net.URI;
 import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +34,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -189,18 +190,28 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         @NonNullByDefault
-        MapNode createReceivers() {
-            final var list = new ArrayList<MapEntryNode>();
+        private @Nullable Entry<Uint32, MapNode> asReceiver() {
+            return switch (state()) {
+                case ACTIVE, SUSPENDED -> Map.entry(id(), createReceivers());
+                case END -> null;
+            };
+        }
+
+        @NonNullByDefault
+        private MapNode createReceivers() {
+            final var builder = ImmutableNodes.newSystemMapBuilder().withNodeIdentifier(RECEIVER_NODEID);
+            var empty = true;
+
             for (var subscriber : receivers) {
-                list.add(receiverNode(subscriber.receiverName(), State.Active, subscriber.sentEventRecords(),
+                builder.withChild(receiverNode(subscriber.receiverName(), State.Active, subscriber.sentEventRecords(),
                     subscriber.excludedEventRecords()));
-            }
-            if (list.isEmpty()) {
-                list.add(receiverNode(receiverName(), State.Suspended, Uint64.ZERO, Uint64.ZERO));
+                empty = false;
             }
 
-            final var builder = ImmutableNodes.newSystemMapBuilder().withNodeIdentifier(RECEIVER_NODEID);
-            list.forEach(builder::withChild);
+            if (empty) {
+                builder.withChild(receiverNode(receiverName(), State.Suspended, Uint64.ZERO, Uint64.ZERO));
+            }
+
             return builder.build();
         }
 
@@ -804,14 +815,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         MapNode receivers);
 
     @NonNullByDefault
-    protected final Map<Uint32, MapNode> currentReceivers() {
-        final var result = new HashMap<Uint32, MapNode>();
-        for (var subscription : subscriptions.values()) {
-            if (subscription.state() != SubscriptionState.END) {
-                result.put(subscription.id(), subscription.createReceivers());
-            }
-        }
-        return result;
+    protected final Stream<Entry<Uint32, MapNode>> currentReceivers() {
+        return subscriptions.values().stream().map(DynSubscription::asReceiver).filter(Objects::nonNull);
     }
 
     @NonNullByDefault
