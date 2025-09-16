@@ -417,10 +417,10 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
          */
         ACTIVE {
             @Override
-            public boolean canMoveTo(final SubscriptionState newState) {
+            public SubscriptionState moveTo(final SubscriptionState newState) {
                 return switch (newState) {
-                    case ACTIVE -> false;
-                    case END, SUSPENDED -> true;
+                    case ACTIVE -> throw ise(ACTIVE);
+                    case END, SUSPENDED -> newState;
                 };
             }
         },
@@ -430,10 +430,10 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
          */
         SUSPENDED {
             @Override
-            public boolean canMoveTo(final SubscriptionState newState) {
+            public SubscriptionState moveTo(final SubscriptionState newState) {
                 return switch (newState) {
-                    case ACTIVE, END -> true;
-                    case SUSPENDED -> false;
+                    case ACTIVE, END -> newState;
+                    case SUSPENDED -> throw ise(SUSPENDED);
                 };
             }
         },
@@ -442,8 +442,8 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
          */
         END {
             @Override
-            public boolean canMoveTo(final SubscriptionState newState) {
-                return false;
+            public SubscriptionState moveTo(final SubscriptionState newState) {
+                throw ise(newState);
             }
         };
 
@@ -451,9 +451,16 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
          * Returns {@code true} if a subscription can move from this state to a propose new state.
          *
          * @param newState proposed new state
-         * @return {@code true} if the transition to {@code newState} is allowed
+         * @return {@code newState} if the transition to {@code newState} is allowed
+         * @throws IllegalStateException if the move cannot be made
          */
-        public abstract boolean canMoveTo(SubscriptionState newState);
+        @NonNullByDefault
+        public abstract SubscriptionState moveTo(SubscriptionState newState);
+
+        @NonNullByDefault
+        IllegalStateException ise(final SubscriptionState newState) {
+            return new IllegalStateException("Cannot transition from " + this + " to " + newState);
+        }
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);

@@ -7,8 +7,8 @@
  */
 package org.opendaylight.restconf.server.spi;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState.ACTIVE;
 import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState.END;
@@ -27,7 +27,7 @@ class SubscriptionStateTest {
     @ParameterizedTest
     @MethodSource
     void moveStateValid(final SubscriptionState oldState, final SubscriptionState newState) {
-        assertTrue(oldState.canMoveTo(newState));
+        assertSame(newState, oldState.moveTo(newState));
     }
 
     private static List<Arguments> moveStateValid() {
@@ -41,7 +41,7 @@ class SubscriptionStateTest {
     @ParameterizedTest
     @MethodSource
     void moveStateInvalid(final SubscriptionState oldState, final SubscriptionState newState) {
-        assertFalse(oldState.canMoveTo(newState));
+        assertThrows(IllegalStateException.class, () -> oldState.moveTo(newState));
     }
 
     private static List<Arguments> moveStateInvalid() {
