@@ -208,6 +208,24 @@
       "message": "this does not belong to this patch",
       "revId": "37646285ae0c56c1df100401f9afabfeb26de39d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fbc5ff1_d7b26cc5",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-16T10:38:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df3f7279_f79da935",
+      "revId": "37646285ae0c56c1df100401f9afabfeb26de39d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
