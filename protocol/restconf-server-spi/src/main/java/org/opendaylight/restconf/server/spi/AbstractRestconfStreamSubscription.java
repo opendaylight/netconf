@@ -31,16 +31,15 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
     private final @NonNull String receiverName;
     private final @NonNull TransportSession session;
 
-    private @NonNull SubscriptionState state;
+    private @NonNull SubscriptionState state = SubscriptionState.ACTIVE;
     private @Nullable Instant stopTime;
 
     protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName,
-            final String streamName, final String receiverName, final SubscriptionState state,
-            final TransportSession session, final @Nullable Instant stopTime) {
+            final String streamName, final String receiverName, final TransportSession session,
+            final @Nullable Instant stopTime) {
         this.id = requireNonNull(id);
         this.encoding = requireNonNull(encoding);
         this.encodingName = requireNonNull(encodingName);
-        this.state = requireNonNull(state);
         this.session = requireNonNull(session);
         this.streamName = requireNonNull(streamName);
         this.receiverName = requireNonNull(receiverName);
