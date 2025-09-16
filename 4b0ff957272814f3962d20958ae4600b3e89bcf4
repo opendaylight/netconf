@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ba151f4_6ed81b80",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-09-16T22:11:02Z",
+      "side": 1,
+      "message": "right, but this is really what we want to expose instead of setState():\n    - this method should be an State.Active -\u003e State.Suspended transition\n    - resumeSubscription() should be a State.Suspended -\u003e State.Active transition\n    - we probably need a `boolean terminateSubscription(QName reason)`, which would also service terminate()",
+      "range": {
+        "startLine": 354,
+        "startChar": 29,
+        "endLine": 354,
+        "endChar": 48
+      },
+      "revId": "4b0ff957272814f3962d20958ae4600b3e89bcf4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
