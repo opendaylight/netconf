@@ -77,7 +77,7 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
     }
 
     @Override
-    public void setState(final SubscriptionState newState) {
+    void setState(final SubscriptionState newState) {
         if (state.canMoveTo(newState)) {
             state = newState;
         } else {
