@@ -572,7 +572,7 @@ public class PropertyEntity {
 
         def.setDefaultValue(bitsType.getDefaultValue().isPresent()
             ? bitsType.getDefaultValue().orElseThrow().toString() :
-            (enumNames.iterator().next() + " " + enumNames.get(enumNames.size() - 1)));
+            enumNames.iterator().next() + " " + enumNames.get(enumNames.size() - 1));
         return STRING_TYPE;
     }
 
