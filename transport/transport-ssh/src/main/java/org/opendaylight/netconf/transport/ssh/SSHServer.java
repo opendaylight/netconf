@@ -42,7 +42,7 @@ public final class SSHServer extends SSHTransportStack {
 
     private SSHServer(final String subsystem, final TransportChannelListener<? super SSHTransportChannel> listener,
             final TransportSshServer sshServer) {
-        super(listener, sshServer, sshServer.getSessionFactory());
+        super(listener, sshServer);
         this.subsystem = requireNonNull(subsystem);
     }
 

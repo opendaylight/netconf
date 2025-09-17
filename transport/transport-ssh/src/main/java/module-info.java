@@ -19,6 +19,7 @@ module org.opendaylight.netconf.transport.ssh {
     requires transitive org.opendaylight.yang.gen.ietf.ssh.server.rfc9644;
     requires com.google.common;
     requires io.netty.buffer;
+    requires io.netty.handler;
     requires io.netty.transport;
     requires org.apache.commons.codec;
     requires org.bouncycastle.provider;

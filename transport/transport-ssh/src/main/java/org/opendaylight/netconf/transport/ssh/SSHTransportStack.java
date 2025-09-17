@@ -11,17 +11,18 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.flow.FlowControlHandler;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.SshConstants;
-import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionListener;
 import org.opendaylight.netconf.transport.api.AbstractOverlayTransportStack;
@@ -34,9 +35,6 @@ import org.slf4j.LoggerFactory;
 /**
  * An SSH {@link TransportStack}. Instances of this class are built indirectly. The setup of the Netty channel is quite
  * weird. We start off with whatever the underlay sets up.
- *
- * <p>We then add {@link TransportIoSession#handler()}, which routes data between the socket and
- * {@link TransportSshClient} (or {@link TransportSshServer}) -- forming the "bottom half" of the channel.
  *
  * <p>The "upper half" of the channel is formed once the corresponding SSH subsystem is established, via
  * {@link TransportClientSubsystem}, which installs a {@link OutboundChannelHandler}. These two work together:
@@ -129,12 +127,11 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     private final Map<Long, TransportChannel> underlays = new ConcurrentHashMap<>();
     private final Map<Long, Session> sessions = new ConcurrentHashMap<>();
 
-    private final TransportIoService ioService;
+    private final AtomicLong sessionSeq = new AtomicLong();
 
     SSHTransportStack(final TransportChannelListener<? super SSHTransportChannel> listener,
-            final FactoryManager factoryManager, final IoHandler handler) {
+            final FactoryManager factoryManager) {
         super(listener);
-        ioService = new TransportIoService(factoryManager, handler);
         factoryManager.addSessionListener(new Listener());
     }
 
@@ -144,11 +141,11 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         // Acquire underlying channel, create a TransportIoSession and attach its handler to this channel -- which takes
         // care of routing bytes between the underlay channel and SSHD's network-facing side.
         final var channel = underlayChannel.channel();
-        final var ioSession = ioService.createSession(channel.localAddress());
-        channel.pipeline().addLast(ioSession.handler());
+        final var adapter = new FlowControlHandler();
+        channel.pipeline().addLast(adapter);
 
         // we now have an attached underlay, but it needs further processing before we expose it to the end user
-        underlays.put(ioSession.getId(), underlayChannel);
+        underlays.put(sessionSeq.incrementAndGet(), underlayChannel);
     }
 
     abstract void onKeyEstablished(Session session) throws IOException;

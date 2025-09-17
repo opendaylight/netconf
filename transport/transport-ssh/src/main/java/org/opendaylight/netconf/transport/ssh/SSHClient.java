@@ -42,7 +42,7 @@ public final class SSHClient extends SSHTransportStack {
 
     private SSHClient(final String subsystem, final TransportChannelListener<? super SSHTransportChannel> listener,
             final TransportSshClient sshClient) {
-        super(listener, sshClient, sshClient.getSessionFactory());
+        super(listener, sshClient);
         // Mirrors check in ChannelSubsystem's constructor
         if (subsystem.isBlank()) {
             throw new IllegalArgumentException("Blank subsystem");
