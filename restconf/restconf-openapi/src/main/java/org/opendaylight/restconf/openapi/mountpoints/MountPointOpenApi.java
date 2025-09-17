@@ -13,12 +13,11 @@ import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.SE
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -42,11 +41,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     private static final String DATASTORES_REVISION = "-";
     private static final String DATASTORES_LABEL = "Datastores";
 
-    private static final Comparator<YangInstanceIdentifier> COMPARATOR =
-        // FIXME: do not use toString()
-        (o1, o2) -> o1.toString().compareToIgnoreCase(o2.toString());
-
-    private final ConcurrentMap<YangInstanceIdentifier, Long> mountIdToLong = new ConcurrentSkipListMap<>(COMPARATOR);
+    private final ConcurrentHashMap<YangInstanceIdentifier, Long> mountIdToLong = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, YangInstanceIdentifier> longToMountId = new ConcurrentHashMap<>();
     private final AtomicLong idKey = new AtomicLong();
     private final DOMSchemaService globalSchema;
@@ -74,13 +69,14 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     }
 
     public MountPointsEntity getInstanceIdentifiers() {
-        final var urlToId = new HashMap<String, Long>();
         final var modelContext = globalSchema.getGlobalContext();
-        for (var entry : mountIdToLong.entrySet()) {
-            final var modName = findModuleName(entry.getKey(), modelContext);
-            urlToId.put(generateUrlPrefixFromInstanceID(entry.getKey(), modName), entry.getValue());
-        }
-        return new MountPointsEntity(urlToId);
+        return new MountPointsEntity(longToMountId.entrySet().stream()
+            .map(entry -> {
+                final var value = entry.getValue();
+                return Map.entry(entry.getKey(),
+                    generateUrlPrefixFromInstanceID(value, findModuleName(value, modelContext)));
+            })
+            .collect(Collectors.toUnmodifiableMap(Entry::getKey, Entry::getValue)));
     }
 
     private static @Nullable String findModuleName(final @NonNull YangInstanceIdentifier id,

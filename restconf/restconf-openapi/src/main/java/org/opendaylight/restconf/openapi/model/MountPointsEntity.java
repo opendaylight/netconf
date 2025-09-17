@@ -11,26 +11,41 @@ import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 @NonNullByDefault
 public final class MountPointsEntity extends OpenApiEntity {
-    private final Map<String, Long> mountPoints;
+    private static final Comparator<Entry<Long, ?>> COMPARATOR = Comparator.comparing(Entry::getKey);
 
-    public MountPointsEntity(final Map<String, Long> mountPoints) {
+    private final Map<Long, String> mountPoints;
+
+    public MountPointsEntity(final Map<Long, String> mountPoints) {
         this.mountPoints = requireNonNull(mountPoints);
     }
 
     @Override
     public void generate(final JsonGenerator generator) throws IOException {
         generator.writeStartArray();
-        for (final var entry : mountPoints.entrySet()) {
-            generator.writeStartObject();
-            generator.writeStringField("instance", entry.getKey());
-            generator.writeStringField("id", entry.getValue().toString());
-            generator.writeEndObject();
+
+        try {
+            mountPoints.entrySet().stream().sorted(COMPARATOR).forEachOrdered(entry -> {
+                try {
+                    generator.writeStartObject();
+                    generator.writeNumberField("id", entry.getKey());
+                    generator.writeStringField("instance", entry.getValue());
+                    generator.writeEndObject();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
         }
+
         generator.writeEndArray();
     }
 }
