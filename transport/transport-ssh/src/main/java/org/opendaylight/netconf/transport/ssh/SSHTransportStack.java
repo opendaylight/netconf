@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * An SSH {@link TransportStack}. Instances of this class are built indirectly. The setup of the Netty channel is quite
  * weird. We start off with whatever the underlay sets up.
  *
- * <p>We then add {@link TransportIoSession#handler()}, which routes data between the socket and
+ * <p>We then add {@link OdlFlowControlHandler}, which routes data between the socket and
  * {@link TransportSshClient} (or {@link TransportSshServer}) -- forming the "bottom half" of the channel.
  *
  * <p>The "upper half" of the channel is formed once the corresponding SSH subsystem is established, via
@@ -131,11 +131,11 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
 
     private final TransportIoService ioService;
 
-    SSHTransportStack(final TransportChannelListener<? super SSHTransportChannel> listener,
-            final FactoryManager factoryManager, final IoHandler handler) {
+    SSHTransportStack(final @NonNull TransportChannelListener<? super SSHTransportChannel> listener,
+            final @NonNull FactoryManager factoryManager, final @NonNull IoHandler handler) {
         super(listener);
-        ioService = new TransportIoService(factoryManager, handler);
-        factoryManager.addSessionListener(new Listener());
+        ioService = new TransportIoService(handler);
+        requireNonNull(factoryManager).addSessionListener(new Listener());
     }
 
     @Override
@@ -145,7 +145,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         // care of routing bytes between the underlay channel and SSHD's network-facing side.
         final var channel = underlayChannel.channel();
         final var ioSession = ioService.createSession(channel.localAddress());
-        channel.pipeline().addLast(ioSession.handler());
+        channel.pipeline().addLast(ioSession.createAdapter());
 
         // we now have an attached underlay, but it needs further processing before we expose it to the end user
         underlays.put(ioSession.getId(), underlayChannel);
