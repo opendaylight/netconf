@@ -206,7 +206,7 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
             return;
         }
 
-        switch (prepareRequest(method, targetUri, msg.headers())) {
+        switch (tryPrepareRequest(method, targetUri, msg.headers())) {
             case CompletedRequest completed -> {
                 msg.release();
                 LOG.debug("Immediate response to {} {}", method, targetUri);
@@ -216,6 +216,18 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
                 LOG.debug("Scheduling execution of {} {}", method, targetUri);
                 executor.executeRequest(ctx, version, streamId, pending, msg.content());
             }
+        }
+    }
+
+    @NonNullByDefault
+    @SuppressWarnings("checkstyle:illegalCatch")
+    private PreparedRequest tryPrepareRequest(final ImplementedMethod method, final URI targetUri,
+            final HttpHeaders headers) {
+        try {
+            return prepareRequest(method, targetUri, headers);
+        } catch (RuntimeException e) {
+            LOG.warn("Unexpected error while preparing {} request to {}", method, targetUri, e);
+            return new ExceptionRequestResponse(e);
         }
     }
 
