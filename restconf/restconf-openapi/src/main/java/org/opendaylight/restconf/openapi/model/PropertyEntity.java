@@ -191,17 +191,17 @@ public class PropertyEntity {
                 required.add(name);
             }
         } else if (shouldBeAddedAsChild) {
-            if (schemaNode instanceof LeafSchemaNode leaf) {
-                processLeafNode(leaf, name, stack, parentNamespace);
-            } else if (schemaNode instanceof AnyxmlSchemaNode || schemaNode instanceof AnydataSchemaNode) {
-                processUnknownDataSchemaNode(schemaNode, name, parentNamespace);
-            } else if (schemaNode instanceof LeafListSchemaNode leafList) {
-                if (isSchemaNodeMandatory(schemaNode)) {
-                    required.add(name);
+            switch (schemaNode) {
+                case AnyxmlSchemaNode anyxml -> processOpaqueDataSchemaNode(anyxml, anyxml, name, parentNamespace);
+                case AnydataSchemaNode anydata -> processOpaqueDataSchemaNode(anydata, anydata, name, parentNamespace);
+                case LeafSchemaNode leaf -> processLeafNode(leaf, name, stack, parentNamespace);
+                case LeafListSchemaNode leafList -> {
+                    if (isSchemaNodeMandatory(schemaNode)) {
+                        required.add(name);
+                    }
+                    processLeafListNode(leafList, stack);
                 }
-                processLeafListNode(leafList, stack);
-            } else {
-                throw new IllegalArgumentException("Unknown DataSchemaNode type: " + schemaNode.getClass());
+                default -> throw new IOException("Unknown DataSchemaNode type: " + schemaNode.getClass());
             }
         }
         stack.exit();
@@ -325,22 +325,20 @@ public class PropertyEntity {
         return exampleValue;
     }
 
-    private void processUnknownDataSchemaNode(final DataSchemaNode leafNode, final String name,
-            final XMLNamespace parentNamespace) throws IOException {
-        assert (leafNode instanceof AnydataSchemaNode || leafNode instanceof AnyxmlSchemaNode);
-
-        final var leafDescription = leafNode.getDescription().orElse("");
+    private void processOpaqueDataSchemaNode(final DataSchemaNode dataSchema, final MandatoryAware mandatoryAware,
+            final String name, final XMLNamespace parentNamespace) throws IOException {
+        final var leafDescription = dataSchema.getDescription().orElse("");
         generator.writeStringField(DESCRIPTION,
             leafDescription + " (This is unknown data, need to be filled by user.)");
 
         generator.writeObjectFieldStart(EXAMPLE);
         generator.writeEndObject();
         generator.writeStringField(TYPE, OBJECT_TYPE);
-        if (!leafNode.getQName().getNamespace().equals(parentNamespace)) {
+        if (!dataSchema.getQName().getNamespace().equals(parentNamespace)) {
             // If the parent is not from the same model, define the child XML namespace.
-            buildXmlParameter(leafNode);
+            buildXmlParameter(dataSchema);
         }
-        processMandatory((MandatoryAware) leafNode, name, required);
+        processMandatory(mandatoryAware, name, required);
     }
 
     private void processLeafListNode(final LeafListSchemaNode listNode, final SchemaInferenceStack stack)
@@ -437,35 +435,33 @@ public class PropertyEntity {
     private String processTypeDef(final TypeDefinition<?> leafTypeDef, final DataSchemaNode schemaNode,
             final SchemaInferenceStack stack, final TypeDef def) {
         final String jsonType;
-        if (leafTypeDef instanceof BinaryTypeDefinition binaryType) {
-            jsonType = processBinaryType(binaryType, def);
-        } else if (leafTypeDef instanceof BitsTypeDefinition bitsType) {
-            jsonType = processBitsType(bitsType, def);
-        } else if (leafTypeDef instanceof EnumTypeDefinition enumType) {
-            jsonType = processEnumType(enumType, def);
-        } else if (leafTypeDef instanceof IdentityrefTypeDefinition identityrefType) {
-            jsonType = processIdentityRefType(identityrefType, stack.modelContext(), def);
-        } else if (leafTypeDef instanceof StringTypeDefinition stringType) {
-            jsonType = processStringType(stringType, schemaNode.getQName().getLocalName(), def);
-        } else if (leafTypeDef instanceof UnionTypeDefinition unionType) {
-            jsonType = processTypeDef(unionType.getTypes().iterator().next(), schemaNode, stack, def);
-        } else if (leafTypeDef instanceof EmptyTypeDefinition) {
-            jsonType = OBJECT_TYPE;
-        } else if (leafTypeDef instanceof LeafrefTypeDefinition leafrefType) {
-            jsonType = processTypeDef(stack.resolveLeafref(leafrefType), schemaNode, stack, def);
-        } else if (leafTypeDef instanceof BooleanTypeDefinition) {
-            jsonType = "boolean";
-            if (leafTypeDef.getDefaultValue().isPresent()) {
-                def.setDefaultValue(Boolean.parseBoolean((String) leafTypeDef.getDefaultValue().orElseThrow()));
+        switch (leafTypeDef) {
+            case BinaryTypeDefinition binaryType -> jsonType = processBinaryType(binaryType, def);
+            case BitsTypeDefinition bitsType -> jsonType = processBitsType(bitsType, def);
+            case EnumTypeDefinition enumType -> jsonType = processEnumType(enumType, def);
+            case IdentityrefTypeDefinition identityrefType -> jsonType = processIdentityRefType(identityrefType, stack.modelContext(), def);
+            case StringTypeDefinition stringType -> jsonType = processStringType(stringType, schemaNode.getQName().getLocalName(), def);
+            case UnionTypeDefinition unionType -> jsonType = processTypeDef(unionType.getTypes().iterator().next(), schemaNode, stack, def);
+            case null, default -> {
+                if (leafTypeDef instanceof EmptyTypeDefinition) {
+                    jsonType = OBJECT_TYPE;
+                } else if (leafTypeDef instanceof LeafrefTypeDefinition leafrefType) {
+                    jsonType = processTypeDef(stack.resolveLeafref(leafrefType), schemaNode, stack, def);
+                } else if (leafTypeDef instanceof BooleanTypeDefinition) {
+                    jsonType = "boolean";
+                    if (leafTypeDef.getDefaultValue().isPresent()) {
+                        def.setDefaultValue(Boolean.parseBoolean((String) leafTypeDef.getDefaultValue().orElseThrow()));
+                    }
+                    def.setExample(true);
+                } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition<?, ?> rangeRestrictedType) {
+                    jsonType = processNumberType(rangeRestrictedType, def);
+                } else if (leafTypeDef instanceof InstanceIdentifierTypeDefinition instanceIdentifierType) {
+                    jsonType = processInstanceIdentifierType(instanceIdentifierType, schemaNode,
+                        stack.modelContext(), def);
+                } else {
+                    jsonType = STRING_TYPE;
+                }
             }
-            def.setExample(true);
-        } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition<?, ?> rangeRestrictedType) {
-            jsonType = processNumberType(rangeRestrictedType, def);
-        } else if (leafTypeDef instanceof InstanceIdentifierTypeDefinition instanceIdentifierType) {
-            jsonType = processInstanceIdentifierType(instanceIdentifierType, schemaNode,
-                stack.modelContext(), def);
-        } else {
-            jsonType = STRING_TYPE;
         }
 
         if (leafTypeDef.getDefaultValue().isPresent()) {
@@ -476,15 +472,11 @@ public class PropertyEntity {
                 } else if (leafTypeDef instanceof DecimalTypeDefinition
                     || leafTypeDef instanceof Uint64TypeDefinition) {
                     def.setDefaultValue(new BigDecimal(stringDefaultValue));
-                } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition<?, ?> rangeRestrictedType) {
-                    //uint8,16,32 int8,16,32,64
-                    if (isHexadecimalOrOctal(rangeRestrictedType)) {
-                        def.setDefaultValue(stringDefaultValue);
-                    } else {
-                        def.setDefaultValue(Long.valueOf(stringDefaultValue));
-                    }
-                } else {
+                } else //uint8,16,32 int8,16,32,64
+                if (!(leafTypeDef instanceof RangeRestrictedTypeDefinition<?, ?> rangeRestrictedType) || isHexadecimalOrOctal(rangeRestrictedType)) {
                     def.setDefaultValue(stringDefaultValue);
+                } else {
+                    def.setDefaultValue(Long.valueOf(stringDefaultValue));
                 }
             }
         }
