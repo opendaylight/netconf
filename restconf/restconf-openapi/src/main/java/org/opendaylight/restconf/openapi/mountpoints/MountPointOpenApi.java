@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.openapi.mountpoints;
 
-import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.SECURITY;
 
@@ -114,12 +113,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     }
 
     private EffectiveModelContext getModelContext(final YangInstanceIdentifier id) {
-        if (id == null) {
-            return null;
-        }
-
-        checkState(mountService != null);
-        return mountService.getMountPoint(id)
+        return id == null ? null : mountService.getMountPoint(id)
             .flatMap(mountPoint -> mountPoint.getService(DOMSchemaService.class))
             .map(DOMSchemaService::getGlobalContext)
             .orElse(null);
