@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "48eb26d8_d1009ff2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-17T10:54:50Z",
+      "side": 1,
+      "message": "Can you, finally, document full logs in ticket?",
+      "parentUuid": "f12fc160_e49bd5ba",
+      "revId": "dd7593a2f48f1972a37a6403b59434e75815a9c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "65ec0173_2954df1a",
