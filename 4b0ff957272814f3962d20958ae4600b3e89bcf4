@@ -22,6 +22,30 @@
       },
       "revId": "4b0ff957272814f3962d20958ae4600b3e89bcf4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a47216fc_a20f35a8",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-17T10:09:48Z",
+      "side": 1,
+      "message": "I tried to address last part here:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/118147/1\n\nBut why it should return boolean?",
+      "parentUuid": "8ba151f4_6ed81b80",
+      "range": {
+        "startLine": 354,
+        "startChar": 29,
+        "endLine": 354,
+        "endChar": 48
+      },
+      "revId": "4b0ff957272814f3962d20958ae4600b3e89bcf4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
