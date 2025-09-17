@@ -27,7 +27,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.AbstractQName;
+import org.opendaylight.yangtools.yang.common.CanonicalValue;
 import org.opendaylight.yangtools.yang.common.Decimal64;
+import org.opendaylight.yangtools.yang.common.DerivedString;
+import org.opendaylight.yangtools.yang.common.Uint16;
+import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.common.Uint64;
+import org.opendaylight.yangtools.yang.common.Uint8;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.AnydataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AnyxmlSchemaNode;
@@ -481,20 +487,31 @@ public class PropertyEntity {
     }
 
     private void writeValue(final String field, final Object value) throws IOException {
-        if (value instanceof Number) {
-            if (value instanceof Integer intValue) {
-                generator.writeNumberField(field, intValue);
-            } else if (value instanceof Long longValue) {
-                generator.writeNumberField(field, longValue);
-            } else if (value instanceof BigDecimal decimalValue) {
-                generator.writeNumberField(field, decimalValue);
-            } else if (value instanceof BigInteger bigIntValue) {
-                generator.writeNumberField(field, bigIntValue);
+        switch (value) {
+            case null -> generator.writeNullField(field);
+            case Byte val -> generator.writeNumberField(field, val.shortValue());
+            case Short val -> generator.writeNumberField(field, val);
+            case Integer val -> generator.writeNumberField(field, val);
+            case Long val -> generator.writeNumberField(field, val);
+            case Float val -> generator.writeNumberField(field, val);
+            case Double val -> generator.writeNumberField(field, val);
+            case BigDecimal val -> generator.writeNumberField(field, val);
+            case BigInteger val -> generator.writeNumberField(field, val);
+            case Uint8 val -> generator.writeNumberField(field, val.toJava());
+            case Uint16 val -> generator.writeNumberField(field, val.toJava());
+            case Uint32 val -> generator.writeNumberField(field, val.toJava());
+            case Uint64 val -> {
+                generator.writeFieldName(field);
+                generator.writeNumber(val.toCanonicalString());
             }
-        } else if (value instanceof Boolean bool) {
-            generator.writeBooleanField(field, bool);
-        } else {
-            generator.writeStringField(field, (String) value);
+            case Decimal64 val -> {
+                generator.writeFieldName(field);
+                generator.writeNumber(val.toCanonicalString());
+            }
+            case Boolean val -> generator.writeBooleanField(field, val);
+            case String val -> generator.writeStringField(field, val);
+            case DerivedString<?> val -> generator.writeStringField(field, val.toCanonicalString());
+            default -> throw new IOException("Unhandled value " + value.getClass().getName());
         }
     }
 
