@@ -88,7 +88,6 @@ public final class KillSubscriptionRpc extends RpcImplementation {
                 "There is no active or suspended subscription with given ID."));
             return;
         }
-        subscription.setState(SubscriptionState.END);
         subscription.terminate(request.transform(unused -> ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(KillSubscriptionOutput.QNAME))
             .build()), NoSuchSubscription.QNAME);
