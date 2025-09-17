@@ -123,16 +123,16 @@ public abstract class BaseYangOpenApiGenerator {
 
     public static Collection<? extends Module> getModelsSublist(final List<Module> modulesWithoutDuplications,
             final int offset, final int limit) {
-        if (offset != 0 || limit != 0) {
-            final var modules = configModulesList(modulesWithoutDuplications);
-            if (offset > modules.size() || offset < 0 || limit < 0) {
-                return List.of();
-            }
-            final var end = limit == 0 ? modules.size() : Math.min(modules.size(), offset + limit);
-            final var portionOfModules = modules.subList(offset, end);
-            return portionOfModules;
+        if (offset < 0 || limit < 0) {
+            return List.of();
         }
-        return modulesWithoutDuplications;
+        if (offset == 0 && limit == 0) {
+            return modulesWithoutDuplications;
+        }
+
+        final var modules = configModulesList(modulesWithoutDuplications);
+        final var size = modules.size();
+        return offset > size ? List.of() : modules.subList(offset, limit == 0 ? size : Math.min(size, offset + limit));
     }
 
     public static List<Module> configModulesList(final List<Module> modulesWithoutDuplications) {
