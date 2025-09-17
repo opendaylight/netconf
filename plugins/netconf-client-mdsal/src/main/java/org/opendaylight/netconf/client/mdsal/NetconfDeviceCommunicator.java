@@ -86,7 +86,6 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     // end its close operation without calling tearDown to release the locks they hold to avoid deadlock.
     //
     // This field is manipulated using CLOSING VarHandle
-    @SuppressWarnings("unused")
     @SuppressFBWarnings(value = "UUF_UNUSED_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
     private volatile boolean closing;
 
