@@ -293,7 +293,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
          * @throws IllegalStateException if the subscription cannot be moved to the new state
          */
         @NonNullByDefault
-        public abstract void setState(SubscriptionState newState);
+        abstract void setState(SubscriptionState newState);
 
         /**
          * Returns the {@code subscription session}.
@@ -328,6 +328,9 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
 
         @NonNullByDefault
         public final void terminate(final ServerRequest<Empty> request, final QName reason) {
+            if (state() != SubscriptionState.END) {
+                setState(SubscriptionState.END);
+            }
             final var witness = (QName) TERMINATED_VH.compareAndExchangeRelease(this, null, requireNonNull(reason));
             if (witness != null) {
                 request.completeWith(new RequestException("Subscription already terminated with " + witness));
