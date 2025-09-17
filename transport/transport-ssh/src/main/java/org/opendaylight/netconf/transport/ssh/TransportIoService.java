@@ -7,34 +7,23 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
-import io.netty.channel.Channel;
+import static java.util.Objects.requireNonNull;
+
 import java.net.SocketAddress;
-import java.util.concurrent.CancellationException;
-import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
+import java.util.concurrent.atomic.AtomicLong;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
-import org.opendaylight.netconf.shaded.sshd.netty.NettyIoService;
-import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactory;
 
-final class TransportIoService extends NettyIoService {
-    TransportIoService(final FactoryManager factoryManager, final IoHandler handler) {
-        super((NettyIoServiceFactory) factoryManager.getIoServiceFactory(), handler, "sshd-transport-channels");
-    }
+@NonNullByDefault
+final class TransportIoService {
+    private final AtomicLong sessionSeq = new AtomicLong();
+    private final IoHandler handler;
 
-    @Override
-    protected void registerChannel(final Channel channel) throws CancellationException {
-        // Required to keep things working, but does not need to be functional at all.
-        //
-        // Under normal circumstances, NettyIoService's group is used to track all open channels, so that we can close
-        // them when we are shutdown.
-        //
-        // We do not need to do that, as we track the underlying transport instead, hence any channels tracked here will
-        // disappear when we shut down the underlay.
-        // Thus, we even do not need to check NettyIoService.noMoreSessions property.
-
-        // no-op
+    TransportIoService(final IoHandler handler) {
+        this.handler = requireNonNull(handler);
     }
 
     TransportIoSession createSession(final SocketAddress acceptanceAddress) {
-        return new TransportIoSession(this, handler, acceptanceAddress);
+        return new TransportIoSession(handler, acceptanceAddress, sessionSeq.incrementAndGet());
     }
 }
