@@ -158,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c346dce5_93bfeba7",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/SubscriptionSuspensionTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-17T08:08:40Z",
+      "side": 1,
+      "message": "suspending is done internally, so yes, theoretically suspendSubscription method can be called when subscription is already suspended, in that case nothing will happen.\nAdded test for this case.",
+      "parentUuid": "6858685e_1708ec9d",
+      "revId": "37646285ae0c56c1df100401f9afabfeb26de39d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f2c9636b_40a6b148",
