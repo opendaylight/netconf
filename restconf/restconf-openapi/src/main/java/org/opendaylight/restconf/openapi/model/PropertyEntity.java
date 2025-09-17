@@ -570,9 +570,9 @@ public class PropertyEntity {
 
         def.setEnums(enumNames);
 
-        def.setDefaultValue(bitsType.getDefaultValue().isPresent()
-            ? bitsType.getDefaultValue().orElseThrow().toString() :
-            (enumNames.iterator().next() + " " + enumNames.get(enumNames.size() - 1)));
+        def.setDefaultValue(bitsType.getDefaultValue()
+            .map(Object::toString)
+            .orElseGet(() -> enumNames.getFirst() + " " + enumNames.getLast()));
         return STRING_TYPE;
     }
 
