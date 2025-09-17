@@ -191,17 +191,17 @@ public class PropertyEntity {
                 required.add(name);
             }
         } else if (shouldBeAddedAsChild) {
-            if (schemaNode instanceof LeafSchemaNode leaf) {
-                processLeafNode(leaf, name, stack, parentNamespace);
-            } else if (schemaNode instanceof AnyxmlSchemaNode || schemaNode instanceof AnydataSchemaNode) {
-                processUnknownDataSchemaNode(schemaNode, name, parentNamespace);
-            } else if (schemaNode instanceof LeafListSchemaNode leafList) {
-                if (isSchemaNodeMandatory(schemaNode)) {
-                    required.add(name);
+            switch (schemaNode) {
+                case AnyxmlSchemaNode anyxml -> processUnknownDataSchemaNode(anyxml, name, parentNamespace);
+                case AnydataSchemaNode anydata -> processUnknownDataSchemaNode(anydata, name, parentNamespace);
+                case LeafSchemaNode leaf -> processLeafNode(leaf, name, stack, parentNamespace);
+                case LeafListSchemaNode leafList -> {
+                    if (isSchemaNodeMandatory(schemaNode)) {
+                        required.add(name);
+                    }
+                    processLeafListNode(leafList, stack);
                 }
-                processLeafListNode(leafList, stack);
-            } else {
-                throw new IllegalArgumentException("Unknown DataSchemaNode type: " + schemaNode.getClass());
+                default -> throw new IOException("Unknown DataSchemaNode type: " + schemaNode.getClass());
             }
         }
         stack.exit();
@@ -327,8 +327,6 @@ public class PropertyEntity {
 
     private void processUnknownDataSchemaNode(final DataSchemaNode leafNode, final String name,
             final XMLNamespace parentNamespace) throws IOException {
-        assert (leafNode instanceof AnydataSchemaNode || leafNode instanceof AnyxmlSchemaNode);
-
         final var leafDescription = leafNode.getDescription().orElse("");
         generator.writeStringField(DESCRIPTION,
             leafDescription + " (This is unknown data, need to be filled by user.)");
