@@ -17,13 +17,14 @@ public final class MetadataEntity extends OpenApiEntity {
     private final long allModules;
     private final long configModules;
 
-    public MetadataEntity(final int offset, final int limit, final long allModules, final long configModules) {
+    public MetadataEntity(final int offset, final int limit, final long allModules, final long configModules)
+            throws IOException {
         this.offset = offset;
         this.limit = limit;
         this.allModules = allModules;
         this.configModules = configModules;
         if (offset > limit) {
-            throw new IllegalArgumentException("Offset %s is greater than limit %s".formatted(offset, limit));
+            throw new IOException("Offset " + offset + " is greater than limit " + limit);
         }
     }
 
