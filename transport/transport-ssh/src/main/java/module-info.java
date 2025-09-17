@@ -42,4 +42,5 @@ module org.opendaylight.netconf.transport.ssh {
     requires static com.google.errorprone.annotations;
     requires static org.kohsuke.metainf_services;
     requires static org.osgi.annotation.bundle;
+    requires io.netty.common;
 }
