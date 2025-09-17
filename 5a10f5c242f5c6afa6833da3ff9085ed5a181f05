@@ -99,6 +99,30 @@
       },
       "revId": "5a10f5c242f5c6afa6833da3ff9085ed5a181f05",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e6227db_6ddf94df",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerRequestExecutor.java",
+        "patchSetId": 32
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-17T10:56:12Z",
+      "side": 1,
+      "message": "addressed in \nhttps://git.opendaylight.org/gerrit/c/netconf/+/117526",
+      "parentUuid": "b4381c71_0c439201",
+      "range": {
+        "startLine": 145,
+        "startChar": 11,
+        "endLine": 145,
+        "endChar": 82
+      },
+      "revId": "5a10f5c242f5c6afa6833da3ff9085ed5a181f05",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
