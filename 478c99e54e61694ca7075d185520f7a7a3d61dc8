@@ -16,6 +16,24 @@
       "message": "IOException is not thrown + in other methods as well",
       "revId": "478c99e54e61694ca7075d185520f7a7a3d61dc8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10e49ffb_ee9d1c7e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-09-17T12:59:04Z",
+      "side": 1,
+      "message": "those are placeholders for getting rid of unchecked exception, will be dealt with separately.",
+      "parentUuid": "81c4a81b_0a88acd8",
+      "revId": "478c99e54e61694ca7075d185520f7a7a3d61dc8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
