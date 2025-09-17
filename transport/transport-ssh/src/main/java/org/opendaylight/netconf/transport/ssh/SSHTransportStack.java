@@ -35,9 +35,6 @@ import org.slf4j.LoggerFactory;
  * An SSH {@link TransportStack}. Instances of this class are built indirectly. The setup of the Netty channel is quite
  * weird. We start off with whatever the underlay sets up.
  *
- * <p>We then add {@link TransportIoSession#handler()}, which routes data between the socket and
- * {@link TransportSshClient} (or {@link TransportSshServer}) -- forming the "bottom half" of the channel.
- *
  * <p>The "upper half" of the channel is formed once the corresponding SSH subsystem is established, via
  * {@link TransportClientSubsystem}, which installs a {@link OutboundChannelHandler}. These two work together:
  * <ul>
@@ -134,7 +131,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     SSHTransportStack(final TransportChannelListener<? super SSHTransportChannel> listener,
             final FactoryManager factoryManager, final IoHandler handler) {
         super(listener);
-        ioService = new TransportIoService(factoryManager, handler);
+        ioService = new TransportIoService(handler);
         factoryManager.addSessionListener(new Listener());
     }
 
@@ -148,7 +145,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         channel.pipeline().addLast(ioSession.handler());
 
         // we now have an attached underlay, but it needs further processing before we expose it to the end user
-        underlays.put(ioSession.getId(), underlayChannel);
+        underlays.put(ioSession.getId(), underlayChannel);//
     }
 
     abstract void onKeyEstablished(Session session) throws IOException;
