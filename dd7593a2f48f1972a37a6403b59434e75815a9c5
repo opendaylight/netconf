@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "f12fc160_e49bd5ba",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-17T10:42:50Z",
+      "side": 1,
+      "message": "I tried to use null for stop-time and checked in debug\nfor JSON it fails on null check in org.opendaylight.yangtools.yang.data.api.codec.AbstractIllegalArgumentCodec#deserialize˝\n\nfor XML I get \"error-tag\": \"invalid-value\" response because for xml it pops out as empty string not a null value (what will get trough deserialize), that does not match regex for stop-time",
+      "parentUuid": "bd784011_3cae5f27",
+      "revId": "dd7593a2f48f1972a37a6403b59434e75815a9c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "65ec0173_2954df1a",
