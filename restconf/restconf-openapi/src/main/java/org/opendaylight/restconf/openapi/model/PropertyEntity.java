@@ -222,7 +222,7 @@ public class PropertyEntity {
         processRef(nodeName, dataNode, discriminator, stack, nodeDepth);
     }
 
-    private void processRef(final String name, final SchemaNode schemaNode, String discriminator,
+    private void processRef(final String name, final SchemaNode schemaNode, final String discriminator,
             final SchemaInferenceStack stack, final int nodeDepth) throws IOException {
         final var ref = COMPONENTS_PREFIX + name + discriminator;
         if (schemaNode instanceof ListSchemaNode listNode) {
