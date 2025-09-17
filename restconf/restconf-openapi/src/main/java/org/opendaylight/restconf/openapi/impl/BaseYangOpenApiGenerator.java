@@ -41,9 +41,13 @@ public abstract class BaseYangOpenApiGenerator {
         this.schemaService = requireNonNull(schemaService);
     }
 
+    private @NonNull EffectiveModelContext modelContext() {
+        return schemaService.getGlobalContext();
+    }
+
     public DocumentEntity getControllerModulesDoc(final URI uri, final int width, final int depth,
             final int offset, final int limit) throws IOException {
-        final var modelContext = requireNonNull(schemaService.getGlobalContext());
+        final var modelContext = modelContext();
         final var schema = createSchemaFromUri(uri);
         final var host = createHostFromUri(uri);
         final var title = "Controller modules of RESTCONF";
@@ -56,17 +60,14 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public MetadataEntity getControllerModulesMeta(final int offset, final int limit) throws IOException {
-        final var modelContext = requireNonNull(schemaService.getGlobalContext());
-        final var modulesWithoutDuplications = getModulesWithoutDuplications(modelContext);
+        final var modulesWithoutDuplications = getModulesWithoutDuplications(modelContext());
         return new MetadataEntity(offset, limit, modulesWithoutDuplications.size(),
             configModulesList(modulesWithoutDuplications).size());
     }
 
     public DocumentEntity getApiDeclaration(final String module, final String revision, final URI uri, final int width,
             final int depth) throws IOException {
-        final var modelContext = schemaService.getGlobalContext();
-        Preconditions.checkState(modelContext != null);
-        return getApiDeclaration(module, revision, uri, modelContext, "", CONTROLLER_RESOURCE_NAME, width, depth);
+        return getApiDeclaration(module, revision, uri, modelContext(), "", CONTROLLER_RESOURCE_NAME, width, depth);
     }
 
     public DocumentEntity getApiDeclaration(final String moduleName, final String revision, final URI uri,
@@ -128,11 +129,10 @@ public abstract class BaseYangOpenApiGenerator {
             final var modules = configModulesList(modulesWithoutDuplications);
             if (offset > modules.size() || offset < 0 || limit < 0) {
                 return List.of();
-            } else {
-                final var end = limit == 0 ? modules.size() : Math.min(modules.size(), offset + limit);
-                final var portionOfModules = modules.subList(offset, end);
-                return portionOfModules;
             }
+            final var end = limit == 0 ? modules.size() : Math.min(modules.size(), offset + limit);
+            final var portionOfModules = modules.subList(offset, end);
+            return portionOfModules;
         }
         return modulesWithoutDuplications;
     }
