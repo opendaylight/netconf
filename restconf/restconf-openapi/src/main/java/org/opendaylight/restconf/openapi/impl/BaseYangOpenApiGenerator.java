@@ -136,18 +136,9 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public static List<Module> configModulesList(final List<Module> modulesWithoutDuplications) {
-        return modulesWithoutDuplications
-            .stream()
-            .filter(BaseYangOpenApiGenerator::containsDataOrOperation)
+        return modulesWithoutDuplications.stream()
+            .filter(module -> !module.getRpcs().isEmpty() || module.getChildNodes().stream()
+                .anyMatch(node -> node instanceof ContainerSchemaNode || node instanceof ListSchemaNode))
             .toList();
-    }
-
-    private static boolean containsDataOrOperation(final Module module) {
-        if (!module.getRpcs().isEmpty()) {
-            return true;
-        }
-        return module.getChildNodes()
-            .stream()
-            .anyMatch(node -> node instanceof ContainerSchemaNode || node instanceof ListSchemaNode);
     }
 }
