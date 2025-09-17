@@ -552,7 +552,7 @@ public class PropertyEntity {
         }
     }
 
-    private String processBinaryType(final BinaryTypeDefinition definition, final TypeDef def) {
+    private static String processBinaryType(final BinaryTypeDefinition definition, final TypeDef def) {
         if (definition.getDefaultValue().isPresent()) {
             def.setDefaultValue(definition.getDefaultValue().toString());
         }
@@ -560,7 +560,7 @@ public class PropertyEntity {
         return STRING_TYPE;
     }
 
-    private String processBitsType(final BitsTypeDefinition bitsType, final TypeDef def) {
+    private static String processBitsType(final BitsTypeDefinition bitsType, final TypeDef def) {
         def.setMinItems(0);
         def.setUniqueItems(true);
         final var bits = bitsType.getBits();
@@ -576,7 +576,7 @@ public class PropertyEntity {
         return STRING_TYPE;
     }
 
-    private String processEnumType(final EnumTypeDefinition enumLeafType, final TypeDef def) {
+    private static String processEnumType(final EnumTypeDefinition enumLeafType, final TypeDef def) {
         final var enumPairs = enumLeafType.getValues();
         final var enumNames = enumPairs.stream()
             .map(EnumTypeDefinition.EnumPair::getName)
@@ -616,7 +616,8 @@ public class PropertyEntity {
         }
     }
 
-    private String processStringType(final StringTypeDefinition stringType, final String nodeName, final TypeDef def) {
+    private static String processStringType(final StringTypeDefinition stringType, final String nodeName,
+            final TypeDef def) {
         var type = stringType;
         while (type.getLengthConstraint().isEmpty() && type.getBaseType() != null) {
             type = type.getBaseType();
@@ -663,7 +664,7 @@ public class PropertyEntity {
         return STRING_TYPE;
     }
 
-    private String processNumberType(final RangeRestrictedTypeDefinition<?, ?> leafTypeDef,final TypeDef def) {
+    private static String processNumberType(final RangeRestrictedTypeDefinition<?, ?> leafTypeDef,final TypeDef def) {
         final var maybeLower = leafTypeDef.getRangeConstraint()
             .map(RangeConstraint::getAllowedRanges).map(RangeSet::span).map(Range::lowerEndpoint);
 
@@ -722,7 +723,7 @@ public class PropertyEntity {
         return false;
     }
 
-    private String processInstanceIdentifierType(final InstanceIdentifierTypeDefinition iidType,
+    private static String processInstanceIdentifierType(final InstanceIdentifierTypeDefinition iidType,
             final DataSchemaNode schemaNode, final EffectiveModelContext modelContext,final TypeDef def) {
         // create example instance-identifier to the first container of node's module if exists or leave it empty
         final var module = modelContext.findModule(schemaNode.getQName().getModule());
