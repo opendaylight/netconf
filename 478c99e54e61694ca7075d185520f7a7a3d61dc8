@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81c4a81b_0a88acd8",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-17T11:06:06Z",
+      "side": 1,
+      "message": "IOException is not thrown + in other methods as well",
+      "revId": "478c99e54e61694ca7075d185520f7a7a3d61dc8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
