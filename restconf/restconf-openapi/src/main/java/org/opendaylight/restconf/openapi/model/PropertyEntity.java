@@ -728,7 +728,7 @@ public class PropertyEntity {
         final var module = modelContext.findModule(schemaNode.getQName().getModule());
         if (module.isPresent()) {
             final var container = module.orElseThrow().getChildNodes().stream()
-                .filter(n -> n instanceof ContainerSchemaNode)
+                .filter(ContainerSchemaNode.class::isInstance)
                 .findFirst();
             if (container.isPresent()) {
                 def.setExample(String.format("/%s:%s", module.orElseThrow().getPrefix(),
