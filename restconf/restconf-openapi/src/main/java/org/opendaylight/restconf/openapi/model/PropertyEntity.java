@@ -312,17 +312,14 @@ public class PropertyEntity {
         return firstExampleMap;
     }
 
-    private Object editExample(final Object exampleValue, final int edit) {
-        if (exampleValue instanceof String string) {
-            return string + "_" + edit;
-        } else if (exampleValue instanceof Integer number) {
-            return number + edit;
-        } else if (exampleValue instanceof Long number) {
-            return number + edit;
-        } else if (exampleValue instanceof Decimal64 number) {
-            return Decimal64.valueOf(BigDecimal.valueOf(number.intValue() + edit));
-        }
-        return exampleValue;
+    private static Object editExample(final Object exampleValue, final int edit) {
+        return switch (exampleValue) {
+            case String val -> val + "_" + edit;
+            case Integer val -> val + edit;
+            case Long val -> val + edit;
+            case Decimal64 val -> Decimal64.valueOf(BigDecimal.valueOf(val.longValue() + edit));
+            case null, default -> exampleValue;
+        };
     }
 
     private void processUnknownDataSchemaNode(final DataSchemaNode leafNode, final String name,
