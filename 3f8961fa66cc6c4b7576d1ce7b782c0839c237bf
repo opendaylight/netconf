@@ -158,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b4fa64e_7f657ea4",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseBodyOutputStream.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-17T10:55:00Z",
+      "side": 1,
+      "message": "it shouldn\u0027t happen unless we flush twice",
+      "parentUuid": "d06228ec_1fc7afb7",
+      "revId": "3f8961fa66cc6c4b7576d1ce7b782c0839c237bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "58b6bc6e_5175efde",
@@ -206,6 +224,24 @@
       "writtenOn": "2025-07-25T08:24:51Z",
       "side": 1,
       "message": "IMO if is not needed with session.sendResponsePart(createChunk(buffer));",
+      "revId": "3f8961fa66cc6c4b7576d1ce7b782c0839c237bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "041bc205_d0cf7839",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseBodyOutputStream.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-17T10:55:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3fdf558_5a62f429",
       "revId": "3f8961fa66cc6c4b7576d1ce7b782c0839c237bf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
