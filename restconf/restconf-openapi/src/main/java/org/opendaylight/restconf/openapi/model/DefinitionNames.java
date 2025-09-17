@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,11 +47,9 @@ final class DefinitionNames {
         return discriminator;
     }
 
-    void addUnlinkedName(final String name) {
-        if (!names.contains(name)) {
-            names.add(name);
-        } else {
-            throw new IllegalArgumentException(String.format("Definition name:%s already in use", name));
+    void addUnlinkedName(final String name) throws IOException {
+        if (!names.add(name)) {
+            throw new IOException("Definition name:" + name + " already in use");
         }
     }
 
