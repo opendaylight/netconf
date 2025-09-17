@@ -18,6 +18,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.AuthHandlerFactory;
 import org.opendaylight.netconf.transport.http.EmptyResponse;
+import org.opendaylight.netconf.transport.http.ExceptionRequestResponse;
 import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.netconf.transport.http.SegmentPeeler;
@@ -61,7 +62,7 @@ final class EndpointRoot {
     private final ConcurrentHashMap<String, WebHostResource> resources = new ConcurrentHashMap<>();
     private final @NonNull PrincipalService principalService;
     // FIXME: at some point this should just be 'XRD xrd'
-    private final WellKnownResources wellKnown;
+    private final @NonNull WellKnownResources wellKnown;
     // FIXME: at some point this should be integrated into 'providers' Map with a coherent resource access
     //        API across the three classes of resources we have today
     private final Map<String, AbstractResource> fixedResources;
@@ -115,6 +116,18 @@ final class EndpointRoot {
         }
         final var resource = resources.get(segment);
         return resource == null ? EmptyResponse.NOT_FOUND
-            : resource.prepare(method, targetUri, headers, peeler, wellKnown);
+            : prepareRequest(resource, method, targetUri, headers, peeler);
+    }
+
+    @NonNullByDefault
+    @SuppressWarnings("checkstyle:illegalCatch")
+    private PreparedRequest prepareRequest(final WebHostResource resource, final ImplementedMethod method,
+            final URI targetUri, final HttpHeaders headers, final SegmentPeeler peeler) {
+        try {
+            return resource.prepare(method, targetUri, headers, peeler, wellKnown);
+        } catch (RuntimeException e) {
+            LOG.warn("Failed to prepare request", e);
+            return new ExceptionRequestResponse(e);
+        }
     }
 }
