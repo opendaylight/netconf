@@ -91,9 +91,7 @@ public final class DeleteSubscriptionRpc extends RpcImplementation {
                 "Subscription with given id does not exist on this session"));
             return;
         }
-        subscription.setState(SubscriptionState.END);
-        subscription.terminate(request.transform(unused -> ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(NodeIdentifier.create(DeleteSubscriptionOutput.QNAME))
-            .build()), NoSuchSubscription.QNAME);
+
+        subscription.terminateSubscription(request, DeleteSubscriptionOutput.QNAME);
     }
 }

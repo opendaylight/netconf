@@ -50,6 +50,7 @@ import org.opendaylight.restconf.server.spi.Subscriber.Rfc8639Subscriber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.NoSuchSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
@@ -290,6 +291,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                     subscriptions.remove(id);
                 }
             }, MoreExecutors.directExecutor());
+        }
+
+        public void terminateSubscription(final ServerRequest<ContainerNode> request, final QName reason) {
+            setState(SubscriptionState.END);
+            terminate(request.transform(unused -> ImmutableNodes.newContainerBuilder()
+                .withNodeIdentifier(NodeIdentifier.create(reason))
+                .build()), NoSuchSubscription.QNAME);
         }
 
 

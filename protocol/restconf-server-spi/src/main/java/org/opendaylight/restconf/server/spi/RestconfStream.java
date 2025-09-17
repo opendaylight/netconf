@@ -40,6 +40,7 @@ import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -293,7 +294,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
          * @throws IllegalStateException if the subscription cannot be moved to the new state
          */
         @NonNullByDefault
-        public abstract void setState(SubscriptionState newState);
+        abstract void setState(SubscriptionState newState);
 
         /**
          * Returns the {@code subscription session}.
@@ -349,6 +350,8 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
         @Nullable QName terminated() {
             return (QName) TERMINATED_VH.getVolatile(this);
         }
+
+        public abstract void terminateSubscription(ServerRequest<ContainerNode> request, QName reason);
 
         @VisibleForTesting
         public abstract void suspendSubscription(QName reason);
