@@ -60,7 +60,7 @@ public final class SchemasEntity extends OpenApiEntity {
         generator.writeEndObject();
     }
 
-    private ArrayDeque<SchemaEntity> toComponents(final Module module) {
+    private ArrayDeque<SchemaEntity> toComponents(final Module module) throws IOException {
         final var result = new ArrayDeque<SchemaEntity>();
         final var definitionNames = new DefinitionNames();
         final var stack = SchemaInferenceStack.of(modelContext);
