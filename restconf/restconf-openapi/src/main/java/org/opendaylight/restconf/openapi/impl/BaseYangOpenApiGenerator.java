@@ -9,7 +9,6 @@ package org.opendaylight.restconf.openapi.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.net.URI;
 import java.time.format.DateTimeParseException;
@@ -78,12 +77,11 @@ public abstract class BaseYangOpenApiGenerator {
         try {
             rev = Revision.ofNullable(revision);
         } catch (final DateTimeParseException e) {
-            throw new IllegalArgumentException(e);
+            throw new IOException("Failed to parse revision", e);
         }
 
-        final var module = modelContext.findModule(moduleName, rev).orElse(null);
-        Preconditions.checkArgument(module != null,
-                "Could not find module by name,revision: " + moduleName + "," + revision);
+        final var module = modelContext.findModule(moduleName, rev).orElseThrow(
+            () -> new IOException("Could not find module by name,revision: " + moduleName + "," + revision));
 
         final var schema = createSchemaFromUri(uri);
         final var host = createHostFromUri(uri);
