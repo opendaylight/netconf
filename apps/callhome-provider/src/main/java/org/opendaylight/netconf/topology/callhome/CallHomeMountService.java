@@ -182,6 +182,18 @@ public final class CallHomeMountService implements AutoCloseable {
             If true, the connector would auto disconnect/reconnect when schemas are
             changed in the remote device.""")
         boolean reconnect$_$on$_$changed$_$schema() default false;
+
+        @AttributeDefinition(description = "Client advertised key exchange algorithms.")
+        String key$_$exchange() default "";
+
+        @AttributeDefinition(description = "Client advertised masc.")
+        String macs() default "";
+
+        @AttributeDefinition(description = "Client advertised encryption.")
+        String encryption() default "";
+
+        @AttributeDefinition(description = "Client advertised masc.")
+        String host$_$keys() default "";
     }
 
     private static final Protocol SSH_PROTOCOL = new ProtocolBuilder().setName(Protocol.Name.SSH).build();

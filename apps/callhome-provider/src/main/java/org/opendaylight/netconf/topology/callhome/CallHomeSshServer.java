@@ -35,6 +35,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240814.netconf.client.initiate.stack.grouping.transport.ssh.ssh.SshClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240814.netconf.client.listen.stack.grouping.transport.ssh.ssh.TcpServerParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentityBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.TransportParams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
 import org.opendaylight.yangtools.binding.util.BindingMap;
@@ -58,7 +59,8 @@ public final class CallHomeSshServer implements AutoCloseable {
             final NetconfClientSessionNegotiatorFactory negotiatorFactory,
             final CallHomeSshSessionContextManager contextManager,
             final CallHomeSshAuthProvider authProvider,
-            final CallHomeStatusRecorder statusRecorder) {
+            final CallHomeStatusRecorder statusRecorder,
+            final TransportParams transportParams) {
         this.authProvider = requireNonNull(authProvider);
         this.statusRecorder = requireNonNull(statusRecorder);
         this.contextManager = requireNonNull(contextManager);
@@ -70,7 +72,9 @@ public final class CallHomeSshServer implements AutoCloseable {
         // SSH transport layer configuration
         // NB actual username will be assigned dynamically but predefined one is required for transport initialization
         final var sshClientParams = new SshClientParametersBuilder().setClientIdentity(
-            new ClientIdentityBuilder().setUsername("ignored").build()).build();
+                new ClientIdentityBuilder().setUsername("ignored").build())
+            .setTransportParams(transportParams)
+            .build();
         final var configurator = new ClientFactoryManagerConfigurator() {
             @Override
             protected void configureClientFactoryManager(final ClientFactoryManager factoryManager) {
@@ -160,6 +164,7 @@ public final class CallHomeSshServer implements AutoCloseable {
         private CallHomeSshAuthProvider authProvider;
         private CallHomeSshSessionContextManager contextManager;
         private CallHomeStatusRecorder statusRecorder;
+        private TransportParams transportParams;
 
         private Builder() {
             // on purpose
@@ -171,7 +176,7 @@ public final class CallHomeSshServer implements AutoCloseable {
                 transportStackFactory == null ? defaultTransportStackFactory() : transportStackFactory,
                 negotiationFactory,
                 contextManager == null ? new CallHomeSshSessionContextManager() : contextManager,
-                authProvider, statusRecorder);
+                authProvider, statusRecorder, transportParams);
         }
 
         public Builder withAuthProvider(final CallHomeSshAuthProvider newAuthProvider) {
@@ -211,6 +216,11 @@ public final class CallHomeSshServer implements AutoCloseable {
 
         public Builder withTimeout(final int newTimeoutMillis) {
             timeoutMillis = newTimeoutMillis;
+            return this;
+        }
+
+        public Builder withTransportParams(final TransportParams newTransportParams) {
+            transportParams = newTransportParams;
             return this;
         }
     }
