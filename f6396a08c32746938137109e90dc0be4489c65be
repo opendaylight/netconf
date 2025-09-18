@@ -34,6 +34,24 @@
       "parentUuid": "91f92458_e842e91c",
       "revId": "f6396a08c32746938137109e90dc0be4489c65be",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25627bba_5bfe82ec",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerRequestExecutor.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-18T09:45:06Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "c1f87251_9afca7d2",
+      "revId": "f6396a08c32746938137109e90dc0be4489c65be",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
