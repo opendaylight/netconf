@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1001a21d_cc6fb586",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/FormattableDataResponse.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-18T06:37:14Z",
+      "side": 1,
+      "message": "We could have, but purpose of this is only to check if there was some error during generating response, so we can stop streaming properly, once this got outside that first try block, out is closed and before that we need to properly stop streaming (not sending last chunk which is send on close)\noriginally this was catched only in writeResponse in ServerRequestExecutor, but then out was already closed",
+      "parentUuid": "7591a4bf_42fb88f6",
+      "revId": "61df9bf5f8e653414ceeb97e9b1c80ca19c126c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d980c770_bac5d482",
