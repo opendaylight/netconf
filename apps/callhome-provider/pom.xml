@@ -186,6 +186,10 @@
             <artifactId>netconf-server</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc9644-ietf-ssh-server</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
