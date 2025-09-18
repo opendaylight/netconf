@@ -34,6 +34,24 @@
       "parentUuid": "de806c1e_bef52c5e",
       "revId": "f535c2f109769b3895a7af78c0ad9401d652096d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30661210_fa3f5b27",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-18T10:46:15Z",
+      "side": 1,
+      "message": "I can\u0027t see any reason why setState can\u0027t be moved inside `terminate(final ServerRequest\u003cEmpty\u003e request, final QName reason)`. Terminate implies that the subscription moves to the \u0027END\u0027 state.",
+      "parentUuid": "42fe2f69_edaa139f",
+      "revId": "f535c2f109769b3895a7af78c0ad9401d652096d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
