@@ -14,12 +14,15 @@ import io.netty.channel.Channel;
 import java.math.RoundingMode;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -45,8 +48,22 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240814.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshEncryptionAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.Encryption;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.EncryptionBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.HostKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.HostKeyBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.KeyExchange;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.KeyExchangeBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.Mac;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.MacBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.parameters.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.parameters.ProtocolBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.parameters.protocol.specification.SshCaseBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.parameters.protocol.specification.ssh._case.SshTransportParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.credentials.credentials.LoginPwUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.NetconfNodeAugmentBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.netconf.node.augment.NetconfNodeBuilder;
@@ -182,9 +199,21 @@ public final class CallHomeMountService implements AutoCloseable {
             If true, the connector would auto disconnect/reconnect when schemas are
             changed in the remote device.""")
         boolean reconnect$_$on$_$changed$_$schema() default false;
+
+        @AttributeDefinition(description = "Allowed key exchange algorithms.")
+        String key$_$exchange() default "";
+
+        @AttributeDefinition(description = "Allowed macs.")
+        String macs() default "";
+
+        @AttributeDefinition(description = "Allowed encryption.")
+        String encryption() default "";
+
+        @AttributeDefinition(description = "Allowed host keys.")
+        String host$_$keys() default "";
     }
 
-    private static final Protocol SSH_PROTOCOL = new ProtocolBuilder().setName(Protocol.Name.SSH).build();
+    private static final Pattern COMMA_WITH_WHITESPACE = Pattern.compile(",\\s*");
     private static final Protocol TLS_PROTOCOL = new ProtocolBuilder().setName(Protocol.Name.TLS).build();
     private static final DataObjectReference<Device> DEVICE_IDENTIFIER = DataObjectReference
         .builder(NetconfCallhomeServer.class).child(AllowedDevices.class)
@@ -302,7 +331,14 @@ public final class CallHomeMountService implements AutoCloseable {
             @Override
             public CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession) {
                 final var remoteAddr = clientSession.getRemoteAddress();
-                topology.enableNode(asNode(id, remoteAddr, SSH_PROTOCOL));
+                topology.enableNode(asNode(id, remoteAddr, new ProtocolBuilder().setName(Protocol.Name.SSH)
+                    .setSpecification(new SshCaseBuilder().setSshTransportParameters(new SshTransportParametersBuilder()
+                        .setEncryption(parseEncryption(config.encryption()))
+                        .setHostKey(parseHostKey(config.host$_$keys()))
+                        .setKeyExchange(parseKeyExchange(config.key$_$exchange()))
+                        .setMac(parseMac(config.macs()))
+                        .build()).build())
+                    .build()));
                 final var netconfLayer = netconfLayerMapping.remove(id);
                 return netconfLayer == null ? null : new CallHomeSshSessionContext(id, remoteAddr, clientSession,
                     netconfLayer.sessionListener, netconfLayer.netconfSessionFuture);
@@ -356,5 +392,45 @@ public final class CallHomeMountService implements AutoCloseable {
 
     private record NetconfLayer(String id, NetconfClientSessionListener sessionListener,
         SettableFuture<NetconfClientSession> netconfSessionFuture) {
+    }
+
+    private static @NonNull KeyExchange parseKeyExchange(final String keyExchange) {
+        final var kex = keyExchange.isEmpty() ? new String[0] : COMMA_WITH_WHITESPACE.split(keyExchange);
+        final var kexAlg = new ArrayList<SshKeyExchangeAlgorithm>();
+        for (var alg : kex) {
+            kexAlg.add(new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh
+                .key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.ofName(alg)));
+        }
+        return new KeyExchangeBuilder().setKeyExchangeAlg(kexAlg).build();
+    }
+
+    private static @NonNull Mac parseMac(final String mac) {
+        final var macs = mac.isEmpty() ? new String[0] : COMMA_WITH_WHITESPACE.split(mac);
+        final var macAlg = new ArrayList<SshMacAlgorithm>();
+        for (var alg : macs) {
+            macAlg.add(new SshMacAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh
+                .mac.algs.rev241016.SshMacAlgorithm.ofName(alg)));
+        }
+        return new MacBuilder().setMacAlg(macAlg).build();
+    }
+
+    private static @NonNull Encryption parseEncryption(final String encryption) {
+        final var encryptions = encryption.isEmpty() ? new String[0] : COMMA_WITH_WHITESPACE.split(encryption);
+        final var encryptionAlg = new ArrayList<SshEncryptionAlgorithm>();
+        for (var alg : encryptions) {
+            encryptionAlg.add(new SshEncryptionAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana
+                .ssh.encryption.algs.rev241016.SshEncryptionAlgorithm.ofName(alg)));
+        }
+        return new EncryptionBuilder().setEncryptionAlg(encryptionAlg).build();
+    }
+
+    private static @NonNull HostKey parseHostKey(final String hostKey) {
+        final var hostKeys = hostKey.isEmpty() ? new String[0] : COMMA_WITH_WHITESPACE.split(hostKey);
+        final var hostKeysAlg = new ArrayList<SshPublicKeyAlgorithm>();
+        for (var alg : hostKeys) {
+            hostKeysAlg.add(new SshPublicKeyAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh
+                ._public.key.algs.rev241016.SshPublicKeyAlgorithm.ofName(alg)));
+        }
+        return new HostKeyBuilder().setHostKeyAlg(hostKeysAlg).build();
     }
 }
