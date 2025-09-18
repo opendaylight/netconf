@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3fe4ecc2_ab947b76",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-18T08:02:18Z",
+      "side": 1,
+      "message": "Would need a slight rework as defined in:\nhttps://lf-opendaylight.atlassian.net/browse/NETCONF-1497",
+      "revId": "e8373fcfda1446b0e28d82870d93316d0a75d0f8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3fbdda52_3e43df2b",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ConcurrentRestconfSession.java",
         "patchSetId": 9
