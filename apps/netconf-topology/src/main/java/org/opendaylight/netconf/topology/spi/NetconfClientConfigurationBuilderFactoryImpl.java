@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
@@ -101,7 +102,8 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         this.encryptionService = requireNonNull(encryptionService);
         this.credentialProvider = requireNonNull(credentialProvider);
         sslContextFactoryProvider = requireNonNull(sslHandlerContextProvider);
-        parseConfig(configuration);
+        transportParams = parseConfig(configuration.key$_$exchange(), configuration.macs(), configuration.encryption(),
+            configuration.host$_$keys());
     }
 
     @Override
@@ -198,10 +200,10 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             .build();
     }
 
-    private void parseConfig(final Configuration configuration) {
+    public static @NonNull TransportParams parseConfig(final String keyExchange, final String mac,
+            final String encryption, final String hostKey) {
         // KEX
-        final var kex = configuration.key$_$exchange().isEmpty() ? new String[0]
-            : configuration.key$_$exchange().split(",");
+        final var kex = keyExchange.isEmpty() ? new String[0] : keyExchange.split(",");
         final var kexAlg = new ArrayList<SshKeyExchangeAlgorithm>();
         final var kexBuilder = new KeyExchangeBuilder();
         for (var alg : kex) {
@@ -212,8 +214,7 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         transportParamBuilder.setKeyExchange(kexBuilder.setKeyExchangeAlg(kexAlg).build());
 
         // MACS
-        final var macs = configuration.macs().isEmpty() ? new String[0]
-            : configuration.macs().split(",");
+        final var macs = mac.isEmpty() ? new String[0] : mac.split(",");
         final var macAlg = new ArrayList<SshMacAlgorithm>();
         final var macBuilder = new MacBuilder();
         for (var alg : macs) {
@@ -223,8 +224,7 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         transportParamBuilder.setMac(macBuilder.setMacAlg(macAlg).build());
 
         //ENCRYPTION (ciphers)
-        final var encryptions = configuration.encryption().isEmpty() ? new String[0]
-            : configuration.encryption().split(",");
+        final var encryptions = encryption.isEmpty() ? new String[0] : encryption.split(",");
         final var encryptionAlg = new ArrayList<SshEncryptionAlgorithm>();
         final var encryptionBuilder = new EncryptionBuilder();
         for (var alg : encryptions) {
@@ -235,8 +235,7 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
 
 
         // HOST KEYS (signatures)
-        final var hostKeys = configuration.host$_$keys().isEmpty() ? new String[0]
-            : configuration.host$_$keys().split(",");
+        final var hostKeys = hostKey.isEmpty() ? new String[0] : hostKey.split(",");
         final var hostKeysAlg = new ArrayList<SshPublicKeyAlgorithm>();
         final var hostKeyBuilder = new HostKeyBuilder();
         for (var alg : hostKeys) {
@@ -245,6 +244,6 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         }
         transportParamBuilder.setHostKey(hostKeyBuilder.setHostKeyAlg(hostKeysAlg).build());
 
-        transportParams = transportParamBuilder.build();
+        return transportParamBuilder.build();
     }
 }

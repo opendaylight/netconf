@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactoryImpl;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -49,6 +50,9 @@ public final class IetfZeroTouchCallHomeServerProvider implements AutoCloseable 
                 .withNegotiationFactory(new NetconfClientSessionNegotiatorFactory(timer, Optional.empty(),
                     configuration.connection$_$timeout$_$millis(),
                     NetconfClientSessionNegotiatorFactory.DEFAULT_CLIENT_CAPABILITIES))
+                .withTransportParams(NetconfClientConfigurationBuilderFactoryImpl.parseConfig(
+                    configuration.key$_$exchange(), configuration.macs(), configuration.encryption(),
+                    configuration.host$_$keys()))
                 .build();
         } catch (UnknownHostException e) {
             throw new IllegalArgumentException("Invalid address", e);
