@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de806c1e_bef52c5e",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-18T07:56:21Z",
+      "side": 1,
+      "message": "We don\u0027t need to create a method similar to https://git.opendaylight.org/gerrit/c/netconf/+/118147/4/protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java#331\n Probably terminateSubscription(Qname) for internal calls where it is not triggered by RPC https://git.opendaylight.org/gerrit/c/netconf/+/116964/30/protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java#385",
+      "revId": "f535c2f109769b3895a7af78c0ad9401d652096d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
