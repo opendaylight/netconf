@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0dd7fa7_8e50bba3",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-18T16:01:55Z",
+      "side": 1,
+      "message": "@NonNullByDefault?",
+      "revId": "8e1362f1b77df0a1711bb9fe9cb3a4bcb93172c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a477a6bd_9065d11a",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-18T16:01:55Z",
+      "side": 1,
+      "message": "can be static?",
+      "revId": "8e1362f1b77df0a1711bb9fe9cb3a4bcb93172c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b05ae132_cbd1e63a",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-18T16:01:55Z",
+      "side": 1,
+      "message": "can be static?",
+      "revId": "8e1362f1b77df0a1711bb9fe9cb3a4bcb93172c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79f23e99_34e1c580",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-18T16:01:55Z",
+      "side": 1,
+      "message": "can we use stream?",
+      "revId": "8e1362f1b77df0a1711bb9fe9cb3a4bcb93172c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "564e4d7f_33ae4508",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-18T16:01:55Z",
+      "side": 1,
+      "message": "First line\n\n\u003cp\u003eAnother paragraph",
+      "revId": "8e1362f1b77df0a1711bb9fe9cb3a4bcb93172c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
