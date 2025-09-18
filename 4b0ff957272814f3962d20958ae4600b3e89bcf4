@@ -46,6 +46,30 @@
       },
       "revId": "4b0ff957272814f3962d20958ae4600b3e89bcf4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "004cb996_677d369e",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-18T11:56:49Z",
+      "side": 1,
+      "message": "resolved here\nhttps://git.opendaylight.org/gerrit/c/netconf/+/118147/comment/de806c1e_bef52c5e/",
+      "parentUuid": "a47216fc_a20f35a8",
+      "range": {
+        "startLine": 354,
+        "startChar": 29,
+        "endLine": 354,
+        "endChar": 48
+      },
+      "revId": "4b0ff957272814f3962d20958ae4600b3e89bcf4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
