@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5f48ac53_177585e6",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-18T06:06:05Z",
+      "side": 1,
+      "message": "Overridden method in super does not have a JavaDoc",
+      "parentUuid": "0068ccea_a91f7b62",
+      "range": {
+        "startLine": 93,
+        "startChar": 11,
+        "endLine": 93,
+        "endChar": 22
+      },
+      "revId": "9cf1680f073e7ee84f431181f6f49706356f266d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ee5e9d73_c264d18a",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
         "patchSetId": 26
@@ -37,6 +61,30 @@
       "writtenOn": "2025-09-17T18:15:16Z",
       "side": 1,
       "message": "not needed",
+      "range": {
+        "startLine": 110,
+        "startChar": 11,
+        "endLine": 110,
+        "endChar": 14
+      },
+      "revId": "9cf1680f073e7ee84f431181f6f49706356f266d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "555e20a8_e201de4f",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-18T06:06:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee5e9d73_c264d18a",
       "range": {
         "startLine": 110,
         "startChar": 11,
