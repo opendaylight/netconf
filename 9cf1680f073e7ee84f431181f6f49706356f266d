@@ -72,6 +72,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1037aa51_4a9eb790",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-18T11:55:59Z",
+      "side": 1,
+      "message": "Added doc to super and here with {@interitDoc} implementation specific info",
+      "parentUuid": "66a1adbb_5c6fc1c4",
+      "range": {
+        "startLine": 93,
+        "startChar": 11,
+        "endLine": 93,
+        "endChar": 22
+      },
+      "revId": "9cf1680f073e7ee84f431181f6f49706356f266d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee5e9d73_c264d18a",
