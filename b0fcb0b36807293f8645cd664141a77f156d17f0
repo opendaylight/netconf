@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73a80b7d_0853fbb1",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-18T16:03:16Z",
+      "side": 1,
+      "message": "1. this is just for HTTP to HTT1 fallback\n2. for HTTP2 we probably need HTTPS and configuration made in Alpn..Handler",
+      "revId": "b0fcb0b36807293f8645cd664141a77f156d17f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
