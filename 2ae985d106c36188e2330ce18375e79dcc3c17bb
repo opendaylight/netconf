@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25e3fee1_7e491d99",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-09-19T15:58:07Z",
+      "side": 1,
+      "message": "looking at possible values of MediaTypes\nwhat about APPLICATION_YANG_PATCH_JSON?\nis it not possible to outcome? otherwise EncodeJson$I.QNAME is more fitting outcome imo",
+      "revId": "2ae985d106c36188e2330ce18375e79dcc3c17bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc6d84fe_33ad18b0",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyServerRequest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-09-19T15:58:07Z",
+      "side": 1,
+      "message": "imo switch would be nicer here",
+      "revId": "2ae985d106c36188e2330ce18375e79dcc3c17bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
