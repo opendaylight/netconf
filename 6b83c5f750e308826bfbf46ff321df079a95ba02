@@ -16,6 +16,24 @@
       "message": "Extra line",
       "revId": "6b83c5f750e308826bfbf46ff321df079a95ba02",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18e14482_63770c79",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 411,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-19T12:49:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "242c0b88_a0e6722b",
+      "revId": "6b83c5f750e308826bfbf46ff321df079a95ba02",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
