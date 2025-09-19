@@ -42,7 +42,9 @@ public class Configuration {
             new YangResource("ietf-yang-types", "2013-07-15",
                     "/META-INF/yang/ietf-yang-types@2013-07-15.yang"),
             new YangResource("ietf-inet-types", "2013-07-15",
-                    "/META-INF/yang/ietf-inet-types@2013-07-15.yang")
+                    "/META-INF/yang/ietf-inet-types@2013-07-15.yang"),
+            new YangResource("ietf-netconf", "2011-06-01",
+                    "/META-INF/yang/ietf-netconf@2011-06-01.yang")
     );
 
     public static final AuthProvider DEFAULT_AUTH_PROVIDER = (username, password) -> {

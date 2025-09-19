@@ -152,7 +152,7 @@ public class TestToolTest {
     void getSchemas(final NetconfClientProtocol protocol) throws Exception {
         final var docResponse = sendRequest(protocol, GET_SCHEMAS_REQUEST);
         final var expectedYangResources = Configuration.DEFAULT_YANG_RESOURCES;
-        assertEquals(4, expectedYangResources.size());
+        assertEquals(5, expectedYangResources.size());
         assertThat(docResponse)
             .withNamespaceContext(PREFIX_2_URI)
             .valueByXPath("count(//base10:rpc-reply/base10:data/ncmon:netconf-state/ncmon:schemas/ncmon:schema)")
