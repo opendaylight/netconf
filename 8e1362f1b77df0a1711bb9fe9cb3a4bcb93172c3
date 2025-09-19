@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0bdb70f_9bf38e5b",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-19T10:00:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c0dd7fa7_8e50bba3",
+      "revId": "8e1362f1b77df0a1711bb9fe9cb3a4bcb93172c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a477a6bd_9065d11a",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-18T16:01:55Z",
       "side": 1,
       "message": "can be static?",
+      "revId": "8e1362f1b77df0a1711bb9fe9cb3a4bcb93172c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc076cda_d6393093",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-19T10:00:29Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/116857/comment/e4c5ab8a_f2ce7d82/",
+      "parentUuid": "a477a6bd_9065d11a",
       "revId": "8e1362f1b77df0a1711bb9fe9cb3a4bcb93172c3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebb54c24_e7568cc4",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-19T10:00:29Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/116857/comment/e4c5ab8a_f2ce7d82/",
+      "parentUuid": "b05ae132_cbd1e63a",
+      "revId": "8e1362f1b77df0a1711bb9fe9cb3a4bcb93172c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "79f23e99_34e1c580",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa7f9895_4578aed8",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-19T10:00:29Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/116857/comment/e4c5ab8a_f2ce7d82/",
+      "parentUuid": "79f23e99_34e1c580",
+      "revId": "8e1362f1b77df0a1711bb9fe9cb3a4bcb93172c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "564e4d7f_33ae4508",
@@ -82,6 +154,24 @@
       "writtenOn": "2025-09-18T16:01:55Z",
       "side": 1,
       "message": "First line\n\n\u003cp\u003eAnother paragraph",
+      "revId": "8e1362f1b77df0a1711bb9fe9cb3a4bcb93172c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f75136c9_4e0c035b",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-19T10:00:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "564e4d7f_33ae4508",
       "revId": "8e1362f1b77df0a1711bb9fe9cb3a4bcb93172c3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

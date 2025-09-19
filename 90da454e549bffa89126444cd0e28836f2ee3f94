@@ -16,6 +16,24 @@
       "message": "aha, just a copy 😊 then we do not make any improvements in this patch",
       "revId": "90da454e549bffa89126444cd0e28836f2ee3f94",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84447799_b3c17334",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfRestconfStrategy.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-19T10:00:29Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "e4c5ab8a_f2ce7d82",
+      "revId": "90da454e549bffa89126444cd0e28836f2ee3f94",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
