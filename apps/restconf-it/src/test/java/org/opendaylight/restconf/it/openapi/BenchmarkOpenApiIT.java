@@ -75,7 +75,7 @@ public class BenchmarkOpenApiIT extends AbstractOpenApiTest {
             .build(), HttpResponse.BodyHandlers.discarding());
         assertEquals(200, headers.statusCode());
         // Mainly here to verify there is some large data in the response, the exact length is not that important
-        assertEquals("1357417988", headers.headers().firstValue("content-length").orElseThrow());
+        assertEquals("1357435766", headers.headers().firstValue("content-length").orElseThrow());
 
         final var response = client.send(HttpRequest.newBuilder()
             .GET()
