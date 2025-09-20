@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-impl">
     <feature name="odl-netconf-impl">
-        <feature version="[14,15)">odl-mdsal-model-rfc6022</feature>
-        <feature version="[14,15)">odl-mdsal-model-rfc7407-ietf-x509-cert-to-name</feature>
+        <feature version="[1,2)">odl-ietf-model-rfc6022</feature>
+        <feature version="[1,2)">odl-ietf-model-rfc7407-ietf-x509-cert-to-name</feature>
     </feature>
 </features>

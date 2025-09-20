@@ -51,24 +51,24 @@
             <artifactId>org.eclipse.jdt.annotation</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc8040-ietf-restconf-monitoring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc8639</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc8650</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
             <artifactId>mdsal-common-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
             <artifactId>mdsal-dom-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
-            <artifactId>rfc8040-ietf-restconf-monitoring</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
-            <artifactId>rfc8639</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
-            <artifactId>rfc8650</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>

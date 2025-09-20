@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-keystore">
     <feature name="odl-netconf-keystore">
-        <feature version="[14,15)">odl-mdsal-model-rfc9642</feature>
+        <feature version="[1,2)">odl-ietf-model-rfc9642</feature>
     </feature>
 </features>
