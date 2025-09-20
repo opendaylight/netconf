@@ -35,7 +35,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataObjectWritten;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.client.NetconfClientSession;
@@ -140,19 +142,21 @@ class CallHomeMountServiceTest {
     @Test
     void testDeletingDeviceFromTopologyAfterModification() {
         final var mockDeviceBeforeAddition = createMockDevice(ID1);
-        final var mockObjectModification = mock(DataObjectModification.class);
+        final DataObjectWritten<Device> mockObjectWritten = mock();
 
         // modification of overriding device inside 'allowed-devices' container
-        when(mockObjectModification.modificationType()).thenReturn(WRITE);
-        when(mockObjectModification.dataBefore()).thenReturn(mockDeviceBeforeAddition);
+        when(mockObjectWritten.modificationType()).thenReturn(WRITE);
+        when(mockObjectWritten.dataBefore()).thenReturn(mockDeviceBeforeAddition);
         service.onAllowedDevicesChanged(List.of(new CustomTreeModification(LogicalDatastoreType.CONFIGURATION,
-            IDENTIFIER, mockObjectModification)));
+            IDENTIFIER, mockObjectWritten)));
         verify(topology, times(1)).disableNode(NODE_ID1);
 
         // modification of deleting device from 'allowed-devices' container
-        when(mockObjectModification.modificationType()).thenReturn(DELETE);
+        final DataObjectDeleted<Device> mockObjectDeleted = mock();
+        when(mockObjectDeleted.modificationType()).thenReturn(DELETE);
+        when(mockObjectDeleted.dataBefore()).thenReturn(mockDeviceBeforeAddition);
         service.onAllowedDevicesChanged(List.of(
-            new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, IDENTIFIER, mockObjectModification)));
+            new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, IDENTIFIER, mockObjectDeleted)));
         verify(topology, times(2)).disableNode(NODE_ID1);
     }
 
@@ -162,8 +166,8 @@ class CallHomeMountServiceTest {
         final var mockDevice2 = createMockDevice(ID2);
 
         // Mock DataObjectModifications for each device
-        final var mockModification1 = mock(DataObjectModification.class);
-        final var mockModification2 = mock(DataObjectModification.class);
+        final DataObjectDeleted<Device> mockModification1 = mock();
+        final DataObjectDeleted<Device> mockModification2 = mock();
 
         when(mockModification1.modificationType()).thenReturn(DELETE);
         when(mockModification1.dataBefore()).thenReturn(mockDevice1);
