@@ -15,6 +15,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.base.MoreObjects.ToStringHelper;
+import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,8 +25,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
-import org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType;
+import org.opendaylight.mdsal.binding.api.DataObjectWritten;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
@@ -37,15 +40,14 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionEnd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionStart;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.ZeroBasedCounter32;
+import org.opendaylight.yangtools.binding.DataObject;
+import org.opendaylight.yangtools.binding.ExactDataObjectStep;
+import org.opendaylight.yangtools.binding.NodeStep;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @ExtendWith(MockitoExtension.class)
 class SessionNotificationProducerTest {
-    private static final Logger LOG = LoggerFactory.getLogger(SessionNotificationProducerTest.class);
-
     @Mock
     private BaseNotificationPublisherRegistration registration;
     @Mock
@@ -56,8 +58,6 @@ class SessionNotificationProducerTest {
     private DataBroker dataBroker;
     @Mock
     private DataTreeModification<Session> treeChange;
-    @Mock
-    private DataObjectModification<Session> changeObject;
 
     private SessionNotificationProducer publisher;
 
@@ -75,8 +75,40 @@ class SessionNotificationProducerTest {
     void testOnDataChangedSessionCreated() {
         doNothing().when(registration).onSessionStarted(any());
         final var session = createSession(Uint32.ONE);
-        final var treeMod = getTreeModification(session, ModificationType.WRITE);
-        publisher.onDataTreeChanged(List.of(treeMod));
+
+        doReturn(new DataObjectWritten<Session>() {
+            @Override
+            public ExactDataObjectStep<Session> step() {
+                return new NodeStep<>(Session.class);
+            }
+
+            @Override
+            public Session dataAfter() {
+                return session;
+            }
+
+            @Override
+            public Session dataBefore() {
+                return null;
+            }
+
+            @Override
+            public <C extends DataObject> DataObjectModification<C> modifiedChild(final ExactDataObjectStep<C> step) {
+                return null;
+            }
+
+            @Override
+            public Collection<? extends DataObjectModification<?>> modifiedChildren() {
+                return List.of();
+            }
+
+            @Override
+            protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+                return helper;
+            }
+        }).when(treeChange).getRootNode();
+
+        publisher.onDataTreeChanged(List.of(treeChange));
         final var captor = ArgumentCaptor.forClass(NetconfSessionStart.class);
         verify(registration).onSessionStarted(captor.capture());
         final var value = captor.getValue();
@@ -89,10 +121,39 @@ class SessionNotificationProducerTest {
     void testOnDataChangedSessionUpdated() {
         final var sessionBefore = createSessionWithInRpcCount(Uint32.ONE, Uint32.ZERO);
         final var sessionAfter = createSessionWithInRpcCount(Uint32.ONE, Uint32.ONE);
-        doReturn(sessionBefore).when(changeObject).dataBefore();
-        doReturn(sessionAfter).when(changeObject).dataAfter();
-        doReturn(ModificationType.WRITE).when(changeObject).modificationType();
-        doReturn(changeObject).when(treeChange).getRootNode();
+
+        doReturn(new DataObjectWritten<Session>() {
+            @Override
+            public ExactDataObjectStep<Session> step() {
+                return new NodeStep<>(Session.class);
+            }
+
+            @Override
+            public Session dataAfter() {
+                return sessionAfter;
+            }
+
+            @Override
+            public Session dataBefore() {
+                return sessionBefore;
+            }
+
+            @Override
+            public <C extends DataObject> DataObjectModification<C> modifiedChild(final ExactDataObjectStep<C> step) {
+                return null;
+            }
+
+            @Override
+            public Collection<? extends DataObjectModification<?>> modifiedChildren() {
+                return List.of();
+            }
+
+            @Override
+            protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+                return helper;
+            }
+        }).when(treeChange).getRootNode();
+
         publisher.onDataTreeChanged(List.of(treeChange));
         //session didn't start, only stats changed. No notification should be produced
         verify(registration, never()).onSessionStarted(any());
@@ -103,8 +164,35 @@ class SessionNotificationProducerTest {
     void testOnDataChangedSessionDeleted() {
         doNothing().when(registration).onSessionEnded(any());
         final var session = createSession(Uint32.ONE);
-        final var treeMod = getTreeModification(session, ModificationType.DELETE);
-        publisher.onDataTreeChanged(List.of(treeMod));
+
+        doReturn(new DataObjectDeleted<Session>() {
+            @Override
+            public ExactDataObjectStep<Session> step() {
+                return new NodeStep<>(Session.class);
+            }
+
+            @Override
+            public Session dataBefore() {
+                return session;
+            }
+
+            @Override
+            public <C extends DataObject> DataObjectModification<C> modifiedChild(final ExactDataObjectStep<C> step) {
+                return null;
+            }
+
+            @Override
+            public Collection<? extends DataObjectModification<?>> modifiedChildren() {
+                return List.of();
+            }
+
+            @Override
+            protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+                return helper;
+            }
+        }).when(treeChange).getRootNode();
+
+        publisher.onDataTreeChanged(List.of(treeChange));
         final var captor = ArgumentCaptor.forClass(NetconfSessionEnd.class);
         verify(registration).onSessionEnded(captor.capture());
         final NetconfSessionEnd value = captor.getValue();
@@ -124,25 +212,5 @@ class SessionNotificationProducerTest {
             .setUsername("user")
             .setInRpcs(new ZeroBasedCounter32(inRpc))
             .build();
-    }
-
-    private DataTreeModification<Session> getTreeModification(final Session session, final ModificationType type) {
-        doReturn(type).when(changeObject).modificationType();
-        doReturn(changeObject).when(treeChange).getRootNode();
-        return switch (type) {
-            case WRITE -> {
-                doReturn(null).when(changeObject).dataBefore();
-                doReturn(session).when(changeObject).dataAfter();
-                yield treeChange;
-            }
-            case DELETE -> {
-                doReturn(session).when(changeObject).dataBefore();
-                yield treeChange;
-            }
-            default -> {
-                LOG.debug("Received intentionally unhandled type: {}.", type);
-                yield treeChange;
-            }
-        };
     }
 }

@@ -7,6 +7,6 @@
  -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-aaa-netconf-plugin">
     <feature name="odl-aaa-netconf-plugin">
-        <feature version="[0.21,1)">odl-aaa-shiro</feature>
+        <feature version="[0.22,1)">odl-aaa-shiro</feature>
     </feature>
 </features>

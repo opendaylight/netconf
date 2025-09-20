@@ -8,9 +8,9 @@
   -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-${project.version}">
     <feature name="odl-netconf-connector" version="${project.version}">
+        <feature version="[1,2)">odl-ietf-model-rfc6022</feature>
         <feature version="[14,15)">odl-mdsal-model-draft-clemm-netmod-yang-network-topo-01-minimal</feature>
-        <feature version="[14,15)">odl-mdsal-model-rfc6022</feature>
-        <feature version="[11,12)">odl-mdsal-broker</feature>
-        <feature version="[0.21,1)">odl-aaa-encryption-service</feature>
+        <feature version="[12,13)">odl-mdsal-broker</feature>
+        <feature version="[0.22,1)">odl-aaa-encryption-service</feature>
     </feature>
 </features>
