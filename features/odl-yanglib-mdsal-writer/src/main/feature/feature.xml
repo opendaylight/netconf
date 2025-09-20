@@ -8,7 +8,7 @@
 -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-${project.version}">
     <feature name="odl-yanglib-mdsal-writer" version="${project.version}">
-        <feature version="[14,15)">odl-mdsal-model-rfc8525</feature>
-        <feature version="[11,12)">odl-mdsal-broker</feature>
+        <feature version="[1,2)">odl-ietf-model-rfc8525</feature>
+        <feature version="[12,13)">odl-mdsal-broker</feature>
     </feature>
 </features>
