@@ -8,6 +8,6 @@
  -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.2.0" name="odl-netconf-${project.version}">
     <feature name="odl-netconf-mdsal-common" version="${project.version}">
-        <feature version="[14,15)">odl-mdsal-dom-api</feature>
+        <feature version="[15,16)">odl-mdsal-dom-api</feature>
     </feature>
 </features>
