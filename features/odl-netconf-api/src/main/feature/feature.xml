@@ -9,9 +9,9 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-${project.version}">
     <feature name="odl-netconf-api" version="${project.version}">
         <feature version="[14,15)">odl-netty-4</feature>
-        <feature version="[14,15)">odl-mdsal-model-rfc6241</feature>
-        <feature version="[14,15)">odl-mdsal-model-rfc6470</feature>
-        <feature version="[14,15)">odl-mdsal-model-rfc8525</feature>
-        <feature version="[14,15)">odl-mdsal-model-rfc8526</feature>
+        <feature version="[1,2)">odl-ietf-model-rfc6241</feature>
+        <feature version="[1,2)">odl-ietf-model-rfc6470</feature>
+        <feature version="[1,2)">odl-ietf-model-rfc8525</feature>
+        <feature version="[1,2)">odl-ietf-model-rfc8526</feature>
     </feature>
 </features>
