@@ -55,55 +55,55 @@
             <artifactId>yang-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc6022</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc6241</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc6470</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc6991-ietf-inet-types</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc6991-ietf-yang-types</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc7407-ietf-x509-cert-to-name</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc8525</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc9643-ietf-tcp-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc9643-ietf-tcp-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc9643-ietf-tcp-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc9644-ietf-ssh-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc9644-ietf-ssh-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc9645-ietf-tls-server</artifactId>
         </dependency>
         <dependency>
