@@ -21,7 +21,6 @@ import static org.opendaylight.mdsal.binding.api.DataObjectModification.Modifica
 import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.SUBTREE_MODIFIED;
 import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.WRITE;
 
-import com.google.common.collect.Iterables;
 import com.google.common.io.CharSource;
 import com.google.common.util.concurrent.Futures;
 import com.typesafe.config.ConfigFactory;
@@ -46,7 +45,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataObjectWritten;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -199,7 +198,6 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         TestKit.shutdownActorSystem(masterSystem, true);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     void testSlaveMountPointRegistration() {
         initializeMaster();
@@ -221,8 +219,8 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         final NetconfNodeAugment netconfNodeAugment = newNetconfNode();
         final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(netconfNodeAugment).build();
 
-        DataObjectModification<Node> mockDataObjModification = mock(DataObjectModification.class);
-        doReturn(Iterables.getLast(nodeListPath.getPathArguments())).when(mockDataObjModification).step();
+        DataObjectWritten<Node> mockDataObjModification = mock();
+        doReturn(nodeListPath.lastStep()).when(mockDataObjModification).step();
         doReturn(WRITE).when(mockDataObjModification).modificationType();
         doReturn(node).when(mockDataObjModification).dataAfter();
 
@@ -302,7 +300,6 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         verifyNoMoreInteractions(mockMountPointReg);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     void testSlaveMountPointRegistrationFailuresAndRetries() throws Exception {
         final NodeId nodeId = new NodeId("device");
@@ -313,8 +310,8 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         final NetconfNodeAugment netconfNodeAugment = newNetconfNode();
         final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(netconfNodeAugment).build();
 
-        DataObjectModification<Node> mockDataObjModification = mock(DataObjectModification.class);
-        doReturn(Iterables.getLast(nodeListPath.getPathArguments())).when(mockDataObjModification).step();
+        DataObjectWritten<Node> mockDataObjModification = mock();
+        doReturn(nodeListPath.lastStep()).when(mockDataObjModification).step();
         doReturn(WRITE).when(mockDataObjModification).modificationType();
         doReturn(node).when(mockDataObjModification).dataAfter();
 
