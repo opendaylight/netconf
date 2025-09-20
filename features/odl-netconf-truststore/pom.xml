@@ -21,8 +21,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.opendaylight.mdsal.model</groupId>
-            <artifactId>odl-mdsal-model-rfc9641</artifactId>
+            <groupId>org.opendaylight.ietf</groupId>
+            <artifactId>odl-ietf-model-rfc9641</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>

@@ -8,11 +8,11 @@
   -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-restconf-nb-${project.version}">
     <feature name="odl-restconf-nb" version="${project.version}">
-        <feature version="[0.21,1)">odl-aaa-shiro</feature>
-        <feature version="[14,15)">odl-mdsal-model-rfc7317-iana-crypt-hash</feature>
-        <feature version="[14,15)">odl-mdsal-model-rfc7407-ietf-x509-cert-to-name</feature>
-        <feature version="[14,15)">odl-mdsal-model-rfc8341</feature>
-        <feature version="[14,15)">odl-mdsal-model-rfc8650</feature>
+        <feature version="[0.22,1)">odl-aaa-shiro</feature>
+        <feature version="[1,2)">odl-ietf-model-rfc7317-iana-crypt-hash</feature>
+        <feature version="[1,2)">odl-ietf-model-rfc7407-ietf-x509-cert-to-name</feature>
+        <feature version="[1,2)">odl-ietf-model-rfc8341</feature>
+        <feature version="[1,2)">odl-ietf-model-rfc8650</feature>
         <configfile finalname="etc/org.opendaylight.restconf.nb.rfc8040.cfg">
             mvn:org.opendaylight.netconf/restconf-nb/${project.version}/cfg/config
         </configfile>

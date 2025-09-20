@@ -22,14 +22,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.opendaylight.mdsal.model</groupId>
-            <artifactId>odl-mdsal-model-draft-clemm-netmod-yang-network-topo-01-minimal</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal.model</groupId>
-            <artifactId>odl-mdsal-model-rfc6022</artifactId>
+            <groupId>org.opendaylight.aaa</groupId>
+            <artifactId>odl-aaa-encryption-service</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
@@ -40,8 +34,14 @@
             <classifier>features</classifier>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.aaa</groupId>
-            <artifactId>odl-aaa-encryption-service</artifactId>
+            <groupId>org.opendaylight.ietf</groupId>
+            <artifactId>odl-ietf-model-rfc6022</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>odl-mdsal-model-draft-clemm-netmod-yang-network-topo-01-minimal</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
