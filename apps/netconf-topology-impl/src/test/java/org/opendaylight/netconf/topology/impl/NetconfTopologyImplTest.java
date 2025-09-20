@@ -19,7 +19,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
+import org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType;
+import org.opendaylight.mdsal.binding.api.DataObjectModified;
+import org.opendaylight.mdsal.binding.api.DataObjectWritten;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
@@ -80,7 +83,11 @@ class NetconfTopologyImplTest {
     @Mock
     private WriteTransaction wtx;
     @Mock
-    private DataObjectModification<Node> objMod;
+    private DataObjectDeleted<Node> objDeleted;
+    @Mock
+    private DataObjectWritten<Node> objWritten;
+    @Mock
+    private DataObjectModified<Node> objModified;
     @Mock
     private DataTreeModification<Node> treeMod;
 
@@ -123,21 +130,24 @@ class NetconfTopologyImplTest {
                     .build())
                 .build();
 
-            doReturn(DataObjectModification.ModificationType.WRITE).when(objMod).modificationType();
-            doReturn(node).when(objMod).dataAfter();
+            doReturn(ModificationType.WRITE).when(objWritten).modificationType();
+            doReturn(node).when(objWritten).dataAfter();
 
-            doReturn(TOPOLOGY_PATH.toBuilder().child(Node.class, key).build()).when(treeMod).path();
             final var changes = List.of(treeMod);
 
-            doReturn(objMod).when(treeMod).getRootNode();
+            doReturn(objWritten).when(treeMod).getRootNode();
             spyTopology.onDataTreeChanged(changes);
             verify(spyTopology).ensureNode(node);
 
-            doReturn(DataObjectModification.ModificationType.DELETE).when(objMod).modificationType();
+            doReturn(TOPOLOGY_PATH.toBuilder().child(Node.class, key).build()).when(treeMod).path();
+            doReturn(ModificationType.DELETE).when(objDeleted).modificationType();
+            doReturn(objDeleted).when(treeMod).getRootNode();
             spyTopology.onDataTreeChanged(changes);
             verify(spyTopology).deleteNode(key.getNodeId());
 
-            doReturn(DataObjectModification.ModificationType.SUBTREE_MODIFIED).when(objMod).modificationType();
+            doReturn(ModificationType.SUBTREE_MODIFIED).when(objModified).modificationType();
+            doReturn(node).when(objModified).dataAfter();
+            doReturn(objModified).when(treeMod).getRootNode();
             spyTopology.onDataTreeChanged(changes);
 
             // one in previous creating and deleting node and one in updating
