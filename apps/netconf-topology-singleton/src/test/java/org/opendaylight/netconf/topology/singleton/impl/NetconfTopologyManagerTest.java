@@ -42,7 +42,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataObjectModified;
+import org.opendaylight.mdsal.binding.api.DataObjectWritten;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.ReadTransaction;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
@@ -178,7 +181,6 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         verifyNoMoreInteractions(mockListenerReg);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     void testOnDataTreeChanged() {
         // Notify of 2 created Node objects.
@@ -197,11 +199,10 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
             .build();
         final Node node1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(netconfNodeAugment1).build();
 
-        final DataObjectModification<Node> dataObjectModification1 = mock(DataObjectModification.class);
+        final DataObjectWritten<Node> dataObjectModification1 = mock();
         doReturn(WRITE).when(dataObjectModification1).modificationType();
         doReturn(node1).when(dataObjectModification1).dataAfter();
-        doReturn(new KeyStep<>(Node.class, new NodeKey(nodeId1)))
-                .when(dataObjectModification1).step();
+        doReturn(new KeyStep<>(Node.class, new NodeKey(nodeId1))).when(dataObjectModification1).step();
 
         final NetconfNodeAugment netconfNodeAugment2 = new NetconfNodeAugmentBuilder()
             .setNetconfNode(new NetconfNodeBuilder()
@@ -212,7 +213,7 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
             .build();
         final Node node2 = new NodeBuilder().setNodeId(nodeId2).addAugmentation(netconfNodeAugment2).build();
 
-        final DataObjectModification<Node> dataObjectModification2 = mock(DataObjectModification.class);
+        final DataObjectWritten<Node> dataObjectModification2 = mock();
         doReturn(WRITE).when(dataObjectModification2).modificationType();
         doReturn(node2).when(dataObjectModification2).dataAfter();
         doReturn(new KeyStep<>(Node.class, new NodeKey(nodeId2))).when(dataObjectModification2).step();
@@ -260,8 +261,10 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         doReturn(WRITE).when(dataObjectModification1).modificationType();
         doReturn(updatedNode1).when(dataObjectModification1).dataAfter();
 
-        doReturn(SUBTREE_MODIFIED).when(dataObjectModification2).modificationType();
-        doReturn(node2).when(dataObjectModification2).dataAfter();
+        final DataObjectModified<Node> dataObjectModification3 = mock();
+        doReturn(SUBTREE_MODIFIED).when(dataObjectModification3).modificationType();
+        doReturn(node2).when(dataObjectModification3).dataAfter();
+        doReturn(new KeyStep<>(Node.class, new NodeKey(nodeId2))).when(dataObjectModification3).step();
 
         doNothing().when(mockContext1).refresh(any());
         doNothing().when(mockContext2).refresh(any());
@@ -270,7 +273,7 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
                 new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId1.toIdentifier(),
                     dataObjectModification1),
                 new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId2.toIdentifier(),
-                    dataObjectModification2)));
+                    dataObjectModification3)));
 
         final var mockContext1Setup = ArgumentCaptor.forClass(NetconfTopologySetup.class);
         verify(mockContext1).refresh(mockContext1Setup.capture());
@@ -281,11 +284,13 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         verifyNoMoreInteractions(clusterSingletonServiceProvider);
 
         // Notify of Node 1 deleted.
-        doReturn(DELETE).when(dataObjectModification1).modificationType();
+        final DataObjectDeleted<Node> dataObjectModification4 = mock();
+        doReturn(DELETE).when(dataObjectModification4).modificationType();
+        doReturn(new KeyStep<>(Node.class, new NodeKey(nodeId1))).when(dataObjectModification4).step();
 
         netconfTopologyManager.onDataTreeChanged(List.of(
                 new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId1.toIdentifier(),
-                    dataObjectModification1)));
+                    dataObjectModification4)));
 
         verify(mockClusterRegistration1).close();
         verify(mockContext1).close();
@@ -347,7 +352,7 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
                     .build())
                 .build();
 
-        final DataObjectModification<Node> dataObjectModification = mock();
+        final DataObjectWritten<Node> dataObjectModification = mock();
         doReturn(WRITE).when(dataObjectModification).modificationType();
         doReturn(node).when(dataObjectModification).dataAfter();
         doReturn(new KeyStep<>(Node.class, new NodeKey(nodeId))).when(dataObjectModification).step();
