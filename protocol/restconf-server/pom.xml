@@ -80,7 +80,7 @@
             <artifactId>repackaged-shiro</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc8639</artifactId>
             <!-- FIXME: this does not look right -->
             <scope>provided</scope>

@@ -13,6 +13,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.base.MoreObjects.ToStringHelper;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +24,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataObjectWritten;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -38,6 +42,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.changed.by.server.or.user.ServerBuilder;
 import org.opendaylight.yangtools.binding.DataObject;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
+import org.opendaylight.yangtools.binding.ExactDataObjectStep;
+import org.opendaylight.yangtools.binding.NodeStep;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 
@@ -53,8 +59,6 @@ class CapabilityChangeNotificationProducerTest {
     private DataBroker dataBroker;
     @Mock
     private DataTreeModification<Capabilities> treeModification;
-    @Mock
-    private DataObjectModification<Capabilities> objectModification;
 
     private CapabilityChangeNotificationProducer capabilityChangeNotificationProducer;
 
@@ -80,8 +84,7 @@ class CapabilityChangeNotificationProducerTest {
         final var newCapabilities = new CapabilitiesBuilder().setCapability(newCapabilitiesList).build();
         final var createdData = new HashMap<DataObjectIdentifier<?>, DataObject>();
         createdData.put(capabilitiesIdentifier, newCapabilities);
-        verifyDataTreeChange(DataObjectModification.ModificationType.WRITE, null, newCapabilities,
-                changedCapabilitesFrom(newCapabilitiesList, Set.of()));
+        verifyDataTreeChange(null, newCapabilities, changedCapabilitesFrom(newCapabilitiesList, Set.of()));
     }
 
     @Test
@@ -92,7 +95,7 @@ class CapabilityChangeNotificationProducerTest {
         Capabilities updatedCapabilities = new CapabilitiesBuilder()
             .setCapability(Set.of(new Uri("originalCapability"), new Uri("newCapability")))
             .build();
-        verifyDataTreeChange(DataObjectModification.ModificationType.WRITE, originalCapabilities, updatedCapabilities,
+        verifyDataTreeChange(originalCapabilities, updatedCapabilities,
             changedCapabilitesFrom(Set.of(new Uri("newCapability")), Set.of(new Uri("anotherOriginalCapability"))));
     }
 
@@ -101,21 +104,70 @@ class CapabilityChangeNotificationProducerTest {
         final var originalCapabilitiesList =
             Set.of(new Uri("originalCapability"), new Uri("anotherOriginalCapability"));
         final var originalCapabilities = new CapabilitiesBuilder().setCapability(originalCapabilitiesList).build();
-        doReturn(DataObjectModification.ModificationType.DELETE).when(objectModification).modificationType();
-        doReturn(objectModification).when(treeModification).getRootNode();
-        doReturn(originalCapabilities).when(objectModification).dataBefore();
+        doReturn(new DataObjectDeleted<Capabilities>() {
+            @Override
+            public ExactDataObjectStep<Capabilities> step() {
+                return new NodeStep<>(Capabilities.class);
+            }
+
+            @Override
+            public Capabilities dataBefore() {
+                return originalCapabilities;
+            }
+
+            @Override
+            public <C extends DataObject> DataObjectModification<C> modifiedChild(final ExactDataObjectStep<C> step) {
+                return null;
+            }
+
+            @Override
+            public Collection<? extends DataObjectModification<?>> modifiedChildren() {
+                return List.of();
+            }
+
+            @Override
+            protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+                return helper;
+            }
+        }).when(treeModification).getRootNode();
         capabilityChangeNotificationProducer.onDataTreeChanged(List.of(treeModification));
         verify(baseNotificationPublisherRegistration)
             .onCapabilityChanged(changedCapabilitesFrom(Set.of(), originalCapabilitiesList));
     }
 
-    private void verifyDataTreeChange(final DataObjectModification.ModificationType modificationType,
-            final Capabilities originalCapabilities, final Capabilities updatedCapabilities,
+    private void verifyDataTreeChange(final Capabilities originalCapabilities, final Capabilities updatedCapabilities,
             final NetconfCapabilityChange expectedChange) {
-        doReturn(modificationType).when(objectModification).modificationType();
-        doReturn(objectModification).when(treeModification).getRootNode();
-        doReturn(originalCapabilities).when(objectModification).dataBefore();
-        doReturn(updatedCapabilities).when(objectModification).dataAfter();
+        doReturn(new DataObjectWritten<Capabilities>() {
+            @Override
+            public Capabilities dataAfter() {
+                return updatedCapabilities;
+            }
+
+            @Override
+            public ExactDataObjectStep<Capabilities> step() {
+                return new NodeStep<>(Capabilities.class);
+            }
+
+            @Override
+            public Capabilities dataBefore() {
+                return originalCapabilities;
+            }
+
+            @Override
+            public <C extends DataObject> DataObjectModification<C> modifiedChild(final ExactDataObjectStep<C> step) {
+                return null;
+            }
+
+            @Override
+            public Collection<? extends DataObjectModification<?>> modifiedChildren() {
+                return List.of();
+            }
+
+            @Override
+            protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+                return helper;
+            }
+        }).when(treeModification).getRootNode();
         capabilityChangeNotificationProducer.onDataTreeChanged(List.of(treeModification));
         verify(baseNotificationPublisherRegistration).onCapabilityChanged(expectedChange);
     }

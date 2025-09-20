@@ -56,7 +56,7 @@
       <artifactId>org.eclipse.jdt.annotation</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+      <groupId>org.opendaylight.ietf.model</groupId>
       <artifactId>rfc6241</artifactId>
     </dependency>
     <dependency>
