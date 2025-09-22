@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49003760_059de57a",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-22T19:55:33Z",
+      "side": 1,
+      "message": "\"macs\" instead of \"masc\". Please fix this everywhere.",
+      "range": {
+        "startLine": 71,
+        "startChar": 61,
+        "endLine": 71,
+        "endChar": 66
+      },
+      "revId": "f1ba671ad4049c1b9cd5be8420a7cfe53e5bc360",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9bdb108_d993e1e9",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-22T19:55:33Z",
+      "side": 1,
+      "message": "\"Client advertised host keys.\" or something different than the \"macs\" description. Please fix this everywhere.",
+      "revId": "f1ba671ad4049c1b9cd5be8420a7cfe53e5bc360",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0b6ff13_f8371bdd",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-22T19:55:33Z",
+      "side": 1,
+      "message": "Is there any reason to create this constructor for testing purposes instead of adding the Configuration parameter directly to NetconfClientConfigurationBuilderFactoryImplTest?\n\nIf there is a specific reason not to add it to NetconfClientConfigurationBuilderFactoryImplTest, could we have a test that validates the parsing of this new configuration?",
+      "revId": "f1ba671ad4049c1b9cd5be8420a7cfe53e5bc360",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1a62403_b40b92dd",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-22T19:55:33Z",
+      "side": 1,
+      "message": "This could cause issue in configs specified like \"a, b, c\".\n\nIf we also want to handle whitespaces, we can use \",\\\\s*\".\n\nTo increase performance, we can prepare a pattern for this as a constant:\nprivate static final Pattern COMMA_WITH_WHITESPACE \u003d Pattern.compile(\",\\\\s*\");\n\nCOMMA_WITH_WHITESPACE.split(configuration.key$_$exchange());",
+      "range": {
+        "startLine": 204,
+        "startChar": 50,
+        "endLine": 204,
+        "endChar": 54
+      },
+      "revId": "f1ba671ad4049c1b9cd5be8420a7cfe53e5bc360",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
