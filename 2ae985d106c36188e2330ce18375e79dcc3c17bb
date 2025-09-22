@@ -33,6 +33,24 @@
       "message": "imo switch would be nicer here",
       "revId": "2ae985d106c36188e2330ce18375e79dcc3c17bb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3dfdf1b5_0e3e873f",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyServerRequest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-22T08:21:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cc6d84fe_33ad18b0",
+      "revId": "2ae985d106c36188e2330ce18375e79dcc3c17bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
