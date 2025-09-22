@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "458ed524_d35f290b",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-22T15:23:44Z",
+      "side": 1,
+      "message": "contentEncoding() returns only MediaTypes.APPLICATION_YANG_DATA_JSON or MediaTypes.APPLICATION_YANG_DATA_XML",
+      "parentUuid": "25e3fee1_7e491d99",
+      "revId": "2ae985d106c36188e2330ce18375e79dcc3c17bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cc6d84fe_33ad18b0",
