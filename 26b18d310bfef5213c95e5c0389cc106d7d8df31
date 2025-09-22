@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "18b89859_7dd570ee",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-22T11:12:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "90423a3f_05357b61",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 6
+      },
+      "revId": "26b18d310bfef5213c95e5c0389cc106d7d8df31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9a7d69e6_d69e5e19",
@@ -37,6 +61,30 @@
       "writtenOn": "2025-09-20T13:15:21Z",
       "side": 1,
       "message": "invert",
+      "range": {
+        "startLine": 110,
+        "startChar": 11,
+        "endLine": 110,
+        "endChar": 13
+      },
+      "revId": "26b18d310bfef5213c95e5c0389cc106d7d8df31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ef617ce_f2b15c0e",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfRestconfStrategy.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-22T11:12:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a7d69e6_d69e5e19",
       "range": {
         "startLine": 110,
         "startChar": 11,
