@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "609965c6_b700dfad",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/WellKnownResourcesTest.java",
+        "patchSetId": 63
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-22T12:41:44Z",
+      "side": 1,
+      "message": "\"throws Exception\" not required anymore.",
+      "revId": "28dc65f4a9c2c7411dc7aadfafd7ab347b9989c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "247e1dbc_081304ff",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 63
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-22T12:41:44Z",
+      "side": 1,
+      "message": "Similar LOG message with line 111.",
+      "revId": "28dc65f4a9c2c7411dc7aadfafd7ab347b9989c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
