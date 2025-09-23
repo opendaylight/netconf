@@ -16,6 +16,24 @@
       "message": "Is any exception other than IOException expected? If so, can we catch a specific RuntimeException here? If not, please explain why SuppressWarnings is required.\n\nhttps://docs.opendaylight.org/en/stable-potassium/contributor-guides/coding-guidelines/coding-guidelines-java.html#suppresswarnings\n\nSame to others SuppressWarnings in this patch.",
       "revId": "e982559e81e21b5511b472c647fcd076976977a3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5241baf4_7c24cec8",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ExceptionRequestResponse.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-23T11:54:39Z",
+      "side": 1,
+      "message": "Yes, IllegalArgumentException is enough",
+      "parentUuid": "13fd2a20_4790f745",
+      "revId": "e982559e81e21b5511b472c647fcd076976977a3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
