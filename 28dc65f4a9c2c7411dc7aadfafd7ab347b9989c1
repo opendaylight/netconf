@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1850c63d_a08c8c9a",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/WellKnownResourcesTest.java",
+        "patchSetId": 63
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-23T08:12:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "609965c6_b700dfad",
+      "revId": "28dc65f4a9c2c7411dc7aadfafd7ab347b9989c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "247e1dbc_081304ff",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-22T12:41:44Z",
       "side": 1,
       "message": "Similar LOG message with line 111.",
+      "revId": "28dc65f4a9c2c7411dc7aadfafd7ab347b9989c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15fa2651_0c45d693",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 63
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-23T08:12:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "247e1dbc_081304ff",
       "revId": "28dc65f4a9c2c7411dc7aadfafd7ab347b9989c1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
