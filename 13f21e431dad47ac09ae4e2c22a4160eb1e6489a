@@ -52,6 +52,24 @@
       "parentUuid": "6d5038e7_db279e28",
       "revId": "13f21e431dad47ac09ae4e2c22a4160eb1e6489a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c56f95fe_e06ebe2a",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-23T09:40:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f16e6ec0_f35813b3",
+      "revId": "13f21e431dad47ac09ae4e2c22a4160eb1e6489a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

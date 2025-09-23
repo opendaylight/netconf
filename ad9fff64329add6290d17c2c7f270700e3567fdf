@@ -16,6 +16,24 @@
       "message": "USe ctx.executor().execute()",
       "revId": "ad9fff64329add6290d17c2c7f270700e3567fdf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a703cec_1b354e63",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-23T09:40:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e93445c1_df03c725",
+      "revId": "ad9fff64329add6290d17c2c7f270700e3567fdf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
