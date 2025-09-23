@@ -124,6 +124,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "224b6725_4dc3ef78",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-23T09:50:24Z",
+      "side": 1,
+      "message": "Test implementation calls this production one, blockedRequests is private here so only from here I can provide it\u0027s size.",
+      "parentUuid": "d4d694eb_d7a4b683",
+      "revId": "9a9b126a59f9dc521322b23803aacf219e4a04b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4dff9258_92d8f499",
