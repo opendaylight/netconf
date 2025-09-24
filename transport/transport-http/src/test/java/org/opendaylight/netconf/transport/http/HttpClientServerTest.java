@@ -36,6 +36,7 @@ import static org.opendaylight.netconf.transport.http.TestUtils.invoke;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.util.concurrent.Uninterruptibles;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
@@ -43,6 +44,10 @@ import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http2.Http2Exception;
+import io.netty.handler.codec.http2.Http2Flags;
+import io.netty.handler.codec.http2.Http2Headers;
+import io.netty.handler.codec.http2.Http2Settings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Authenticator;
@@ -174,6 +179,71 @@ class HttpClientServerTest {
                 @Override
                 protected ConcurrentHTTPServerSession configureHttp2(final ChannelHandlerContext ctx) {
                     return new ConcurrentHTTPServerSession(scheme) {
+                        @Override
+                        public int onDataRead(final ChannelHandlerContext ctx, final int streamId, final ByteBuf data, final int padding, final boolean endOfStream) throws Http2Exception {
+                            return 0;
+                        }
+
+                        @Override
+                        public void onHeadersRead(final ChannelHandlerContext ctx, final int streamId, final Http2Headers headers, final int padding, final boolean endOfStream) throws Http2Exception {
+
+                        }
+
+                        @Override
+                        public void onHeadersRead(final ChannelHandlerContext ctx, final int streamId, final Http2Headers headers, final int streamDependency, final short weight, final boolean exclusive, final int padding, final boolean endOfStream) throws Http2Exception {
+
+                        }
+
+                        @Override
+                        public void onPriorityRead(final ChannelHandlerContext ctx, final int streamId, final int streamDependency, final short weight, final boolean exclusive) throws Http2Exception {
+
+                        }
+
+                        @Override
+                        public void onRstStreamRead(final ChannelHandlerContext ctx, final int streamId, final long errorCode) throws Http2Exception {
+
+                        }
+
+                        @Override
+                        public void onSettingsAckRead(final ChannelHandlerContext ctx) throws Http2Exception {
+
+                        }
+
+                        @Override
+                        public void onSettingsRead(final ChannelHandlerContext ctx, final Http2Settings settings) throws Http2Exception {
+
+                        }
+
+                        @Override
+                        public void onPingRead(final ChannelHandlerContext ctx, final long data) throws Http2Exception {
+
+                        }
+
+                        @Override
+                        public void onPingAckRead(final ChannelHandlerContext ctx, final long data) throws Http2Exception {
+
+                        }
+
+                        @Override
+                        public void onPushPromiseRead(final ChannelHandlerContext ctx, final int streamId, final int promisedStreamId, final Http2Headers headers, final int padding) throws Http2Exception {
+
+                        }
+
+                        @Override
+                        public void onGoAwayRead(final ChannelHandlerContext ctx, final int lastStreamId, final long errorCode, final ByteBuf debugData) throws Http2Exception {
+
+                        }
+
+                        @Override
+                        public void onWindowUpdateRead(final ChannelHandlerContext ctx, final int streamId, final int windowSizeIncrement) throws Http2Exception {
+
+                        }
+
+                        @Override
+                        public void onUnknownFrame(final ChannelHandlerContext ctx, final byte frameType, final int streamId, final Http2Flags flags, final ByteBuf payload) throws Http2Exception {
+
+                        }
+
                         @Override
                         protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
                                 final HttpHeaders headers) {
