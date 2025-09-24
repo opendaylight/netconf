@@ -140,6 +140,30 @@
       },
       "revId": "c962d51f6f5f8e3751927dc540e2bb3069abfde9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fbc0166_008b1681",
+        "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientFactoryImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-09-24T08:44:48Z",
+      "side": 1,
+      "message": "yes, as noted explicitly below.",
+      "parentUuid": "5dd4ad0f_83b1e526",
+      "range": {
+        "startLine": 58,
+        "startChar": 4,
+        "endLine": 58,
+        "endChar": 35
+      },
+      "revId": "c962d51f6f5f8e3751927dc540e2bb3069abfde9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
