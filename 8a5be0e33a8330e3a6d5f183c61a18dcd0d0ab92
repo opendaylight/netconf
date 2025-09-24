@@ -16,6 +16,24 @@
       "message": "We wanted just to make testool to advertise model - it measn add model to it - see yang-types, etc.",
       "revId": "8a5be0e33a8330e3a6d5f183c61a18dcd0d0ab92",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7e2cb32_4d84a76c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-24T15:09:08Z",
+      "side": 1,
+      "message": "This patch is not about the testtool. It is about making it possible to invoke the base RPC for models that are not the standard ietf-netconf@2011-06-01, but rather custom revisions, e.g. ietf-netconf@2013-09-29, inside the netopeer device.",
+      "parentUuid": "c593325c_6e32f815",
+      "revId": "8a5be0e33a8330e3a6d5f183c61a18dcd0d0ab92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
