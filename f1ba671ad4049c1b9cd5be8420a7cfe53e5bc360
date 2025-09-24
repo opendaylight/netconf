@@ -79,6 +79,29 @@
       },
       "revId": "f1ba671ad4049c1b9cd5be8420a7cfe53e5bc360",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26d7d1d6_dc375c0e",
+        "filename": "apps/netconf-topology/src/main/resources/org.opendaylight.netconf.topology.spi.cfg",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-09-24T08:43:15Z",
+      "side": 1,
+      "message": "nope, netconf-topology has a clear place where it stores its per-topology defaults:\nhttps://github.com/opendaylight/netconf/blob/ce1de126adaa00db22fd1f6c0ce4b1eadacf3bae/apps/netconf-topology/src/main/yang/netconf-node-topology.yang#L102-L107",
+      "range": {
+        "startLine": 1,
+        "startChar": 2,
+        "endLine": 1,
+        "endChar": 44
+      },
+      "revId": "f1ba671ad4049c1b9cd5be8420a7cfe53e5bc360",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
