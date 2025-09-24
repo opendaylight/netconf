@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c593325c_6e32f815",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-24T15:00:41Z",
+      "side": 1,
+      "message": "We wanted just to make testool to advertise model - it measn add model to it - see yang-types, etc.",
+      "revId": "8a5be0e33a8330e3a6d5f183c61a18dcd0d0ab92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
