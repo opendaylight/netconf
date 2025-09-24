@@ -14,17 +14,17 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http2.DelegatingDecompressorFrameListener;
 import io.netty.handler.codec.http2.Http2Connection;
+import io.netty.handler.codec.http2.Http2ConnectionHandlerBuilder;
 import io.netty.handler.codec.http2.Http2Exception;
 import io.netty.handler.codec.http2.Http2Flags;
 import io.netty.handler.codec.http2.Http2FrameListener;
+import io.netty.handler.codec.http2.Http2FrameLogger;
 import io.netty.handler.codec.http2.Http2Headers;
 import io.netty.handler.codec.http2.Http2Settings;
 import io.netty.handler.codec.http2.Http2Stream;
 import io.netty.handler.codec.http2.HttpConversionUtil;
-import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandler;
-import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandlerBuilder;
+import io.netty.handler.logging.LogLevel;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.util.Map;
@@ -69,16 +69,11 @@ final class ConcurrentRestconfSession extends ConcurrentHTTPServerSession implem
         final var authHandlerFactory = root.authHandlerFactory();
         ctx.pipeline().addBefore(ctx.name(), null, authHandlerFactory.create());
 
-        final var connectionHandler = ctx.pipeline().get(HttpToHttp2ConnectionHandler.class);
-        final var connection = connectionHandler.connection();
-
-        final var newConnectionHandler = new HttpToHttp2ConnectionHandlerBuilder()
-            .connection(connection)
-            .frameListener(new DelegatingDecompressorFrameListener(connection, this, 0))
-            .gracefulShutdownTimeoutMillis(0L)
+        final var connectionHandler = new Http2ConnectionHandlerBuilder()
+            .frameLogger(new Http2FrameLogger(LogLevel.INFO))
+            .frameListener(this)
             .build();
-
-        ctx.pipeline().replace(HttpToHttp2ConnectionHandler.class, null, newConnectionHandler);
+        ctx.pipeline().addLast(connectionHandler);
     }
 
     @Override
