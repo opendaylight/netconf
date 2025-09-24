@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c16835b_af9294d4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-24T12:07:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fe4ecc2_ab947b76",
+      "revId": "e8373fcfda1446b0e28d82870d93316d0a75d0f8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3fbdda52_3e43df2b",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-10T14:10:03Z",
       "side": 1,
       "message": "We would have a new instance for each stream.\n\nctx.pipeline().addLast(Http2FrameCodecBuilder.forServer().build());\nctx.pipeline().addLast(new Http2MultiplexHandler(new Http2StreamHandler()));",
+      "revId": "e8373fcfda1446b0e28d82870d93316d0a75d0f8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e01f2f96_95870c5f",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ConcurrentRestconfSession.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-24T12:07:41Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "3fbdda52_3e43df2b",
       "revId": "e8373fcfda1446b0e28d82870d93316d0a75d0f8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6e6b759_e2ebb322",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ConcurrentRestconfSession.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-24T12:07:41Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "087ba208_e7be7c57",
+      "revId": "e8373fcfda1446b0e28d82870d93316d0a75d0f8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9fe8ce3f_7db3b8c6",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-09-10T14:10:03Z",
       "side": 1,
       "message": "reading data",
+      "revId": "e8373fcfda1446b0e28d82870d93316d0a75d0f8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c10e90d2_9fd469d9",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ConcurrentRestconfSession.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-24T12:07:41Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "9fe8ce3f_7db3b8c6",
       "revId": "e8373fcfda1446b0e28d82870d93316d0a75d0f8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
