@@ -7,10 +7,14 @@
  */
 package org.opendaylight.netconf.transport.http;
 
+import io.netty.handler.codec.http2.Http2Connection;
+import io.netty.handler.codec.http2.Http2FrameListener;
+
 /**
  * A concurrent HTTP/2+ server session.
  */
-public abstract non-sealed class ConcurrentHTTPServerSession extends HTTPServerSession {
+public abstract non-sealed class ConcurrentHTTPServerSession extends HTTPServerSession
+        implements Http2Connection.Listener, Http2FrameListener {
     protected ConcurrentHTTPServerSession(final HTTPScheme scheme) {
         super(scheme);
     }

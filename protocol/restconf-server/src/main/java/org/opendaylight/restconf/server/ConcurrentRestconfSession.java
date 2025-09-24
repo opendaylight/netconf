@@ -14,16 +14,11 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http2.DelegatingDecompressorFrameListener;
-import io.netty.handler.codec.http2.Http2Connection;
 import io.netty.handler.codec.http2.Http2Exception;
 import io.netty.handler.codec.http2.Http2Flags;
-import io.netty.handler.codec.http2.Http2FrameListener;
 import io.netty.handler.codec.http2.Http2Headers;
 import io.netty.handler.codec.http2.Http2Settings;
 import io.netty.handler.codec.http2.Http2Stream;
-import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandler;
-import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandlerBuilder;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.util.Map;
@@ -44,8 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * <p>It acts as glue between a Netty channel and a RESTCONF server and services multiple HTTP/2+ logical connections.
  */
-final class ConcurrentRestconfSession extends ConcurrentHTTPServerSession implements Http2Connection.Listener,
-        Http2FrameListener {
+final class ConcurrentRestconfSession extends ConcurrentHTTPServerSession {
     private static final Logger LOG = LoggerFactory.getLogger(ConcurrentRestconfSession.class);
 
     // this map should be enhanced to store a reference from stream (Integer) to a Record containing streams aggregated buffer
@@ -71,17 +65,6 @@ final class ConcurrentRestconfSession extends ConcurrentHTTPServerSession implem
         super.handlerAdded(ctx);
         final var authHandlerFactory = root.authHandlerFactory();
         ctx.pipeline().addBefore(ctx.name(), null, authHandlerFactory.create());
-
-        final var connectionHandler = ctx.pipeline().get(HttpToHttp2ConnectionHandler.class);
-        final var connection = connectionHandler.connection();
-
-        final var newConnectionHandler = new HttpToHttp2ConnectionHandlerBuilder()
-            .connection(connection)
-            .frameListener(new DelegatingDecompressorFrameListener(connection, this, 0))
-            .gracefulShutdownTimeoutMillis(0L)
-            .build();
-
-        ctx.pipeline().replace(HttpToHttp2ConnectionHandler.class, null, newConnectionHandler);
     }
 
     @Override
