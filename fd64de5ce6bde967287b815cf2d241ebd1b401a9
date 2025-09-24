@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a66c5b06_89825401",
+        "filename": "protocol/restconf-server/pom.xml",
+        "patchSetId": 28
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-24T14:51:13Z",
+      "side": 1,
+      "message": "\u003cscope\u003etest\u003c/scope\u003e not needed - check for other usages in project, I assume we have scope derived from odlparent",
+      "revId": "fd64de5ce6bde967287b815cf2d241ebd1b401a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0352a219_630c85a7",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/AbstractRequestProcessorTest.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-24T14:51:13Z",
+      "side": 1,
+      "message": "IMO we can just throws from tests",
+      "revId": "fd64de5ce6bde967287b815cf2d241ebd1b401a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01580194_b2fd2622",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/EntityRequestResponse.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-24T14:51:13Z",
+      "side": 1,
+      "message": "Is this logged somewhere?",
+      "revId": "fd64de5ce6bde967287b815cf2d241ebd1b401a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7520cc5a_cbfaecda",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseBodyOutputStream.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-24T14:51:13Z",
+      "side": 1,
+      "message": "formatting",
+      "revId": "fd64de5ce6bde967287b815cf2d241ebd1b401a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
