@@ -34,6 +34,24 @@
       "parentUuid": "c593325c_6e32f815",
       "revId": "8a5be0e33a8330e3a6d5f183c61a18dcd0d0ab92",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7c09ffa_193813a1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-24T15:09:56Z",
+      "side": 1,
+      "message": "https://lf-opendaylight.atlassian.net/browse/NETCONF-1474?focusedCommentId\u003d47722",
+      "parentUuid": "d7e2cb32_4d84a76c",
+      "revId": "8a5be0e33a8330e3a6d5f183c61a18dcd0d0ab92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
