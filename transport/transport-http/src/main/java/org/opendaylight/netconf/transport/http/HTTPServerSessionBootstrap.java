@@ -12,6 +12,13 @@ import static java.util.Objects.requireNonNull;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.HttpServerUpgradeHandler;
+import io.netty.handler.codec.http2.CleartextHttp2ServerUpgradeHandler;
+import io.netty.handler.codec.http2.Http2CodecUtil;
+import io.netty.handler.codec.http2.Http2ConnectionHandlerBuilder;
+import io.netty.handler.codec.http2.Http2ServerUpgradeCodec;
+import io.netty.util.AsciiString;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
@@ -34,13 +41,27 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
         scheme.initializeServerPipeline(ctx);
     }
 
+    private static final HttpServerUpgradeHandler.UpgradeCodecFactory upgradeCodecFactory = new HttpServerUpgradeHandler.UpgradeCodecFactory() {
+        @Override
+        public HttpServerUpgradeHandler.UpgradeCodec newUpgradeCodec(CharSequence protocol) {
+            if (AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)) {
+                return new Http2ServerUpgradeCodec(new Http2ConnectionHandlerBuilder().build());
+            } else {
+                return null;
+            }
+        }
+    };
+
     @Override
     public final void userEventTriggered(final ChannelHandlerContext ctx, final Object event) throws Exception {
+        final HttpServerCodec sourceCodec = new HttpServerCodec();
+        final HttpServerUpgradeHandler upgradeHandler = new HttpServerUpgradeHandler(sourceCodec, upgradeCodecFactory);
+
         if (event instanceof HTTPServerPipelineSetup setup) {
             LOG.debug("{} resolved to {} semantics", ctx.channel(), setup);
             ctx.pipeline().replace(this, null, switch (setup) {
                 case HTTP_11 -> configureHttp1(ctx);
-                case HTTP_2 -> configureHttp2(ctx);
+                case HTTP_2 -> new CleartextHttp2ServerUpgradeHandler(sourceCodec, upgradeHandler, configureHttp2(ctx));
             });
         } else {
             super.userEventTriggered(ctx, event);
