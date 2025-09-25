@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72db8a5d_6e7d75f1",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/ChunkedFrameDecoder.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-09-25T09:44:51Z",
+      "side": 1,
+      "message": "what exactly is the change to refcounting here?",
+      "range": {
+        "startLine": 155,
+        "startChar": 20,
+        "endLine": 156,
+        "endChar": 36
+      },
+      "revId": "b3eabcb5e93a66a419a6072542d81f95d855ef26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
