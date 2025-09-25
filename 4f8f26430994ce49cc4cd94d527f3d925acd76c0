@@ -16,6 +16,24 @@
       "message": "hmm, I see only 3 usages of this method - all from tests - is this used somewhere?",
       "revId": "4f8f26430994ce49cc4cd94d527f3d925acd76c0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72144047_eafba5cd",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-25T14:32:12Z",
+      "side": 1,
+      "message": "not yet, it will be used in https://git.opendaylight.org/gerrit/c/netconf/+/117646",
+      "parentUuid": "917caa2f_f9e0373a",
+      "revId": "4f8f26430994ce49cc4cd94d527f3d925acd76c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
