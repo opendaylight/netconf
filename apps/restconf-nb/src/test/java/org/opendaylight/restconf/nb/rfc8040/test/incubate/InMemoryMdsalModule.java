@@ -24,6 +24,10 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
+import org.opendaylight.mdsal.dom.broker.RouterDOMActionService;
+import org.opendaylight.mdsal.dom.broker.RouterDOMNotificationService;
+import org.opendaylight.mdsal.dom.broker.RouterDOMPublishNotificationService;
+import org.opendaylight.mdsal.dom.broker.RouterDOMRpcService;
 
 /**
  * Copy paste from org.opendaylight.controller.sal.restconf.impl.test.incubate.InMemoryMdsalModule.
@@ -77,23 +81,23 @@ public class InMemoryMdsalModule extends AbstractModule {
 
     @Provides
     @Singleton DOMNotificationService getDOMNotificationService() {
-        return domNotificationRouter.notificationService();
+        return new RouterDOMNotificationService(domNotificationRouter);
     }
 
     @Provides
     @Singleton DOMNotificationPublishService getDOMNotificationPublishService() {
-        return domNotificationRouter.notificationPublishService();
+        return new RouterDOMPublishNotificationService(domNotificationRouter);
     }
 
     @Provides
     @Singleton DOMRpcService getDOMRpcService(final DOMSchemaService schemaService) {
-        return new DOMRpcRouter(schemaService).rpcService();
+        return new RouterDOMRpcService(new DOMRpcRouter(schemaService));
     }
 
     @Provides
     @Singleton
     DOMActionService getDOMActionService(final DOMSchemaService schemaService) {
-        return new DOMRpcRouter(schemaService).actionService();
+        return new RouterDOMActionService(new DOMRpcRouter(schemaService));
     }
 
     @PreDestroy
