@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2ba39fd_adf49f38",
+        "filename": "protocol/restconf-server/pom.xml",
+        "patchSetId": 28
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-25T10:03:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a66c5b06_89825401",
+      "revId": "fd64de5ce6bde967287b815cf2d241ebd1b401a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0352a219_630c85a7",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-24T14:51:13Z",
       "side": 1,
       "message": "IMO we can just throws from tests",
+      "revId": "fd64de5ce6bde967287b815cf2d241ebd1b401a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05b2e8a2_e2a39403",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/AbstractRequestProcessorTest.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-25T10:03:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0352a219_630c85a7",
       "revId": "fd64de5ce6bde967287b815cf2d241ebd1b401a9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "264d40e7_f797f250",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/EntityRequestResponse.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-25T10:03:04Z",
+      "side": 1,
+      "message": "Added explanation to method definition in super.",
+      "parentUuid": "01580194_b2fd2622",
+      "revId": "fd64de5ce6bde967287b815cf2d241ebd1b401a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7520cc5a_cbfaecda",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-09-24T14:51:13Z",
       "side": 1,
       "message": "formatting",
+      "revId": "fd64de5ce6bde967287b815cf2d241ebd1b401a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f27527fc_b6dcbab0",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseBodyOutputStream.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-25T10:03:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7520cc5a_cbfaecda",
       "revId": "fd64de5ce6bde967287b815cf2d241ebd1b401a9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
