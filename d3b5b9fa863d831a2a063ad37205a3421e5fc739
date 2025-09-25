@@ -89,6 +89,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c75285b_3c12652c",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 32
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-25T13:59:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ee51d10_efdc59fe",
+      "revId": "d3b5b9fa863d831a2a063ad37205a3421e5fc739",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "42cb9adb_69996d5d",
@@ -102,6 +120,24 @@
       "writtenOn": "2025-09-25T13:38:36Z",
       "side": 1,
       "message": "then we can log actual and desired state",
+      "revId": "d3b5b9fa863d831a2a063ad37205a3421e5fc739",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d4a01ba_f1c1349b",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 32
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-25T13:59:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "42cb9adb_69996d5d",
       "revId": "d3b5b9fa863d831a2a063ad37205a3421e5fc739",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },

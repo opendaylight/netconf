@@ -16,6 +16,24 @@
       "message": "if (subscription.state().canMoveTo(SubscriptionState.ACTIVE)) {",
       "revId": "f4ebbdd335542a503901785362730ccc1f129493",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0179a478_b35bd2a4",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 734,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-25T13:59:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7a81c5b_36a84fa0",
+      "revId": "f4ebbdd335542a503901785362730ccc1f129493",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
