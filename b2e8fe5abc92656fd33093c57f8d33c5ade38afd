@@ -88,6 +88,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1e73ed3c_40d014c5",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceRpc.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-25T07:55:17Z",
+      "side": 1,
+      "message": "can we consider case AnyxmlNode\u003c?\u003e",
+      "revId": "b2e8fe5abc92656fd33093c57f8d33c5ade38afd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "370d4448_96baf9d2",
         "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NetconfBaseOpsTest.java",
         "patchSetId": 16
