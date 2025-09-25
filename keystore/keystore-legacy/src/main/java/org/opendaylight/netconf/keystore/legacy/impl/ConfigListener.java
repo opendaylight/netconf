@@ -21,6 +21,9 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.keystore.entry.KeyCredential;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.trusted.certificates.TrustedCertificate;
+import org.opendaylight.yangtools.binding.EntryObject;
+import org.opendaylight.yangtools.binding.Key;
+import org.opendaylight.yangtools.binding.KeyStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +64,7 @@ record ConfigListener(DefaultNetconfKeystoreService keystore) implements DataTre
                         builder.privateKeys().put(privateKey.requireName(), privateKey);
                     }
                     case DataObjectDeleted<PrivateKey> deleted ->
-                        builder.privateKeys().remove(deleted.dataBefore().requireName());
+                        builder.privateKeys().remove(getKey(deleted).getName());
                 }
             }
             for (var mod : rootNode.getModifiedChildren(TrustedCertificate.class)) {
@@ -71,7 +74,7 @@ record ConfigListener(DefaultNetconfKeystoreService keystore) implements DataTre
                         builder.trustedCertificates().put(trustedCertificate.requireName(), trustedCertificate);
                     }
                     case DataObjectDeleted<TrustedCertificate> deleted ->
-                        builder.trustedCertificates().remove(deleted.dataBefore().requireName());
+                        builder.trustedCertificates().remove(getKey(deleted).getName());
                 }
             }
             for (var mod : rootNode.getModifiedChildren(KeyCredential.class)) {
@@ -81,9 +84,14 @@ record ConfigListener(DefaultNetconfKeystoreService keystore) implements DataTre
                         builder.credentials().put(keyCredential.requireKeyId(), keyCredential);
                     }
                     case DataObjectDeleted<KeyCredential> deleted ->
-                        builder.credentials().remove(deleted.dataBefore().requireKeyId());
+                        builder.credentials().remove(getKey(deleted).getKeyId());
                }
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <E extends EntryObject<E, K>, K extends Key<E>> K getKey(final DataObjectDeleted<E> mod) {
+        return ((KeyStep<K, E>) mod.step()).key();
     }
 }
