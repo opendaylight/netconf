@@ -63,6 +63,11 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
+import org.opendaylight.mdsal.dom.broker.RouterDOMActionProviderService;
+import org.opendaylight.mdsal.dom.broker.RouterDOMActionService;
+import org.opendaylight.mdsal.dom.broker.RouterDOMNotificationService;
+import org.opendaylight.mdsal.dom.broker.RouterDOMRpcProviderService;
+import org.opendaylight.mdsal.dom.broker.RouterDOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.odl.device.notification.SubscribeDeviceNotificationRpc;
 import org.opendaylight.netconf.sal.remote.impl.CreateDataChangeEventSubscriptionRpc;
@@ -191,22 +196,26 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         domMountPointService = new DOMMountPointServiceImpl();
         final var adapterContext = new ConstantAdapterContext(new DefaultBindingDOMCodecServices(getRuntimeContext()));
         final var adapterFactory = new BindingAdapterFactory(adapterContext);
-        actionProviderService = adapterFactory.createActionProviderService(domRpcRouter.actionProviderService());
+        actionProviderService = adapterFactory.createActionProviderService(
+            new RouterDOMActionProviderService(domRpcRouter));
         // action implementations
         actionProviderService.registerImplementation(
             ActionSpec.builder(Root.class).build(ExampleAction.class), new ExampleActionImpl());
-        rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext, domRpcRouter.rpcProviderService());
+        rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext,
+            new RouterDOMRpcProviderService(domRpcRouter));
         domNotificationRouter = new DOMNotificationRouter(32);
 
-        streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, domNotificationRouter.notificationService(),
+        streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker,
+            new RouterDOMNotificationService(domNotificationRouter),
             schemaService, uri -> uri.resolve("streams"), dataBindProvider);
         final var rpcImplementations = List.<RpcImplementation>of(
             // rpcImplementations
             new CreateDataChangeEventSubscriptionRpc(streamRegistry, dataBindProvider, domDataBroker),
             new SubscribeDeviceNotificationRpc(streamRegistry, domMountPointService)
         );
-        final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker, domRpcRouter.rpcService(),
-            domRpcRouter.actionService(), domMountPointService, rpcImplementations);
+        final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker,
+            new RouterDOMRpcService(domRpcRouter), new RouterDOMActionService(domRpcRouter), domMountPointService,
+            rpcImplementations);
 
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
