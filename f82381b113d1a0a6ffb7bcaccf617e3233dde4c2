@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "570c22ce_9edcbb78",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/StopTimeTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-25T09:06:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2d47797_17c1fffd",
+      "revId": "f82381b113d1a0a6ffb7bcaccf617e3233dde4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2a6acb01_06da1af9",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-25T06:30:22Z",
       "side": 1,
       "message": "then why #subscriptionModified has a check for newStopTime \u003d\u003d null?",
+      "revId": "f82381b113d1a0a6ffb7bcaccf617e3233dde4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7faa660f_1c439b14",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 674,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-25T09:06:05Z",
+      "side": 1,
+      "message": "check in #subscriptionModified removed",
+      "parentUuid": "2a6acb01_06da1af9",
       "revId": "f82381b113d1a0a6ffb7bcaccf617e3233dde4c2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
