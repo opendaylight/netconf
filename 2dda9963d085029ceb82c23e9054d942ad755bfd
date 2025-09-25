@@ -34,6 +34,23 @@
       "parentUuid": "20d92d10_178ddf2e",
       "revId": "2dda9963d085029ceb82c23e9054d942ad755bfd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "909b8cfb_eba3c727",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-25T07:40:07Z",
+      "side": 1,
+      "message": "we are no more doing dataRetrievalOperations?",
+      "revId": "2dda9963d085029ceb82c23e9054d942ad755bfd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
