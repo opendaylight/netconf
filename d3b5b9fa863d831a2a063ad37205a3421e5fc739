@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ceeb5da_bec18a72",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 32
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-25T13:01:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d02b755_1c071f90",
+      "revId": "d3b5b9fa863d831a2a063ad37205a3421e5fc739",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b10999e0_4ff439b6",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "045b12a9_776c1d47",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 32
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-25T13:01:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b10999e0_4ff439b6",
+      "revId": "d3b5b9fa863d831a2a063ad37205a3421e5fc739",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "400689e9_80ff788c",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-09-25T12:47:03Z",
       "side": 1,
       "message": "SubscriptionState.SUSPENDED \u003d\u003d state()",
+      "revId": "d3b5b9fa863d831a2a063ad37205a3421e5fc739",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29c5c2e4_22728b62",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 32
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-25T13:01:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "400689e9_80ff788c",
       "revId": "d3b5b9fa863d831a2a063ad37205a3421e5fc739",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
