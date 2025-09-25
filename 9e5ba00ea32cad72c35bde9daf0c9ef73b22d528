@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "9e5ba00ea32cad72c35bde9daf0c9ef73b22d528",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a05cb8a_3dc9fe67",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2025-09-25T10:20:47Z",
+      "side": 1,
+      "message": "currentNode !\u003d null is redundant since there is currentNode instanceof DataSchemaContext.PathMixin currentMixin",
+      "revId": "9e5ba00ea32cad72c35bde9daf0c9ef73b22d528",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
