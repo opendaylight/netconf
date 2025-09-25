@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "676c7768_81ebc515",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-25T14:21:13Z",
+      "side": 1,
+      "message": "why do we need this for implementing suspend/resume?",
+      "revId": "bad0268eb8c8ba54366a1c11fee5868f24bd95dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d12ddf2_29aae8e6",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-25T14:21:13Z",
+      "side": 1,
+      "message": "setState() has its own logic to verify the correctness of the move..",
+      "revId": "bad0268eb8c8ba54366a1c11fee5868f24bd95dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
