@@ -75,6 +75,8 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMService;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
+import org.opendaylight.mdsal.dom.broker.RouterDOMRpcProviderService;
+import org.opendaylight.mdsal.dom.broker.RouterDOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.mdsal.eos.dom.simple.SimpleDOMEntityOwnershipService;
@@ -253,15 +255,19 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         deviceModelContext = BindingRuntimeHelpers.createEffectiveModel(Top.class);
 
+        // FIXME: shutdown?
         final var router = new DOMRpcRouter(new FixedDOMSchemaService(deviceModelContext));
 
         putTopRpcSchemaPath = findRpcDefinition("put-top").getQName();
         getTopRpcSchemaPath = findRpcDefinition("get-top").getQName();
 
-        router.rpcProviderService().registerRpcImplementation(topRpcImplementation,
+        final var rpcProviderService = new RouterDOMRpcProviderService(router);
+
+        // FIXME: registration cleanup?
+        rpcProviderService.registerRpcImplementation(topRpcImplementation,
                 DOMRpcIdentifier.create(putTopRpcSchemaPath), DOMRpcIdentifier.create(getTopRpcSchemaPath));
 
-        final var rpcService = router.rpcService();
+        final var rpcService = new RouterDOMRpcService(router);
         deviceRpcService = new Rpcs.Normalized() {
             @Override
             public ListenableFuture<? extends DOMRpcResult> invokeNetconf(final QName type, final ContainerNode input) {
