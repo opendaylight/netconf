@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "917caa2f_f9e0373a",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-25T14:17:05Z",
+      "side": 1,
+      "message": "hmm, I see only 3 usages of this method - all from tests - is this used somewhere?",
+      "revId": "4f8f26430994ce49cc4cd94d527f3d925acd76c0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
