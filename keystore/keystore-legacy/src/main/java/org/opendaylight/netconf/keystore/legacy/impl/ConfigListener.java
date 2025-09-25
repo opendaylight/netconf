@@ -12,6 +12,8 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.Stopwatch;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
+import org.opendaylight.mdsal.binding.api.DataObjectModification.WithDataAfter;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.keystore.legacy.impl.DefaultNetconfKeystoreService.ConfigStateBuilder;
@@ -53,40 +55,34 @@ record ConfigListener(DefaultNetconfKeystoreService keystore) implements DataTre
             final var rootNode = change.getRootNode();
 
             for (var mod : rootNode.getModifiedChildren(PrivateKey.class)) {
-                switch (mod.modificationType()) {
-                    case SUBTREE_MODIFIED, WRITE -> {
-                        final var privateKey = mod.dataAfter();
+                switch (mod) {
+                    case WithDataAfter<PrivateKey> present -> {
+                        final var privateKey = present.dataAfter();
                         builder.privateKeys().put(privateKey.requireName(), privateKey);
                     }
-                    case DELETE -> builder.privateKeys().remove(mod.dataBefore().requireName());
-                    default -> {
-                        // no-op
-                    }
+                    case DataObjectDeleted<PrivateKey> deleted ->
+                        builder.privateKeys().remove(deleted.dataBefore().requireName());
                 }
             }
             for (var mod : rootNode.getModifiedChildren(TrustedCertificate.class)) {
-                switch (mod.modificationType()) {
-                    case SUBTREE_MODIFIED, WRITE -> {
-                        final var trustedCertificate = mod.dataAfter();
+                switch (mod) {
+                    case WithDataAfter<TrustedCertificate> present -> {
+                        final var trustedCertificate = present.dataAfter();
                         builder.trustedCertificates().put(trustedCertificate.requireName(), trustedCertificate);
                     }
-                    case DELETE -> builder.trustedCertificates().remove(mod.dataBefore().requireName());
-                    default -> {
-                        // no-op
-                    }
+                    case DataObjectDeleted<TrustedCertificate> deleted ->
+                        builder.trustedCertificates().remove(deleted.dataBefore().requireName());
                 }
             }
             for (var mod : rootNode.getModifiedChildren(KeyCredential.class)) {
-                switch (mod.modificationType()) {
-                    case SUBTREE_MODIFIED, WRITE -> {
-                        final var keyCredential = mod.dataAfter();
+                switch (mod) {
+                    case WithDataAfter<KeyCredential> present -> {
+                        final var keyCredential = present.dataAfter();
                         builder.credentials().put(keyCredential.requireKeyId(), keyCredential);
                     }
-                    case DELETE -> builder.credentials().remove(mod.dataBefore().requireKeyId());
-                    default -> {
-                        // no-op
-                    }
-                }
+                    case DataObjectDeleted<KeyCredential> deleted ->
+                        builder.credentials().remove(deleted.dataBefore().requireKeyId());
+               }
             }
         }
     }
