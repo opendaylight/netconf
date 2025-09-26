@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "89c3bdb5_39394bbd",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformer.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-26T21:27:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09fdb3ae_be092fd3",
+      "revId": "3bd9fed3f4afd59a4dad2d88d53f833406c6e02a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "73c06bb7_061f2b8b",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-26T12:59:45Z",
       "side": 1,
       "message": "You are using this method to create the same node with the same parameters across this class. \n\nSince in the createNode method:\nValue of parameter \u0027namespace\u0027 is always \u0027\"urn:ietf:params:xml:ns:netconf:base:1.0\"\u0027\nValue of parameter \u0027date\u0027 is always \u0027\"2011-06-01\"\u0027 \nValue of parameter \u0027localName\u0027 is always \u0027\"filter\"\u0027 \n\nThey can be inlined inside the createNode method to remove duplication.",
+      "revId": "3bd9fed3f4afd59a4dad2d88d53f833406c6e02a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30b3a6fe_f10139f7",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceRpcTest.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-26T21:27:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "73c06bb7_061f2b8b",
       "revId": "3bd9fed3f4afd59a4dad2d88d53f833406c6e02a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
