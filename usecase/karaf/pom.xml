@@ -7,94 +7,95 @@
  and is available at http://www.eclipse.org/legal/epl-v10.html
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.opendaylight.odlparent</groupId>
-    <artifactId>karaf4-parent</artifactId>
-    <version>14.1.3</version>
-    <relativePath/>
-  </parent>
-  <groupId>org.opendaylight.netconf</groupId>
-  <artifactId>netconf-karaf</artifactId>
-  <version>10.0.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.opendaylight.odlparent</groupId>
+        <artifactId>karaf4-parent</artifactId>
+        <version>14.1.3</version>
+        <relativePath/>
+    </parent>
 
-  <dependencyManagement>
+    <groupId>org.opendaylight.netconf</groupId>
+    <artifactId>netconf-karaf</artifactId>
+    <version>10.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.opendaylight.infrautils</groupId>
+                <artifactId>infrautils-artifacts</artifactId>
+                <version>7.1.7</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.controller</groupId>
+                <artifactId>controller-artifacts</artifactId>
+                <version>12.0.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>netconf-artifacts</artifactId>
+                <version>10.0.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
-      <dependency>
-        <groupId>org.opendaylight.infrautils</groupId>
-        <artifactId>infrautils-artifacts</artifactId>
-        <version>7.1.7</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.opendaylight.controller</groupId>
-        <artifactId>controller-artifacts</artifactId>
-        <version>12.0.0</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.opendaylight.netconf</groupId>
-        <artifactId>netconf-artifacts</artifactId>
-        <version>10.0.0-SNAPSHOT</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
+        <dependency>
+            <!-- scope is compile so all features (there is only one) are installed
+            into startup.properties and the feature repo itself is not installed -->
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>framework</artifactId>
+            <type>kar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.controller</groupId>
+            <artifactId>features-controller-testing</artifactId>
+            <classifier>features</classifier>
+            <type>xml</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.infrautils</groupId>
+            <artifactId>features-infrautils</artifactId>
+            <classifier>features</classifier>
+            <type>xml</type>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>features-netconf</artifactId>
+            <classifier>features</classifier>
+            <type>xml</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>features-netconf-testing</artifactId>
+            <classifier>features</classifier>
+            <type>xml</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>features-netconf-experimental</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
-  </dependencyManagement>
 
-  <dependencies>
-    <dependency>
-      <!-- scope is compile so all features (there is only one) are installed
-      into startup.properties and the feature repo itself is not installed -->
-      <groupId>org.apache.karaf.features</groupId>
-      <artifactId>framework</artifactId>
-      <type>kar</type>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>features-controller-testing</artifactId>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.infrautils</groupId>
-      <artifactId>features-infrautils</artifactId>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>features-netconf</artifactId>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>features-netconf-testing</artifactId>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>features-netconf-experimental</artifactId>
-      <type>xml</type>
-      <classifier>features</classifier>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
-
-  <scm>
-    <connection>scm:git:ssh://git.opendaylight.org:29418/netconf.git</connection>
-    <developerConnection>scm:git:ssh://git.opendaylight.org:29418/netconf.git</developerConnection>
-    <tag>HEAD</tag>
-    <url>https://git.opendaylight.org/gerrit/gitweb?p=netconf.git;a=summary</url>
-  </scm>
+    <scm>
+        <connection>scm:git:ssh://git.opendaylight.org:29418/netconf.git</connection>
+        <developerConnection>scm:git:ssh://git.opendaylight.org:29418/netconf.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://git.opendaylight.org/gerrit/gitweb?p=netconf.git;a=summary</url>
+    </scm>
 </project>
