@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8eeb8ea_e3d02d63",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-26T07:05:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a1a9afb_f9c6798c",
+      "revId": "bad0268eb8c8ba54366a1c11fee5868f24bd95dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d12ddf2_29aae8e6",
@@ -49,6 +67,24 @@
       "writtenOn": "2025-09-25T14:21:13Z",
       "side": 1,
       "message": "setState() has its own logic to verify the correctness of the move..",
+      "revId": "bad0268eb8c8ba54366a1c11fee5868f24bd95dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "404b5f15_e9fe3c4f",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-26T07:05:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d12ddf2_29aae8e6",
       "revId": "bad0268eb8c8ba54366a1c11fee5868f24bd95dd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
