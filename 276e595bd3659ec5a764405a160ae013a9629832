@@ -16,6 +16,24 @@
       "message": "IMO requireNonNull seems redundant here, if not then why not to check id?",
       "revId": "276e595bd3659ec5a764405a160ae013a9629832",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0aab3986_233eca6a",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 756,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-26T06:59:08Z",
+      "side": 1,
+      "message": "yes, it was redundant",
+      "parentUuid": "8c894bcc_e82c2a66",
+      "revId": "276e595bd3659ec5a764405a160ae013a9629832",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
