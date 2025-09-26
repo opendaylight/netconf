@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "07de2116_40484f06",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-26T07:48:59Z",
+      "side": 1,
+      "message": "https://lf-opendaylight.atlassian.net/browse/NETCONF-1474?focusedCommentId\u003d47722",
+      "parentUuid": "a3086a62_50566444",
+      "revId": "b2e8fe5abc92656fd33093c57f8d33c5ade38afd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a8848728_5ee9d8a4",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-25T07:40:07Z",
       "side": 1,
       "message": "requireNonNull?",
+      "revId": "b2e8fe5abc92656fd33093c57f8d33c5ade38afd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "543931b1_0099adce",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceRpc.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-26T07:48:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a8848728_5ee9d8a4",
       "revId": "b2e8fe5abc92656fd33093c57f8d33c5ade38afd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0a523b7_69300a11",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceRpc.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-26T07:48:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "feb573ec_815baa3b",
+      "revId": "b2e8fe5abc92656fd33093c57f8d33c5ade38afd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c82ebff6_64c81a9c",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-09-25T07:40:07Z",
       "side": 1,
       "message": "please document",
+      "revId": "b2e8fe5abc92656fd33093c57f8d33c5ade38afd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1904cc22_4f686bd5",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceRpc.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-26T07:48:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c82ebff6_64c81a9c",
       "revId": "b2e8fe5abc92656fd33093c57f8d33c5ade38afd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d659c0d8_4cf61976",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceRpc.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-26T07:48:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9eb5a23_170b7bba",
+      "revId": "b2e8fe5abc92656fd33093c57f8d33c5ade38afd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1e73ed3c_40d014c5",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-09-25T07:55:17Z",
       "side": 1,
       "message": "can we consider case AnyxmlNode\u003c?\u003e",
+      "revId": "b2e8fe5abc92656fd33093c57f8d33c5ade38afd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a80f3cd_b334d267",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceRpc.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-26T07:48:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e73ed3c_40d014c5",
       "revId": "b2e8fe5abc92656fd33093c57f8d33c5ade38afd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
