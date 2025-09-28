@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc6f4afa_cdb1fe14",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeMatcher.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-28T21:30:37Z",
+      "side": 1,
+      "message": "We need to keep walking until all segments of the path are matched",
+      "parentUuid": "a5b019d6_eb2e710c",
+      "revId": "eb5e74d6a8701763b6bff933c8b9a9f673a9a681",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "97608ab0_d158ead2",
