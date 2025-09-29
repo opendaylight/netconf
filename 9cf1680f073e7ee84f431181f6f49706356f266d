@@ -189,6 +189,30 @@
       },
       "revId": "9cf1680f073e7ee84f431181f6f49706356f266d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68df7ec4_353283b0",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-29T09:04:16Z",
+      "side": 1,
+      "message": "I assume that whole line was unnecessary as it was basically same as first one",
+      "parentUuid": "bd57a6e4_57c9abe2",
+      "range": {
+        "startLine": 110,
+        "startChar": 11,
+        "endLine": 110,
+        "endChar": 14
+      },
+      "revId": "9cf1680f073e7ee84f431181f6f49706356f266d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
