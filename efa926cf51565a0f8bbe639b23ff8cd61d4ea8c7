@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bced3cd_ceb8e8b9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-09-29T08:34:43Z",
+      "side": 1,
+      "message": "I think this will need a different approach",
+      "revId": "efa926cf51565a0f8bbe639b23ff8cd61d4ea8c7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6e6d561_48a186ca",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceRpc.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-09-29T08:34:43Z",
+      "side": 1,
+      "message": "I can\u0027t say I am a fan of this open-coded approach",
+      "range": {
+        "startLine": 102,
+        "startChar": 34,
+        "endLine": 102,
+        "endChar": 49
+      },
+      "revId": "efa926cf51565a0f8bbe639b23ff8cd61d4ea8c7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e142a9d_d118df25",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceRpc.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-09-29T08:34:43Z",
+      "side": 1,
+      "message": "for example here we just pass through the value ... but values can very much hold a namespace/revision pair",
+      "range": {
+        "startLine": 123,
+        "startChar": 54,
+        "endLine": 123,
+        "endChar": 65
+      },
+      "revId": "efa926cf51565a0f8bbe639b23ff8cd61d4ea8c7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
