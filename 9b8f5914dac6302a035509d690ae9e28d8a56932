@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c68a1e8_0c19e5d7",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-29T12:02:11Z",
+      "side": 1,
+      "message": "KeepaliveSalFacade purpose is ONLY to schedule a task which is sending a small request when there is not other request running on to KEEP connection alive.\n\nIt is not mentioned to serve as handler of `default-request-timeout-millis`. Request timeout is something different and has to be respected when or when not using keepalives.",
+      "revId": "9b8f5914dac6302a035509d690ae9e28d8a56932",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
