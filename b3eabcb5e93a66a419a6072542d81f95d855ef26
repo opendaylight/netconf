@@ -22,6 +22,30 @@
       },
       "revId": "b3eabcb5e93a66a419a6072542d81f95d855ef26",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1909d97_384011ff",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/ChunkedFrameDecoder.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-29T12:11:40Z",
+      "side": 1,
+      "message": "There is no change in the refcount here. In both cases, we are storing the chunk (CompositeByteBuf) in an array and leaving it for Netty to release it when required. However, this makes a difference for the Netty ResourceLeakDetector.\n\nWith this fix, I have not seen this issue with manual testing, and I have also prepared a jUnit test that can reproduce this issue and verified that this fix will prevent this issue from being created",
+      "parentUuid": "72db8a5d_6e7d75f1",
+      "range": {
+        "startLine": 155,
+        "startChar": 20,
+        "endLine": 156,
+        "endChar": 36
+      },
+      "revId": "b3eabcb5e93a66a419a6072542d81f95d855ef26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
