@@ -16,6 +16,24 @@
       "message": "first introduce a variable with context.get() value",
       "revId": "132111f52e33e0911c2e55e50439ec39ff5f2342",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d2cc81d_793c422c",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/DefaultNotificationSource.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-29T10:28:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b48aeae_00101cf0",
+      "revId": "132111f52e33e0911c2e55e50439ec39ff5f2342",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
