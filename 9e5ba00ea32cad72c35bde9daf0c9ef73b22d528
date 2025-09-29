@@ -33,6 +33,24 @@
       "message": "currentNode !\u003d null is redundant since there is currentNode instanceof DataSchemaContext.PathMixin currentMixin",
       "revId": "9e5ba00ea32cad72c35bde9daf0c9ef73b22d528",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02c59abe_727b09ac",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/FieldsParamParser.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-29T11:30:21Z",
+      "side": 1,
+      "message": "This code was moved from NetconfRestconfStrategy to separate this logic.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/116857/29/plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfRestconfStrategy.java#b355\n\nTherefore, this patch will not contain a significant improvement in logic.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/116857/comment/e4c5ab8a_f2ce7d82/",
+      "parentUuid": "2a05cb8a_3dc9fe67",
+      "revId": "9e5ba00ea32cad72c35bde9daf0c9ef73b22d528",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
