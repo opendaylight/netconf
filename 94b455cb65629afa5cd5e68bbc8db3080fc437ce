@@ -35,6 +35,23 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b9fa9ea_9140a43c",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/SubscriptionSuspensionTest.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-29T20:36:56Z",
+      "side": 1,
+      "message": "If streamClient.shutdown().get throws an exception, any other cleanup in parent afterEach() method will not be executed, which could affects other test results. This will make it harder to find the reason why a multiple tests fail.\n\nHowever, as I can see, the parent method does the same, and it is already approved and merged. So take this more like advice or something to consider.\n\n        Exception streamClientException \u003d null;\n        if (streamClient !\u003d null) {\n            try {\n                streamClient.shutdown().get(2, TimeUnit.SECONDS);\n            } catch (InterruptedException | ExecutionException | TimeoutException e) {\n                streamClientException \u003d e;\n            }\n        }\n        super.afterEach();\n        assertNull(streamClientException, \"Stream Client shutdown fails with error: \" + streamClientException);",
+      "revId": "94b455cb65629afa5cd5e68bbc8db3080fc437ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5fa660f_df46944d",
