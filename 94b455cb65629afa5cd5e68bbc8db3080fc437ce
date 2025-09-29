@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f662439e_1ac7357a",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/SubscriptionSuspensionTest.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-29T20:02:23Z",
+      "side": 1,
+      "message": "BREAD_NODE_ID",
+      "revId": "94b455cb65629afa5cd5e68bbc8db3080fc437ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2d5f402_6e3f07e3",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/SubscriptionSuspensionTest.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-29T20:02:23Z",
+      "side": 1,
+      "message": "Use NodeIdentifier.create instead of YangInstanceIdentifier.NodeIdentifier.create\n\nimport org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier",
+      "revId": "94b455cb65629afa5cd5e68bbc8db3080fc437ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5fa660f_df46944d",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/SubscriptionSuspensionTest.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-09-29T20:02:23Z",
+      "side": 1,
+      "message": "Redundant empty line",
+      "revId": "94b455cb65629afa5cd5e68bbc8db3080fc437ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
