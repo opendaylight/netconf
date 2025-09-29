@@ -22,21 +22,11 @@ import org.opendaylight.yangtools.binding.DataObjectIdentifier.WithKey;
 import org.opendaylight.yangtools.binding.DataObjectReference;
 import org.opendaylight.yangtools.binding.DataObjectStep;
 import org.opendaylight.yangtools.binding.KeyStep;
-import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
 public final class NetconfTopologyUtils {
-    public static final long DEFAULT_REQUEST_TIMEOUT_MILLIS = 60000L;
-    public static final int DEFAULT_KEEPALIVE_DELAY = 0;
-    public static final boolean DEFAULT_RECONNECT_ON_CHANGED_SCHEMA = false;
-    public static final boolean DEFAULT_IS_TCP_ONLY = false;
-    public static final int DEFAULT_CONCURRENT_RPC_LIMIT = 0;
-    public static final int DEFAULT_MAX_CONNECTION_ATTEMPTS = 0;
-    public static final int DEFAULT_MIN_BACKOFF = 2000;
-    public static final long DEFAULT_CONNECTION_TIMEOUT_MILLIS = 20000L;
-    public static final Decimal64 DEFAULT_BACKOFF_MULTIPLIER = Decimal64.valueOf("1.5");
 
     private NetconfTopologyUtils() {
         // Hidden on purpose
