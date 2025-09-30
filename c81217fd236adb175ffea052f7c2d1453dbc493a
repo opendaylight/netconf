@@ -282,6 +282,30 @@
       },
       "revId": "c81217fd236adb175ffea052f7c2d1453dbc493a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "907428bf_fbdad99c",
+        "filename": "protocol/restconf-server-spi/src/test/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilterTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-09-30T08:40:56Z",
+      "side": 1,
+      "message": "https://lf-opendaylight.atlassian.net/browse/NETCONF-1480?focusedCommentId\u003d48976",
+      "parentUuid": "486309a2_1eccd76e",
+      "range": {
+        "startLine": 99,
+        "startChar": 2,
+        "endLine": 99,
+        "endChar": 23
+      },
+      "revId": "c81217fd236adb175ffea052f7c2d1453dbc493a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
