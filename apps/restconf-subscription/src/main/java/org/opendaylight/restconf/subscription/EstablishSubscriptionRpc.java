@@ -92,14 +92,14 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
             encoding = org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909
                 .EncodeJson$I.QNAME;
         } else if (!SUPPORTED_ENCODINGS.contains(encoding)) {
-            request.completeWith(new RequestException(EncodingUnsupported.VALUE.toString()));
+            request.failWith(new RequestException(EncodingUnsupported.VALUE.toString()));
             return;
         }
 
         final var target = (ChoiceNode) body.childByArg(TARGET_NODEID);
         if (target == null) {
             // means there is no stream information present
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No stream specified"));
             return;
         }
@@ -107,7 +107,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         // check stream name
         final var streamName = leaf(target, STREAM_NODEID, String.class);
         if (streamName == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No stream specified"));
             return;
         }

@@ -78,7 +78,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
                     @Override
                     public void onFailure(final Throwable cause) {
-                        request.completeWith(new RequestException("Transaction to delete failed", new ErrorPath(path),
+                        request.failWith(new RequestException("Transaction to delete failed", new ErrorPath(path),
                             cause));
                     }
                 }, MoreExecutors.directExecutor());
@@ -91,7 +91,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
             private void cancelTx(final RequestException ex) {
                 tx.cancel();
-                request.completeWith(ex);
+                request.failWith(ex);
             }
         }, MoreExecutors.directExecutor());
     }
@@ -108,7 +108,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
                 translated = NormalizedNodeWriter.translateFieldsParam(path.inference().modelContext(), path.schema(),
                     fields);
             } catch (RequestException e) {
-                request.completeWith(e);
+                request.failWith(e);
                 return;
             }
             writerFactory = new MdsalNormalizedNodeWriterFactory(translated, depth);

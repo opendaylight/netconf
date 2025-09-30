@@ -23,7 +23,7 @@ public record FailedHttpGetResource(RequestException cause) implements HttpGetRe
 
     @Override
     public void httpGET(final ServerRequest<FormattableBody> request) {
-        request.completeWith(cause);
+        request.failWith(cause);
     }
 
     @Override

@@ -56,13 +56,13 @@ final class DOMRpcResultCallback implements FutureCallback<DOMRpcResult> {
         if (errors.isEmpty()) {
             request.completeWith(InterceptingServerRpcOperations.invokeResultOf(path, result.value()));
         } else {
-            request.completeWith(new RequestException(errors, null, "Invocation failed"));
+            request.failWith(new RequestException(errors, null, "Invocation failed"));
         }
     }
 
     @Override
     public void onFailure(final Throwable cause) {
-        request.completeWith(switch (cause) {
+        request.failWith(switch (cause) {
             case CancellationException e -> new RequestException(ErrorType.RPC, ErrorTag.PARTIAL_OPERATION,
                 "Action cancelled while executing", e);
             case DOMActionException e -> new RequestException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, e);

@@ -107,12 +107,12 @@ public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementatio
         try {
             path = leaf(body, PATH_NODEID, YangInstanceIdentifier.class);
         } catch (IllegalArgumentException e) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
             return;
         }
 
         if (path == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT, "missing path"));
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT, "missing path"));
             return;
         }
 
@@ -120,7 +120,7 @@ public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementatio
         try {
             apiPath = new ApiPathCanonizer(input.path().databind()).dataToApiPath(path);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
 

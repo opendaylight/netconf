@@ -331,7 +331,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
             setState(SubscriptionState.END);
             final var witness = (QName) TERMINATED_VH.compareAndExchangeRelease(this, null, requireNonNull(reason));
             if (witness != null) {
-                request.completeWith(new RequestException("Subscription already terminated with " + witness));
+                request.failWith(new RequestException("Subscription already terminated with " + witness));
                 return;
             }
 

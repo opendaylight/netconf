@@ -115,7 +115,7 @@ class ModifySubscriptionRpcTest {
         doReturn(null).when(subscription).session();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
-        verify(request).completeWith(responseCaptor.capture());
+        verify(request).failWith(responseCaptor.capture());
         assertEquals("Subscription with given id does not exist on this session",
             responseCaptor.getValue().getMessage());
     }
@@ -125,7 +125,7 @@ class ModifySubscriptionRpcTest {
         doReturn(null).when(streamRegistry).lookupSubscription(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
-        verify(request).completeWith(responseCaptor.capture());
+        verify(request).failWith(responseCaptor.capture());
         assertEquals("No subscription with given ID.", responseCaptor.getValue().getMessage());
     }
 
@@ -135,7 +135,7 @@ class ModifySubscriptionRpcTest {
         doReturn(SubscriptionState.END).when(subscription).state();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
-        verify(request).completeWith(responseCaptor.capture());
+        verify(request).failWith(responseCaptor.capture());
         assertEquals("There is no active or suspended subscription with given ID.",
             responseCaptor.getValue().getMessage());
     }

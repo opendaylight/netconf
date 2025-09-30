@@ -80,7 +80,7 @@ public final class NotSupportedServerDataOperations implements ServerDataOperati
     }
 
     private static void notSupported(final ServerRequest<?> request, final Data path) {
-        request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
+        request.failWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
             "Data request not supported", new ErrorPath(path), null));
     }
 }
