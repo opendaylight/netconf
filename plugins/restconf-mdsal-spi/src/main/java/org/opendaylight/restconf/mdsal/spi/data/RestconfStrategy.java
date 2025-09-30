@@ -302,10 +302,11 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
     private void completeCreateData(final ServerRequest<? super CreateResourceResult> request,
             final Data path, final NormalizedNode data,
             final ListenableFuture<? extends CommitInfo> future) {
-        final var instance = path.instance();
         Futures.addCallback(future, new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
+                final var instance = path.instance();
+
                 final ApiPath apiPath;
                 try {
                     apiPath = new ApiPathCanonizer(databind).dataToApiPath(data instanceof MapNode mapData
