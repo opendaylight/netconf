@@ -16,6 +16,23 @@
       "message": "context:get -\u003e context",
       "revId": "d0a620b5a2978edf6a3f0c7073b18c6d184309a0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "834e6ce9_479d7033",
+        "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/MdsalRestconfStreamRegistry.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-30T10:54:33Z",
+      "side": 1,
+      "message": "thus we can remove FIXME",
+      "revId": "d0a620b5a2978edf6a3f0c7073b18c6d184309a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
