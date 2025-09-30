@@ -93,7 +93,7 @@ class EstablishSubscriptionRpcTest {
             .build();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, input));
-        verify(request).completeWith(response.capture());
+        verify(request).failWith(response.capture());
         assertEquals("No stream specified", response.getValue().getMessage());
     }
 

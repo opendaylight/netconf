@@ -103,7 +103,7 @@ class KillSubscriptionRpcTest {
         doReturn(null).when(streamRegistry).lookupSubscription(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
-        verify(request).completeWith(response.capture());
+        verify(request).failWith(response.capture());
         assertEquals("No subscription with given ID.", response.getValue().getMessage());
     }
 
@@ -113,8 +113,7 @@ class KillSubscriptionRpcTest {
         doReturn(SubscriptionState.END).when(subscription).state();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
-        verify(request).completeWith(response.capture());
-        assertEquals("There is no active or suspended subscription with given ID.",
-            response.getValue().getMessage());
+        verify(request).failWith(response.capture());
+        assertEquals("There is no active or suspended subscription with given ID.", response.getValue().getMessage());
     }
 }

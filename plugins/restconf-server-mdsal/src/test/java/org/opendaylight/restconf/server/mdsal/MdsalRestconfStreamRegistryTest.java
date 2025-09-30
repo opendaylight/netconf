@@ -149,7 +149,7 @@ class MdsalRestconfStreamRegistryTest {
         when(request.session()).thenReturn(session);
         registry.establishSubscription(request, "TEST", EncodeJson$I.QNAME, null, null);
         final var errCap = ArgumentCaptor.forClass(RequestException.class);
-        verify(request).completeWith(errCap.capture());
+        verify(request).failWith(errCap.capture());
         assertEquals("TEST refers to an unknown stream", errCap.getValue().getMessage());
     }
 

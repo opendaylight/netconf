@@ -53,7 +53,7 @@ public record DOMServerRpcOperations(@NonNull DOMRpcService rpcService) implemen
                         request.completeWith(InterceptingServerRpcOperations.invokeResultOf(path, result.value()));
                     } else {
                         LOG.debug("RPC invocation reported {}", result.errors());
-                        request.completeWith(new RequestException(result.errors().stream()
+                        request.failWith(new RequestException(result.errors().stream()
                             .map(RequestError::ofRpcError)
                             .collect(Collectors.toList()), null, "Opereation implementation reported errors"));
                     }
@@ -63,10 +63,10 @@ public record DOMServerRpcOperations(@NonNull DOMRpcService rpcService) implemen
                 public void onFailure(final Throwable cause) {
                     LOG.debug("RPC invocation failed, cause");
                     if (cause instanceof RequestException ex) {
-                        request.completeWith(ex);
+                        request.failWith(ex);
                     } else {
                         // TODO: YangNetconfErrorAware if we ever get into a broader invocation scope
-                        request.completeWith(new RequestException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause));
+                        request.failWith(new RequestException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause));
                     }
                 }
             }, MoreExecutors.directExecutor());

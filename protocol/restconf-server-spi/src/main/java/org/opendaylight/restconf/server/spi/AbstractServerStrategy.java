@@ -86,12 +86,12 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         final var instance = path.instance();
         if (instance.isEmpty()) {
-            request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
+            request.failWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
                 "Cannot delete a datastore"));
             return;
         }
@@ -109,7 +109,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         dataGET(request, path);
@@ -121,7 +121,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             params = DataGetParams.of(request.queryParameters());
         } catch (IllegalArgumentException e) {
-            request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+            request.failWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                 "Invalid GET /data parameters", e));
             return;
         }
@@ -139,7 +139,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             path = pathNormalizer.normalizeDataOrActionPath(apiPath);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         request.completeWith(switch (path) {
@@ -164,7 +164,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         dataPATCH(request, path, body);
@@ -175,7 +175,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             data = body.toNormalizedNode(path);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         data().mergeData(request, path, data);
@@ -193,7 +193,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         dataPATCH(request, path, body);
@@ -204,7 +204,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             patch = body.toPatchContext(new DefaultResourceContext(path));
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         data().patchData(request, path, patch);
@@ -222,7 +222,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             ref = pathNormalizer.normalizeDataOrActionPath(path);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
 
@@ -246,14 +246,14 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             insert = Insert.of(path.databind(), request.queryParameters());
         } catch (IllegalArgumentException e) {
-            request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+            request.failWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
             return;
         }
         final PrefixAndBody payload;
         try {
             payload = body.toPayload(path);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
 
@@ -271,7 +271,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             input = body.toContainerNode(path);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         action().invokeAction(request, path, input);
@@ -289,7 +289,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         dataPUT(request, path, body);
@@ -301,14 +301,14 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             insert = Insert.of(databind, request.queryParameters());
         } catch (IllegalArgumentException e) {
-            request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+            request.failWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
             return;
         }
         final NormalizedNode data;
         try {
             data = body.toNormalizedNode(path);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
 
@@ -334,7 +334,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             pathNormalizer.normalizeRpcPath(operation);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         // RFC8040 is not consistent on this point:
@@ -358,7 +358,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             path = pathNormalizer.normalizeRpcPath(apiPath);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
 
@@ -366,7 +366,7 @@ public abstract class AbstractServerStrategy implements ServerStrategy {
         try {
             input = body.toContainerNode(path);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         rpc().invokeRpc(request, restconfURI, path, input);

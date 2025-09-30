@@ -48,7 +48,7 @@ public final class ExportingServerModulesOperations implements ServerModulesOper
         } else if (YinTextSource.class.isAssignableFrom(representation)) {
             exportSource(request, source, YinCharSource.OfModule::new, YinCharSource.OfSubmodule::new);
         } else {
-            request.completeWith(new RequestException("Unsupported source representation " + representation.getName()));
+            request.failWith(new RequestException("Unsupported source representation " + representation.getName()));
         }
     }
 
@@ -79,6 +79,6 @@ public final class ExportingServerModulesOperations implements ServerModulesOper
         final var sb = new StringBuilder().append("Source ").append(source.name().getLocalName());
         optRevision.ifPresent(rev -> sb.append('@').append(rev));
         sb.append(" not found");
-        request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.DATA_MISSING, sb.toString()));
+        request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.DATA_MISSING, sb.toString()));
     }
 }
