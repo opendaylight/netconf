@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1ce2768e_d70770bc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-30T10:58:37Z",
+      "side": 1,
+      "message": "start() in registry creates `RestconfStream` which then starts source when subscriber isa added",
+      "revId": "d0a620b5a2978edf6a3f0c7073b18c6d184309a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "43b3c0e5_87cf0209",
         "filename": "plugins/restconf-server-mdsal/src/main/java/org/opendaylight/restconf/server/mdsal/DefaultNotificationSource.java",
         "patchSetId": 12
