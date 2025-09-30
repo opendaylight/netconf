@@ -166,8 +166,8 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         completePutData(request, path, exists, commitFuture);
     }
 
-    private void completePutData(final ServerRequest<DataPutResult> request, final Data path, final boolean exists,
-            final ListenableFuture<? extends CommitInfo> future) {
+    private static void completePutData(final ServerRequest<DataPutResult> request, final Data path,
+            final boolean exists, final ListenableFuture<? extends CommitInfo> future) {
         Futures.addCallback(future, new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
