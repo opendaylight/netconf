@@ -5,5 +5,8 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
+/**
+ * Object model of a <a href="https://www.rfc-editor.org/rfc/rfc6241#section-6">Subtree Filter</a>.
+ */
 @org.osgi.annotation.bundle.Export
 package org.opendaylight.netconf.databind.subtree;
