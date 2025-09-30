@@ -171,7 +171,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     private final ScheduledExecutorService updateCounters;
     private final DOMDataBroker dataBroker;
-    private final DOMNotificationService notificationService;
     private final DatabindProvider databindProvider;
     private final List<StreamSupport> supports;
     private final Registration sclReg;
@@ -189,7 +188,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             @Reference final DatabindProvider databindProvider) {
         super(schemaService.getGlobalContext());
         this.dataBroker = requireNonNull(dataBroker);
-        this.notificationService = requireNonNull(notificationService);
         this.databindProvider = requireNonNull(databindProvider);
         supports = List.of(new Rfc8639StreamSupport(), new Rfc8040StreamSupport(locationProvider));
         allocateTxChain();
