@@ -139,6 +139,23 @@
       "parentUuid": "f549e8a5_d3b7fbc7",
       "revId": "c14f5011712d0add6c2be27739b2594c3d9ef984",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6dae2841_6705e4e3",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 38
+      },
+      "lineNbr": 936,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-30T11:53:06Z",
+      "side": 1,
+      "message": "ImmutableMap.copyOf()",
+      "revId": "c14f5011712d0add6c2be27739b2594c3d9ef984",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
