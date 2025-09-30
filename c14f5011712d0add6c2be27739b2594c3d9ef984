@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "975f477d_2084ddbf",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 38
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-30T11:37:09Z",
+      "side": 1,
+      "message": "Internally terminating ...",
+      "revId": "c14f5011712d0add6c2be27739b2594c3d9ef984",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60dc9066_606ff5ba",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 38
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-30T11:37:09Z",
+      "side": 1,
+      "message": ".. terminated internally",
+      "revId": "c14f5011712d0add6c2be27739b2594c3d9ef984",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cd2604b_714f639d",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 38
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-09-30T11:37:09Z",
+      "side": 1,
+      "message": "{} internally",
+      "revId": "c14f5011712d0add6c2be27739b2594c3d9ef984",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
