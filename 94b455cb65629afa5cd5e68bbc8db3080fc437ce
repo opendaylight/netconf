@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "49b98527_160ad537",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/SubscriptionSuspensionTest.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-30T06:01:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f662439e_1ac7357a",
+      "revId": "94b455cb65629afa5cd5e68bbc8db3080fc437ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2d5f402_6e3f07e3",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-29T20:02:23Z",
       "side": 1,
       "message": "Use NodeIdentifier.create instead of YangInstanceIdentifier.NodeIdentifier.create\n\nimport org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier",
+      "revId": "94b455cb65629afa5cd5e68bbc8db3080fc437ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "181bf46e_ce33828e",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/SubscriptionSuspensionTest.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-30T06:01:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2d5f402_6e3f07e3",
       "revId": "94b455cb65629afa5cd5e68bbc8db3080fc437ce",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -65,6 +101,24 @@
       "writtenOn": "2025-09-29T20:02:23Z",
       "side": 1,
       "message": "Redundant empty line",
+      "revId": "94b455cb65629afa5cd5e68bbc8db3080fc437ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8307b7ed_080f5786",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/SubscriptionSuspensionTest.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-09-30T06:01:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5fa660f_df46944d",
       "revId": "94b455cb65629afa5cd5e68bbc8db3080fc437ce",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
