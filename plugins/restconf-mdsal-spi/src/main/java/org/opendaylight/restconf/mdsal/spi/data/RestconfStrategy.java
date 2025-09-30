@@ -122,7 +122,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                request.completeWith(decodeException(cause, "MERGE", path));
+                request.failWith(decodeException(cause, "MERGE", path));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -134,7 +134,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         try {
             exists = syncAccess(exists(instance), instance);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
 
@@ -149,7 +149,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
         try {
             exists = syncAccess(exists(instance), instance);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
 
@@ -160,7 +160,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             checkListAndOrderedType(parentPath);
             commitFuture = insertAndCommitPut(instance, data, insert, parentPath.instance());
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         completePutData(request, path, exists, commitFuture);
@@ -176,7 +176,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                request.completeWith(decodeException(cause, "PUT", path));
+                request.failWith(decodeException(cause, "PUT", path));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -279,7 +279,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             tx.create(path.instance(), data);
         } catch (RequestException e) {
             tx.cancel();
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         completeCreateData(request, path, data, tx.commit());
@@ -293,7 +293,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             checkListAndOrderedType(path);
             future = insertAndCommit(path, data, insert);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         completeCreateData(request, path, data, future);
@@ -313,7 +313,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                         && !mapData.isEmpty() ? instance.node(mapData.body().iterator().next().name()) : instance);
                 } catch (RequestException e) {
                     // This should never happen
-                    request.completeWith(e);
+                    request.failWith(e);
                     return;
                 }
                 request.completeWith(new CreateResourceResult(apiPath));
@@ -321,7 +321,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
 
             @Override
             public void onFailure(final Throwable cause) {
-                request.completeWith(decodeException(cause, "POST", path));
+                request.failWith(decodeException(cause, "POST", path));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -398,56 +398,55 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
 
         boolean noError = true;
         for (var patchEntity : patch.entities()) {
-            if (noError) {
-                final var targetNode = patchEntity.getDataPath().instance();
-                final var editId = patchEntity.getEditId();
-
-                switch (patchEntity.getOperation()) {
-                    case Create:
-                        try {
-                            tx.create(targetNode, patchEntity.getNode());
-                            editCollection.add(new PatchStatusEntity(editId, true, null));
-                        } catch (RequestException e) {
-                            editCollection.add(new PatchStatusEntity(editId, false, e.errors()));
-                            noError = false;
-                        }
-                        break;
-                    case Delete:
-                        try {
-                            tx.delete(targetNode);
-                            editCollection.add(new PatchStatusEntity(editId, true, null));
-                        } catch (RequestException e) {
-                            editCollection.add(new PatchStatusEntity(editId, false, e.errors()));
-                            noError = false;
-                        }
-                        break;
-                    case Merge:
-                        tx.ensureParentsByMerge(targetNode);
-                        tx.merge(targetNode, patchEntity.getNode());
-                        editCollection.add(new PatchStatusEntity(editId, true, null));
-                        break;
-                    case Replace:
-                        tx.replace(targetNode, patchEntity.getNode());
-                        editCollection.add(new PatchStatusEntity(editId, true, null));
-                        break;
-                    case Remove:
-                        try {
-                            tx.remove(targetNode);
-                            editCollection.add(new PatchStatusEntity(editId, true, null));
-                        } catch (RequestException e) {
-                            editCollection.add(new PatchStatusEntity(editId, false, e.errors()));
-                            noError = false;
-                        }
-                        break;
-                    default:
-                        editCollection.add(new PatchStatusEntity(editId, false, List.of(
-                            new RequestError(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
-                                "Not supported Yang Patch operation"))));
-                        noError = false;
-                        break;
-                }
-            } else {
+            if (!noError) {
                 break;
+            }
+            final var targetNode = patchEntity.getDataPath().instance();
+            final var editId = patchEntity.getEditId();
+
+            switch (patchEntity.getOperation()) {
+                case Create:
+                    try {
+                        tx.create(targetNode, patchEntity.getNode());
+                        editCollection.add(new PatchStatusEntity(editId, true, null));
+                    } catch (RequestException e) {
+                        editCollection.add(new PatchStatusEntity(editId, false, e.errors()));
+                        noError = false;
+                    }
+                    break;
+                case Delete:
+                    try {
+                        tx.delete(targetNode);
+                        editCollection.add(new PatchStatusEntity(editId, true, null));
+                    } catch (RequestException e) {
+                        editCollection.add(new PatchStatusEntity(editId, false, e.errors()));
+                        noError = false;
+                    }
+                    break;
+                case Merge:
+                    tx.ensureParentsByMerge(targetNode);
+                    tx.merge(targetNode, patchEntity.getNode());
+                    editCollection.add(new PatchStatusEntity(editId, true, null));
+                    break;
+                case Replace:
+                    tx.replace(targetNode, patchEntity.getNode());
+                    editCollection.add(new PatchStatusEntity(editId, true, null));
+                    break;
+                case Remove:
+                    try {
+                        tx.remove(targetNode);
+                        editCollection.add(new PatchStatusEntity(editId, true, null));
+                    } catch (RequestException e) {
+                        editCollection.add(new PatchStatusEntity(editId, false, e.errors()));
+                        noError = false;
+                    }
+                    break;
+                default:
+                    editCollection.add(new PatchStatusEntity(editId, false, List.of(
+                        new RequestError(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
+                            "Not supported Yang Patch operation"))));
+                    noError = false;
+                    break;
             }
         }
 
@@ -518,13 +517,12 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
      */
     private void checkListDataDoesNotExist(final Data path, final NormalizedNode data)
             throws RequestException {
-        if (data instanceof NormalizedNodeContainer<?> dataNode) {
-            for (final var node : dataNode.body()) {
-                final var nodePath = path.instance().node(node.name());
-                checkItemDoesNotExists(databind, exists(nodePath), nodePath);
-            }
-        } else {
+        if (!(data instanceof NormalizedNodeContainer<?> dataNode)) {
             throw new RequestException("Unexpected node type: " + data.getClass().getName());
+        }
+        for (final var node : dataNode.body()) {
+            final var nodePath = path.instance().node(node.name());
+            checkItemDoesNotExists(databind, exists(nodePath), nodePath);
         }
     }
 
@@ -580,14 +578,14 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                 if (result.isPresent()) {
                     getRequest.completeWith(result);
                 } else {
-                    getRequest.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+                    getRequest.failWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
                         "Request could not be completed because the relevant data model content does not exist"));
                 }
             }
 
             @Override
             public void onFailure(Throwable cause) {
-                getRequest.completeWith(decodeException(cause, "GET", path));
+                getRequest.failWith(decodeException(cause, "GET", path));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -634,7 +632,8 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
                             dataPath.instance());
                         return new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists",
                             dataPath.toErrorPath(), ex);
-                    } else if (errorTag.equals(ErrorTag.DATA_MISSING)) {
+                    }
+                    if (errorTag.equals(ErrorTag.DATA_MISSING)) {
                         LOG.trace("Operation via Restconf was not executed because data at {} does not exist",
                             dataPath.instance());
                         return new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,

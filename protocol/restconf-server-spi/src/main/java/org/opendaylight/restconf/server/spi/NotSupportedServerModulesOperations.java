@@ -30,7 +30,7 @@ public final class NotSupportedServerModulesOperations implements ServerModulesO
     @Override
     public void getModelSource(final ServerRequest<ModulesGetResult> request, final SourceIdentifier source,
             final Class<? extends SourceRepresentation> representation) {
-        request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
+        request.failWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
             "Modules not supported"));
     }
 }

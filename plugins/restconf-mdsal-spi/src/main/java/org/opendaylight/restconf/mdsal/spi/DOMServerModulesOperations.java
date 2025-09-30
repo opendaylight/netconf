@@ -46,7 +46,7 @@ public record DOMServerModulesOperations(
 
                 @Override
                 public void onFailure(final Throwable cause) {
-                    request.completeWith(cause instanceof RequestException e ? e
+                    request.failWith(cause instanceof RequestException e ? e
                         : new RequestException(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause));
                 }
             }, MoreExecutors.directExecutor());

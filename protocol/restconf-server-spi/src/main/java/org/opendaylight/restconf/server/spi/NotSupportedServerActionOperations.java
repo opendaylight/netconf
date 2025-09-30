@@ -31,7 +31,7 @@ public final class NotSupportedServerActionOperations implements ServerActionOpe
     @Override
     public void invokeAction(final ServerRequest<? super InvokeResult> request, final Action path,
             final ContainerNode input) {
-        request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
+        request.failWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
             "Action not supported"));
     }
 }
