@@ -163,7 +163,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         try {
             stratAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         stratAndTail.strategy().dataDELETE(request, stratAndTail.path());
@@ -180,7 +180,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         try {
             stratAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         stratAndTail.strategy().dataGET(request, stratAndTail.path());
@@ -197,7 +197,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         try {
             stratAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
 
@@ -222,7 +222,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         try {
             strategyAndPath = localStrategy().resolveStrategy(identifier);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         strategyAndPath.strategy().dataPATCH(request, strategyAndPath.path(), body);
@@ -240,7 +240,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         try {
             strategyAndPath = localStrategy().resolveStrategy(identifier);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         strategyAndPath.strategy().dataPATCH(request, strategyAndPath.path(), body);
@@ -258,7 +258,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         try {
             strategyAndPath = localStrategy().resolveStrategy(identifier);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         strategyAndPath.strategy().dataPOST(request, strategyAndPath.path(), body);
@@ -275,7 +275,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         try {
             strategyAndPath = localStrategy().resolveStrategy(identifier);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return ;
         }
         strategyAndPath.strategy().dataPUT(request, strategyAndPath.path(), body);
@@ -314,7 +314,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
             final String fileName, final String revision, final Class<? extends SourceRepresentation> representation) {
         final var mountOffset = mountPath.indexOf("yang-ext", "mount");
         if (mountOffset != mountPath.steps().size() - 1) {
-            request.completeWith(new RequestException("Mount path has to end with yang-ext:mount"));
+            request.failWith(new RequestException("Mount path has to end with yang-ext:mount"));
             return;
         }
 
@@ -322,7 +322,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         try {
             stratAndTail = localStrategy().resolveStrategy(mountPath);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         // FIXME: require remnant to be empty
@@ -333,22 +333,22 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
             final String moduleName, final String revisionStr,
             final Class<? extends SourceRepresentation> representation) {
         if (moduleName == null) {
-            request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+            request.failWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                 "Module name must be supplied"));
             return;
         }
         if (moduleName.isEmpty() || !YangNames.IDENTIFIER_START.matches(moduleName.charAt(0))) {
-            request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+            request.failWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                 "Identifier must start with character from set 'a-zA-Z_"));
             return;
         }
         if (moduleName.toUpperCase(Locale.ROOT).startsWith("XML")) {
-            request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+            request.failWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                 "Identifier must NOT start with XML ignore case"));
             return;
         }
         if (YangNames.NOT_IDENTIFIER_PART.matchesAnyOf(moduleName.substring(1))) {
-            request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+            request.failWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                 "Supplied name has not expected identifier format"));
             return;
         }
@@ -358,7 +358,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         try {
             revision = Revision.ofNullable(revisionStr).orElse(null);
         } catch (final DateTimeParseException e) {
-            request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+            request.failWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                 "Supplied revision is not in expected date format YYYY-mm-dd", e));
             return;
         }
@@ -377,7 +377,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         try {
             strategyAndPath = localStrategy().resolveStrategy(operation);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
 
@@ -396,7 +396,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         try {
             strategyAndPath = localStrategy().resolveStrategy(operation);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
 
@@ -415,7 +415,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         try {
             strategyAndPath = localStrategy().resolveStrategy(apiPath);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         strategyAndPath.strategy().operationsPOST(request, restconfURI, strategyAndPath.path(), body);

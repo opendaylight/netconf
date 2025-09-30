@@ -64,17 +64,16 @@ public final class DeleteSubscriptionRpc extends RpcImplementation {
         try {
             id = leaf(body, SUBSCRIPTION_ID, Uint32.class);
         } catch (IllegalArgumentException e) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
             return;
         }
         if (id == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
-                "No ID specified."));
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT, "No ID specified."));
             return;
         }
         final var subscription = streamRegistry.lookupSubscription(id);
         if (subscription == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No subscription with given ID."));
             return;
         }
@@ -82,12 +81,12 @@ public final class DeleteSubscriptionRpc extends RpcImplementation {
         // FIXME: DynamicSubscription.delete()
         final var state = subscription.state();
         if (state != SubscriptionState.ACTIVE && state != SubscriptionState.SUSPENDED) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "There is no active or suspended subscription with given ID."));
             return;
         }
         if (subscription.session() != request.session()) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "Subscription with given id does not exist on this session"));
             return;
         }

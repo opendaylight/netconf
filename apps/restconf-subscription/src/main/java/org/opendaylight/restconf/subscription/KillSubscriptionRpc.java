@@ -65,18 +65,17 @@ public final class KillSubscriptionRpc extends RpcImplementation {
         try {
             id = leaf(body, SUBSCRIPTION_ID, Uint32.class);
         } catch (IllegalArgumentException e) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
             return;
         }
         if (id == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
-                "No id specified"));
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT, "No id specified"));
             return;
         }
 
         final var subscription = streamRegistry.lookupSubscription(id);
         if (subscription == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No subscription with given ID."));
             return;
         }
@@ -84,7 +83,7 @@ public final class KillSubscriptionRpc extends RpcImplementation {
         // FIXME: DynamicSubscription.kill()
         final var state = subscription.state();
         if (state != SubscriptionState.ACTIVE && state != SubscriptionState.SUSPENDED) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "There is no active or suspended subscription with given ID."));
             return;
         }

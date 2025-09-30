@@ -74,7 +74,7 @@ abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
         try {
             response = transform(result);
         } catch (RequestException e) {
-            completeWith(e);
+            failWith(e);
             return;
         }
         ar.resume(response);

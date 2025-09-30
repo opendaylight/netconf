@@ -32,7 +32,7 @@ public final class NotSupportedServerRpcOperations implements ServerRpcOperation
     @Override
     public void invokeRpc(final ServerRequest<InvokeResult> request, final URI restconfURI, final Rpc path,
             final ContainerNode input) {
-        request.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
+        request.failWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED,
             "RPC not supported"));
     }
 }

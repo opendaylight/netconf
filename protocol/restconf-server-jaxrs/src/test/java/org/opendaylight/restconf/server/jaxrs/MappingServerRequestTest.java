@@ -201,7 +201,7 @@ class MappingServerRequestTest extends AbstractJukeboxTest {
 
     private static FormattableBody assertMapped(final HttpStatusCode expectedCode, final RequestException ex) {
         final var req = spy(Req.class);
-        req.completeWith(ex);
+        req.failWith(ex);
         final var captor = ArgumentCaptor.forClass(FormattableBody.class);
         verify(req).onFailure(eq(expectedCode), captor.capture());
         return captor.getValue();

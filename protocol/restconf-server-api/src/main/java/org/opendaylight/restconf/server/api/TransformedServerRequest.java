@@ -58,11 +58,6 @@ record TransformedServerRequest<I, R>(ServerRequest<R> delegate, Function<I, R> 
     }
 
     @Override
-    public void completeWith(final RequestException failure) {
-        delegate.completeWith(failure);
-    }
-
-    @Override
     public void completeWith(final YangErrorsBody errors) {
         delegate.completeWith(errors);
     }
@@ -70,5 +65,10 @@ record TransformedServerRequest<I, R>(ServerRequest<R> delegate, Function<I, R> 
     @Override
     public void completeWith(final ErrorTag errorTag,  final FormattableBody body) {
         delegate.completeWith(errorTag, body);
+    }
+
+    @Override
+    public void failWith(final RequestException failure) {
+        delegate.failWith(failure);
     }
 }

@@ -73,7 +73,7 @@ public final class OperationsResource implements HttpGetResource {
         try {
             path = pathNormalizer.normalizeRpcPath(apiPath);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         request.completeWith(new OneOperation(path.inference().modelContext(), path.statement().argument()));

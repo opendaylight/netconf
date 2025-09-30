@@ -72,30 +72,29 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
         try {
             id = leaf(body, SUBSCRIPTION_ID, Uint32.class);
         } catch (IllegalArgumentException e) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, e));
             return;
         }
         if (id == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
-                "No ID specified."));
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT, "No ID specified."));
             return;
         }
 
         final var subscription = streamRegistry.lookupSubscription(id);
         if (subscription == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No subscription with given ID."));
             return;
         }
         final var state = subscription.state();
         if (state != SubscriptionState.ACTIVE && state != SubscriptionState.SUSPENDED) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "There is no active or suspended subscription with given ID."));
             return;
         }
 
         if (subscription.session() != request.session()) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "Subscription with given id does not exist on this session"));
             return;
         }
@@ -103,7 +102,7 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
         final var target = (ChoiceNode) body.childByArg(SUBSCRIPTION_TARGET);
 
         if (target == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No filter specified"));
             return;
         }
@@ -111,7 +110,7 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
         final var streamFilter = (ChoiceNode) target.childByArg(SUBSCRIPTION_STREAM_FILTER);
         final var filter = streamFilter == null ? null : EstablishSubscriptionRpc.extractFilter(streamFilter);
         if (filter == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No filter specified"));
             return;
         }

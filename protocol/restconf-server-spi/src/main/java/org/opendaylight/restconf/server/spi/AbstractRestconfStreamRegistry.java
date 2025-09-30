@@ -130,7 +130,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 case END -> {
                     LOG.debug("Subscription for id {} is not active", id());
                     // TODO: this should be mapped to 404 Not Found
-                    request.completeWith(new RequestException("Subscription terminated"));
+                    request.failWith(new RequestException("Subscription terminated"));
                 }
             }
         }
@@ -143,13 +143,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             if (stream == null) {
                 // TODO: this should never happen, really
                 LOG.debug("Stream '{}' not found", streamName);
-                request.completeWith(new RequestException("Subscription stream not found"));
+                request.failWith(new RequestException("Subscription stream not found"));
                 return;
             }
 
             final var session = request.session();
             if (session == null) {
-                request.completeWith(new RequestException("This endpoint does not support dynamic subscriptions"));
+                request.failWith(new RequestException("This endpoint does not support dynamic subscriptions"));
                 return;
             }
 
@@ -158,12 +158,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 newSubscriber = stream.addSubscriber(sender, encodingName(),
                     newReceiverName(session.description(), request.principal()), filter(), receiverState);
             } catch (UnsupportedEncodingException e) {
-                request.completeWith(new RequestException(e));
+                request.failWith(new RequestException(e));
                 return;
             }
 
             if (newSubscriber == null) {
-                request.completeWith(new RequestException("Subscription stream terminated"));
+                request.failWith(new RequestException("Subscription stream terminated"));
                 return;
             }
 
@@ -183,7 +183,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 public void onFailure(final Throwable cause) {
                     receivers.remove(newSubscriber);
                     newSubscriber.close();
-                    request.completeWith(new RequestException(cause));
+                    request.failWith(new RequestException(cause));
                 }
             }, MoreExecutors.directExecutor());
         }
@@ -257,7 +257,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 @Override
                 public void onFailure(final Throwable cause) {
                     LOG.warn("Cannot terminate subscription {}", id, cause);
-                    request.completeWith(new RequestException(cause));
+                    request.failWith(new RequestException(cause));
                 }
             }, MoreExecutors.directExecutor());
         }
@@ -568,7 +568,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             public void onFailure(final Throwable cause) {
                 LOG.debug("Failed to add stream {}", name, cause);
                 streams.remove(name, stream);
-                request.completeWith(new RequestException("Failed to create stream " + name, cause));
+                request.failWith(new RequestException("Failed to create stream " + name, cause));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -662,14 +662,14 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             final QName encoding, final @Nullable SubscriptionFilter filter, final @Nullable Instant stopTime) {
         final var session = request.session();
         if (session == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
                 "This end point does not support dynamic subscriptions."));
             return;
         }
 
         final var stream = lookupStream(streamName);
         if (stream == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
                 "%s refers to an unknown stream", streamName));
             return;
         }
@@ -680,7 +680,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         } else if (encoding.equals(EncodeXml$I.QNAME)) {
             encodingName = EncodingName.RFC8040_XML;
         } else {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
                 "Encoding %s not supported", encoding));
             return;
         }
@@ -689,13 +689,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         try {
             filterImpl = resolveFilter(filter);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         final var filterName = filter instanceof SubscriptionFilter.Reference(var name) ? name : null;
 
         if (stopTime != null && !stopTime.isAfter(Instant.now())) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
                 "Stop-time must be in future."));
             return;
         }
@@ -719,7 +719,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
                 @Override
                 public void onFailure(final Throwable cause) {
-                    request.completeWith(new RequestException(cause));
+                    request.failWith(new RequestException(cause));
                 }
             }, MoreExecutors.directExecutor());
     }
@@ -736,7 +736,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             final SubscriptionFilter filter, final Instant stopTime) {
         final var subscription = subscriptions.get(id);
         if (subscription == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "There is no subscription with given ID."));
             return;
         }
@@ -745,14 +745,14 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         try {
             filterImpl = resolveFilter(filter);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
 
         final var newFilterName = filter instanceof SubscriptionFilter.Reference(var name) ? name : null;
 
         if (stopTime != null && !stopTime.isAfter(Instant.now())) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
                 "Stop-time must be in future."));
             return;
         }
@@ -775,7 +775,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
             @Override
             public void onFailure(final Throwable cause) {
-                request.completeWith(new RequestException(cause));
+                request.failWith(new RequestException(cause));
             }
         }, MoreExecutors.directExecutor());
     }

@@ -63,23 +63,23 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
         final var body = input.input();
         final var pathLeaf = body.childByArg(DEVICE_NOTIFICATION_PATH_NODEID);
         if (pathLeaf == null) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No path specified"));
             return;
         }
         final var pathLeafBody = pathLeaf.body();
         if (!(pathLeafBody instanceof YangInstanceIdentifier path)) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "Unexpected path %s", pathLeafBody));
             return;
         }
         if (!(path.getLastPathArgument() instanceof NodeIdentifierWithPredicates listId)) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "%s does not refer to a list item", path));
             return;
         }
         if (listId.size() != 1) {
-            request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
                 "%s uses multiple keys", path));
             return;
         }
@@ -88,7 +88,7 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
         try {
             apiPath = new ApiPathCanonizer(input.path().databind()).dataToApiPath(path);
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
 

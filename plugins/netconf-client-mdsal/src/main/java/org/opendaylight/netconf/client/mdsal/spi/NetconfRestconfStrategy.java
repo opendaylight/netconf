@@ -70,7 +70,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
             tx.delete(path.instance());
         } catch (RequestException e) {
             tx.cancel();
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
 
@@ -82,7 +82,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
             @Override
             public void onFailure(final Throwable cause) {
-                request.completeWith(decodeException(cause, "DELETE", path));
+                request.failWith(decodeException(cause, "DELETE", path));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -94,7 +94,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
             fieldPaths = FieldsParamParser.fieldsParamsToPaths(path.inference().modelContext(), path.schema(),
                 params.fields());
         } catch (RequestException e) {
-            request.completeWith(e);
+            request.failWith(e);
             return;
         }
         final var netconfGetRequest = request.<Optional<NormalizedNode>>transform(result -> {
@@ -160,18 +160,18 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
         Futures.addCallback(getFuture, new FutureCallback<>() {
             @Override
-            public void onSuccess(Optional<NormalizedNode> result) {
+            public void onSuccess(final Optional<NormalizedNode> result) {
                 if (result.isPresent()) {
                     getRequest.completeWith(result);
                 } else {
-                    getRequest.completeWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+                    getRequest.failWith(new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
                         "Request could not be completed because the relevant data model content does not exist"));
                 }
             }
 
             @Override
-            public void onFailure(Throwable cause) {
-                getRequest.completeWith(decodeException(cause, "GET", path));
+            public void onFailure(final Throwable cause) {
+                getRequest.failWith(decodeException(cause, "GET", path));
             }
         }, MoreExecutors.directExecutor());
     }
