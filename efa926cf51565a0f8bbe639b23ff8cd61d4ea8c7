@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbbe8a64_1f0f4bd2",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceRpc.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-10-01T08:04:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6e6d561_48a186ca",
+      "range": {
+        "startLine": 102,
+        "startChar": 34,
+        "endLine": 102,
+        "endChar": 49
+      },
+      "revId": "efa926cf51565a0f8bbe639b23ff8cd61d4ea8c7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4e142a9d_d118df25",
@@ -54,6 +78,30 @@
       "writtenOn": "2025-09-29T08:34:43Z",
       "side": 1,
       "message": "for example here we just pass through the value ... but values can very much hold a namespace/revision pair",
+      "range": {
+        "startLine": 123,
+        "startChar": 54,
+        "endLine": 123,
+        "endChar": 65
+      },
+      "revId": "efa926cf51565a0f8bbe639b23ff8cd61d4ea8c7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "83eb7584_6f06cac0",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceRpc.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-10-01T08:04:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4e142a9d_d118df25",
       "range": {
         "startLine": 123,
         "startChar": 54,
