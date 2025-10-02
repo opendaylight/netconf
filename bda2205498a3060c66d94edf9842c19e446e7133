@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b28219fd_65a5fbac",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 42
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-02T15:58:11Z",
+      "side": 1,
+      "message": "DataStoreService (RFC6241)",
+      "revId": "bda2205498a3060c66d94edf9842c19e446e7133",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1c712a0_40e65eb7",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/DataOperationService.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-02T15:58:11Z",
+      "side": 1,
+      "message": "separate explanations into \u003cp\u003e",
+      "revId": "bda2205498a3060c66d94edf9842c19e446e7133",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
