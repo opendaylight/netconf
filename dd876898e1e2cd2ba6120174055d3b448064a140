@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ec26abd_fe344877",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 495,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-02T15:25:47Z",
+      "side": 1,
+      "message": "we have made no operations yet - we do not have RPC_SUCCESS",
+      "revId": "dd876898e1e2cd2ba6120174055d3b448064a140",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
