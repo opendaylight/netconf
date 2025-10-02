@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dd528c6_8e8a0b58",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/AbstractServerDataOperationsTest.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-02T15:37:23Z",
+      "side": 1,
+      "message": "does not need to be public",
+      "revId": "78c66e2dd736a7cd5ad30cfb4ce9622ed5a36b06",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09350b53_23831a5b",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/AbstractServerDataOperationsTest.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-02T15:37:23Z",
+      "side": 1,
+      "message": "getFirst()",
+      "revId": "78c66e2dd736a7cd5ad30cfb4ce9622ed5a36b06",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3dd9fa70_7609c7ac",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/AbstractServerDataOperationsTest.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-02T15:37:23Z",
+      "side": 1,
+      "message": "getFirst()",
+      "revId": "78c66e2dd736a7cd5ad30cfb4ce9622ed5a36b06",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e22caf20_60ff0322",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/AbstractServerDataOperationsTest.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-02T15:37:23Z",
+      "side": 1,
+      "message": "message can be null",
+      "revId": "78c66e2dd736a7cd5ad30cfb4ce9622ed5a36b06",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4202bcb4_36765bbe",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/NetconfDataOperationsTest.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-02T15:37:23Z",
+      "side": 1,
+      "message": "how this relates to patch?",
+      "revId": "78c66e2dd736a7cd5ad30cfb4ce9622ed5a36b06",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
