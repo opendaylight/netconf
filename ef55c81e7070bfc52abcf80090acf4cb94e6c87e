@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "129d06f4_b9e5a98d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 51
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-03T11:12:51Z",
+      "side": 1,
+      "message": "Is delete operation handled correctly - do we NOT require body?",
+      "revId": "ef55c81e7070bfc52abcf80090acf4cb94e6c87e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "207ba595_7e7bdad5",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformerTest.java",
+        "patchSetId": 51
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-03T11:12:51Z",
+      "side": 1,
+      "message": "redundant line",
+      "revId": "ef55c81e7070bfc52abcf80090acf4cb94e6c87e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
