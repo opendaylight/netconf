@@ -18,8 +18,8 @@ import javax.ws.rs.sse.SseEventSink;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
+import org.opendaylight.restconf.server.spi.StreamEncoding;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ final class SSESender implements Sender {
 
     private final PingExecutor pingExecutor;
     private final RestconfStream<?> stream;
-    private final EncodingName encoding;
+    private final StreamEncoding encoding;
     private final EventStreamGetParams params;
     private final SseEventSink sink;
     private final Sse sse;
@@ -60,7 +60,7 @@ final class SSESender implements Sender {
      *            session up. Ping control frames are disabled if this parameter is set to 0.
      */
     SSESender(final PingExecutor pingExecutor, final SseEventSink sink, final Sse sse, final RestconfStream<?> stream,
-            final EncodingName encoding, final EventStreamGetParams params, final int maximumFragmentLength,
+            final StreamEncoding encoding, final EventStreamGetParams params, final int maximumFragmentLength,
             final long heartbeatMillis) {
         this.pingExecutor = requireNonNull(pingExecutor);
         this.sse = requireNonNull(sse);

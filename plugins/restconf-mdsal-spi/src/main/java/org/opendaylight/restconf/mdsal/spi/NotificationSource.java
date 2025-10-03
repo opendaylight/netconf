@@ -15,9 +15,9 @@ import com.google.common.collect.ImmutableSet;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.netconf.databind.DatabindProvider;
-import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sink;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
+import org.opendaylight.restconf.server.spi.StreamEncoding;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -26,9 +26,9 @@ import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absol
  * A {@link Source} reporting YANG notifications.
  */
 public final class NotificationSource extends AbstractNotificationSource {
-    public static final ImmutableMap<EncodingName, NotificationFormatterFactory> ENCODINGS = ImmutableMap.of(
-        EncodingName.RFC8040_JSON, JSONNotificationFormatter.FACTORY,
-        EncodingName.RFC8040_XML, XMLNotificationFormatter.FACTORY);
+    public static final ImmutableMap<StreamEncoding, NotificationFormatterFactory> ENCODINGS = ImmutableMap.of(
+        StreamEncoding.Rfc8040Encoding.JSON, JSONNotificationFormatter.FACTORY,
+        StreamEncoding.Rfc8040Encoding.XML, XMLNotificationFormatter.FACTORY);
 
     private final DatabindProvider databindProvider;
     private final DOMNotificationService notificationService;
