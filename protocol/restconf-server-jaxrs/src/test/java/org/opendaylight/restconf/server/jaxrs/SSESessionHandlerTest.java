@@ -29,7 +29,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.spi.LegacyRestconfStream;
-import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
+import org.opendaylight.restconf.server.spi.StreamEncoding;
 import org.opendaylight.yangtools.concepts.Registration;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,7 +49,7 @@ class SSESessionHandlerTest {
 
     private SSESender setup(final int maxFragmentSize, final long heartbeatInterval) throws Exception {
         final var sseSessionHandler = new SSESender(pingExecutor, eventSink, sse, stream,
-            EncodingName.RFC8040_XML, new EventStreamGetParams(null, null, null, null, null, null, null),
+            StreamEncoding.Rfc8040Encoding.XML, new EventStreamGetParams(null, null, null, null, null, null, null),
             maxFragmentSize, heartbeatInterval);
         doReturn(reg).when(stream).addSubscriber(eq(sseSessionHandler), any(), any());
         return sseSessionHandler;

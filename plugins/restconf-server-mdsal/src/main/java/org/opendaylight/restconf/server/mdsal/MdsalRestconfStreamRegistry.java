@@ -65,6 +65,7 @@ import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.EventFormatter;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.restconf.server.spi.StreamEncoding;
 import org.opendaylight.restconf.server.spi.SubtreeEventStreamFilter;
 import org.opendaylight.restconf.server.spi.TextParameters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.subscribed.notifications.rev191117.Subscription1;
@@ -487,10 +488,10 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
      */
     private static EventFormatter<DOMNotification> getStateNotifEventFormatter(final QName encoding) {
         if (EncodeJson$I.QNAME.equals(encoding)) {
-            return NotificationSource.ENCODINGS.get(RestconfStream.EncodingName.RFC8040_JSON)
+            return NotificationSource.ENCODINGS.get(StreamEncoding.Rfc8040Encoding.JSON)
                 .newFormatter(TextParameters.EMPTY);
         } else if (EncodeXml$I.QNAME.equals(encoding)) {
-            return NotificationSource.ENCODINGS.get(RestconfStream.EncodingName.RFC8040_XML)
+            return NotificationSource.ENCODINGS.get(StreamEncoding.Rfc8040Encoding.XML)
                 .newFormatter(TextParameters.EMPTY);
         } else {
             // this should not happen

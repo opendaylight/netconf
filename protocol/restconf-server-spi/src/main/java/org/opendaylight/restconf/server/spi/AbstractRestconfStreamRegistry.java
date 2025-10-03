@@ -44,7 +44,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
-import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
 import org.opendaylight.restconf.server.spi.RestconfStream.Subscription;
@@ -113,7 +112,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         private @Nullable EventStreamFilter filter;
         private @Nullable String filterName;
 
-        DynSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName, final String streamName,
+        DynSubscription(final Uint32 id, final QName encoding, final StreamEncoding encodingName, final String streamName,
                 final String receiverName, final TransportSession session, final @Nullable EventStreamFilter filter,
                 final @Nullable String filterName, final @Nullable Instant stopTime) {
             super(id, encoding, encodingName, streamName, receiverName, session, stopTime);
@@ -674,12 +673,10 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             return;
         }
 
-        final EncodingName encodingName;
-        if (encoding.equals(EncodeJson$I.QNAME)) {
-            encodingName = EncodingName.RFC8040_JSON;
-        } else if (encoding.equals(EncodeXml$I.QNAME)) {
-            encodingName = EncodingName.RFC8040_XML;
-        } else {
+        final StreamEncoding encodingName;
+        try {
+            encodingName = StreamEncoding.parse(encoding.getLocalName());
+        } catch (IllegalArgumentException exception) {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
                 "Encoding %s not supported", encoding));
             return;

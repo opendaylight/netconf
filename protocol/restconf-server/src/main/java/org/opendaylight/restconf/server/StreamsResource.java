@@ -33,6 +33,7 @@ import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.restconf.server.spi.StreamEncoding;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,9 +59,9 @@ final class StreamsResource extends AbstractEventStreamResource {
     PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
             final HttpHeaders headers, final @Nullable Principal principal, final String firstSegment,
             final SegmentPeeler peeler) {
-        final RestconfStream.EncodingName encoding;
+        final StreamEncoding encoding;
         try {
-            encoding = new RestconfStream.EncodingName(firstSegment);
+            encoding = StreamEncoding.parse(firstSegment);
         } catch (IllegalArgumentException e) {
             LOG.debug("Stream encoding name '{}' is invalid", firstSegment, e);
             return EmptyResponse.NOT_FOUND;
@@ -86,7 +87,7 @@ final class StreamsResource extends AbstractEventStreamResource {
     }
 
     private PreparedRequest prepareGet(final URI targetUri, final HttpHeaders headers,
-            final @Nullable Principal principal, final RestconfStream.EncodingName encoding,
+            final @Nullable Principal principal, final StreamEncoding encoding,
             final RestconfStream<?> stream) {
         if (!headers.contains(HttpHeaderNames.ACCEPT, HttpHeaderValues.TEXT_EVENT_STREAM, false)) {
             return new EmptyResponse(HttpResponseStatus.NOT_ACCEPTABLE);
@@ -108,7 +109,7 @@ final class StreamsResource extends AbstractEventStreamResource {
     // HTTP/1 event stream start. This amounts to a 'long GET', i.e. if our subscription attempt is successful, we will
     // not be servicing any other requests.
     private PreparedRequest switchToEventStream(final RestconfStream<?> stream,
-            final RestconfStream.EncodingName encoding, final EventStreamGetParams params) {
+            final StreamEncoding encoding, final EventStreamGetParams params) {
         final var sender = new ChannelSender(sseMaximumFragmentLength);
         final var registration = registerSender(stream, encoding, params, sender);
         if (registration == null) {
@@ -121,7 +122,7 @@ final class StreamsResource extends AbstractEventStreamResource {
 
     // HTTP/2 event stream start.
     private PreparedRequest addEventStream(final Integer streamId, final RestconfStream<?> stream,
-            final RestconfStream.EncodingName encoding, final EventStreamGetParams params) {
+            final StreamEncoding encoding, final EventStreamGetParams params) {
         final var sender = new StreamSender(streamId);
         final var registration = registerSender(stream, encoding, params, sender);
         if (registration == null) {
@@ -134,8 +135,7 @@ final class StreamsResource extends AbstractEventStreamResource {
     }
 
     private static @Nullable Registration registerSender(final RestconfStream<?> stream,
-            final RestconfStream.EncodingName encoding, final EventStreamGetParams params,
-            final RestconfStream.Sender sender) {
+            final StreamEncoding encoding, final EventStreamGetParams params, final RestconfStream.Sender sender) {
         final Registration reg;
         try {
             reg = stream.addSubscriber(sender, encoding, params);

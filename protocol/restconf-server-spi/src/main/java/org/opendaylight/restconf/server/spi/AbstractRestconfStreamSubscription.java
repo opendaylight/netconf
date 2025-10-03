@@ -15,7 +15,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
-import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -26,7 +25,7 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 public abstract class AbstractRestconfStreamSubscription extends RestconfStream.Subscription {
     private final @NonNull Uint32 id;
     private final @NonNull QName encoding;
-    private final @NonNull EncodingName encodingName;
+    private final @NonNull StreamEncoding encodingName;
     private final @NonNull String streamName;
     private final @NonNull String receiverName;
     private final @NonNull TransportSession session;
@@ -34,7 +33,7 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
     private @NonNull SubscriptionState state = SubscriptionState.ACTIVE;
     private @Nullable Instant stopTime;
 
-    protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName,
+    protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final StreamEncoding encodingName,
             final String streamName, final String receiverName, final TransportSession session,
             final @Nullable Instant stopTime) {
         this.id = requireNonNull(id);
@@ -92,7 +91,7 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
 
     protected abstract @Nullable EventStreamFilter filter();
 
-    protected final @NonNull EncodingName encodingName() {
+    protected final @NonNull StreamEncoding encodingName() {
         return encodingName;
     }
 
