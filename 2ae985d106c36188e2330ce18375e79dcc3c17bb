@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "81c55e40_d8670c49",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-10-03T12:52:46Z",
+      "side": 1,
+      "message": "you misunderstood here, the point is that request.contentEncoding() should not be a plain String, but rather a QName matching the enconding",
+      "parentUuid": "d426d796_15cb8d91",
+      "revId": "2ae985d106c36188e2330ce18375e79dcc3c17bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cc6d84fe_33ad18b0",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyServerRequest.java",
         "patchSetId": 3
