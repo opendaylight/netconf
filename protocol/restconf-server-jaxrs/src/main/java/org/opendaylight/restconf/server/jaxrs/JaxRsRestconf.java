@@ -84,7 +84,7 @@ import org.opendaylight.restconf.server.api.XmlPatchBody;
 import org.opendaylight.restconf.server.api.XmlResourceBody;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
+import org.opendaylight.restconf.server.spi.StreamEncoding;
 import org.opendaylight.restconf.server.spi.YangPatchStatusBody;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.YangConstants;
@@ -1019,7 +1019,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     @GET
     @Produces(MediaType.SERVER_SENT_EVENTS)
     @Path("/" + STREAMS_SUBPATH + "/{encodingName:[a-zA-Z]+}/{streamName:.+}")
-    public void streamsGET(@PathParam("encodingName") final EncodingName encodingName,
+    public void streamsGET(@PathParam("encodingName") final StreamEncoding encodingName,
             @PathParam("streamName") final String streamName, @Context final UriInfo uriInfo,
             @Context final SseEventSink sink, @Context final Sse sse) {
         final var stream = streamRegistry.lookupStream(streamName);
@@ -1042,7 +1042,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     @OPTIONS
     @Path("/" + STREAMS_SUBPATH + "/{encodingName:[a-zA-Z]+}/{streamName:.+}")
     @SuppressWarnings("checkstyle:abbreviationAsWordInName")
-    public Response streamsOPTIONS(@PathParam("encodingName") final EncodingName encodingName) {
+    public Response streamsOPTIONS(@PathParam("encodingName") final StreamEncoding encodingName) {
         return allowGetHeadOptions();
     }
 

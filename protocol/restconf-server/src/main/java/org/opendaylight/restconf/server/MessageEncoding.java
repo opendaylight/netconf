@@ -17,7 +17,7 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
+import org.opendaylight.restconf.server.spi.StreamEncoding;
 
 /**
  * A RESTCONF message encoding, as defined in
@@ -30,7 +30,7 @@ public enum MessageEncoding {
      * <a href="https://www.rfc-editor.org/rfc/rfc7952#section-5.2">RFC7952, section 5.2</a>.
      */
     JSON(NettyMediaTypes.APPLICATION_YANG_DATA_JSON, NettyMediaTypes.APPLICATION_YANG_PATCH_JSON,
-            EncodingName.RFC8040_JSON, HttpHeaderValues.APPLICATION_JSON) {
+            StreamEncoding.Rfc8040Encoding.JSON, HttpHeaderValues.APPLICATION_JSON) {
         @Override
         void formatBody(final FormattableBody body, final PrettyPrintParam prettyPrint, final OutputStream out)
                 throws IOException {
@@ -42,7 +42,7 @@ public enum MessageEncoding {
      * <a href="https://www.rfc-editor.org/rfc/rfc7952#section-5.1">RFC7952, section 5.1</a>.
      */
     XML(NettyMediaTypes.APPLICATION_YANG_DATA_XML, NettyMediaTypes.APPLICATION_YANG_PATCH_XML,
-            EncodingName.RFC8040_XML, HttpHeaderValues.APPLICATION_XML, NettyMediaTypes.TEXT_XML) {
+        StreamEncoding.Rfc8040Encoding.XML, HttpHeaderValues.APPLICATION_XML, NettyMediaTypes.TEXT_XML) {
         @Override
         void formatBody(final FormattableBody body, final PrettyPrintParam prettyPrint, final OutputStream out)
                 throws IOException {
@@ -52,11 +52,11 @@ public enum MessageEncoding {
 
     private final AsciiString dataMediaType;
     private final AsciiString patchMediaType;
-    private final EncodingName streamEncodingName;
+    private final StreamEncoding streamEncodingName;
     private final Set<AsciiString> compatibleDataMediaTypes;
 
     MessageEncoding(final AsciiString dataMediaType, final AsciiString patchMediaType,
-            final EncodingName streamEncodingName, final AsciiString... compatibleMediaTypes) {
+            final StreamEncoding streamEncodingName, final AsciiString... compatibleMediaTypes) {
         this.dataMediaType = requireNonNull(dataMediaType);
         this.patchMediaType = requireNonNull(patchMediaType);
         this.streamEncodingName = requireNonNull(streamEncodingName);
@@ -86,7 +86,7 @@ public enum MessageEncoding {
      *
      * @return A stream {@link EncodingName}
      */
-    EncodingName streamEncodingName() {
+    StreamEncoding streamEncodingName() {
         return streamEncodingName;
     }
 

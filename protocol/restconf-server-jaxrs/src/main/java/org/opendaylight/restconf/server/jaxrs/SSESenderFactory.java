@@ -12,7 +12,7 @@ import javax.ws.rs.sse.SseEventSink;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
+import org.opendaylight.restconf.server.spi.StreamEncoding;
 
 /**
  * A factory for creating {@link SSESender}s.
@@ -20,6 +20,6 @@ import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 @NonNullByDefault
 interface SSESenderFactory {
 
-    void newSSESender(SseEventSink sink, Sse sse, RestconfStream<?> stream, EncodingName encodingName,
+    void newSSESender(SseEventSink sink, Sse sse, RestconfStream<?> stream, StreamEncoding encodingName,
         EventStreamGetParams getParams);
 }

@@ -31,7 +31,7 @@ import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
+import org.opendaylight.restconf.server.spi.StreamEncoding;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -139,7 +139,7 @@ public final class JaxRsEndpoint implements SSESenderFactory, AutoCloseable {
 
     @Override
     public void newSSESender(final SseEventSink sink, final Sse sse, final RestconfStream<?> stream,
-            final EncodingName encodingName, final EventStreamGetParams getParams) {
+            final StreamEncoding encodingName, final EventStreamGetParams getParams) {
         // FIXME: invert control here: we should call 'listener.addSession()', which in turn should call
         //        handler.init()/handler.close()
         final var handler = new SSESender(pingExecutor, sink, sse, stream, encodingName, getParams,
@@ -148,7 +148,7 @@ public final class JaxRsEndpoint implements SSESenderFactory, AutoCloseable {
         try {
             handler.init();
         } catch (UnsupportedEncodingException e) {
-            throw new NotFoundException("Unsupported encoding " + encodingName.name(), e);
+            throw new NotFoundException("Unsupported encoding " + encodingName.localName(), e);
         } catch (IllegalArgumentException | XPathExpressionException e) {
             throw new BadRequestException(e.getMessage(), e);
         }
