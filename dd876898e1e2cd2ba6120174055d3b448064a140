@@ -16,6 +16,23 @@
       "message": "we have made no operations yet - we do not have RPC_SUCCESS",
       "revId": "dd876898e1e2cd2ba6120174055d3b448064a140",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e2f6f57_c45a7a8a",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 807,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-03T13:13:27Z",
+      "side": 1,
+      "message": "IMO when we use for loop we do not have to check if list is non-empty",
+      "revId": "dd876898e1e2cd2ba6120174055d3b448064a140",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
