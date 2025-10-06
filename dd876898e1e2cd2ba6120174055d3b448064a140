@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a965e03_fcc89738",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 495,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-06T07:45:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ec26abd_fe344877",
+      "revId": "dd876898e1e2cd2ba6120174055d3b448064a140",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e2f6f57_c45a7a8a",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-03T13:13:27Z",
       "side": 1,
       "message": "IMO when we use for loop we do not have to check if list is non-empty",
+      "revId": "dd876898e1e2cd2ba6120174055d3b448064a140",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73fea80e_b900f4c8",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 807,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-06T07:45:37Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "8e2f6f57_c45a7a8a",
       "revId": "dd876898e1e2cd2ba6120174055d3b448064a140",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
