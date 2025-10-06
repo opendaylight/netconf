@@ -16,6 +16,24 @@
       "message": "unnecessary change",
       "revId": "bd7c8d47f9403d769a7544760372eb703074aa15",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5cd2acae_ef0b6e58",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfStrategyTest.java",
+        "patchSetId": 61
+      },
+      "lineNbr": 475,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-06T07:44:47Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "e0168ea4_548d2fc3",
+      "revId": "bd7c8d47f9403d769a7544760372eb703074aa15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

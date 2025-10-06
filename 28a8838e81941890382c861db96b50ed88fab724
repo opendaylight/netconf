@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bbe787d_5babe212",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfStrategyTest.java",
+        "patchSetId": 61
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-06T07:44:47Z",
+      "side": 1,
+      "message": "no, that can\u0027t be 😊",
+      "parentUuid": "1125e9e0_5b4d5db4",
+      "revId": "28a8838e81941890382c861db96b50ed88fab724",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fa65d1dd_f41070f1",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-02T15:16:01Z",
       "side": 1,
       "message": "we can just simply throws",
+      "revId": "28a8838e81941890382c861db96b50ed88fab724",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb13d710_a7ba1846",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfStrategyTest.java",
+        "patchSetId": 61
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-06T07:44:47Z",
+      "side": 1,
+      "message": "AssertionError seems to better fit",
+      "parentUuid": "fa65d1dd_f41070f1",
       "revId": "28a8838e81941890382c861db96b50ed88fab724",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
