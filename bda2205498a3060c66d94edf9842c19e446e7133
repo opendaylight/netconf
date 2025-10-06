@@ -33,6 +33,24 @@
       "message": "separate explanations into \u003cp\u003e",
       "revId": "bda2205498a3060c66d94edf9842c19e446e7133",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ec892d1_d1843e41",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/DataOperationService.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-06T09:01:54Z",
+      "side": 1,
+      "message": "Probably we have just only moved a code to another place as-is.",
+      "parentUuid": "f1c712a0_40e65eb7",
+      "revId": "bda2205498a3060c66d94edf9842c19e446e7133",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
