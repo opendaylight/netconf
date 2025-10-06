@@ -33,6 +33,24 @@
       "message": "redundant line",
       "revId": "ef55c81e7070bfc52abcf80090acf4cb94e6c87e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2be2adab_348bb299",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformerTest.java",
+        "patchSetId": 51
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-06T09:22:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "207ba595_7e7bdad5",
+      "revId": "ef55c81e7070bfc52abcf80090acf4cb94e6c87e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
