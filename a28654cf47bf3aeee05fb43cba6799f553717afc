@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "337250d3_20c141db",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2025-10-07T12:36:13Z",
+      "side": 1,
+      "message": "Redundant suppression",
+      "revId": "a28654cf47bf3aeee05fb43cba6799f553717afc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
