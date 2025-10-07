@@ -16,6 +16,24 @@
       "message": "Redundant suppression",
       "revId": "a28654cf47bf3aeee05fb43cba6799f553717afc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21dd64b7_f4ff8175",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-07T14:06:55Z",
+      "side": 1,
+      "message": "I assume you intended to put this comment on line 45, here it is needed, on extractPath it was redundant",
+      "parentUuid": "337250d3_20c141db",
+      "revId": "a28654cf47bf3aeee05fb43cba6799f553717afc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
