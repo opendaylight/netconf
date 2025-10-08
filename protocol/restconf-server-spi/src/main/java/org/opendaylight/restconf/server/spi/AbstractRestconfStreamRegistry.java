@@ -804,6 +804,66 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     /**
+     * Recreate a subscription previously persisted in the operational datastore.
+     *
+     * @param id subscription identifier
+     * @param encoding subscription encoding
+     * @param streamName stream name
+     * @param receiverName receiver name associated with control session
+     * @param session reconstructed transport session
+     * @param filter optional subscription filter definition
+     * @param stopTime optional stop time
+     * @return {@code true} if the subscription was restored, {@code false} if it was skipped
+     * @throws RequestException if the stored filter definition cannot be resolved
+     */
+    protected final boolean restoreSubscription(final Uint32 id, final QName encoding, final String streamName,
+            final String receiverName, final TransportSession session,
+            final RestconfStream.SubscriptionFilter filter, final @Nullable Instant stopTime)
+            throws RequestException {
+        requireNonNull(id);
+        requireNonNull(encoding);
+        requireNonNull(streamName);
+        requireNonNull(receiverName);
+        requireNonNull(session);
+
+        if (streams.get(streamName) == null) {
+            LOG.warn("Skipping restoration of subscription {}: stream {} is not available", id, streamName);
+            return false;
+        }
+
+        final EncodingName encodingName;
+        if (encoding.equals(EncodeJson$I.QNAME)) {
+            encodingName = EncodingName.RFC8040_JSON;
+        } else if (encoding.equals(EncodeXml$I.QNAME)) {
+            encodingName = EncodingName.RFC8040_XML;
+        } else {
+            LOG.warn("Skipping restoration of subscription {}: unsupported encoding {}", id, encoding);
+            return false;
+        }
+
+        final var filterImpl = resolveFilter(filter);
+        final var filterName = filter instanceof RestconfStream.SubscriptionFilter.Reference(var name) ? name : null;
+
+        final var subscription = new DynSubscription(id, encoding, encodingName, streamName, receiverName, session,
+            filterImpl, filterName, stopTime);
+
+        if (subscriptions.putIfAbsent(id, subscription) != null) {
+            LOG.debug("Subscription {} already present, skipping restoration", id);
+            return false;
+        }
+
+        session.registerResource(new DynSubscriptionResource(subscription));
+
+        if (stopTime != null) {
+            initiateStopTime(id, stopTime);
+        }
+
+        final int idBits = id.intValue();
+        prevDynamicId.updateAndGet(prev -> Integer.compareUnsigned(prev, idBits) >= 0 ? prev : idBits);
+        return true;
+    }
+
+    /**
      * Cancel any existing scheduled stop task and schedule a new stop task for the given stop time.
      */
     private void scheduleStopTimeTask(final Uint32 id, final Instant stopTime) {
