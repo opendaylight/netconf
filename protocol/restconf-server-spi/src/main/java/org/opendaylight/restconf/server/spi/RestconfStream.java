@@ -13,6 +13,7 @@ import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.UnsupportedEncodingException;
@@ -34,6 +35,8 @@ import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
 import org.opendaylight.restconf.server.spi.Subscriber.Rfc8040Subscriber;
 import org.opendaylight.restconf.server.spi.Subscriber.Rfc8639Subscriber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver.State;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -51,6 +54,17 @@ import org.slf4j.LoggerFactory;
  * @param <T> Type of processed events
  */
 public sealed class RestconfStream<T> permits LegacyRestconfStream {
+    /**
+     * A bidirectional, immutable mapping between {@link QName} objects and {@link EncodingName} enums.
+     * 
+     * <p>This map allows:
+     * - Lookup of the {@link EncodingName} corresponding to a given {@link QName} key.
+     * - Reverse lookup of the {@link QName} corresponding to a given {@link EncodingName} key.
+     */
+    public static final ImmutableBiMap<QName, EncodingName> QNAME_TO_ENCODING = ImmutableBiMap.<QName, EncodingName>builder()
+        .put(EncodeJson$I.QNAME, EncodingName.RFC8040_JSON)
+        .put(EncodeXml$I.QNAME, EncodingName.RFC8040_XML)
+        .build();
     /**
      * An opinionated view on what values we can produce for {@code Access.getEncoding()}. The name can only be composed
      * of one or more characters matching {@code [a-zA-Z]}.
