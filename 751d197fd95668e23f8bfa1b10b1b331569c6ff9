@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5a3a0c8_c230bf43",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeMatcher.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-08T08:18:51Z",
+      "side": 1,
+      "message": "then we do not need two constructors?",
+      "revId": "751d197fd95668e23f8bfa1b10b1b331569c6ff9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86636684_42ecbb28",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeMatcher.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-08T08:18:51Z",
+      "side": 1,
+      "message": "private",
+      "revId": "751d197fd95668e23f8bfa1b10b1b331569c6ff9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "baa7d983_5755fd94",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-08T08:18:51Z",
+      "side": 1,
+      "message": "we would have here just: new SubtreeMatcher(filter, body, path).matches()",
+      "revId": "751d197fd95668e23f8bfa1b10b1b331569c6ff9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
