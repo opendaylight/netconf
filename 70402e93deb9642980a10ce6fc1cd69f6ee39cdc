@@ -16,6 +16,23 @@
       "message": "ommited.",
       "revId": "70402e93deb9642980a10ce6fc1cd69f6ee39cdc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8793963_af7e466a",
+        "filename": "apps/restconf-subscription/src/main/java/org/opendaylight/restconf/subscription/EstablishSubscriptionRpc.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-08T08:24:10Z",
+      "side": 1,
+      "message": "we should not assume any default - it should be derived from response payload..",
+      "revId": "70402e93deb9642980a10ce6fc1cd69f6ee39cdc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
