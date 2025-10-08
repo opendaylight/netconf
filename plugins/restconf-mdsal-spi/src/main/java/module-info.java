@@ -18,6 +18,7 @@ module org.opendaylight.restconf.mdsal.spi {
     requires org.opendaylight.netconf.api;
     requires org.opendaylight.odlparent.logging.markers;
     requires org.opendaylight.yang.gen.ietf.restconf.rfc8040;
+    requires org.opendaylight.yang.gen.ietf.subscribed.notifications.rfc8639;
     requires org.opendaylight.yangtools.binding.spec;
     requires org.opendaylight.yangtools.yang.data.codec.xml;
     requires org.opendaylight.yangtools.yang.data.impl;

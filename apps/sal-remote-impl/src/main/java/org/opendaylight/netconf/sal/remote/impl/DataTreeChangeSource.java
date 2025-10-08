@@ -21,10 +21,12 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeListener;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sink;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 
@@ -33,9 +35,9 @@ import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
  */
 @VisibleForTesting
 public final class DataTreeChangeSource extends Source<List<DataTreeCandidate>> {
-    private static final ImmutableMap<EncodingName, DataTreeCandidateFormatterFactory> ENCODINGS = ImmutableMap.of(
-        EncodingName.RFC8040_JSON, JSONDataTreeCandidateFormatter.FACTORY,
-        EncodingName.RFC8040_XML, XMLDataTreeCandidateFormatter.FACTORY);
+    private static final ImmutableMap<QName, DataTreeCandidateFormatterFactory> ENCODINGS = ImmutableMap.of(
+        EncodeJson$I.QNAME, JSONDataTreeCandidateFormatter.FACTORY,
+        EncodeXml$I.QNAME, XMLDataTreeCandidateFormatter.FACTORY);
 
     private final @NonNull DataTreeChangeExtension changeService;
     private final @NonNull DatabindProvider databindProvider;

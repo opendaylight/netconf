@@ -12,6 +12,7 @@ module org.opendaylight.netconf.sal.remote.impl {
     requires transitive org.opendaylight.restconf.server.api;
     requires transitive org.opendaylight.restconf.server.spi;
     requires org.opendaylight.netconf.sal.remote;
+    requires org.opendaylight.yang.gen.ietf.subscribed.notifications.rfc8639;
     requires org.opendaylight.yangtools.binding.spec;
     requires org.opendaylight.yangtools.yang.data.spi;
     requires org.slf4j;

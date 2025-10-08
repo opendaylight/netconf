@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.mdsal;
 import static com.google.common.base.Verify.verify;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.server.spi.RestconfStream.QNAME_TO_ENCODING;
 import static org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.YangModuleInfoImpl.qnameOf;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -68,8 +69,6 @@ import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.SubtreeEventStreamFilter;
 import org.opendaylight.restconf.server.spi.TextParameters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.subscribed.notifications.rev191117.Subscription1;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Filters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionModified;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionResumed;
@@ -486,16 +485,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
      * @return {@link EventFormatter} formatter used to format state notifications
      */
     private static EventFormatter<DOMNotification> getStateNotifEventFormatter(final QName encoding) {
-        if (EncodeJson$I.QNAME.equals(encoding)) {
-            return NotificationSource.ENCODINGS.get(RestconfStream.EncodingName.RFC8040_JSON)
-                .newFormatter(TextParameters.EMPTY);
-        } else if (EncodeXml$I.QNAME.equals(encoding)) {
-            return NotificationSource.ENCODINGS.get(RestconfStream.EncodingName.RFC8040_XML)
-                .newFormatter(TextParameters.EMPTY);
-        } else {
-            // this should not happen
-            return null;
-        }
+        return NotificationSource.ENCODINGS.get(QNAME_TO_ENCODING.get(encoding)).newFormatter(TextParameters.EMPTY);
     }
 
     private static @NonNull ListenableFuture<@Nullable Void> mapFuture(

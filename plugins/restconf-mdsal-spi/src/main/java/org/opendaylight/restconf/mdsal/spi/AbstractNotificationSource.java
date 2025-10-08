@@ -16,9 +16,9 @@ import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.restconf.server.spi.EventFormatterFactory;
-import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sink;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
@@ -42,7 +42,7 @@ public abstract class AbstractNotificationSource extends Source<DOMNotification>
     }
 
     protected AbstractNotificationSource(
-            final ImmutableMap<EncodingName, ? extends EventFormatterFactory<DOMNotification>> encodings) {
+            final ImmutableMap<QName, ? extends EventFormatterFactory<DOMNotification>> encodings) {
         super(encodings);
     }
 }
