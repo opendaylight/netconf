@@ -24,8 +24,10 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -61,7 +63,9 @@ import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
 import org.opendaylight.restconf.mdsal.spi.NotificationSource;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
+import org.opendaylight.restconf.server.spi.DefaultTransportSession;
 import org.opendaylight.restconf.server.spi.EventFormatter;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -99,8 +103,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedAnydata;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
@@ -138,6 +145,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private static final NodeIdentifier STREAM_SUBTREE_FILTER_NODEID = NodeIdentifier.create(StreamSubtreeFilter.QNAME);
     private static final NodeIdentifier TARGET_NODEID = NodeIdentifier.create(Target.QNAME);
     private static final YangInstanceIdentifier FILTERS_OPER_PATH = YangInstanceIdentifier.of(FILTERS_NODEID);
+    private static final YangInstanceIdentifier SUBSCRIPTIONS_LIST_PATH =
+        YangInstanceIdentifier.of(SUBSCRIPTIONS_NODEID, SUBSCRIPTION_NODEID);
     private static final ServiceGroupIdentifier SGI = new ServiceGroupIdentifier("restconf-stream-filters");
     /**
      * {@link NodeIdentifier} of {@code leaf reason} in {@link SubscriptionSuspended} and
@@ -204,6 +213,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private final Registration sclReg;
     private final Registration tclReg;
     private final AtomicBoolean isLeader = new AtomicBoolean(false);
+    private final AtomicBoolean restoreInProgress = new AtomicBoolean(false);
+    private final AtomicBoolean restoreCompleted = new AtomicBoolean(false);
     private DefaultNotificationSource notificationSource;
     private DOMTransactionChain txChain;
 
@@ -326,6 +337,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     @VisibleForTesting
     synchronized void onModelContextUpdated(final EffectiveModelContext context) {
         super.updateModelContext(context);
+        triggerSubscriptionRestore();
     }
 
     @NonNullByDefault
@@ -594,6 +606,188 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             LOG.debug("Filter operational view updated {}", info);
             return null;
         }, MoreExecutors.directExecutor());
+    }
+
+    private void triggerSubscriptionRestore() {
+        if (restoreCompleted.get()) {
+            LOG.debug("Subscription restoration already completed, ignoring trigger");
+            return;
+        }
+        if (!restoreInProgress.compareAndSet(false, true)) {
+            LOG.debug("Subscription restoration already in progress, ignoring trigger");
+            return;
+        }
+
+        final var readTx = dataBroker.newReadOnlyTransaction();
+        final var future = readTx.read(LogicalDatastoreType.OPERATIONAL, SUBSCRIPTIONS_LIST_PATH);
+        Futures.addCallback(future, new FutureCallback<>() {
+            @Override
+            public void onSuccess(final Optional<NormalizedNode> data) {
+                if (data.isPresent()) {
+                    final var node = data.orElseThrow();
+                    if (node instanceof MapNode mapNode) {
+                        restoreSubscriptions(mapNode);
+                    } else {
+                        LOG.warn("Unexpected data at {} when restoring subscriptions: {}", SUBSCRIPTIONS_LIST_PATH,
+                            node.getClass());
+                    }
+                } else {
+                    LOG.debug("No persisted subscriptions found in operational datastore");
+                }
+                restoreInProgress.set(false);
+                restoreCompleted.set(true);
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                LOG.warn("Failed to read subscriptions from operational datastore", cause);
+                readTx.close();
+                restoreInProgress.set(false);
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
+    private void restoreSubscriptions(final MapNode subscriptions) {
+        int restored = 0;
+        for (var child : subscriptions.body()) {
+            if (restoreSubscription(child)) {
+                restored++;
+            }
+        }
+        if (restored > 0) {
+            LOG.info("Restored {} subscription(s) from operational datastore", restored);
+        } else {
+            LOG.debug("No subscriptions restored from operational datastore snapshot");
+        }
+    }
+
+    private boolean restoreSubscription(final MapEntryNode entry) {
+        final var idNode = entry.childByArg(ID_NODEID);
+        if (!(idNode instanceof LeafNode<?> idLeaf) || !(idLeaf.body() instanceof Uint32 id)) {
+            LOG.warn("Skipping malformed subscription entry without valid id:");
+            return false;
+        }
+
+        if (lookupSubscription(id) != null) {
+            LOG.debug("Subscription {} already present, skipping restoration", id);
+            return false;
+        }
+
+        final var encodingNode = entry.childByArg(ENCODING_NODEID);
+        if (!(encodingNode instanceof LeafNode<?> encLeaf) || !(encLeaf.body() instanceof QName encoding)) {
+            LOG.warn("Skipping subscription {} restoration: missing encoding", id);
+            return false;
+        }
+
+        final var targetNode = entry.childByArg(TARGET_NODEID);
+        if (!(targetNode instanceof ChoiceNode target)) {
+            LOG.warn("Skipping subscription {} restoration: missing target", id);
+            return false;
+        }
+
+        final var streamNode = target.childByArg(STREAM_NODEID);
+        if (!(streamNode instanceof LeafNode<?> streamLeaf) || !(streamLeaf.body() instanceof String streamName)) {
+            LOG.warn("Skipping subscription {} restoration: missing stream", id);
+            return false;
+        }
+
+        final var streamFilter = target.childByArg(STREAM_FILTER_NODEID);
+        final var filter = streamFilter instanceof ChoiceNode choice ? extractFilter(choice) : null;
+
+        final var stopTime = parseStopTime(entry, id);
+        final var receiverName = extractReceiverName(entry);
+
+        final var session = new DefaultTransportSession(new RestoredDescription(receiverName));
+        try {
+            if (restoreSubscription(id, encoding, streamName, receiverName, session, filter, stopTime)) {
+                LOG.info("Restored subscription {} targeting stream {}", id, streamName);
+                return true;
+            }
+            session.close();
+            return false;
+        } catch (RequestException e) {
+            LOG.warn("Failed to restore subscription {}: ", id, e);
+            session.close();
+            return false;
+        } catch (RuntimeException e) {
+            LOG.warn("Failed to restore subscription {} due to unexpected error", id, e);
+            session.close();
+            return false;
+        }
+    }
+
+    private static String extractReceiverName(final MapEntryNode subscription) {
+        final var receiversNode = subscription.childByArg(RECEIVERS_NODEID);
+        if (receiversNode instanceof ContainerNode receiversContainer) {
+            final var receiverMap = receiversContainer.childByArg(RECEIVER_NODEID);
+            if (receiverMap instanceof MapNode receiverList) {
+                for (var receiverEntry : receiverList.body()) {
+                    final var nameNode = receiverEntry.childByArg(NAME_NODEID);
+                    if (nameNode instanceof LeafNode<?> nameLeaf && nameLeaf.body() instanceof String name) {
+                        return name;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private static @Nullable Instant parseStopTime(final MapEntryNode entry, final Uint32 id) {
+        final var stopTimeNode = entry.childByArg(STOP_TIME_NODEID);
+        if (stopTimeNode instanceof LeafNode<?> stopLeaf && stopLeaf.body() instanceof String stopTime) {
+            try {
+                return Instant.parse(stopTime);
+            } catch (DateTimeParseException e) {
+                LOG.warn("Ignoring invalid stop-time '{}' for subscription {}", stopTime, id, e);
+            }
+        }
+        return null;
+    }
+
+    private static RestconfStream.SubscriptionFilter extractFilter(final ChoiceNode streamFilter) {
+        final var nameNode = streamFilter.childByArg(STREAM_FILTER_NAME_NODEID);
+        if (nameNode instanceof LeafNode<?> nameLeaf && nameLeaf.body() instanceof String filterName) {
+            return new RestconfStream.SubscriptionFilter.Reference(filterName);
+        }
+
+        final var filterSpec = streamFilter.childByArg(FILTER_SPEC_NODEID);
+        if (filterSpec instanceof ChoiceNode specChoice) {
+            final var subtreeNode = specChoice.childByArg(STREAM_SUBTREE_FILTER_NODEID);
+            if (subtreeNode instanceof AnydataNode<?> anydata) {
+                return new RestconfStream.SubscriptionFilter.SubtreeDefinition(anydata);
+            }
+            final var xpathNode = specChoice.childByArg(STREAM_XPATH_FILTER_NODEID);
+            if (xpathNode instanceof LeafNode<?> xpathLeaf && xpathLeaf.body() instanceof String xpath) {
+                return new RestconfStream.SubscriptionFilter.XPathDefinition(xpath);
+            }
+        }
+        return null;
+    }
+
+    private record RestoredDescription(String receiverName) implements TransportSession.Description {
+        RestoredDescription {
+            requireNonNull(receiverName);
+        }
+
+        @Override
+        public String messageLayer() {
+            return "RESTCONF";
+        }
+
+        @Override
+        public String transportLayer() {
+            return "restored";
+        }
+
+        @Override
+        public String transportPeer() {
+            return receiverName;
+        }
+
+        @Override
+        public String toFriendlyString() {
+            return receiverName;
+        }
     }
 
 
