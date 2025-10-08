@@ -13,6 +13,7 @@ import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.UnsupportedEncodingException;
@@ -21,8 +22,10 @@ import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -34,6 +37,8 @@ import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
 import org.opendaylight.restconf.server.spi.Subscriber.Rfc8040Subscriber;
 import org.opendaylight.restconf.server.spi.Subscriber.Rfc8639Subscriber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver.State;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -52,12 +57,24 @@ import org.slf4j.LoggerFactory;
  */
 public sealed class RestconfStream<T> permits LegacyRestconfStream {
     /**
+     * A bidirectional, immutable mapping between {@link QName} objects and {@link EncodingName} enums.
+     *
+     * <p>This map allows:
+     * - Lookup of the {@link EncodingName} corresponding to a given {@link QName} key.
+     * - Reverse lookup of the {@link QName} corresponding to a given {@link EncodingName} key.
+     */
+    public static final ImmutableBiMap<QName, EncodingName> QNAME_TO_ENCODING =
+        ImmutableBiMap.<QName, EncodingName>builder()
+            .put(EncodeJson$I.QNAME, EncodingName.RFC8040_JSON)
+            .put(EncodeXml$I.QNAME, EncodingName.RFC8040_XML)
+            .build();
+
+    /**
      * An opinionated view on what values we can produce for {@code Access.getEncoding()}. The name can only be composed
      * of one or more characters matching {@code [a-zA-Z]}.
      *
      * @param name Encoding name, as visible via the stream's {@code access} list
      */
-    // FIXME: reconcile with RFC8639
     public record EncodingName(@NonNull String name) {
         private static final Pattern PATTERN = Pattern.compile("[a-zA-Z]+");
 
@@ -118,9 +135,9 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
      */
     public abstract static class Source<T> {
         // ImmutableMap because it retains iteration order
-        final @NonNull ImmutableMap<EncodingName, ? extends EventFormatterFactory<T>> encodings;
+        final @NonNull ImmutableMap<QName, ? extends EventFormatterFactory<T>> encodings;
 
-        protected Source(final ImmutableMap<EncodingName, ? extends EventFormatterFactory<T>> encodings) {
+        protected Source(final ImmutableMap<QName, ? extends EventFormatterFactory<T>> encodings) {
             if (encodings.isEmpty()) {
                 throw new IllegalArgumentException("A source must support at least one encoding");
             }
@@ -570,12 +587,14 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
      *
      * @return Supported encodings.
      */
-    @SuppressWarnings("null")
     public @NonNull Set<EncodingName> encodings() {
-        return source.encodings.keySet();
+        return source.encodings.keySet().stream()
+            .map(QNAME_TO_ENCODING::get)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toUnmodifiableSet());
     }
 
-    @NonNull EventFormatterFactory<T> getFactory(final EncodingName encoding) throws UnsupportedEncodingException {
+    @NonNull EventFormatterFactory<T> getFactory(final QName encoding) throws UnsupportedEncodingException {
         final var factory = source.encodings.get(requireNonNull(encoding));
         if (factory == null) {
             throw new UnsupportedEncodingException("Stream '" + name + "' does not support " + encoding);
@@ -597,7 +616,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
     @NonNullByDefault
     public @Nullable Registration addSubscriber(final Sender handler, final EncodingName encoding,
             final EventStreamGetParams params) throws UnsupportedEncodingException, XPathExpressionException {
-        final var factory = getFactory(encoding);
+        final var factory = getFactory(QNAME_TO_ENCODING.inverse().get(encoding));
         final var startTime = params.startTime();
         if (startTime != null) {
             throw new IllegalArgumentException("Stream " + name + " does not support replay");
@@ -622,7 +641,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
     }
 
     @NonNullByDefault
-    @Nullable Rfc8639Subscriber<T> addSubscriber(final Sender handler, final EncodingName encoding,
+    @Nullable Rfc8639Subscriber<T> addSubscriber(final Sender handler, final QName encoding,
             final String receiverName, @Nullable final EventStreamFilter eventStreamFilter, final State state)
             throws UnsupportedEncodingException {
         return addSubscriber(new Rfc8639Subscriber<>(this, handler,

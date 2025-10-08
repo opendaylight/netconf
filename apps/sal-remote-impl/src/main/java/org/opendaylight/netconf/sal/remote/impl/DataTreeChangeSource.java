@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.sal.remote.impl;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.server.spi.RestconfStream.QNAME_TO_ENCODING;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects.ToStringHelper;
@@ -25,6 +26,7 @@ import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sink;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 
@@ -33,9 +35,11 @@ import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
  */
 @VisibleForTesting
 public final class DataTreeChangeSource extends Source<List<DataTreeCandidate>> {
-    private static final ImmutableMap<EncodingName, DataTreeCandidateFormatterFactory> ENCODINGS = ImmutableMap.of(
-        EncodingName.RFC8040_JSON, JSONDataTreeCandidateFormatter.FACTORY,
-        EncodingName.RFC8040_XML, XMLDataTreeCandidateFormatter.FACTORY);
+    private static final ImmutableMap<QName, DataTreeCandidateFormatterFactory> ENCODINGS = ImmutableMap.of(
+        requireNonNull(QNAME_TO_ENCODING.inverse().get(EncodingName.RFC8040_JSON)),
+            JSONDataTreeCandidateFormatter.FACTORY,
+        requireNonNull(QNAME_TO_ENCODING.inverse().get(EncodingName.RFC8040_XML)),
+            XMLDataTreeCandidateFormatter.FACTORY);
 
     private final @NonNull DataTreeChangeExtension changeService;
     private final @NonNull DatabindProvider databindProvider;

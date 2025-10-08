@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.server.spi.RestconfStream.QNAME_TO_ENCODING;
 import static org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.YangModuleInfoImpl.qnameOf;
 
 import com.google.common.annotations.Beta;
@@ -155,7 +156,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
             final Rfc8639Subscriber<?> newSubscriber;
             try {
-                newSubscriber = stream.addSubscriber(sender, encodingName(),
+                newSubscriber = stream.addSubscriber(sender, encoding(),
                     newReceiverName(session.description(), request.principal()), filter(), receiverState);
             } catch (UnsupportedEncodingException e) {
                 request.failWith(new RequestException(e));
@@ -674,12 +675,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             return;
         }
 
-        final EncodingName encodingName;
-        if (encoding.equals(EncodeJson$I.QNAME)) {
-            encodingName = EncodingName.RFC8040_JSON;
-        } else if (encoding.equals(EncodeXml$I.QNAME)) {
-            encodingName = EncodingName.RFC8040_XML;
-        } else {
+        final EncodingName encodingName = QNAME_TO_ENCODING.get(encoding);
+        if (encodingName == null) {
             request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
                 "Encoding %s not supported", encoding));
             return;

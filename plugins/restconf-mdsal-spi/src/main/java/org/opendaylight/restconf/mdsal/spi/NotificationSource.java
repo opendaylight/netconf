@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.mdsal.spi;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.server.spi.RestconfStream.QNAME_TO_ENCODING;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
@@ -15,7 +16,7 @@ import com.google.common.collect.ImmutableSet;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.netconf.databind.DatabindProvider;
-import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sink;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -26,9 +27,11 @@ import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absol
  * A {@link Source} reporting YANG notifications.
  */
 public final class NotificationSource extends AbstractNotificationSource {
-    public static final ImmutableMap<EncodingName, NotificationFormatterFactory> ENCODINGS = ImmutableMap.of(
-        EncodingName.RFC8040_JSON, JSONNotificationFormatter.FACTORY,
-        EncodingName.RFC8040_XML, XMLNotificationFormatter.FACTORY);
+    public static final ImmutableMap<QName, NotificationFormatterFactory> ENCODINGS = ImmutableMap.of(
+        requireNonNull(QNAME_TO_ENCODING.inverse().get(RestconfStream.EncodingName.RFC8040_JSON)),
+            JSONNotificationFormatter.FACTORY,
+        requireNonNull(QNAME_TO_ENCODING.inverse().get(RestconfStream.EncodingName.RFC8040_XML)),
+            XMLNotificationFormatter.FACTORY);
 
     private final DatabindProvider databindProvider;
     private final DOMNotificationService notificationService;
