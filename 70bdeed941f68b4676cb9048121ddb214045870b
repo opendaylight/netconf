@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "421b5d50_0fbc9f6d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-09T07:15:05Z",
+      "side": 1,
+      "message": "Check new comments on reconcile encodings and think if its applicable here",
+      "revId": "70bdeed941f68b4676cb9048121ddb214045870b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
