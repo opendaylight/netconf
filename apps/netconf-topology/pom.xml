@@ -54,6 +54,22 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>iana-ssh-encryption-algs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>iana-ssh-key-exchange-algs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>iana-ssh-mac-algs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>iana-ssh-public-key-algs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc9643-ietf-tcp-client</artifactId>
         </dependency>
         <dependency>
@@ -71,6 +87,10 @@
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
             <artifactId>mdsal-dom-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc9644-ietf-ssh-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
