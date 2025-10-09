@@ -296,6 +296,34 @@ module odl-netconf-device {
       description "Time that slave actor will wait for response from master.";
     }
 
+    leaf key-exchange {
+      config true;
+      type string;
+      default "";
+      description "Client advertised key exchange algorithms.";
+    }
+
+    leaf macs {
+      config true;
+      type string;
+      default "";
+      description "Client advertised masc.";
+    }
+
+    leaf encryption {
+      config true;
+      type string;
+      default "";
+      description "Client advertised encryption.";
+    }
+
+    leaf host-keys {
+      config true;
+      type string;
+      default "";
+      description "Client advertised host keys.";
+    }
+
     container odl-hello-message-capabilities {
       config true;
       leaf-list capability {
