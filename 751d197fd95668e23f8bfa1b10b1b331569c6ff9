@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "37aad420_1ba1c614",
+        "filename": "protocol/databind/src/main/java/org/opendaylight/netconf/databind/subtree/SubtreeMatcher.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-10-09T07:52:44Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/116911/comment/baa7d983_5755fd94/",
+      "parentUuid": "86636684_42ecbb28",
+      "revId": "751d197fd95668e23f8bfa1b10b1b331569c6ff9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "baa7d983_5755fd94",
@@ -102,6 +120,24 @@
       "side": 1,
       "message": "ACK 😊 and is permitsPath able to accept empty path? then that if will be there instead of SubtreeMatcher#matches",
       "parentUuid": "2f266fae_a8a92bec",
+      "revId": "751d197fd95668e23f8bfa1b10b1b331569c6ff9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3dc8375d_4ff35f83",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-10-09T07:52:44Z",
+      "side": 1,
+      "message": "Sure, it will not iterate through pathArguments and just return true",
+      "parentUuid": "20ef4796_a8108f46",
       "revId": "751d197fd95668e23f8bfa1b10b1b331569c6ff9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
