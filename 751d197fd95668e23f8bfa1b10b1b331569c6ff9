@@ -86,6 +86,24 @@
       "parentUuid": "baa7d983_5755fd94",
       "revId": "751d197fd95668e23f8bfa1b10b1b331569c6ff9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20ef4796_a8108f46",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-09T07:12:31Z",
+      "side": 1,
+      "message": "ACK 😊 and is permitsPath able to accept empty path? then that if will be there instead of SubtreeMatcher#matches",
+      "parentUuid": "2f266fae_a8a92bec",
+      "revId": "751d197fd95668e23f8bfa1b10b1b331569c6ff9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
