@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b0bbaba_31281629",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-09T17:15:56Z",
+      "side": 1,
+      "message": "Have you checked if we can store default at nt:network-topology/nt:topology/nt:topology-types?",
+      "revId": "ace0a52be96fd648e3fe2f2687eefb172074a478",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
