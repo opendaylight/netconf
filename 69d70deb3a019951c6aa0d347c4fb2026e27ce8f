@@ -16,6 +16,98 @@
       "message": "recheck",
       "revId": "69d70deb3a019951c6aa0d347c4fb2026e27ce8f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3ead72d_7bd97ae8",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/ServerRequest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-10-10T23:14:03Z",
+      "side": 1,
+      "message": "@Nullable this is a bad decomposition of what we are implementing.\n\nWe are creating this abstraction from a single case, which is an RPC which has mandatory inputs, which is why RFC8639 can say there is such a thing as RPC encoding -- it assumes there in input.\n\nThis means we are implementing this for RPCs, which MAY have input and MAY have output -- see https://www.rfc-editor.org/rfc/rfc8040#section-4.4.2.\n\nThis in turn means that an RPC definition modelling no (which really means optional in YANG due to augments) input and mandatory output could make the same assumption and assume \"RPC encoding\" is derived from \u0027Accept\u0027 header.\n\nSo let\u0027s take a leap of faith here, and say that there is a \u0027requestEncoding\u0027, which is supplied is always available.",
+      "range": {
+        "startLine": 60,
+        "startChar": 4,
+        "endLine": 60,
+        "endChar": 38
+      },
+      "revId": "69d70deb3a019951c6aa0d347c4fb2026e27ce8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c690b566_20d91bc1",
+        "filename": "protocol/restconf-server-jaxrs/src/main/java/org/opendaylight/restconf/server/jaxrs/JaxRsRestconf.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 652,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-10-10T23:14:03Z",
+      "side": 1,
+      "message": "there are two subclasses doing this in this class, leading to unnecessary duplication",
+      "range": {
+        "startLine": 652,
+        "startChar": 35,
+        "endLine": 652,
+        "endChar": 50
+      },
+      "revId": "69d70deb3a019951c6aa0d347c4fb2026e27ce8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f350e695_1bdee3e2",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyServerRequest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-10-10T23:14:03Z",
+      "side": 1,
+      "message": "as per the API note: we should be covering also the case when there is no request body (but there might be a result).\n\nwhat we are doing here is implementation-by-forwarding, so this should just delegate through request.XYZ",
+      "range": {
+        "startLine": 55,
+        "startChar": 31,
+        "endLine": 55,
+        "endChar": 53
+      },
+      "revId": "69d70deb3a019951c6aa0d347c4fb2026e27ce8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "194c7862_24ba87df",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyServerRequest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-10-10T23:14:03Z",
+      "side": 1,
+      "message": "so contentEncoding is an enum in this package and while switch expressions are a possibility, it is open-coding something we can have centralized.\n\nThe enum is exposing encodingName(), so this should follow in those tracks, as that forces in-package consistency.",
+      "range": {
+        "startLine": 56,
+        "startChar": 31,
+        "endLine": 56,
+        "endChar": 46
+      },
+      "revId": "69d70deb3a019951c6aa0d347c4fb2026e27ce8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
