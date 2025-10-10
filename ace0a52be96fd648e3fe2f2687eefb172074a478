@@ -70,6 +70,24 @@
       "parentUuid": "286d8afc_00183f7a",
       "revId": "ace0a52be96fd648e3fe2f2687eefb172074a478",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c7fedec_7f6fc283",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-10-10T09:08:05Z",
+      "side": 1,
+      "message": "Improvement to be considered is moving it to container protocol (same grouping)\nhttps://git.opendaylight.org/gerrit/c/netconf/+/117896/7/plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang#138",
+      "parentUuid": "bc1ce374_b213e142",
+      "revId": "ace0a52be96fd648e3fe2f2687eefb172074a478",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
