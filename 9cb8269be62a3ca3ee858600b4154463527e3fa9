@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7bcca0aa_5cea3d86",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/AbstractServerDataOperationsTest.java",
+        "patchSetId": 66
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T08:20:20Z",
+      "side": 1,
+      "message": "IDK can we have at least assertNotNull?",
+      "revId": "9cb8269be62a3ca3ee858600b4154463527e3fa9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0174d108_c1974577",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/AbstractServerDataOperationsTest.java",
+        "patchSetId": 66
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T08:20:20Z",
+      "side": 1,
+      "message": "IDK can we have at least assertNotNull?",
+      "revId": "9cb8269be62a3ca3ee858600b4154463527e3fa9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ab6d5ea_188782bb",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfStrategyTest.java",
+        "patchSetId": 66
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T08:20:20Z",
+      "side": 1,
+      "message": "can be online as it was",
+      "revId": "9cb8269be62a3ca3ee858600b4154463527e3fa9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58205f43_0b462fbe",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfStrategyTest.java",
+        "patchSetId": 66
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T08:20:20Z",
+      "side": 1,
+      "message": "one line",
+      "revId": "9cb8269be62a3ca3ee858600b4154463527e3fa9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6793fef7_ed5dbfd8",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/NC1495Test.java",
+        "patchSetId": 66
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T08:20:20Z",
+      "side": 1,
+      "message": "but we have ..DataOperations",
+      "revId": "9cb8269be62a3ca3ee858600b4154463527e3fa9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9229e23_396eaf01",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 66
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T08:20:20Z",
+      "side": 1,
+      "message": "NonNullByDefault?",
+      "revId": "9cb8269be62a3ca3ee858600b4154463527e3fa9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
