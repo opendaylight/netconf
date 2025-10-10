@@ -88,6 +88,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "89f9a40a_71b3946c",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/NC1495Test.java",
+        "patchSetId": 66
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T10:38:09Z",
+      "side": 1,
+      "message": "on other places as well",
+      "parentUuid": "6793fef7_ed5dbfd8",
+      "revId": "9cb8269be62a3ca3ee858600b4154463527e3fa9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e9229e23_396eaf01",
         "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
         "patchSetId": 66
