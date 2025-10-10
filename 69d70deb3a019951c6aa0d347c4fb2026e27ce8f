@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9175f54_f76fac1e",
+        "filename": "protocol/restconf-server-api/src/main/java/org/opendaylight/restconf/server/api/ServerRequest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-10-10T23:25:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b3ead72d_7bd97ae8",
+      "range": {
+        "startLine": 60,
+        "startChar": 4,
+        "endLine": 60,
+        "endChar": 38
+      },
+      "revId": "69d70deb3a019951c6aa0d347c4fb2026e27ce8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c690b566_20d91bc1",
@@ -54,6 +78,30 @@
       "writtenOn": "2025-10-10T23:14:03Z",
       "side": 1,
       "message": "there are two subclasses doing this in this class, leading to unnecessary duplication",
+      "range": {
+        "startLine": 652,
+        "startChar": 35,
+        "endLine": 652,
+        "endChar": 50
+      },
+      "revId": "69d70deb3a019951c6aa0d347c4fb2026e27ce8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa36031a_c9243cbe",
+        "filename": "protocol/restconf-server-jaxrs/src/main/java/org/opendaylight/restconf/server/jaxrs/JaxRsRestconf.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 652,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-10-10T23:25:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c690b566_20d91bc1",
       "range": {
         "startLine": 652,
         "startChar": 35,
@@ -87,6 +135,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "945f8411_70a05a1a",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyServerRequest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-10-10T23:25:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f350e695_1bdee3e2",
+      "range": {
+        "startLine": 55,
+        "startChar": 31,
+        "endLine": 55,
+        "endChar": 53
+      },
+      "revId": "69d70deb3a019951c6aa0d347c4fb2026e27ce8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "194c7862_24ba87df",
@@ -100,6 +172,30 @@
       "writtenOn": "2025-10-10T23:14:03Z",
       "side": 1,
       "message": "so contentEncoding is an enum in this package and while switch expressions are a possibility, it is open-coding something we can have centralized.\n\nThe enum is exposing encodingName(), so this should follow in those tracks, as that forces in-package consistency.",
+      "range": {
+        "startLine": 56,
+        "startChar": 31,
+        "endLine": 56,
+        "endChar": 46
+      },
+      "revId": "69d70deb3a019951c6aa0d347c4fb2026e27ce8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbb12e80_b059041b",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyServerRequest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-10-10T23:25:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "194c7862_24ba87df",
       "range": {
         "startLine": 56,
         "startChar": 31,
