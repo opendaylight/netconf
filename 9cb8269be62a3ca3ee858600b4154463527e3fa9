@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3edc5d5f_3fe826b4",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/AbstractServerDataOperationsTest.java",
+        "patchSetId": 66
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T16:24:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7bcca0aa_5cea3d86",
+      "revId": "9cb8269be62a3ca3ee858600b4154463527e3fa9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0174d108_c1974577",
