@@ -86,6 +86,24 @@
       "message": "should be jukeboxDataOperations()",
       "revId": "28a8838e81941890382c861db96b50ed88fab724",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "440d6d9e_be081c4d",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/NetconfDataOperationsTest.java",
+        "patchSetId": 61
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T16:23:05Z",
+      "side": 1,
+      "message": "no",
+      "parentUuid": "b7faa4ee_e55b38b2",
+      "revId": "28a8838e81941890382c861db96b50ed88fab724",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
