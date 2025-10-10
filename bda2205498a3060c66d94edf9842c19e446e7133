@@ -69,6 +69,24 @@
       "parentUuid": "f1c712a0_40e65eb7",
       "revId": "bda2205498a3060c66d94edf9842c19e446e7133",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d495b64_e7692d04",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/DataOperationService.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T18:03:53Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "1ec892d1_d1843e41",
+      "revId": "bda2205498a3060c66d94edf9842c19e446e7133",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
