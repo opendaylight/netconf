@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05150707_348a23b9",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/AbstractServerDataOperationsTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T09:30:09Z",
+      "side": 1,
+      "message": "patchContext()",
+      "revId": "782e958e471efedbed701a18134ccba607622e53",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c1ea851_bfd358d8",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T09:30:09Z",
+      "side": 1,
+      "message": "can we move to iterator?",
+      "revId": "782e958e471efedbed701a18134ccba607622e53",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3c93b92_50a2dd01",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T09:30:09Z",
+      "side": 1,
+      "message": "can we instead process first one and then remaining entities?",
+      "revId": "782e958e471efedbed701a18134ccba607622e53",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c95d747f_d149e424",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T09:30:09Z",
+      "side": 1,
+      "message": "can you document diff between using addIntoFutureChain and chainPatchEditTransaction?",
+      "revId": "782e958e471efedbed701a18134ccba607622e53",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
