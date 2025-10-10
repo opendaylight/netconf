@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9076d19e_0f292a01",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 495,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T08:00:48Z",
+      "side": 1,
+      "message": "In fact its already addressed here: https://git.opendaylight.org/gerrit/c/netconf/+/116904/49/plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/DataOperationImpl.java#71",
+      "parentUuid": "0a965e03_fcc89738",
+      "revId": "dd876898e1e2cd2ba6120174055d3b448064a140",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e2f6f57_c45a7a8a",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Ack",
       "parentUuid": "8e2f6f57_c45a7a8a",
+      "revId": "dd876898e1e2cd2ba6120174055d3b448064a140",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "302dc04b_a2e2adc0",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 807,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T08:00:48Z",
+      "side": 1,
+      "message": "Reworked in https://git.opendaylight.org/gerrit/c/netconf/+/116904/49/plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/DataOperationImpl.java",
+      "parentUuid": "73fea80e_b900f4c8",
       "revId": "dd876898e1e2cd2ba6120174055d3b448064a140",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
