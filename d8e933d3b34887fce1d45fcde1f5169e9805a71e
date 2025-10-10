@@ -16,6 +16,24 @@
       "message": "final?",
       "revId": "d8e933d3b34887fce1d45fcde1f5169e9805a71e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6998d411_5bd42b48",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/PipeliningIT.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-10T06:39:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b29b303_51b0a2b9",
+      "revId": "d8e933d3b34887fce1d45fcde1f5169e9805a71e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
