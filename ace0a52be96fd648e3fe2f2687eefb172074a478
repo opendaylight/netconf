@@ -52,6 +52,24 @@
       "parentUuid": "0626f2b1_0e3eb3e5",
       "revId": "ace0a52be96fd648e3fe2f2687eefb172074a478",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc1ce374_b213e142",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-10-10T09:06:47Z",
+      "side": 1,
+      "message": "ok so now:\nhere leaf key-exchange is inside grouping connection-parameters\n\nwhich is used in module netconf-node-topology grouping netconf-node-fields\nhttps://github.com/opendaylight/netconf/blob/751d197fd95668e23f8bfa1b10b1b331569c6ff9/apps/netconf-topology/src/main/yang/netconf-node-topology.yang#L33\n\nthen augmented inside netconf-node\nhttps://github.com/opendaylight/netconf/blob/751d197fd95668e23f8bfa1b10b1b331569c6ff9/apps/netconf-topology/src/main/yang/netconf-node-topology.yang#L118\n\nCrating new grouping and using it directly inside netconf-node \nhttps://github.com/opendaylight/netconf/blob/751d197fd95668e23f8bfa1b10b1b331569c6ff9/apps/netconf-topology/src/main/yang/netconf-node-topology.yang#L113\nwould have same result.\n\nI think current placement inside grouping connection-parameters seem correct.",
+      "parentUuid": "286d8afc_00183f7a",
+      "revId": "ace0a52be96fd648e3fe2f2687eefb172074a478",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
