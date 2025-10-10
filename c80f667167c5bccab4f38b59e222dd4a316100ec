@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99e03953_8f345055",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-10-10T23:31:18Z",
+      "side": 1,
+      "message": "so let\u0027s try to take a different route here.\n\nrestconf-server has MessageEncoding, which covers the two cases and already has a \u0027RestconfStream.EncodingName streamEncodingName()\u0027.\n\nso instead introducing a new enum (as was the previous approach) or introducing a Map (as is now), we introduce a common interface in restconf-server-api, which will cover both ietf-restconf-monitoring and ietf-subscribed-notifications?",
+      "revId": "c80f667167c5bccab4f38b59e222dd4a316100ec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
