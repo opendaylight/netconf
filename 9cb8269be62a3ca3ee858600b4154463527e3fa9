@@ -123,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "11c3c46a_5ed170f6",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/MdsalRestconfStrategyTest.java",
+        "patchSetId": 66
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T16:24:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "58205f43_0b462fbe",
+      "revId": "9cb8269be62a3ca3ee858600b4154463527e3fa9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6793fef7_ed5dbfd8",
