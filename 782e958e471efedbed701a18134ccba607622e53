@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb42229b_57bc7a7e",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/AbstractServerDataOperationsTest.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T17:06:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "633c949b_11f32785",
+      "revId": "782e958e471efedbed701a18134ccba607622e53",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9c1ea851_bfd358d8",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "see: https://git.opendaylight.org/gerrit/c/netconf/+/116904/comment/87aac29f_7df65293/ and fix it there",
       "parentUuid": "9c1ea851_bfd358d8",
+      "revId": "782e958e471efedbed701a18134ccba607622e53",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "603b6d79_44dbfa2c",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T17:06:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c0f7b12b_87761e45",
       "revId": "782e958e471efedbed701a18134ccba607622e53",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -106,6 +142,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a82819b_51712231",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T17:06:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72eb26e8_717a088e",
+      "revId": "782e958e471efedbed701a18134ccba607622e53",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c95d747f_d149e424",
@@ -119,6 +173,24 @@
       "writtenOn": "2025-10-10T09:30:09Z",
       "side": 1,
       "message": "can you document diff between using addIntoFutureChain and chainPatchEditTransaction?",
+      "revId": "782e958e471efedbed701a18134ccba607622e53",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a712f6a_bac2056e",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T17:06:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c95d747f_d149e424",
       "revId": "782e958e471efedbed701a18134ccba607622e53",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
