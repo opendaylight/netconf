@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87aac29f_7df65293",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 49
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T10:43:43Z",
+      "side": 1,
+      "message": "we can have var lastProcessed \u003d firstEntity; instead of int i",
+      "revId": "f50f21fe45109664e615405750d4defceef09200",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc6aed1e_d8a8d7d1",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 49
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-10T10:43:43Z",
+      "side": 1,
+      "message": "lastProcessed \u003d currentEntity",
+      "revId": "f50f21fe45109664e615405750d4defceef09200",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
