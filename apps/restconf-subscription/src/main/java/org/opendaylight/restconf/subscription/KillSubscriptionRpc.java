@@ -33,8 +33,6 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * RESTCONF implementation of {@link KillSubscription}.
@@ -44,8 +42,6 @@ import org.slf4j.LoggerFactory;
 @Component(service = RpcImplementation.class, enabled = false)
 @NonNullByDefault
 public final class KillSubscriptionRpc extends RpcImplementation {
-    private static final Logger LOG = LoggerFactory.getLogger(KillSubscriptionRpc.class);
-
     private static final NodeIdentifier SUBSCRIPTION_ID =
         NodeIdentifier.create(QName.create(KillSubscriptionInput.QNAME, "id").intern());
 

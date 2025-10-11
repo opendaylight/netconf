@@ -34,8 +34,6 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * RESTCONF implementation of {@link ModifySubscription}.
@@ -52,8 +50,6 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
         NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "stream-filter").intern());
     private static final NodeIdentifier STOP_TIME =
         NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "stop-time").intern());
-
-    private static final Logger LOG = LoggerFactory.getLogger(ModifySubscriptionRpc.class);
 
     private final RestconfStream.Registry streamRegistry;
 
