@@ -18,7 +18,6 @@ import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.QName;
 
 /**
  * A {@link ServerRequest} transformed through a {@link Function}.
@@ -54,7 +53,7 @@ record TransformedServerRequest<I, R>(ServerRequest<R> delegate, Function<I, R> 
     }
 
     @Override
-    public QName requestEncoding() {
+    public ServerEncoding requestEncoding() {
         return delegate.requestEncoding();
     }
 

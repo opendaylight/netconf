@@ -18,6 +18,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.MonitoringEncoding;
+import org.opendaylight.restconf.server.api.ServerEncoding;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -27,7 +28,7 @@ import org.opendaylight.yangtools.yang.common.QName;
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-5.2">RFC8040, section 5.2</a>.
  */
 @NonNullByDefault
-public enum MessageEncoding {
+public enum MessageEncoding implements ServerEncoding {
     /**
      * JSON encoding, as specified in <a href="https://www.rfc-editor.org/rfc/rfc7951">RFC7951</a> and extended in
      * <a href="https://www.rfc-editor.org/rfc/rfc7952#section-5.2">RFC7952, section 5.2</a>.
@@ -55,18 +56,28 @@ public enum MessageEncoding {
 
     private final AsciiString dataMediaType;
     private final AsciiString patchMediaType;
-    private final MonitoringEncoding streamEncodingName;
-    private final QName subscriptionEncoding;
+    private final MonitoringEncoding monitoringEncoding;
+    private final QName notificationsEncoding;
     private final Set<AsciiString> compatibleDataMediaTypes;
 
     MessageEncoding(final AsciiString dataMediaType, final AsciiString patchMediaType,
-            final MonitoringEncoding streamEncodingName, final QName subscriptionEncoding,
+            final MonitoringEncoding monitoringEncoding, final QName notificationsEncoding,
             final AsciiString... compatibleMediaTypes) {
         this.dataMediaType = requireNonNull(dataMediaType);
         this.patchMediaType = requireNonNull(patchMediaType);
-        this.streamEncodingName = requireNonNull(streamEncodingName);
-        this.subscriptionEncoding = requireNonNull(subscriptionEncoding);
+        this.monitoringEncoding = requireNonNull(monitoringEncoding);
+        this.notificationsEncoding = requireNonNull(notificationsEncoding);
         compatibleDataMediaTypes = Set.of(compatibleMediaTypes);
+    }
+
+    @Override
+    public MonitoringEncoding monitoringEncoding() {
+        return monitoringEncoding;
+    }
+
+    @Override
+    public QName notificationsEncoding() {
+        return notificationsEncoding;
     }
 
     /**
@@ -85,24 +96,6 @@ public enum MessageEncoding {
      */
     AsciiString patchMediaType() {
         return patchMediaType;
-    }
-
-    /**
-     * Return the stream encoding name {@code ietf-restconf.yang} assigns to this encoding.
-     *
-     * @return A stream {@link MonitoringEncoding}
-     */
-    MonitoringEncoding streamEncodingName() {
-        return streamEncodingName;
-    }
-
-    /**
-     * Return the encoding identity {@code ietf-subscribed-notifications.yang} assigns to this encoding.
-     *
-     * @return A stream {@link EncodingName}
-     */
-    QName subscriptionEncoding() {
-        return subscriptionEncoding;
     }
 
     /**

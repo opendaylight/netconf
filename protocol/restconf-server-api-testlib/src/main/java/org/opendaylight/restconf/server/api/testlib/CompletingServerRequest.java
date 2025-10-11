@@ -26,6 +26,8 @@ import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.AbstractServerRequest;
+import org.opendaylight.restconf.server.api.MonitoringEncoding;
+import org.opendaylight.restconf.server.api.ServerEncoding;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.YangErrorsBody;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
@@ -43,7 +45,7 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
     private static final Logger LOG = LoggerFactory.getLogger(CompletingServerRequest.class);
 
     private final CompletableFuture<T> future = new CompletableFuture<>();
-    private final QName requestEncoding;
+    private final ServerEncoding requestEncoding;
 
     public CompletingServerRequest() {
         this(PrettyPrintParam.TRUE);
@@ -63,11 +65,21 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
 
     public CompletingServerRequest(final @Nullable Principal principal, final QueryParameters queryParameters,
             final PrettyPrintParam defaultPrettyPrint) {
-        this(principal, queryParameters, defaultPrettyPrint, EncodeJson$I.QNAME);
+        this(principal, queryParameters, defaultPrettyPrint, new ServerEncoding() {
+            @Override
+            public MonitoringEncoding monitoringEncoding() {
+                return MonitoringEncoding.JSON;
+            }
+
+            @Override
+            public QName notificationsEncoding() {
+                return EncodeJson$I.QNAME;
+            }
+        });
     }
 
     public CompletingServerRequest(final @Nullable Principal principal, final QueryParameters queryParameters,
-            final PrettyPrintParam defaultPrettyPrint, final QName requestEncoding) {
+            final PrettyPrintParam defaultPrettyPrint, final ServerEncoding requestEncoding) {
         super(principal, queryParameters, defaultPrettyPrint);
         this.requestEncoding = requireNonNull(requestEncoding);
     }
@@ -91,7 +103,7 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
     }
 
     @Override
-    public QName requestEncoding() {
+    public ServerEncoding requestEncoding() {
         return requestEncoding;
     }
 
