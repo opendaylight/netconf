@@ -13,11 +13,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.Request;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.QueryParameters;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.QName;
 
 /**
  * A {@link Request} to {@link RestconfServer}. It contains state and binding established by whoever is performing the
@@ -51,18 +47,15 @@ public sealed interface ServerRequest<R> extends Request<R> permits AbstractServ
     QueryParameters queryParameters();
 
     /**
-     * Returns the on-wire encoding of the original HTTP request body as a YANG {@link QName}, as related to the
-     * purposes of establishing <a href="https://www.rfc-editor.org/rfc/rfc8639#section-2.4.2">the request encoding</a>.
-     *
-     * <p>Valid values are all identities derived from {@link Encoding} and users need to be cognisant of at least
-     * {@link EncodeJson$I} and {@link EncodeXml$I}.
+     * Returns the on-wire encoding of this request, as related to the purposes of establishing
+     * <a href="https://www.rfc-editor.org/rfc/rfc8639#section-2.4.2">the request encoding</a>.
      *
      * <p>A typical implementation would consult mirror either HTTP request's {@code Content-type} header, or HTTP
      * requests' {@code Accept} header or determine the value in some other way.
      *
-     * @return the encoding {@link QName} for the request body, or {@code null} if not applicable
+     * @return the request encoding
      */
-    QName requestEncoding();
+    ServerEncoding requestEncoding();
 
     void completeWith(YangErrorsBody errors);
 

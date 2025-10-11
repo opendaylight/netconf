@@ -13,8 +13,8 @@ import javax.ws.rs.core.SecurityContext;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.server.api.ServerEncoding;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
-import org.opendaylight.yangtools.yang.common.QName;
 
 /**
  * A {@link JaxRsServerRequest} resulting in a {@link FormattableBody}.
@@ -22,7 +22,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 @NonNullByDefault
 final class FormattableJaxRsServerRequest extends JaxRsServerRequest<FormattableBody> {
     FormattableJaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint, final ErrorTagMapping errorTagMapping,
-            final QName requestEncoding, final SecurityContext sc, final AsyncResponse ar) {
+            final ServerEncoding requestEncoding, final SecurityContext sc, final AsyncResponse ar) {
         super(defaultPrettyPrint, errorTagMapping, requestEncoding, sc, ar);
     }
 

@@ -126,7 +126,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
 
         // check encoding
         final var bodyEncoding = leaf(body, ENCODING_NODEID, QName.class);
-        final var encoding = bodyEncoding != null ? bodyEncoding : request.requestEncoding();
+        final var encoding = bodyEncoding != null ? bodyEncoding : request.requestEncoding().notificationsEncoding();
         if (!SUPPORTED_ENCODINGS.contains(encoding)) {
             // FIXME: this looks weird: we should be propagating the identity somewhere, right?
             request.failWith(new RequestException(EncodingUnsupported.VALUE.toString()));

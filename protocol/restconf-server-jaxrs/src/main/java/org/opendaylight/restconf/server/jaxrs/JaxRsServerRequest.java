@@ -21,11 +21,11 @@ import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.server.api.ServerEncoding;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.MappingServerRequest;
-import org.opendaylight.yangtools.yang.common.QName;
 
 /**
  * A {@link ServerRequest} originating in {@link JaxRsRestconf}.
@@ -33,12 +33,12 @@ import org.opendaylight.yangtools.yang.common.QName;
  * @param <T> type of reported result
  */
 abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
-    private final @NonNull QName requestEncoding;
+    private final @NonNull ServerEncoding requestEncoding;
     private final @NonNull AsyncResponse ar;
 
     @NonNullByDefault
     private JaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint, final ErrorTagMapping errorTagMapping,
-            final QName requestEncoding, final SecurityContext sc, final AsyncResponse ar,
+            final ServerEncoding requestEncoding, final SecurityContext sc, final AsyncResponse ar,
             final QueryParameters queryParameters) {
         super(sc.getUserPrincipal(), queryParameters, defaultPrettyPrint, errorTagMapping);
         this.requestEncoding = requireNonNull(requestEncoding);
@@ -47,13 +47,14 @@ abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
 
     @NonNullByDefault
     JaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint, final ErrorTagMapping errorTagMapping,
-            final QName requestEncoding, final SecurityContext sc, final AsyncResponse ar) {
+            final ServerEncoding requestEncoding, final SecurityContext sc, final AsyncResponse ar) {
         this(defaultPrettyPrint, errorTagMapping, requestEncoding, sc, ar, QueryParameters.of());
     }
 
     @NonNullByDefault
     JaxRsServerRequest(final PrettyPrintParam defaultPrettyPrint,final ErrorTagMapping errorTagMapping,
-            final QName requestEncoding, final SecurityContext sc, final AsyncResponse ar, final UriInfo uriInfo) {
+            final ServerEncoding requestEncoding, final SecurityContext sc, final AsyncResponse ar,
+            final UriInfo uriInfo) {
         this(defaultPrettyPrint, errorTagMapping, requestEncoding, sc, ar, queryParamsOf(uriInfo));
     }
 
@@ -73,7 +74,7 @@ abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
     }
 
     @Override
-    public final QName requestEncoding() {
+    public final ServerEncoding requestEncoding() {
         return requestEncoding;
     }
 

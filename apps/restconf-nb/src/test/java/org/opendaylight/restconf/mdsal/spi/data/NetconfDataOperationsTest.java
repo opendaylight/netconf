@@ -78,6 +78,7 @@ import org.opendaylight.restconf.server.api.PatchContext;
 import org.opendaylight.restconf.server.api.PatchEntity;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
+import org.opendaylight.restconf.server.api.ServerEncoding;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.mdsal.MdsalServerStrategy;
@@ -88,14 +89,12 @@ import org.opendaylight.restconf.server.spi.NotSupportedServerModulesOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerMountPointResolver;
 import org.opendaylight.restconf.server.spi.NotSupportedServerRpcOperations;
 import org.opendaylight.restconf.server.spi.ServerDataOperations;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -111,7 +110,7 @@ import org.w3c.dom.DOMException;
 
 @ExtendWith(MockitoExtension.class)
 final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
-    private static class TestServerRequest<T> extends MappingServerRequest<T> {
+    private class TestServerRequest<T> extends MappingServerRequest<T> {
         @NonNullByDefault
         TestServerRequest(final QueryParameters queryParameters, final PrettyPrintParam defaultPrettyPrint) {
             super(null, queryParameters, defaultPrettyPrint, ErrorTagMapping.RFC8040);
@@ -133,8 +132,8 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         }
 
         @Override
-        public QName requestEncoding() {
-            return EncodeJson$I.QNAME;
+        public ServerEncoding requestEncoding() {
+            return requestEncoding;
         }
     }
 
@@ -144,6 +143,8 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
     private NetconfBaseOps mockNetconfBaseOps;
     @Mock
     private ChoiceNode mockNode;
+    @Mock
+    private ServerEncoding requestEncoding;
 
     private NetconfDataOperations netconfData;
     private DataOperationsService dataOperationService;
@@ -720,7 +721,7 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
     @Override
     NormalizedNode readData(final ContentParam content, final Data path, final ServerDataOperations strategy) {
         try {
-            return (dataOperationService)
+            return dataOperationService
                 .getData(path, new DataGetParams(content, DepthParam.max(), null, null))
                 .get(2, TimeUnit.SECONDS)
                 .orElse(null);

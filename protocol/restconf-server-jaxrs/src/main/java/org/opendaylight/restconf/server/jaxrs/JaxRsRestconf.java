@@ -78,6 +78,7 @@ import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.api.ServerEncoding;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 import org.opendaylight.restconf.server.api.XmlDataPostBody;
 import org.opendaylight.restconf.server.api.XmlOperationInputBody;
@@ -86,10 +87,7 @@ import org.opendaylight.restconf.server.api.XmlResourceBody;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.YangPatchStatusBody;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yangtools.yang.common.Empty;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,7 +101,7 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public final class JaxRsRestconf implements ParamConverterProvider {
     private static final Logger LOG = LoggerFactory.getLogger(JaxRsRestconf.class);
-    private static final @NonNull QName DEFAULT_REQUEST_ENCODING = EncodeJson$I.QNAME;
+    private static final @NonNull ServerEncoding DEFAULT_REQUEST_ENCODING = JaxRsServerEncoding.JSON;
     private static final CacheControl NO_CACHE = CacheControl.valueOf("no-cache");
     private static final ParamConverter<ApiPath> API_PATH_CONVERTER = new ParamConverter<>() {
         @Override
@@ -205,7 +203,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void dataJsonGET(@Context final UriInfo uriInfo, final @Context SecurityContext sc,
             @Suspended final AsyncResponse ar) {
-        server.dataGET(newDataGet(EncodeJson$I.QNAME, uriInfo, sc, ar));
+        server.dataGET(newDataGet(JaxRsServerEncoding.JSON, uriInfo, sc, ar));
     }
 
     /**
@@ -224,7 +222,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void dataJsonGET(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
             @Context final SecurityContext sc, @Suspended final AsyncResponse ar) {
-        server.dataGET(newDataGet(EncodeJson$I.QNAME, uriInfo, sc, ar), identifier);
+        server.dataGET(newDataGet(JaxRsServerEncoding.JSON, uriInfo, sc, ar), identifier);
     }
 
     /**
@@ -243,7 +241,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void dataXmlGET(@Context final UriInfo uriInfo, final @Context SecurityContext sc,
             @Suspended final AsyncResponse ar) {
-        server.dataGET(newDataGet(EncodeXml$I.QNAME, uriInfo, sc, ar));
+        server.dataGET(newDataGet(JaxRsServerEncoding.XML, uriInfo, sc, ar));
     }
 
     /**
@@ -263,11 +261,11 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void dataXmlGET(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
             @Context final SecurityContext sc, @Suspended final AsyncResponse ar) {
-        server.dataGET(newDataGet(EncodeXml$I.QNAME, uriInfo, sc, ar), identifier);
+        server.dataGET(newDataGet(JaxRsServerEncoding.XML, uriInfo, sc, ar), identifier);
     }
 
     @NonNullByDefault
-    private JaxRsServerRequest<DataGetResult> newDataGet(final QName requestEncoding, final UriInfo uriInfo,
+    private JaxRsServerRequest<DataGetResult> newDataGet(final ServerEncoding requestEncoding, final UriInfo uriInfo,
             final SecurityContext sc, final AsyncResponse ar) {
         return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, requestEncoding, sc, ar, uriInfo) {
             @Override
@@ -358,7 +356,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataXmlPATCH(final InputStream body, final @Context SecurityContext sc,
             @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            server.dataPATCH(newDataPATCH(EncodeJson$I.QNAME, sc, ar), xmlBody);
+            server.dataPATCH(newDataPATCH(JaxRsServerEncoding.JSON, sc, ar), xmlBody);
         }
     }
 
@@ -381,7 +379,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataXmlPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            server.dataPATCH(newDataPATCH(EncodeXml$I.QNAME, sc, ar), identifier, xmlBody);
+            server.dataPATCH(newDataPATCH(JaxRsServerEncoding.XML, sc, ar), identifier, xmlBody);
         }
     }
 
@@ -402,7 +400,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataJsonPATCH(final InputStream body, final @Context SecurityContext sc,
             @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            server.dataPATCH(newDataPATCH(EncodeJson$I.QNAME, sc, ar), jsonBody);
+            server.dataPATCH(newDataPATCH(JaxRsServerEncoding.JSON, sc, ar), jsonBody);
         }
     }
 
@@ -424,13 +422,13 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataJsonPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            server.dataPATCH(newDataPATCH(EncodeJson$I.QNAME, sc, ar), identifier, jsonBody);
+            server.dataPATCH(newDataPATCH(JaxRsServerEncoding.JSON, sc, ar), identifier, jsonBody);
         }
     }
 
     @NonNullByDefault
-    private JaxRsServerRequest<DataPatchResult> newDataPATCH(final QName requestEncoding, final SecurityContext sc,
-            final AsyncResponse ar) {
+    private JaxRsServerRequest<DataPatchResult> newDataPATCH(final ServerEncoding requestEncoding,
+            final SecurityContext sc, final AsyncResponse ar) {
         return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, requestEncoding, sc, ar) {
             @Override
             Response transform(final DataPatchResult result) {
@@ -460,7 +458,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataYangJsonPATCH(final InputStream body, @Context final UriInfo uriInfo,
             final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonPatchBody(body)) {
-            server.dataPATCH(newDataYangPATCH(EncodeJson$I.QNAME, uriInfo, sc, ar), jsonBody);
+            server.dataPATCH(newDataYangPATCH(JaxRsServerEncoding.JSON, uriInfo, sc, ar), jsonBody);
         }
     }
 
@@ -484,7 +482,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataYangJsonPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonPatchBody(body)) {
-            server.dataPATCH(newDataYangPATCH(EncodeJson$I.QNAME, uriInfo, sc, ar), identifier, jsonBody);
+            server.dataPATCH(newDataYangPATCH(JaxRsServerEncoding.JSON, uriInfo, sc, ar), identifier, jsonBody);
         }
     }
 
@@ -507,7 +505,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataYangXmlPATCH(final InputStream body, @Context final UriInfo uriInfo,
             final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlPatchBody(body)) {
-            server.dataPATCH(newDataYangPATCH(EncodeXml$I.QNAME, uriInfo, sc, ar), xmlBody);
+            server.dataPATCH(newDataYangPATCH(JaxRsServerEncoding.XML, uriInfo, sc, ar), xmlBody);
         }
     }
 
@@ -531,13 +529,13 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataYangXmlPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlPatchBody(body)) {
-            server.dataPATCH(newDataYangPATCH(EncodeXml$I.QNAME, uriInfo, sc, ar), identifier, xmlBody);
+            server.dataPATCH(newDataYangPATCH(JaxRsServerEncoding.XML, uriInfo, sc, ar), identifier, xmlBody);
         }
     }
 
     @NonNullByDefault
-    private JaxRsServerRequest<DataYangPatchResult> newDataYangPATCH(final QName requestEncoding, final UriInfo uriInfo,
-            final SecurityContext sc, final AsyncResponse ar) {
+    private JaxRsServerRequest<DataYangPatchResult> newDataYangPATCH(final ServerEncoding requestEncoding,
+            final UriInfo uriInfo, final SecurityContext sc, final AsyncResponse ar) {
         return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, requestEncoding, sc, ar, uriInfo) {
             @Override
             Response transform(final DataYangPatchResult result) {
@@ -591,7 +589,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void postDataJSON(final InputStream body, @Context final UriInfo uriInfo, final @Context SecurityContext sc,
             @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonChildBody(body)) {
-            server.dataPOST(newDataPOST(EncodeJson$I.QNAME, uriInfo, sc, ar), jsonBody);
+            server.dataPOST(newDataPOST(JaxRsServerEncoding.JSON, uriInfo, sc, ar), jsonBody);
         }
     }
 
@@ -612,7 +610,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void postDataJSON(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
-        server.dataPOST(newDataPOST(EncodeJson$I.QNAME, uriInfo, sc, ar), identifier, new JsonDataPostBody(body));
+        server.dataPOST(newDataPOST(JaxRsServerEncoding.JSON, uriInfo, sc, ar), identifier, new JsonDataPostBody(body));
     }
 
     /**
@@ -633,7 +631,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void postDataXML(final InputStream body, @Context final UriInfo uriInfo, final @Context SecurityContext sc,
             @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlChildBody(body)) {
-            server.dataPOST(newDataPOST(EncodeXml$I.QNAME, uriInfo, sc, ar), xmlBody);
+            server.dataPOST(newDataPOST(JaxRsServerEncoding.XML, uriInfo, sc, ar), xmlBody);
         }
     }
 
@@ -655,11 +653,11 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void postDataXML(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
-        server.dataPOST(newDataPOST(EncodeXml$I.QNAME, uriInfo, sc, ar), identifier, new XmlDataPostBody(body));
+        server.dataPOST(newDataPOST(JaxRsServerEncoding.XML, uriInfo, sc, ar), identifier, new XmlDataPostBody(body));
     }
 
     @NonNullByDefault
-    private <T extends DataPostResult> JaxRsServerRequest<T> newDataPOST(final QName requestEncoding,
+    private <T extends DataPostResult> JaxRsServerRequest<T> newDataPOST(final ServerEncoding requestEncoding,
             final UriInfo uriInfo, final SecurityContext sc, final AsyncResponse ar) {
         return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, requestEncoding, sc, ar, uriInfo) {
             @Override
@@ -700,7 +698,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataJsonPUT(@Context final UriInfo uriInfo, final @Context SecurityContext sc, final InputStream body,
             @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            server.dataPUT(newDataPUT(EncodeJson$I.QNAME, uriInfo, sc, ar), jsonBody);
+            server.dataPUT(newDataPUT(JaxRsServerEncoding.JSON, uriInfo, sc, ar), jsonBody);
         }
     }
 
@@ -722,7 +720,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataJsonPUT(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
             final @Context SecurityContext sc, final InputStream body, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            server.dataPUT(newDataPUT(EncodeJson$I.QNAME, uriInfo, sc, ar), identifier, jsonBody);
+            server.dataPUT(newDataPUT(JaxRsServerEncoding.JSON, uriInfo, sc, ar), identifier, jsonBody);
         }
     }
 
@@ -744,7 +742,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataXmlPUT(@Context final UriInfo uriInfo, final @Context SecurityContext sc, final InputStream body,
             @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            server.dataPUT(newDataPUT(EncodeXml$I.QNAME, uriInfo, sc, ar), xmlBody);
+            server.dataPUT(newDataPUT(JaxRsServerEncoding.XML, uriInfo, sc, ar), xmlBody);
         }
     }
 
@@ -767,12 +765,12 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataXmlPUT(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
             final @Context SecurityContext sc, final InputStream body, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            server.dataPUT(newDataPUT(EncodeXml$I.QNAME, uriInfo, sc, ar), identifier, xmlBody);
+            server.dataPUT(newDataPUT(JaxRsServerEncoding.XML, uriInfo, sc, ar), identifier, xmlBody);
         }
     }
 
     @NonNullByDefault
-    private JaxRsServerRequest<DataPutResult> newDataPUT(final QName requestEncoding, final UriInfo uriInfo,
+    private JaxRsServerRequest<DataPutResult> newDataPUT(final ServerEncoding requestEncoding, final UriInfo uriInfo,
             final SecurityContext sc, final AsyncResponse ar) {
         return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, requestEncoding, sc, ar, uriInfo) {
             @Override
@@ -798,8 +796,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.APPLICATION_JSON
     })
     public void operationsJsonGET(final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
-        server.operationsGET(new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, EncodeJson$I.QNAME, sc,
-            ar));
+        server.operationsGET(new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, JaxRsServerEncoding.JSON,
+            sc, ar));
     }
 
     /**
@@ -818,7 +816,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void operationsJsonGET(@PathParam("operation") final ApiPath operation, final @Context SecurityContext sc,
             @Suspended final AsyncResponse ar) {
         server.operationsGET(
-            new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, EncodeJson$I.QNAME, sc, ar), operation);
+            new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, JaxRsServerEncoding.JSON, sc, ar),
+            operation);
     }
 
     /**
@@ -836,7 +835,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void operationsXmlGET(final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         server.operationsGET(
-            new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, EncodeXml$I.QNAME, sc, ar));
+            new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, JaxRsServerEncoding.XML, sc, ar));
     }
 
     /**
@@ -856,7 +855,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void operationsXmlGET(@PathParam("operation") final ApiPath operation, final @Context SecurityContext sc,
             @Suspended final AsyncResponse ar) {
         server.operationsGET(
-            new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping,  EncodeXml$I.QNAME, sc, ar), operation);
+            new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, JaxRsServerEncoding.XML, sc, ar),
+            operation);
     }
 
     @OPTIONS
@@ -901,7 +901,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void operationsXmlPOST(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlOperationInputBody(body)) {
-            operationsPOST(EncodeXml$I.QNAME, identifier, uriInfo, sc, ar, xmlBody);
+            operationsPOST(JaxRsServerEncoding.XML, identifier, uriInfo, sc, ar, xmlBody);
         }
     }
 
@@ -931,12 +931,12 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void operationsJsonPOST(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonOperationInputBody(body)) {
-            operationsPOST(EncodeJson$I.QNAME, identifier, uriInfo, sc, ar, jsonBody);
+            operationsPOST(JaxRsServerEncoding.JSON, identifier, uriInfo, sc, ar, jsonBody);
         }
     }
 
     @NonNullByDefault
-    private void operationsPOST(final QName requestEncoding, final ApiPath identifier, final UriInfo uriInfo,
+    private void operationsPOST(final ServerEncoding requestEncoding, final ApiPath identifier, final UriInfo uriInfo,
             final SecurityContext sc, final AsyncResponse ar, final OperationInputBody body) {
         server.operationsPOST(new JaxRsServerRequest<>(prettyPrint, errorTagMapping, requestEncoding, sc, ar, uriInfo) {
             @Override
@@ -961,8 +961,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.APPLICATION_JSON
     })
     public void yangLibraryVersionGETJ(final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
-        server.yangLibraryVersionGET(new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, EncodeJson$I.QNAME,
-            sc, ar));
+        server.yangLibraryVersionGET(
+            new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, JaxRsServerEncoding.JSON, sc, ar));
     }
 
     /**
@@ -979,8 +979,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.TEXT_XML
     })
     public void yangLibraryVersionGETX(final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
-        server.yangLibraryVersionGET(new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, EncodeXml$I.QNAME,
-            sc, ar));
+        server.yangLibraryVersionGET(
+            new FormattableJaxRsServerRequest(prettyPrint, errorTagMapping, JaxRsServerEncoding.XML, sc, ar));
     }
 
     @OPTIONS
@@ -1019,7 +1019,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void modulesYangGET(@PathParam("fileName") final String fileName,
             @QueryParam("revision") final String revision, final @Context SecurityContext sc,
             @Suspended final AsyncResponse ar) {
-        server.modulesYangGET(newModulesGET(sc, ar), fileName, revision);
+        server.modulesYangGET(newModulesGET(JaxRsServerEncoding.JSON, sc, ar), fileName, revision);
     }
 
     /**
@@ -1037,7 +1037,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void modulesYangGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
             @PathParam("fileName") final String fileName, @QueryParam("revision") final String revision,
             final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
-        server.modulesYangGET(newModulesGET(sc, ar), mountPath, fileName, revision);
+        server.modulesYangGET(newModulesGET(JaxRsServerEncoding.JSON, sc, ar), mountPath, fileName, revision);
     }
 
     /**
@@ -1054,7 +1054,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void modulesYinGET(@PathParam("fileName") final String fileName,
             @QueryParam("revision") final String revision, final @Context SecurityContext sc,
             @Suspended final AsyncResponse ar) {
-        server.modulesYinGET(newModulesGET(sc, ar), fileName, revision);
+        server.modulesYinGET(newModulesGET(JaxRsServerEncoding.XML, sc, ar), fileName, revision);
     }
 
     /**
@@ -1072,7 +1072,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void modulesYinGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
             @PathParam("fileName") final String fileName, @QueryParam("revision") final String revision,
             final @Context SecurityContext sc, @Suspended final AsyncResponse ar) {
-        server.modulesYinGET(newModulesGET(sc, ar), mountPath, fileName, revision);
+        server.modulesYinGET(newModulesGET(JaxRsServerEncoding.XML, sc, ar), mountPath, fileName, revision);
     }
 
     @OPTIONS
@@ -1090,8 +1090,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     }
 
     @NonNullByDefault
-    private JaxRsServerRequest<ModulesGetResult> newModulesGET(final SecurityContext sc, final AsyncResponse ar) {
-        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, EncodeJson$I.QNAME, sc, ar) {
+    private JaxRsServerRequest<ModulesGetResult> newModulesGET(final ServerEncoding requestEncoding,
+            final SecurityContext sc, final AsyncResponse ar) {
+        return new JaxRsServerRequest<>(prettyPrint, errorTagMapping, requestEncoding, sc, ar) {
             @Override
             Response transform(final ModulesGetResult result) throws RequestException {
                 final Reader reader;
