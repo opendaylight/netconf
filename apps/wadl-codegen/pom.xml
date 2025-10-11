@@ -16,7 +16,7 @@
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>restconf-wadl-generator</artifactId>
+    <artifactId>wadl-codegen</artifactId>
     <packaging>jar</packaging>
     <description>A simple generator for WADL files, pluggable into yang-maven-plugin</description>
 
