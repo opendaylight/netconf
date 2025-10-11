@@ -5,5 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-@org.osgi.annotation.bundle.Export
-package org.opendaylight.restconf.subscription;
+/**
+ * Internal details of {@code ietf-subscribed-notifications.yang} implementation.
+ */
+package org.opendaylight.netconf.rfc8639.impl;

@@ -29,17 +29,28 @@
     </properties>
 
     <modules>
+        <!-- baseline model implementations -->
+        <module>odl-device-notification</module>
+        <module>sal-remote-impl</module>
+        <module>rfc8639-impl</module>
+        <module>yanglib-mdsal-writer</module>
+
+        <!-- northbound applications -->
+        <module>netconf-nb</module>
+        <module>restconf-nb</module>
+
+        <!-- legacy ietf-topology implementations -->
         <module>netconf-topology</module>
         <module>netconf-topology-impl</module>
         <module>netconf-topology-singleton</module>
+
+        <!-- legacy callhome integration -->
         <module>callhome-provider</module>
+
+        <!-- NETCONF console -->
         <module>netconf-console</module>
-        <module>netconf-nb</module>
-        <module>restconf-nb</module>
-        <module>restconf-subscription</module>
-        <module>odl-device-notification</module>
-        <module>sal-remote-impl</module>
-        <module>yanglib-mdsal-writer</module>
+
+        <!-- RESTCONF integration tests -->
         <module>restconf-it</module>
     </modules>
 </project>
