@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -118,13 +119,24 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
 
         // check stop-time
         final var stopTime = leaf(body, STOP_TIME_NODEID, String.class);
-        final var stopTimeInst = stopTime == null ? null : Instant.parse(stopTime);
+        final Instant stopInstant;
+        if (stopTime != null) {
+            try {
+                stopInstant = Instant.parse(stopTime);
+            } catch (DateTimeParseException e) {
+                request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                    "Malformed stop-type", e));
+                return;
+            }
+        } else {
+            stopInstant = null;
+        }
 
         streamRegistry.establishSubscription(request.transform(subscriptionId -> ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(OUTPUT_NODEID)
             .withChild(ImmutableNodes.leafNode(ID_NODEID, subscriptionId))
             .build()
-        ), streamName, encoding, filter, stopTimeInst);
+        ), streamName, encoding, filter, stopInstant);
     }
 
     static @Nullable SubscriptionFilter extractFilter(final ChoiceNode streamFilter) {
