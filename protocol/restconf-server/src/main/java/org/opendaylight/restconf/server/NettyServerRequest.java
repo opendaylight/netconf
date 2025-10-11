@@ -16,11 +16,11 @@ import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.api.ServerEncoding;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
 import org.opendaylight.restconf.server.spi.MappingServerRequest;
-import org.opendaylight.yangtools.yang.common.QName;
 
 /**
  * The {@link ServerRequest}s implementation we are passing to {@link RestconfServer}. Completion callbacks are routed
@@ -48,8 +48,8 @@ final class NettyServerRequest<T> extends MappingServerRequest<T> {
     }
 
     @Override
-    public QName requestEncoding() {
-        return request.requestEncoding().subscriptionEncoding();
+    public ServerEncoding requestEncoding() {
+        return request.requestEncoding();
     }
 
     @Override
