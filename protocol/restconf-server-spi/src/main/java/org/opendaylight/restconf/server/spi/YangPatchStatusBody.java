@@ -41,8 +41,8 @@ public final class YangPatchStatusBody extends FormattableBody {
     @Override
     public void formatToJSON(final PrettyPrintParam prettyPrint, final OutputStream out) throws IOException {
         try (var writer = FormattableBodySupport.createJsonWriter(out, prettyPrint)) {
-            writer.beginObject().name("ietf-yang-patch:yang-patch-status")
-                .beginObject().name("patch-id").value(status.patchId());
+            writer.beginObject().value("ietf-yang-patch:yang-patch-status")
+                .beginObject().value("patch-id").value(status.patchId());
 
             if (status.ok()) {
                 writeOk(writer);
@@ -51,10 +51,10 @@ public final class YangPatchStatusBody extends FormattableBody {
                 if (globalErrors != null) {
                     writeErrors(globalErrors, writer);
                 } else {
-                    writer.name("edit-status").beginObject()
-                        .name("edit").beginArray();
+                    writer.value("edit-status").beginObject()
+                        .value("edit").beginArray();
                     for (var editStatus : status.editCollection()) {
-                        writer.beginObject().name("edit-id").value(editStatus.getEditId());
+                        writer.beginObject().value("edit-id").value(editStatus.getEditId());
 
                         final var editErrors = editStatus.getEditErrors();
                         if (editErrors != null) {
