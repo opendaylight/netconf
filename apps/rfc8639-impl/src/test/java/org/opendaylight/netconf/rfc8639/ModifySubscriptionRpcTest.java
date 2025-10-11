@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.subscription;
+package org.opendaylight.netconf.rfc8639;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
@@ -33,8 +33,8 @@ import org.opendaylight.restconf.server.spi.AbstractRestconfStreamSubscription;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscriptionInput;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscriptionOutput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -46,15 +46,12 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 @ExtendWith(MockitoExtension.class)
-class DeleteSubscriptionRpcTest {
+class ModifySubscriptionRpcTest {
     private static final URI RESTCONF_URI = URI.create("/restconf/");
     private static final Uint32 ID = Uint32.valueOf(2147483648L);
-    private static final QName ID_QNAME = QName.create(Subscription.QNAME, "id");
-    private static final NodeIdentifierWithPredicates IDENTIFIER =
-        NodeIdentifierWithPredicates.of(Subscription.QNAME, ID_QNAME, ID);
     private static final ContainerNode INPUT = ImmutableNodes.newContainerBuilder()
-        .withNodeIdentifier(NodeIdentifier.create(DeleteSubscriptionInput.QNAME))
-        .withChild(ImmutableNodes.leafNode(ID_QNAME, ID))
+        .withNodeIdentifier(new NodeIdentifier(EstablishSubscriptionInput.QNAME))
+        .withChild(ImmutableNodes.leafNode(QName.create(Subscription.QNAME, "id"), ID))
         .build();
 
     @Mock
@@ -72,63 +69,74 @@ class DeleteSubscriptionRpcTest {
     @Mock
     private AbstractRestconfStreamSubscription subscription;
     @Captor
-    private ArgumentCaptor<RequestException> response;
+    private ArgumentCaptor<RequestException> responseCaptor;
 
-    private DeleteSubscriptionRpc rpc;
+    private ModifySubscriptionRpc rpc;
 
     @BeforeEach
     void before() {
-        rpc = new DeleteSubscriptionRpc(streamRegistry);
+        rpc = new ModifySubscriptionRpc(streamRegistry);
     }
 
     @Disabled
     @Test
-    void deleteSubscriptionTest() {
-        final var responseBuilder = ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(NodeIdentifier.create(DeleteSubscriptionOutput.QNAME))
+    void modifySubscriptionTest() {
+        final var idLeaf = QName.create(Subscription.QNAME, "id");
+
+        final var expectedNode = ImmutableNodes.newMapEntryBuilder()
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Subscription.QNAME, idLeaf, ID))
+            .withChild(ImmutableNodes.leafNode(idLeaf, ID))
+            .build();
+
+        final var response = ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(ModifySubscriptionOutput.QNAME))
             .build();
 
         doReturn(writeTx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTx).commit();
         doReturn(session).when(request).session();
-        doReturn(subscription).when(streamRegistry).lookupSubscription(ID);
         doReturn(session).when(subscription).session();
+        doReturn(subscription).when(streamRegistry).lookupSubscription(ID);
         doReturn(SubscriptionState.ACTIVE).when(subscription).state();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
-        verify(writeTx).delete(eq(LogicalDatastoreType.OPERATIONAL), eq(YangInstanceIdentifier.of(
-            new NodeIdentifier(Subscriptions.QNAME), new NodeIdentifier(Subscription.QNAME), IDENTIFIER)));
-        verify(request).completeWith(eq(responseBuilder));
+        verify(writeTx).merge(eq(LogicalDatastoreType.OPERATIONAL), eq(YangInstanceIdentifier.of(
+            new NodeIdentifier(Subscriptions.QNAME), new NodeIdentifier(Subscription.QNAME), expectedNode.name())),
+            eq(expectedNode));
+        verify(request).completeWith(eq(response));
     }
 
     @Test
-    void deleteSubscriptionWrongSessionTest() {
+    void modifySubscriptionWrongSessionTest() {
         doReturn(session).when(request).session();
         // return session different from request session
         doReturn(subscription).when(streamRegistry).lookupSubscription(ID);
         doReturn(SubscriptionState.ACTIVE).when(subscription).state();
+        doReturn(null).when(subscription).session();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
-        verify(request).failWith(response.capture());
-        assertEquals("Subscription with given id does not exist on this session", response.getValue().getMessage());
+        verify(request).failWith(responseCaptor.capture());
+        assertEquals("Subscription with given id does not exist on this session",
+            responseCaptor.getValue().getMessage());
     }
 
     @Test
-    void deleteSubscriptionWrongIDTest() {
+    void modifySubscriptionWrongIDTest() {
         doReturn(null).when(streamRegistry).lookupSubscription(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
-        verify(request).failWith(response.capture());
-        assertEquals("No subscription with given ID.", response.getValue().getMessage());
+        verify(request).failWith(responseCaptor.capture());
+        assertEquals("No subscription with given ID.", responseCaptor.getValue().getMessage());
     }
 
     @Test
-    void deleteSubscriptionAlreadyEndedTest() {
+    void modifySubscriptionAlreadyEndedTest() {
         doReturn(subscription).when(streamRegistry).lookupSubscription(ID);
         doReturn(SubscriptionState.END).when(subscription).state();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
-        verify(request).failWith(response.capture());
-        assertEquals("There is no active or suspended subscription with given ID.", response.getValue().getMessage());
+        verify(request).failWith(responseCaptor.capture());
+        assertEquals("There is no active or suspended subscription with given ID.",
+            responseCaptor.getValue().getMessage());
     }
 }

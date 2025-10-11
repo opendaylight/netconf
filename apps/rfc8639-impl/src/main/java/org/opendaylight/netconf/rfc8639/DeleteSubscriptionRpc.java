@@ -5,12 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.subscription;
+package org.opendaylight.netconf.rfc8639;
 
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
-import java.time.Instant;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -20,15 +19,15 @@ import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscription;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionInput;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.ModifySubscriptionOutput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscription;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscriptionInput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscriptionOutput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.NoSuchSubscription;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.osgi.service.component.annotations.Activate;
@@ -36,27 +35,21 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * RESTCONF implementation of {@link ModifySubscription}.
+ * RESTCONF implementation of {@link DeleteSubscription}.
  */
 @Singleton
 @Component(service = RpcImplementation.class)
 @NonNullByDefault
-public final class ModifySubscriptionRpc extends RpcImplementation {
+public final class DeleteSubscriptionRpc extends RpcImplementation {
     private static final NodeIdentifier SUBSCRIPTION_ID =
-        NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "id").intern());
-    private static final NodeIdentifier SUBSCRIPTION_TARGET =
-        NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "target").intern());
-    private static final NodeIdentifier SUBSCRIPTION_STREAM_FILTER =
-        NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "stream-filter").intern());
-    private static final NodeIdentifier STOP_TIME =
-        NodeIdentifier.create(QName.create(ModifySubscriptionInput.QNAME, "stop-time").intern());
+        NodeIdentifier.create(QName.create(DeleteSubscriptionInput.QNAME, "id").intern());
 
     private final RestconfStream.Registry streamRegistry;
 
     @Inject
     @Activate
-    public ModifySubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry) {
-        super(ModifySubscription.QNAME);
+    public DeleteSubscriptionRpc(@Reference final RestconfStream.Registry streamRegistry) {
+        super(DeleteSubscription.QNAME);
         this.streamRegistry = requireNonNull(streamRegistry);
     }
 
@@ -64,7 +57,6 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
     public void invoke(final ServerRequest<ContainerNode> request, final URI restconfURI, final OperationInput input) {
         final var body = input.input();
         final Uint32 id;
-
         try {
             id = leaf(body, SUBSCRIPTION_ID, Uint32.class);
         } catch (IllegalArgumentException e) {
@@ -75,48 +67,27 @@ public final class ModifySubscriptionRpc extends RpcImplementation {
             request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT, "No ID specified."));
             return;
         }
-
         final var subscription = streamRegistry.lookupSubscription(id);
         if (subscription == null) {
             request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
                 "No subscription with given ID."));
             return;
         }
+
+        // FIXME: DynamicSubscription.delete()
         final var state = subscription.state();
         if (state != SubscriptionState.ACTIVE && state != SubscriptionState.SUSPENDED) {
             request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "There is no active or suspended subscription with given ID."));
             return;
         }
-
         if (subscription.session() != request.session()) {
             request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT,
                 "Subscription with given id does not exist on this session"));
             return;
         }
-
-        final var target = (ChoiceNode) body.childByArg(SUBSCRIPTION_TARGET);
-
-        if (target == null) {
-            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
-                "No filter specified"));
-            return;
-        }
-
-        final var streamFilter = (ChoiceNode) target.childByArg(SUBSCRIPTION_STREAM_FILTER);
-        final var filter = streamFilter == null ? null : EstablishSubscriptionRpc.extractFilter(streamFilter);
-        if (filter == null) {
-            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT,
-                "No filter specified"));
-            return;
-        }
-
-        // check stop-time
-        final var stopTime = leaf(body, STOP_TIME, String.class);
-        final var stopTimeInst = stopTime == null ? null : Instant.parse(stopTime);
-
-        streamRegistry.modifySubscription(request.transform(modifiedSubscription -> ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(NodeIdentifier.create(ModifySubscriptionOutput.QNAME))
-            .build()), id, filter, stopTimeInst);
+        subscription.terminate(request.transform(unused -> ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(DeleteSubscriptionOutput.QNAME))
+            .build()), NoSuchSubscription.QNAME);
     }
 }

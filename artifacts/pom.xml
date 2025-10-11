@@ -314,6 +314,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>rfc8639-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>sal-remote-impl</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -544,11 +549,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>restconf-wadl-generator</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>restconf-subscription</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

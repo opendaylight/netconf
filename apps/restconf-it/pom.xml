@@ -170,11 +170,6 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-subscription</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-server-api</artifactId>
         </dependency>
         <dependency>
@@ -192,6 +187,11 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-server-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>rfc8639-impl</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>

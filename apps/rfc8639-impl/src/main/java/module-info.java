@@ -5,11 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-import org.opendaylight.restconf.subscription.impl.IetfSubscriptionFeatureProvider;
+import org.opendaylight.netconf.rfc8639.impl.IetfSubscriptionFeatureProvider;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
-module org.opendaylight.restconf.subscription {
-    exports org.opendaylight.restconf.subscription;
+/**
+ * RPCs implementing {@code ietf-subscribed-notifications.yang}.
+ */
+module org.opendaylight.netconf.rfc8639 {
+    exports org.opendaylight.netconf.rfc8639;
 
     provides YangFeatureProvider with IetfSubscriptionFeatureProvider;
 
