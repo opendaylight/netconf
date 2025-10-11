@@ -39,6 +39,12 @@
         <module>netconf-nb</module>
         <module>restconf-nb</module>
 
+        <!-- NETCONF console -->
+        <module>netconf-console</module>
+
+        <!-- RESTCONF integration tests -->
+        <module>restconf-it</module>
+
         <!-- legacy ietf-topology implementations -->
         <module>netconf-topology</module>
         <module>netconf-topology-impl</module>
@@ -47,10 +53,7 @@
         <!-- legacy callhome integration -->
         <module>callhome-provider</module>
 
-        <!-- NETCONF console -->
-        <module>netconf-console</module>
-
-        <!-- RESTCONF integration tests -->
-        <module>restconf-it</module>
+        <!-- legacy WADL generator -->
+        <module>wadl-codegen</module>
     </modules>
 </project>
