@@ -29,6 +29,5 @@
 
     <modules>
         <module>restconf-openapi</module>
-        <module>wadl-generator</module>
     </modules>
 </project>

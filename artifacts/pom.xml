@@ -324,6 +324,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>wadl-codegen</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>yanglib-mdsal-writer</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -544,11 +549,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sal-restconf-broker</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>restconf-wadl-generator</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
