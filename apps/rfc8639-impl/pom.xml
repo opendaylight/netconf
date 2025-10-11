@@ -15,10 +15,10 @@
         <relativePath>../../bnd-parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>restconf-subscription</artifactId>
+    <artifactId>rfc8639-impl</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
-    <description>RESTCONF Subscription application</description>
+    <description>Implementation of ietf-subscribed-notifications.yang model</description>
 
     <dependencies>
         <dependency>

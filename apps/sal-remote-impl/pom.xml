@@ -18,7 +18,7 @@
     <artifactId>sal-remote-impl</artifactId>
     <name>${project.artifactId}</name>
     <packaging>jar</packaging>
-    <description>Implementation of sal-remote</description>
+    <description>Implementation of sal-remote.yang model</description>
 
     <dependencies>
         <dependency>

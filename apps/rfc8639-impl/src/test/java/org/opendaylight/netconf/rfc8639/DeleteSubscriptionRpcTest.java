@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.subscription;
+package org.opendaylight.netconf.rfc8639;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
@@ -27,13 +27,15 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.databind.DatabindPath;
 import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.netconf.rfc8639.DeleteSubscriptionRpc;
+import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamSubscription;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.KillSubscriptionInput;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.KillSubscriptionOutput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscriptionInput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.DeleteSubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -45,14 +47,14 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 @ExtendWith(MockitoExtension.class)
-class KillSubscriptionRpcTest {
+class DeleteSubscriptionRpcTest {
     private static final URI RESTCONF_URI = URI.create("/restconf/");
     private static final Uint32 ID = Uint32.valueOf(2147483648L);
     private static final QName ID_QNAME = QName.create(Subscription.QNAME, "id");
     private static final NodeIdentifierWithPredicates IDENTIFIER =
         NodeIdentifierWithPredicates.of(Subscription.QNAME, ID_QNAME, ID);
     private static final ContainerNode INPUT = ImmutableNodes.newContainerBuilder()
-        .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(KillSubscriptionInput.QNAME))
+        .withNodeIdentifier(NodeIdentifier.create(DeleteSubscriptionInput.QNAME))
         .withChild(ImmutableNodes.leafNode(ID_QNAME, ID))
         .build();
 
@@ -65,41 +67,55 @@ class KillSubscriptionRpcTest {
     @Mock
     private CompletingServerRequest<ContainerNode> request;
     @Mock
+    private TransportSession session;
+    @Mock
     private RestconfStream.Registry streamRegistry;
     @Mock
     private AbstractRestconfStreamSubscription subscription;
     @Captor
     private ArgumentCaptor<RequestException> response;
 
-    private KillSubscriptionRpc rpc;
+    private DeleteSubscriptionRpc rpc;
 
     @BeforeEach
     void before() {
-        rpc = new KillSubscriptionRpc(streamRegistry);
+        rpc = new DeleteSubscriptionRpc(streamRegistry);
     }
 
     @Disabled
     @Test
-    void killSubscriptionTest() {
+    void deleteSubscriptionTest() {
         final var responseBuilder = ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(KillSubscriptionOutput.QNAME))
+            .withNodeIdentifier(NodeIdentifier.create(DeleteSubscriptionOutput.QNAME))
             .build();
 
         doReturn(writeTx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTx).commit();
+        doReturn(session).when(request).session();
         doReturn(subscription).when(streamRegistry).lookupSubscription(ID);
+        doReturn(session).when(subscription).session();
         doReturn(SubscriptionState.ACTIVE).when(subscription).state();
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
         verify(writeTx).delete(eq(LogicalDatastoreType.OPERATIONAL), eq(YangInstanceIdentifier.of(
-            new NodeIdentifier(Subscriptions.QNAME),
-            new NodeIdentifier(Subscription.QNAME),
-            IDENTIFIER)));
+            new NodeIdentifier(Subscriptions.QNAME), new NodeIdentifier(Subscription.QNAME), IDENTIFIER)));
         verify(request).completeWith(eq(responseBuilder));
     }
 
     @Test
-    void killSubscriptionWrongIDTest() {
+    void deleteSubscriptionWrongSessionTest() {
+        doReturn(session).when(request).session();
+        // return session different from request session
+        doReturn(subscription).when(streamRegistry).lookupSubscription(ID);
+        doReturn(SubscriptionState.ACTIVE).when(subscription).state();
+
+        rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
+        verify(request).failWith(response.capture());
+        assertEquals("Subscription with given id does not exist on this session", response.getValue().getMessage());
+    }
+
+    @Test
+    void deleteSubscriptionWrongIDTest() {
         doReturn(null).when(streamRegistry).lookupSubscription(ID);
 
         rpc.invoke(request, RESTCONF_URI, new OperationInput(operationPath, INPUT));
@@ -108,7 +124,7 @@ class KillSubscriptionRpcTest {
     }
 
     @Test
-    void killSubscriptionAlreadyEndedTest() {
+    void deleteSubscriptionAlreadyEndedTest() {
         doReturn(subscription).when(streamRegistry).lookupSubscription(ID);
         doReturn(SubscriptionState.END).when(subscription).state();
 
