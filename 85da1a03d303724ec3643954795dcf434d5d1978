@@ -16,6 +16,40 @@
       "message": "IMHO Unrelated to current issue",
       "revId": "85da1a03d303724ec3643954795dcf434d5d1978",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16b2d642_8ececf89",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T07:25:17Z",
+      "side": 1,
+      "message": "just set result?",
+      "revId": "85da1a03d303724ec3643954795dcf434d5d1978",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4afd645_0c4a268c",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 582,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T07:25:17Z",
+      "side": 1,
+      "message": "if (exists)?",
+      "revId": "85da1a03d303724ec3643954795dcf434d5d1978",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
