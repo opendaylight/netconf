@@ -105,4 +105,4 @@ There are sorts of things here:
 * [Secure Transport layer](transport/README.md) implementation
 * [Low-level](protocol/README.md) protocol implementations
 * [High-level](plugins) protocol integrations, notably with MD-SAL
-* a handful of unsorted things, both [NETCONF-related](netconf) and [RESTCONF-related](restconf)
+* a handful of unsorted things, both [NETCONF-related](netconf)
