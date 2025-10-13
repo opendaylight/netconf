@@ -44,5 +44,6 @@
         <module>restconf-server-api-testlib</module>
         <module>restconf-server-jaxrs</module>
         <module>restconf-server-spi</module>
+        <module>wg-server-api</module>
     </modules>
 </project>
