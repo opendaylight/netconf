@@ -17,6 +17,7 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.server.api.StreamEncoding;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 
 /**
@@ -24,13 +25,18 @@ import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-5.2">RFC8040, section 5.2</a>.
  */
 @NonNullByDefault
-public enum MessageEncoding {
+public enum MessageEncoding implements StreamEncoding {
     /**
      * JSON encoding, as specified in <a href="https://www.rfc-editor.org/rfc/rfc7951">RFC7951</a> and extended in
      * <a href="https://www.rfc-editor.org/rfc/rfc7952#section-5.2">RFC7952, section 5.2</a>.
      */
     JSON(NettyMediaTypes.APPLICATION_YANG_DATA_JSON, NettyMediaTypes.APPLICATION_YANG_PATCH_JSON,
             EncodingName.RFC8040_JSON, HttpHeaderValues.APPLICATION_JSON) {
+        @Override
+        public String localName() {
+            return "json";
+        }
+
         @Override
         void formatBody(final FormattableBody body, final PrettyPrintParam prettyPrint, final OutputStream out)
                 throws IOException {
@@ -43,6 +49,11 @@ public enum MessageEncoding {
      */
     XML(NettyMediaTypes.APPLICATION_YANG_DATA_XML, NettyMediaTypes.APPLICATION_YANG_PATCH_XML,
             EncodingName.RFC8040_XML, HttpHeaderValues.APPLICATION_XML, NettyMediaTypes.TEXT_XML) {
+        @Override
+        public String localName() {
+            return "xml";
+        }
+
         @Override
         void formatBody(final FormattableBody body, final PrettyPrintParam prettyPrint, final OutputStream out)
                 throws IOException {

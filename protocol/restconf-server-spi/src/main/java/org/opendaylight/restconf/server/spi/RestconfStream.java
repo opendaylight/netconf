@@ -30,6 +30,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.api.StreamEncoding;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
 import org.opendaylight.restconf.server.spi.Subscriber.Rfc8040Subscriber;
@@ -58,7 +59,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
      * @param name Encoding name, as visible via the stream's {@code access} list
      */
     // FIXME: reconcile with RFC8639
-    public record EncodingName(@NonNull String name) {
+    public record EncodingName(@NonNull String name) implements StreamEncoding {
         private static final Pattern PATTERN = Pattern.compile("[a-zA-Z]+");
 
         /**
@@ -74,6 +75,11 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
             if (!PATTERN.matcher(name).matches()) {
                 throw new IllegalArgumentException("name must match " + PATTERN);
             }
+        }
+
+        @Override
+        public String localName() {
+            return name;
         }
     }
 
