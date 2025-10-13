@@ -38,9 +38,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.restconf.server.api.MonitoringEncoding;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
-import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
 import org.opendaylight.restconf.server.spi.RestconfStream.Subscription;
@@ -106,8 +106,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         private @Nullable EventStreamFilter filter;
 
-        DynSubscription(final Uint32 id, final QName encoding, final EncodingName encodingName, final String streamName,
-                final String receiverName, final TransportSession session, final @Nullable EventStreamFilter filter,
+        DynSubscription(final Uint32 id, final QName encoding, final MonitoringEncoding encodingName,
+                final String streamName, final String receiverName, final TransportSession session,
+                final @Nullable EventStreamFilter filter, final @Nullable String filterName,
                 final @Nullable Instant stopTime) {
             super(id, encoding, encodingName, streamName, receiverName, session, stopTime);
             this.filter = filter;
@@ -643,11 +644,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             return;
         }
 
-        final EncodingName encodingName;
+        // FIXME: should not be necessary: just encoding.monitoringBody()
+        final MonitoringEncoding encodingName;
         if (encoding.equals(EncodeJson$I.QNAME)) {
-            encodingName = EncodingName.RFC8040_JSON;
+            encodingName = MonitoringEncoding.JSON;
         } else if (encoding.equals(EncodeXml$I.QNAME)) {
-            encodingName = EncodingName.RFC8040_XML;
+            encodingName = MonitoringEncoding.XML;
         } else {
             request.completeWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
                 "Encoding %s not supported", encoding));
