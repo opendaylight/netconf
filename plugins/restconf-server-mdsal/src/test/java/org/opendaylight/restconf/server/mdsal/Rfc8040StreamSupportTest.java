@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
+import org.opendaylight.restconf.server.api.MonitoringEncoding;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -31,7 +31,7 @@ class Rfc8040StreamSupportTest {
 
         assertMappedData(prepareMap(streamName, uri, outputType),
             Rfc8040StreamSupport.streamEntry(streamName, "description", "location",
-                Set.of(new EncodingName(outputType))));
+                Set.of(new MonitoringEncoding(outputType))));
     }
 
     @Test
@@ -41,7 +41,7 @@ class Rfc8040StreamSupportTest {
 
         assertMappedData(prepareMap("notifi", uri, outputType),
             Rfc8040StreamSupport.streamEntry("notifi", "description", "location",
-                Set.of(new EncodingName(outputType))));
+                Set.of(new MonitoringEncoding(outputType))));
     }
 
     private static Map<QName, Object> prepareMap(final String name, final String uri, final String outputType) {

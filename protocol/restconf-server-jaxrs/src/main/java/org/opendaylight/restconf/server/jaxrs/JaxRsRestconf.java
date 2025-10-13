@@ -73,6 +73,7 @@ import org.opendaylight.restconf.server.api.JsonOperationInputBody;
 import org.opendaylight.restconf.server.api.JsonPatchBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
+import org.opendaylight.restconf.server.api.MonitoringEncoding;
 import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.OptionsResult;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
@@ -84,7 +85,6 @@ import org.opendaylight.restconf.server.api.XmlPatchBody;
 import org.opendaylight.restconf.server.api.XmlResourceBody;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.YangPatchStatusBody;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
@@ -1113,7 +1113,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     @GET
     @Produces(MediaType.SERVER_SENT_EVENTS)
     @Path("/" + STREAMS_SUBPATH + "/{encodingName:[a-zA-Z]+}/{streamName:.+}")
-    public void streamsGET(@PathParam("encodingName") final EncodingName encodingName,
+    public void streamsGET(@PathParam("encodingName") final MonitoringEncoding encodingName,
             @PathParam("streamName") final String streamName, @Context final UriInfo uriInfo,
             @Context final SseEventSink sink, @Context final Sse sse) {
         final var stream = streamRegistry.lookupStream(streamName);
@@ -1136,7 +1136,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     @OPTIONS
     @Path("/" + STREAMS_SUBPATH + "/{encodingName:[a-zA-Z]+}/{streamName:.+}")
     @SuppressWarnings("checkstyle:abbreviationAsWordInName")
-    public Response streamsOPTIONS(@PathParam("encodingName") final EncodingName encodingName) {
+    public Response streamsOPTIONS(@PathParam("encodingName") final MonitoringEncoding encodingName) {
         return allowGetHeadOptions();
     }
 
