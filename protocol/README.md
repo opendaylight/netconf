@@ -24,7 +24,7 @@ Both implementations share
 There is a notable difference in where we take over from the Netty pipeline:
 * for ```netconf-*``` we integrate with raw ByteBufs
 * for ```restconf-*``` we integrate with
-  [netty-codec-http](https://javadoc.io/doc/io.netty/netty-codec-http/4.1.114.Final/index.html)
-  and [netty-codec-http2](https://javadoc.io/doc/io.netty/netty-codec-http2/4.1.114.Final/index.html),
+  [netty-codec-http](https://netty.io/4.2/api/io/netty/handler/codec/http/package-summary.html)
+  and [netty-codec-http2](https://netty.io/4.2/api/io/netty/handler/codec/http2/package-summary.html),
   where a lot of the pipelined currently resides in transport/transport-http
   in terms of HttpRequest, HttpHeaders, etc.)
