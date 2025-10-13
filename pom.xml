@@ -34,6 +34,8 @@
         <module>parent</module>
         <module>features</module>
         <module>model</module>
+        <module>keystore</module>
+        <module>truststore</module>
         <module>transport</module>
         <module>protocol</module>
         <module>plugins</module>
@@ -43,10 +45,6 @@
 
         <!-- Legacy layout -->
         <module>netconf</module>
-        <module>restconf</module>
-
-        <module>keystore</module>
-        <module>truststore</module>
     </modules>
 
     <profiles>

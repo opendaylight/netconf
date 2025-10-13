@@ -38,6 +38,7 @@
         <module>netconf-test-util</module>
         <module>restconf-api</module>
         <module>restconf-client</module>
+        <module>restconf-openapi</module>
         <module>restconf-server</module>
         <module>restconf-server-api</module>
         <module>restconf-server-api-testlib</module>
