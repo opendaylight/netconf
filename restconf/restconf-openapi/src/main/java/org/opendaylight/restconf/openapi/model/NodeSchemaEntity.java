@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.openapi.model;
 
 import static org.opendaylight.restconf.openapi.model.PropertyEntity.isSchemaNodeMandatory;
-import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.widthList;
+import static org.opendaylight.restconf.openapi.model.RestDocgenUtil.widthList;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
