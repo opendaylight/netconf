@@ -16,6 +16,24 @@
       "message": "The chain contain unresolved comments and need adaptation of unit tests.",
       "revId": "09255812ce9dfa155963ed3aa3c197d5babada4d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d43466b_45ca8e75",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 56
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T12:37:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ca6b9cea_85470a0f",
+      "revId": "09255812ce9dfa155963ed3aa3c197d5babada4d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
