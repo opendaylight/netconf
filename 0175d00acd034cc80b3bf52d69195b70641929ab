@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f50e0fe0_3fa8ac92",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/DataOperationsServiceImpl.java",
+        "patchSetId": 75
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T13:16:04Z",
+      "side": 1,
+      "message": "format",
+      "revId": "0175d00acd034cc80b3bf52d69195b70641929ab",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
