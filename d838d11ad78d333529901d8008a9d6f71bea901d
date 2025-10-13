@@ -263,6 +263,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0cc2cbe_1c8a3d34",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/NetconfDataOperationsTest.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T13:41:02Z",
+      "side": 1,
+      "message": "because createEditConfigStructure returns NetconfBaseOps#ChoiceNode - now we are testing deeper interactions than we did before",
+      "parentUuid": "9355fef2_ccc4dde8",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d729b867_9c703522",
