@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5a4893d_40b7db7d",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/netconf/CreateEditConfigRequest.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T12:37:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5d32ae1_9d201960",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eed91354_1cc8d439",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-13T08:14:49Z",
       "side": 1,
       "message": "2L",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e733186_76b13827",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/netconf/DeleteEditConfigRequest.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T12:37:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eed91354_1cc8d439",
       "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d281911d_431b8762",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/netconf/EditConfigRequest.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T12:37:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1e38e6a_8ae41e92",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9627eb66_1ee579ae",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-10-13T08:14:49Z",
       "side": 1,
       "message": "2L",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cab5b0f1_04e4e6d8",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/netconf/MergeEditConfigRequest.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T12:37:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9627eb66_1ee579ae",
       "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d8af75e_f7413527",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/netconf/RemoveEditConfigRequest.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T12:37:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0419609a_84b17321",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e44824bc_cee05f13",
@@ -103,6 +193,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ecfb8422_abb00cdb",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/ProxyNetconfDataTreeServiceTest.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T12:37:21Z",
+      "side": 1,
+      "message": "not-needed",
+      "parentUuid": "e44824bc_cee05f13",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "68c4bead_7c00a9b6",
@@ -116,6 +224,24 @@
       "writtenOn": "2025-10-13T08:14:49Z",
       "side": 1,
       "message": "really needed to be non private?",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9db74eb_4e85446b",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/AbstractServerDataOperationsTest.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T12:37:21Z",
+      "side": 1,
+      "message": "made private again",
+      "parentUuid": "68c4bead_7c00a9b6",
       "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -154,6 +280,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e74184d_0a37825d",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/AbstractDataStore.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T12:37:21Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "d729b867_9c703522",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "005dd081_d6350d60",
@@ -171,6 +315,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ca769df_1022344f",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/AbstractDataStore.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T12:37:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "005dd081_d6350d60",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c7551335_8ff5435a",
@@ -184,6 +346,24 @@
       "writtenOn": "2025-10-13T08:14:49Z",
       "side": 1,
       "message": "formatting",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "120e9121_7332a2d0",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/AbstractDataStore.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T12:37:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7551335_8ff5435a",
       "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
