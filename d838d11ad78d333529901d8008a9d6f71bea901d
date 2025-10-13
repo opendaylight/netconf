@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5d32ae1_9d201960",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/netconf/CreateEditConfigRequest.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T08:14:49Z",
+      "side": 1,
+      "message": "2L becasue we have omitted felds",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eed91354_1cc8d439",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/netconf/DeleteEditConfigRequest.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T08:14:49Z",
+      "side": 1,
+      "message": "2L",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1e38e6a_8ae41e92",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/netconf/EditConfigRequest.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T08:14:49Z",
+      "side": 1,
+      "message": "2L",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9627eb66_1ee579ae",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/netconf/MergeEditConfigRequest.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T08:14:49Z",
+      "side": 1,
+      "message": "2L",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0419609a_84b17321",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/netconf/RemoveEditConfigRequest.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T08:14:49Z",
+      "side": 1,
+      "message": "2L",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e44824bc_cee05f13",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/ProxyNetconfDataTreeServiceTest.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T08:14:49Z",
+      "side": 1,
+      "message": "we should not depend on restconf from here",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68c4bead_7c00a9b6",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/AbstractServerDataOperationsTest.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T08:14:49Z",
+      "side": 1,
+      "message": "really needed to be non private?",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9355fef2_ccc4dde8",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/mdsal/spi/data/NetconfDataOperationsTest.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T08:14:49Z",
+      "side": 1,
+      "message": "why choice node?",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d729b867_9c703522",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/AbstractDataStore.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T08:14:49Z",
+      "side": 1,
+      "message": "IDK looks weird but this is legacy codec just moved over from other place",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "005dd081_d6350d60",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/AbstractDataStore.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T08:14:49Z",
+      "side": 1,
+      "message": "formatting",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7551335_8ff5435a",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/AbstractDataStore.java",
+        "patchSetId": 71
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T08:14:49Z",
+      "side": 1,
+      "message": "formatting",
+      "revId": "d838d11ad78d333529901d8008a9d6f71bea901d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
