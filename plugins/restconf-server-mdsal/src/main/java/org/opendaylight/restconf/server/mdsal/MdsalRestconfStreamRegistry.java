@@ -61,6 +61,7 @@ import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
 import org.opendaylight.restconf.mdsal.spi.NotificationSource;
+import org.opendaylight.restconf.server.api.MonitoringEncoding;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.EventFormatter;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
@@ -487,15 +488,13 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
      */
     private static EventFormatter<DOMNotification> getStateNotifEventFormatter(final QName encoding) {
         if (EncodeJson$I.QNAME.equals(encoding)) {
-            return NotificationSource.ENCODINGS.get(RestconfStream.EncodingName.RFC8040_JSON)
-                .newFormatter(TextParameters.EMPTY);
-        } else if (EncodeXml$I.QNAME.equals(encoding)) {
-            return NotificationSource.ENCODINGS.get(RestconfStream.EncodingName.RFC8040_XML)
-                .newFormatter(TextParameters.EMPTY);
-        } else {
-            // this should not happen
-            return null;
+            return NotificationSource.ENCODINGS.get(MonitoringEncoding.JSON).newFormatter(TextParameters.EMPTY);
         }
+        if (EncodeXml$I.QNAME.equals(encoding)) {
+            return NotificationSource.ENCODINGS.get(MonitoringEncoding.XML).newFormatter(TextParameters.EMPTY);
+        }
+        // this should not happen
+        return null;
     }
 
     private static @NonNull ListenableFuture<@Nullable Void> mapFuture(

@@ -22,13 +22,13 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
+import org.opendaylight.restconf.server.api.MonitoringEncoding;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
@@ -51,32 +51,6 @@ import org.slf4j.LoggerFactory;
  * @param <T> Type of processed events
  */
 public sealed class RestconfStream<T> permits LegacyRestconfStream {
-    /**
-     * An opinionated view on what values we can produce for {@code Access.getEncoding()}. The name can only be composed
-     * of one or more characters matching {@code [a-zA-Z]}.
-     *
-     * @param name Encoding name, as visible via the stream's {@code access} list
-     */
-    // FIXME: reconcile with RFC8639
-    public record EncodingName(@NonNull String name) {
-        private static final Pattern PATTERN = Pattern.compile("[a-zA-Z]+");
-
-        /**
-         * Well-known JSON encoding defined by RFC8040's {@code ietf-restconf-monitoring.yang}.
-         */
-        public static final @NonNull EncodingName RFC8040_JSON = new EncodingName("json");
-        /**
-         * Well-known XML encoding defined by RFC8040's {@code ietf-restconf-monitoring.yang}.
-         */
-        public static final @NonNull EncodingName RFC8040_XML = new EncodingName("xml");
-
-        public EncodingName {
-            if (!PATTERN.matcher(name).matches()) {
-                throw new IllegalArgumentException("name must match " + PATTERN);
-            }
-        }
-    }
-
     /**
      * A service which knows where instantiated streams can be located. This is typically tied to a server endpoint
      * providing access to <a href="https://www.rfc-editor.org/rfc/rfc8040#section-6.2">RFC8040 event streams</a>.
@@ -118,9 +92,9 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
      */
     public abstract static class Source<T> {
         // ImmutableMap because it retains iteration order
-        final @NonNull ImmutableMap<EncodingName, ? extends EventFormatterFactory<T>> encodings;
+        final @NonNull ImmutableMap<MonitoringEncoding, ? extends EventFormatterFactory<T>> encodings;
 
-        protected Source(final ImmutableMap<EncodingName, ? extends EventFormatterFactory<T>> encodings) {
+        protected Source(final ImmutableMap<MonitoringEncoding, ? extends EventFormatterFactory<T>> encodings) {
             if (encodings.isEmpty()) {
                 throw new IllegalArgumentException("A source must support at least one encoding");
             }
@@ -565,17 +539,18 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
     }
 
     /**
-     * Get supported {@link EncodingName}s. The set is guaranteed to contain at least one element and does not contain
-     * {@code null}s.
+     * Get supported {@link MonitoringEncoding}s. The set is guaranteed to contain at least one element and does not
+     * contain {@code null}s.
      *
      * @return Supported encodings.
      */
     @SuppressWarnings("null")
-    public @NonNull Set<EncodingName> encodings() {
+    public @NonNull Set<MonitoringEncoding> encodings() {
         return source.encodings.keySet();
     }
 
-    @NonNull EventFormatterFactory<T> getFactory(final EncodingName encoding) throws UnsupportedEncodingException {
+    @NonNull EventFormatterFactory<T> getFactory(final MonitoringEncoding encoding)
+            throws UnsupportedEncodingException {
         final var factory = source.encodings.get(requireNonNull(encoding));
         if (factory == null) {
             throw new UnsupportedEncodingException("Stream '" + name + "' does not support " + encoding);
@@ -595,7 +570,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
      * @throws XPathExpressionException if requested filter is not valid
      */
     @NonNullByDefault
-    public @Nullable Registration addSubscriber(final Sender handler, final EncodingName encoding,
+    public @Nullable Registration addSubscriber(final Sender handler, final MonitoringEncoding encoding,
             final EventStreamGetParams params) throws UnsupportedEncodingException, XPathExpressionException {
         final var factory = getFactory(encoding);
         final var startTime = params.startTime();
@@ -622,7 +597,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
     }
 
     @NonNullByDefault
-    @Nullable Rfc8639Subscriber<T> addSubscriber(final Sender handler, final EncodingName encoding,
+    @Nullable Rfc8639Subscriber<T> addSubscriber(final Sender handler, final MonitoringEncoding encoding,
             final String receiverName, @Nullable final EventStreamFilter eventStreamFilter, final State state)
             throws UnsupportedEncodingException {
         return addSubscriber(new Rfc8639Subscriber<>(this, handler,

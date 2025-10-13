@@ -16,6 +16,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
+import org.opendaylight.restconf.server.api.MonitoringEncoding;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.LocationProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
@@ -82,16 +83,16 @@ final class Rfc8040StreamSupport extends StreamSupport {
 
     @VisibleForTesting
     static MapEntryNode streamEntry(final String name, final String description, final String baseStreamLocation,
-            final Set<RestconfStream.EncodingName> encodings) {
+            final Set<MonitoringEncoding> encodings) {
         final var accessBuilder = ImmutableNodes.newSystemMapBuilder()
             .withNodeIdentifier(new NodeIdentifier(Access.QNAME));
         for (var encoding : encodings) {
-            final var encodingName = encoding.name();
+            final var encodingValue = encoding.value();
             accessBuilder.withChild(ImmutableNodes.newMapEntryBuilder()
-                .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, ENCODING_QNAME, encodingName))
-                .withChild(ImmutableNodes.leafNode(ENCODING_QNAME, encodingName))
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, ENCODING_QNAME, encodingValue))
+                .withChild(ImmutableNodes.leafNode(ENCODING_QNAME, encodingValue))
                 .withChild(ImmutableNodes.leafNode(LOCATION_QNAME,
-                    baseStreamLocation + '/' + encodingName + '/' + name))
+                    baseStreamLocation + '/' + encodingValue + '/' + name))
                 .build());
         }
 
