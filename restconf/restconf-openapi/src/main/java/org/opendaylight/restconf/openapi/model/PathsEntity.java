@@ -8,18 +8,21 @@
 package org.opendaylight.restconf.openapi.model;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolveFullNameFromNode;
-import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolvePathArgumentsName;
-import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.widthList;
+import static org.opendaylight.restconf.openapi.model.RestDocgenUtil.widthList;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
@@ -43,6 +46,10 @@ import org.opendaylight.yangtools.yang.model.api.type.Uint8TypeDefinition;
 public final class PathsEntity extends OpenApiEntity {
     private static final String OPERATIONS = "operations";
     private static final String DATA = "data";
+
+    // FIXME: static map vs. concurrent computation vs. cleanup?
+    private static final Map<XMLNamespace, Map<Optional<Revision>, Module>> NAMESPACE_AND_REVISION_TO_MODULE =
+        new HashMap<>();
 
     private final @NonNull EffectiveModelContext modelContext;
     private final @NonNull String deviceName;
@@ -136,7 +143,7 @@ public final class PathsEntity extends OpenApiEntity {
             return;
         }
         final var resourcePath = basePath + DATA + path;
-        final var fullName = resolveFullNameFromNode(node.getQName(), modelContext);
+        final var fullName = resolveFullNameFromNode(node.getQName());
         final var firstChild = getListOrContainerChildNode((DataNodeContainer) node, width, depth, nodeDepth);
         if (firstChild != null && node instanceof ContainerSchemaNode) {
             processTopPathEntity(node, resourcePath, pathParams, moduleName, refPath, isConfig, fullName, firstChild)
@@ -155,7 +162,7 @@ public final class PathsEntity extends OpenApiEntity {
             final var actionParams = new ArrayList<>(pathParams);
             for (var actionDef : actionContainer.getActions()) {
                 final var resourceActionPath = path + "/" + resolvePathArgumentsName(actionDef.getQName(),
-                    node.getQName(), modelContext);
+                    node.getQName());
                 processActionPathEntity(actionDef, basePath + DATA + resourceActionPath, actionParams, moduleName,
                     refPath, deviceName, parentNode, listOfParentsForActions).generate(generator);
             }
@@ -165,7 +172,7 @@ public final class PathsEntity extends OpenApiEntity {
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
                 final var childParams = new ArrayList<>(pathParams);
                 final var newRefPath = refPath + "_" + childNode.getQName().getLocalName();
-                final var localName = resolvePathArgumentsName(childNode.getQName(), node.getQName(), modelContext);
+                final var localName = resolvePathArgumentsName(childNode.getQName(), node.getQName());
                 final var resourceDataPath = path + "/" + processPath(childNode, childParams, localName);
                 final var newConfig = isConfig && childNode.isConfiguration();
                 processChildNode(generator, childNode, childParams, moduleName, resourceDataPath, newRefPath, newConfig,
@@ -280,5 +287,36 @@ public final class PathsEntity extends OpenApiEntity {
             case BooleanTypeDefinition def -> "boolean";
             default -> "string";
         };
+    }
+
+    /**
+     * Resolve path argument name for {@code node}.
+     *
+     * <p>The name can contain also prefix which consists of module name followed by colon. The module
+     * prefix is presented if namespace of {@code node} and its parent is different. In other cases
+     * only name of {@code node} is returned.
+     *
+     * @return name of {@code node}
+     */
+    private String resolvePathArgumentsName(final @NonNull QName node, final @NonNull QName parent) {
+        if (isEqualNamespaceAndRevision(node, parent)) {
+            return node.getLocalName();
+        }
+        return resolveFullNameFromNode(node);
+    }
+
+    private String resolveFullNameFromNode(final QName node) {
+        final var namespace = node.getNamespace();
+        final var revision = node.getRevision();
+
+        final var revisionToModule = NAMESPACE_AND_REVISION_TO_MODULE.computeIfAbsent(namespace, k -> new HashMap<>());
+        final var module = revisionToModule.computeIfAbsent(revision,
+                k -> modelContext.findModule(namespace, k).orElse(null));
+        return module == null ? node.getLocalName() : module.getName() + ":" + node.getLocalName();
+    }
+
+    private static boolean isEqualNamespaceAndRevision(final QName node, final QName parent) {
+        return parent.getNamespace().equals(node.getNamespace())
+                && parent.getRevision().equals(node.getRevision());
     }
 }
