@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server.api;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.wg.server.api.RestconfMonitoringEncoding;
 import org.opendaylight.yangtools.yang.common.QName;
 
 /**
@@ -28,7 +29,7 @@ public interface ServerEncoding {
     /**
      * {@return the value to use in {@code ietf-restconf-monitoring.yang} context}
      */
-    MonitoringEncoding monitoringEncoding();
+    RestconfMonitoringEncoding monitoringEncoding();
 
     /**
      * {@return the value to use in {@code ietf-subscribed-notification.yang} context}

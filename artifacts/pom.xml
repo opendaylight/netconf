@@ -25,11 +25,74 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- NETCONF Transport API and implementations-->
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>transport-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>transport-http</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>transport-ssh</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>transport-tcp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>transport-tls</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>transport-udp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>odl-netconf-transport</artifactId>
+                <version>${project.version}</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>odl-netconf-transport-api</artifactId>
+                <version>${project.version}</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+
+            <!-- Databind -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>databind</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>odl-netconf-databind</artifactId>
+                <version>${project.version}</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+
+            <!-- Common server model -->
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>wg-server-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- implementation artifacts -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-api</artifactId>
@@ -116,65 +179,6 @@
                 <artifactId>netconf-client-mdsal</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
-            <!-- NETCONF Transport API and implementations-->
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>transport-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>transport-http</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>transport-ssh</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>transport-tcp</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>transport-tls</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>transport-udp</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <!-- Databind -->
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>odl-netconf-databind</artifactId>
-                <version>${project.version}</version>
-                <type>xml</type>
-                <classifier>features</classifier>
-            </dependency>
-
-            <!-- NETCONF Transport features -->
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>odl-netconf-transport</artifactId>
-                <version>${project.version}</version>
-                <type>xml</type>
-                <classifier>features</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>odl-netconf-transport-api</artifactId>
-                <version>${project.version}</version>
-                <type>xml</type>
-                <classifier>features</classifier>
-            </dependency>
-
-            <!-- YANG models -->
             <!-- RFC5277 NETCONF Event Notifications -->
             <dependency>
                 <groupId>org.opendaylight.netconf.model</groupId>
