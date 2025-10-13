@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bbd93f83_285ad411",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-13T07:28:42Z",
+      "side": 1,
+      "message": "can we just use callback?",
+      "revId": "85da1a03d303724ec3643954795dcf434d5d1978",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f4afd645_0c4a268c",
         "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperations.java",
         "patchSetId": 42
