@@ -233,7 +233,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         final NetconfDeviceRpc deviceRpc = new NetconfDeviceRpc(modelContext, listener,
             new NetconfMessageTransformer(emptyDatabind, false, baseSchema));
 
-        return Futures.transform(deviceRpc.domRpcService().invokeRpc(Get.QNAME, ImmutableNodes.newContainerBuilder()
+        return Futures.transform(deviceRpc.invokeNetconf(Get.QNAME, ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NETCONF_GET_NODEID)
             .withChild(NetconfMessageTransformUtil.toFilterStructure(RFC8528_SCHEMA_MOUNTS, modelContext))
             .build()), rpcResult -> processSchemaMounts(rpcResult, emptyDatabind), MoreExecutors.directExecutor());
