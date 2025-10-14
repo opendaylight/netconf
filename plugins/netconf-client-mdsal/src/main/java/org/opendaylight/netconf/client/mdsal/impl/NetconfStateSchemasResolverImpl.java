@@ -124,8 +124,8 @@ public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchem
         //            urn:ietf:params:netconf:capability:yang-library:1.0?revision=<date>&module-set-id=<id>
         //
         //        and then dispatch to resolveYang11(), which should resolve schemas based on RFC7950's conformance
-        //        announcement via I <hello/> message, as defined in
-        //        https://www.rfc-editor.org/rfc/rfc6020#section-5.6.4
+        //        announcement via <hello/> message, as defined in
+        //        https://www.rfc-editor.org/rfc/rfc7950#section-5.6.4
         //
         //        if (sessionPreferences.containsNonModuleCapability(CapabilityURN.YANG_LIBRARY)) {
         //            LOG.debug("{}: resolving YANG 1.1 conformance", deviceId);
