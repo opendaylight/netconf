@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6fd72f62_3c6e2de4",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/MonitoringSchemaSourceProvider.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-10-14T13:48:39Z",
+      "side": 1,
+      "message": "package-protected static with a long name: should be a top-level source, e.g. `mdsal.impl.MonitoringSchemaSourceException` instead of `mdsal.impl.MonitoringSchemaSourceProvider.MonitoringSchemaSourceException`\n\nbut: what exactly do we need beyond `model.api.meta.StatementSourceException` ?",
+      "range": {
+        "startLine": 118,
+        "startChar": 23,
+        "endLine": 118,
+        "endChar": 54
+      },
+      "revId": "1c077448673a525f094bc1a835663e6c0b808fa3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
