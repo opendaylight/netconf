@@ -41,7 +41,7 @@ public record ProvidedSources<T extends SourceRepresentation>(
 
     public Stream<Registration> registerWith(final SchemaSourceRegistry registry, final int cost) {
         return sources.stream()
-            .map(qname -> new SourceIdentifier(qname.getLocalName(), qname.getRevision().orElse(null)))
+            .map(qname -> new SourceIdentifier(qname.getLocalName(), qname.getModule().revision()))
             .map(sourceId -> registry.registerSchemaSource(provider,
                 PotentialSchemaSource.create(sourceId, representation, cost)));
     }

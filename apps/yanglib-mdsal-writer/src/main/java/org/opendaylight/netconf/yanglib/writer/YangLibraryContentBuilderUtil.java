@@ -190,7 +190,7 @@ final class YangLibraryContentBuilderUtil {
     private static @Nullable Set<Uri> buildSchemaSourceUrls(final @NonNull ModuleLike module,
             final @NonNull YangLibrarySchemaSourceUrlProvider urlProvider) {
         final var uris = urlProvider.getSchemaSourceUrl(DEFAULT_MODULE_SET_NAME, module.getName(),
-            module.getRevision().orElse(null));
+            module.getQNameModule().revision());
         return uris.isEmpty() ? null : uris;
     }
 
