@@ -16,6 +16,24 @@
       "message": "Check new comments on reconcile encodings and think if its applicable here",
       "revId": "70bdeed941f68b4676cb9048121ddb214045870b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1609ba47_33144a5e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-14T11:39:50Z",
+      "side": 1,
+      "message": "IMO this is a different case, in encodings we have 2 variants of same encodings with different local names we want somehow tie together, here we have different type of filters.",
+      "parentUuid": "421b5d50_0fbc9f6d",
+      "revId": "70bdeed941f68b4676cb9048121ddb214045870b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
