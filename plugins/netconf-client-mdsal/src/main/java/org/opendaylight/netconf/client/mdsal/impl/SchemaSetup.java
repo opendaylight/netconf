@@ -92,7 +92,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
         }
 
         requiredSources = deviceRequiredSources.stream()
-            .map(qname -> new SourceIdentifier(qname.getLocalName(), qname.getRevision().orElse(null)))
+            .map(qname -> new SourceIdentifier(qname.getLocalName(), qname.getModule().revision()))
             .collect(Collectors.toList());
 
         final var missingSources = filterMissingSources(requiredSources);
@@ -248,7 +248,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
                 continue;
             }
 
-            if (Objects.equals(identifier.revision(), qname.getRevision().orElse(null))) {
+            if (Objects.equals(identifier.revision(), qname.getModule().revision())) {
                 return qname;
             }
         }
