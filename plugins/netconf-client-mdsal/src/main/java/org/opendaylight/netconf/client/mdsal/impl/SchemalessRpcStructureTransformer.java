@@ -79,7 +79,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
     @Override
     public AnyxmlNode<DOMSource> createEditConfigStructure(final Optional<NormalizedNode> data,
             final YangInstanceIdentifier dataPath, final Optional<EffectiveOperation> operation) {
-        //FIXME: DELETE operation should not be forced to provide data.
+        //FIXME NETCONF-1525: DELETE operation should not be forced to provide data.
         final var dataValue = data.orElseThrow();
         if (!(dataValue instanceof DOMSourceAnyxmlNode anxmlData)) {
             throw new IllegalArgumentException("Unexpected data " + dataValue.prettyTree());
@@ -119,7 +119,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         document.appendChild(configElement);
 
         for (final var nodeEntry : elements.entrySet()) {
-            //FIXME: DELETE operation should not be forced to provide data.
+            //FIXME NETCONF-1525: DELETE operation should not be forced to provide data.
             final var dataValue = nodeEntry.getValue().orElseThrow();
             if (!(dataValue instanceof DOMSourceAnyxmlNode anxmlData)) {
                 throw new IllegalArgumentException("Unexpected data " + dataValue.prettyTree());
