@@ -52,6 +52,9 @@ class MountPointE2ETest extends AbstractE2ETest {
         org.opendaylight.yang.svc.v1.test.device.simulator.rev240917.YangModuleInfoImpl.getInstance();
     private static final YangModuleInfo NOTIFICATION_MODEL = org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns
         .netconf.notification._1._0.rev080714.YangModuleInfoImpl.getInstance();
+    // RFC 6241 base model: urn:ietf:params:xml:ns:netconf:base:1.0
+    private static final YangModuleInfo IETF_NETCONF = org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns
+        .netconf.base._1._0.rev110601.YangModuleInfoImpl.getInstance();
     private static final String DEVICE_USERNAME = "device-username";
     private static final String DEVICE_PASSWORD = "device-password";
     private static final String TOPOLOGY_URI =
@@ -326,10 +329,10 @@ class MountPointE2ETest extends AbstractE2ETest {
             .setAuthProvider((usr, pwd) -> DEVICE_USERNAME.equals(usr) && DEVICE_PASSWORD.equals(pwd))
             .setMdSal(mdsal);
         if (mdsal) {
-            configBuilder.setModels(Set.of(DEVICE_YANG_MODEL));
+            configBuilder.setModels(Set.of(DEVICE_YANG_MODEL, IETF_NETCONF));
         } else {
             configBuilder
-                .setModels(Set.of(DEVICE_YANG_MODEL, NOTIFICATION_MODEL))
+                .setModels(Set.of(DEVICE_YANG_MODEL, IETF_NETCONF, NOTIFICATION_MODEL))
                 .setNotificationFile(Path.of(getClass().getResource("/device-sim-notifications.xml").toURI())
                     .toFile());
         }
