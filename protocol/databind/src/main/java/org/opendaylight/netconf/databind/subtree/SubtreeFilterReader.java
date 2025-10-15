@@ -10,8 +10,6 @@ package org.opendaylight.netconf.databind.subtree;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import javanet.staxutils.SimpleNamespaceContext;
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -61,21 +59,13 @@ final class SubtreeFilterReader {
         final var subtreeFilterBuilder = SubtreeFilter.builder(databind);
         final var context = databind.modelContext();
         final var codec = databind.xmlCodecs();
-        // create namespace context to parse content using XmlCodecs
-        final var prefixToNs = new HashMap<String, String>();
-        for (final var module : context.getModuleStatements().values()) {
-            for (final var prefix : module.namespacePrefixes()) {
-                prefixToNs.putIfAbsent(prefix.getValue(), prefix.getKey().namespace().toString());
-            }
-        }
-        final var nsContext = new SimpleNamespaceContext(prefixToNs);
 
         final var stack = SchemaInferenceStack.of(context);
         // start processing filter elements
         while (reader.hasNext()) {
             if (reader.next() == XMLStreamConstants.START_ELEMENT) {
                 fillElement(reader, subtreeFilterBuilder, List.of(stack), context, getAttributes(reader, context),
-                    codec, nsContext);
+                    codec);
                 break;
             }
         }
@@ -94,12 +84,11 @@ final class SubtreeFilterReader {
      * @param context model context
      * @param attributes element attributes
      * @param codec xml codec used for content parsing
-     * @param nsContext context that store prefix to namespace map of the model
      * @throws XMLStreamException when encountering issues with xml structure
      */
     private static void fillElement(final XMLStreamReader reader, final SiblingSetBuilder builder,
             final List<SchemaInferenceStack> parents, final EffectiveModelContext context,
-            final List<AttributeMatch> attributes, final XmlCodecFactory codec, final NamespaceContext nsContext)
+            final List<AttributeMatch> attributes, final XmlCodecFactory codec)
             throws XMLStreamException {
         final var elementName = reader.getName();
         final var elementLocalName = elementName.getLocalPart();
@@ -156,14 +145,13 @@ final class SubtreeFilterReader {
                     LOG.debug("Starting processing children of the {} node.", elementName);
                     final var containmentBuilder = ContainmentNode.builder(namespace);
                     // add first child since we already found it
-                    fillElement(reader, containmentBuilder, children, context, getAttributes(reader, context), codec,
-                        nsContext);
+                    fillElement(reader, containmentBuilder, children, context, getAttributes(reader, context), codec);
                     // add rest of the children until we reach the end of the element
                     while (reader.hasNext()) {
                         final var event = reader.next();
                         if (event == XMLStreamConstants.START_ELEMENT) {
                             fillElement(reader, containmentBuilder, children, context, getAttributes(reader, context),
-                                codec, nsContext);
+                                codec);
                         } else if (event == XMLStreamConstants.END_ELEMENT) {
                             // if true then we reached the end of the containment element
                             if (elementName.equals(reader.getName())) {
@@ -191,7 +179,8 @@ final class SubtreeFilterReader {
                                         .currentStatement())));
                             if (node instanceof TypedDataSchemaNode typed) {
                                 try {
-                                    final var value = codec.codecFor(typed, entry).parseValue(nsContext, text);
+                                    final var value = codec.codecFor(typed, entry)
+                                        .parseValue(reader.getNamespaceContext(), text);
                                     nameValueMap.put(node.getQName(), value);
                                     LOG.debug("Successfully parsed value for {} node.", node.getQName());
                                 } catch (IllegalArgumentException e) {
