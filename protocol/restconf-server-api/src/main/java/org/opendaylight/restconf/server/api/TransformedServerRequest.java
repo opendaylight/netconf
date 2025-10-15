@@ -64,13 +64,13 @@ record TransformedServerRequest<I, R>(ServerRequest<R> delegate, Function<I, R> 
     }
 
     @Override
-    public void completeWith(final YangErrorsBody errors) {
-        delegate.completeWith(errors);
+    public void failWith(final YangErrorsBody errors) {
+        delegate.failWith(errors);
     }
 
     @Override
-    public void completeWith(final ErrorTag errorTag,  final FormattableBody body) {
-        delegate.completeWith(errorTag, body);
+    public void failWith(final ErrorTag errorTag,  final FormattableBody body) {
+        delegate.failWith(errorTag, body);
     }
 
     @Override

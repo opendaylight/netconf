@@ -64,9 +64,20 @@ public sealed interface ServerRequest<R> extends Request<R> permits AbstractServ
      */
     QName requestEncoding();
 
-    void completeWith(YangErrorsBody errors);
+    /**
+     * Fail this request with specified {@link YangErrorsBody}.
+     *
+     * @param errors the {@link YangErrorsBody}
+     */
+    void failWith(YangErrorsBody errors);
 
-    void completeWith(ErrorTag errorTag, FormattableBody body);
+    /**
+     * Fail this request with specified {@link ErrorTag} and a {@link FormattableBody}.
+     *
+     * @param errorTag the {@link ErrorTag}
+     * @param body the {@link FormattableBody}
+     */
+    void failWith(ErrorTag errorTag, FormattableBody body);
 
     @Override
     default <I> ServerRequest<I> transform(final Function<I, R> function) {

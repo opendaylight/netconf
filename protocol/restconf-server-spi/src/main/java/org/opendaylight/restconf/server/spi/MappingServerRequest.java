@@ -38,7 +38,7 @@ public abstract class MappingServerRequest<T> extends AbstractServerRequest<T> {
     }
 
     @Override
-    public final void completeWith(final ErrorTag errorTag, final FormattableBody body) {
+    public final void failWith(final ErrorTag errorTag, final FormattableBody body) {
         onFailure(errorTagMapping.statusOf(errorTag), body);
     }
 
