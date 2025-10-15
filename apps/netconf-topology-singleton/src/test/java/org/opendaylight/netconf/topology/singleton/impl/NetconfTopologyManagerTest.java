@@ -43,10 +43,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
-import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataObjectModified;
 import org.opendaylight.mdsal.binding.api.DataObjectWritten;
-import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.ReadTransaction;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractDataBrokerTest;
@@ -241,9 +239,9 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
                 .registerClusterSingletonService(mockContext2);
 
         netconfTopologyManager.onDataTreeChanged(List.of(
-                new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId1.toIdentifier(),
+                new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId1,
                     dataObjectModification1),
-                new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId2.toIdentifier(),
+                new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId2,
                     dataObjectModification2)));
 
         verify(clusterSingletonServiceProvider).registerClusterSingletonService(mockContext1);
@@ -270,9 +268,9 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         doNothing().when(mockContext2).refresh(any());
 
         netconfTopologyManager.onDataTreeChanged(List.of(
-                new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId1.toIdentifier(),
+                new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId1,
                     dataObjectModification1),
-                new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId2.toIdentifier(),
+                new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId2,
                     dataObjectModification3)));
 
         final var mockContext1Setup = ArgumentCaptor.forClass(NetconfTopologySetup.class);
@@ -289,7 +287,7 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         doReturn(new KeyStep<>(Node.class, new NodeKey(nodeId1))).when(dataObjectModification4).step();
 
         netconfTopologyManager.onDataTreeChanged(List.of(
-                new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId1.toIdentifier(),
+                new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId1,
                     dataObjectModification4)));
 
         verify(mockClusterRegistration1).close();
@@ -315,7 +313,7 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         });
 
         netconfTopologyManager.onDataTreeChanged(List.of(
-                new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId1.toIdentifier(),
+                new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId1,
                     dataObjectModification1)));
 
         verify(clusterSingletonServiceProvider, times(2)).registerClusterSingletonService(newMockContext1);
@@ -364,7 +362,7 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
                 .registerClusterSingletonService(mockContext);
 
         netconfTopologyManager.onDataTreeChanged(List.of(
-                new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId.toIdentifier(),
+                new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId,
                     dataObjectModification)));
 
         verify(clusterSingletonServiceProvider, times(3)).registerClusterSingletonService(mockContext);
@@ -373,33 +371,5 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
 
         netconfTopologyManager.close();
         verifyNoMoreInteractions(mockContext);
-    }
-
-    static class CustomTreeModification implements DataTreeModification<Node> {
-        private final LogicalDatastoreType datastore;
-        private final DataObjectIdentifier<Node> path;
-        private final DataObjectModification<Node> rootNode;
-
-        CustomTreeModification(final LogicalDatastoreType datastore, final DataObjectIdentifier<Node> path,
-                final DataObjectModification<Node> rootNode) {
-            this.datastore = datastore;
-            this.path = path;
-            this.rootNode = rootNode;
-        }
-
-        @Override
-        public DataObjectModification<Node> getRootNode() {
-            return rootNode;
-        }
-
-        @Override
-        public LogicalDatastoreType datastore() {
-            return datastore;
-        }
-
-        @Override
-        public DataObjectIdentifier<Node> path() {
-            return path;
-        }
     }
 }
