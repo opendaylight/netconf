@@ -11,6 +11,9 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.UncheckedExecutionException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -27,6 +30,7 @@ import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.api.YangErrorsBody;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +101,22 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
     }
 
     @Override
+    public void failWith(final ErrorTag errorTag, final FormattableBody body) {
+        future.completeExceptionally(new RequestException(ErrorType.APPLICATION, errorTag, bodyToString(body)));
+    }
+
+    private static String bodyToString(final FormattableBody body) {
+        final var baos = new ByteArrayOutputStream();
+        try {
+            body.formatToJSON(PrettyPrintParam.TRUE, baos);
+        } catch (IOException e) {
+            LOG.warn("Error body failed to format", e);
+            return e.toString();
+        }
+        return new String(baos.toByteArray(), StandardCharsets.UTF_8);
+    }
+
+    @Override
     protected void onSuccess(final T result) {
         future.complete(result);
     }
@@ -104,10 +124,5 @@ public final class CompletingServerRequest<T> extends AbstractServerRequest<T> {
     @Override
     protected void onFailure(final YangErrorsBody errors) {
         future.completeExceptionally(new RequestException(errors.errors(), null, "reconstructed for testing"));
-    }
-
-    @Override
-    public void completeWith(final ErrorTag errorTag, final FormattableBody body) {
-        throw new UnsupportedOperationException();
     }
 }

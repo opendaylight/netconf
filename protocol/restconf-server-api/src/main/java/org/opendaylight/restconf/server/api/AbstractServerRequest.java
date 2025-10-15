@@ -68,16 +68,15 @@ public abstract non-sealed class AbstractServerRequest<R> extends AbstractReques
     }
 
     /**
-     * Return the effective {@link PrettyPrintParam}.
-     *
-     * @return the effective {@link PrettyPrintParam}
+     * {@return the effective {@link PrettyPrintParam}}
      */
-    public final @NonNull PrettyPrintParam prettyPrint() {
+    @NonNullByDefault
+    public final PrettyPrintParam prettyPrint() {
         return prettyPrint;
     }
 
     @Override
-    public final void completeWith(final YangErrorsBody errors) {
+    public final void failWith(final YangErrorsBody errors) {
         onFailure(requireNonNull(errors));
     }
 
@@ -87,7 +86,13 @@ public abstract non-sealed class AbstractServerRequest<R> extends AbstractReques
         onFailure(new YangErrorsBody(failure.errors()));
     }
 
-    protected abstract void onFailure(@NonNull YangErrorsBody errors);
+    /**
+     * Invoked when this request fails.
+     *
+     * @param errors the {@link YangErrorsBody} to report
+     */
+    @NonNullByDefault
+    protected abstract void onFailure(YangErrorsBody errors);
 
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
