@@ -31,7 +31,6 @@ import org.opendaylight.netconf.topology.singleton.messages.RefreshSlaveActor;
 import org.opendaylight.netconf.topology.singleton.messages.UnregisterSlaveMountPoint;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.ConnectionOper.ConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.NetconfNodeAugment;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -73,7 +72,7 @@ class NetconfNodeManager implements DataTreeChangeListener<Node>, AutoCloseable 
     public void onDataTreeChanged(final List<DataTreeModification<Node>> changes) {
         for (var change : changes) {
             final var rootNode = change.getRootNode();
-            final NodeId nodeId = NetconfTopologyUtils.getNodeId(rootNode.step());
+            final var nodeId = rootNode.coerceKeyStep(Node.class).key().getNodeId();
             switch (rootNode.modificationType()) {
                 case SUBTREE_MODIFIED:
                     LOG.debug("{}: Operational state for node {} - subtree modified from {} to {}", id, nodeId,
