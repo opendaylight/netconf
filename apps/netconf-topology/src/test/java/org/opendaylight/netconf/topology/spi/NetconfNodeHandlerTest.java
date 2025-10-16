@@ -66,7 +66,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.cr
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.credentials.credentials.LoginPwUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.credentials.credentials.key.auth.KeyBasedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.netconf.node.augment.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -165,7 +165,7 @@ class NetconfNodeHandlerTest {
                         .setPassword("testpassword")
                         .build())
                     .build())
-                .build(), null);
+                .build(), null, AbstractNetconfTopology.defaultSshParams());
     }
 
     @AfterEach
@@ -299,7 +299,7 @@ class NetconfNodeHandlerTest {
                         .build())
                     .build())
                 .build(),
-                null);
+                null, AbstractNetconfTopology.defaultSshParams());
 
         // return null when attempt to load credentials fot key id
         doReturn(null).when(credentialProvider).credentialForId(any());
@@ -342,7 +342,7 @@ class NetconfNodeHandlerTest {
                     .setPassword("testpassword")
                     .build())
                 .build())
-            .build(), null);
+            .build(), null, AbstractNetconfTopology.defaultSshParams());
 
         // Test 1000 iterations and pick the smallest value.
         // Less iteration has higher chance to not catch NETCONF-1408 issue.

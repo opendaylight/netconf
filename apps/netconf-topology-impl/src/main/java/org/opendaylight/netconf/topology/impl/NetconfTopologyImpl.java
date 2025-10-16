@@ -12,6 +12,7 @@ import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
@@ -32,12 +33,16 @@ import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFa
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.netconf.topology.spi.NetconfTopologyRPCProvider;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.TopologyTypes1;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.network.topology.topology.topology.types.TopologyNetconf;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.TopologyTypes;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier.WithKey;
 import org.opendaylight.yangtools.binding.DataObjectReference;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -56,6 +61,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyImpl.class);
 
     private Registration dtclReg;
+    private Registration dtclRegParams;
     private NetconfTopologyRPCProvider rpcProvider;
 
     @Inject
@@ -102,6 +108,15 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
                 .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
                 .child(Node.class)
                 .build(), this);
+
+        dtclRegParams = dataBroker.registerTreeChangeListener(LogicalDatastoreType.CONFIGURATION,
+            DataObjectReference.builder(NetworkTopology.class)
+                .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
+                .child(TopologyTypes.class)
+                .augmentation(TopologyTypes1.class)
+                .child(TopologyNetconf.class)
+                .child(SshTransportTopologyParameters.class)
+                .build(), this::onDataTreeChangedParams);
         rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, topologyId);
     }
 
@@ -117,10 +132,15 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
         // close all existing connectors, delete whole topology in datastore?
         deleteAllNodes();
 
+        if (dtclRegParams != null) {
+            dtclRegParams.close();
+            dtclRegParams = null;
+        }
         if (dtclReg != null) {
             dtclReg.close();
             dtclReg = null;
         }
+        deleteSshParams();
     }
 
     @Override
@@ -135,6 +155,19 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
                     LOG.debug("Config for node {} deleted", nodeId);
                     deleteNode(nodeId);
                 }
+            }
+        }
+    }
+
+    public void onDataTreeChangedParams(
+            final @NonNull List<DataTreeModification<SshTransportTopologyParameters>> changes) {
+        for (var change : changes) {
+            final var rootNode = change.getRootNode();
+            final var modType = rootNode.modificationType();
+            switch (modType) {
+                case SUBTREE_MODIFIED, WRITE -> updateSshParams(rootNode.dataAfter());
+                case DELETE -> updateSshParams(defaultSshParams());
+                default -> LOG.debug("Unsupported modification type: {}.", modType);
             }
         }
     }

@@ -26,7 +26,7 @@ import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterAc
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.NetconfNodeAugment;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.NetconfNodeAugment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,7 +143,8 @@ final class NetconfNodeContext implements AutoCloseable {
 
         nodeHandler = new NetconfNodeHandler(setup.getNetconfClientFactory(), setup.getTimer(),
             setup.getBaseSchemaProvider(), schemaManager, setup.getSchemaAssembler(), builderFactory,
-            deviceActionFactory, masterSalFacade, remoteDeviceId, configNode.getNodeId(), netconfNode, nodeOptional);
+            deviceActionFactory, masterSalFacade, remoteDeviceId, configNode.getNodeId(), netconfNode, nodeOptional,
+            setup.getSshParams());
         nodeHandler.connect();
     }
 
