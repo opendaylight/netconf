@@ -83,11 +83,17 @@ final class Rfc8040StreamSupport extends StreamSupport {
 
     @VisibleForTesting
     static MapEntryNode streamEntry(final String name, final String description, final String baseStreamLocation,
-            final Set<MonitoringEncoding> encodings) {
+            final Set<QName> encodings) {
         final var accessBuilder = ImmutableNodes.newSystemMapBuilder()
             .withNodeIdentifier(new NodeIdentifier(Access.QNAME));
         for (var encoding : encodings) {
-            final var encodingValue = encoding.value();
+            final var monitoringEncoding = MonitoringEncoding.forEncoding(encoding);
+            if (monitoringEncoding == null) {
+                LOG.debug("Encoding {} does not map to ietf-restconf-monitoring", encoding);
+                continue;
+            }
+
+            final var encodingValue = monitoringEncoding.value();
             accessBuilder.withChild(ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, ENCODING_QNAME, encodingValue))
                 .withChild(ImmutableNodes.leafNode(ENCODING_QNAME, encodingValue))

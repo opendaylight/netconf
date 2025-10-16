@@ -139,16 +139,16 @@ public final class JaxRsEndpoint implements SSESenderFactory, AutoCloseable {
 
     @Override
     public void newSSESender(final SseEventSink sink, final Sse sse, final RestconfStream<?> stream,
-            final MonitoringEncoding encoding, final EventStreamGetParams getParams) {
+            final MonitoringEncoding encodingName, final EventStreamGetParams getParams) {
         // FIXME: invert control here: we should call 'listener.addSession()', which in turn should call
         //        handler.init()/handler.close()
-        final var handler = new SSESender(pingExecutor, sink, sse, stream, encoding, getParams,
+        final var handler = new SSESender(pingExecutor, sink, sse, stream, encodingName, getParams,
             configuration.sseMaximumFragmentLength().toJava(), configuration.sseHeartbeatIntervalMillis().toJava());
 
         try {
             handler.init();
         } catch (UnsupportedEncodingException e) {
-            throw new NotFoundException("Unsupported encoding " + encoding.value(), e);
+            throw new NotFoundException("Unsupported encoding " + encodingName.value(), e);
         } catch (IllegalArgumentException | XPathExpressionException e) {
             throw new BadRequestException(e.getMessage(), e);
         }
