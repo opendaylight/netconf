@@ -100,7 +100,6 @@ class YangErrorsBodyTest extends AbstractJukeboxTest {
                 <error-app-tag> app tag #3</error-app-tag>
                 <error-info>my error info</error-info>
               </error>
-            </errors>
-            """, body::formatToXML, true);
+            </errors>""", body::formatToXML, true);
     }
 }
