@@ -22,7 +22,6 @@ class NC1439Test extends AbstractRestconfTest {
     private static final MultivaluedMap<String, String> QUERY_PARAMS = new MultivaluedHashMap<>();
 
     @Test
-    @SuppressWarnings("checkstyle:LineLength")
     void testPutWrongData() {
         doReturn(QUERY_PARAMS).when(uriInfo).getQueryParameters();
         final var result = assert400Error(ar -> restconf.dataJsonPUT(JUKEBOX_API_PATH, uriInfo, sc,
@@ -41,7 +40,8 @@ class NC1439Test extends AbstractRestconfTest {
                 "error": [
                   {
                     "error-tag": "malformed-message",
-                    "error-message": "Error parsing input: Schema node with name WRONG was not found under (http://example.com/ns/example-jukebox?revision=2015-04-04)player.",
+                    "error-message": "Error parsing input: Schema node with name WRONG was not found under \
+            (http://example.com/ns/example-jukebox?revision=2015-04-04)player.",
                     "error-type": "protocol"
                   }
                 ]
@@ -50,7 +50,6 @@ class NC1439Test extends AbstractRestconfTest {
     }
 
     @Test
-    @SuppressWarnings("checkstyle:LineLength")
     void testPatchDataWrongData() {
         final var result = assert400Error(ar -> restconf.dataJsonPATCH(JUKEBOX_API_PATH,
             stringInputStream("""
@@ -68,7 +67,8 @@ class NC1439Test extends AbstractRestconfTest {
                 "error": [
                   {
                     "error-tag": "malformed-message",
-                    "error-message": "Error parsing input: Schema node with name WRONG was not found under (http://example.com/ns/example-jukebox?revision=2015-04-04)player.",
+                    "error-message": "Error parsing input: Schema node with name WRONG was not found under \
+            (http://example.com/ns/example-jukebox?revision=2015-04-04)player.",
                     "error-type": "protocol"
                   }
                 ]

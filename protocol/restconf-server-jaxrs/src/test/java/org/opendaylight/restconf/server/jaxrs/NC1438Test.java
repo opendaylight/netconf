@@ -450,7 +450,6 @@ class NC1438Test extends AbstractRestconfTest {
     }
 
     @Test
-    @SuppressWarnings("checkstyle:LineLength")
     void testXmlPatchWrongLeafData() {
         final var body = assert400PatchError(ar -> restconf.dataYangXmlPATCH(stringInputStream("""
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
@@ -475,17 +474,20 @@ class NC1438Test extends AbstractRestconfTest {
               <error>
                 <error-type>protocol</error-type>
                 <error-message>Error parsing YANG Patch XML: ParseError at [row,col]:[-1,-1]
-            Message: Schema for node with name WRONG and namespace http://example.com/ns/example-jukebox does not exist in parent EmptyContainerEffectiveStatement{argument=(http://example.com/ns/example-jukebox?revision=2015-04-04)player}</error-message>
+            Message: Schema for node with name WRONG and namespace http://example.com/ns/example-jukebox does not \
+            exist in parent EmptyContainerEffectiveStatement{argument=(http://example.com/ns/example-jukebox?revision=\
+            2015-04-04)player}</error-message>
                 <error-tag>malformed-message</error-tag>
                 <error-info>ParseError at [row,col]:[-1,-1]
-            Message: Schema for node with name WRONG and namespace http://example.com/ns/example-jukebox does not exist in parent EmptyContainerEffectiveStatement{argument=(http://example.com/ns/example-jukebox?revision=2015-04-04)player}</error-info>
+            Message: Schema for node with name WRONG and namespace http://example.com/ns/example-jukebox does not \
+            exist in parent EmptyContainerEffectiveStatement{argument=(http://example.com/ns/example-jukebox?revision=\
+            2015-04-04)player}</error-info>
               </error>
             </errors>
             """, body::formatToXML, true);
     }
 
     @Test
-    @SuppressWarnings("checkstyle:LineLength")
     void testPatchWrongLeafData() {
         final var body = assert400PatchError(ar -> restconf.dataYangJsonPATCH(stringInputStream("""
             {
@@ -514,7 +516,8 @@ class NC1438Test extends AbstractRestconfTest {
                 "error": [
                   {
                     "error-tag": "malformed-message",
-                    "error-message": "Schema node with name wrong was not found under (http://example.com/ns/example-jukebox?revision=2015-04-04)player.",
+                    "error-message": "Schema node with name wrong was not found under \
+            (http://example.com/ns/example-jukebox?revision=2015-04-04)player.",
                     "error-type": "application"
                   }
                 ]
