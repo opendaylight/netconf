@@ -318,9 +318,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     }
 
     /**
-     * Method to update model context
-     *
-     * <p>Method create new DefaultNotificationSource from updated EffectiveModelContext.
+     * Method to update model context. Method creates new DefaultNotificationSource from updated EffectiveModelContext.
      *
      * @param context new EffectiveModelContext
      */
