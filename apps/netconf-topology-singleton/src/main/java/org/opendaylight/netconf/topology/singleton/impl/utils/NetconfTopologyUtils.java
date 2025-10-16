@@ -20,8 +20,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier.WithKey;
 import org.opendaylight.yangtools.binding.DataObjectReference;
-import org.opendaylight.yangtools.binding.DataObjectStep;
-import org.opendaylight.yangtools.binding.KeyStep;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -38,13 +36,6 @@ public final class NetconfTopologyUtils {
 
     public static String createMasterActorName(final String name, final String masterAddress) {
         return masterAddress.replace("//", "") + "_" + name;
-    }
-
-    public static @NonNull NodeId getNodeId(final DataObjectStep<?> pathArgument) {
-        if (pathArgument instanceof KeyStep identifiableItem && identifiableItem.key() instanceof NodeKey nodeKey) {
-            return nodeKey.getNodeId();
-        }
-        throw new IllegalStateException("Unable to create NodeId from: " + pathArgument);
     }
 
     public static @NonNull WithKey<Topology, TopologyKey> createTopologyListPath(final String topologyId) {
