@@ -72,7 +72,6 @@ class OperationsE2ETest extends AbstractE2ETest {
     }
 
     @Test
-    @SuppressWarnings("checkstyle:LineLength")
     void createKeystoreEntryTest() throws Exception {
         final var response = invokeRequest(HttpMethod.POST, ADD_KEYSTORE_ENTRY,
             APPLICATION_XML, """
@@ -116,8 +115,26 @@ class OperationsE2ETest extends AbstractE2ETest {
             <key-credential xmlns="urn:opendaylight:netconf:keystore">
                 <key-id>key-id</key-id>
                 <algorithm>RSA</algorithm>
-                <public-key>MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvM2whCdDEmxTfio1oUCmxlZBvkyircTGraSjCeZWA5gdXcFgR3Po49/obQLXONwVE8ULP+wm9vFVae5AdXRjndG/xxi/Z/HAZqkXMXvjRIYiBVgDcu3c0jRdbimwS84zKYIygXGeHODvNKQcMNFNENQz2f/QIVPRioFB4sHxynvP4re0+pYUNsl6gpZFtMZ804oqWAuk90Db0x1jgn87FLh3FXAOLHqmWDDjoj6jLo4FMLNoydstJQ14Nm3Gsg8LWoV9qGT/hYpfYnzuQizb/ZsPs3vEcV3g67RRCc82X5jKeXJo/C5r3czrM68X3TKBtvIMThmF17p79/nuLyt9kQIDAQAB</public-key>
-                <private-key>MIIEwAIBADANBgkqhkiG9w0BAQEFAASCBKowggSmAgEAAoIBAQC8zbCEJ0MSbFN+KjWhQKbGVkG+TKKtxMatpKMJ5lYDmB1dwWBHc+jj3+htAtc43BUTxQs/7Cb28VVp7kB1dGOd0b/HGL9n8cBmqRcxe+NEhiIFWANy7dzSNF1uKbBLzjMpgjKBcZ4c4O80pBww0U0Q1DPZ/9AhU9GKgUHiwfHKe8/it7T6lhQ2yXqClkW0xnzTiipYC6T3QNvTHWOCfzsUuHcVcA4seqZYMOOiPqMujgUws2jJ2y0lDXg2bcayDwtahX2oZP+Fil9ifO5CLNv9mw+ze8RxXeDrtFEJzzZfmMp5cmj8LmvdzOszrxfdMoG28gxOGYXXunv3+e4vK32RAgMBAAECggEBAI5YuiP5Ag2q1IxDwKlx+AuDTw/t8Zz3xh93CGFXYzRUhJeCS1ez4TulPjSqNqAs9kswfZnVL09xhsdWFQ05Ej4TvPacBvuUfk4oYE8zq5anVpEW2YrWIW3ugx6imcOdlF9QRUno4p+9SzwyGvsHYoY0p19OCpqF+m7lo0oWlXjl8Zo8WEh4ol5MUTFVA2ZwfDHNA+p6hw4e4QVdo7MuJ1cz0pP2Aamx/QWjSu/or2hkY7cLkZGd/aORYvQ+mgktaNHt80ZZmnWewZqgbyb3CNvopiRDCuu9xWbOM9ybC99wbQUFQwvAw0qInn+eKyltHROkvue3TV8bY/WvDK6dtW0CgYEA7xGM0cm3sUU6LzbEpwk17pLAPqnxNEk1b2PUzGE5L/Jqr0MPJVGnAUdmjukr9NTgcFzoNjIU31bn7hOf9xaa671h+KaE2q6gU7nfWoXeW0nplj7BGzdxjNCi4Lu7DDrw90sYYTa/Ekte69Wuaxt6+Hf5Uq0t2pc7y/rXwoJz7f8CgYEAyizOAnRGPGb5U5u9iMnP5/NosI005Ek7gLjsX3CjLiKdJQ47Y/fRAQFEL5Q+MzkAmLNSnxfU0I5bjejfN8CYGG0MsjCGtbx9Zz85B6oO3sYz1DZrzLJc8AKoOqwEPFN67cyETAALNe4dGxxDIhFXwccJamHfHBPAsYb1kgRwtG8CgYEAhuw1uHSKym5SjzDuvYKyQGnsO7F3otWqZapG/+3i849x7GYBV0OE6HDejctE9pFp9aBJocSUCRQoIzJKNo44ctFYSJfaJP0nGPmu94zT2FuXjCbwnyakXB+nvQPWZemh8z8bjEn0fiOxd5IKNQK2XSKAwMtiNJrjsZRpTqqHOQsCgYEAwgP1Ps2uiVCYe++9F4P0DLe+A4++7kSI4aKU05IYRrHY9DKQNAMhg0Ff2fj9J9LQC7oq05nfFLVIjwqnC627R9V+lZGT9NuJzIcTh5Ne6dJy8ne3Q5z3KyyhnIxvFCVYltPpMbXpDDwRmm6ozgyulrsXAgwiO6OJC9Rj3Vh9f+kCgYEA20Y+5WisTxTs+YB9O8RQrC+kNTPZBZkI5g5rMEytc1WxYtJ1pojplCiwqBD1OFVjAi2oTV0Gnm+M9ArCMEZbYRsIeXZdQleH1wfzs/eTJgBz2yp5AZ/51I6Q0RayYWXVXBoJS3ov6OqF8EZBArVsAeaN1F+xqPWBnIT06gd++TY=</private-key>
+                <public-key>MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvM2whCdDEmxTfio1oUCmxlZBvkyircTGraSjCeZWA5gdXcF\
+            gR3Po49/obQLXONwVE8ULP+wm9vFVae5AdXRjndG/xxi/Z/HAZqkXMXvjRIYiBVgDcu3c0jRdbimwS84zKYIygXGeHODvNKQcMNFNENQz2f\
+            /QIVPRioFB4sHxynvP4re0+pYUNsl6gpZFtMZ804oqWAuk90Db0x1jgn87FLh3FXAOLHqmWDDjoj6jLo4FMLNoydstJQ14Nm3Gsg8LWoV9q\
+            GT/hYpfYnzuQizb/ZsPs3vEcV3g67RRCc82X5jKeXJo/C5r3czrM68X3TKBtvIMThmF17p79/nuLyt9kQIDAQAB</public-key>
+                <private-key>MIIEwAIBADANBgkqhkiG9w0BAQEFAASCBKowggSmAgEAAoIBAQC8zbCEJ0MSbFN+KjWhQKbGVkG+TKKtxMatpKMJ5l\
+            YDmB1dwWBHc+jj3+htAtc43BUTxQs/7Cb28VVp7kB1dGOd0b/HGL9n8cBmqRcxe+NEhiIFWANy7dzSNF1uKbBLzjMpgjKBcZ4c4O80pBww0\
+            U0Q1DPZ/9AhU9GKgUHiwfHKe8/it7T6lhQ2yXqClkW0xnzTiipYC6T3QNvTHWOCfzsUuHcVcA4seqZYMOOiPqMujgUws2jJ2y0lDXg2bcay\
+            DwtahX2oZP+Fil9ifO5CLNv9mw+ze8RxXeDrtFEJzzZfmMp5cmj8LmvdzOszrxfdMoG28gxOGYXXunv3+e4vK32RAgMBAAECggEBAI5YuiP\
+            5Ag2q1IxDwKlx+AuDTw/t8Zz3xh93CGFXYzRUhJeCS1ez4TulPjSqNqAs9kswfZnVL09xhsdWFQ05Ej4TvPacBvuUfk4oYE8zq5anVpEW2Y\
+            rWIW3ugx6imcOdlF9QRUno4p+9SzwyGvsHYoY0p19OCpqF+m7lo0oWlXjl8Zo8WEh4ol5MUTFVA2ZwfDHNA+p6hw4e4QVdo7MuJ1cz0pP2A\
+            amx/QWjSu/or2hkY7cLkZGd/aORYvQ+mgktaNHt80ZZmnWewZqgbyb3CNvopiRDCuu9xWbOM9ybC99wbQUFQwvAw0qInn+eKyltHROkvue3\
+            TV8bY/WvDK6dtW0CgYEA7xGM0cm3sUU6LzbEpwk17pLAPqnxNEk1b2PUzGE5L/Jqr0MPJVGnAUdmjukr9NTgcFzoNjIU31bn7hOf9xaa671\
+            h+KaE2q6gU7nfWoXeW0nplj7BGzdxjNCi4Lu7DDrw90sYYTa/Ekte69Wuaxt6+Hf5Uq0t2pc7y/rXwoJz7f8CgYEAyizOAnRGPGb5U5u9iM\
+            nP5/NosI005Ek7gLjsX3CjLiKdJQ47Y/fRAQFEL5Q+MzkAmLNSnxfU0I5bjejfN8CYGG0MsjCGtbx9Zz85B6oO3sYz1DZrzLJc8AKoOqwEP\
+            FN67cyETAALNe4dGxxDIhFXwccJamHfHBPAsYb1kgRwtG8CgYEAhuw1uHSKym5SjzDuvYKyQGnsO7F3otWqZapG/+3i849x7GYBV0OE6HDe\
+            jctE9pFp9aBJocSUCRQoIzJKNo44ctFYSJfaJP0nGPmu94zT2FuXjCbwnyakXB+nvQPWZemh8z8bjEn0fiOxd5IKNQK2XSKAwMtiNJrjsZR\
+            pTqqHOQsCgYEAwgP1Ps2uiVCYe++9F4P0DLe+A4++7kSI4aKU05IYRrHY9DKQNAMhg0Ff2fj9J9LQC7oq05nfFLVIjwqnC627R9V+lZGT9N\
+            uJzIcTh5Ne6dJy8ne3Q5z3KyyhnIxvFCVYltPpMbXpDDwRmm6ozgyulrsXAgwiO6OJC9Rj3Vh9f+kCgYEA20Y+5WisTxTs+YB9O8RQrC+kN\
+            TPZBZkI5g5rMEytc1WxYtJ1pojplCiwqBD1OFVjAi2oTV0Gnm+M9ArCMEZbYRsIeXZdQleH1wfzs/eTJgBz2yp5AZ/51I6Q0RayYWXVXBoJ\
+            S3ov6OqF8EZBArVsAeaN1F+xqPWBnIT06gd++TY=</private-key>
             </key-credential>
             """);
     }
