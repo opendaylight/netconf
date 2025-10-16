@@ -7,6 +7,7 @@ module netconf-node-topology {
     import yang-ext { prefix ext; revision-date "2013-07-09";}
     import netconf-node-optional { prefix nno; }
     import odl-netconf-device { prefix ond; }
+    import ietf-ssh-common { prefix sshcmn; }
 
     revision 2024-09-11 {
         description "Encapsulate netconf-node state";
@@ -103,6 +104,11 @@ module netconf-node-topology {
         container topology-netconf {
             presence "The presence of the container node indicates a network
                       of NETCONF devices";
+
+            container ssh-transport-topology-parameters {
+              description "Configurable parameters of the SSH transport layer.";
+              uses sshcmn:transport-params-grouping;
+            }
         }
     }
 

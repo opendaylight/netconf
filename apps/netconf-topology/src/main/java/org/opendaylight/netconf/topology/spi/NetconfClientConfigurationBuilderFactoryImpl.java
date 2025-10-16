@@ -38,6 +38,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.cr
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.credentials.LoginPw;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.credentials.LoginPwUnencrypted;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.netconf.node.augment.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -66,14 +67,14 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
 
     @Override
     public NetconfClientConfigurationBuilder createClientConfigurationBuilder(final NodeId nodeId,
-            final NetconfNode node) {
+            final NetconfNode node, final SshTransportTopologyParameters sshParams) {
         final var builder = NetconfClientConfigurationBuilder.create();
         final var protocol = node.getProtocol();
         if (node.requireTcpOnly()) {
             builder.withProtocol(NetconfClientProtocol.TCP);
         } else if (protocol == null || protocol.getName() == Name.SSH) {
             builder.withProtocol(NetconfClientProtocol.SSH);
-            setSshParametersFromCredentials(builder, node.getCredentials(), node);
+            setSshParametersFromCredentials(builder, node.getCredentials(), node, sshParams);
         } else if (protocol.getName() == Name.TLS) {
             final var contextFactory = sslContextFactoryProvider.getSslContextFactory(protocol.getSpecification());
             final var sslContext = protocol.getKeyId() == null
@@ -99,7 +100,7 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
     }
 
     private void setSshParametersFromCredentials(final NetconfClientConfigurationBuilder confBuilder,
-            final Credentials credentials, final NetconfNode node) {
+            final Credentials credentials, final NetconfNode node, final SshTransportTopologyParameters sshParams) {
         final var sshParamsBuilder = new SshClientParametersBuilder();
         if (credentials instanceof LoginPwUnencrypted unencrypted) {
             final var loginPassword = unencrypted.getLoginPasswordUnencrypted();
@@ -141,17 +142,37 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         } else {
             throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
         }
-        if (node.nonnullProtocol().getSpecification() instanceof SshCase sshCase) {
-            final var sshParams = sshCase.getSshTransportParameters();
-            final var transportParamBuilder = new TransportParamsBuilder();
 
+        //TODO: improve?
+        final var transportParamBuilder = new TransportParamsBuilder();
+        if (node.nonnullProtocol().getSpecification() instanceof SshCase sshCase) {
+            final var nodeSshParams = sshCase.getSshTransportParameters();
+
+            if (nodeSshParams.getHostKey() == null) {
+                transportParamBuilder.setHostKey(sshParams.nonnullHostKey());
+            } else {
+                transportParamBuilder.setHostKey(nodeSshParams.getHostKey());
+            }
+            if (nodeSshParams.getEncryption() == null) {
+                transportParamBuilder.setEncryption(sshParams.nonnullEncryption());
+            } else {
+                transportParamBuilder.setEncryption(nodeSshParams.getEncryption());
+            }
+            if (nodeSshParams.getKeyExchange() == null) {
+                transportParamBuilder.setKeyExchange(sshParams.nonnullKeyExchange()));
+            } else {
+                transportParamBuilder.setKeyExchange(nodeSshParams.getKeyExchange());
+            }
+            if (nodeSshParams.getMac() == null) {
+                transportParamBuilder.setMac(sshParams.nonnullMac());
+            } else {
+                transportParamBuilder.setMac(nodeSshParams.getMac());
+            }
+        } else {
             transportParamBuilder.setHostKey(sshParams.nonnullHostKey());
-            transportParamBuilder.setEncryption(sshParams.nonnullEncryption());
-            transportParamBuilder.setKeyExchange(sshParams.nonnullKeyExchange());
-            transportParamBuilder.setMac(sshParams.nonnullMac());
-            sshParamsBuilder.setTransportParams(transportParamBuilder.build());
         }
-        //sshParamsBuilder.setTransportParams(parseTransportParams(node));
+        sshParamsBuilder.setTransportParams(transportParamBuilder.build());
+
         confBuilder.withSshParameters(sshParamsBuilder.build());
     }
 
