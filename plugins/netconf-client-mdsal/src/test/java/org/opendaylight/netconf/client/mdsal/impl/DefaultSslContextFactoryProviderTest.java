@@ -28,7 +28,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType;
 import org.opendaylight.mdsal.binding.api.DataObjectModified;
 import org.opendaylight.mdsal.binding.api.DataObjectWritten;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
@@ -117,7 +116,6 @@ class DefaultSslContextFactoryProviderTest {
         doReturn(keystoreObjectModification1).when(dataTreeModification1).getRootNode();
         doReturn(List.of(privateKeyModification)).when(keystoreObjectModification1)
             .getModifiedChildren(PrivateKey.class);
-        doReturn(ModificationType.WRITE).when(privateKeyModification).modificationType();
 
         final var privateKey = getPrivateKey();
         doReturn(privateKey).when(privateKeyModification).dataAfter();
@@ -140,7 +138,6 @@ class DefaultSslContextFactoryProviderTest {
 
         doReturn(List.of(privateKeyModification)).when(keystoreObjectModification1)
             .getModifiedChildren(PrivateKey.class);
-        doReturn(ModificationType.WRITE).when(privateKeyModification).modificationType();
 
         final var privateKey = getPrivateKey();
         doReturn(privateKey).when(privateKeyModification).dataAfter();
@@ -151,7 +148,6 @@ class DefaultSslContextFactoryProviderTest {
         doReturn(List.of()).when(keystoreObjectModification2).getModifiedChildren(PrivateKey.class);
         doReturn(List.of(trustedCertificateModification)).when(keystoreObjectModification2)
             .getModifiedChildren(TrustedCertificate.class);
-        doReturn(ModificationType.WRITE).when(trustedCertificateModification).modificationType();
 
         final var trustedCertificate = getTrustedCertificate();
         doReturn(trustedCertificate).when(trustedCertificateModification).dataAfter();
