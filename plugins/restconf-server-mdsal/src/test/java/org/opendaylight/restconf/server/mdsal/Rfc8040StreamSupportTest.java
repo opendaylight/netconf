@@ -14,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.restconf.server.api.MonitoringEncoding;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -25,23 +26,16 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 class Rfc8040StreamSupportTest {
     @Test
     void toStreamEntryNodeTest() throws Exception {
-        final var outputType = "XML";
-        final var uri = "uri";
         final var streamName = "/nested-module:depth1-cont/depth2-leaf1";
 
-        assertMappedData(prepareMap(streamName, uri, outputType),
-            Rfc8040StreamSupport.streamEntry(streamName, "description", "location",
-                Set.of(new MonitoringEncoding(outputType))));
+        assertMappedData(prepareMap(streamName, "uri", "xml"),
+            Rfc8040StreamSupport.streamEntry(streamName, "description", "location", Set.of(EncodeXml$I.QNAME)));
     }
 
     @Test
     void toStreamEntryNodeNotifiTest() throws Exception {
-        final var outputType = "JSON";
-        final var uri = "uri";
-
-        assertMappedData(prepareMap("notifi", uri, outputType),
-            Rfc8040StreamSupport.streamEntry("notifi", "description", "location",
-                Set.of(new MonitoringEncoding(outputType))));
+        assertMappedData(prepareMap("notifi", "uri", "json"),
+            Rfc8040StreamSupport.streamEntry("notifi", "description", "location", Set.of(EncodeJson$I.QNAME)));
     }
 
     private static Map<QName, Object> prepareMap(final String name, final String uri, final String outputType) {

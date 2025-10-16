@@ -20,6 +20,6 @@ import org.opendaylight.restconf.server.spi.RestconfStream;
 @NonNullByDefault
 interface SSESenderFactory {
 
-    void newSSESender(SseEventSink sink, Sse sse, RestconfStream<?> stream, MonitoringEncoding encoding,
+    void newSSESender(SseEventSink sink, Sse sse, RestconfStream<?> stream, MonitoringEncoding encodingName,
         EventStreamGetParams getParams);
 }
