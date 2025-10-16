@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a25fbe1e_89bf38fc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 27
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-10-16T19:39:26Z",
+      "side": 1,
+      "message": "So I have a simpler idea here: how about we just recognize 2013-09-39 as a quirk and construct the EffectiveModelContext with 2011-06-01?\n\nThe difference between the revisions does not affect data mapping and we will actually be supplying the difference via YANG parser (I am filing an issue for that separately)",
+      "revId": "cb7bd77bac871cb263a7d9ade8631d693ad69be2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
