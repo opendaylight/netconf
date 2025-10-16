@@ -155,7 +155,8 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
     }
 
     private NetconfClientConfiguration createConfig(final NetconfNode netconfNode) {
-        return factory.createClientConfigurationBuilder(NODE_ID, netconfNode)
+        return factory.createClientConfigurationBuilder(NODE_ID, netconfNode,
+                AbstractNetconfTopology.defaultSshParams())
             .withSessionListener(sessionListener)
             .build();
     }
