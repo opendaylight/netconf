@@ -20,7 +20,7 @@
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>shaded-sshd</artifactId>
     <packaging>bundle</packaging>
-    <version>10.0.0</version>
+    <version>10.0.1-SNAPSHOT</version>
     <name>${project.artifactId}</name>
 
     <properties>
