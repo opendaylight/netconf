@@ -9,7 +9,10 @@ package org.opendaylight.netconf.topology.singleton.impl;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.actor.ActorSystem;
@@ -38,7 +41,10 @@ import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterA
 import org.opendaylight.netconf.topology.spi.NetconfDeviceTopologyAdapter;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.Credentials;
-import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
+import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
+import org.opendaylight.yangtools.yang.model.api.ModuleLike;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
@@ -187,7 +193,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     }
 
     private Future<Object> sendInitialDataToActor() {
-        final var sourceIdentifiers = List.copyOf(SchemaContextUtil.getConstituentModuleIdentifiers(
+        final var sourceIdentifiers = List.copyOf(getConstituentModuleIdentifiers(
             currentSchema.databind().modelContext()));
 
         LOG.debug("{}: Sending CreateInitialMasterActorData with sourceIdentifiers {} to {}", id, sourceIdentifiers,
@@ -204,4 +210,30 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         datastoreAdapter.updateClusteredDeviceData(true, masterAddress, currentSchema.capabilities(),
                 netconfSessionPreferences.sessionId());
     }
+
+    /**
+     * Extract the identifiers of all modules and submodules which were used to create a particular SchemaContext.
+     *
+     * @param context SchemaContext to be examined
+     * @return Set of ModuleIdentifiers.
+     */
+    @VisibleForTesting
+    static Set<SourceIdentifier> getConstituentModuleIdentifiers(final SchemaContext context) {
+        final var ret = new HashSet<SourceIdentifier>();
+
+        for (var module : context.getModules()) {
+            ret.add(moduleToIdentifier(module));
+
+            for (var submodule : module.getSubmodules()) {
+                ret.add(moduleToIdentifier(submodule));
+            }
+        }
+
+        return ret;
+    }
+
+    private static SourceIdentifier moduleToIdentifier(final ModuleLike module) {
+        return new SourceIdentifier(Unqualified.of(module.getName()), module.getQNameModule().revision());
+    }
+
 }
