@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.netconf.topology.spi.AbstractNetconfTopology.DEFAULT_KEY_EXCHANGE_ALGORITHMS;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
@@ -45,8 +46,11 @@ import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFa
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.netconf.topology.spi.NetconfTopologyRPCProvider;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.KeyExchangeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.NetconfNodeAugment;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.netconf.node.augment.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -106,6 +110,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
 
     private Registration dataChangeListenerRegistration;
     private NetconfTopologyRPCProvider rpcProvider;
+    private SshTransportTopologyParameters sshParams;
 
     @Activate
     public NetconfTopologyManager(@Reference final BaseNetconfSchemaProvider baseSchemaProvider,
@@ -165,6 +170,13 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
         this.resourceManager = requireNonNull(resourceManager);
         this.builderFactory = requireNonNull(builderFactory);
+
+        this.sshParams = new SshTransportTopologyParametersBuilder()
+            .setKeyExchange(new KeyExchangeBuilder()
+                .setKeyExchangeAlg(DEFAULT_KEY_EXCHANGE_ALGORITHMS)
+                //TODO: add others
+                .build())
+            .build();
 
         dataChangeListenerRegistration = registerDataTreeChangeListener();
         rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, topologyId);
@@ -333,6 +345,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
             .setDeviceSchemaProvider(resourceManager.getSchemaResources(netconfNode.getSchemaCacheDirectory(),
                 deviceId))
             .setIdleTimeout(writeTxIdleTimeout)
+            .setSshParams(sshParams)
             .build();
     }
 }

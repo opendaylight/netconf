@@ -19,6 +19,7 @@ import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 
@@ -35,6 +36,7 @@ public final class NetconfTopologySetup {
     private final DeviceNetconfSchemaProvider deviceSchemaProvider;
     private final Duration idleTimeout;
     private final BaseNetconfSchemaProvider baseSchemaProvider;
+    private final SshTransportTopologyParameters sshParams;
 
     private NetconfTopologySetup(final Builder builder) {
         clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
@@ -49,6 +51,7 @@ public final class NetconfTopologySetup {
         deviceSchemaProvider = builder.getDeviceSchemaProvider();
         idleTimeout = builder.getIdleTimeout();
         baseSchemaProvider = builder.getBaseSchemaProvider();
+        sshParams = builder.getSshParams();
     }
 
     public ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
@@ -99,6 +102,10 @@ public final class NetconfTopologySetup {
         return baseSchemaProvider;
     }
 
+    public SshTransportTopologyParameters getSshParams() {
+        return sshParams;
+    }
+
     public static @NonNull Builder builder() {
         return new Builder();
     }
@@ -116,6 +123,7 @@ public final class NetconfTopologySetup {
         private DeviceNetconfSchemaProvider deviceSchemaProvider;
         private Duration idleTimeout;
         private BaseNetconfSchemaProvider baseSchemaProvider;
+        private SshTransportTopologyParameters sshParams;
 
         private Builder() {
             // Hidden on purpose
@@ -233,6 +241,15 @@ public final class NetconfTopologySetup {
 
         Duration getIdleTimeout() {
             return idleTimeout;
+        }
+
+        public SshTransportTopologyParameters getSshParams() {
+            return sshParams;
+        }
+
+        public Builder setSshParams(SshTransportTopologyParameters sshParams) {
+            this.sshParams = sshParams;
+            return this;
         }
     }
 }

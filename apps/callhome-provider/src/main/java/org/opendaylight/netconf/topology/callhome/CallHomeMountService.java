@@ -236,7 +236,8 @@ public final class CallHomeMountService implements AutoCloseable {
     @VisibleForTesting
     NetconfClientConfigurationBuilderFactory createClientConfigurationBuilderFactory() {
         // use minimal configuration, only id and session listener are used
-        return (nodeId, node) -> NetconfClientConfigurationBuilder.create()
+        //TODO: finish
+        return (nodeId, node, unused) -> NetconfClientConfigurationBuilder.create()
             .withName(nodeId.getValue())
             .withConnectionTimeoutMillis(config.connection$_$timeout$_$millis())
             // below parameters are only required to pass configuration validation
