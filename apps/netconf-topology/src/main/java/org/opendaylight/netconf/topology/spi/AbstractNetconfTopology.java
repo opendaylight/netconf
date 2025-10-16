@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.HashMap;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -23,9 +24,17 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.KeyExchangeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.NetconfNodeAugment;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.TopologyTypes1;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.TopologyTypes1Builder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.network.topology.topology.topology.types.TopologyNetconf;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.network.topology.topology.topology.types.TopologyNetconfBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -33,12 +42,48 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.TopologyTypes;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.TopologyTypesBuilder;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractNetconfTopology {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfTopology.class);
+
+    //TODO: should be list of mina-sshd defaults
+    //          Where to put this??
+    private static final List<SshKeyExchangeAlgorithm> DEFAULT_KEY_EXCHANGE_ALGORITHMS =
+        List.of(new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.Sntrup761x25519Sha512),
+            new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.Mlkem768x25519Sha256),
+            new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.Mlkem1024nistp384Sha384),
+            new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.Mlkem768nistp256Sha256),
+            new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.Curve25519Sha256),
+            new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.Curve448Sha512),
+            new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.EcdhSha2Nistp521),
+            new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.EcdhSha2Nistp384),
+            new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.EcdhSha2Nistp256),
+            new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.DiffieHellmanGroupExchangeSha256),
+            new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.DiffieHellmanGroup18Sha512),
+            new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.DiffieHellmanGroup17Sha512),
+            new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.DiffieHellmanGroup16Sha512),
+            new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.DiffieHellmanGroup15Sha512),
+            new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.DiffieHellmanGroup14Sha256));
 
     private final HashMap<NodeId, NetconfNodeHandler> activeConnectors = new HashMap<>();
     private final NetconfClientFactory clientFactory;
@@ -52,6 +97,8 @@ public abstract class AbstractNetconfTopology {
     protected final DataBroker dataBroker;
     protected final DOMMountPointService mountPointService;
     protected final String topologyId;
+
+    private SshTransportTopologyParameters sshParams;
 
     protected AbstractNetconfTopology(final String topologyId, final NetconfClientFactory clientFactory,
             final NetconfTimer timer, final NetconfTopologySchemaAssembler schemaAssembler,
@@ -71,10 +118,22 @@ public abstract class AbstractNetconfTopology {
 
         // FIXME: this should be a put(), as we are initializing and will be re-populating the datastore with all the
         //        devices. Whatever has been there before should be nuked to properly re-align lifecycle.
+
+        // TODO: make this attribute, and be updatable trough TreeChangeListener?
+        this.sshParams = defaultSshParams();
+
         final var wtx = dataBroker.newWriteOnlyTransaction();
         wtx.merge(LogicalDatastoreType.OPERATIONAL, DataObjectIdentifier.builder(NetworkTopology.class)
             .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
-            .build(), new TopologyBuilder().setTopologyId(new TopologyId(topologyId)).build());
+            .build(), new TopologyBuilder()
+                .setTopologyId(new TopologyId(topologyId))
+                .setTopologyTypes(new TopologyTypesBuilder().addAugmentation(new TopologyTypes1Builder()
+                    .setTopologyNetconf(new TopologyNetconfBuilder()
+                        .setSshTransportTopologyParameters(sshParams)
+                        .build())
+                    .build()).build())
+                .build());
+
         final var future = wtx.commit();
         try {
             future.get();
@@ -83,7 +142,16 @@ public abstract class AbstractNetconfTopology {
             throw new IllegalStateException(e);
         }
 
-        LOG.debug("Topology {} initialized", topologyId);
+        LOG.info("Topology {} initialized", topologyId);
+    }
+
+    public static SshTransportTopologyParameters defaultSshParams() {
+        return new SshTransportTopologyParametersBuilder()
+            .setKeyExchange(new KeyExchangeBuilder()
+                .setKeyExchangeAlg(DEFAULT_KEY_EXCHANGE_ALGORITHMS)
+                //TODO: add others
+                .build())
+            .build();
     }
 
     // Non-final for testing
@@ -123,7 +191,7 @@ public abstract class AbstractNetconfTopology {
 
         final NetconfNodeHandler nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemaProvider,
             schemaManager, schemaAssembler, builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId,
-            netconfNode, nodeOptional);
+            netconfNode, nodeOptional, sshParams);
 
         // ... record it ...
         activeConnectors.put(nodeId, nodeHandler);
@@ -155,6 +223,31 @@ public abstract class AbstractNetconfTopology {
     protected RemoteDeviceHandler createSalFacade(final RemoteDeviceId deviceId, final Credentials credentials,
             final boolean lockDatastore) {
         return new NetconfTopologyDeviceSalFacade(deviceId, credentials,  mountPointService, lockDatastore, dataBroker);
+    }
+
+    protected void updateSshParams(final SshTransportTopologyParameters rootNode) {
+        sshParams = rootNode;
+        final var wtx = dataBroker.newWriteOnlyTransaction();
+        wtx.put(LogicalDatastoreType.OPERATIONAL, DataObjectIdentifier.builder(NetworkTopology.class)
+            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
+            .child(TopologyTypes.class)
+            .augmentation(TopologyTypes1.class)
+            .child(TopologyNetconf.class)
+            .child(SshTransportTopologyParameters.class)
+            .build(), sshParams);
+        wtx.commit();
+    }
+
+    protected void deleteSshParams() {
+        final var wtx = dataBroker.newWriteOnlyTransaction();
+        wtx.delete(LogicalDatastoreType.OPERATIONAL, DataObjectIdentifier.builder(NetworkTopology.class)
+            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
+            .child(TopologyTypes.class)
+            .augmentation(TopologyTypes1.class)
+            .child(TopologyNetconf.class)
+            .child(SshTransportTopologyParameters.class)
+            .build());
+        wtx.commit();
     }
 
     /**
