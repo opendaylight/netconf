@@ -113,11 +113,10 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         private @Nullable EventStreamFilter filter;
         private @Nullable String filterName;
 
-        DynSubscription(final Uint32 id, final QName encoding, final MonitoringEncoding encodingName,
-                final String streamName, final String receiverName, final TransportSession session,
-                final @Nullable EventStreamFilter filter, final @Nullable String filterName,
-                final @Nullable Instant stopTime) {
-            super(id, encoding, encodingName, streamName, receiverName, session, stopTime);
+        DynSubscription(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
+                final TransportSession session, final @Nullable EventStreamFilter filter,
+                final @Nullable String filterName, final @Nullable Instant stopTime) {
+            super(id, encoding, streamName, receiverName, session, stopTime);
             this.filter = filter;
             this.filterName = filterName;
         }
@@ -156,7 +155,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
             final Rfc8639Subscriber<?> newSubscriber;
             try {
-                newSubscriber = stream.addSubscriber(sender, encodingName(),
+                newSubscriber = stream.addSubscriber(sender, encoding(),
                     newReceiverName(session.description(), request.principal()), filter(), receiverState);
             } catch (UnsupportedEncodingException e) {
                 request.failWith(new RequestException(e));
@@ -707,8 +706,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             new FutureCallback<>() {
                 @Override
                 public void onSuccess(final Void result) {
-                    final var subscription = new DynSubscription(id, encoding, encodingName, streamName, receiverName,
-                        session, filterImpl, filterName, stopTime);
+                    final var subscription = new DynSubscription(id, encoding, streamName, receiverName, session,
+                        filterImpl, filterName, stopTime);
                     subscriptions.put(id, subscription);
                     if (stopTime != null) {
                         initiateStopTime(id, stopTime);

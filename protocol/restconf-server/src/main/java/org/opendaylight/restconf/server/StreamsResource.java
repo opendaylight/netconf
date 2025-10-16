@@ -35,6 +35,7 @@ import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,8 +88,7 @@ final class StreamsResource extends AbstractEventStreamResource {
     }
 
     private PreparedRequest prepareGet(final URI targetUri, final HttpHeaders headers,
-            final @Nullable Principal principal, final MonitoringEncoding encoding,
-            final RestconfStream<?> stream) {
+            final @Nullable Principal principal, final QName encoding, final RestconfStream<?> stream) {
         if (!headers.contains(HttpHeaderNames.ACCEPT, HttpHeaderValues.TEXT_EVENT_STREAM, false)) {
             return new EmptyResponse(HttpResponseStatus.NOT_ACCEPTABLE);
         }
@@ -108,7 +108,7 @@ final class StreamsResource extends AbstractEventStreamResource {
 
     // HTTP/1 event stream start. This amounts to a 'long GET', i.e. if our subscription attempt is successful, we will
     // not be servicing any other requests.
-    private PreparedRequest switchToEventStream(final RestconfStream<?> stream, final MonitoringEncoding encoding,
+    private PreparedRequest switchToEventStream(final RestconfStream<?> stream, final QName encoding,
             final EventStreamGetParams params) {
         final var sender = new ChannelSender(sseMaximumFragmentLength);
         final var registration = registerSender(stream, encoding, params, sender);
@@ -121,8 +121,8 @@ final class StreamsResource extends AbstractEventStreamResource {
     }
 
     // HTTP/2 event stream start.
-    private PreparedRequest addEventStream(final Integer streamId, final RestconfStream<?> stream,
-            final MonitoringEncoding encoding, final EventStreamGetParams params) {
+    private PreparedRequest addEventStream(final Integer streamId, final RestconfStream<?> stream, final QName encoding,
+            final EventStreamGetParams params) {
         final var sender = new StreamSender(streamId);
         final var registration = registerSender(stream, encoding, params, sender);
         if (registration == null) {
@@ -134,8 +134,8 @@ final class StreamsResource extends AbstractEventStreamResource {
         return EmptyResponse.OK;
     }
 
-    private static @Nullable Registration registerSender(final RestconfStream<?> stream,
-            final MonitoringEncoding encoding, final EventStreamGetParams params, final RestconfStream.Sender sender) {
+    private static @Nullable Registration registerSender(final RestconfStream<?> stream, final QName encoding,
+            final EventStreamGetParams params, final RestconfStream.Sender sender) {
         final Registration reg;
         try {
             reg = stream.addSubscriber(sender, encoding, params);

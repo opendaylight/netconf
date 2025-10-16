@@ -81,7 +81,12 @@ final class SSESender implements Sender {
      * @throws IllegalArgumentException if the subscriber cannot be instantiated
      */
     public synchronized boolean init() throws UnsupportedEncodingException, XPathExpressionException {
-        final var local = stream.addSubscriber(this, encoding, params);
+        final var qname = encoding.encoding();
+        if (qname == null) {
+            throw new UnsupportedEncodingException("Encoding " + encoding.value() + " not recognized");
+        }
+
+        final var local = stream.addSubscriber(this, qname, params);
         if (local == null) {
             return false;
         }
