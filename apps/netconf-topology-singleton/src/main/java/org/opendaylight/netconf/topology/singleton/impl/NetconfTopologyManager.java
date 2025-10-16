@@ -48,7 +48,6 @@ import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.NetconfNodeAugment;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.netconf.node.augment.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyBuilder;
@@ -175,7 +174,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
         for (var change : changes) {
             final var rootNode = change.getRootNode();
             final var dataModifIdent = change.path();
-            final NodeId nodeId = NetconfTopologyUtils.getNodeId(rootNode.step());
+            final var nodeId = rootNode.coerceKeyStep(Node.class).key().getNodeId();
             switch (rootNode.modificationType()) {
                 case SUBTREE_MODIFIED:
                     LOG.debug("Config for node {} updated", nodeId);
