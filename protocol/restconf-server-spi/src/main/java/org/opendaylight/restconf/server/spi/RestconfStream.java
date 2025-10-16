@@ -28,12 +28,12 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
-import org.opendaylight.restconf.server.api.MonitoringEncoding;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
 import org.opendaylight.restconf.server.spi.Subscriber.Rfc8040Subscriber;
 import org.opendaylight.restconf.server.spi.Subscriber.Rfc8639Subscriber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver.State;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -92,9 +92,9 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
      */
     public abstract static class Source<T> {
         // ImmutableMap because it retains iteration order
-        final @NonNull ImmutableMap<MonitoringEncoding, ? extends EventFormatterFactory<T>> encodings;
+        final @NonNull ImmutableMap<QName, ? extends EventFormatterFactory<T>> encodings;
 
-        protected Source(final ImmutableMap<MonitoringEncoding, ? extends EventFormatterFactory<T>> encodings) {
+        protected Source(final ImmutableMap<QName, ? extends EventFormatterFactory<T>> encodings) {
             if (encodings.isEmpty()) {
                 throw new IllegalArgumentException("A source must support at least one encoding");
             }
@@ -534,22 +534,22 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
      *
      * @return Stream name.
      */
-    public @NonNull String name() {
+    public final @NonNull String name() {
         return name;
     }
 
     /**
-     * Get supported {@link MonitoringEncoding}s. The set is guaranteed to contain at least one element and does not
-     * contain {@code null}s.
+     * Get supported {@link Encoding}s. The set is guaranteed to contain at least one element and does not contain
+     * {@code null}s.
      *
      * @return Supported encodings.
      */
     @SuppressWarnings("null")
-    public @NonNull Set<MonitoringEncoding> encodings() {
+    public final @NonNull Set<QName> encodings() {
         return source.encodings.keySet();
     }
 
-    @NonNull EventFormatterFactory<T> getFactory(final MonitoringEncoding encoding)
+    @NonNull EventFormatterFactory<T> getFactory(final QName encoding)
             throws UnsupportedEncodingException {
         final var factory = source.encodings.get(requireNonNull(encoding));
         if (factory == null) {
@@ -570,7 +570,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
      * @throws XPathExpressionException if requested filter is not valid
      */
     @NonNullByDefault
-    public @Nullable Registration addSubscriber(final Sender handler, final MonitoringEncoding encoding,
+    public @Nullable Registration addSubscriber(final Sender handler, final QName encoding,
             final EventStreamGetParams params) throws UnsupportedEncodingException, XPathExpressionException {
         final var factory = getFactory(encoding);
         final var startTime = params.startTime();
@@ -597,8 +597,8 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
     }
 
     @NonNullByDefault
-    @Nullable Rfc8639Subscriber<T> addSubscriber(final Sender handler, final MonitoringEncoding encoding,
-            final String receiverName, @Nullable final EventStreamFilter eventStreamFilter, final State state)
+    @Nullable Rfc8639Subscriber<T> addSubscriber(final Sender handler, final QName encoding, final String receiverName,
+            final @Nullable EventStreamFilter eventStreamFilter, final State state)
             throws UnsupportedEncodingException {
         return addSubscriber(new Rfc8639Subscriber<>(this, handler,
             getFactory(encoding).getFormatter(TextParameters.EMPTY),

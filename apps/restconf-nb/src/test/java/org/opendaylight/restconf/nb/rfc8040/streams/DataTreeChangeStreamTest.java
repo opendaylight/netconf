@@ -44,7 +44,6 @@ import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
 import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.SkipNotificationDataParam;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
-import org.opendaylight.restconf.server.api.MonitoringEncoding;
 import org.opendaylight.restconf.server.api.testlib.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
@@ -60,6 +59,8 @@ import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.P
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1Builder;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1Key;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.binding.util.BindingMap;
@@ -246,8 +247,8 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
         final var handler = new TestHandler();
         stream.addSubscriber(handler,
             switch (outputType) {
-                case JSON -> MonitoringEncoding.JSON;
-                case XML -> MonitoringEncoding.XML;
+                case JSON -> EncodeJson$I.QNAME;
+                case XML -> EncodeXml$I.QNAME;
             },
             new EventStreamGetParams(null, null, null,
                 leafNodesOnly ? LeafNodesOnlyParam.of(true) : null,

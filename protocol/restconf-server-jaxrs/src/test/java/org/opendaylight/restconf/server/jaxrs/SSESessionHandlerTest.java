@@ -48,9 +48,8 @@ class SSESessionHandlerTest {
     private Registration reg;
 
     private SSESender setup(final int maxFragmentSize, final long heartbeatInterval) throws Exception {
-        final var sseSessionHandler = new SSESender(pingExecutor, eventSink, sse, stream,
-            MonitoringEncoding.XML, new EventStreamGetParams(null, null, null, null, null, null, null),
-            maxFragmentSize, heartbeatInterval);
+        final var sseSessionHandler = new SSESender(pingExecutor, eventSink, sse, stream, MonitoringEncoding.XML,
+            new EventStreamGetParams(null, null, null, null, null, null, null), maxFragmentSize, heartbeatInterval);
         doReturn(reg).when(stream).addSubscriber(eq(sseSessionHandler), any(), any());
         return sseSessionHandler;
     }

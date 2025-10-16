@@ -59,9 +59,9 @@ final class StreamsResource extends AbstractEventStreamResource {
     PreparedRequest prepare(final TransportSession session, final ImplementedMethod method, final URI targetUri,
             final HttpHeaders headers, final @Nullable Principal principal, final String firstSegment,
             final SegmentPeeler peeler) {
-        final MonitoringEncoding encoding;
+        final MonitoringEncoding encodingName;
         try {
-            encoding = MonitoringEncoding.of(firstSegment);
+            encodingName = MonitoringEncoding.of(firstSegment);
         } catch (IllegalArgumentException e) {
             LOG.debug("Stream encoding name '{}' is invalid", firstSegment, e);
             return EmptyResponse.NOT_FOUND;
@@ -79,7 +79,7 @@ final class StreamsResource extends AbstractEventStreamResource {
         }
 
         return switch (method) {
-            case GET -> prepareGet(targetUri, headers, principal, encoding, stream);
+            case GET -> prepareGet(targetUri, headers, principal, encodingName, stream);
             case HEAD -> EVENT_STREAM_HEAD;
             case OPTIONS -> AbstractPendingOptions.READ_ONLY;
             default -> METHOD_NOT_ALLOWED_READ_ONLY;
@@ -87,7 +87,7 @@ final class StreamsResource extends AbstractEventStreamResource {
     }
 
     private PreparedRequest prepareGet(final URI targetUri, final HttpHeaders headers,
-            final @Nullable Principal principal, final MonitoringEncoding encoding,
+            final @Nullable Principal principal, final MonitoringEncoding encodingName,
             final RestconfStream<?> stream) {
         if (!headers.contains(HttpHeaderNames.ACCEPT, HttpHeaderValues.TEXT_EVENT_STREAM, false)) {
             return new EmptyResponse(HttpResponseStatus.NOT_ACCEPTABLE);
@@ -102,16 +102,16 @@ final class StreamsResource extends AbstractEventStreamResource {
         }
 
         final var streamId = headers.getInt(STREAM_ID);
-        return streamId != null ? addEventStream(streamId, stream, encoding, streamParams)
-            : switchToEventStream(stream, encoding, streamParams);
+        return streamId != null ? addEventStream(streamId, stream, encodingName, streamParams)
+            : switchToEventStream(stream, encodingName, streamParams);
     }
 
     // HTTP/1 event stream start. This amounts to a 'long GET', i.e. if our subscription attempt is successful, we will
     // not be servicing any other requests.
-    private PreparedRequest switchToEventStream(final RestconfStream<?> stream, final MonitoringEncoding encoding,
+    private PreparedRequest switchToEventStream(final RestconfStream<?> stream, final MonitoringEncoding encodingName,
             final EventStreamGetParams params) {
         final var sender = new ChannelSender(sseMaximumFragmentLength);
-        final var registration = registerSender(stream, encoding, params, sender);
+        final var registration = registerSender(stream, encodingName, params, sender);
         if (registration == null) {
             return EmptyResponse.NOT_FOUND;
         }
@@ -122,9 +122,9 @@ final class StreamsResource extends AbstractEventStreamResource {
 
     // HTTP/2 event stream start.
     private PreparedRequest addEventStream(final Integer streamId, final RestconfStream<?> stream,
-            final MonitoringEncoding encoding, final EventStreamGetParams params) {
+            final MonitoringEncoding encodingName, final EventStreamGetParams params) {
         final var sender = new StreamSender(streamId);
-        final var registration = registerSender(stream, encoding, params, sender);
+        final var registration = registerSender(stream, encodingName, params, sender);
         if (registration == null) {
             return EmptyResponse.NOT_FOUND;
         }
@@ -135,7 +135,14 @@ final class StreamsResource extends AbstractEventStreamResource {
     }
 
     private static @Nullable Registration registerSender(final RestconfStream<?> stream,
-            final MonitoringEncoding encoding, final EventStreamGetParams params, final RestconfStream.Sender sender) {
+            final MonitoringEncoding encodingName, final EventStreamGetParams params,
+            final RestconfStream.Sender sender) {
+        final var encoding = encodingName.encoding();
+        if (encoding == null) {
+            // FIXME: report an error, as as below would
+            return null;
+        }
+
         final Registration reg;
         try {
             reg = stream.addSubscriber(sender, encoding, params);
