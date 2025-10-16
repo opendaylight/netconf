@@ -58,7 +58,7 @@ record ConfigListener(DefaultNetconfKeystoreService keystore) implements DataTre
                         final var privateKey = mod.dataAfter();
                         builder.privateKeys().put(privateKey.requireName(), privateKey);
                     }
-                    case DELETE -> builder.privateKeys().remove(mod.dataBefore().requireName());
+                    case DELETE -> builder.privateKeys().remove(mod.coerceKeyStep(PrivateKey.class).key().getName());
                     default -> {
                         // no-op
                     }
@@ -70,7 +70,8 @@ record ConfigListener(DefaultNetconfKeystoreService keystore) implements DataTre
                         final var trustedCertificate = mod.dataAfter();
                         builder.trustedCertificates().put(trustedCertificate.requireName(), trustedCertificate);
                     }
-                    case DELETE -> builder.trustedCertificates().remove(mod.dataBefore().requireName());
+                    case DELETE -> builder.trustedCertificates()
+                        .remove(mod.coerceKeyStep(TrustedCertificate.class).key().getName());
                     default -> {
                         // no-op
                     }
@@ -82,7 +83,8 @@ record ConfigListener(DefaultNetconfKeystoreService keystore) implements DataTre
                         final var keyCredential = mod.dataAfter();
                         builder.credentials().put(keyCredential.requireKeyId(), keyCredential);
                     }
-                    case DELETE -> builder.credentials().remove(mod.dataBefore().requireKeyId());
+                    case DELETE ->
+                        builder.credentials().remove(mod.coerceKeyStep(KeyCredential.class).key().getKeyId());
                     default -> {
                         // no-op
                     }
