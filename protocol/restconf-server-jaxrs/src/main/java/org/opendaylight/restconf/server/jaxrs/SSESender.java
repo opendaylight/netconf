@@ -34,7 +34,7 @@ final class SSESender implements Sender {
 
     private final PingExecutor pingExecutor;
     private final RestconfStream<?> stream;
-    private final MonitoringEncoding encoding;
+    private final MonitoringEncoding encodingName;
     private final EventStreamGetParams params;
     private final SseEventSink sink;
     private final Sse sse;
@@ -60,13 +60,13 @@ final class SSESender implements Sender {
      *            session up. Ping control frames are disabled if this parameter is set to 0.
      */
     SSESender(final PingExecutor pingExecutor, final SseEventSink sink, final Sse sse, final RestconfStream<?> stream,
-            final MonitoringEncoding encoding, final EventStreamGetParams params, final int maximumFragmentLength,
+            final MonitoringEncoding encodingName, final EventStreamGetParams params, final int maximumFragmentLength,
             final long heartbeatMillis) {
         this.pingExecutor = requireNonNull(pingExecutor);
         this.sse = requireNonNull(sse);
         this.sink = requireNonNull(sink);
         this.stream = requireNonNull(stream);
-        this.encoding = requireNonNull(encoding);
+        this.encodingName = requireNonNull(encodingName);
         this.params = requireNonNull(params);
         this.maximumFragmentLength = maximumFragmentLength;
         this.heartbeatMillis = heartbeatMillis;
@@ -81,6 +81,11 @@ final class SSESender implements Sender {
      * @throws IllegalArgumentException if the subscriber cannot be instantiated
      */
     public synchronized boolean init() throws UnsupportedEncodingException, XPathExpressionException {
+        final var encoding = encodingName.encoding();
+        if (encoding == null) {
+            throw new UnsupportedEncodingException("Encoding " + encodingName.value() + " not recognized");
+        }
+
         final var local = stream.addSubscriber(this, encoding, params);
         if (local == null) {
             return false;
