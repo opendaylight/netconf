@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.pekko.actor.ActorSystem;
 import org.apache.pekko.util.Timeout;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -44,18 +45,26 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
+import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.netconf.topology.spi.NetconfTopologyRPCProvider;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.NetconfNodeAugment;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240911.netconf.node.augment.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.NetconfNodeAugment;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.TopologyTypes1;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.TopologyTypes1Builder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.netconf.node.augment.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.network.topology.topology.topology.types.TopologyNetconf;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.network.topology.topology.topology.types.TopologyNetconfBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.TopologyTypes;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.TopologyTypesBuilder;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -107,7 +116,9 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
     private final SchemaResourceManager resourceManager;
 
     private Registration dataChangeListenerRegistration;
+    private Registration dtclRegParams;
     private NetconfTopologyRPCProvider rpcProvider;
+    private SshTransportTopologyParameters sshParams;
 
     @Activate
     public NetconfTopologyManager(@Reference final BaseNetconfSchemaProvider baseSchemaProvider,
@@ -167,6 +178,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
         this.resourceManager = requireNonNull(resourceManager);
         this.builderFactory = requireNonNull(builderFactory);
+        this.sshParams = AbstractNetconfTopology.defaultSshParams();
 
         dataChangeListenerRegistration = registerDataTreeChangeListener();
         rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, topologyId);
@@ -271,6 +283,11 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
             dataChangeListenerRegistration.close();
             dataChangeListenerRegistration = null;
         }
+        if (dtclRegParams != null) {
+            dtclRegParams.close();
+            dtclRegParams = null;
+        }
+        deleteSshParams();
 
         contexts.values().forEach(NetconfTopologyManager::close);
         clusterRegistrations.values().forEach(NetconfTopologyManager::close);
@@ -295,7 +312,14 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
         //        oper being transient and perhaps on a put() instead, how do we handle that in the clustered case?
         wtx.merge(LogicalDatastoreType.OPERATIONAL, DataObjectIdentifier.builder(NetworkTopology.class)
             .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
-            .build(), new TopologyBuilder().setTopologyId(new TopologyId(topologyId)).build());
+            .build(), new TopologyBuilder()
+            .setTopologyId(new TopologyId(topologyId))
+            .setTopologyTypes(new TopologyTypesBuilder().addAugmentation(new TopologyTypes1Builder()
+                .setTopologyNetconf(new TopologyNetconfBuilder()
+                    .setSshTransportTopologyParameters(sshParams)
+                    .build())
+                .build()).build())
+            .build());
         wtx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
@@ -308,11 +332,77 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
             }
         }, MoreExecutors.directExecutor());
 
+        dtclRegParams = dataBroker.registerTreeChangeListener(LogicalDatastoreType.CONFIGURATION,
+            NetconfTopologyUtils.createTopologyListPath(topologyId).toBuilder().toReferenceBuilder()
+                .child(TopologyTypes.class)
+                .augmentation(TopologyTypes1.class)
+                .child(TopologyNetconf.class)
+                .child(SshTransportTopologyParameters.class)
+                .build(), this::onDataTreeChangedParams);
+
         LOG.debug("Registering datastore listener");
         return dataBroker.registerTreeChangeListener(LogicalDatastoreType.CONFIGURATION,
             NetconfTopologyUtils.createTopologyListPath(topologyId).toBuilder().toReferenceBuilder()
                 .child(Node.class)
                 .build(), this);
+    }
+
+    public void onDataTreeChangedParams(
+            final @NonNull List<DataTreeModification<SshTransportTopologyParameters>> changes) {
+        for (var change : changes) {
+            final var rootNode = change.getRootNode();
+            final var modType = rootNode.modificationType();
+            switch (modType) {
+                case SUBTREE_MODIFIED, WRITE -> updateSshParams(rootNode.dataAfter());
+                case DELETE -> updateSshParams(AbstractNetconfTopology.defaultSshParams());
+                default -> LOG.debug("Unsupported modification type: {}.", modType);
+            }
+        }
+    }
+
+    private void updateSshParams(final SshTransportTopologyParameters rootNode) {
+        final var wtx = dataBroker.newWriteOnlyTransaction();
+        wtx.put(LogicalDatastoreType.OPERATIONAL, DataObjectIdentifier.builder(NetworkTopology.class)
+            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
+            .child(TopologyTypes.class)
+            .augmentation(TopologyTypes1.class)
+            .child(TopologyNetconf.class)
+            .child(SshTransportTopologyParameters.class)
+            .build(), sshParams);
+        wtx.commit().addCallback(new FutureCallback<CommitInfo>() {
+            @Override
+            public void onSuccess(final CommitInfo result) {
+                LOG.debug("Topology ssh parameters updated successfully");
+                sshParams = rootNode;
+            }
+
+            @Override
+            public void onFailure(final Throwable throwable) {
+                LOG.error("Unable update topology ssh parameters", throwable);
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
+    private void deleteSshParams() {
+        final var wtx = dataBroker.newWriteOnlyTransaction();
+        wtx.delete(LogicalDatastoreType.OPERATIONAL, DataObjectIdentifier.builder(NetworkTopology.class)
+            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
+            .child(TopologyTypes.class)
+            .augmentation(TopologyTypes1.class)
+            .child(TopologyNetconf.class)
+            .child(SshTransportTopologyParameters.class)
+            .build());
+        wtx.commit().addCallback(new FutureCallback<CommitInfo>() {
+            @Override
+            public void onSuccess(final CommitInfo result) {
+                LOG.debug("Topology ssh parameters cleared successfully");
+            }
+
+            @Override
+            public void onFailure(final Throwable throwable) {
+                LOG.error("Unable delete topology ssh parameters", throwable);
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     private NetconfTopologySetup createSetup(final DataObjectIdentifier<Node> instanceIdentifier, final Node node) {
@@ -333,6 +423,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
             .setDeviceSchemaProvider(resourceManager.getSchemaResources(netconfNode.getSchemaCacheDirectory(),
                 deviceId))
             .setIdleTimeout(writeTxIdleTimeout)
+            .setSshParams(sshParams)
             .build();
     }
 }
