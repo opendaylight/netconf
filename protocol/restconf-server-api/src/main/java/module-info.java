@@ -25,7 +25,6 @@ module org.opendaylight.restconf.server.api {
     requires org.opendaylight.yangtools.yang.data.impl;
     requires org.opendaylight.yangtools.yang.data.spi;
     requires org.slf4j;
-    requires stax.utils;
 
     // Annotation-only dependencies
     requires static transitive org.eclipse.jdt.annotation;
