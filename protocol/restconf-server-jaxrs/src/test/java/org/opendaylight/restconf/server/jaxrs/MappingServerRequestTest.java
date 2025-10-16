@@ -79,8 +79,7 @@ class MappingServerRequestTest extends AbstractJukeboxTest {
                 <error-message>Sample error message</error-message>
                 <error-tag>operation-failed</error-tag>
               </error>
-            </errors>
-            """, body::formatToXML, true);
+            </errors>""", body::formatToXML, true);
     }
 
     @Test
@@ -121,8 +120,7 @@ class MappingServerRequestTest extends AbstractJukeboxTest {
                 <error-message>message 2</error-message>
                 <error-tag>operation-failed</error-tag>
               </error>
-            </errors>
-            """, body::formatToXML, true);
+            </errors>""", body::formatToXML, true);
     }
 
     @Test
@@ -195,8 +193,7 @@ class MappingServerRequestTest extends AbstractJukeboxTest {
                 <error-app-tag> app tag #3</error-app-tag>
                 <error-info>my error info</error-info>
               </error>
-            </errors>
-            """, body::formatToXML, true);
+            </errors>""", body::formatToXML, true);
     }
 
     private static FormattableBody assertMapped(final HttpStatusCode expectedCode, final RequestException ex) {

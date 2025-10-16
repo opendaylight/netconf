@@ -145,8 +145,7 @@ class NC1438Test extends AbstractRestconfTest {
                 <error-message>Missing required element 'edit-id'</error-message>
                 <error-tag>missing-element</error-tag>
               </error>
-            </errors>
-            """, body::formatToXML, true);
+            </errors>""", body::formatToXML, true);
     }
 
     @Test
@@ -211,8 +210,7 @@ class NC1438Test extends AbstractRestconfTest {
                 <error-message>Missing required element 'patch-id'</error-message>
                 <error-tag>missing-element</error-tag>
               </error>
-            </errors>
-            """, body::formatToXML, true);
+            </errors>""", body::formatToXML, true);
     }
 
     @Test
@@ -277,8 +275,7 @@ class NC1438Test extends AbstractRestconfTest {
                 <error-message>Missing required element 'operation'</error-message>
                 <error-tag>missing-element</error-tag>
               </error>
-            </errors>
-            """, body::formatToXML, true);
+            </errors>""", body::formatToXML, true);
     }
 
     @Test
@@ -342,8 +339,7 @@ class NC1438Test extends AbstractRestconfTest {
                 <error-message>Missing required element 'target'</error-message>
                 <error-tag>missing-element</error-tag>
               </error>
-            </errors>
-            """, body::formatToXML, true);
+            </errors>""", body::formatToXML, true);
     }
 
     @Test
@@ -408,8 +404,7 @@ class NC1438Test extends AbstractRestconfTest {
                 <error-message>Operation value: [WRONG] is incorrect.</error-message>
                 <error-tag>invalid-value</error-tag>
               </error>
-            </errors>
-            """, body::formatToXML, true);
+            </errors>""", body::formatToXML, true);
     }
 
     @Test
@@ -480,8 +475,7 @@ class NC1438Test extends AbstractRestconfTest {
                 <error-info>ParseError at [row,col]:[-1,-1]
             Message: Schema for node with name WRONG and namespace http://example.com/ns/example-jukebox does not exist in parent EmptyContainerEffectiveStatement{argument=(http://example.com/ns/example-jukebox?revision=2015-04-04)player}</error-info>
               </error>
-            </errors>
-            """, body::formatToXML, true);
+            </errors>""", body::formatToXML, true);
     }
 
     @Test
@@ -611,8 +605,7 @@ class NC1438Test extends AbstractRestconfTest {
                 <error-message>Empty 'value' element is not allowed</error-message>
                 <error-tag>invalid-value</error-tag>
               </error>
-            </errors>
-            """, body::formatToXML, true);
+            </errors>""", body::formatToXML, true);
     }
 
     @Test
