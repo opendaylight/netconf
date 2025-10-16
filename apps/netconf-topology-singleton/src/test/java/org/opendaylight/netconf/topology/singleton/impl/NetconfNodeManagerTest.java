@@ -9,6 +9,7 @@ package org.opendaylight.netconf.topology.singleton.impl;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -219,7 +220,7 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         final NetconfNodeAugment netconfNodeAugment = newNetconfNode();
         final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(netconfNodeAugment).build();
 
-        DataObjectWritten<Node> mockDataObjModification = mock();
+        DataObjectWritten<Node> mockDataObjModification = mock(CALLS_REAL_METHODS);
         doReturn(nodeListPath.lastStep()).when(mockDataObjModification).step();
         doReturn(WRITE).when(mockDataObjModification).modificationType();
         doReturn(node).when(mockDataObjModification).dataAfter();
@@ -307,7 +308,7 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         final NetconfNodeAugment netconfNodeAugment = newNetconfNode();
         final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(netconfNodeAugment).build();
 
-        DataObjectWritten<Node> mockDataObjModification = mock();
+        DataObjectWritten<Node> mockDataObjModification = mock(CALLS_REAL_METHODS);
         doReturn(nodeListPath.lastStep()).when(mockDataObjModification).step();
         doReturn(WRITE).when(mockDataObjModification).modificationType();
         doReturn(node).when(mockDataObjModification).dataAfter();
