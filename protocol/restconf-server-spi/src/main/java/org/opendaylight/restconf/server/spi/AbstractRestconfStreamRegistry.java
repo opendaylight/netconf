@@ -326,10 +326,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         /**
-         * Method for suspending subscription
-         *
-         * <p>Method suspends all receivers for subscription, set subscription state to suspended and send subscription
-         * suspended state notification. If subscription is already in suspended state method is skipped.
+         * Method for suspending subscription. Method suspends all receivers for subscription, sets subscription state
+         * to suspended and send subscription suspended state notification. If subscription is already in suspended
+         * state method is skipped.
          *
          * @param reason Reason of suspension;
          */
@@ -354,10 +353,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
 
         /**
-         * Method for resuming subscription from suspended state
-         *
-         * <p>Method resumes all receivers for subscription, set subscription state to active and send subscription
-         * resumed state notification. If subscription is not in suspended state method is skipped.
+         * Method for resuming subscription from suspended state. Method resumes all receivers for subscription,
+         * sets subscription state to active and send subscription resumed state notification. If subscription is not
+         * in suspended state method is skipped.
          */
         @Override
         void resumeSubscription() {
