@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -20,6 +19,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.yangtools.util.xml.IndentedXML;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 
 /**
@@ -29,6 +29,7 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 public final class FormattableBodySupport {
     private static final XMLOutputFactory XML_FACTORY = XMLOutputFactory.newFactory();
     private static final String PRETTY_PRINT_INDENT = "  ";
+    private static final IndentedXML INDENTED = IndentedXML.of(4);
 
     private FormattableBodySupport() {
         // Hidden on purpose
@@ -54,6 +55,6 @@ public final class FormattableBodySupport {
     }
 
     public static XMLStreamWriter indentXmlWriter(final XMLStreamWriter writer, final PrettyPrintParam prettyPrint) {
-        return prettyPrint.value() ? new IndentingXMLStreamWriter(writer) : writer;
+        return prettyPrint.value() ? INDENTED.wrapStreamWriter(writer) : writer;
     }
 }
