@@ -9,6 +9,9 @@ package org.opendaylight.netconf.server.mdsal.notifications;
 
 import java.util.List;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
+import org.opendaylight.mdsal.binding.api.DataObjectModified;
+import org.opendaylight.mdsal.binding.api.DataObjectWritten;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -62,23 +65,20 @@ public final class SessionNotificationProducer implements DataTreeChangeListener
     @Override
     public void onDataTreeChanged(final List<DataTreeModification<Session>> changes) {
         for (var change : changes) {
-            final var rootNode = change.getRootNode();
-            final var modificationType = rootNode.modificationType();
-            switch (modificationType) {
-                case WRITE:
-                    final Session created = rootNode.dataAfter();
-                    if (created != null && rootNode.dataBefore() == null) {
-                        publishStartedSession(created);
+            switch (change.getRootNode()) {
+                case DataObjectWritten<Session> written -> {
+                    if (written.dataBefore() == null) {
+                        publishStartedSession(written.dataAfter());
                     }
-                    break;
-                case DELETE:
-                    final Session removed = rootNode.dataBefore();
+                }
+                case DataObjectDeleted<Session> deleted -> {
+                    final Session removed = deleted.dataBefore();
                     if (removed != null) {
                         publishEndedSession(removed);
                     }
-                    break;
-                default:
-                    LOG.debug("Received intentionally unhandled type: {}.", modificationType);
+                }
+                case DataObjectModified<Session> modified ->
+                    LOG.debug("Received intentionally unhandled type: {}.", modified);
             }
         }
     }
