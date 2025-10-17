@@ -82,7 +82,7 @@ public final class CapabilityChangeNotificationProducer implements DataTreeChang
                     break;
                 }
                 case DataObjectDeleted<Capabilities> deleted: {
-                    final Capabilities dataBeforeDelete = deleted.dataBefore();
+                    final Capabilities dataBeforeDelete = deleted.coerceKeyStep(Capabilities.class).key();
                     if (dataBeforeDelete != null) {
                         final Set<Uri> removed = ImmutableSet.copyOf(dataBeforeDelete.getCapability());
                         publishNotification(Set.of(), removed);
