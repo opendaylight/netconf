@@ -73,6 +73,10 @@
             <artifactId>rfc9644-ietf-ssh-client</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc9644-ietf-ssh-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
             <artifactId>ietf-topology</artifactId>
         </dependency>
