@@ -20,9 +20,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.DELETE;
-import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.SUBTREE_MODIFIED;
-import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.WRITE;
 
 import java.util.HashMap;
 import java.util.List;
@@ -199,7 +196,6 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         final Node node1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(netconfNodeAugment1).build();
 
         final DataObjectWritten<Node> dataObjectModification1 = mock(CALLS_REAL_METHODS);
-        doReturn(WRITE).when(dataObjectModification1).modificationType();
         doReturn(node1).when(dataObjectModification1).dataAfter();
         doReturn(new KeyStep<>(Node.class, new NodeKey(nodeId1))).when(dataObjectModification1).step();
 
@@ -213,7 +209,6 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         final Node node2 = new NodeBuilder().setNodeId(nodeId2).addAugmentation(netconfNodeAugment2).build();
 
         final DataObjectWritten<Node> dataObjectModification2 = mock(CALLS_REAL_METHODS);
-        doReturn(WRITE).when(dataObjectModification2).modificationType();
         doReturn(node2).when(dataObjectModification2).dataAfter();
         doReturn(new KeyStep<>(Node.class, new NodeKey(nodeId2))).when(dataObjectModification2).step();
 
@@ -257,11 +252,9 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
             .build();
         final Node updatedNode1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(updatedNetconfNode1).build();
 
-        doReturn(WRITE).when(dataObjectModification1).modificationType();
         doReturn(updatedNode1).when(dataObjectModification1).dataAfter();
 
         final DataObjectModified<Node> dataObjectModification3 = mock(CALLS_REAL_METHODS);
-        doReturn(SUBTREE_MODIFIED).when(dataObjectModification3).modificationType();
         doReturn(node2).when(dataObjectModification3).dataAfter();
         doReturn(new KeyStep<>(Node.class, new NodeKey(nodeId2))).when(dataObjectModification3).step();
 
@@ -284,7 +277,6 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
 
         // Notify of Node 1 deleted.
         final DataObjectDeleted<Node> dataObjectModification4 = mock(CALLS_REAL_METHODS);
-        doReturn(DELETE).when(dataObjectModification4).modificationType();
         doReturn(new KeyStep<>(Node.class, new NodeKey(nodeId1))).when(dataObjectModification4).step();
 
         netconfTopologyManager.onDataTreeChanged(List.of(
@@ -304,7 +296,6 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         doThrow(new RuntimeException("mock error")).doReturn(newMockClusterRegistration1)
                 .when(clusterSingletonServiceProvider).registerClusterSingletonService(newMockContext1);
 
-        doReturn(WRITE).when(dataObjectModification1).modificationType();
         doReturn(node1).when(dataObjectModification1).dataAfter();
 
         mockContextMap.put(nodeInstanceId1, setup -> {
@@ -352,7 +343,6 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
                 .build();
 
         final DataObjectWritten<Node> dataObjectModification = mock(CALLS_REAL_METHODS);
-        doReturn(WRITE).when(dataObjectModification).modificationType();
         doReturn(node).when(dataObjectModification).dataAfter();
         doReturn(new KeyStep<>(Node.class, new NodeKey(nodeId))).when(dataObjectModification).step();
 
