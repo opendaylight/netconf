@@ -18,9 +18,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.DELETE;
-import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.SUBTREE_MODIFIED;
-import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.WRITE;
 
 import com.google.common.io.CharSource;
 import com.google.common.util.concurrent.Futures;
@@ -222,7 +219,6 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         DataObjectWritten<Node> mockDataObjModification = mock(CALLS_REAL_METHODS);
         doReturn(nodeListPath.lastStep()).when(mockDataObjModification).step();
-        doReturn(WRITE).when(mockDataObjModification).modificationType();
         doReturn(node).when(mockDataObjModification).dataAfter();
 
         netconfNodeManager.onDataTreeChanged(List.of(
@@ -237,7 +233,6 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         // Notify that the NetconfNode operational state was deleted. Expect the slave mount point closed.
 
-        doReturn(DELETE).when(mockDataObjModification).modificationType();
 
         netconfNodeManager.onDataTreeChanged(List.of(
             new CustomTreeModification(LogicalDatastoreType.OPERATIONAL, nodeListPath,
@@ -249,7 +244,6 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         setupMountPointMocks();
 
-        doReturn(WRITE).when(mockDataObjModification).modificationType();
         doReturn(null).when(mockDataObjModification).dataBefore();
         doReturn(node).when(mockDataObjModification).dataAfter();
 
@@ -285,7 +279,6 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
                     .build())
                 .build();
 
-        doReturn(SUBTREE_MODIFIED).when(mockDataObjModification).modificationType();
         doReturn(node).when(mockDataObjModification).dataBefore();
         doReturn(updatedNode).when(mockDataObjModification).dataAfter();
 
@@ -310,7 +303,6 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         DataObjectWritten<Node> mockDataObjModification = mock(CALLS_REAL_METHODS);
         doReturn(nodeListPath.lastStep()).when(mockDataObjModification).step();
-        doReturn(WRITE).when(mockDataObjModification).modificationType();
         doReturn(node).when(mockDataObjModification).dataAfter();
 
         // First try the registration where the perceived master hasn't been initialized as the master.

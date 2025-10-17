@@ -17,7 +17,10 @@ import org.apache.pekko.pattern.Patterns;
 import org.apache.pekko.util.Timeout;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataObjectModified;
+import org.opendaylight.mdsal.binding.api.DataObjectWritten;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -73,27 +76,25 @@ class NetconfNodeManager implements DataTreeChangeListener<Node>, AutoCloseable 
         for (var change : changes) {
             final var rootNode = change.getRootNode();
             final var nodeId = rootNode.coerceKeyStep(Node.class).key().getNodeId();
-            switch (rootNode.modificationType()) {
-                case SUBTREE_MODIFIED:
+            switch (rootNode) {
+                case DataObjectModified<Node> modified -> {
                     LOG.debug("{}: Operational state for node {} - subtree modified from {} to {}", id, nodeId,
-                        rootNode.dataBefore(), rootNode.dataAfter());
-                    handleSlaveMountPoint(rootNode);
-                    break;
-                case WRITE:
-                    if (rootNode.dataBefore() != null) {
+                        modified.dataBefore(), modified.dataAfter());
+                    handleSlaveMountPoint(modified);
+                }
+                case DataObjectWritten<Node> written -> {
+                    if (written.dataBefore() != null) {
                         LOG.debug("{}: Operational state for node {} updated from {} to {}", id, nodeId,
-                            rootNode.dataBefore(), rootNode.dataAfter());
+                            written.dataBefore(), written.dataAfter());
                     } else {
-                        LOG.debug("{}: Operational state for node {} created: {}", id, nodeId, rootNode.dataAfter());
+                        LOG.debug("{}: Operational state for node {} created: {}", id, nodeId, written.dataAfter());
                     }
-                    handleSlaveMountPoint(rootNode);
-                    break;
-                case DELETE:
+                    handleSlaveMountPoint(written);
+                }
+                case DataObjectDeleted<Node> deleted -> {
                     LOG.debug("{}: Operational state for node {} deleted.", id, nodeId);
                     unregisterSlaveMountpoint();
-                    break;
-                default:
-                    LOG.debug("{}: Uknown operation for node: {}", id, nodeId);
+                }
             }
         }
     }
@@ -136,7 +137,7 @@ class NetconfNodeManager implements DataTreeChangeListener<Node>, AutoCloseable 
             LogicalDatastoreType.OPERATIONAL, path, this);
     }
 
-    private synchronized void handleSlaveMountPoint(final DataObjectModification<Node> rootNode) {
+    private synchronized void handleSlaveMountPoint(final DataObjectModification.WithDataAfter<Node> rootNode) {
         if (closed) {
             return;
         }
