@@ -20,6 +20,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
+import org.opendaylight.mdsal.binding.api.DataObjectModification.WithDataAfter;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -135,18 +137,14 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
         public final void onDataTreeChanged(final List<DataTreeModification<Device>> mods) {
             for (var dataTreeModification : mods) {
                 final var deviceMod = dataTreeModification.getRootNode();
-                final var modType = deviceMod.modificationType();
-                switch (modType) {
-                    case DELETE:
-                        deleteDevice(deviceMod.dataBefore());
+                switch (deviceMod) {
+                    case DataObjectDeleted<Device> deleted:
+                        deleteDevice(deleted.dataBefore());
                         break;
-                    case SUBTREE_MODIFIED:
-                    case WRITE:
-                        deleteDevice(deviceMod.dataBefore());
-                        writeDevice(deviceMod.dataAfter());
+                    case WithDataAfter<Device> written:
+                        deleteDevice(written.dataBefore());
+                        writeDevice(written.dataAfter());
                         break;
-                    default:
-                        throw new IllegalStateException("Unhandled modification type " + modType);
                 }
             }
         }
@@ -241,7 +239,13 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
         @Override
         public void onDataTreeChanged(final List<DataTreeModification<Global>> mods) {
             if (!mods.isEmpty()) {
-                current = mods.get(mods.size() - 1).getRootNode().dataAfter();
+                switch (mods.getLast().getRootNode()) {
+                    case WithDataAfter<Global> present:
+                        current = present.dataAfter();
+                        break;
+                    case DataObjectDeleted<Global> deleted:
+                        break;
+                }
             }
         }
 
