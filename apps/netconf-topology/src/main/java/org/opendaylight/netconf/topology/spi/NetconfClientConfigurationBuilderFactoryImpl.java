@@ -29,8 +29,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.cli
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240814.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentity;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentityBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.TransportParamsBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.client.identity.PasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.parameters.Protocol.Name;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.connection.parameters.protocol.specification.SshCase;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.credentials.KeyAuth;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.credentials.LoginPw;
@@ -71,7 +73,7 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             builder.withProtocol(NetconfClientProtocol.TCP);
         } else if (protocol == null || protocol.getName() == Name.SSH) {
             builder.withProtocol(NetconfClientProtocol.SSH);
-            setSshParametersFromCredentials(builder, node.getCredentials());
+            setSshParametersFromCredentials(builder, node.getCredentials(), node);
         } else if (protocol.getName() == Name.TLS) {
             final var contextFactory = sslContextFactoryProvider.getSslContextFactory(protocol.getSpecification());
             final var sslContext = protocol.getKeyId() == null
@@ -97,7 +99,7 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
     }
 
     private void setSshParametersFromCredentials(final NetconfClientConfigurationBuilder confBuilder,
-            final Credentials credentials) {
+            final Credentials credentials, final NetconfNode node) {
         final var sshParamsBuilder = new SshClientParametersBuilder();
         if (credentials instanceof LoginPwUnencrypted unencrypted) {
             final var loginPassword = unencrypted.getLoginPasswordUnencrypted();
@@ -139,6 +141,17 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         } else {
             throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
         }
+        if(node.getProtocol().getSpecification() instanceof SshCase sshCase) {
+            final var sshParams = sshCase.getSshTransportParameters();
+            final var transportParamBuilder = new TransportParamsBuilder();
+
+            transportParamBuilder.setHostKey(sshParams.nonnullHostKey());
+            transportParamBuilder.setEncryption(sshParams.nonnullEncryption());
+            transportParamBuilder.setKeyExchange(sshParams.nonnullKeyExchange());
+            transportParamBuilder.setMac(sshParams.nonnullMac());
+            sshParamsBuilder.setTransportParams(transportParamBuilder.build());
+        }
+        //sshParamsBuilder.setTransportParams(parseTransportParams(node));
         confBuilder.withSshParameters(sshParamsBuilder.build());
     }
 
