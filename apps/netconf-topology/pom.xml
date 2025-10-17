@@ -53,6 +53,7 @@
             <artifactId>mdsal-dom-api</artifactId>
         </dependency>
         <dependency>
+<<<<<<< HEAD   (55f36f Add SSH transport configuration to netconf device)
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
             <artifactId>rfc6241</artifactId>
         </dependency>
@@ -71,6 +72,10 @@
         <dependency>
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
             <artifactId>rfc9644-ietf-ssh-client</artifactId>
+=======
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc9644-ietf-ssh-common</artifactId>
+>>>>>>> CHANGE (ab25e2 Make node SSH transport configurable)
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
