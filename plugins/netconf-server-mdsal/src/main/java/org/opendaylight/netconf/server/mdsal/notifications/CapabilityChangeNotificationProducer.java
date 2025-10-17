@@ -12,6 +12,9 @@ import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Set;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
+import org.opendaylight.mdsal.binding.api.DataObjectModified;
+import org.opendaylight.mdsal.binding.api.DataObjectWritten;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -66,31 +69,28 @@ public final class CapabilityChangeNotificationProducer implements DataTreeChang
     @Override
     public void onDataTreeChanged(final List<DataTreeModification<Capabilities>> changes) {
         for (var change : changes) {
-            final var rootNode = change.getRootNode();
-            final var modificationType = rootNode.modificationType();
-            switch (modificationType) {
-                case WRITE: {
-                    final Capabilities dataAfter = rootNode.dataAfter();
-                    final Capabilities dataBefore = rootNode.dataBefore();
+            switch (change.getRootNode()) {
+                case DataObjectWritten<Capabilities> written: {
+                    final Capabilities dataAfter = written.dataAfter();
+                    final Capabilities dataBefore = written.dataBefore();
                     final Set<Uri> before = dataBefore != null ? ImmutableSet.copyOf(dataBefore.getCapability())
                         : Set.of();
-                    final Set<Uri> after = dataAfter != null ? ImmutableSet.copyOf(dataAfter.getCapability())
-                        : Set.of();
+                    final Set<Uri> after = ImmutableSet.copyOf(dataAfter.getCapability());
                     final Set<Uri> added = Sets.difference(after, before);
                     final Set<Uri> removed = Sets.difference(before, after);
                     publishNotification(added, removed);
                     break;
                 }
-                case DELETE: {
-                    final Capabilities dataBeforeDelete = rootNode.dataBefore();
+                case DataObjectDeleted<Capabilities> deleted: {
+                    final Capabilities dataBeforeDelete = deleted.dataBefore();
                     if (dataBeforeDelete != null) {
                         final Set<Uri> removed = ImmutableSet.copyOf(dataBeforeDelete.getCapability());
                         publishNotification(Set.of(), removed);
                     }
                     break;
                 }
-                default:
-                    LOG.debug("Received intentionally unhandled type: {}.", modificationType);
+                case DataObjectModified<Capabilities> ignored:
+                    break;
             }
         }
     }
