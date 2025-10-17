@@ -20,6 +20,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
+import org.opendaylight.mdsal.binding.api.DataObjectModified;
+import org.opendaylight.mdsal.binding.api.DataObjectWritten;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -187,17 +190,15 @@ public final class CallHomeMountStatusReporter implements CallHomeStatusRecorder
     private void onConfigurationDataTreeChanged(final List<DataTreeModification<Device>> changes) {
         final var deleted = ImmutableList.<DataObjectIdentifier<Device>>builder();
         final var modified = ImmutableList.<Device>builder();
-        for (var change : changes) {
-            var changeRootNode = change.getRootNode();
-            switch (changeRootNode.modificationType()) {
-                case SUBTREE_MODIFIED:
-                case WRITE:
-                    modified.add(changeRootNode.dataAfter());
+        for (var change : changes) {;
+            switch (change.getRootNode()) {
+                case DataObjectModified<Device> objectModified:
                     break;
-                case DELETE:
+                case DataObjectWritten<Device> written:
+                    modified.add(written.dataAfter());
+                    break;
+                case DataObjectDeleted<Device> objectDeleted:
                     deleted.add(change.path());
-                    break;
-                default:
                     break;
             }
         }
