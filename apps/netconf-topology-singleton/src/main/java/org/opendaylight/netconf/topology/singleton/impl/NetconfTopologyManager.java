@@ -24,6 +24,9 @@ import org.apache.pekko.util.Timeout;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
+import org.opendaylight.mdsal.binding.api.DataObjectModified;
+import org.opendaylight.mdsal.binding.api.DataObjectWritten;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
@@ -175,26 +178,24 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
             final var rootNode = change.getRootNode();
             final var dataModifIdent = change.path();
             final var nodeId = rootNode.coerceKeyStep(Node.class).key().getNodeId();
-            switch (rootNode.modificationType()) {
-                case SUBTREE_MODIFIED:
+            switch (rootNode) {
+                case DataObjectModified<Node> modified:
                     LOG.debug("Config for node {} updated", nodeId);
-                    refreshNetconfDeviceContext(dataModifIdent, rootNode.dataAfter());
+                    refreshNetconfDeviceContext(dataModifIdent, modified.dataAfter());
                     break;
-                case WRITE:
+                case DataObjectWritten<Node> written:
                     if (contexts.containsKey(dataModifIdent)) {
                         LOG.debug("RemoteDevice{{}} was already configured, reconfiguring node...", nodeId);
-                        refreshNetconfDeviceContext(dataModifIdent, rootNode.dataAfter());
+                        refreshNetconfDeviceContext(dataModifIdent, written.dataAfter());
                     } else {
                         LOG.debug("Config for node {} created", nodeId);
-                        startNetconfDeviceContext(dataModifIdent, rootNode.dataAfter());
+                        startNetconfDeviceContext(dataModifIdent, written.dataAfter());
                     }
                     break;
-                case DELETE:
+                case DataObjectDeleted<Node> deleted:
                     LOG.debug("Config for node {} deleted", nodeId);
                     stopNetconfDeviceContext(dataModifIdent);
                     break;
-                default:
-                    LOG.warn("Unknown operation for {}.", nodeId);
             }
         }
     }
