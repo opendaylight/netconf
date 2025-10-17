@@ -73,6 +73,10 @@
             <artifactId>mdsal-dom-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc9644-ietf-ssh-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
             <artifactId>ietf-topology</artifactId>
         </dependency>
