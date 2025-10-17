@@ -20,7 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
-import org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType;
 import org.opendaylight.mdsal.binding.api.DataObjectModified;
 import org.opendaylight.mdsal.binding.api.DataObjectWritten;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
@@ -130,7 +129,6 @@ class NetconfTopologyImplTest {
                     .build())
                 .build();
 
-            doReturn(ModificationType.WRITE).when(objWritten).modificationType();
             doReturn(node).when(objWritten).dataAfter();
 
             final var changes = List.of(treeMod);
@@ -140,12 +138,10 @@ class NetconfTopologyImplTest {
             verify(spyTopology).ensureNode(node);
 
             doReturn(TOPOLOGY_PATH.toBuilder().child(Node.class, key).build()).when(treeMod).path();
-            doReturn(ModificationType.DELETE).when(objDeleted).modificationType();
             doReturn(objDeleted).when(treeMod).getRootNode();
             spyTopology.onDataTreeChanged(changes);
             verify(spyTopology).deleteNode(key.getNodeId());
 
-            doReturn(ModificationType.SUBTREE_MODIFIED).when(objModified).modificationType();
             doReturn(node).when(objModified).dataAfter();
             doReturn(objModified).when(treeMod).getRootNode();
             spyTopology.onDataTreeChanged(changes);
