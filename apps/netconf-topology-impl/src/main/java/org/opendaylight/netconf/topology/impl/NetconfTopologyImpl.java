@@ -14,6 +14,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
+import org.opendaylight.mdsal.binding.api.DataObjectModified;
+import org.opendaylight.mdsal.binding.api.DataObjectWritten;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
@@ -124,17 +127,14 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     public void onDataTreeChanged(final List<DataTreeModification<Node>> changes) {
         for (var change : changes) {
             final var rootNode = change.getRootNode();
-            final var modType = rootNode.modificationType();
-            switch (modType) {
-                case SUBTREE_MODIFIED -> ensureNode("updated", rootNode.dataAfter());
-                case WRITE -> ensureNode("created", rootNode.dataAfter());
-                case DELETE -> {
-                    @SuppressWarnings("unchecked")
+            switch (rootNode) {
+                case DataObjectModified<Node> modified -> ensureNode("updated", modified.dataAfter());
+                case DataObjectWritten<Node> written -> ensureNode("created", written.dataAfter());
+                case DataObjectDeleted<Node> deleted -> {
                     final var nodeId = ((WithKey<Node, NodeKey>) change.path()).key().getNodeId();
                     LOG.debug("Config for node {} deleted", nodeId);
                     deleteNode(nodeId);
                 }
-                default -> LOG.debug("Unsupported modification type: {}.", modType);
             }
         }
     }
