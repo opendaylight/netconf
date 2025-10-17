@@ -21,6 +21,8 @@ import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataListener;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
+import org.opendaylight.mdsal.binding.api.DataObjectModification.WithDataAfter;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -136,18 +138,13 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
         public final void onDataTreeChanged(final List<DataTreeModification<Device>> mods) {
             for (var dataTreeModification : mods) {
                 final var deviceMod = dataTreeModification.getRootNode();
-                final var modType = deviceMod.modificationType();
-                switch (modType) {
-                    case DELETE:
-                        deleteDevice(deviceMod.dataBefore());
-                        break;
-                    case SUBTREE_MODIFIED:
-                    case WRITE:
-                        deleteDevice(deviceMod.dataBefore());
-                        writeDevice(deviceMod.dataAfter());
-                        break;
-                    default:
-                        throw new IllegalStateException("Unhandled modification type " + modType);
+                switch (deviceMod) {
+                    case DataObjectDeleted<Device> deleted ->
+                        deleteDevice(deleted.dataBefore());
+                    case WithDataAfter<Device> present -> {
+                        deleteDevice(present.dataBefore());
+                        writeDevice(present.dataAfter());
+                    }
                 }
             }
         }
