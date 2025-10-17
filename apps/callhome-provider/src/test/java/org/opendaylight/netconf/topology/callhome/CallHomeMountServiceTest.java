@@ -20,8 +20,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.DELETE;
-import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.WRITE;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.channel.Channel;
@@ -145,7 +143,6 @@ class CallHomeMountServiceTest {
         final DataObjectWritten<Device> mockObjectWritten = mock();
 
         // modification of overriding device inside 'allowed-devices' container
-        when(mockObjectWritten.modificationType()).thenReturn(WRITE);
         when(mockObjectWritten.dataBefore()).thenReturn(mockDeviceBeforeAddition);
         service.onAllowedDevicesChanged(List.of(new CustomTreeModification(LogicalDatastoreType.CONFIGURATION,
             IDENTIFIER, mockObjectWritten)));
@@ -153,7 +150,6 @@ class CallHomeMountServiceTest {
 
         // modification of deleting device from 'allowed-devices' container
         final DataObjectDeleted<Device> mockObjectDeleted = mock();
-        when(mockObjectDeleted.modificationType()).thenReturn(DELETE);
         when(mockObjectDeleted.dataBefore()).thenReturn(mockDeviceBeforeAddition);
         service.onAllowedDevicesChanged(List.of(
             new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, IDENTIFIER, mockObjectDeleted)));
@@ -169,10 +165,7 @@ class CallHomeMountServiceTest {
         final DataObjectDeleted<Device> mockModification1 = mock();
         final DataObjectDeleted<Device> mockModification2 = mock();
 
-        when(mockModification1.modificationType()).thenReturn(DELETE);
         when(mockModification1.dataBefore()).thenReturn(mockDevice1);
-
-        when(mockModification2.modificationType()).thenReturn(DELETE);
         when(mockModification2.dataBefore()).thenReturn(mockDevice2);
 
         service.onAllowedDevicesChanged(List.of(
