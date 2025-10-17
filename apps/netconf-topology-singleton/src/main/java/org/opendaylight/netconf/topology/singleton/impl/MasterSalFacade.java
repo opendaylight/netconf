@@ -36,8 +36,16 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.spi.NetconfDeviceTopologyAdapter;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
+<<<<<<< HEAD   (986ea6 Make respond non-static and return Future)
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev241009.credentials.Credentials;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
+=======
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.credentials.Credentials;
+import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
+import org.opendaylight.yangtools.yang.model.api.ModuleLike;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+>>>>>>> CHANGE (bb7552 Add SSH transport configuration to netconf device)
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
