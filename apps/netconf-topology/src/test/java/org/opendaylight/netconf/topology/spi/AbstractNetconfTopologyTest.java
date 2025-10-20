@@ -19,6 +19,7 @@ import static org.mockito.Mockito.verify;
 
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -27,9 +28,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
+import org.opendaylight.mdsal.binding.api.DataObjectModified;
+import org.opendaylight.mdsal.binding.api.DataObjectWritten;
+import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
+import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
@@ -41,6 +47,7 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.test.util.CustomTreeModification;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -57,7 +64,10 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev25
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
+import org.opendaylight.yangtools.binding.KeyStep;
+import org.opendaylight.yangtools.binding.impl.DataObjectIdentifierWithKey;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -87,6 +97,12 @@ class AbstractNetconfTopologyTest {
     private WriteTransaction wtx;
     @Mock
     private RemoteDeviceHandler delegate;
+    @Mock
+    private DataObjectWritten<Node> dataObjectWritten;
+    @Mock
+    private DataObjectDeleted<Node> dataObjectDeleted;
+    @Mock
+    private DataObjectIdentifierWithKey<Node, NodeKey> identifier;
 
     @Captor
     private ArgumentCaptor<Throwable> exceptionCaptor;
@@ -189,18 +205,24 @@ class AbstractNetconfTopologyTest {
         doNothing().when(delegate).close();
         doThrow(new GeneralSecurityException()).when(encryptionService).decrypt(any());
 
-        topology.onDataTreeChanged(testNode, ModificationType.WRITE);
+        doReturn(testNode).when(dataObjectWritten).dataAfter();
+        topology.onDataTreeChanged(List.of(
+            new CustomTreeModification(LogicalDatastoreType.OPERATIONAL, identifier, dataObjectWritten)));
         verify(encryptionService).decrypt(any());
         verify(delegate).onDeviceFailed(any(IllegalStateException.class));
 
         assertEquals("Failed to decrypt password",
             exceptionCaptor.getValue().getMessage());
 
-        topology.onDataTreeChanged(testNode, ModificationType.DELETE);
+        final var keyStep = new KeyStep<>(Node.class, new NodeKey(testNode.getNodeId()));
+        doReturn(keyStep).when(dataObjectDeleted).coerceKeyStep(Node.class);
+        topology.onDataTreeChanged((List.of(
+            new CustomTreeModification(LogicalDatastoreType.OPERATIONAL, identifier, dataObjectDeleted))));
         verify(delegate).close();
     }
 
-    private final class TestingNetconfTopologyImpl extends AbstractNetconfTopology {
+    private final class TestingNetconfTopologyImpl extends AbstractNetconfTopology
+            implements DataTreeChangeListener<Node> {
         TestingNetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory,
             final NetconfTimer timer, final NetconfTopologySchemaAssembler schemaAssembler,
             final SchemaResourceManager schemaManager, final DataBroker dataBroker,
@@ -211,11 +233,16 @@ class AbstractNetconfTopologyTest {
         }
 
         // Want to simulate on data tree change
-        public void onDataTreeChanged(final Node node, final ModificationType type) {
-            switch (type) {
-                case WRITE -> ensureNode(node);
-                case DELETE -> deleteNode(node.getNodeId());
-                default -> throw new IllegalArgumentException("Unexpected modification type: " + type);
+        @Override
+        public void onDataTreeChanged(final List<DataTreeModification<Node>> changes) {
+            for (var change : changes) {
+                switch (change.getRootNode()) {
+                    case DataObjectWritten<Node> written -> ensureNode(written.dataAfter());
+                    case DataObjectDeleted<Node> deleted ->
+                        deleteNode(deleted.coerceKeyStep(Node.class).key().getNodeId());
+                    case DataObjectModified<Node> modified ->
+                        throw new IllegalArgumentException("Unexpected modification type: " + modified);
+                }
             }
         }
 

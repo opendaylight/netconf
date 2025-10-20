@@ -181,6 +181,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>netconf-test-util</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.netconf.model</groupId>
             <artifactId>test-models</artifactId>
         </dependency>
