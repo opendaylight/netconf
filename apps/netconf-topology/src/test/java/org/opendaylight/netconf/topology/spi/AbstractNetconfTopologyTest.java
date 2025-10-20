@@ -27,7 +27,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
+import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType;
+import org.opendaylight.mdsal.binding.api.DataObjectModified;
+import org.opendaylight.mdsal.binding.api.DataObjectWritten;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -87,6 +91,10 @@ class AbstractNetconfTopologyTest {
     private WriteTransaction wtx;
     @Mock
     private RemoteDeviceHandler delegate;
+    @Mock
+    private DataObjectWritten<Node> dataObjectWritten;
+    @Mock
+    private DataObjectDeleted<Node> dataObjectDeleted;
 
     @Captor
     private ArgumentCaptor<Throwable> exceptionCaptor;
@@ -189,14 +197,15 @@ class AbstractNetconfTopologyTest {
         doNothing().when(delegate).close();
         doThrow(new GeneralSecurityException()).when(encryptionService).decrypt(any());
 
-        topology.onDataTreeChanged(testNode, ModificationType.WRITE);
+
+        topology.onDataTreeChanged(testNode, dataObjectWritten);
         verify(encryptionService).decrypt(any());
         verify(delegate).onDeviceFailed(any(IllegalStateException.class));
 
         assertEquals("Failed to decrypt password",
             exceptionCaptor.getValue().getMessage());
 
-        topology.onDataTreeChanged(testNode, ModificationType.DELETE);
+        topology.onDataTreeChanged(testNode, dataObjectDeleted);
         verify(delegate).close();
     }
 
@@ -211,11 +220,16 @@ class AbstractNetconfTopologyTest {
         }
 
         // Want to simulate on data tree change
-        public void onDataTreeChanged(final Node node, final ModificationType type) {
+        public void onDataTreeChanged(final Node node, final DataObjectModification<Node> type) {
             switch (type) {
-                case WRITE -> ensureNode(node);
-                case DELETE -> deleteNode(node.getNodeId());
-                default -> throw new IllegalArgumentException("Unexpected modification type: " + type);
+                case DataObjectWritten<Node> written:
+                    ensureNode(node);
+                    break;
+                case DataObjectDeleted<Node> deleted:
+                    deleteNode(node.getNodeId());
+                    break;
+                case DataObjectModified<Node> modified:
+                    throw new IllegalArgumentException("Unexpected modification type: " + modified);
             }
         }
 
