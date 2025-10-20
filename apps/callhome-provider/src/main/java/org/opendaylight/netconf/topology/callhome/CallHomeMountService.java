@@ -21,9 +21,6 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
-import org.opendaylight.mdsal.binding.api.DataObjectModified;
-import org.opendaylight.mdsal.binding.api.DataObjectWritten;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -341,19 +338,10 @@ public final class CallHomeMountService implements AutoCloseable {
     @VisibleForTesting
     void onAllowedDevicesChanged(final List<DataTreeModification<Device>> changes) {
         for (final var change : changes) {
-            final var rootNode = change.getRootNode();
-            switch (rootNode) {
-                case DataObjectDeleted<Device> deleted:
-                    break;
-                case DataObjectWritten<Device> written:
-                    break;
-                case DataObjectModified<Device> modified:
-                    final var deletedDevice = modified.dataBefore();
-                    if (deletedDevice != null) {
-                        final var uniqueId = deletedDevice.getUniqueId();
-                        topology.disableNode(new NodeId(uniqueId));
-                    }
-                    break;
+            final var deletedDevice = change.getRootNode().dataBefore();
+            if (deletedDevice != null) {
+                final var uniqueId = deletedDevice.getUniqueId();
+                topology.disableNode(new NodeId(uniqueId));
             }
         }
     }
