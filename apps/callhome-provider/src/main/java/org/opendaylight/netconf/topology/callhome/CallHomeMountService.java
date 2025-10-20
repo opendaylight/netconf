@@ -338,19 +338,9 @@ public final class CallHomeMountService implements AutoCloseable {
     @VisibleForTesting
     void onAllowedDevicesChanged(final List<DataTreeModification<Device>> changes) {
         for (final var change : changes) {
-            final var rootNode = change.getRootNode();
-            switch (rootNode.modificationType()) {
-                case DELETE:
-                case WRITE:
-                case SUBTREE_MODIFIED:
-                    final var deletedDevice = rootNode.dataBefore();
-                    if (deletedDevice != null) {
-                        final var uniqueId = deletedDevice.getUniqueId();
-                        topology.disableNode(new NodeId(uniqueId));
-                    }
-                    break;
-                default:
-                    break;
+            final var deletedDevice = change.getRootNode().dataBefore();
+            if (deletedDevice != null) {
+                topology.disableNode(new NodeId(deletedDevice.getUniqueId()));
             }
         }
     }
