@@ -55,6 +55,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
+import org.opendaylight.mdsal.binding.api.DataObjectModification.WithDataAfter;
 import org.opendaylight.mdsal.binding.api.ReadTransaction;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
@@ -443,12 +445,14 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             final WriteTransaction slaveTx = slaveTxChain.newWriteOnlyTransaction();
             for (var dataTreeModification : changes) {
                 var rootNode = dataTreeModification.getRootNode();
-                switch (rootNode.modificationType()) {
-                    case null -> throw new NullPointerException();
-                    case SUBTREE_MODIFIED, WRITE ->
+                switch (rootNode) {
+                    case WithDataAfter<Node> withData:
                         slaveTx.merge(LogicalDatastoreType.OPERATIONAL, dataTreeModification.path(),
-                            rootNode.dataAfter());
-                    case DELETE -> slaveTx.delete(LogicalDatastoreType.OPERATIONAL, dataTreeModification.path());
+                            withData.dataAfter());
+                        break;
+                    case DataObjectDeleted<Node> deleted:
+                        slaveTx.delete(LogicalDatastoreType.OPERATIONAL, dataTreeModification.path());
+
                 }
             }
 
