@@ -22,8 +22,8 @@ import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
-import java.util.ArrayDeque;
-import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
@@ -57,12 +57,15 @@ public final class ResponseWriter extends ChannelInboundHandlerAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResponseWriter.class);
 
-    private final Queue<HttpObject> pendingChunks = new ArrayDeque<>();
+    private final ArrayBlockingQueue<HttpObject> pendingChunks = new ArrayBlockingQueue<>(1);
 
     private @NonNull State state = Inactive.INSTANCE;
 
+    private volatile ChannelHandlerContext ctx;
+
     @Override
     public synchronized void handlerAdded(final ChannelHandlerContext ctx) {
+        this.ctx = requireNonNull(ctx);
         state = ctx.channel().isWritable() ? new Writable(ctx) : new Unwritable();
     }
 
@@ -82,6 +85,7 @@ public final class ResponseWriter extends ChannelInboundHandlerAdapter {
     private synchronized void becameWritable(final ChannelHandlerContext ctx) {
         state = new Writable(ctx);
         sendQueue();
+        trySendNext();
     }
 
     private synchronized void becameUnwritable(final ChannelHandlerContext ctx) {
@@ -109,11 +113,13 @@ public final class ResponseWriter extends ChannelInboundHandlerAdapter {
             }
             case Unwritable ignored -> {
                 LOG.debug("Channel unwritable, adding first chunk to queue");
-                pendingChunks.add(response);
+                blockPut(response);
+                scheduleDrain();
                 return true;
             }
             case Writable writable -> {
-                writable.ctx.writeAndFlush(response);
+                blockPut(response);
+                scheduleDrain();
                 return true;
             }
         }
@@ -129,24 +135,29 @@ public final class ResponseWriter extends ChannelInboundHandlerAdapter {
     @NonNullByDefault
     synchronized boolean sendResponsePart(final ByteBuf chunk) {
         final var content = new DefaultHttpContent(chunk);
-        switch (state) {
-            case Inactive ignored -> {
-                LOG.debug("Rejecting response part");
-                return false;
-            }
-            case Unwritable ignored -> {
-                LOG.debug("Channel unwritable, adding part chunk to queue");
-                pendingChunks.add(content);
-                return true;
-            }
-            case Writable writable -> {
-                if (pendingChunks.isEmpty()) {
-                    writable.ctx.writeAndFlush(content);
-                } else {
-                    pendingChunks.add(content);
+        try {
+            switch (state) {
+                case Inactive ignored -> {
+                    LOG.debug("Rejecting response part");
+                    return false;
                 }
-                return true;
+                case Unwritable ignored -> {
+                    LOG.debug("Channel unwritable, adding part chunk to queue");
+                    pendingChunks.put(content);
+                    return true;
+                }
+                case Writable writable -> {
+                    if (pendingChunks.isEmpty()) {
+                        writable.ctx.writeAndFlush(content);
+                    } else {
+                        pendingChunks.put(content);
+                    }
+                    return true;
+                }
             }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
         }
     }
 
@@ -166,14 +177,14 @@ public final class ResponseWriter extends ChannelInboundHandlerAdapter {
             }
             case Unwritable ignored -> {
                 LOG.debug("Channel unwritable, adding end chunk to queue");
-                pendingChunks.add(lastContent);
+                blockPut(lastContent);
                 return true;
             }
             case Writable writable -> {
                 if (pendingChunks.isEmpty()) {
                     writable.ctx.writeAndFlush(lastContent);
                 } else {
-                    pendingChunks.add(lastContent);
+                    pendingChunks.put(lastContent);
                 }
                 return true;
             }
@@ -184,5 +195,75 @@ public final class ResponseWriter extends ChannelInboundHandlerAdapter {
         while (state instanceof Writable(ChannelHandlerContext ctx) && !pendingChunks.isEmpty()) {
             ctx.writeAndFlush(pendingChunks.poll());
         }
+    }
+
+/*    private void trySendNext() {
+        if (state instanceof Writable(ChannelHandlerContext ctx) && ctx.channel().isWritable()) {
+            final var next = pendingChunks.poll();
+            if (next != null) {
+                ctx.writeAndFlush(next).addListener(f -> {
+                    if (f.isSuccess()) {
+                        // send next if possible
+                        trySendNext();
+                    } else {
+                        LOG.warn("Write failed: {}", f.cause().toString());
+                        ctx.close();
+                    }
+                });
+            }
+        }
+    }*/
+
+    private void blockPut(final HttpObject obj) {
+        try {
+            pendingChunks.put(obj);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            safeRelease(obj);
+            throw new RejectedExecutionException("Interrupted while enqueuing outbound object", e);
+        }
+    }
+
+    private static void safeRelease(final HttpObject obj) {
+        try {
+            if (obj instanceof DefaultHttpContent c) {
+                c.content().release();
+            }
+        } catch (Throwable ignore) {
+        }
+    }
+
+    /** Schedule a drain on the event loop. */
+    private void scheduleDrain() {
+        final var localCtx = ctx;
+        if (localCtx == null) {
+            return;
+        }
+        localCtx.executor().execute(() -> drainOnEventLoop(localCtx));
+    }
+
+    private void drainOnEventLoop(final ChannelHandlerContext ctx) {
+        if (!ctx.channel().isActive()) {
+            state = Inactive.INSTANCE;
+            return;
+        }
+        if (!ctx.channel().isWritable()) {
+            state = Unwritable.INSTANCE;
+            return;
+        }
+        state = new Writable(ctx);
+
+        while (true) {
+            if (!ctx.channel().isWritable()) {
+                state = Unwritable.INSTANCE;
+                break;
+            }
+            final HttpObject obj = pendingChunks.poll();
+            if (obj == null) {
+                break;
+            }
+            ctx.write(obj);
+        }
+        ctx.flush();
     }
 }
