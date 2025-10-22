@@ -422,11 +422,6 @@ public final class ResponseBodyOutputStream extends OutputStream {
 
     private @NonNull State state;
 
-    @NonNullByDefault
-    ResponseBodyOutputStream(final ChannelHandlerContext ctx, final HttpResponseStatus status,
-            final ReadOnlyHttpHeaders headers, final HttpVersion version, final @Nullable Integer streamId) {
-        this(ctx, status, headers, version, streamId, MAX_CHUNK_SIZE);
-    }
 
     @NonNullByDefault
     ResponseBodyOutputStream(final ChannelHandlerContext ctx, final HttpResponseStatus status,

@@ -34,8 +34,9 @@ final class ConcurrentRestconfSession extends ConcurrentHTTPServerSession {
     private final @NonNull EndpointRoot root;
 
     @NonNullByDefault
-    ConcurrentRestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root) {
-        super(scheme);
+    ConcurrentRestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root,
+            final NettyEndpointConfiguration configuration) {
+        super(scheme, configuration);
         this.root = requireNonNull(root);
         transportSession = new DefaultTransportSession(new HttpDescription(scheme, remoteAddress));
     }

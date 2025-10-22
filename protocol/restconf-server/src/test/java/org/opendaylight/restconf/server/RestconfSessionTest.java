@@ -75,7 +75,7 @@ class RestconfSessionTest {
         // default config just for testing purposes
         final var configuration = new NettyEndpointConfiguration(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE,
             Uint16.ZERO, Uint32.valueOf(10_000), "restconf",
-            MessageEncoding.JSON, httpServerStackGrouping);
+            MessageEncoding.JSON, httpServerStackGrouping, 16 * 1024);
 
         final var listener = new RestconfTransportChannelListener(server, streamRegistry, principalService,
             configuration);
