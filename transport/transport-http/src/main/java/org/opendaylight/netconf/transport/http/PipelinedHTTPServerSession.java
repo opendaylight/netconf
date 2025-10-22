@@ -7,11 +7,13 @@
  */
 package org.opendaylight.netconf.transport.http;
 
+import org.opendaylight.yangtools.yang.common.Uint32;
+
 /**
  * An pipelined HTTP/1.1 server session.
  */
 public abstract non-sealed class PipelinedHTTPServerSession extends HTTPServerSession {
-    protected PipelinedHTTPServerSession(final HTTPScheme scheme) {
-        super(scheme);
+    protected PipelinedHTTPServerSession(final HTTPScheme scheme, final Uint32 chunkSize) {
+        super(scheme, chunkSize);
     }
 }
