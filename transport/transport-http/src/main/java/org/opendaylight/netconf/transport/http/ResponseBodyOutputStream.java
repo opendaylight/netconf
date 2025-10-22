@@ -31,6 +31,7 @@ import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,7 +166,7 @@ public final class ResponseBodyOutputStream extends OutputStream {
         private final HttpVersion version;
         private final @Nullable Integer streamId;
 
-        PendingBody(final HTTPServerSession session,final int maxChunkSize, final HttpResponseStatus status,
+        PendingBody(final HTTPServerSession session, final int maxChunkSize, final HttpResponseStatus status,
                 final ReadOnlyHttpHeaders headers, final ChannelHandlerContext ctx, final HttpVersion version,
                 final @Nullable Integer streamId) {
             super(session, ctx.alloc(), maxChunkSize);
@@ -417,22 +418,14 @@ public final class ResponseBodyOutputStream extends OutputStream {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(ResponseBodyOutputStream.class);
-    // FIXME: make maxChunkSize tunable
-    private static final int MAX_CHUNK_SIZE = 256 * 1024;
 
     private @NonNull State state;
 
     @NonNullByDefault
     ResponseBodyOutputStream(final ChannelHandlerContext ctx, final HttpResponseStatus status,
-            final ReadOnlyHttpHeaders headers, final HttpVersion version, final @Nullable Integer streamId) {
-        this(ctx, status, headers, version, streamId, MAX_CHUNK_SIZE);
-    }
-
-    @NonNullByDefault
-    ResponseBodyOutputStream(final ChannelHandlerContext ctx, final HttpResponseStatus status,
             final ReadOnlyHttpHeaders headers, final HttpVersion version, final @Nullable Integer streamId,
-            final int maxChunkSize) {
-        state = new PendingBody(ctx.pipeline().get(HTTPServerSession.class), maxChunkSize, status,
+            final Uint32 maxChunkSize) {
+        state = new PendingBody(ctx.pipeline().get(HTTPServerSession.class), maxChunkSize.intValue(), status,
             headers, ctx, version, streamId);
     }
 
