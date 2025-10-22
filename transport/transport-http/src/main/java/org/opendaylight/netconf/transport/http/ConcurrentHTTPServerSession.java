@@ -7,11 +7,13 @@
  */
 package org.opendaylight.netconf.transport.http;
 
+import org.opendaylight.yangtools.yang.common.Uint32;
+
 /**
  * A concurrent HTTP/2+ server session.
  */
 public abstract non-sealed class ConcurrentHTTPServerSession extends HTTPServerSession {
-    protected ConcurrentHTTPServerSession(final HTTPScheme scheme) {
-        super(scheme);
+    protected ConcurrentHTTPServerSession(final HTTPScheme scheme, final Uint32 chunkSize) {
+        super(scheme, chunkSize);
     }
 }

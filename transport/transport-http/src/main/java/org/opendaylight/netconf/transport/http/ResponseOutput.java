@@ -18,6 +18,7 @@ import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
 import io.netty.util.AsciiString;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 /**
  * Streaming interface for emitting the contents of a {@link FiniteResponse} to the session. It supports only a single
@@ -30,26 +31,44 @@ public final class ResponseOutput {
     private final ChannelHandlerContext ctx;
     private final HttpVersion version;
     private final @Nullable Integer streamId;
+    private final Uint32 configChunkSize;
 
-    ResponseOutput(final ChannelHandlerContext ctx, final HttpVersion version, final @Nullable Integer streamId) {
+    ResponseOutput(final ChannelHandlerContext ctx, final HttpVersion version, final @Nullable Integer streamId,
+            final Uint32 configChunkSize) {
         this.ctx = requireNonNull(ctx);
         this.version = requireNonNull(version);
         this.streamId = streamId;
+        this.configChunkSize = requireNonNull(configChunkSize);
+    }
+
+    public ResponseBodyOutputStream start(final HttpResponseStatus status, final Uint32 chunkSize) {
+        return start(status, null, chunkSize);
     }
 
     public ResponseBodyOutputStream start(final HttpResponseStatus status) {
-        return start(status, null);
+        return start(status, null, configChunkSize);
+    }
+
+    public ResponseBodyOutputStream start(final HttpResponseStatus status, final AsciiString name,
+            final CharSequence value, final Uint32 chunkSize) {
+        return start(status, new ReadOnlyHttpHeaders(HeadersResponse.VALIDATE_HEADERS, name, value), chunkSize);
     }
 
     public ResponseBodyOutputStream start(final HttpResponseStatus status, final AsciiString name,
             final CharSequence value) {
-        return start(status, new ReadOnlyHttpHeaders(HeadersResponse.VALIDATE_HEADERS, name, value));
+        return start(status, new ReadOnlyHttpHeaders(HeadersResponse.VALIDATE_HEADERS, name, value), configChunkSize);
+    }
+
+    public ResponseBodyOutputStream start(final HttpResponseStatus status,
+            final @Nullable ReadOnlyHttpHeaders headers, final Uint32 chunkSize) {
+        return new ResponseBodyOutputStream(ctx, status, headers != null ? headers : HeadersResponse.EMPTY_HEADERS,
+            version, streamId, chunkSize);
     }
 
     public ResponseBodyOutputStream start(final HttpResponseStatus status,
             final @Nullable ReadOnlyHttpHeaders headers) {
         return new ResponseBodyOutputStream(ctx, status, headers != null ? headers : HeadersResponse.EMPTY_HEADERS,
-            version, streamId);
+            version, streamId, configChunkSize);
     }
 
     @Override

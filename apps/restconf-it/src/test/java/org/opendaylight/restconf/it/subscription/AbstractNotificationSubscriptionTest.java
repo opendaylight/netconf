@@ -224,7 +224,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
             ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000), RESTCONF,
-            MessageEncoding.JSON, serverStackGrouping);
+            MessageEncoding.JSON, serverStackGrouping, Uint32.valueOf(256 * 1024));
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory,
             configuration);
     }
