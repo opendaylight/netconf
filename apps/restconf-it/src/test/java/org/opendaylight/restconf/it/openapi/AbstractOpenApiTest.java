@@ -122,6 +122,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
     protected static final ObjectMapper MAPPER = new ObjectMapper();
     protected static final String TOASTER = "toaster";
     protected static final String TOASTER_REV = "2009-11-20";
+    protected static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
     /**
      * Model toaster@2009-11-19 is used for test correct generating of openapi with models with same name and another
      * revision date. We want to test that the same model is not duplicated and loaded just the newest version.
@@ -213,7 +214,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
             ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000),
-            RESTS, MessageEncoding.JSON, serverStackGrouping);
+            RESTS, MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE);
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory,
             configuration);
 

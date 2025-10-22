@@ -138,6 +138,8 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     private DOMRpcRouter domRpcRouter;
     private MdsalRestconfStreamRegistry streamRegistry;
 
+    protected static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
+
     @Override
     protected BindingRuntimeContext getRuntimeContext() {
         return RUNTIME_CONTEXT_CACHE.getUnchecked(getModuleInfos());
@@ -224,7 +226,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
             ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000), RESTCONF,
-            MessageEncoding.JSON, serverStackGrouping);
+            MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE);
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory,
             configuration);
     }
