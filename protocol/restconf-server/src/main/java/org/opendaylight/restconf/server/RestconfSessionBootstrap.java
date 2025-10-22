@@ -15,23 +15,30 @@ import org.opendaylight.netconf.transport.http.ConcurrentHTTPServerSession;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.netconf.transport.http.HTTPServerSessionBootstrap;
 import org.opendaylight.netconf.transport.http.PipelinedHTTPServerSession;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 @NonNullByDefault
 final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
     private final EndpointRoot root;
+    private final Uint32 chunkSize;
 
-    RestconfSessionBootstrap(final HTTPScheme scheme, final EndpointRoot root) {
+    RestconfSessionBootstrap(final HTTPScheme scheme, final EndpointRoot root,
+            final Uint32 chunkSize) {
         super(scheme);
         this.root = requireNonNull(root);
+        this.chunkSize = requireNonNull(chunkSize);
     }
 
     @Override
     protected PipelinedHTTPServerSession configureHttp1(final ChannelHandlerContext ctx) {
-        return new RestconfSession(scheme, ctx.channel().remoteAddress(), root);
+        return new RestconfSession(scheme, ctx.channel().remoteAddress(), root, chunkSize);
     }
 
     @Override
     protected ConcurrentHTTPServerSession configureHttp2(final ChannelHandlerContext ctx) {
-        return new ConcurrentRestconfSession(scheme, ctx.channel().remoteAddress(), root);
+        // FIXME: Do not use chunk size for Http2
+        //        PipelinedHTTPServerSession and ConcurrentRestconfSession extends abstract HTTPServerSession where
+        //        we need chunk size only for HTTP1. Remove it from this implementation
+        return new ConcurrentRestconfSession(scheme, ctx.channel().remoteAddress(), root, chunkSize);
     }
 }
