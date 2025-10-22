@@ -122,6 +122,7 @@ class HttpClientServerTest {
     private static final Map<String, String> USER_HASHES_MAP = Map.of(USERNAME, "$0$" + PASSWORD);
     private static final AtomicInteger COUNTER = new AtomicInteger(0);
     private static final String[] METHODS = {"GET", "POST", "PUT", "PATCH", "DELETE"};
+    private static final int CHUNK_SIZE = 256 * 1024;
 
     private static final AuthHandlerFactory CUSTOM_AUTH_HANDLER_FACTORY =
         () -> new AbstractBasicAuthHandler<String>() {
@@ -162,7 +163,7 @@ class HttpClientServerTest {
             channel.channel().pipeline().addLast(new HTTPServerSessionBootstrap(channel.scheme()) {
                 @Override
                 protected PipelinedHTTPServerSession configureHttp1(final ChannelHandlerContext ctx) {
-                    return new PipelinedHTTPServerSession(scheme) {
+                    return new PipelinedHTTPServerSession(scheme, CHUNK_SIZE) {
                         @Override
                         protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
                                 final HttpHeaders headers) {
@@ -173,7 +174,7 @@ class HttpClientServerTest {
 
                 @Override
                 protected ConcurrentHTTPServerSession configureHttp2(final ChannelHandlerContext ctx) {
-                    return new ConcurrentHTTPServerSession(scheme) {
+                    return new ConcurrentHTTPServerSession(scheme, CHUNK_SIZE) {
                         @Override
                         protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
                                 final HttpHeaders headers) {

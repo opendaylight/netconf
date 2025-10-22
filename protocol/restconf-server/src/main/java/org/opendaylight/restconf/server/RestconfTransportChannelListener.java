@@ -29,6 +29,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     private static final Logger LOG = LoggerFactory.getLogger(RestconfTransportChannelListener.class);
 
     private final EndpointRoot root;
+    private final int chunkSize;
 
     RestconfTransportChannelListener(final RestconfServer server, final RestconfStream.Registry streamRegistry,
             final PrincipalService principalService, final NettyEndpointConfiguration configuration) {
@@ -59,6 +60,8 @@ final class RestconfTransportChannelListener implements TransportChannelListener
             "subscriptions",
             new SubscriptionsResource(invariants, streamRegistry, heartbeatIntervalMillis, maximumFragmentLength)));
 
+        chunkSize = configuration.chunkSize();
+
         LOG.info("Initialized with service {}", server.getClass());
         LOG.info("Initialized with base path: {}, default encoding: {}, default pretty print: {}", restconf,
             configuration.defaultEncoding(), configuration.prettyPrint().value());
@@ -70,7 +73,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
     @Override
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
-        channel.channel().pipeline().addLast(new RestconfSessionBootstrap(channel.scheme(), root));
+        channel.channel().pipeline().addLast(new RestconfSessionBootstrap(channel.scheme(), root, chunkSize));
     }
 
     @Override
