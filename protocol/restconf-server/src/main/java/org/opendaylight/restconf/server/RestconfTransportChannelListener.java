@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.server;
 
+import static java.util.Objects.requireNonNull;
+
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -29,9 +31,11 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     private static final Logger LOG = LoggerFactory.getLogger(RestconfTransportChannelListener.class);
 
     private final EndpointRoot root;
+    private final NettyEndpointConfiguration configuration;
 
     RestconfTransportChannelListener(final RestconfServer server, final RestconfStream.Registry streamRegistry,
             final PrincipalService principalService, final NettyEndpointConfiguration configuration) {
+        this.configuration = requireNonNull(configuration);
         // Reconstruct root API path in encoded form
         final var apiRootPath = configuration.apiRootPath();
         final var sb = new StringBuilder();
@@ -70,7 +74,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
     @Override
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
-        channel.channel().pipeline().addLast(new RestconfSessionBootstrap(channel.scheme(), root));
+        channel.channel().pipeline().addLast(new RestconfSessionBootstrap(channel.scheme(), root, configuration));
     }
 
     @Override

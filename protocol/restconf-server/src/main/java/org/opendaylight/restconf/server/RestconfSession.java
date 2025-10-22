@@ -23,6 +23,7 @@ import org.opendaylight.netconf.transport.http.PipelinedHTTPServerSession;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.DefaultTransportSession;
+import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 
 /**
  * HTTP/1.1 RESTCONF session, as defined in <a href="https://www.rfc-editor.org/rfc/rfc8650#section-3.1">RFC8650</a>.
@@ -34,8 +35,9 @@ final class RestconfSession extends PipelinedHTTPServerSession {
     private final @NonNull EndpointRoot root;
 
     @NonNullByDefault
-    RestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root) {
-        super(scheme);
+    RestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root,
+            final EndpointConfiguration configuration) {
+        super(scheme, configuration);
         this.root = requireNonNull(root);
         transportSession = new DefaultTransportSession(new HttpDescription(scheme, remoteAddress));
     }

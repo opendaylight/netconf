@@ -19,19 +19,22 @@ import org.opendaylight.netconf.transport.http.PipelinedHTTPServerSession;
 @NonNullByDefault
 final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
     private final EndpointRoot root;
+    private final NettyEndpointConfiguration configuration;
 
-    RestconfSessionBootstrap(final HTTPScheme scheme, final EndpointRoot root) {
+    RestconfSessionBootstrap(final HTTPScheme scheme, final EndpointRoot root,
+            final NettyEndpointConfiguration configuration) {
         super(scheme);
         this.root = requireNonNull(root);
+        this.configuration = requireNonNull(configuration);
     }
 
     @Override
     protected PipelinedHTTPServerSession configureHttp1(final ChannelHandlerContext ctx) {
-        return new RestconfSession(scheme, ctx.channel().remoteAddress(), root);
+        return new RestconfSession(scheme, ctx.channel().remoteAddress(), root, configuration);
     }
 
     @Override
     protected ConcurrentHTTPServerSession configureHttp2(final ChannelHandlerContext ctx) {
-        return new ConcurrentRestconfSession(scheme, ctx.channel().remoteAddress(), root);
+        return new ConcurrentRestconfSession(scheme, ctx.channel().remoteAddress(), root, configuration);
     }
 }
