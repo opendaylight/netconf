@@ -15,6 +15,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceInstance;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceProvider;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
+import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -27,11 +28,14 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true)
 public final class OpenApiResourceProvider implements WebHostResourceProvider {
     private final OpenApiService service;
+    private final JaxRsEndpoint endpoint;
 
     @Inject
     @Activate
-    public OpenApiResourceProvider(@Reference final OpenApiService service) {
+    public OpenApiResourceProvider(@Reference final OpenApiService service,
+            @Reference final JaxRsEndpoint jaxrsEndpoint) {
         this.service = requireNonNull(service);
+        this.endpoint = requireNonNull(jaxrsEndpoint);
     }
 
     @Override
@@ -41,6 +45,6 @@ public final class OpenApiResourceProvider implements WebHostResourceProvider {
 
     @Override
     public WebHostResourceInstance createInstance(final String path) {
-        return new OpenApiResourceInstance(path, service);
+        return new OpenApiResourceInstance(path, service, endpoint.configuration().chunkSize());
     }
 }
