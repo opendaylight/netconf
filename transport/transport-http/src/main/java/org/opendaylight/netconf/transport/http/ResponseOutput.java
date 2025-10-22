@@ -37,19 +37,37 @@ public final class ResponseOutput {
         this.streamId = streamId;
     }
 
+    public ResponseBodyOutputStream start(final HttpResponseStatus status, final int chunkSize) {
+        return start(status, null, chunkSize);
+    }
+
     public ResponseBodyOutputStream start(final HttpResponseStatus status) {
-        return start(status, null);
+        // FIXME
+        return start(status, null, 16 * 1024);
+    }
+
+    public ResponseBodyOutputStream start(final HttpResponseStatus status, final AsciiString name,
+            final CharSequence value, final int chunkSize) {
+        return start(status, new ReadOnlyHttpHeaders(HeadersResponse.VALIDATE_HEADERS, name, value), chunkSize);
     }
 
     public ResponseBodyOutputStream start(final HttpResponseStatus status, final AsciiString name,
             final CharSequence value) {
-        return start(status, new ReadOnlyHttpHeaders(HeadersResponse.VALIDATE_HEADERS, name, value));
+        // FIXME
+        return start(status, new ReadOnlyHttpHeaders(HeadersResponse.VALIDATE_HEADERS, name, value), 16 * 1024);
+    }
+
+    public ResponseBodyOutputStream start(final HttpResponseStatus status,
+            final @Nullable ReadOnlyHttpHeaders headers, final int chunkSize) {
+        return new ResponseBodyOutputStream(ctx, status, headers != null ? headers : HeadersResponse.EMPTY_HEADERS,
+            version, streamId, chunkSize);
     }
 
     public ResponseBodyOutputStream start(final HttpResponseStatus status,
             final @Nullable ReadOnlyHttpHeaders headers) {
+        // FIXME
         return new ResponseBodyOutputStream(ctx, status, headers != null ? headers : HeadersResponse.EMPTY_HEADERS,
-            version, streamId);
+            version, streamId, 16 * 1024);
     }
 
     @Override

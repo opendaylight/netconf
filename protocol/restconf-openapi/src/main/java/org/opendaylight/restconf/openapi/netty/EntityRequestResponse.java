@@ -27,15 +27,17 @@ final class EntityRequestResponse extends AbstractFiniteResponse {
         new ReadOnlyHttpHeaders(false, HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
 
     private final OpenApiEntity entity;
+    private final int chunkSize;
 
-    EntityRequestResponse(final OpenApiEntity entity) {
+    EntityRequestResponse(final OpenApiEntity entity, final int chunkSize) {
         super(HttpResponseStatus.OK);
         this.entity = requireNonNull(entity);
+        this.chunkSize = chunkSize;
     }
 
     @Override
     public void writeTo(final ResponseOutput output) throws IOException {
-        try (var out = output.start(status(), HEADERS)) {
+        try (var out = output.start(status(), HEADERS, chunkSize)) {
             final var generator = FACTORY.createGenerator(out);
             try {
                 entity.generate(generator);
