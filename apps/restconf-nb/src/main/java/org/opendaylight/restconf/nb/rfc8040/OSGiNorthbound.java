@@ -76,6 +76,12 @@ public final class OSGiNorthbound {
             The value of RFC8040 {+restconf} URI template, pointing to the root resource. Must not end with '/'.""")
         String restconf() default "rests";
 
+        @AttributeDefinition(
+            name = "HTTP/1.1 outbound chunk size (bytes)",
+            description = "Size of each chunk emitted in HTTP/1.1 responses. Must be >= 1.",
+            min = "1")
+        int http1$_$chunk$_$size() default 262144; // 256 KiB
+
         @AttributeDefinition(min = "1")
         String ping$_$executor$_$name$_$prefix() default JaxRsEndpointConfiguration.DEFAULT_NAME_PREFIX;
 
@@ -210,7 +216,8 @@ public final class OSGiNorthbound {
             PrettyPrintParam.of(configuration.pretty$_$print()),
             Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
             Uint32.valueOf(configuration.heartbeat$_$interval()), configuration.restconf(),
-            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count()));
+            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count(),
+            configuration.http1$_$chunk$_$size()));
     }
 
     private static Map<String, ?> newNettyEndpointProps(final BootstrapFactory bootstrapFactory,
@@ -230,7 +237,8 @@ public final class OSGiNorthbound {
             PrettyPrintParam.of(configuration.pretty$_$print()),
             Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
             Uint32.valueOf(configuration.heartbeat$_$interval()), configuration.api$_$root$_$path(),
-            parseDefaultEncoding(configuration.default$_$encoding()), new HttpServerStackConfiguration(transport))
+            parseDefaultEncoding(configuration.default$_$encoding()), new HttpServerStackConfiguration(transport),
+            configuration.http1$_$chunk$_$size())
         );
     }
 
