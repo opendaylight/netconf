@@ -28,13 +28,15 @@ public abstract class EndpointConfiguration {
     private final @NonNull PrettyPrintParam prettyPrint;
     private final @NonNull Uint16 sseMaximumFragmentLength;
     private final @NonNull Uint32 sseHeartbeatIntervalMillis;
+    private final @NonNull int chunkSize;
 
     protected EndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
-            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis) {
+            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final int chunkSize) {
         this.errorTagMapping = requireNonNull(errorTagMapping);
         this.prettyPrint = requireNonNull(prettyPrint);
         this.sseMaximumFragmentLength = requireNonNull(sseMaximumFragmentLength);
         this.sseHeartbeatIntervalMillis = requireNonNull(sseHeartbeatIntervalMillis);
+        this.chunkSize = chunkSize;
 
         final var fragSize = sseMaximumFragmentLength.toJava();
         if (fragSize != 0 && fragSize < SSE_MAXIMUM_FRAGMENT_LENGTH_MAX) {
@@ -68,6 +70,15 @@ public abstract class EndpointConfiguration {
      */
     public final Uint32 sseHeartbeatIntervalMillis() {
         return sseHeartbeatIntervalMillis;
+    }
+
+    /**
+     * Maximum number of response bytes buffered before switching to chunked flushing.
+     *
+     * @return HTTP/1.1 response chunk size
+     */
+    public int chunkSize() {
+        return chunkSize;
     }
 
     @Override

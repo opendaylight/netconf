@@ -11,7 +11,7 @@ package org.opendaylight.netconf.transport.http;
  * A concurrent HTTP/2+ server session.
  */
 public abstract non-sealed class ConcurrentHTTPServerSession extends HTTPServerSession {
-    protected ConcurrentHTTPServerSession(final HTTPScheme scheme) {
-        super(scheme);
+    protected ConcurrentHTTPServerSession(final HTTPScheme scheme, final int chunkSize) {
+        super(scheme, chunkSize);
     }
 }

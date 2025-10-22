@@ -55,10 +55,12 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
 
     private final OpenApiService service;
+    private final int chunkSize;
 
-    OpenApiResourceInstance(final String path, final OpenApiService service) {
+    OpenApiResourceInstance(final String path, final OpenApiService service, final int chunkSize) {
         super(path);
         this.service = requireNonNull(service);
+        this.chunkSize = chunkSize;
     }
 
     @Override
@@ -105,7 +107,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         return switch (next) {
             case "mounts" -> peeler.hasNext() ? apiMounts(method, targetUri, peeler)
                 : switch (method) {
-                    case GET -> new EntityRequestResponse(service.getListOfMounts());
+                    case GET -> new EntityRequestResponse(service.getListOfMounts(), chunkSize);
                     case HEAD -> JSON_OK;
                     case OPTIONS -> GHO_OK;
                     default -> GHO_METHOD_NOT_ALLOWED;
@@ -135,7 +137,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         } catch (IOException e) {
             return new ExceptionRequestResponse(e);
         }
-        return withContent ? new EntityRequestResponse(entity) : JSON_OK;
+        return withContent ? new EntityRequestResponse(entity, chunkSize) : JSON_OK;
     }
 
     private Response apiMounts(final ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler) {
@@ -176,7 +178,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         } catch (IOException e) {
             return new ExceptionRequestResponse(e);
         }
-        return withContent ? new EntityRequestResponse(entity) : JSON_OK;
+        return withContent ? new EntityRequestResponse(entity, chunkSize) : JSON_OK;
     }
 
     private Response prepareMountsInstanceMeta(final ImplementedMethod method, final URI targetUri,
@@ -200,7 +202,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         } catch (IOException e) {
             return new ExceptionRequestResponse(e);
         }
-        return withContent ? new EntityRequestResponse(entity) : JSON_OK;
+        return withContent ? new EntityRequestResponse(entity, chunkSize) : JSON_OK;
     }
 
     private Response prepareMountsInstanceModule(final ImplementedMethod method, final URI targetUri,
@@ -226,7 +228,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         } catch (IOException e) {
             return new ExceptionRequestResponse(e);
         }
-        return withContent ? new EntityRequestResponse(entity) : JSON_OK;
+        return withContent ? new EntityRequestResponse(entity, chunkSize) : JSON_OK;
     }
 
     private Response single(final ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler) {
@@ -259,7 +261,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         } catch (IOException e) {
             return new ExceptionRequestResponse(e);
         }
-        return withContent ? new EntityRequestResponse(entity) : JSON_OK;
+        return withContent ? new EntityRequestResponse(entity, chunkSize) : JSON_OK;
     }
 
     private Response singleMeta(final URI targetUri, final boolean withContent) {
@@ -273,7 +275,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         } catch (IOException e) {
             return new ExceptionRequestResponse(e);
         }
-        return withContent ? new EntityRequestResponse(entity) : JSON_OK;
+        return withContent ? new EntityRequestResponse(entity, chunkSize) : JSON_OK;
     }
 
     // the /explorer resource
