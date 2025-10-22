@@ -51,14 +51,20 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     private final @NonNull HttpServerStackGrouping transportConfiguration;
     private final @NonNull List<String> apiRootPath;
     private final @NonNull MessageEncoding defaultEncoding;
+    private final @NonNull Uint32 chunkSize;
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
             final List<String> apiRootPath, final MessageEncoding defaultEncoding,
-            final HttpServerStackGrouping transportConfiguration) {
+            final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize) {
         super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
         this.transportConfiguration = requireNonNull(transportConfiguration);
         this.defaultEncoding = requireNonNull(defaultEncoding);
+
+        if (chunkSize.intValue() < 1) {
+            throw new IllegalArgumentException("Chunks have to have at least one byte");
+        }
+        this.chunkSize = chunkSize;
 
         if (apiRootPath.isEmpty()) {
             throw new IllegalArgumentException("empty apiRootPath");
@@ -71,15 +77,16 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
-            final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration) {
+            final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration,
+            final Uint32 chunkSize) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
-            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration);
+            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize);
     }
 
     @Beta
-    public NettyEndpointConfiguration(final HttpServerStackGrouping transportConfiguration) {
+    public NettyEndpointConfiguration(final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize) {
         this(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO, Uint32.valueOf(10_000), "restconf",
-            MessageEncoding.JSON, transportConfiguration);
+            MessageEncoding.JSON, transportConfiguration, chunkSize);
     }
 
     /**
@@ -155,6 +162,13 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     @Beta
     public @NonNull MessageEncoding defaultEncoding() {
         return defaultEncoding;
+    }
+
+    /**
+     * {@return size of HTTP/1.1 response chunk}
+     */
+    public Uint32 chunkSize() {
+        return chunkSize;
     }
 
     @Override

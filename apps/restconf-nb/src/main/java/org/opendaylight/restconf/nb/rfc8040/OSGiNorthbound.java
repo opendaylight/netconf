@@ -119,6 +119,12 @@ public final class OSGiNorthbound {
                 single segment, i.e. must be correctly percent-encoded by clients attempting to access it.
             """)
         String api$_$root$_$path() default "restconf";
+
+        @AttributeDefinition(
+            name = "HTTP/1.1 outbound chunk size (bytes)",
+            description = "Size of each chunk emitted in HTTP/1.1 responses. Must be >= 1.",
+            min = "1")
+        int http1$_$chunk$_$size() default 262144; // 256 KiB
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
@@ -230,7 +236,8 @@ public final class OSGiNorthbound {
             PrettyPrintParam.of(configuration.pretty$_$print()),
             Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
             Uint32.valueOf(configuration.heartbeat$_$interval()), configuration.api$_$root$_$path(),
-            parseDefaultEncoding(configuration.default$_$encoding()), new HttpServerStackConfiguration(transport))
+            parseDefaultEncoding(configuration.default$_$encoding()), new HttpServerStackConfiguration(transport),
+            Uint32.valueOf(configuration.http1$_$chunk$_$size()))
         );
     }
 
