@@ -28,19 +28,30 @@ public abstract class EndpointConfiguration {
     private final @NonNull PrettyPrintParam prettyPrint;
     private final @NonNull Uint16 sseMaximumFragmentLength;
     private final @NonNull Uint32 sseHeartbeatIntervalMillis;
+    private final @NonNull Uint32 chunkSize;
 
     protected EndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
-            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis) {
+            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final Uint32 chunkSize) {
         this.errorTagMapping = requireNonNull(errorTagMapping);
         this.prettyPrint = requireNonNull(prettyPrint);
         this.sseMaximumFragmentLength = requireNonNull(sseMaximumFragmentLength);
         this.sseHeartbeatIntervalMillis = requireNonNull(sseHeartbeatIntervalMillis);
+        this.chunkSize = requireNonNull(chunkSize);
+        if (chunkSize.intValue() < 1) {
+            throw new IllegalArgumentException("Chunks have to have at least one byte");
+        }
 
         final var fragSize = sseMaximumFragmentLength.toJava();
         if (fragSize != 0 && fragSize < SSE_MAXIMUM_FRAGMENT_LENGTH_MAX) {
             throw new IllegalArgumentException(
                 "Maximum fragment length must be disabled (0) or specified by positive value less than 64KiB");
         }
+    }
+
+    protected EndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
+            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis) {
+        this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
+            Uint32.valueOf(256 * 1024));
     }
 
     public final ErrorTagMapping errorTagMapping() {
@@ -68,6 +79,13 @@ public abstract class EndpointConfiguration {
      */
     public final Uint32 sseHeartbeatIntervalMillis() {
         return sseHeartbeatIntervalMillis;
+    }
+
+    /**
+     * {@return size of HTTP/1.1 response chunk}
+     */
+    public final Uint32 chunkSize() {
+        return chunkSize;
     }
 
     @Override

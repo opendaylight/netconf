@@ -71,6 +71,7 @@ import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 @ExtendWith(MockitoExtension.class)
 class HttpClientServerTest {
@@ -122,6 +123,7 @@ class HttpClientServerTest {
     private static final Map<String, String> USER_HASHES_MAP = Map.of(USERNAME, "$0$" + PASSWORD);
     private static final AtomicInteger COUNTER = new AtomicInteger(0);
     private static final String[] METHODS = {"GET", "POST", "PUT", "PATCH", "DELETE"};
+    private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
 
     private static final AuthHandlerFactory CUSTOM_AUTH_HANDLER_FACTORY =
         () -> new AbstractBasicAuthHandler<String>() {
@@ -162,7 +164,7 @@ class HttpClientServerTest {
             channel.channel().pipeline().addLast(new HTTPServerSessionBootstrap(channel.scheme()) {
                 @Override
                 protected PipelinedHTTPServerSession configureHttp1(final ChannelHandlerContext ctx) {
-                    return new PipelinedHTTPServerSession(scheme) {
+                    return new PipelinedHTTPServerSession(scheme, CHUNK_SIZE) {
                         @Override
                         protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
                                 final HttpHeaders headers) {
@@ -173,7 +175,7 @@ class HttpClientServerTest {
 
                 @Override
                 protected ConcurrentHTTPServerSession configureHttp2(final ChannelHandlerContext ctx) {
-                    return new ConcurrentHTTPServerSession(scheme) {
+                    return new ConcurrentHTTPServerSession(scheme, CHUNK_SIZE) {
                         @Override
                         protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
                                 final HttpHeaders headers) {
