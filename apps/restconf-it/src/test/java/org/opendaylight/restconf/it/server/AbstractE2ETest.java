@@ -121,6 +121,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     private static final String USERNAME = "username";
     private static final String PASSWORD = "pa$$w0Rd";
     private static final Map<String, String> NS_CONTEXT = Map.of("r", "urn:ietf:params:xml:ns:yang:ietf-restconf");
+    private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
 
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String APPLICATION_XML = "application/xml";
@@ -225,7 +226,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
             ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000),
-            "rests", MessageEncoding.JSON, serverStackGrouping);
+            "rests", MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE);
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory, configuration);
     }
 
