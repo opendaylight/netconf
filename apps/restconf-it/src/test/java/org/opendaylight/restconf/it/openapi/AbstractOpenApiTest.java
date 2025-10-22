@@ -227,7 +227,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
         // FIXME use constructor that has NettyEndpoint as parameter when we migrate to Netty in the future.
         final var openApiService = new OpenApiServiceImpl(mountPointOpenApiGeneratorRFC8040,
             new OpenApiGeneratorRFC8040(openApiSchemaService, RESTS));
-        final var openApiResourceProvider = new OpenApiResourceProvider(openApiService);
+        final var openApiResourceProvider = new OpenApiResourceProvider(openApiService, null);
         endpoint.registerWebResource(openApiResourceProvider);
     }
 

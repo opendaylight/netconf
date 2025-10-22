@@ -37,19 +37,19 @@ public final class ResponseOutput {
         this.streamId = streamId;
     }
 
-    public ResponseBodyOutputStream start(final HttpResponseStatus status) {
-        return start(status, null);
+    public ResponseBodyOutputStream start(final HttpResponseStatus status, final int chunkSize) {
+        return start(status, null, chunkSize);
     }
 
     public ResponseBodyOutputStream start(final HttpResponseStatus status, final AsciiString name,
-            final CharSequence value) {
-        return start(status, new ReadOnlyHttpHeaders(HeadersResponse.VALIDATE_HEADERS, name, value));
+            final CharSequence value, final int chunkSize) {
+        return start(status, new ReadOnlyHttpHeaders(HeadersResponse.VALIDATE_HEADERS, name, value), chunkSize);
     }
 
     public ResponseBodyOutputStream start(final HttpResponseStatus status,
-            final @Nullable ReadOnlyHttpHeaders headers) {
+            final @Nullable ReadOnlyHttpHeaders headers, final int chunkSize) {
         return new ResponseBodyOutputStream(ctx, status, headers != null ? headers : HeadersResponse.EMPTY_HEADERS,
-            version, streamId);
+            version, streamId, chunkSize);
     }
 
     @Override
