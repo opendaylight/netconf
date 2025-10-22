@@ -45,7 +45,17 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
+import org.opendaylight.aaa.cert.impl.CertificateManagerService;
+import org.opendaylight.aaa.filterchain.configuration.impl.CustomFilterAdapterConfigurationImpl;
+import org.opendaylight.aaa.impl.password.service.DefaultPasswordHashService;
+import org.opendaylight.aaa.shiro.realm.EmptyRealmAuthProvider;
+import org.opendaylight.aaa.shiro.web.env.AAAWebEnvironment;
+import org.opendaylight.aaa.shiro.web.env.ShiroWebContextSecurer;
+import org.opendaylight.aaa.tokenauthrealm.auth.AuthenticationManager;
+import org.opendaylight.aaa.web.jetty.JettyWebServer;
+import org.opendaylight.aaa.web.servlet.jersey2.JerseyServletSupport;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
+import org.opendaylight.mdsal.binding.dom.adapter.BindingDOMDataBrokerAdapter;
 import org.opendaylight.mdsal.binding.dom.adapter.BindingDOMRpcProviderServiceAdapter;
 import org.opendaylight.mdsal.binding.dom.adapter.ConstantAdapterContext;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractDataBrokerTest;
@@ -86,6 +96,8 @@ import org.opendaylight.restconf.server.AAAShiroPrincipalService;
 import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
 import org.opendaylight.restconf.server.SimpleNettyEndpoint;
+import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
+import org.opendaylight.restconf.server.jaxrs.JaxRsEndpointConfiguration;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
@@ -93,6 +105,8 @@ import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.stack.grouping.Transport;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.aaa.app.config.rev170619.ShiroConfigurationBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.aaa.cert.rev151126.AaaCertServiceConfigBuilder;
 import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecServices;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -111,6 +125,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
     private static final String DEVICE_NODE_URI = TOPOLOGY_URI + "/node=device-sim";
     private static final String DEVICE_STATUS_URI =
         DEVICE_NODE_URI + "/netconf-node-topology:netconf-node?fields=connection-status";
+    private static final int CHUNK_SIZE = 256 * 1024;
 
     protected static final String DEVICE_USERNAME = "device-username";
     protected static final String DEVICE_PASSWORD = "device-password";
@@ -213,7 +228,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
             ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000),
-            RESTS, MessageEncoding.JSON, serverStackGrouping);
+            RESTS, MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE);
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory,
             configuration);
 
@@ -221,13 +236,35 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
         final var openApiSchemaContext = YangParserTestUtils.parseYangResourceDirectory("/toaster/");
         final var openApiSchemaService = new FixedDOMSchemaService(openApiSchemaContext);
 
+        // JaxRs endpoint
+        final var passwordHashService = new DefaultPasswordHashService();
+        final var realmAuthProvider = new EmptyRealmAuthProvider();
+        final var authManager = new AuthenticationManager();
+        final var servletSupport = new JerseyServletSupport();
+        final var dataBroker = new BindingDOMDataBrokerAdapter(adapterContext, domDataBroker);
+        final var shiroConfig = new ShiroConfigurationBuilder().build();
+        final var certService = new AaaCertServiceConfigBuilder().setUseConfig(false).build();
+        final var encryptionService = new NullAAAEncryptionService();
+        final var certificateManager = new CertificateManagerService(rpcProviderService, dataBroker, encryptionService,
+            certService);
+        final var webEnvironment = new AAAWebEnvironment(shiroConfig, dataBroker, certificateManager, authManager,
+            realmAuthProvider, passwordHashService, servletSupport);
+        final var webContextSecurer = new ShiroWebContextSecurer(webEnvironment);
+        final var jaxRsConfig = new JaxRsEndpointConfiguration(
+            ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000), RESTS, CHUNK_SIZE);
+
+        final var filterAdapterConfiguration = new CustomFilterAdapterConfigurationImpl();
+        final var webServer = new JettyWebServer(randomBindablePort());
+        final var jaxRsEndpoint = new JaxRsEndpoint(webServer, webContextSecurer, servletSupport,
+            filterAdapterConfiguration, server, streamRegistry, jaxRsConfig);
+
         // OpenApi
         final var mountPointOpenApiGeneratorRFC8040 = new MountPointOpenApiGeneratorRFC8040(openApiSchemaService,
             domMountPointService, RESTS);
         // FIXME use constructor that has NettyEndpoint as parameter when we migrate to Netty in the future.
         final var openApiService = new OpenApiServiceImpl(mountPointOpenApiGeneratorRFC8040,
             new OpenApiGeneratorRFC8040(openApiSchemaService, RESTS));
-        final var openApiResourceProvider = new OpenApiResourceProvider(openApiService);
+        final var openApiResourceProvider = new OpenApiResourceProvider(openApiService, jaxRsEndpoint);
         endpoint.registerWebResource(openApiResourceProvider);
     }
 
