@@ -37,6 +37,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,20 +86,22 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
     //        reconsider the design
 
     private final HTTPScheme scheme;
+    private final EndpointConfiguration configuration;
 
     // Only valid when the session is attached to a Channel
     private ServerRequestExecutor executor;
     private ResponseWriter responseWriter;
 
-    protected HTTPServerSession(final HTTPScheme scheme) {
+    protected HTTPServerSession(final HTTPScheme scheme, final EndpointConfiguration configuration) {
         super(FullHttpRequest.class, false);
         this.scheme = requireNonNull(scheme);
+        this.configuration = configuration;
     }
 
     @Override
     public void handlerAdded(final ChannelHandlerContext ctx) {
         final var channel = ctx.channel();
-        executor = new ServerRequestExecutor(channel.remoteAddress().toString(), this);
+        executor = new ServerRequestExecutor(channel.remoteAddress().toString(), this, configuration.chunkSize());
         LOG.debug("Threadpools for {} started", channel);
 
         responseWriter = new ResponseWriter();

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
@@ -55,8 +56,8 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
             final List<String> apiRootPath, final MessageEncoding defaultEncoding,
-            final HttpServerStackGrouping transportConfiguration) {
-        super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
+            final HttpServerStackGrouping transportConfiguration, final int chunkSize) {
+        super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis, chunkSize);
         this.transportConfiguration = requireNonNull(transportConfiguration);
         this.defaultEncoding = requireNonNull(defaultEncoding);
 
@@ -71,15 +72,17 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
-            final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration) {
+            final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration,
+            final int chunkSize) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
-            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration);
+            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize);
     }
 
     @Beta
-    public NettyEndpointConfiguration(final HttpServerStackGrouping transportConfiguration) {
+    public NettyEndpointConfiguration(final HttpServerStackGrouping transportConfiguration,
+            final int chunkSize) {
         this(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO, Uint32.valueOf(10_000), "restconf",
-            MessageEncoding.JSON, transportConfiguration);
+            MessageEncoding.JSON, transportConfiguration, chunkSize);
     }
 
     /**

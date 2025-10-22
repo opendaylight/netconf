@@ -31,8 +31,8 @@ public final class JaxRsEndpointConfiguration extends EndpointConfiguration {
 
     public JaxRsEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String restconf,
-            final String pingNamePrefix, final int pingCorePoolSize) {
-        super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
+            final String pingNamePrefix, final int pingCorePoolSize, final int chunkSize) {
+        super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis, chunkSize);
         if (restconf.endsWith("/")) {
             throw new IllegalArgumentException("restconf cannot end with '/'");
         }
@@ -42,9 +42,10 @@ public final class JaxRsEndpointConfiguration extends EndpointConfiguration {
     }
 
     public JaxRsEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
-            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String restconf) {
+            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String restconf,
+            final int chunkSize) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis, restconf,
-            DEFAULT_NAME_PREFIX, DEFAULT_CORE_POOL_SIZE);
+            DEFAULT_NAME_PREFIX, DEFAULT_CORE_POOL_SIZE, chunkSize);
     }
 
     /**
