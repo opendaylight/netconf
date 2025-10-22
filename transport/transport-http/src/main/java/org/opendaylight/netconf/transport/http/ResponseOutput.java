@@ -30,26 +30,44 @@ public final class ResponseOutput {
     private final ChannelHandlerContext ctx;
     private final HttpVersion version;
     private final @Nullable Integer streamId;
+    private final int http1ChunkSize;
 
-    ResponseOutput(final ChannelHandlerContext ctx, final HttpVersion version, final @Nullable Integer streamId) {
+    ResponseOutput(final ChannelHandlerContext ctx, final HttpVersion version, final @Nullable Integer streamId,
+            int http1ChunkSize) {
         this.ctx = requireNonNull(ctx);
         this.version = requireNonNull(version);
         this.streamId = streamId;
+        this.http1ChunkSize = http1ChunkSize;
+    }
+
+    public ResponseBodyOutputStream start(final HttpResponseStatus status, final int chunkSize) {
+        return start(status, null, chunkSize);
     }
 
     public ResponseBodyOutputStream start(final HttpResponseStatus status) {
-        return start(status, null);
+        return start(status, null, http1ChunkSize);
+    }
+
+    public ResponseBodyOutputStream start(final HttpResponseStatus status, final AsciiString name,
+            final CharSequence value, final int chunkSize) {
+        return start(status, new ReadOnlyHttpHeaders(HeadersResponse.VALIDATE_HEADERS, name, value), chunkSize);
     }
 
     public ResponseBodyOutputStream start(final HttpResponseStatus status, final AsciiString name,
             final CharSequence value) {
-        return start(status, new ReadOnlyHttpHeaders(HeadersResponse.VALIDATE_HEADERS, name, value));
+        return start(status, new ReadOnlyHttpHeaders(HeadersResponse.VALIDATE_HEADERS, name, value), http1ChunkSize);
+    }
+
+    public ResponseBodyOutputStream start(final HttpResponseStatus status,
+            final @Nullable ReadOnlyHttpHeaders headers, final int chunkSize) {
+        return new ResponseBodyOutputStream(ctx, status, headers != null ? headers : HeadersResponse.EMPTY_HEADERS,
+            version, streamId, chunkSize);
     }
 
     public ResponseBodyOutputStream start(final HttpResponseStatus status,
             final @Nullable ReadOnlyHttpHeaders headers) {
         return new ResponseBodyOutputStream(ctx, status, headers != null ? headers : HeadersResponse.EMPTY_HEADERS,
-            version, streamId);
+            version, streamId, http1ChunkSize);
     }
 
     @Override
