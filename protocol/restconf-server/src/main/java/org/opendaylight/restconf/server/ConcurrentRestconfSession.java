@@ -23,6 +23,7 @@ import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.DefaultTransportSession;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 /**
  * HTTP/2+ RESTCONF session, as defined in <a href="https://www.rfc-editor.org/rfc/rfc8650#section-3.1">RFC8650</a>.
@@ -34,8 +35,9 @@ final class ConcurrentRestconfSession extends ConcurrentHTTPServerSession {
     private final @NonNull EndpointRoot root;
 
     @NonNullByDefault
-    ConcurrentRestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root) {
-        super(scheme);
+    ConcurrentRestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root,
+            final Uint32 chunkSize) {
+        super(scheme, chunkSize);
         this.root = requireNonNull(root);
         transportSession = new DefaultTransportSession(new HttpDescription(scheme, remoteAddress));
     }

@@ -19,6 +19,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.AbstractFiniteResponse;
 import org.opendaylight.netconf.transport.http.ResponseOutput;
 import org.opendaylight.restconf.openapi.model.OpenApiEntity;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 @NonNullByDefault
 final class EntityRequestResponse extends AbstractFiniteResponse {
@@ -27,15 +28,17 @@ final class EntityRequestResponse extends AbstractFiniteResponse {
         new ReadOnlyHttpHeaders(false, HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
 
     private final OpenApiEntity entity;
+    private final Uint32 chunkSize;
 
-    EntityRequestResponse(final OpenApiEntity entity) {
+    EntityRequestResponse(final OpenApiEntity entity, final Uint32 chunkSize) {
         super(HttpResponseStatus.OK);
         this.entity = requireNonNull(entity);
+        this.chunkSize = requireNonNull(chunkSize);
     }
 
     @Override
     public void writeTo(final ResponseOutput output) throws IOException {
-        try (var out = output.start(status(), HEADERS)) {
+        try (var out = output.start(status(), HEADERS, chunkSize)) {
             final var generator = FACTORY.createGenerator(out);
             try {
                 entity.generate(generator);
