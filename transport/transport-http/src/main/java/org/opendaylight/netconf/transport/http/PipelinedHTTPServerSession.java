@@ -7,11 +7,13 @@
  */
 package org.opendaylight.netconf.transport.http;
 
+import org.opendaylight.restconf.server.spi.EndpointConfiguration;
+
 /**
  * An pipelined HTTP/1.1 server session.
  */
 public abstract non-sealed class PipelinedHTTPServerSession extends HTTPServerSession {
-    protected PipelinedHTTPServerSession(final HTTPScheme scheme) {
-        super(scheme);
+    protected PipelinedHTTPServerSession(final HTTPScheme scheme, final EndpointConfiguration configuration) {
+        super(scheme, configuration);
     }
 }
