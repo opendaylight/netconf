@@ -69,6 +69,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
+import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
 
@@ -142,6 +143,8 @@ class HttpClientServerTest {
     private TransportChannelListener<TransportChannel> serverTransportListener;
     @Mock
     private TransportChannelListener<TransportChannel> clientTransportListener;
+    @Mock
+    private EndpointConfiguration configuration;
 
     @BeforeAll
     static void beforeAll() {
@@ -157,12 +160,13 @@ class HttpClientServerTest {
     @BeforeEach
     void beforeEach() {
         // TODO: this looks like a spy() on a real implementation
+        doReturn(16 * 1024).when(configuration).chunkSize();
         doAnswer(inv -> {
             final var channel = inv.<HTTPTransportChannel>getArgument(0);
             channel.channel().pipeline().addLast(new HTTPServerSessionBootstrap(channel.scheme()) {
                 @Override
                 protected PipelinedHTTPServerSession configureHttp1(final ChannelHandlerContext ctx) {
-                    return new PipelinedHTTPServerSession(scheme) {
+                    return new PipelinedHTTPServerSession(scheme, configuration) {
                         @Override
                         protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
                                 final HttpHeaders headers) {
@@ -173,7 +177,7 @@ class HttpClientServerTest {
 
                 @Override
                 protected ConcurrentHTTPServerSession configureHttp2(final ChannelHandlerContext ctx) {
-                    return new ConcurrentHTTPServerSession(scheme) {
+                    return new ConcurrentHTTPServerSession(scheme, configuration) {
                         @Override
                         protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
                                 final HttpHeaders headers) {
