@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "759bbeab_f50eaf1e",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountSshAuthProvider.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-10-22T11:41:16Z",
+      "side": 1,
+      "message": "this does not look like the same thing: delete does not set current to null",
+      "range": {
+        "startLine": 241,
+        "startChar": 16,
+        "endLine": 241,
+        "endChar": 22
+      },
+      "revId": "9e08a2c6087d4589d91e8d8f348f188944a6afe0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
