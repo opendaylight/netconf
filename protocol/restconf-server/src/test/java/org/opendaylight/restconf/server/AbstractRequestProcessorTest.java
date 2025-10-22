@@ -104,7 +104,7 @@ class AbstractRequestProcessorTest {
             new EndpointRoot(principalService, WELL_KNOWN, Map.of(BASE_PATH.substring(1),
                 new APIResource(new EndpointInvariants(server, PRETTY_PRINT, ERROR_TAG_MAPPING, MessageEncoding.JSON,
                     URI.create("/rests/")),
-                List.of(), 1000, Integer.MAX_VALUE, streamRegistry))));
+                List.of(), 1000, Integer.MAX_VALUE, streamRegistry))), 256 * 1024);
         doReturn(channel).when(ctx).channel();
         doReturn(pipeline).when(ctx).pipeline();
         doReturn(pipeline).when(pipeline).addBefore(any(), isNull(), any());

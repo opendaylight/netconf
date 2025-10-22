@@ -34,8 +34,9 @@ final class RestconfSession extends PipelinedHTTPServerSession {
     private final @NonNull EndpointRoot root;
 
     @NonNullByDefault
-    RestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root) {
-        super(scheme);
+    RestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root,
+            final int chunkSize) {
+        super(scheme, chunkSize);
         this.root = requireNonNull(root);
         transportSession = new DefaultTransportSession(new HttpDescription(scheme, remoteAddress));
     }

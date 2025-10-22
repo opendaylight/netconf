@@ -142,6 +142,8 @@ class HttpClientServerTest {
     private TransportChannelListener<TransportChannel> serverTransportListener;
     @Mock
     private TransportChannelListener<TransportChannel> clientTransportListener;
+    @Mock
+    private int chunkSize;
 
     @BeforeAll
     static void beforeAll() {
@@ -162,7 +164,7 @@ class HttpClientServerTest {
             channel.channel().pipeline().addLast(new HTTPServerSessionBootstrap(channel.scheme()) {
                 @Override
                 protected PipelinedHTTPServerSession configureHttp1(final ChannelHandlerContext ctx) {
-                    return new PipelinedHTTPServerSession(scheme) {
+                    return new PipelinedHTTPServerSession(scheme, 256 * 1024) {
                         @Override
                         protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
                                 final HttpHeaders headers) {
@@ -173,7 +175,7 @@ class HttpClientServerTest {
 
                 @Override
                 protected ConcurrentHTTPServerSession configureHttp2(final ChannelHandlerContext ctx) {
-                    return new ConcurrentHTTPServerSession(scheme) {
+                    return new ConcurrentHTTPServerSession(scheme, chunkSize) {
                         @Override
                         protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
                                 final HttpHeaders headers) {
