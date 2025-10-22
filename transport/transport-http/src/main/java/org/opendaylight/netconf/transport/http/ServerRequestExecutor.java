@@ -27,6 +27,7 @@ import java.util.concurrent.RejectedExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,9 +56,11 @@ final class ServerRequestExecutor implements PendingRequestListener {
     private final ExecutorService reqExecutor;
     private final ExecutorService respExecutor;
     private final @NonNull HTTPServerSession session;
+    private final Uint32 chunkSize;
 
-    ServerRequestExecutor(final String threadNamePrefix, final HTTPServerSession session) {
+    ServerRequestExecutor(final String threadNamePrefix, final HTTPServerSession session, final Uint32 chunkSize) {
         this.session = requireNonNull(session);
+        this.chunkSize = requireNonNull(chunkSize);
         reqExecutor = Executors.newThreadPerTaskExecutor(Thread.ofVirtual()
             .name(threadNamePrefix + "-http-server-req-", 0)
             .inheritInheritableThreadLocals(false)
@@ -143,7 +146,7 @@ final class ServerRequestExecutor implements PendingRequestListener {
     private void writeResponse(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
             final HttpVersion version, final FiniteResponse response) {
         try {
-            response.writeTo(new ResponseOutput(ctx, version, streamId));
+            response.writeTo(new ResponseOutput(ctx, version, streamId, chunkSize));
         } catch (RuntimeException | IOException e) {
             LOG.warn("Internal error while processing response {}", response, e);
         }

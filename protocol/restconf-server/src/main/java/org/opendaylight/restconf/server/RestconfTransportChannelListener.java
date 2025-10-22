@@ -18,6 +18,7 @@ import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     private static final Logger LOG = LoggerFactory.getLogger(RestconfTransportChannelListener.class);
 
     private final EndpointRoot root;
+    private final Uint32 chunkSize;
 
     RestconfTransportChannelListener(final RestconfServer server, final RestconfStream.Registry streamRegistry,
             final PrincipalService principalService, final NettyEndpointConfiguration configuration) {
@@ -59,6 +61,8 @@ final class RestconfTransportChannelListener implements TransportChannelListener
             "subscriptions",
             new SubscriptionsResource(invariants, streamRegistry, heartbeatIntervalMillis, maximumFragmentLength)));
 
+        chunkSize = configuration.chunkSize();
+
         LOG.info("Initialized with service {}", server.getClass());
         LOG.info("Initialized with base path: {}, default encoding: {}, default pretty print: {}", restconf,
             configuration.defaultEncoding(), configuration.prettyPrint().value());
@@ -70,7 +74,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
     @Override
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
-        channel.channel().pipeline().addLast(new RestconfSessionBootstrap(channel.scheme(), root));
+        channel.channel().pipeline().addLast(new RestconfSessionBootstrap(channel.scheme(), root, chunkSize));
     }
 
     @Override
