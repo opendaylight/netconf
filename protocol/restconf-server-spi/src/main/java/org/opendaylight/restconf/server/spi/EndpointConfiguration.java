@@ -88,4 +88,8 @@ public abstract class EndpointConfiguration {
             .add("sseMaximumFragmentLength", sseMaximumFragmentLength.toJava())
             .add("sseHeartbeatIntervalMillis", sseHeartbeatIntervalMillis.toJava());
     }
+
+    public int chunkSize() {
+        return 16 * 1024;
+    }
 }
