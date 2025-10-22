@@ -213,7 +213,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
             ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000),
-            RESTS, MessageEncoding.JSON, serverStackGrouping);
+            RESTS, MessageEncoding.JSON, serverStackGrouping, 16 * 1024);
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory,
             configuration);
 
@@ -227,7 +227,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
         // FIXME use constructor that has NettyEndpoint as parameter when we migrate to Netty in the future.
         final var openApiService = new OpenApiServiceImpl(mountPointOpenApiGeneratorRFC8040,
             new OpenApiGeneratorRFC8040(openApiSchemaService, RESTS));
-        final var openApiResourceProvider = new OpenApiResourceProvider(openApiService);
+        final var openApiResourceProvider = new OpenApiResourceProvider(openApiService, null);
         endpoint.registerWebResource(openApiResourceProvider);
     }
 

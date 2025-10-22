@@ -53,8 +53,10 @@ final class ServerRequestExecutor implements PendingRequestListener {
     private final ConcurrentHashMap<PendingRequest<?>, RequestContext> pendingRequests = new ConcurrentHashMap<>();
     private final ExecutorService reqExecutor;
     private final ExecutorService respExecutor;
+    private final int http1ChunkSize;
 
-    ServerRequestExecutor(final String threadNamePrefix) {
+    ServerRequestExecutor(final String threadNamePrefix, int http1ChunkSize) {
+        this.http1ChunkSize = http1ChunkSize;
         reqExecutor = Executors.newThreadPerTaskExecutor(Thread.ofVirtual()
             .name(threadNamePrefix + "-http-server-req-", 0)
             .inheritInheritableThreadLocals(false)
@@ -140,7 +142,7 @@ final class ServerRequestExecutor implements PendingRequestListener {
     private void writeResponse(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
             final HttpVersion version, final FiniteResponse response) {
         try {
-            response.writeTo(new ResponseOutput(ctx, version, streamId));
+            response.writeTo(new ResponseOutput(ctx, version, streamId, http1ChunkSize));
         } catch (RuntimeException | IOException e) {
             LOG.warn("Internal error while processing response {}", response, e);
         }

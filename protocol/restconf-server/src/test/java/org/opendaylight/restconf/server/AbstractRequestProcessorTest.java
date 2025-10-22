@@ -46,6 +46,7 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.TestUtils.TestEncoding;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
+import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 
 @ExtendWith(MockitoExtension.class)
@@ -90,6 +91,8 @@ class AbstractRequestProcessorTest {
     @Mock
     private ChannelPipeline pipeline;
     @Mock
+    private EndpointConfiguration configuration;
+    @Mock
     private RestconfStream.Registry streamRegistry;
     @Captor
     private ArgumentCaptor<FullHttpResponse> responseCaptor;
@@ -100,11 +103,12 @@ class AbstractRequestProcessorTest {
 
     @BeforeEach
     void beforeEach() {
+        doReturn(16 * 1024).when(configuration).chunkSize();
         session = new RestconfSession(HTTPScheme.HTTP, new LocalAddress("test"),
             new EndpointRoot(principalService, WELL_KNOWN, Map.of(BASE_PATH.substring(1),
                 new APIResource(new EndpointInvariants(server, PRETTY_PRINT, ERROR_TAG_MAPPING, MessageEncoding.JSON,
                     URI.create("/rests/")),
-                List.of(), 1000, Integer.MAX_VALUE, streamRegistry))));
+                List.of(), 1000, Integer.MAX_VALUE, streamRegistry))), configuration);
         doReturn(channel).when(ctx).channel();
         doReturn(pipeline).when(ctx).pipeline();
         doReturn(pipeline).when(pipeline).addBefore(any(), isNull(), any());
