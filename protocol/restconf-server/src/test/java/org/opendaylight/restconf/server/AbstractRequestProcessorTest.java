@@ -47,10 +47,12 @@ import org.opendaylight.restconf.server.TestUtils.TestEncoding;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 @ExtendWith(MockitoExtension.class)
 class AbstractRequestProcessorTest {
     private static final PrettyPrintParam PRETTY_PRINT = PrettyPrintParam.FALSE;
+    private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
 
     protected static final String BASE_PATH = "/rests";
     protected static final String HOST = "somehost:1234";
@@ -104,7 +106,7 @@ class AbstractRequestProcessorTest {
             new EndpointRoot(principalService, WELL_KNOWN, Map.of(BASE_PATH.substring(1),
                 new APIResource(new EndpointInvariants(server, PRETTY_PRINT, ERROR_TAG_MAPPING, MessageEncoding.JSON,
                     URI.create("/rests/")),
-                List.of(), 1000, Integer.MAX_VALUE, streamRegistry))));
+                List.of(), 1000, Integer.MAX_VALUE, streamRegistry))), CHUNK_SIZE);
         doReturn(channel).when(ctx).channel();
         doReturn(pipeline).when(ctx).pipeline();
         doReturn(pipeline).when(pipeline).addBefore(any(), isNull(), any());
