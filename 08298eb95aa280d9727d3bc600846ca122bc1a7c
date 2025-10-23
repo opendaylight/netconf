@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c703235e_f4f9ef23",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-23T13:13:50Z",
+      "side": 1,
+      "message": "https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html\ntry-with-resources close all resources at the end, so IMO that would mean we would close netty executor? I don\u0027t think we want to do that.",
+      "parentUuid": "1fcef217_d8639ab7",
+      "revId": "08298eb95aa280d9727d3bc600846ca122bc1a7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ec73b4ca_fa3d31f6",
         "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
         "patchSetId": 24
