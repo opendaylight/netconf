@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "69c75e46_1f2043fc",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/PipeliningTest.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-23T12:54:32Z",
+      "side": 1,
+      "message": "why not to use single thread event loop?",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "705aa338_2ea411b2",
         "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/PipeliningTest.java",
         "patchSetId": 31
