@@ -52,6 +52,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9e2afc2_4d19ecdb",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-23T12:59:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ec73b4ca_fa3d31f6",
+      "revId": "08298eb95aa280d9727d3bc600846ca122bc1a7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9377cac7_df1147ad",
@@ -65,6 +83,24 @@
       "writtenOn": "2025-10-23T12:15:00Z",
       "side": 1,
       "message": "why its used here and not in other close methods?",
+      "revId": "08298eb95aa280d9727d3bc600846ca122bc1a7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5eec4576_928da3ff",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseBodyOutputStream.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-23T12:59:42Z",
+      "side": 1,
+      "message": "close in PendingBody and FirstChunk already calls session.respond() which trigger pipeline logic.\nhere close is called after chunked response was succesfully finished, there is no call for respond() so I added this to notify pipeline logic about finishing of response",
+      "parentUuid": "9377cac7_df1147ad",
       "revId": "08298eb95aa280d9727d3bc600846ca122bc1a7c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
