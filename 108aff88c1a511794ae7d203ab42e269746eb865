@@ -3,6 +3,108 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c607677a_6f0fe093",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/PipeliningIT.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-23T13:13:31Z",
+      "side": 1,
+      "message": "it would be better to compare something comparable - small is with witdh parameters and huge one without limits",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a219422f_d6ed1486",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/PipeliningIT.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-23T13:13:31Z",
+      "side": 1,
+      "message": "IMO: we can just use \\r\\n in message - no need to replace",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5aefb913_abd4303b",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/PipeliningIT.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-23T13:13:31Z",
+      "side": 1,
+      "message": "we are using UTF",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "907a2d21_19a2b2f3",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/PipeliningIT.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-23T13:13:31Z",
+      "side": 1,
+      "message": "we do not need this 2 elements loop",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c27410c5_3ddf9fbe",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/PipeliningIT.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-23T13:13:31Z",
+      "side": 1,
+      "message": "assert headers is not empty",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "232bc0e4_907c3d8a",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/PipeliningIT.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-23T13:13:31Z",
+      "side": 1,
+      "message": "BufferedInputStreamReader, etc. instead?",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4e4b47b9_c5f53ecc",
         "filename": "protocol/restconf-server/pom.xml",
         "patchSetId": 31
