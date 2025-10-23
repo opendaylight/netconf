@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataListener;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -58,7 +59,7 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
     @Inject
     public CallHomeMountSshAuthProvider(final @Reference DataBroker broker,
             final @Reference CallHomeMountStatusReporter statusReporter) {
-        configReg = broker.registerTreeChangeListener(LogicalDatastoreType.CONFIGURATION,
+        configReg = broker.registerDataListener(LogicalDatastoreType.CONFIGURATION,
             DataObjectIdentifier.builder(NetconfCallhomeServer.class).child(Global.class).build(), globalConfig);
 
         final var allowedDeviceWildcard = DataObjectReference.builder(NetconfCallhomeServer.class)
@@ -235,14 +236,12 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
         }
     }
 
-    private static final class GlobalConfig implements DataTreeChangeListener<Global> {
+    private static final class GlobalConfig implements DataListener<Global> {
         private volatile Global current = null;
 
         @Override
-        public void onDataTreeChanged(final List<DataTreeModification<Global>> mods) {
-            if (!mods.isEmpty()) {
-                current = mods.get(mods.size() - 1).getRootNode().dataAfter();
-            }
+        public void dataChangedTo(final Global data) {
+            current = data;
         }
 
         boolean allowedUnknownKeys() {
