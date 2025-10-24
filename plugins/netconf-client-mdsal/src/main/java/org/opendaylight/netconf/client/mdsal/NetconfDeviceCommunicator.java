@@ -277,8 +277,10 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         final var request = pollRequest();
         if (request == null) {
             // No matching request, bail out
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("{}: Ignoring unsolicited message {}", id, msgToS(message));
+            LOG.warn("{}: Ignoring unsolicited message with id {} ", id, message.getDocument().getDocumentElement()
+                .getAttribute(XmlNetconfConstants.MESSAGE_ID));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("{}: Received unsolicited message {}", id, msgToS(message));
             }
             return;
         }
