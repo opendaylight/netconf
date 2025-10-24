@@ -22,6 +22,30 @@
       },
       "revId": "1c077448673a525f094bc1a835663e6c0b808fa3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f688b99d_02185e3d",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/MonitoringSchemaSourceProvider.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-10-24T08:36:17Z",
+      "side": 1,
+      "message": "I have removed it as this task focus on timed-out to initial RPCs which produce CancellationException which can be directly caught in SchemaSetup.",
+      "parentUuid": "6fd72f62_3c6e2de4",
+      "range": {
+        "startLine": 118,
+        "startChar": 23,
+        "endLine": 118,
+        "endChar": 54
+      },
+      "revId": "1c077448673a525f094bc1a835663e6c0b808fa3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
