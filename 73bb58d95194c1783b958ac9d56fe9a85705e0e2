@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1a082566_070eb1f7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-24T14:14:19Z",
+      "side": 1,
+      "message": "Option #2 is currently here: https://git.opendaylight.org/gerrit/c/netconf/+/118145",
+      "parentUuid": "41ba67af_0101dca3",
+      "revId": "73bb58d95194c1783b958ac9d56fe9a85705e0e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4ece293d_f30d0535",
         "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStack.java",
         "patchSetId": 6
