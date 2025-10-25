@@ -48,7 +48,7 @@ abstract class AbstractEdit extends AbstractConfigOperation {
     static final void parseIntoNormalizedNode(final SchemaTreeInference inference, final XmlElement element,
                                               final NormalizedNodeStreamWriter writer) throws DocumentedException {
         final var path = inference.statementPath();
-        final var schemaNode = path.get(path.size() - 1);
+        final var schemaNode = path.getLast();
         if (!(schemaNode instanceof ContainerSchemaNode) && !(schemaNode instanceof ListSchemaNode)) {
             // This should never happen since any edit operation on any other node type
             // should not be possible nor makes sense

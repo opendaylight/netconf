@@ -257,7 +257,7 @@ public final class NetconfDataOperations extends AbstractServerDataOperations {
             }
 
             futureChain = chainPatchEditTransaction(futureChain, dataStoreService::commit,
-                entities.get(entities.size() - 1), editCollection);
+                entities.getLast(), editCollection);
         }
 
         Futures.addCallback(futureChain, new FutureCallback<DOMRpcResult>() {

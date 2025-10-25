@@ -197,7 +197,7 @@ public class NetconfDeviceSimulator implements Closeable {
         }
 
         final var first = openDevices.get(0);
-        final var last = openDevices.isEmpty() ? null : openDevices.get(openDevices.size() - 1);
+        final var last = openDevices.isEmpty() ? null : openDevices.getLast();
         if (openDevices.size() == configuration.getDeviceCount()) {
             LOG.info("All simulated devices started successfully from port {} to {}", first, last);
         } else if (openDevices.isEmpty()) {
