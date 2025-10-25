@@ -33,7 +33,6 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 abstract class AbstractEdit extends AbstractConfigOperation {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEdit.class);
@@ -114,17 +113,16 @@ abstract class AbstractEdit extends AbstractConfigOperation {
     }
 
     static final XmlElement extractTargetElement(final XmlElement operationElement, final String operationName)
-        throws DocumentedException {
-        final NodeList elementsByTagName = getElementsByTagName(operationElement, TARGET_KEY);
+            throws DocumentedException {
+        final var elementsByTagName = getElementsByTagName(operationElement, TARGET_KEY);
         // Direct lookup instead of using XmlElement class due to performance
-        if (elementsByTagName.getLength() == 0) {
-            throw new DocumentedException("Missing target element", ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
-                ErrorSeverity.ERROR, ImmutableMap.of("bad-attribute", TARGET_KEY, "bad-element", operationName));
-        } else if (elementsByTagName.getLength() > 1) {
-            throw new DocumentedException("Multiple target elements", ErrorType.RPC, ErrorTag.UNKNOWN_ATTRIBUTE,
-                ErrorSeverity.ERROR);
-        } else {
-            return XmlElement.fromDomElement((Element) elementsByTagName.item(0)).getOnlyChildElement();
-        }
+        return switch (elementsByTagName.getLength()) {
+            case 0 -> throw new DocumentedException("Missing target element", ErrorType.PROTOCOL,
+                    ErrorTag.MISSING_ATTRIBUTE, ErrorSeverity.ERROR,
+                    ImmutableMap.of("bad-attribute", TARGET_KEY, "bad-element", operationName));
+            case 1 -> XmlElement.fromDomElement((Element) elementsByTagName.item(0)).getOnlyChildElement();
+            default -> throw new DocumentedException("Multiple target elements", ErrorType.RPC,
+                    ErrorTag.UNKNOWN_ATTRIBUTE, ErrorSeverity.ERROR);
+        };
     }
 }
