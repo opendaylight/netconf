@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1ad750c_58e91b3a",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/PipeliningIT.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-27T12:15:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c607677a_6f0fe093",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a219422f_d6ed1486",
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a0af962_3af2abf2",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/PipeliningIT.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-27T12:15:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5aefb913_abd4303b",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "907a2d21_19a2b2f3",
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5a0e6de_84994565",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/PipeliningIT.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-27T12:15:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "907a2d21_19a2b2f3",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c27410c5_3ddf9fbe",
@@ -82,6 +136,24 @@
       "writtenOn": "2025-10-23T13:13:31Z",
       "side": 1,
       "message": "assert headers is not empty",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75d7692d_4f13157f",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/PipeliningIT.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-27T12:15:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c27410c5_3ddf9fbe",
       "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +192,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "78c9b89f_43dec751",
+        "filename": "protocol/restconf-server/pom.xml",
+        "patchSetId": 31
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-27T12:15:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4e4b47b9_c5f53ecc",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "63fd34c8_746477e0",
@@ -133,6 +223,24 @@
       "writtenOn": "2025-10-23T12:32:36Z",
       "side": 1,
       "message": "private, use different approach, see mockSession",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43ae6a2d_d117197d",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/AbstractRequestProcessorTest.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-27T12:15:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "63fd34c8_746477e0",
       "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -154,6 +262,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c061c30_74cfaca6",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/PipeliningTest.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-27T12:15:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "69c75e46_1f2043fc",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "705aa338_2ea411b2",
@@ -167,6 +293,24 @@
       "writtenOn": "2025-10-23T12:32:36Z",
       "side": 1,
       "message": "there is no InterruptedException",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "444a1f44_58b1883e",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/PipeliningTest.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-27T12:15:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "705aa338_2ea411b2",
       "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
