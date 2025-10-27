@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b75e75e0_84753776",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/PipeliningIT.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-27T12:26:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a219422f_d6ed1486",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5aefb913_abd4303b",
@@ -171,6 +189,24 @@
       "writtenOn": "2025-10-23T13:13:31Z",
       "side": 1,
       "message": "BufferedInputStreamReader, etc. instead?",
+      "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58459e77_d5d91305",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/PipeliningIT.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-27T12:26:49Z",
+      "side": 1,
+      "message": "used different approach without buffer",
+      "parentUuid": "232bc0e4_907c3d8a",
       "revId": "108aff88c1a511794ae7d203ab42e269746eb865",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
