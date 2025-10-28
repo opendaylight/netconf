@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7dd57d26_1c3950a3",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-28T10:30:39Z",
+      "side": 1,
+      "message": "https://netty.io/wiki/new-and-noteworthy-in-4.0.html#well-defined-thread-model\n\n\"EventExecutor and EventLoop assigned to a handler or a channel are always single-threaded\nThe handler methods will always be invoked by the same thread.\"\n\nAlso there is example in https://netty.io/4.1/api/io/netty/channel/ChannelHandler.html at section State management\n\nhttps://www.k0d.cc/storage/books/JAVA/Netty%20in%20Action.pdf\nchapter 7.4.2\nfigure 7.4\n\"For the lifetime of each Channel, all operations are executed by the same Thread.\"",
+      "parentUuid": "5e90944b_aae86c38",
+      "revId": "08298eb95aa280d9727d3bc600846ca122bc1a7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1fcef217_d8639ab7",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
         "patchSetId": 24
