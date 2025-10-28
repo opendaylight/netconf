@@ -51,6 +51,24 @@
       "parentUuid": "2b1458ed_116103b5",
       "revId": "65880f237b55e08f56510ca0e7e16080459f7d5d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da179b68_a8d5b9ef",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-10-28T08:37:20Z",
+      "side": 1,
+      "message": "According to the guide, we should avoid using `isDebugEnabled()`, but there can be an exception in case of logging something that has some cost to calculate `msgToS(message)`",
+      "parentUuid": "c7f6af3e_f2de23ab",
+      "revId": "65880f237b55e08f56510ca0e7e16080459f7d5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
