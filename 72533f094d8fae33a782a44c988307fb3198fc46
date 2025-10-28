@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9bc10318_5c51aa71",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 601,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-28T11:48:22Z",
+      "side": 1,
+      "message": "directly no, EventStreamFilter is implemented only in SubtreeEventStreamFilter which also extends EventFilter",
+      "parentUuid": "60232317_c8df9c06",
+      "revId": "72533f094d8fae33a782a44c988307fb3198fc46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a8074064_4a69fdc4",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-23T14:12:12Z",
       "side": 1,
       "message": "why volatile?",
+      "revId": "72533f094d8fae33a782a44c988307fb3198fc46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad42ac99_1bb8e9e8",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-28T11:48:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a8074064_4a69fdc4",
       "revId": "72533f094d8fae33a782a44c988307fb3198fc46",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "05bcc691_06df0956",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-28T11:48:22Z",
+      "side": 1,
+      "message": "This is basically a setter for private filter",
+      "parentUuid": "4b79bf27_d7974288",
+      "revId": "72533f094d8fae33a782a44c988307fb3198fc46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eea43f75_98d0237e",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7abbde2_ea0d011e",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-28T11:48:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eea43f75_98d0237e",
+      "revId": "72533f094d8fae33a782a44c988307fb3198fc46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5269b8d0_1bcc941c",
@@ -82,6 +154,24 @@
       "writtenOn": "2025-10-23T14:11:27Z",
       "side": 1,
       "message": "which attributes are we adding?",
+      "revId": "72533f094d8fae33a782a44c988307fb3198fc46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca160fc4_bb7f091e",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-28T11:48:22Z",
+      "side": 1,
+      "message": "None, but must be overriden here after we extend EventFilter\ndone same as in AcceptingEventFilter",
+      "parentUuid": "5269b8d0_1bcc941c",
       "revId": "72533f094d8fae33a782a44c988307fb3198fc46",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
