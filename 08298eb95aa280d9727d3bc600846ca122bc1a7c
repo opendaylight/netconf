@@ -90,6 +90,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8172d508_19f43df5",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-28T11:50:01Z",
+      "side": 1,
+      "message": "So there should be no need for it as either we and netty are executing it in same thread",
+      "parentUuid": "7dd57d26_1c3950a3",
+      "revId": "08298eb95aa280d9727d3bc600846ca122bc1a7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1fcef217_d8639ab7",
