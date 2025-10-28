@@ -69,6 +69,24 @@
       "parentUuid": "c7f6af3e_f2de23ab",
       "revId": "65880f237b55e08f56510ca0e7e16080459f7d5d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7543b5fb_a0597512",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-10-28T15:25:38Z",
+      "side": 1,
+      "message": "Based on https://www.slf4j.org/faq.html#logging_performance\n\"After evaluating whether to log or not, and only if the decision is affirmative, will the logger implementation format the message and replace the \u0027{}\u0027 pair with the string value of entry. In other words, this form does not incur the cost of parameter construction in case the log statement is disabled.\"\n\nThe construction of msgToS(message) is not called if debug is disabled. Usage of \"isDebugEnabled()\" makes sense when a logger is used without parameterized messages:\n\n```\nif(logger.isDebugEnabled()) {\n  logger.debug(\"Entry number: \" + i + \" is \" + String.valueOf(entry[i]));\n}\n```\n\nWhich is not recommended too.",
+      "parentUuid": "da179b68_a8d5b9ef",
+      "revId": "65880f237b55e08f56510ca0e7e16080459f7d5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
