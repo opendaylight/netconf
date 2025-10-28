@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "48bcee1a_2dd16188",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-10-28T08:43:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "49003760_059de57a",
+      "range": {
+        "startLine": 71,
+        "startChar": 61,
+        "endLine": 71,
+        "endChar": 66
+      },
+      "revId": "f1ba671ad4049c1b9cd5be8420a7cfe53e5bc360",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e9bdb108_d993e1e9",
@@ -41,6 +65,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a44bed7_bbd5242e",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-10-28T08:43:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9bdb108_d993e1e9",
+      "revId": "f1ba671ad4049c1b9cd5be8420a7cfe53e5bc360",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a0b6ff13_f8371bdd",
@@ -54,6 +96,24 @@
       "writtenOn": "2025-09-22T19:55:33Z",
       "side": 1,
       "message": "Is there any reason to create this constructor for testing purposes instead of adding the Configuration parameter directly to NetconfClientConfigurationBuilderFactoryImplTest?\n\nIf there is a specific reason not to add it to NetconfClientConfigurationBuilderFactoryImplTest, could we have a test that validates the parsing of this new configuration?",
+      "revId": "f1ba671ad4049c1b9cd5be8420a7cfe53e5bc360",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b466e4f_29f1c743",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-10-28T08:43:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a0b6ff13_f8371bdd",
       "revId": "f1ba671ad4049c1b9cd5be8420a7cfe53e5bc360",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -81,6 +141,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7f145e2_855fbfa8",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-10-28T08:43:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c1a62403_b40b92dd",
+      "range": {
+        "startLine": 204,
+        "startChar": 50,
+        "endLine": 204,
+        "endChar": 54
+      },
+      "revId": "f1ba671ad4049c1b9cd5be8420a7cfe53e5bc360",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "26d7d1d6_dc375c0e",
@@ -94,6 +178,30 @@
       "writtenOn": "2025-09-24T08:43:15Z",
       "side": 1,
       "message": "nope, netconf-topology has a clear place where it stores its per-topology defaults:\nhttps://github.com/opendaylight/netconf/blob/ce1de126adaa00db22fd1f6c0ce4b1eadacf3bae/apps/netconf-topology/src/main/yang/netconf-node-topology.yang#L102-L107",
+      "range": {
+        "startLine": 1,
+        "startChar": 2,
+        "endLine": 1,
+        "endChar": 44
+      },
+      "revId": "f1ba671ad4049c1b9cd5be8420a7cfe53e5bc360",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df59b34c_b8899c90",
+        "filename": "apps/netconf-topology/src/main/resources/org.opendaylight.netconf.topology.spi.cfg",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-10-28T08:43:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "26d7d1d6_dc375c0e",
       "range": {
         "startLine": 1,
         "startChar": 2,

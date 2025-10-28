@@ -88,6 +88,24 @@
       "parentUuid": "bc1ce374_b213e142",
       "revId": "ace0a52be96fd648e3fe2f2687eefb172074a478",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61f02734_80660e84",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-10-28T08:43:42Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "5c7fedec_7f6fc283",
+      "revId": "ace0a52be96fd648e3fe2f2687eefb172074a478",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
