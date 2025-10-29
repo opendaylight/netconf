@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d84577a_53495332",
+        "filename": "apps/callhome-provider/src/main/resources/org.opendaylight.netconf.topology.callhome.cfg",
+        "patchSetId": 5
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-10-29T08:38:07Z",
+      "side": 1,
+      "message": "host-keys?",
+      "range": {
+        "startLine": 44,
+        "startChar": 20,
+        "endLine": 44,
+        "endChar": 24
+      },
+      "revId": "5576fe4844190744974c8a98f4978124058b6903",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
