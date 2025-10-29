@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -64,11 +65,15 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.NetconfNodeAugment;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.NetconfNodeAugmentBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.TopologyTypes1;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.netconf.node.augment.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.network.topology.topology.topology.types.TopologyNetconf;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.TopologyTypes;
 import org.opendaylight.yang.svc.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.YangModuleInfoImpl;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.binding.KeyStep;
@@ -89,6 +94,8 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
     private ClusterSingletonServiceProvider clusterSingletonServiceProvider;
     @Mock
     private Registration mockListenerReg;
+    @Mock
+    private Registration mockListenerParamsReg;
     @Mock
     private Registration mockRpcReg;
     @Mock
@@ -123,7 +130,9 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         AbstractDataBrokerTest dataBrokerTest = new AbstractDataBrokerTest() {
             @Override
             protected Set<YangModuleInfo> getModuleInfos() {
-                return Set.of(YangModuleInfoImpl.getInstance());
+                return Set.of(YangModuleInfoImpl.getInstance(),
+                    org.opendaylight.yang.svc.v1.urn.opendaylight.netconf.node.topology.rev251028
+                        .YangModuleInfoImpl.getInstance());
             }
         };
 
@@ -131,7 +140,17 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         dataBroker = spy(dataBrokerTest.getDataBroker());
 
         doNothing().when(mockListenerReg).close();
-        doReturn(mockListenerReg).when(dataBroker).registerTreeChangeListener(any(), any(), any());
+        doReturn(mockListenerReg).when(dataBroker).registerTreeChangeListener(any(),
+            eq(NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID).toBuilder().toReferenceBuilder()
+                .child(Node.class)
+                .build()), any());
+        doReturn(mockListenerParamsReg).when(dataBroker).registerTreeChangeListener(any(),
+            eq(NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID).toBuilder().toReferenceBuilder()
+                .child(TopologyTypes.class)
+                .augmentation(TopologyTypes1.class)
+                .child(TopologyNetconf.class)
+                .child(SshTransportTopologyParameters.class)
+                .build()), any());
         doReturn(mockRpcReg).when(rpcProviderService).registerRpcImplementations(any(Rpc[].class));
 
         netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, clusterSingletonServiceProvider,
