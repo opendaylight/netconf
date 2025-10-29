@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32c036b2_da48a9da",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-29T11:58:23Z",
+      "side": 1,
+      "message": "we have ended with practically full IoSession - what about just to pass empty Service there?",
+      "revId": "b331ddf9a449b65d75d0775d51588f9285e93fe2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
