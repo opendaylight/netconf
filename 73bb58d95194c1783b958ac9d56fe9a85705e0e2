@@ -69,6 +69,24 @@
       "message": "This way we end up with service usage anyway.. lets go to option #2",
       "revId": "73bb58d95194c1783b958ac9d56fe9a85705e0e2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f2fc70d_06640a96",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStack.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-29T14:41:12Z",
+      "side": 1,
+      "message": "We can just complete option #1 by simply override NettyIoSession methods.",
+      "parentUuid": "4ece293d_f30d0535",
+      "revId": "73bb58d95194c1783b958ac9d56fe9a85705e0e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ],
   "submitRequirementResults": [
