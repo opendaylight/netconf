@@ -189,7 +189,7 @@ class CallHomeMountServiceTest {
                 final var configBuilderFactory = service.createClientConfigurationBuilderFactory();
                 final var config = configBuilderFactory
                     .createClientConfigurationBuilder(node1.requireNodeId(),
-                        node1.augmentation(NetconfNodeAugment.class).getNetconfNode())
+                        node1.augmentation(NetconfNodeAugment.class).getNetconfNode(), null)
                     .withSessionListener(sessionListener).build();
                 try {
                     netconfSessionFuture = service.createClientFactory().createClient(config);
