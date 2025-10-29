@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4751b2fe_efda8bd3",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-10-29T08:47:14Z",
+      "side": 1,
+      "message": "I went with option to just pass protocol instead of node, as we would need to make credentials variable anyways",
+      "parentUuid": "3720931e_5658e4e3",
+      "revId": "00fd31308215128bbd6551a1f8d70186eb3f2e46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b33fbb72_68d6b838",
@@ -48,6 +66,30 @@
       "writtenOn": "2025-10-29T08:22:09Z",
       "side": 1,
       "message": "Could be just Protocol instead of NetconfNode as we use only:\nnode.nonnullProtocol().getSpecification()",
+      "range": {
+        "startLine": 102,
+        "startChar": 49,
+        "endLine": 102,
+        "endChar": 60
+      },
+      "revId": "00fd31308215128bbd6551a1f8d70186eb3f2e46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67e60821_632474a0",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-10-29T08:47:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b33fbb72_68d6b838",
       "range": {
         "startLine": 102,
         "startChar": 49,
