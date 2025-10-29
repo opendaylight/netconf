@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3720931e_5658e4e3",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-10-29T07:08:01Z",
+      "side": 1,
+      "message": "Looks like we can get rid of node.getCredentials()",
+      "revId": "00fd31308215128bbd6551a1f8d70186eb3f2e46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
