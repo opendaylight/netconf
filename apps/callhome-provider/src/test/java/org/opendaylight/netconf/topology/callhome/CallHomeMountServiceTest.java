@@ -41,6 +41,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.NetconfNodeAugment;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.NetconfCallhomeServer;
@@ -189,7 +190,8 @@ class CallHomeMountServiceTest {
                 final var configBuilderFactory = service.createClientConfigurationBuilderFactory();
                 final var config = configBuilderFactory
                     .createClientConfigurationBuilder(node1.requireNodeId(),
-                        node1.augmentation(NetconfNodeAugment.class).getNetconfNode())
+                        node1.augmentation(NetconfNodeAugment.class).getNetconfNode(),
+                        AbstractNetconfTopology.defaultSshParams())
                     .withSessionListener(sessionListener).build();
                 try {
                     netconfSessionFuture = service.createClientFactory().createClient(config);
