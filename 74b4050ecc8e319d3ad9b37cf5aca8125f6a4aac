@@ -139,6 +139,24 @@
       "parentUuid": "29ef81d7_65020ba4",
       "revId": "74b4050ecc8e319d3ad9b37cf5aca8125f6a4aac",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d69f3608_c71c22e1",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportIoSession.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-29T12:14:50Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "bad614bf_1eaa8edb",
+      "revId": "74b4050ecc8e319d3ad9b37cf5aca8125f6a4aac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

@@ -16,6 +16,24 @@
       "message": "we have ended with practically full IoSession - what about just to pass empty Service there?",
       "revId": "b331ddf9a449b65d75d0775d51588f9285e93fe2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6292ed9_7f3a0c3f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-29T12:14:50Z",
+      "side": 1,
+      "message": "no, that would not work, NettyIoService requires in constructor: abstract class NettyIoService, even if we extend NettyIoService then channelGroup is already there.. and there is no other constructor or option to replace it (since mina 2.16.0)",
+      "parentUuid": "32c036b2_da48a9da",
+      "revId": "b331ddf9a449b65d75d0775d51588f9285e93fe2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
