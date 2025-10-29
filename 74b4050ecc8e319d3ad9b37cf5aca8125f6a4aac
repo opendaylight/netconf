@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "162cd0e9_43612604",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-29T11:28:42Z",
+      "side": 1,
+      "message": "what do we need?",
+      "revId": "74b4050ecc8e319d3ad9b37cf5aca8125f6a4aac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b72dd232_e184c475",
+        "filename": "transport/transport-ssh/src/main/java/module-info.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-29T11:28:42Z",
+      "side": 1,
+      "message": "remove this additon",
+      "revId": "74b4050ecc8e319d3ad9b37cf5aca8125f6a4aac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f51cfaca_9d8d112a",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStack.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-29T11:28:42Z",
+      "side": 1,
+      "message": "requireNonNull",
+      "revId": "74b4050ecc8e319d3ad9b37cf5aca8125f6a4aac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29ef81d7_65020ba4",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportIoSession.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-29T11:28:42Z",
+      "side": 1,
+      "message": "isn\u0027t AbstractSession enough?",
+      "revId": "74b4050ecc8e319d3ad9b37cf5aca8125f6a4aac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
