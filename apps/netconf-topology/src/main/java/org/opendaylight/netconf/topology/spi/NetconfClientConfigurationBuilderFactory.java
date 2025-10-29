@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.spi;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.netconf.node.augment.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 
 /**
@@ -24,5 +25,5 @@ public interface NetconfClientConfigurationBuilderFactory {
      * @return An initialized {@link NetconfClientConfigurationBuilder}
      */
     @NonNull NetconfClientConfigurationBuilder createClientConfigurationBuilder(@NonNull NodeId nodeId,
-        @NonNull NetconfNode node);
+        @NonNull NetconfNode node, SshTransportTopologyParameters sshParams);
 }
