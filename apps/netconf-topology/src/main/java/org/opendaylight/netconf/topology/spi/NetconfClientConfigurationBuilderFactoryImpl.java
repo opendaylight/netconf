@@ -39,6 +39,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.cr
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.credentials.credentials.LoginPw;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.credentials.credentials.LoginPwUnencrypted;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.netconf.node.augment.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -67,14 +68,14 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
 
     @Override
     public NetconfClientConfigurationBuilder createClientConfigurationBuilder(final NodeId nodeId,
-            final NetconfNode node) {
+            final NetconfNode node, final SshTransportTopologyParameters topologySshParams) {
         final var builder = NetconfClientConfigurationBuilder.create();
         final var protocol = node.getProtocol();
         if (node.requireTcpOnly()) {
             builder.withProtocol(NetconfClientProtocol.TCP);
         } else if (protocol == null || protocol.getName() == Name.SSH) {
             builder.withProtocol(NetconfClientProtocol.SSH);
-            setSshParametersFromCredentials(builder, node.getCredentials(), node.nonnullProtocol());
+            setSshParametersFromCredentials(builder, node.getCredentials(), node.nonnullProtocol(), topologySshParams);
         } else if (protocol.getName() == Name.TLS) {
             final var contextFactory = sslContextFactoryProvider.getSslContextFactory(protocol.getSpecification());
             final var sslContext = protocol.getKeyId() == null
@@ -100,7 +101,8 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
     }
 
     private void setSshParametersFromCredentials(final NetconfClientConfigurationBuilder confBuilder,
-            final Credentials credentials, final Protocol protocol) {
+            final Credentials credentials, final Protocol protocol,
+            final SshTransportTopologyParameters topologySshParams) {
         final var sshParamsBuilder = new SshClientParametersBuilder();
         if (credentials instanceof LoginPwUnencrypted unencrypted) {
             final var loginPassword = unencrypted.getLoginPasswordUnencrypted();
@@ -143,16 +145,32 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
         }
 
-        if (protocol.getSpecification() instanceof SshCase sshCase) {
-            final var sshParams = sshCase.getSshTransportParameters();
-            final var transportParamBuilder = new TransportParamsBuilder();
-
-            transportParamBuilder.setHostKey(sshParams.nonnullHostKey());
-            transportParamBuilder.setEncryption(sshParams.nonnullEncryption());
-            transportParamBuilder.setKeyExchange(sshParams.nonnullKeyExchange());
-            transportParamBuilder.setMac(sshParams.nonnullMac());
-            sshParamsBuilder.setTransportParams(transportParamBuilder.build());
+        final var transportParamBuilder = new TransportParamsBuilder();
+        switch (protocol.getSpecification()) {
+            case SshCase sshCase -> {
+                final var nodeSshParams = sshCase.getSshTransportParameters();
+                transportParamBuilder.setHostKey(nodeSshParams.getHostKey() == null
+                    ? topologySshParams.nonnullHostKey() : nodeSshParams.getHostKey());
+                transportParamBuilder.setEncryption(nodeSshParams.getEncryption() == null
+                    ? topologySshParams.nonnullEncryption() : nodeSshParams.getEncryption());
+                transportParamBuilder.setKeyExchange(nodeSshParams.getKeyExchange() == null
+                    ? topologySshParams.nonnullKeyExchange() : nodeSshParams.getKeyExchange());
+                transportParamBuilder.setMac(nodeSshParams.getMac() == null
+                    ? topologySshParams.nonnullMac() : nodeSshParams.getMac());
+            }
+            case null -> {
+                // There are no node specific parameters use topology defaults
+                transportParamBuilder.setHostKey(topologySshParams.nonnullHostKey());
+                transportParamBuilder.setEncryption(topologySshParams.nonnullEncryption());
+                transportParamBuilder.setKeyExchange(topologySshParams.nonnullKeyExchange());
+                transportParamBuilder.setMac(topologySshParams.nonnullMac());
+            }
+            default -> {
+                throw new IllegalArgumentException("Unexpected protocol specification:" + protocol.getSpecification());
+            }
         }
+        sshParamsBuilder.setTransportParams(transportParamBuilder.build());
+
         confBuilder.withSshParameters(sshParamsBuilder.build());
     }
 

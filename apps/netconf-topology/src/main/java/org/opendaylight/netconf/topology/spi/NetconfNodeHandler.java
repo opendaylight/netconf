@@ -47,6 +47,7 @@ import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.netconf.node.augment.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -115,6 +116,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private final @NonNull NetconfNode node;
     private final @NonNull NodeId nodeId;
     private final @NonNull NetconfClientConfigurationBuilderFactory builderFactory;
+    private final @NonNull SshTransportTopologyParameters sshParams;
 
     private final long maxBackoff;
     private final long maxAttempts;
@@ -137,7 +139,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final RemoteDeviceHandler delegate,
             final RemoteDeviceId deviceId, final NodeId nodeId, final NetconfNode node,
-            final NetconfNodeAugmentedOptional nodeOptional) {
+            final NetconfNodeAugmentedOptional nodeOptional, final SshTransportTopologyParameters sshParams) {
         this.clientFactory = requireNonNull(clientFactory);
         this.timer = requireNonNull(timer);
         this.delegate = requireNonNull(delegate);
@@ -145,6 +147,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         this.node = requireNonNull(node);
         this.nodeId = requireNonNull(nodeId);
         this.builderFactory = requireNonNull(builderFactory);
+        this.sshParams = requireNonNull(sshParams);
 
         maxAttempts = node.requireMaxConnectionAttempts().toJava();
         minBackoff = node.requireMinBackoffMillis().toJava();
@@ -213,7 +216,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private void lockedConnect() {
         if (clientConfig == null) {
             try {
-                clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node)
+                clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node, sshParams)
                     .withSessionListener(communicator)
                     .build();
             } catch (IllegalArgumentException | IllegalStateException e) {
