@@ -16,7 +16,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.cr
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
-import org.opendaylight.yang.svc.v1.urn.opendaylight.netconf.node.topology.rev240911.YangModuleInfoImpl;
+import org.opendaylight.yang.svc.v1.urn.opendaylight.netconf.node.topology.rev251028.YangModuleInfoImpl;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint16;
