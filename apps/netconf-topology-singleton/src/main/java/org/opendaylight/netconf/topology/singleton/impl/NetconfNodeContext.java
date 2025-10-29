@@ -143,7 +143,8 @@ final class NetconfNodeContext implements AutoCloseable {
 
         nodeHandler = new NetconfNodeHandler(setup.getNetconfClientFactory(), setup.getTimer(),
             setup.getBaseSchemaProvider(), schemaManager, setup.getSchemaAssembler(), builderFactory,
-            deviceActionFactory, masterSalFacade, remoteDeviceId, configNode.getNodeId(), netconfNode, nodeOptional);
+            deviceActionFactory, masterSalFacade, remoteDeviceId, configNode.getNodeId(), netconfNode, nodeOptional,
+            setup.getSshParams());
         nodeHandler.connect();
     }
 
