@@ -51,6 +51,23 @@
       "parentUuid": "bd28fd98_a0d5ffa3",
       "revId": "670e9e6b30f7f10861d04d93bfd64f0a8d4a3fd8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a204dff_84307ea0",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportIoSession.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-30T13:52:56Z",
+      "side": 1,
+      "message": "we still have service if we want to eliminate it we would need to go with https://git.opendaylight.org/gerrit/c/netconf/+/118145 where we have to reimplement NettyIoSession",
+      "revId": "670e9e6b30f7f10861d04d93bfd64f0a8d4a3fd8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
