@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7494d7ea_e232d7f5",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-30T09:56:43Z",
+      "side": 1,
+      "message": "These can be grouped together",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 51
+      },
+      "revId": "12b639ab700760f3961af20bb0d50deaa24c6ad6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
