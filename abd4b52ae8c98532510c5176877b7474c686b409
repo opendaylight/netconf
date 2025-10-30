@@ -16,6 +16,70 @@
       "message": "can be improved",
       "revId": "abd4b52ae8c98532510c5176877b7474c686b409",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0eb1363_c0af3b83",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportIoSession.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-10-30T20:02:55Z",
+      "side": 1,
+      "message": "i.e. \u0027DuplexChannel duplex\u0027 and remove the cast below",
+      "parentUuid": "4220ff80_34ba8459",
+      "revId": "abd4b52ae8c98532510c5176877b7474c686b409",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9f9bfd3_08d8fa62",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportIoSession.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-10-30T20:02:55Z",
+      "side": 1,
+      "message": "superfluous parentheses",
+      "range": {
+        "startLine": 236,
+        "startChar": 16,
+        "endLine": 236,
+        "endChar": 17
+      },
+      "revId": "abd4b52ae8c98532510c5176877b7474c686b409",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdebfb82_71192947",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportIoSession.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-10-30T20:02:55Z",
+      "side": 1,
+      "message": "if (context \u003d\u003d null) {\n        return null;\n    }\n    final var channel \u003d context.channel();\n    return channel \u003d\u003d null ? null : channel.localAddress()",
+      "range": {
+        "startLine": 247,
+        "startChar": 0,
+        "endLine": 248,
+        "endChar": 65
+      },
+      "revId": "abd4b52ae8c98532510c5176877b7474c686b409",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
