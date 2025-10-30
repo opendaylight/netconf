@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4220ff80_34ba8459",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportIoSession.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-30T15:59:08Z",
+      "side": 1,
+      "message": "can be improved",
+      "revId": "abd4b52ae8c98532510c5176877b7474c686b409",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
