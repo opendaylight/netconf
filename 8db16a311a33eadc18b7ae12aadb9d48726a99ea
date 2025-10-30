@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2320d37d_6fcc27b0",
+        "filename": "apps/netconf-topology-impl/src/main/java/org/opendaylight/netconf/topology/impl/NetconfTopologyImpl.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-30T06:28:59Z",
+      "side": 1,
+      "message": "same here",
+      "range": {
+        "startLine": 165,
+        "startChar": 0,
+        "endLine": 173,
+        "endChar": 9
+      },
+      "revId": "8db16a311a33eadc18b7ae12aadb9d48726a99ea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ea14c25_71d6577f",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-30T06:28:59Z",
+      "side": 1,
+      "message": "modificationType() and dataAfter() is deprecated and we are geting rid of it here:\nhttps://git.opendaylight.org/gerrit/q/NETCONF-1530\n\n        for (var change : changes) {\n            switch (change.getRootNode()) {\n                case WithDataAfter\u003cSshTransportTopologyParameters\u003e present -\u003e updateSshParams(present.dataAfter());\n                case DataObjectDeleted\u003cSshTransportTopologyParameters\u003e deleted \n                    -\u003e updateSshParams(AbstractNetconfTopology.defaultSshParams());\n            }\n        }\n\nalso in NetconfTopologyImpl",
+      "range": {
+        "startLine": 353,
+        "startChar": 0,
+        "endLine": 360,
+        "endChar": 13
+      },
+      "revId": "8db16a311a33eadc18b7ae12aadb9d48726a99ea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
