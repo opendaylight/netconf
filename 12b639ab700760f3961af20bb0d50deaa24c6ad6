@@ -22,6 +22,30 @@
       },
       "revId": "12b639ab700760f3961af20bb0d50deaa24c6ad6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4e31735_a1e67310",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-10-30T10:09:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7494d7ea_e232d7f5",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 51
+      },
+      "revId": "12b639ab700760f3961af20bb0d50deaa24c6ad6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
