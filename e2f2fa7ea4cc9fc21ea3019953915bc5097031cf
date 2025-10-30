@@ -33,6 +33,24 @@
       "message": "This seems less fit than https://git.opendaylight.org/gerrit/c/netconf/+/117844",
       "revId": "e2f2fa7ea4cc9fc21ea3019953915bc5097031cf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b014651c_6a69626e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-30T15:46:32Z",
+      "side": 1,
+      "message": "This one provides better memory improvement than https://git.opendaylight.org/gerrit/c/netconf/+/117844.",
+      "parentUuid": "c04d7d98_c9938652",
+      "revId": "e2f2fa7ea4cc9fc21ea3019953915bc5097031cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ],
   "submitRequirementResults": [
