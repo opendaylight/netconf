@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c42eece2_43fc5fc6",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportIoService.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-30T13:54:06Z",
+      "side": 1,
+      "message": "we would need to override #mapSession too",
+      "revId": "466266add95a1a66e532a8173b7f1444b8bd6bcf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
