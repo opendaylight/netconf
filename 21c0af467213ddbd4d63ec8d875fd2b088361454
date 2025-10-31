@@ -208,6 +208,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "65e2e3e1_bef43990",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsTimeoutHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T12:52:09Z",
+      "side": 1,
+      "message": "what about devices (configurations) which are not using keepalives",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cde0804e_68bed4a5",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsTimeoutHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T12:52:09Z",
+      "side": 1,
+      "message": "in case we do not have keepalives setup - are we unable to disconnect a device?",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3f273a38_41494ea0",
         "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsTimeoutHandler.java",
         "patchSetId": 11
