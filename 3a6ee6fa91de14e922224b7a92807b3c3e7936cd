@@ -16,6 +16,24 @@
       "message": "Redundant suppression",
       "revId": "3a6ee6fa91de14e922224b7a92807b3c3e7936cd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bb39f1f_04580cf4",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-10-31T09:22:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "138c346f_a9773e87",
+      "revId": "3a6ee6fa91de14e922224b7a92807b3c3e7936cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
