@@ -417,16 +417,7 @@ public final class ResponseBodyOutputStream extends OutputStream {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(ResponseBodyOutputStream.class);
-    // FIXME: make maxChunkSize tunable
-    private static final int MAX_CHUNK_SIZE = 256 * 1024;
-
     private @NonNull State state;
-
-    @NonNullByDefault
-    ResponseBodyOutputStream(final ChannelHandlerContext ctx, final HttpResponseStatus status,
-            final ReadOnlyHttpHeaders headers, final HttpVersion version, final @Nullable Integer streamId) {
-        this(ctx, status, headers, version, streamId, MAX_CHUNK_SIZE);
-    }
 
     @NonNullByDefault
     ResponseBodyOutputStream(final ChannelHandlerContext ctx, final HttpResponseStatus status,

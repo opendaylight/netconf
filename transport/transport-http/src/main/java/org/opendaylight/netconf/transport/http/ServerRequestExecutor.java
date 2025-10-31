@@ -14,7 +14,9 @@ import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
@@ -27,6 +29,12 @@ import java.util.concurrent.RejectedExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +42,14 @@ import org.slf4j.LoggerFactory;
  * Asynchronous task executor. Usually tied to {@link HTTPServerSession}.
  */
 final class ServerRequestExecutor implements PendingRequestListener {
-    /**
+        @ObjectClassDefinition
+        public @interface Restconf8040Configuration {
+
+            @AttributeDefinition(description = "Chunk size for RESTCONF responses")
+            int chunk$_$size() default 262144;
+        }
+
+        /**
      * Transport-level details about a {@link PendingRequest} execution.
      *
      * @param ctx the {@link ChannelHandlerContext} on which the request is occuring
@@ -55,8 +70,10 @@ final class ServerRequestExecutor implements PendingRequestListener {
     private final ExecutorService reqExecutor;
     private final ExecutorService respExecutor;
     private final @NonNull HTTPServerSession session;
+    private final @NonNull Restconf8040Configuration config;
 
     ServerRequestExecutor(final String threadNamePrefix, final HTTPServerSession session) {
+        this.config = configProvider();
         this.session = requireNonNull(session);
         reqExecutor = Executors.newThreadPerTaskExecutor(Thread.ofVirtual()
             .name(threadNamePrefix + "-http-server-req-", 0)
@@ -143,7 +160,7 @@ final class ServerRequestExecutor implements PendingRequestListener {
     private void writeResponse(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
             final HttpVersion version, final FiniteResponse response) {
         try {
-            response.writeTo(new ResponseOutput(ctx, version, streamId));
+            response.writeTo(new ResponseOutput(ctx, version, streamId, config));
         } catch (RuntimeException | IOException e) {
             LOG.warn("Internal error while processing response {}", response, e);
         }
