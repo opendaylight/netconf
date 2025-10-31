@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "034bba4c_7265a605",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T13:38:32Z",
+      "side": 1,
+      "message": "private",
+      "revId": "7f32518000a1af8916532e4095de15efda051b57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "39dc5bb0_195bf40d",
         "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
         "patchSetId": 14
@@ -32,6 +49,109 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "39dc5bb0_195bf40d",
+      "revId": "7f32518000a1af8916532e4095de15efda051b57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7197aa5f_a6607be5",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T13:38:32Z",
+      "side": 1,
+      "message": "we have currently 2.15.0: https://github.com/apache/mina-sshd/blob/sshd-2.15.0/sshd-core/src/main/java/org/apache/sshd/common/BaseBuilder.java",
+      "parentUuid": "016efaae_cb100280",
+      "revId": "7f32518000a1af8916532e4095de15efda051b57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d26b5fbc_6b34ccfd",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactory.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T13:38:32Z",
+      "side": 1,
+      "message": "@NonNull SshTransportTopologyParameters?",
+      "revId": "7f32518000a1af8916532e4095de15efda051b57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d0f080e_e20a8786",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T13:38:32Z",
+      "side": 1,
+      "message": "please use better naming that clearly defines that these are topology defaults",
+      "revId": "7f32518000a1af8916532e4095de15efda051b57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bba21d4_dd2df707",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T13:38:32Z",
+      "side": 1,
+      "message": "else what? TLS case? null case?",
+      "revId": "7f32518000a1af8916532e4095de15efda051b57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4265d731_bcecf98b",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T13:38:32Z",
+      "side": 1,
+      "message": "belongs above to class (as opposite to int, long) definitions with @NonNull/@Nullable annotation",
+      "revId": "7f32518000a1af8916532e4095de15efda051b57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30f68352_c9477263",
+        "filename": "apps/netconf-topology/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 14
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T13:38:32Z",
+      "side": 1,
+      "message": "this should be done in a separate patch with changing the model revision?",
       "revId": "7f32518000a1af8916532e4095de15efda051b57",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
