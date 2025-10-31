@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "045f3485_7f366206",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopologyTest.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T14:12:07Z",
+      "side": 1,
+      "message": "maybe, when at place we can make this class to implement DataTreeChangeListener to override onDataTreeChanged(final List\u003cDataTreeModification\u003c?\u003e\u003e changes)",
+      "revId": "010dacbec3fe4c522e91bccd1489e4092a955c91",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e202891e_102b78de",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopologyTest.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T14:12:07Z",
+      "side": 1,
+      "message": "can be oneline",
+      "revId": "010dacbec3fe4c522e91bccd1489e4092a955c91",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
