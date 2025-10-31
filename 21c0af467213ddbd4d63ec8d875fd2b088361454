@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "267895ad_938b6273",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T12:46:49Z",
+      "side": 1,
+      "message": "should be place in org.opendaylight.netconf.client.mdsal.api",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6ab78fb3_95f008e5",
         "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsHandler.java",
         "patchSetId": 11
@@ -31,6 +48,23 @@
       "writtenOn": "2025-10-31T11:55:01Z",
       "side": 1,
       "message": "can be this interface sealed?",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69d38c07_9fc211ca",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T12:46:49Z",
+      "side": 1,
+      "message": "so we really need a new interface to handle timeout of requests? how other requests are handled?",
       "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
