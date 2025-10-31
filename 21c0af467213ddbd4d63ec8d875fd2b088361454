@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ab78fb3_95f008e5",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T11:55:01Z",
+      "side": 1,
+      "message": "Handle ...",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e23d0254_b2c9f89f",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T11:55:01Z",
+      "side": 1,
+      "message": "can be this interface sealed?",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b03e289a_5d9bc632",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T11:55:01Z",
+      "side": 1,
+      "message": "Set ...\n\nplease document parameters",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5db76bd_294b7f34",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T11:55:01Z",
+      "side": 1,
+      "message": "Return ..",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6679281_b5a1c019",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T11:55:01Z",
+      "side": 1,
+      "message": "Wrap ..\n\nplease document parameters",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6f6c7c3_8c839695",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsTimeoutHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T11:55:01Z",
+      "side": 1,
+      "message": "add one empty line before import",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1685c2f_7542781f",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsTimeoutHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T11:55:01Z",
+      "side": 1,
+      "message": "final",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f273a38_41494ea0",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsTimeoutHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T11:55:01Z",
+      "side": 1,
+      "message": "not needed empty line",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
