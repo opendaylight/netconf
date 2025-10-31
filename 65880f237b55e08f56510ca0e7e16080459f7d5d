@@ -105,6 +105,24 @@
       "parentUuid": "7543b5fb_a0597512",
       "revId": "65880f237b55e08f56510ca0e7e16080459f7d5d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54291aae_c1a9689e",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceCommunicator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2025-10-31T16:42:08Z",
+      "side": 1,
+      "message": "Actually, `msgToS` is not needed at all since `NetconfMessage.toString()` is exactly the same as `msgToS` since this fix:\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/109928",
+      "parentUuid": "fd85772d_cce30281",
+      "revId": "65880f237b55e08f56510ca0e7e16080459f7d5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
