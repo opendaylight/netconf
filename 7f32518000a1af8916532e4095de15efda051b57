@@ -16,6 +16,24 @@
       "message": "Missing:\nSshEncryptionAlgorithm.Chacha20Poly130\n\nhttps://github.com/apache/mina-sshd/blob/b4f2c4a44f249f3df6502a1694d4546ab6b5c336/sshd-core/src/main/java/org/apache/sshd/common/BaseBuilder.java#L74",
       "revId": "7f32518000a1af8916532e4095de15efda051b57",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "016efaae_cb100280",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-10-31T08:14:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "39dc5bb0_195bf40d",
+      "revId": "7f32518000a1af8916532e4095de15efda051b57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
