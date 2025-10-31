@@ -30,11 +30,14 @@ public final class ResponseOutput {
     private final ChannelHandlerContext ctx;
     private final HttpVersion version;
     private final @Nullable Integer streamId;
+    private final Restconf8040ConfigProvider.Restconf8040Configuration config;
 
-    ResponseOutput(final ChannelHandlerContext ctx, final HttpVersion version, final @Nullable Integer streamId) {
+    ResponseOutput(final ChannelHandlerContext ctx, final HttpVersion version, final @Nullable Integer streamId,
+            final Restconf8040ConfigProvider.Restconf8040Configuration config) {
         this.ctx = requireNonNull(ctx);
         this.version = requireNonNull(version);
         this.streamId = streamId;
+        this.config = config;
     }
 
     public ResponseBodyOutputStream start(final HttpResponseStatus status) {
@@ -49,7 +52,7 @@ public final class ResponseOutput {
     public ResponseBodyOutputStream start(final HttpResponseStatus status,
             final @Nullable ReadOnlyHttpHeaders headers) {
         return new ResponseBodyOutputStream(ctx, status, headers != null ? headers : HeadersResponse.EMPTY_HEADERS,
-            version, streamId);
+            version, streamId, config.chunk$_$size());
     }
 
     @Override

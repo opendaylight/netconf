@@ -14,7 +14,9 @@ import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
@@ -27,6 +29,7 @@ import java.util.concurrent.RejectedExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.nb.rfc8040.OSGiNorthbound;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,8 +58,12 @@ final class ServerRequestExecutor implements PendingRequestListener {
     private final ExecutorService reqExecutor;
     private final ExecutorService respExecutor;
     private final @NonNull HTTPServerSession session;
+    private final Restconf8040ConfigProvider.@NonNull Restconf8040Configuration config;
 
-    ServerRequestExecutor(final String threadNamePrefix, final HTTPServerSession session) {
+    ServerRequestExecutor(final String threadNamePrefix, final HTTPServerSession session,
+            final Restconf8040ConfigProvider.@NonNull Restconf8040Configuration config) {
+        this.config = config;
+        new OSGiNorthbound()
         this.session = requireNonNull(session);
         reqExecutor = Executors.newThreadPerTaskExecutor(Thread.ofVirtual()
             .name(threadNamePrefix + "-http-server-req-", 0)
@@ -143,7 +150,7 @@ final class ServerRequestExecutor implements PendingRequestListener {
     private void writeResponse(final ChannelHandlerContext ctx, final @Nullable Integer streamId,
             final HttpVersion version, final FiniteResponse response) {
         try {
-            response.writeTo(new ResponseOutput(ctx, version, streamId));
+            response.writeTo(new ResponseOutput(ctx, version, streamId, config));
         } catch (RuntimeException | IOException e) {
             LOG.warn("Internal error while processing response {}", response, e);
         }
