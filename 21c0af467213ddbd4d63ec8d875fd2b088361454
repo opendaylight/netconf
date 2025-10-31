@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dd43ee8c_8f61b8a1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-10-31T12:48:35Z",
+      "side": 1,
+      "message": "couldn\u0027t we just employ odl-nectonf-device.yang#default-request-timeout-millis?",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "267895ad_938b6273",
         "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsHandler.java",
         "patchSetId": 11
