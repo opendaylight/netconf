@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fcd5476_9644c8a3",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopologyTest.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-11-03T11:43:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "045f3485_7f366206",
+      "revId": "010dacbec3fe4c522e91bccd1489e4092a955c91",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e202891e_102b78de",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-31T14:12:07Z",
       "side": 1,
       "message": "can be oneline",
+      "revId": "010dacbec3fe4c522e91bccd1489e4092a955c91",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbff077f_afcda089",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopologyTest.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-11-03T11:43:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e202891e_102b78de",
       "revId": "010dacbec3fe4c522e91bccd1489e4092a955c91",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
