@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "0b93577f0deb0998e3c27c36dd3d99299326e2af",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55a60e84_7f888af9",
+        "filename": "apps/netconf-topology/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-03T13:38:10Z",
+      "side": 1,
+      "message": "ssh-transport-topology-parameters (dot?, comma? instead?) should",
+      "revId": "0b93577f0deb0998e3c27c36dd3d99299326e2af",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa75bdef_8fb305a6",
+        "filename": "apps/netconf-topology/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-03T13:38:10Z",
+      "side": 1,
+      "message": "Default topology wide configurable parameters..",
+      "revId": "0b93577f0deb0998e3c27c36dd3d99299326e2af",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
