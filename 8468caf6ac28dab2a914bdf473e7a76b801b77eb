@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "afe2658a_61ae1dce",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopologyTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-03T13:33:26Z",
+      "side": 1,
+      "message": "Instead of mocking we can use: https://github.com/opendaylight/netconf/commit/b35b70a793f88a51a5b341dd5f6d482ac18b72f3",
+      "revId": "8468caf6ac28dab2a914bdf473e7a76b801b77eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
