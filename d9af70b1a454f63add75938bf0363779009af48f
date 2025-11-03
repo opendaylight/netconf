@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4173086c_db19bec6",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-03T10:05:59Z",
+      "side": 1,
+      "message": "can we log error/warning?",
+      "revId": "d9af70b1a454f63add75938bf0363779009af48f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a759a827_b2d4d107",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-03T10:05:59Z",
+      "side": 1,
+      "message": "we are not passing tasks to executor, IMO this exception is not appropriate here",
+      "revId": "d9af70b1a454f63add75938bf0363779009af48f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3eed8b9_5ecc25b0",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-03T10:05:59Z",
+      "side": 1,
+      "message": "IMO Java style comments are better looking\n```\n/**\n* Hello, I am a comment.\n*/\n```",
+      "revId": "d9af70b1a454f63add75938bf0363779009af48f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3208fd5_e3e75e78",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-03T10:05:59Z",
+      "side": 1,
+      "message": "we do not need to schedule anything - we can get writable notifications in channelWritabilityChanged",
+      "revId": "d9af70b1a454f63add75938bf0363779009af48f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55408559_5bc9b0f2",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-03T10:05:59Z",
+      "side": 1,
+      "message": "when ctx is null - IMO we have unwritable - can we check state instead?",
+      "revId": "d9af70b1a454f63add75938bf0363779009af48f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
