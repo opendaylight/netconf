@@ -84,6 +84,23 @@
       "message": "when ctx is null - IMO we have unwritable - can we check state instead?",
       "revId": "d9af70b1a454f63add75938bf0363779009af48f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a22700ed_a94f83a9",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-03T12:39:47Z",
+      "side": 1,
+      "message": "are we flushing when channel is closed?",
+      "revId": "d9af70b1a454f63add75938bf0363779009af48f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
