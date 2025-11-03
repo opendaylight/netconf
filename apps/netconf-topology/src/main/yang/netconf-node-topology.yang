@@ -9,6 +9,11 @@ module netconf-node-topology {
     import odl-netconf-device { prefix ond; }
     import ietf-ssh-common { prefix sshcmn; }
 
+    revision 2025-11-03 {
+        description "Fix misplaced container ssh-transport-topology-parameters should be placed
+                     inside of container topology-netconf. Not augmented directly into nt:topology-types";
+    }
+
     revision 2025-10-28 {
         description "Add topology configurable parameters of the SSH transport layer";
     }
@@ -108,11 +113,11 @@ module netconf-node-topology {
         container topology-netconf {
             presence "The presence of the container node indicates a network
                       of NETCONF devices";
-        }
 
-        container ssh-transport-topology-parameters {
-            description "Configurable parameters of the SSH transport layer.";
-            uses sshcmn:transport-params-grouping;
+            container ssh-transport-topology-parameters {
+                description "Configurable parameters of the SSH transport layer.";
+                uses sshcmn:transport-params-grouping;
+            }
         }
     }
 
