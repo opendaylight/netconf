@@ -232,9 +232,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         // Dispatch between notifications and messages. Messages need to be processed with lock held, notifications do
         // not.
         if (NotificationMessage.ELEMENT_NAME.equals(XmlElement.fromDomDocument(message.getDocument()).getName())) {
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("{}: Notification received: {}", id, message);
-            }
+            LOG.trace("{}: Notification received: {}", id, message);
             remoteDevice.onNotification(message);
         } else {
             processMessage(message);
@@ -277,20 +275,14 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         final var request = pollRequest();
         if (request == null) {
             // No matching request, bail out
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("{}: Ignoring unsolicited message with id {} ", id, message.getDocument().getDocumentElement()
-                    .getAttribute(XmlNetconfConstants.MESSAGE_ID));
-            }
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("{}: Received unsolicited message {}", id, msgToS(message));
-            }
+            LOG.warn("{}: Ignoring unsolicited message with id {} ", id, message.getDocument().getDocumentElement()
+                .getAttribute(XmlNetconfConstants.MESSAGE_ID));
+            LOG.debug("{}: Received unsolicited message {}", id, message);
             return;
         }
 
         LOG.debug("{}: Message received {}", id, message);
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("{}: Matched request: {} to response: {}", id, msgToS(request.request), msgToS(message));
-        }
+        LOG.trace("{}: Matched request: {} to response: {}", id, request.request, message);
 
         final var inputMsgId = request.request.getDocument().getDocumentElement()
             .getAttribute(XmlNetconfConstants.MESSAGE_ID);
@@ -301,10 +293,8 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             final var ex = new DocumentedException("Response message contained unknown \"message-id\"", null,
                 ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE, ErrorSeverity.ERROR,
                 ImmutableMap.of("actual-message-id", outputMsgId, "expected-message-id", inputMsgId));
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("{}: Invalid request-reply match, reply message contains different message-id, request: {}, "
-                    + "response: {}", id, msgToS(request.request), msgToS(message));
-            }
+            LOG.warn("{}: Invalid request-reply match, reply message contains different message-id, request: {}, "
+                + "response: {}", id, request.request, message);
             request.future.set(RpcResultBuilder.<NetconfMessage>failed().withRpcError(toRpcError(ex)).build());
 
             // recursively processing message to eventually find matching request
@@ -316,20 +306,13 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         if (NetconfMessageUtil.isErrorMessage(message)) {
             // FIXME: we should be able to transform directly to RpcError without an intermediate exception
             final var ex = DocumentedException.fromXMLDocument(message.getDocument());
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("{}: Error reply from remote device, request: {}, response: {}", id, msgToS(request.request),
-                    msgToS(message));
-            }
+            LOG.warn("{}: Error reply from remote device, request: {}, response: {}", id, request.request, message);
             result = RpcResultBuilder.<NetconfMessage>failed().withRpcError(toRpcError(ex)).build();
         } else {
             result = RpcResultBuilder.success(message).build();
         }
 
         request.future.set(result);
-    }
-
-    private static String msgToS(final NetconfMessage msg) {
-        return XmlUtil.toString(msg.getDocument());
     }
 
     private static RpcError toRpcError(final DocumentedException ex) {
@@ -376,9 +359,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     }
 
     private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final NetconfMessage message) {
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("{}: Sending message {}", id, msgToS(message));
-        }
+        LOG.trace("{}: Sending message {}", id, message);
 
         final var req = new Request(new UncancellableFuture<>(), message);
         requests.add(req);
@@ -387,9 +368,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             final var cause = future.cause();
             if (cause != null) {
                 // We expect that a session down will occur at this point
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("{}: Failed to send request {}", id, XmlUtil.toString(req.request.getDocument()), cause);
-                }
+                LOG.debug("{}: Failed to send request {}", id, req.request, cause);
 
                 req.future.set(createErrorRpcResult(ErrorType.TRANSPORT, cause.getLocalizedMessage()));
             } else {
