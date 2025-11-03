@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "03064570_0ef30699",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 21
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-03T13:34:41Z",
+      "side": 1,
+      "message": "IMO try to write something different which better reflects changes made in this class",
+      "revId": "8468caf6ac28dab2a914bdf473e7a76b801b77eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "afe2658a_61ae1dce",
         "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopologyTest.java",
         "patchSetId": 21
