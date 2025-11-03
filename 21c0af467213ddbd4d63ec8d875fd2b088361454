@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6245d0b_2c97724c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-03T14:07:45Z",
+      "side": 1,
+      "message": "Yes we do. In the NetconfNodeHandler class we obtain odl-nectonf-device.yang#default-request-timeout-millis here https://git.opendaylight.org/gerrit/c/netconf/+/117596/11/apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java#166\n\nand use it InitialRpcsTimeoutHandler class to set time-out.",
+      "parentUuid": "dd43ee8c_8f61b8a1",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "267895ad_938b6273",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35dfe085_8775cc95",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-03T14:07:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "267895ad_938b6273",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6ab78fb3_95f008e5",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-10-31T11:55:01Z",
       "side": 1,
       "message": "Handle ...",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88540df2_f39bfa4c",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-03T14:07:45Z",
+      "side": 1,
+      "message": "Done. Seems like third-person is not wrong too.\nhttps://stackoverflow.com/questions/8910214/comment-style-imperative-or-third-person",
+      "parentUuid": "6ab78fb3_95f008e5",
       "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +140,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb9fca8b_a961cfcd",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-03T14:07:45Z",
+      "side": 1,
+      "message": "I have used Open/Closed Principle. But yeah, right now it is not needed and can be removed. If you would like to remove it, please reopen this comment.",
+      "parentUuid": "69d38c07_9fc211ca",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "123ec58b_4f64c974",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-03T14:07:45Z",
+      "side": 1,
+      "message": "Class \u0027org.opendaylight.netconf.client.mdsal.InitialRpcsTimeoutHandler\u0027 from another package not allowed to extend sealed interface \u0027org.opendaylight.netconf.client.mdsal.api.InitialRpcsHandler\u0027 in unnamed module\n\nAnd creating module.info would be too invasive for netconf-client-mdsal.",
+      "parentUuid": "e23d0254_b2c9f89f",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b03e289a_5d9bc632",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-10-31T11:55:01Z",
       "side": 1,
       "message": "Set ...\n\nplease document parameters",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e9f2420_488ad8e9",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-03T14:07:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b03e289a_5d9bc632",
       "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "736ea4e8_8324d0f0",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-03T14:07:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a5db76bd_294b7f34",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e6679281_b5a1c019",
@@ -133,6 +259,24 @@
       "writtenOn": "2025-10-31T11:55:01Z",
       "side": 1,
       "message": "Wrap ..\n\nplease document parameters",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea882f2e_4b6f1c43",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-03T14:07:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e6679281_b5a1c019",
       "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -154,6 +298,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "113be01b_b1865488",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsTimeoutHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-03T14:07:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d6f6c7c3_8c839695",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1685c2f_7542781f",
@@ -167,6 +329,24 @@
       "writtenOn": "2025-10-31T11:55:01Z",
       "side": 1,
       "message": "final",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "176499bb_c6cb150c",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsTimeoutHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-03T14:07:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1685c2f_7542781f",
       "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -223,6 +403,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b6049a5_59ee3a4e",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsTimeoutHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-03T14:07:45Z",
+      "side": 1,
+      "message": "Only KeepaliveSalFacade have setter for listener. I moved this logic from NetconfNodeHandler.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/117596/11/apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java#b200",
+      "parentUuid": "65e2e3e1_bef43990",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cde0804e_68bed4a5",
@@ -240,6 +438,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "969d3f55_cbf46caa",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsTimeoutHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-03T14:07:45Z",
+      "side": 1,
+      "message": "No, we are able to. The listener is set in NetconfNodeHandler class. Any other RemoteDeviceHandler implementation when is created is injected into NetconfNodeHandler constructor. Here is created InitialRpcsTimeoutHandler and set with listener.",
+      "parentUuid": "cde0804e_68bed4a5",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3f273a38_41494ea0",
@@ -253,6 +469,24 @@
       "writtenOn": "2025-10-31T11:55:01Z",
       "side": 1,
       "message": "not needed empty line",
+      "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab2bf940_b019091f",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/InitialRpcsTimeoutHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-03T14:07:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f273a38_41494ea0",
       "revId": "21c0af467213ddbd4d63ec8d875fd2b088361454",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
