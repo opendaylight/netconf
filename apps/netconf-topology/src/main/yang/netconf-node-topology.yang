@@ -108,11 +108,11 @@ module netconf-node-topology {
         container topology-netconf {
             presence "The presence of the container node indicates a network
                       of NETCONF devices";
-        }
 
-        container ssh-transport-topology-parameters {
-            description "Configurable parameters of the SSH transport layer.";
-            uses sshcmn:transport-params-grouping;
+            container ssh-transport-topology-parameters {
+                description "Configurable parameters of the SSH transport layer.";
+                uses sshcmn:transport-params-grouping;
+            }
         }
     }
 
