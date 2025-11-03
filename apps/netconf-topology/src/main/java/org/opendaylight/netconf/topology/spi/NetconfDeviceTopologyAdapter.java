@@ -32,10 +32,10 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.oper.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.oper.unavailable.capabilities.UnavailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.NetconfNodeAugment;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.NetconfNodeAugmentBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.netconf.node.augment.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251028.netconf.node.augment.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.NetconfNodeAugment;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.NetconfNodeAugmentBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.netconf.node.augment.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
