@@ -19,15 +19,12 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
 import io.netty.handler.codec.http.HttpServerUpgradeHandler;
 import io.netty.handler.codec.http2.CleartextHttp2ServerUpgradeHandler;
-import io.netty.handler.codec.http2.DefaultHttp2Connection;
-import io.netty.handler.codec.http2.DelegatingDecompressorFrameListener;
 import io.netty.handler.codec.http2.Http2CodecUtil;
+import io.netty.handler.codec.http2.Http2FrameCodec;
+import io.netty.handler.codec.http2.Http2FrameCodecBuilder;
 import io.netty.handler.codec.http2.Http2FrameLogger;
+import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import io.netty.handler.codec.http2.Http2ServerUpgradeCodec;
-import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
-import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandler;
-import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandlerBuilder;
-import io.netty.handler.codec.http2.InboundHttp2ToHttpAdapterBuilder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.ssl.ApplicationProtocolNames;
 import io.netty.handler.ssl.ApplicationProtocolNegotiationHandler;
@@ -52,16 +49,18 @@ public enum HTTPScheme {
         void initializeServerPipeline(final ChannelHandlerContext ctx) {
             // Cleartext upgrade flow
             final var sourceCodec = new HttpServerCodec();
-            final var twoToOne = http2toHttp1(FRAME_LOGGER);
             ctx.pipeline()
-                .addBefore(ctx.name(), null, new CleartextHttp2ServerUpgradeHandler(
-                    sourceCodec,
-                    new HttpServerUpgradeHandler(
-                        sourceCodec,
-                        protocol -> AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)
-                            ? new Http2ServerUpgradeCodec(twoToOne) : null,
-                        HTTPServer.MAX_HTTP_CONTENT_LENGTH),
-                    twoToOne))
+                .addBefore(ctx.name(), null, new CleartextHttp2ServerUpgradeHandler(sourceCodec,
+                    new HttpServerUpgradeHandler(sourceCodec,
+                        protocol -> {
+                            if (AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)) {
+                                final var childChannelInit = ctx.channel().attr(Http2Attributes.CHILD_INIT).get();
+                                return new Http2ServerUpgradeCodec(newHttp2FrameCodec(FRAME_LOGGER),
+                                    new Http2MultiplexHandler(childChannelInit));
+                            }
+                            return null;
+                        },
+                        HTTPServer.MAX_HTTP_CONTENT_LENGTH), newHttp2FrameCodec(FRAME_LOGGER)))
                 .addBefore(ctx.name(), null, new CleartextUpgradeHandler());
         }
     },
@@ -107,7 +106,11 @@ public enum HTTPScheme {
 
         private void configureHttp2(final ChannelHandlerContext ctx) {
             LOG.debug("{}: using HTTP/2", ctx.channel());
-            ctx.pipeline().replace(this, null, http2toHttp1(FRAME_LOGGER));
+            final var childChannelInit = ctx.channel().attr(Http2Attributes.CHILD_INIT).get();
+            ctx.pipeline().replace(this, "h2-frame-codec",
+                Http2FrameCodecBuilder.forServer().frameLogger(FRAME_LOGGER).build());
+            ctx.pipeline().addAfter("h2-frame-codec", "h2-multiplexer",
+                new Http2MultiplexHandler(childChannelInit));
             ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
         }
     }
@@ -139,13 +142,10 @@ public enum HTTPScheme {
             // if there was an upgrade to HTTP/2, the incoming message is propagated as an UpgradeEvent;
             // just pass the request down on the dedicated HTTP/2 stream. Since we are restoring that magic, there is no
             // need for downstream handlers to see this event.
-            if (event instanceof HttpServerUpgradeHandler.UpgradeEvent upgrade) {
+            if (event instanceof HttpServerUpgradeHandler.UpgradeEvent) {
                 LOG.debug("{}: upgraded to HTTP/2", ctx.channel());
                 ctx.pipeline().remove(this);
                 ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
-                final var request = upgrade.upgradeRequest();
-                request.headers().setInt(ExtensionHeaderNames.STREAM_ID.text(), Http2CodecUtil.HTTP_UPGRADE_STREAM_ID);
-                ctx.fireChannelRead(request.retain());
             } else {
                 super.userEventTriggered(ctx, event);
             }
@@ -195,20 +195,9 @@ public enum HTTPScheme {
         return netty.toString();
     }
 
-    // External HTTP 2 to internal HTTP 1.1 adapter handler
-    private static HttpToHttp2ConnectionHandler http2toHttp1(final Http2FrameLogger frameLogger) {
-        final var connection = new DefaultHttp2Connection(true);
-        return new HttpToHttp2ConnectionHandlerBuilder()
-            .connection(connection)
-            .frameListener(new DelegatingDecompressorFrameListener(connection,
-                new InboundHttp2ToHttpAdapterBuilder(connection)
-                    .maxContentLength(HTTPServer.MAX_HTTP_CONTENT_LENGTH)
-                    .propagateSettings(true)
-                    .build(),
-                // FIXME: allow for maxAllocation control to prevent OutOfMemoryError
-                0))
+    private static Http2FrameCodec newHttp2FrameCodec(final Http2FrameLogger frameLogger) {
+        return Http2FrameCodecBuilder.forServer()
             .frameLogger(frameLogger)
-            .gracefulShutdownTimeoutMillis(0L)
             .build();
     }
 }
