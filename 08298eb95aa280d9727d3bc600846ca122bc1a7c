@@ -146,6 +146,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2cc08e6a_7931feaf",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-04T07:55:25Z",
+      "side": 1,
+      "message": "thus, please try to apply my original comment request - need to use lock or AtomicReference - or check that #isEmpty is already handled correctly by deque implementation",
+      "parentUuid": "4f8e1ad3_fdf736f7",
+      "revId": "08298eb95aa280d9727d3bc600846ca122bc1a7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1fcef217_d8639ab7",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
         "patchSetId": 24
