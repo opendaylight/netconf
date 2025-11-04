@@ -128,6 +128,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4f8e1ad3_fdf736f7",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-04T07:54:16Z",
+      "side": 1,
+      "message": "but, yes we need it to have it concurrent - because its one thing that channel is using one thread - but we are running computation in some other threads - we are being notified when it completes - and we have to handle concurrent access from channel and from computation thread when it completes",
+      "parentUuid": "e4466c90_dfb40f3d",
+      "revId": "08298eb95aa280d9727d3bc600846ca122bc1a7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1fcef217_d8639ab7",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
         "patchSetId": 24
