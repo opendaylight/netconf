@@ -43,8 +43,6 @@ final class ConcurrentRestconfSession extends ConcurrentHTTPServerSession {
     @Override
     public void handlerAdded(final ChannelHandlerContext ctx) {
         super.handlerAdded(ctx);
-        final var authHandlerFactory = root.authHandlerFactory();
-        ctx.pipeline().addBefore(ctx.name(), null, authHandlerFactory.create());
     }
 
     @Override
