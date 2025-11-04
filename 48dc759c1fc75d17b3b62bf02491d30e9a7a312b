@@ -50,6 +50,23 @@
       "message": "Please document these - even the fact that when config here is empty (like now they are) - topology defaults are in effect",
       "revId": "48dc759c1fc75d17b3b62bf02491d30e9a7a312b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c622640a_fa0e3d35",
+        "filename": "apps/callhome-provider/src/main/resources/org.opendaylight.netconf.topology.callhome.cfg",
+        "patchSetId": 11
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-04T13:41:45Z",
+      "side": 1,
+      "message": "please add - commented out example of configuration",
+      "revId": "48dc759c1fc75d17b3b62bf02491d30e9a7a312b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
