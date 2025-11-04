@@ -232,6 +232,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ff20d75c_145712b5",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-04T13:34:16Z",
+      "side": 1,
+      "message": "even with throwing exception in case we do not support something yet",
+      "parentUuid": "fd2ea33b_4e4878c4",
+      "revId": "7f32518000a1af8916532e4095de15efda051b57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4265d731_bcecf98b",
         "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
         "patchSetId": 14
