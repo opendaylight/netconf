@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b48cdfd6_3fcabc3b",
+        "filename": "apps/callhome-provider/pom.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-04T13:40:13Z",
+      "side": 1,
+      "message": "move this back please",
+      "revId": "48dc759c1fc75d17b3b62bf02491d30e9a7a312b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "734a30ae_28cd236d",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-04T13:40:13Z",
+      "side": 1,
+      "message": "these are not client advertised - this is a server side configuration of allowed XYZ - even when initial server/client roles are opposite in call-home",
+      "revId": "48dc759c1fc75d17b3b62bf02491d30e9a7a312b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9e92e5a_f85263c2",
+        "filename": "apps/callhome-provider/src/main/resources/org.opendaylight.netconf.topology.callhome.cfg",
+        "patchSetId": 11
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-04T13:40:13Z",
+      "side": 1,
+      "message": "Please document these - even the fact that when config here is empty (like now they are) - topology defaults are in effect",
+      "revId": "48dc759c1fc75d17b3b62bf02491d30e9a7a312b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
