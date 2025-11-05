@@ -33,6 +33,24 @@
       "message": "IMO session should be notified when #sendResponse completes",
       "revId": "4ce19e405282d91c1906affb55d6071cea995d36",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce3ff101_d2073dab",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-11-05T12:02:36Z",
+      "side": 1,
+      "message": "session is notified when we call #respond method, in case of chunked response we dont use that method, so i added this to pass info about request being succesfully finished",
+      "parentUuid": "32a6766b_0b24cdba",
+      "revId": "4ce19e405282d91c1906affb55d6071cea995d36",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
