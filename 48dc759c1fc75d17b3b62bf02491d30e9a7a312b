@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8300799a_c7a7b5b5",
+        "filename": "apps/callhome-provider/pom.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-11-05T09:10:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b48cdfd6_3fcabc3b",
+      "revId": "48dc759c1fc75d17b3b62bf02491d30e9a7a312b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "734a30ae_28cd236d",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-11-04T13:40:13Z",
       "side": 1,
       "message": "these are not client advertised - this is a server side configuration of allowed XYZ - even when initial server/client roles are opposite in call-home",
+      "revId": "48dc759c1fc75d17b3b62bf02491d30e9a7a312b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f607a301_a47ccc20",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-11-05T09:10:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "734a30ae_28cd236d",
       "revId": "48dc759c1fc75d17b3b62bf02491d30e9a7a312b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7253bb2b_670d7b96",
+        "filename": "apps/callhome-provider/src/main/resources/org.opendaylight.netconf.topology.callhome.cfg",
+        "patchSetId": 11
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-11-05T09:10:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9e92e5a_f85263c2",
+      "revId": "48dc759c1fc75d17b3b62bf02491d30e9a7a312b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c622640a_fa0e3d35",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-11-04T13:41:45Z",
       "side": 1,
       "message": "please add - commented out example of configuration",
+      "revId": "48dc759c1fc75d17b3b62bf02491d30e9a7a312b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59b9f186_9ec9a7ef",
+        "filename": "apps/callhome-provider/src/main/resources/org.opendaylight.netconf.topology.callhome.cfg",
+        "patchSetId": 11
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-11-05T09:10:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c622640a_fa0e3d35",
       "revId": "48dc759c1fc75d17b3b62bf02491d30e9a7a312b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
