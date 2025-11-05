@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1d8f47b_cdbd2008",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-05T08:12:33Z",
+      "side": 1,
+      "message": "0. check all possibilities in JIRA ticket\n1. start in RestconfSessionBootstrap with https://lf-opendaylight.atlassian.net/browse/NETCONF-1497?focusedCommentId\u003d49574\n2. debug\n3. maybe we will end up with Http2FrameCodec + Http2MultiplexHandler + InboundHttp2ToHttpAdapter",
+      "revId": "65c18c8ab0466f70303cc3a730deb6920295350d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed9d4e1b_63afc48f",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-05T08:12:33Z",
+      "side": 1,
+      "message": "here its a place to use multiplex - see:\nhttps://lf-opendaylight.atlassian.net/browse/NETCONF-1497?focusedCommentId\u003d49574",
+      "revId": "65c18c8ab0466f70303cc3a730deb6920295350d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
