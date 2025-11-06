@@ -55,6 +55,7 @@ import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.test.util.CustomTreeModification;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;

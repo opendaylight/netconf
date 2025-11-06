@@ -33,6 +33,14 @@
             <artifactId>netconf-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-binding-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>ietf-topology</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-legacy</artifactId>
             <scope>compile</scope>

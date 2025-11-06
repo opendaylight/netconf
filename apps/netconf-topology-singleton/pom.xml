@@ -251,6 +251,10 @@
             <artifactId>restconf-server-api-testlib</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>netconf-test-util</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>binding-runtime-spi</artifactId>
             <scope>test</scope>
