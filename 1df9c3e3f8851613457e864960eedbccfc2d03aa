@@ -16,6 +16,24 @@
       "message": "please fix this empty line",
       "revId": "1df9c3e3f8851613457e864960eedbccfc2d03aa",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9e393a0_3d5a2ca2",
+        "filename": "apps/callhome-provider/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-11-06T14:16:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f5234574_e94a3bfe",
+      "revId": "1df9c3e3f8851613457e864960eedbccfc2d03aa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
