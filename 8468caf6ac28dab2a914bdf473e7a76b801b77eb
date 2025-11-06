@@ -69,6 +69,24 @@
       "parentUuid": "afe2658a_61ae1dce",
       "revId": "8468caf6ac28dab2a914bdf473e7a76b801b77eb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4f011bb_6d12b06a",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopologyTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-11-06T14:11:45Z",
+      "side": 1,
+      "message": "In separate patch I moved CustomTreeModification to netconf-test-util and here I am using it instead of mocking.\nI mocked DataObjectIdentifierWithKey as path argument for CustomTreeModification as we are not using this part here, but it could be created also like this:\nfinal var path \u003d DataObjectIdentifier.builder(NetworkTopology.class)\n    .child(Topology.class, new TopologyKey(new TopologyId(\"topology-netconf\")))\n    .child(Node.class, new NodeKey(new NodeId(\"device\")))\n    .build();",
+      "parentUuid": "337d8def_b167f543",
+      "revId": "8468caf6ac28dab2a914bdf473e7a76b801b77eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
