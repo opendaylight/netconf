@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e72b61f_7e3304ec",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ConcurrentRestconfSession.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-07T10:33:09Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "029c1097_cb71824c",
+      "revId": "cffd8892d4e7c9340f533c498e853664daf8482b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "960a086f_a674a0a1",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "71d11dce_63375506",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-07T10:33:09Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "960a086f_a674a0a1",
+      "revId": "cffd8892d4e7c9340f533c498e853664daf8482b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "945d41f3_b7d9515e",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-11-05T08:12:33Z",
       "side": 0,
       "message": "IMO lets keep InboundHttp2ToHttpAdapterBuilder and debug what we can get in ConcurentRestconfSession",
+      "revId": "cffd8892d4e7c9340f533c498e853664daf8482b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d485eab_795dca57",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-07T10:33:09Z",
+      "side": 0,
+      "message": "Instead of InboundHttp2ToHttpAdapterBuilder, which is used to translate HTTP2 to HTTP1 in the parent channel, we will use Http2StreamFrameToHttpObjectCodec inside each child channel, which converts Http2StreamFrame to HttpObject",
+      "parentUuid": "945d41f3_b7d9515e",
       "revId": "cffd8892d4e7c9340f533c498e853664daf8482b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
