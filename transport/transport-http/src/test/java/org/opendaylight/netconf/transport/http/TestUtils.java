@@ -106,6 +106,7 @@ final class TestUtils {
     }
 
     static X509CertData generateX509CertData(final String algorithm) throws Exception {
+        @SuppressWarnings("InsecureCryptoUsage")
         final var keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
         if (isRSA(algorithm)) {
             keyPairGenerator.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4), SECURE_RANDOM);

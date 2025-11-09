@@ -14,6 +14,7 @@ import java.io.StringReader;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
@@ -38,7 +39,7 @@ public final class SecurityHelper {
 
     static @NonNull PrivateKey generatePrivateKey(final byte[] privateKeyBytes, final String algorithm)
             throws GeneralSecurityException {
-        return KeyFactory.getInstance(algorithm).generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
+        return getKeyFactory(algorithm).generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
     }
 
     @NonNull X509Certificate generateCertificate(final byte[] certificate) throws GeneralSecurityException {
@@ -53,9 +54,13 @@ public final class SecurityHelper {
     static @NonNull KeyPair generateKeyPair(final byte[] privateKeyBytes, final byte[] publicKeyBytes,
             final String algorithm) throws GeneralSecurityException {
         final var privateKey = generatePrivateKey(privateKeyBytes, algorithm);
-        final var publicKey = KeyFactory.getInstance(algorithm).generatePublic(
-            new X509EncodedKeySpec(publicKeyBytes));
+        final var publicKey = getKeyFactory(algorithm).generatePublic(new X509EncodedKeySpec(publicKeyBytes));
         return new KeyPair(publicKey, privateKey);
+    }
+
+    @SuppressWarnings("InsecureCryptoUsage")
+    private static KeyFactory getKeyFactory(final String algorithm) throws NoSuchAlgorithmException {
+        return KeyFactory.getInstance(algorithm);
     }
 
     @VisibleForTesting

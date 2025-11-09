@@ -80,7 +80,9 @@ public abstract class AbstractTransportStack<C extends TransportChannel> impleme
         for (var channel : channels) {
             futures.add(toListenableFuture(channel.channel().close()));
         }
-        Futures.whenAllComplete(futures).run(() -> future.set(Empty.value()), MoreExecutors.directExecutor());
+
+        final var unused = Futures.whenAllComplete(futures)
+            .run(() -> future.set(Empty.value()), MoreExecutors.directExecutor());
         return future;
     }
 

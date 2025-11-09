@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 class HandlingPriorityTest {
     @Test
+    @SuppressWarnings("SelfComparison")
     void testHandlingPriority() {
         assertEquals(0, HANDLE_WITH_DEFAULT_PRIORITY.compareTo(HANDLE_WITH_DEFAULT_PRIORITY));
 

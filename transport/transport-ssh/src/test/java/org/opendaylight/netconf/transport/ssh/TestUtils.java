@@ -300,6 +300,7 @@ public final class TestUtils {
 
     public static KeyData generateKeyPairWithCertificate(final String algorithm) throws IOException {
         try {
+            @SuppressWarnings("InsecureCryptoUsage")
             final var keyPairGenerator = KeyPairGenerator.getInstance(algorithm, BC);
             if (isRSA(algorithm)) {
                 keyPairGenerator.initialize(
