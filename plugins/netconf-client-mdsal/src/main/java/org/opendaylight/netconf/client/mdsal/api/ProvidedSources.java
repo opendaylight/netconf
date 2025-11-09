@@ -34,8 +34,8 @@ public record ProvidedSources<T extends SourceRepresentation>(
         // FIXME: NETCONF-840: use SourceIdentifier
         Set<QName> sources) {
     public ProvidedSources {
-        representation = requireNonNull(representation);
-        provider = requireNonNull(provider);
+        requireNonNull(representation);
+        requireNonNull(provider);
         sources = Set.copyOf(sources);
     }
 
