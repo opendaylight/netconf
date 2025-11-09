@@ -740,7 +740,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             final ContainerNode notificationNode, final State state, final Instant now,
             final EffectiveModelContext context) {
         final var eventFormatter = verifyNotNull(getStateNotifEventFormatter(encoding),
-            "Error getting formatter for encoding {}", encoding);
+            "Error getting formatter for encoding %s", encoding);
         final var notification = new DOMNotificationEvent.Rfc6020(notificationNode, now);
         LOG.debug("Publishing {} state notification for subscription with ID: {}", state.nodeId.getNodeType()
             .getLocalName(), subscriptionId);
