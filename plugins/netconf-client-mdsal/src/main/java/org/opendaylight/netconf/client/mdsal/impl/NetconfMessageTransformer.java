@@ -224,34 +224,34 @@ public class NetconfMessageTransformer
     private NestedNotificationInfo traverseXmlNodeContainingNotification(final Node xmlNode,
             final SchemaNode schemaNode, final List<QName> schemaBuilder,
             final InstanceIdentifierBuilder instanceBuilder) {
-        if (schemaNode instanceof ContainerSchemaNode containerSchema) {
-            instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
-            schemaBuilder.add(containerSchema.getQName());
-
-            final var xmlContainerChildPair = findXmlContainerChildPair(xmlNode, containerSchema);
-            return traverseXmlNodeContainingNotification(xmlContainerChildPair.getKey(),
-                    xmlContainerChildPair.getValue(), schemaBuilder, instanceBuilder);
-        } else if (schemaNode instanceof ListSchemaNode listSchema) {
-            instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
-            schemaBuilder.add(listSchema.getQName());
-
-            final var listKeys = findXmlListKeys(xmlNode, listSchema);
-            instanceBuilder.nodeWithKey(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()), listKeys);
-
-            final var xmlListChildPair = findXmlListChildPair(xmlNode, listSchema);
-            return traverseXmlNodeContainingNotification(xmlListChildPair.getKey(),
-                    xmlListChildPair.getValue(), schemaBuilder, instanceBuilder);
-        } else if (schemaNode instanceof NotificationDefinition notifSchema) {
-            // FIXME: this should not be here: it does not form a valid YangInstanceIdentifier
-            instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
-            schemaBuilder.add(notifSchema.getQName());
-
-            if (xmlNode instanceof Element element) {
-                return new NestedNotificationInfo(Absolute.of(schemaBuilder), instanceBuilder.build(), element);
+        return switch (schemaNode) {
+            case ContainerSchemaNode containerSchema -> {
+                instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
+                schemaBuilder.add(containerSchema.getQName());
+                final var xmlContainerChildPair = findXmlContainerChildPair(xmlNode, containerSchema);
+                yield traverseXmlNodeContainingNotification(xmlContainerChildPair.getKey(),
+                        xmlContainerChildPair.getValue(), schemaBuilder, instanceBuilder);
             }
-            throw new IllegalArgumentException("Unexpected document node " + xmlNode);
-        }
-        throw new IllegalStateException("No notification found");
+            case ListSchemaNode listSchema -> {
+                instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
+                schemaBuilder.add(listSchema.getQName());
+                final var listKeys = findXmlListKeys(xmlNode, listSchema);
+                instanceBuilder.nodeWithKey(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()), listKeys);
+                final var xmlListChildPair = findXmlListChildPair(xmlNode, listSchema);
+                yield traverseXmlNodeContainingNotification(xmlListChildPair.getKey(),
+                        xmlListChildPair.getValue(), schemaBuilder, instanceBuilder);
+            }
+            case NotificationDefinition notifSchema -> {
+                // FIXME: this should not be here: it does not form a valid YangInstanceIdentifier
+                instanceBuilder.node(QName.create(xmlNode.getNamespaceURI(), xmlNode.getLocalName()));
+                schemaBuilder.add(notifSchema.getQName());
+                if (xmlNode instanceof Element element) {
+                    yield new NestedNotificationInfo(Absolute.of(schemaBuilder), instanceBuilder.build(), element);
+                }
+                throw new IllegalArgumentException("Unexpected document node " + xmlNode);
+            }
+            case null, default -> throw new IllegalStateException("No notification found");
+        };
     }
 
     private static Entry<Node, SchemaNode> findXmlContainerChildPair(final Node xmlNode,
