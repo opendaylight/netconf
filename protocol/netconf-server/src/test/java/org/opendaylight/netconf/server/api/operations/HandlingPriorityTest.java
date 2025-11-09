@@ -9,29 +9,25 @@ package org.opendaylight.netconf.server.api.operations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opendaylight.netconf.server.api.operations.HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY;
+import static org.opendaylight.netconf.server.api.operations.HandlingPriority.HANDLE_WITH_MAX_PRIORITY;
 
 import org.junit.jupiter.api.Test;
 
 class HandlingPriorityTest {
     @Test
     void testHandlingPriority() {
-        assertEquals(0,
-            HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.compareTo(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY));
+        assertEquals(0, HANDLE_WITH_DEFAULT_PRIORITY.compareTo(HANDLE_WITH_DEFAULT_PRIORITY));
 
-        assertEquals(-1,
-            HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.compareTo(HandlingPriority.HANDLE_WITH_MAX_PRIORITY));
-        assertEquals(1,
-            HandlingPriority.HANDLE_WITH_MAX_PRIORITY.compareTo(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY));
-        assertEquals(0, new HandlingPriority(Integer.MIN_VALUE)
-            .compareTo(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY));
+        assertEquals(-1, HANDLE_WITH_DEFAULT_PRIORITY.compareTo(HANDLE_WITH_MAX_PRIORITY));
+        assertEquals(1, HANDLE_WITH_MAX_PRIORITY.compareTo(HANDLE_WITH_DEFAULT_PRIORITY));
+        assertEquals(0, new HandlingPriority(Integer.MIN_VALUE).compareTo(HANDLE_WITH_DEFAULT_PRIORITY));
 
-        HandlingPriority prio = new HandlingPriority(10);
-        assertTrue(prio.increasePriority(1).compareTo(new HandlingPriority(11)) == 0);
+        final var prio = new HandlingPriority(10);
+        assertEquals(0, prio.increasePriority(1).compareTo(new HandlingPriority(11)));
 
-        assertFalse(HandlingPriority.HANDLE_WITH_MAX_PRIORITY.equals(new Object()));
-        assertEquals(HandlingPriority.HANDLE_WITH_MAX_PRIORITY, new HandlingPriority(Integer.MAX_VALUE));
-        assertEquals(HandlingPriority.HANDLE_WITH_MAX_PRIORITY.hashCode(),
-            new HandlingPriority(Integer.MAX_VALUE).hashCode());
+        assertFalse(HANDLE_WITH_MAX_PRIORITY.equals(new Object()));
+        assertEquals(HANDLE_WITH_MAX_PRIORITY, new HandlingPriority(Integer.MAX_VALUE));
+        assertEquals(HANDLE_WITH_MAX_PRIORITY.hashCode(), new HandlingPriority(Integer.MAX_VALUE).hashCode());
     }
 }
