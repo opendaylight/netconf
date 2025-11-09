@@ -33,7 +33,7 @@ public final class CredentialServiceAuthProvider implements AuthProvider {
 
     @Inject
     @Activate
-    public CredentialServiceAuthProvider(final @Reference PasswordCredentialAuth credService) {
+    public CredentialServiceAuthProvider(@Reference final PasswordCredentialAuth credService) {
         this.credService = requireNonNull(credService);
     }
 

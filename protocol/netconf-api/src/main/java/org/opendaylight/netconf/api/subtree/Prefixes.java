@@ -19,7 +19,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 final class Prefixes {
     private final LinkedHashMap<String, String> namespaceToPrefixMap;
 
-    private Prefixes(@NonNull final LinkedHashMap<String, String> namespaceToPrefix) {
+    private Prefixes(final @NonNull LinkedHashMap<String, String> namespaceToPrefix) {
         this.namespaceToPrefixMap = requireNonNull(namespaceToPrefix);
     }
 

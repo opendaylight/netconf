@@ -97,10 +97,8 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
     private final @NonNull L sessionListener;
     private final @NonNull NetconfTimer timer;
 
-    @GuardedBy("this")
-    private Timeout timeoutTask;
-    @GuardedBy("this")
-    private State state = State.IDLE;
+    private @GuardedBy("this") Timeout timeoutTask;
+    private @GuardedBy("this") State state = State.IDLE;
 
     protected NetconfSessionNegotiator(final HelloMessage hello, final Promise<S> promise, final Channel channel,
             final NetconfTimer timer, final L sessionListener, final long connectionTimeoutMillis,
