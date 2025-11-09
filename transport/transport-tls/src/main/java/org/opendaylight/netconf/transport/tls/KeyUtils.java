@@ -40,18 +40,26 @@ final class KeyUtils {
     static PrivateKey buildPrivateKey(final String keyAlgorithm, final byte[] bytes)
             throws UnsupportedConfigurationException {
         try {
-            return KeyFactory.getInstance(keyAlgorithm).generatePrivate(new PKCS8EncodedKeySpec(bytes));
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new UnsupportedConfigurationException("Cannot build private key for " + keyAlgorithm, e);
+            return getKeyFactory(keyAlgorithm).generatePrivate(new PKCS8EncodedKeySpec(bytes));
+        } catch (InvalidKeySpecException e) {
+            throw new UnsupportedConfigurationException("Invalid private key for " + keyAlgorithm, e);
         }
     }
 
     static PublicKey buildX509PublicKey(final String keyAlgorithm, final byte[] bytes)
             throws UnsupportedConfigurationException {
         try {
-            return KeyFactory.getInstance(keyAlgorithm).generatePublic(new X509EncodedKeySpec(bytes));
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new UnsupportedConfigurationException("Cannot build private key for " + keyAlgorithm, e);
+            return getKeyFactory(keyAlgorithm).generatePublic(new X509EncodedKeySpec(bytes));
+        } catch (InvalidKeySpecException e) {
+            throw new UnsupportedConfigurationException("Invalid public key for " + keyAlgorithm, e);
+        }
+    }
+
+    private static KeyFactory getKeyFactory(final String algorithm) throws UnsupportedConfigurationException {
+        try {
+            return KeyFactory.getInstance(algorithm);
+        } catch (NoSuchAlgorithmException e) {
+            throw new UnsupportedConfigurationException("Unsupported key algorithm " + algorithm, e);
         }
     }
 
