@@ -126,22 +126,23 @@ public abstract class AbstractTransportStack<C extends TransportChannel> impleme
     @SuppressWarnings("unchecked")
     private synchronized boolean add(final @NonNull TransportChannel channel) {
         final var local = state;
-        if (local instanceof ListenableFuture) {
-            // Already shutting down
-            return false;
-        }
-        if (local == null) {
-            // First session, simple
-            state = channel;
-        } else if (local instanceof Set) {
-            ((Set<TransportChannel>) local).add(channel);
-        } else if (local instanceof TransportChannel tc) {
-            final var set = new HashSet<TransportChannel>(4);
-            set.add(tc);
-            set.add(channel);
-            state = set;
-        } else {
-            throw new IllegalStateException("Unhandled state " + local);
+        switch (local) {
+            case null -> {
+                // First session, simple
+                state = channel;
+            }
+            case ListenableFuture<?> future -> {
+                // Already shutting down
+                return false;
+            }
+            case Set<?> set -> ((Set<TransportChannel>) set).add(channel);
+            case TransportChannel tc -> {
+                final var set = new HashSet<TransportChannel>(4);
+                set.add(tc);
+                set.add(channel);
+                state = set;
+            }
+            default -> throw new IllegalStateException("Unhandled state " + local);
         }
         return true;
     }
