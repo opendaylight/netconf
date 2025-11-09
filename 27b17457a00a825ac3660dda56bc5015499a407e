@@ -16,6 +16,24 @@
       "message": "I see no sense in deleting these two methods, it would be easier to review with them",
       "revId": "27b17457a00a825ac3660dda56bc5015499a407e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07517868_571d5c7f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-09T22:15:57Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "e354099c_96be3494",
+      "revId": "27b17457a00a825ac3660dda56bc5015499a407e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fda376f6_3ff432ca",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-09T22:15:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4173086c_db19bec6",
+      "revId": "d9af70b1a454f63add75938bf0363779009af48f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a759a827_b2d4d107",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-11-03T10:05:59Z",
       "side": 1,
       "message": "we are not passing tasks to executor, IMO this exception is not appropriate here",
+      "revId": "d9af70b1a454f63add75938bf0363779009af48f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8c40648_4ce811ad",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-09T22:15:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a759a827_b2d4d107",
       "revId": "d9af70b1a454f63add75938bf0363779009af48f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "03ab4371_12a55b42",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-09T22:15:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a3eed8b9_5ecc25b0",
+      "revId": "d9af70b1a454f63add75938bf0363779009af48f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b3208fd5_e3e75e78",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-11-03T10:05:59Z",
       "side": 1,
       "message": "we do not need to schedule anything - we can get writable notifications in channelWritabilityChanged",
+      "revId": "d9af70b1a454f63add75938bf0363779009af48f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da87c78a_35d45f44",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-09T22:15:57Z",
+      "side": 1,
+      "message": "But when we enqueue while writable, nothing in Netty changes to trigger the event, we must proactively go to the event loop and drain our queue into Netty so the bytes actually enter the outbound buffer. Only then, if we exceed the high watermark, Netty will flip writability and fire the event later.",
+      "parentUuid": "b3208fd5_e3e75e78",
       "revId": "d9af70b1a454f63add75938bf0363779009af48f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "66d9fab5_5bf895c9",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-09T22:15:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55408559_5bc9b0f2",
+      "revId": "d9af70b1a454f63add75938bf0363779009af48f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a22700ed_a94f83a9",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-11-03T12:39:47Z",
       "side": 1,
       "message": "are we flushing when channel is closed?",
+      "revId": "d9af70b1a454f63add75938bf0363779009af48f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1aa848f7_c0a807b0",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-09T22:15:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a22700ed_a94f83a9",
       "revId": "d9af70b1a454f63add75938bf0363779009af48f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
