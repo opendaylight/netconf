@@ -278,7 +278,7 @@ sealed class ApiPathParser {
             return (char) b;
         }
 
-        if (ch < 0 || ch > 127) {
+        if (ch > 127) {
             throw new ParseException("Unexpected character '" + ch + "'", offset);
         }
         nextOffset = offset + 1;
