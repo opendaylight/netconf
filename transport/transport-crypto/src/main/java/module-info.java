@@ -15,6 +15,7 @@ module org.opendaylight.netconf.transport.crypto {
     requires transitive org.opendaylight.yang.gen.ietf.crypto.types.rfc9640;
 
     requires com.google.common;
+    requires org.bouncycastle.provider;
     requires org.opendaylight.yangtools.binding.spec;
     requires org.slf4j;
 
