@@ -31,8 +31,8 @@ public final class EndtoendTestService implements AutoCloseable {
 
     @Inject
     @Activate
-    public EndtoendTestService(final @Reference RpcProviderService rpcProviderService,
-            final @Reference MountPointService mountPointService) {
+    public EndtoendTestService(@Reference final RpcProviderService rpcProviderService,
+            @Reference final MountPointService mountPointService) {
         registration = rpcProviderService.registerRpcImplementations(
             new WriteRoutesImpl(mountPointService),
             (ShowNode) input -> RpcResultBuilder.<ShowNodeOutput>failed()

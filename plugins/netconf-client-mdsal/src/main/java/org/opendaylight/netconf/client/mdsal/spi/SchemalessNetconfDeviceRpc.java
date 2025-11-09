@@ -61,7 +61,7 @@ public final class SchemalessNetconfDeviceRpc implements Rpcs.Schemaless {
         return schemalessRpcService;
     }
 
-    private @NonNull <I, R> ListenableFuture<R> handleRpc(final @NonNull QName type,
+    private <I, R> @NonNull ListenableFuture<R> handleRpc(final @NonNull QName type,
             final @NonNull I input, final RpcTransformer<I, R> transformer) {
         final var delegateFuture = listener.sendRequest(transformer.toRpcRequest(type, input));
         final var ret = SettableFuture.<R>create();

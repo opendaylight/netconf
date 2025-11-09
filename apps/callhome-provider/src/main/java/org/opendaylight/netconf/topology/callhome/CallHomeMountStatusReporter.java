@@ -59,7 +59,7 @@ public final class CallHomeMountStatusReporter implements CallHomeStatusRecorder
 
     @Activate
     @Inject
-    public CallHomeMountStatusReporter(final @Reference DataBroker broker) {
+    public CallHomeMountStatusReporter(@Reference final DataBroker broker) {
         dataBroker = broker;
         syncReg = dataBroker.registerLegacyTreeChangeListener(LogicalDatastoreType.CONFIGURATION,
             DataObjectReference.builder(NetconfCallhomeServer.class)

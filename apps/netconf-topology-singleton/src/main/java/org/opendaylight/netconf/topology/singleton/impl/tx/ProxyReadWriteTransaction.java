@@ -40,8 +40,8 @@ import scala.concurrent.Future;
 public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransaction {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyReadWriteTransaction.class);
 
-    @GuardedBy("queuedTxOperations")
-    private final List<Consumer<ProxyTransactionFacade>> queuedTxOperations = new ArrayList<>();
+    private final @GuardedBy("queuedTxOperations") List<Consumer<ProxyTransactionFacade>> queuedTxOperations =
+        new ArrayList<>();
     private final SettableFuture<CommitInfo> settableFuture = SettableFuture.create();
     private final @NonNull FluentFuture<CommitInfo> completionFuture = FluentFuture.from(settableFuture);
     private final AtomicBoolean opened = new AtomicBoolean(true);

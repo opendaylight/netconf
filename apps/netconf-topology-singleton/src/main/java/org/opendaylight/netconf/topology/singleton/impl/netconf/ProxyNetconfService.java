@@ -37,8 +37,8 @@ public class ProxyNetconfService implements DataStoreService {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyNetconfService.class);
 
     private final RemoteDeviceId id;
-    @GuardedBy("queuedOperations")
-    private final List<Consumer<ProxyNetconfServiceFacade>> queuedOperations = new ArrayList<>();
+    private final @GuardedBy("queuedOperations") List<Consumer<ProxyNetconfServiceFacade>> queuedOperations =
+        new ArrayList<>();
 
     private volatile ProxyNetconfServiceFacade netconfFacade;
 

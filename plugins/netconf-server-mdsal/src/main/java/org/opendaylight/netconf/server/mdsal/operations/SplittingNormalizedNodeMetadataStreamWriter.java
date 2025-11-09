@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import javax.xml.transform.dom.DOMSource;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfigInput;
@@ -198,7 +197,7 @@ final class SplittingNormalizedNodeMetadataStreamWriter implements NormalizedNod
     }
 
     @Override
-    public void scalarValue(@NonNull final Object value) throws IOException {
+    public void scalarValue(final Object value) throws IOException {
         writer.scalarValue(value);
     }
 

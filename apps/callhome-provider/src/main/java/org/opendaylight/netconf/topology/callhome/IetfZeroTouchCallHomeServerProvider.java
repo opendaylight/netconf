@@ -30,10 +30,10 @@ public final class IetfZeroTouchCallHomeServerProvider implements AutoCloseable 
     @Activate
     @Inject
     public IetfZeroTouchCallHomeServerProvider(
-            final @Reference NetconfTimer timer,
-            final @Reference CallHomeMountService mountService,
-            final @Reference CallHomeSshAuthProvider authProvider,
-            final @Reference CallHomeStatusRecorder statusRecorder,
+            @Reference final NetconfTimer timer,
+            @Reference final CallHomeMountService mountService,
+            @Reference final CallHomeSshAuthProvider authProvider,
+            @Reference final CallHomeStatusRecorder statusRecorder,
             final CallHomeMountService.Configuration configuration) {
 
         LOG.info("Starting Call-Home SSH server at {}:{}", configuration.host(), configuration.ssh$_$port());

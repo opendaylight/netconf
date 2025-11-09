@@ -118,7 +118,7 @@ final class DeviceMountPointContext implements Immutable, MountPointContext {
     }
 
     @Override
-    public Optional<MountPointContextFactory> findMountPoint(@NonNull final MountPointLabel label) {
+    public Optional<MountPointContextFactory> findMountPoint(final MountPointLabel label) {
         return Optional.ofNullable(mountPoints.get(requireNonNull(label)));
     }
 }

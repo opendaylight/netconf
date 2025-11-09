@@ -250,8 +250,8 @@ public final class ConfigUtils {
      * @return transport configuration
      */
     public static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208
-        .http.client.stack.grouping.Transport clientTransportTls(@NonNull final String host, final int port,
-            @NonNull final Certificate certificate) {
+        .http.client.stack.grouping.Transport clientTransportTls(final @NonNull String host, final int port,
+            final @NonNull Certificate certificate) {
         return clientTransportTls(host, port, certificate, null, null);
     }
 
@@ -266,8 +266,8 @@ public final class ConfigUtils {
      * @return transport configuration
      */
     public static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208
-        .http.client.stack.grouping.Transport clientTransportTls(@NonNull final String host, final int port,
-            @NonNull final Certificate certificate, @Nullable final String username, @Nullable final String password) {
+        .http.client.stack.grouping.Transport clientTransportTls(final @NonNull String host, final int port,
+            final @NonNull Certificate certificate, final @Nullable String username, final @Nullable String password) {
 
         final var tcpParams = new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208
             .http.client.stack.grouping.transport.tls.tls.TcpClientParametersBuilder()

@@ -21,7 +21,7 @@ public final class ServerEntity extends OpenApiEntity {
     }
 
     @Override
-    public void generate(@NonNull final JsonGenerator generator) throws IOException {
+    public void generate(final JsonGenerator generator) throws IOException {
         generator.writeStartObject();
         generator.writeStringField("url", url);
         generator.writeEndObject();

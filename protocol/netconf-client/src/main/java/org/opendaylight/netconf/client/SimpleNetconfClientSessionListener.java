@@ -13,7 +13,6 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.concurrent.Promise;
 import java.util.ArrayDeque;
-import java.util.Queue;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
@@ -34,11 +33,9 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleNetconfClientSessionListener.class);
 
-    @GuardedBy("this")
-    private final Queue<RequestEntry> requests = new ArrayDeque<>();
+    private final @GuardedBy("this") ArrayDeque<RequestEntry> requests = new ArrayDeque<>();
 
-    @GuardedBy("this")
-    private NetconfClientSession clientSession;
+    private @GuardedBy("this") NetconfClientSession clientSession;
 
     @Holding("this")
     private void dispatchRequest() {

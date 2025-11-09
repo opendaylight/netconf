@@ -70,10 +70,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private final NotificationHandler notificationHandler;
     private final boolean reconnectOnSchemasChange;
 
-    @GuardedBy("this")
-    private ListenableFuture<?> schemaFuture;
-    @GuardedBy("this")
-    private boolean connected = false;
+    private @GuardedBy("this") ListenableFuture<?> schemaFuture;
+    private @GuardedBy("this") boolean connected = false;
 
     public NetconfDevice(final RemoteDeviceId id,final BaseNetconfSchemaProvider baseSchemaProvider,
             final DeviceNetconfSchemaProvider deviceSchemaProvider, final RemoteDeviceHandler salFacade,

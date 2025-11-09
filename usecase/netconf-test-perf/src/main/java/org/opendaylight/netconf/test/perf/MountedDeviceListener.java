@@ -59,8 +59,8 @@ public final class MountedDeviceListener implements DOMMountPointListener {
 
     @Inject
     @Activate
-    public MountedDeviceListener(final @Reference DOMMountPointService mountPointService,
-                                 final @Reference BindingNormalizedNodeSerializer serializer) {
+    public MountedDeviceListener(@Reference final DOMMountPointService mountPointService,
+            @Reference final BindingNormalizedNodeSerializer serializer) {
         this.mountPointService = requireNonNull(mountPointService);
         this.serializer = requireNonNull(serializer);
         reg = mountPointService.registerProvisionListener(this);

@@ -227,13 +227,13 @@ public final class CallHomeMountService implements AutoCloseable {
     @Activate
     @Inject
     public CallHomeMountService(
-            final @Reference NetconfTimer timer,
-            final @Reference NetconfTopologySchemaAssembler schemaAssembler,
-            final @Reference SchemaResourceManager schemaRepositoryProvider,
-            final @Reference BaseNetconfSchemaProvider baseSchemaProvider,
-            final @Reference DataBroker dataBroker,
-            final @Reference DOMMountPointService mountService,
-            final @Reference DeviceActionFactory deviceActionFactory, final Configuration config) {
+            @Reference final NetconfTimer timer,
+            @Reference final NetconfTopologySchemaAssembler schemaAssembler,
+            @Reference final SchemaResourceManager schemaRepositoryProvider,
+            @Reference final BaseNetconfSchemaProvider baseSchemaProvider,
+            @Reference final DataBroker dataBroker,
+            @Reference final DOMMountPointService mountService,
+            @Reference final DeviceActionFactory deviceActionFactory, final Configuration config) {
         this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, timer, schemaAssembler, schemaRepositoryProvider,
             baseSchemaProvider, dataBroker, mountService, deviceActionFactory, config);
     }
@@ -257,7 +257,7 @@ public final class CallHomeMountService implements AutoCloseable {
     CallHomeMountService(final CallHomeTopology topology, final Configuration config) {
         this.topology = topology;
         this.config = config;
-        this.allowedDevicesReg = () -> {
+        allowedDevicesReg = () -> {
             // do nothing
         };
     }

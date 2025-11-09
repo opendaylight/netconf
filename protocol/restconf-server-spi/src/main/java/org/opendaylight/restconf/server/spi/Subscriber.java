@@ -82,7 +82,7 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
 
         Rfc8639Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter,
                 final EventFilter<T> filter, final String receiverName,
-                @Nullable final EventStreamFilter eventStreamFilter, final State receiverState) {
+                final @Nullable EventStreamFilter eventStreamFilter, final State receiverState) {
             super(stream, sender, formatter, filter);
             this.receiverName = requireNonNull(receiverName);
             this.eventStreamFilter = eventStreamFilter;

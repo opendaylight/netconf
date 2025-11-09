@@ -24,7 +24,7 @@ public final class SecuritySchemesEntity extends OpenApiEntity {
     }
 
     @Override
-    public void generate(@NonNull final JsonGenerator generator) throws IOException {
+    public void generate(final JsonGenerator generator) throws IOException {
         generator.writeObjectFieldStart("securitySchemes");
         for (final var entry : schemes.entrySet()) {
             generator.writeObjectFieldStart(entry.getKey());

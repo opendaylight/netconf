@@ -77,7 +77,7 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
     }
 
     @Override
-    public void generate(@NonNull JsonGenerator generator) throws IOException {
+    public void generate(final JsonGenerator generator) throws IOException {
         generator.writeObjectFieldStart(operation());
         generateBasics(generator);
         generateRequestBody(generator);
@@ -87,12 +87,12 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
         generator.writeEndObject();
     }
 
-    public void generateBasics(@NonNull JsonGenerator generator) throws IOException {
+    public void generateBasics(final @NonNull JsonGenerator generator) throws IOException {
         generator.writeStringField(DESCRIPTION, description());
         generator.writeStringField(SUMMARY, summary());
     }
 
-    protected @NonNull abstract String operation();
+    protected abstract @NonNull String operation();
 
     @NonNull String description() {
         return schema == null ? "" : schema.getDescription().orElse("");
@@ -102,7 +102,7 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
         return schema == null ? null : schema.getQName().getLocalName();
     }
 
-    @NonNull abstract String summary();
+    abstract @NonNull String summary();
 
     abstract void generateRequestBody(@NonNull JsonGenerator generator) throws IOException;
 

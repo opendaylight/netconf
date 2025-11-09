@@ -259,8 +259,8 @@ public class PropertyEntity {
         }
     }
 
-    private void createExamples(final ListSchemaNode schemaNode,
-            @NonNull final Integer minElements, final SchemaInferenceStack stack) throws IOException {
+    private void createExamples(final ListSchemaNode schemaNode, final int minElements,
+            final SchemaInferenceStack stack) throws IOException {
         final var firstExampleMap = prepareFirstListExample(schemaNode, stack);
         final var examples = new ArrayList<Map<String, Object>>();
         examples.add(firstExampleMap);

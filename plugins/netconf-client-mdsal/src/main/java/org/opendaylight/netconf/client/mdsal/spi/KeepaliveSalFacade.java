@@ -208,11 +208,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         private final Rpcs devRpc;
 
-        @GuardedBy("this")
-        private boolean suppressed = false;
-
-        @GuardedBy("this")
-        private int suppressedCounter = 0;
+        private @GuardedBy("this") boolean suppressed = false;
+        private @GuardedBy("this") int suppressedCounter = 0;
 
         private volatile long lastActivity;
 

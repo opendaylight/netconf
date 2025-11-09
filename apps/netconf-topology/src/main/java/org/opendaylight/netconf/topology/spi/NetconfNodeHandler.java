@@ -124,14 +124,10 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private final double backoffMultiplier;
     private final double jitter;
 
-    @GuardedBy("this")
-    private NetconfClientConfiguration clientConfig;
-    @GuardedBy("this")
-    private long attempts;
-    @GuardedBy("this")
-    private long lastMultipliedBackoff;
-    @GuardedBy("this")
-    private Task currentTask;
+    private @GuardedBy("this") NetconfClientConfiguration clientConfig;
+    private @GuardedBy("this") long attempts;
+    private @GuardedBy("this") long lastMultipliedBackoff;
+    private @GuardedBy("this") Task currentTask;
 
     public NetconfNodeHandler(final NetconfClientFactory clientFactory, final NetconfTimer timer,
             final BaseNetconfSchemaProvider baseSchemaProvider, final SchemaResourceManager schemaManager,

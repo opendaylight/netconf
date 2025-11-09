@@ -22,7 +22,7 @@ public final class ServersEntity extends OpenApiEntity {
     }
 
     @Override
-    public void generate(@NonNull final JsonGenerator generator) throws IOException {
+    public void generate(final JsonGenerator generator) throws IOException {
         generator.writeArrayFieldStart("servers");
         for (final var server : servers) {
             server.generate(generator);

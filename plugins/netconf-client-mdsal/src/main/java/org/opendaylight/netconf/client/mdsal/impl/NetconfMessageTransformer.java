@@ -36,7 +36,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
-import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -184,7 +184,7 @@ public class NetconfMessageTransformer
             toNotification(nestedInfo.type, nestedInfo.element), stripped.getKey());
     }
 
-    @GuardedBy("this")
+    @Holding("this")
     @NonNullByDefault
     private ContainerNode toNotification(final Absolute notificationPath, final Element element) {
         final var resultHolder = new NormalizationResultHolder();

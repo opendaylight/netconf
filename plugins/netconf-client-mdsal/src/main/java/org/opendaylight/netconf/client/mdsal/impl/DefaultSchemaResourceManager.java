@@ -13,7 +13,6 @@ import com.google.common.annotations.Beta;
 import com.google.common.base.Strings;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.checkerframework.checker.lock.qual.GuardedBy;
@@ -46,8 +45,7 @@ import org.slf4j.LoggerFactory;
 public final class DefaultSchemaResourceManager implements SchemaResourceManager {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultSchemaResourceManager.class);
 
-    @GuardedBy("this")
-    private final Map<String, DeviceNetconfSchemaProvider> resources = new HashMap<>();
+    private final @GuardedBy("this") HashMap<String, DeviceNetconfSchemaProvider> resources = new HashMap<>();
     private final @NonNull DeviceNetconfSchemaProvider defaultResources;
     private final YangParserFactory parserFactory;
     private final String defaultSubdirectory;

@@ -14,13 +14,9 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multiset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -83,20 +79,12 @@ public final class NetconfNotificationManager implements NetconfNotificationColl
     // And also calling callbacks from a synchronized block is dangerous
     // since the listeners/publishers can block the whole notification processing
 
-    @GuardedBy("this")
-    private final Multimap<StreamNameType, ListenerReg> notificationListeners = HashMultimap.create();
-
-    @GuardedBy("this")
-    private final Set<StreamListenerReg> streamListeners = new HashSet<>();
-
-    @GuardedBy("this")
-    private final Map<StreamNameType, Stream> streamMetadata = new HashMap<>();
-
-    @GuardedBy("this")
-    private final Multiset<StreamNameType> availableStreams = HashMultiset.create();
-
-    @GuardedBy("this")
-    private final Set<PublisherReg> notificationPublishers = new HashSet<>();
+    private final @GuardedBy("this") HashMultimap<StreamNameType, ListenerReg> notificationListeners =
+        HashMultimap.create();
+    private final @GuardedBy("this") HashSet<StreamListenerReg> streamListeners = new HashSet<>();
+    private final @GuardedBy("this") HashMap<StreamNameType, Stream> streamMetadata = new HashMap<>();
+    private final @GuardedBy("this") HashMultiset<StreamNameType> availableStreams = HashMultiset.create();
+    private final @GuardedBy("this") HashSet<PublisherReg> notificationPublishers = new HashSet<>();
     private final NotificationsTransformUtil transformUtil;
 
     @Inject

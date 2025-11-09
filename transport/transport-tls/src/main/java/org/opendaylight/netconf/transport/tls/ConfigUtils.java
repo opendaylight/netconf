@@ -71,9 +71,8 @@ final class ConfigUtils {
         }
     }
 
-    private static Map<String, Certificate> extractCertificates(
-            @Nullable final InlineOrTruststoreCertsGrouping certs,
-            @NonNull final String aliasPrefix) throws UnsupportedConfigurationException {
+    private static Map<String, Certificate> extractCertificates(final @Nullable InlineOrTruststoreCertsGrouping certs,
+            final @NonNull String aliasPrefix) throws UnsupportedConfigurationException {
         if (certs == null) {
             return Map.of();
         }

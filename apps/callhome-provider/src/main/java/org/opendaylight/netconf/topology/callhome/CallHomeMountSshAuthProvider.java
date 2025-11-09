@@ -59,8 +59,8 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
 
     @Activate
     @Inject
-    public CallHomeMountSshAuthProvider(final @Reference DataBroker broker,
-            final @Reference CallHomeMountStatusReporter statusReporter) {
+    public CallHomeMountSshAuthProvider(@Reference final DataBroker broker,
+            @Reference final CallHomeMountStatusReporter statusReporter) {
         configReg = broker.registerDataListener(LogicalDatastoreType.CONFIGURATION,
             DataObjectIdentifier.builder(NetconfCallhomeServer.class).child(Global.class).build(), globalConfig);
 

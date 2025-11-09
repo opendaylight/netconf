@@ -510,8 +510,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     private volatile @Nullable Uint32 nextSubscriptionToStop;
     private volatile @Nullable Instant nextStopTime;
 
-    @GuardedBy("filterLock")
-    private final Map<String, ChoiceNode> filterSpecs = new HashMap<>();
+    private final @GuardedBy("filterLock") HashMap<String, ChoiceNode> filterSpecs = new HashMap<>();
 
     protected AbstractRestconfStreamRegistry(final EffectiveModelContext ctx) {
         modelContext = requireNonNull(ctx);

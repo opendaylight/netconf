@@ -42,9 +42,9 @@ public final class OpenApiServiceImpl implements OpenApiService {
 
     @Inject
     @Activate
-    public OpenApiServiceImpl(final @Reference DOMSchemaService schemaService,
-            final @Reference DOMMountPointService mountPointService,
-            final @Reference JaxRsEndpoint jaxrsEndpoint) {
+    public OpenApiServiceImpl(@Reference final DOMSchemaService schemaService,
+            @Reference final DOMMountPointService mountPointService,
+            @Reference final JaxRsEndpoint jaxrsEndpoint) {
         this(schemaService, mountPointService, jaxrsEndpoint.configuration().restconf());
     }
 

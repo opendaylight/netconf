@@ -54,14 +54,9 @@ class NetconfNodeManager implements DataTreeChangeListener<Node>, AutoCloseable 
     private volatile Registration dataChangeListenerRegistration;
     private volatile RemoteDeviceId id;
 
-    @GuardedBy("this")
-    private ActorRef slaveActorRef;
-
-    @GuardedBy("this")
-    private boolean closed;
-
-    @GuardedBy("this")
-    private int lastUpdateCount;
+    private @GuardedBy("this") ActorRef slaveActorRef;
+    private @GuardedBy("this") int lastUpdateCount;
+    private @GuardedBy("this") boolean closed;
 
     NetconfNodeManager(final NetconfTopologySetup setup, final RemoteDeviceId id, final Timeout actorResponseWaitTime,
                        final DOMMountPointService mountPointService) {

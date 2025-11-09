@@ -31,10 +31,10 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
     @Activate
     @Inject
     public NetconfCallHomeTlsService(
-            final @Reference NetconfTimer timer,
-            final @Reference CallHomeMountService mountService,
-            final @Reference CallHomeTlsAuthProvider authProvider,
-            final @Reference CallHomeStatusRecorder statusRecorder,
+            @Reference final NetconfTimer timer,
+            @Reference final CallHomeMountService mountService,
+            @Reference final CallHomeTlsAuthProvider authProvider,
+            @Reference final CallHomeStatusRecorder statusRecorder,
             final CallHomeMountService.Configuration configuration) {
 
         LOG.info("Starting Call-Home TLS server at {}:{}", configuration.host(), configuration.tls$_$port());

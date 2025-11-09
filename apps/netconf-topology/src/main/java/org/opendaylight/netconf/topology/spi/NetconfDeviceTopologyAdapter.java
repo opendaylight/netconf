@@ -57,10 +57,8 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
     private final @NonNull RemoteDeviceId id;
     private final @NonNull Credentials credentials;
 
-    @GuardedBy("this")
-    private SettableFuture<Empty> closeFuture;
-    @GuardedBy("this")
-    private TransactionChain txChain;
+    private @GuardedBy("this") SettableFuture<Empty> closeFuture;
+    private @GuardedBy("this") TransactionChain txChain;
 
     /**
      * NetconfDeviceTopologyAdapter is responsible for managing the state of a NETCONF device
