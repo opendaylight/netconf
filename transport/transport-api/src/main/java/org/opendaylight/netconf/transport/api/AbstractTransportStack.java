@@ -55,20 +55,23 @@ public abstract class AbstractTransportStack<C extends TransportChannel> impleme
 
         synchronized (this) {
             var local = state;
-            if (local instanceof ListenableFuture) {
-                // Already shutting down, no-op
-                return (ListenableFuture<Empty>) local;
+            switch (local) {
+                case null -> {
+                    channels = Set.of();
+                }
+                case ListenableFuture<?> lf -> {
+                    // Already shutting down, no-op
+                    return (ListenableFuture<Empty>) lf;
+                }
+                case Set<?> set -> {
+                    channels = (Set<TransportChannel>) set;
+                }
+                case TransportChannel tc -> {
+                    channels = Set.of(tc);
+                }
+                default -> throw new IllegalStateException("Unexpected state " + local);
             }
 
-            if (local == null) {
-                channels = Set.of();
-            } else if (local instanceof Set) {
-                channels = (Set<TransportChannel>) local;
-            } else if (local instanceof TransportChannel tc) {
-                channels = Set.of(tc);
-            } else {
-                throw new IllegalStateException("Unexpected state " + local);
-            }
             state = future = SettableFuture.create();
         }
 
