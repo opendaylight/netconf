@@ -27,9 +27,9 @@ import org.opendaylight.netconf.transport.api.TransportChannel;
 final class TransportServerSession extends ServerSessionImpl {
     private record State(String subsystem, TransportChannel underlay, SettableFuture<ChannelHandlerContext> future) {
         State {
-            subsystem = requireNonNull(subsystem);
-            underlay = requireNonNull(underlay);
-            future = requireNonNull(future);
+            requireNonNull(subsystem);
+            requireNonNull(underlay);
+            requireNonNull(future);
         }
     }
 
