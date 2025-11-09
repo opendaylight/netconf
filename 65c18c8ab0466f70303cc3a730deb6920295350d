@@ -51,6 +51,24 @@
       "message": "here its a place to use multiplex - see:\nhttps://lf-opendaylight.atlassian.net/browse/NETCONF-1497?focusedCommentId\u003d49574",
       "revId": "65c18c8ab0466f70303cc3a730deb6920295350d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47e1465a_e7d8e8ec",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-09T21:30:24Z",
+      "side": 1,
+      "message": "We can’t add Http2MultiplexHandler in RestconfSessionBootstrap#configureHttp2(). By the time configureHttp2() runs, the protocol has already been selected and the upgrade/ALPN logic has finished wiring the parent pipeline. Netty constructs Http2ServerUpgradeCodec(new Http2MultiplexHandler(ConcurrentRestconfSession)) during HttpServerUpgradeHandler (or ALPN) initialization, and the ConcurrentRestconfSession must be non-null at that moment. Adding (or replacing with) a Http2MultiplexHandler later causes NPE.\n\nThat’s why we set Http2Hooks.CHILD_INIT in handlerAdded() before transport installs the upgrade/ALPN handlers. HTTPScheme reads this attribute and builds Http2ServerUpgradeCodec(frame, new Http2MultiplexHandler(childInit)) (same for ALPN), so each HTTP/2 stream gets its child pipeline from the start. configureHttp2() now only returns a placeholder for the parent; all real I/O happens on the child channels created by the multiplex handler.",
+      "parentUuid": "ed9d4e1b_63afc48f",
+      "revId": "65c18c8ab0466f70303cc3a730deb6920295350d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
