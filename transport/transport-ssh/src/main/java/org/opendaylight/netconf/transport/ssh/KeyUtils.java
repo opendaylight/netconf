@@ -76,6 +76,7 @@ final class KeyUtils {
         }
     }
 
+    @SuppressWarnings("InsecureCryptoUsage")
     private static KeyFactory getKeyFactory(final String algorithm) throws UnsupportedConfigurationException {
         try {
             return KeyFactory.getInstance(algorithm, BC);

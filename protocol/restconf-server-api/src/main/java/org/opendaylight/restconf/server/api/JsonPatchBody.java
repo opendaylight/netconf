@@ -59,6 +59,7 @@ public final class JsonPatchBody extends PatchBody {
         }
     }
 
+    @SuppressWarnings({ "ReturnValueIgnored", "CheckReturnValue" })
     private static ImmutableList<PatchEntity> read(final JsonReader in, final @NonNull ResourceContext resource,
             final AtomicReference<String> patchId) throws IOException, RequestException {
         final var edits = ImmutableList.<PatchEntity>builder();
@@ -66,6 +67,7 @@ public final class JsonPatchBody extends PatchBody {
 
         while (in.hasNext()) {
             switch (in.peek()) {
+                // FIXME: what are these two even doing?
                 case NUMBER, STRING -> in.nextString();
                 case BOOLEAN -> Boolean.toString(in.nextBoolean());
                 case NULL -> in.nextNull();
