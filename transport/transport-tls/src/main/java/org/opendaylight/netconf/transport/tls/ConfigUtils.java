@@ -7,16 +7,10 @@
  */
 package org.opendaylight.netconf.transport.tls;
 
-import static org.opendaylight.netconf.transport.tls.KeyUtils.EC_ALGORITHM;
-import static org.opendaylight.netconf.transport.tls.KeyUtils.RSA_ALGORITHM;
-import static org.opendaylight.netconf.transport.tls.KeyUtils.buildPrivateKey;
-import static org.opendaylight.netconf.transport.tls.KeyUtils.buildPublicKeyFromSshEncoding;
-import static org.opendaylight.netconf.transport.tls.KeyUtils.buildX509PublicKey;
 import static org.opendaylight.netconf.transport.tls.KeyUtils.validateKeyPair;
 import static org.opendaylight.netconf.transport.tls.KeyUtils.validatePublicKey;
 
 import com.google.common.collect.ImmutableMap;
-import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
@@ -25,12 +19,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.crypto.CMSCertificateParser;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.AsymmetricKeyPairGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.EcPrivateKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.RsaPrivateKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SshPublicKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SubjectPublicKeyInfoFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010._private.key.grouping._private.key.type.CleartextPrivateKey;
+import org.opendaylight.netconf.transport.crypto.KeyPairParser;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreAsymmetricKeyGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststoreCertsGrouping;
@@ -108,7 +97,7 @@ final class ConfigUtils {
         if (inlineDef == null) {
             throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
         }
-        final var keyPair = extractKeyPair(inlineDef);
+        final var keyPair = KeyPairParser.parseKeyPair(inlineDef);
         // ietf-crypto-types:grouping asymmetric-key-pair-grouping
         // "A private key and its associated public key.  Implementations
         // SHOULD ensure that the two keys are a matching pair."
@@ -140,7 +129,7 @@ final class ConfigUtils {
         if (inlineDef == null) {
             throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
         }
-        final var keyPair = extractKeyPair(inlineDef);
+        final var keyPair = KeyPairParser.parseKeyPair(inlineDef);
         final var certificate = CMSCertificateParser.parseCertificate(inlineDef.requireCertData());
 
         // ietf-crypto-types:asymmetric-key-pair-with-cert-grouping
@@ -155,36 +144,6 @@ final class ConfigUtils {
         } catch (KeyStoreException e) {
             throw new UnsupportedConfigurationException("Failed to load certificate and/or private key", e);
         }
-    }
-
-    private static KeyPair extractKeyPair(final AsymmetricKeyPairGrouping input)
-            throws UnsupportedConfigurationException {
-        final var privateKeyFormat = input.getPrivateKeyFormat();
-        final String keyAlgorithm;
-        if (EcPrivateKeyFormat.VALUE.equals(privateKeyFormat)) {
-            keyAlgorithm = EC_ALGORITHM;
-        } else if (RsaPrivateKeyFormat.VALUE.equals(privateKeyFormat)) {
-            keyAlgorithm = RSA_ALGORITHM;
-        } else {
-            throw new UnsupportedConfigurationException("Unsupported private key format " + privateKeyFormat);
-        }
-        if (!(input.getPrivateKeyType() instanceof CleartextPrivateKey clearText)) {
-            throw new UnsupportedConfigurationException("Unsupported private key type " + input.getPrivateKeyType());
-        }
-        final var privateKey = buildPrivateKey(keyAlgorithm, clearText.requireCleartextPrivateKey());
-
-        final var publicKeyFormat = input.getPublicKeyFormat();
-        final boolean isSshPublicKey;
-        if (SubjectPublicKeyInfoFormat.VALUE.equals(publicKeyFormat)) {
-            isSshPublicKey = false;
-        } else if (SshPublicKeyFormat.VALUE.equals(publicKeyFormat)) {
-            isSshPublicKey = true;
-        } else {
-            throw new UnsupportedConfigurationException("Unsupported public key format " + publicKeyFormat);
-        }
-        final var publicKey = isSshPublicKey ? buildPublicKeyFromSshEncoding(input.getPublicKey())
-                : buildX509PublicKey(keyAlgorithm, input.getPublicKey());
-        return new KeyPair(publicKey, privateKey);
     }
 
     private static <T> T ofType(final Class<T> expectedType, final Object obj)
