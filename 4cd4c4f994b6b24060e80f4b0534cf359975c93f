@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "716922ad_a41fa484",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultDeviceNetconfSchemaProvider.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-11-10T18:13:47Z",
+      "side": 1,
+      "message": "yeah this is flakey: just use acquire the schema from \n\norg.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.YangModuleInfoImpl, just like we do in other places",
+      "range": {
+        "startLine": 105,
+        "startChar": 25,
+        "endLine": 105,
+        "endChar": 90
+      },
+      "revId": "4cd4c4f994b6b24060e80f4b0534cf359975c93f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "21d6405a_79c28b39",
         "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultDeviceNetconfSchemaProvider.java",
         "patchSetId": 33
