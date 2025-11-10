@@ -179,9 +179,7 @@ public final class LibraryModulesSchemas {
     public Map<SourceIdentifier, URL> getAvailableModels() {
         final var result = new HashMap<SourceIdentifier, URL>();
         for (var entry : availableModels.entrySet()) {
-            final var sId = new SourceIdentifier(entry.getKey().getLocalName(),
-                entry.getKey().getRevision().map(Revision::toString).orElse(null));
-            result.put(sId, entry.getValue());
+            result.put(SourceIdentifier.ofQName(entry.getKey()), entry.getValue());
         }
 
         return result;

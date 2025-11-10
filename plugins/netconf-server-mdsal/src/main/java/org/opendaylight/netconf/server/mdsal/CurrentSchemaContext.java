@@ -93,10 +93,7 @@ public final class CurrentSchemaContext implements DatabindProvider, AutoCloseab
 
     private static Optional<YangModuleCapability> moduleToCapability(final ModuleLike module,
             final YangTextSourceExtension yangTextSourceExtension) {
-        final String moduleNamespace = module.getNamespace().toString();
-        final String moduleName = module.getName();
-        final String revision = module.getRevision().map(Revision::toString).orElse(null);
-        final SourceIdentifier moduleSourceIdentifier = new SourceIdentifier(moduleName, revision);
+        final SourceIdentifier moduleSourceIdentifier = module.getSourceIdentifier();
 
         String source;
         try {
@@ -107,6 +104,9 @@ public final class CurrentSchemaContext implements DatabindProvider, AutoCloseab
         }
 
         if (source != null) {
+            final String moduleNamespace = module.getNamespace().toString();
+            final String moduleName = module.getName();
+            final String revision = module.getRevision().map(Revision::toString).orElse(null);
             return Optional.of(new YangModuleCapability(moduleNamespace, moduleName, revision, source));
         }
 

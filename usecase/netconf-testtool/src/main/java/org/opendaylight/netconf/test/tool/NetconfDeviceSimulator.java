@@ -291,10 +291,7 @@ public class NetconfDeviceSimulator implements Closeable {
 
     private static void addModuleCapability(final SharedSchemaRepository consumer, final Set<Capability> capabilities,
                                             final ModuleLike module) {
-        final var moduleNamespace = module.getNamespace().toString();
-        final var moduleName = module.getName();
-        final var revision = module.getRevision().map(Revision::toString).orElse(null);
-        final var sourceId = new SourceIdentifier(moduleName, revision);
+        final var sourceId = module.getSourceIdentifier();
 
         final String moduleContent;
         try {
@@ -304,6 +301,9 @@ public class NetconfDeviceSimulator implements Closeable {
                 "Cannot retrieve schema source for module " + sourceId + " from schema repository", e);
         }
 
+        final var moduleNamespace = module.getNamespace().toString();
+        final var moduleName = module.getName();
+        final var revision = module.getRevision().map(Revision::toString).orElse(null);
         capabilities.add(new YangModuleCapability(moduleNamespace, moduleName, revision, moduleContent));
     }
 
