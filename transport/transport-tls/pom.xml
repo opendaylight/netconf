@@ -140,6 +140,7 @@
                 <configuration>
                     <ignoredNonTestScopedDependencies>
                         <ignoredNonTestScopedDependencies>org.bouncycastle:bcpkix-jdk18on</ignoredNonTestScopedDependencies>
+                        <ignoredNonTestScopedDependencies>org.bouncycastle:bcprov-jdk18on</ignoredNonTestScopedDependencies>
                     </ignoredNonTestScopedDependencies>
                 </configuration>
             </plugin>
