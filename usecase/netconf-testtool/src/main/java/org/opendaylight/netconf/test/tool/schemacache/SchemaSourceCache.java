@@ -7,16 +7,14 @@
  */
 package org.opendaylight.netconf.test.tool.schemacache;
 
+import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.AbstractMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
-import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.SourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
@@ -53,18 +51,11 @@ public final class SchemaSourceCache<T extends SourceRepresentation> extends Abs
         // searching for all dependencies
         final Set<YangModuleInfo> allModulesInfo = new HashSet<>(moduleList);
         allModulesInfo.addAll(moduleList.stream()
-                .flatMap(yangModuleInfo -> collectYangModuleInfoDependencies(yangModuleInfo, moduleList).stream())
-                .collect(Collectors.toSet()));
+            .flatMap(yangModuleInfo -> collectYangModuleInfoDependencies(yangModuleInfo, moduleList).stream())
+            .collect(Collectors.toSet()));
 
         // creation of source identifiers for all yang module info
-        cachedSchemas = allModulesInfo.stream()
-                .map(yangModuleInfo -> {
-                    final QName name = yangModuleInfo.getName();
-                    final SourceIdentifier revisionSourceIdentifier = new SourceIdentifier(
-                            name.getLocalName(), name.getRevision().map(Revision::toString).orElse(null));
-                    return new AbstractMap.SimpleEntry<>(revisionSourceIdentifier, yangModuleInfo);
-                })
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+        cachedSchemas = Maps.uniqueIndex(allModulesInfo, info -> SourceIdentifier.ofQName(info.getName()));
         cachedSchemas.keySet().forEach(this::register);
     }
 

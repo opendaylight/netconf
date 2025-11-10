@@ -41,8 +41,6 @@ import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterA
 import org.opendaylight.netconf.topology.spi.NetconfDeviceTopologyAdapter;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.credentials.Credentials;
-import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
-import org.opendaylight.yangtools.yang.model.api.ModuleLike;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.slf4j.Logger;
@@ -222,18 +220,13 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         final var ret = new HashSet<SourceIdentifier>();
 
         for (var module : context.getModules()) {
-            ret.add(moduleToIdentifier(module));
+            ret.add(module.getSourceIdentifier());
 
             for (var submodule : module.getSubmodules()) {
-                ret.add(moduleToIdentifier(submodule));
+                ret.add(submodule.getSourceIdentifier());
             }
         }
 
         return ret;
     }
-
-    private static SourceIdentifier moduleToIdentifier(final ModuleLike module) {
-        return new SourceIdentifier(Unqualified.of(module.getName()), module.getQNameModule().revision());
-    }
-
 }

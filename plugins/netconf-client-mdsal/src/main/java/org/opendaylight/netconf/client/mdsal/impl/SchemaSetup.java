@@ -91,9 +91,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
                     .YangModuleInfoImpl.getInstance().getName());
         }
 
-        requiredSources = deviceRequiredSources.stream()
-            .map(qname -> new SourceIdentifier(qname.getLocalName(), qname.getModule().revision()))
-            .collect(Collectors.toList());
+        requiredSources = deviceRequiredSources.stream().map(SourceIdentifier::ofQName).collect(Collectors.toList());
 
         final var missingSources = filterMissingSources(requiredSources);
         addUnresolvedCapabilities(getQNameFromSourceIdentifiers(missingSources),

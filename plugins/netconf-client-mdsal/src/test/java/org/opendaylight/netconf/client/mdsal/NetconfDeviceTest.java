@@ -94,8 +94,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
     @Test
     void testNetconfDeviceFailFirstSchemaFailSecondEmpty() {
         // Make fallback attempt to fail due to empty resolved sources
-        final var schemaResolutionException = new SchemaResolutionException("fail first",
-            new SourceIdentifier("test-module", "2013-07-22"), new Throwable());
+        final var schemaResolutionException = new SchemaResolutionException("fail first", TEST_SID, new Throwable());
         doReturn(Futures.immediateFailedFuture(schemaResolutionException))
                 .when(schemaFactory).createEffectiveModelContext(anyCollection());
 
