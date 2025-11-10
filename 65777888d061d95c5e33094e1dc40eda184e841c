@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77d4fa28_bad1cfd3",
+        "filename": "transport/transport-crypto/src/main/java/org/opendaylight/netconf/transport/crypto/CertificateSupport.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-11-10T19:29:12Z",
+      "side": 1,
+      "message": "actually this should be specialized ... let\u0027s take it out for now and wait until it is needed",
+      "range": {
+        "startLine": 67,
+        "startChar": 53,
+        "endLine": 67,
+        "endChar": 57
+      },
+      "revId": "65777888d061d95c5e33094e1dc40eda184e841c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
