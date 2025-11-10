@@ -22,6 +22,30 @@
       },
       "revId": "65777888d061d95c5e33094e1dc40eda184e841c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebe38b68_6b694108",
+        "filename": "transport/transport-crypto/src/main/java/org/opendaylight/netconf/transport/crypto/CertificateSupport.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-11-10T21:24:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "77d4fa28_bad1cfd3",
+      "range": {
+        "startLine": 67,
+        "startChar": 53,
+        "endLine": 67,
+        "endChar": 57
+      },
+      "revId": "65777888d061d95c5e33094e1dc40eda184e841c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
