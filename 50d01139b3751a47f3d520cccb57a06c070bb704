@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e84051a6_018fd3a6",
+        "filename": "transport/transport-crypto/src/main/java/org/opendaylight/netconf/transport/crypto/PrivateKeySupport.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-11-10T23:43:29Z",
+      "side": 1,
+      "message": "this does not quite work: we need to return an encapsulation which has a `PrivateKey` and a `PublicKey derivePublicKey()` method.\n\nwe may also need `KeyFactory` for public key parsing, but that is TBD",
+      "range": {
+        "startLine": 24,
+        "startChar": 4,
+        "endLine": 24,
+        "endChar": 14
+      },
+      "revId": "50d01139b3751a47f3d520cccb57a06c070bb704",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
