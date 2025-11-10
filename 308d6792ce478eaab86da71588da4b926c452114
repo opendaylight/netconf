@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b16ac167_88c4ef9a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-10T08:34:13Z",
+      "side": 1,
+      "message": "why do we need that?",
+      "revId": "308d6792ce478eaab86da71588da4b926c452114",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e75295d_74408185",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-10T08:34:13Z",
+      "side": 1,
+      "message": "deprecated?",
+      "revId": "308d6792ce478eaab86da71588da4b926c452114",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d84521ee_dec07ab5",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-10T08:34:13Z",
+      "side": 1,
+      "message": "IIRC we are not going to us aggregator - why do you need it?",
+      "revId": "308d6792ce478eaab86da71588da4b926c452114",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb760a0b_f4477949",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-10T08:34:13Z",
+      "side": 1,
+      "message": "can we avoid overriding this? I did not expect something like this..",
+      "revId": "308d6792ce478eaab86da71588da4b926c452114",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e3c0fe8_9aedc818",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-10T08:34:13Z",
+      "side": 1,
+      "message": "please do not do unrelated modifications",
+      "revId": "308d6792ce478eaab86da71588da4b926c452114",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a7eb683_3f8c0d29",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPTransportStack.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-10T08:34:13Z",
+      "side": 1,
+      "message": "I would prefer to move it to another location instead of making it public",
+      "revId": "308d6792ce478eaab86da71588da4b926c452114",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf6caa94_1c9acc6c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http2Hooks.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-10T08:34:13Z",
+      "side": 1,
+      "message": "what\u0027s the purpose of this class?",
+      "revId": "308d6792ce478eaab86da71588da4b926c452114",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
