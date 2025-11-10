@@ -11,12 +11,10 @@ import com.google.common.annotations.Beta;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.NoSuchProviderException;
-import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Base64;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.EndEntityCertCms;
@@ -32,10 +30,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.type
 @Beta
 @NonNullByDefault
 public final class CertificateSupport {
-    static {
-        Security.addProvider(new BouncyCastleProvider());
-    }
-
     private CertificateSupport() {
         // Hidden on purpose
     }
@@ -80,7 +74,7 @@ public final class CertificateSupport {
             throws UnsupportedConfigurationException {
         final CertificateFactory factory;
         try {
-            factory = CertificateFactory.getInstance("X.509", BouncyCastleProvider.PROVIDER_NAME);
+            factory = CertificateFactory.getInstance("X.509", BCProviderLoader.PROVIDER_NAME);
         } catch (CertificateException | NoSuchProviderException e) {
             throw new UnsupportedConfigurationException("X.509 certificates are not supported", e);
         }
