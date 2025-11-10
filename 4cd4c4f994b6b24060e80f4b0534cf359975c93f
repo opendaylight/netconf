@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21d6405a_79c28b39",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultDeviceNetconfSchemaProvider.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2025-11-10T09:35:57Z",
+      "side": 1,
+      "message": "Dont we also want to throw exception here? Or at least LOG.warn() ? seems too important for me just to be logged in debug mode",
+      "revId": "4cd4c4f994b6b24060e80f4b0534cf359975c93f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
