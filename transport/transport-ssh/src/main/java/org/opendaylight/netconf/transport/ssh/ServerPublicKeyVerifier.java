@@ -7,30 +7,32 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.collect.ImmutableList;
 import java.net.SocketAddress;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.util.List;
+import java.util.stream.Stream;
 import org.opendaylight.netconf.shaded.sshd.client.keyverifier.ServerKeyVerifier;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.shaded.sshd.common.config.keys.KeyUtils;
 
 final class ServerPublicKeyVerifier implements ServerKeyVerifier {
-
-    final List<PublicKey> publicKeys;
+    private final List<PublicKey> allowedKeys;
 
     ServerPublicKeyVerifier(final List<Certificate> certificates, final List<PublicKey> publicKeys) {
-        requireNonNull(certificates);
-        requireNonNull(publicKeys);
-        this.publicKeys = ImmutableList.<PublicKey>builder().addAll(publicKeys)
-                .addAll(certificates.stream().map(Certificate::getPublicKey).toList()).build();
+        allowedKeys = Stream.concat(publicKeys.stream(), certificates.stream().map(Certificate::getPublicKey))
+            .collect(ImmutableList.toImmutableList());
     }
 
     @Override
     public boolean verifyServerKey(final ClientSession clientSession, final SocketAddress socketAddress,
             final PublicKey publicKey) {
-        return publicKeys.contains(publicKey);
+        return allowedKeys.stream().anyMatch(allowedKey -> KeyUtils.compareKeys(allowedKey, publicKey));
+    }
+
+    @Override
+    public String toString() {
+        return "ServerPublicKeyVerifier [allowedKeys=" + allowedKeys.size() + "]";
     }
 }
