@@ -19,6 +19,7 @@ import java.security.spec.X509EncodedKeySpec;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.util.OpenSSHPublicKeyUtil;
 import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.AsymmetricKeyPairGrouping;
@@ -96,8 +97,8 @@ public final class KeyPairParser {
         if (SubjectPublicKeyInfoFormat.VALUE.equals(pubFormat)) {
             pubKey = parseX509(keyFactory, pubBody);
         } else if (SshPublicKeyFormat.VALUE.equals(pubFormat)) {
-            pubKey = parseOpenSsh(keyFactory, pubBody);
-        } else {
+            pubKey = parseOpenSsh(pubBody);
+         } else {
             throw new UnsupportedConfigurationException("Unsupported public key format " + pubFormat);
         }
 
@@ -127,23 +128,25 @@ public final class KeyPairParser {
         throw new UnsupportedOperationException("Cannot derive public keys for " + format);
     }
 
-    private static PublicKey parseOpenSsh(final KeyFactory keyFactory, final byte[] body)
-            throws UnsupportedConfigurationException {
+    private static PublicKey parseOpenSsh(final byte[] body) throws UnsupportedConfigurationException {
         final SubjectPublicKeyInfo spki;
         try {
             spki = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(OpenSSHPublicKeyUtil.parsePublicKey(body));
         } catch (IllegalArgumentException | IllegalStateException | IOException e) {
-            throw new UnsupportedConfigurationException("Cannot parse OpenSSH public key", e);
+            throw new UnsupportedConfigurationException("Cannot parse OpenSSH public key: " + e.getMessage(), e);
         }
 
-        // FIXME: NETCONF-1536: do not go through this encoding
-        final byte[] converted;
+        final PublicKey publicKey;
         try {
-            converted = spki.getEncoded();
+            publicKey = BouncyCastleProvider.getPublicKey(spki);
         } catch (IOException e) {
-            throw new UnsupportedConfigurationException("Cannot convert  OpenSSH public key", e);
+            throw new UnsupportedConfigurationException("Cannot extract OpenSSH public key: " + e.getMessage(), e);
         }
-        return parseX509(keyFactory, converted);
+        if (publicKey == null) {
+            throw new UnsupportedConfigurationException(
+                "Unsupported OpenSSH public key algorithm " + spki.getAlgorithm());
+        }
+        return publicKey;
     }
 
     private static PublicKey parseX509(final KeyFactory keyFactory, final byte[] body)
