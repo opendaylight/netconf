@@ -7,12 +7,18 @@
  */
 package org.opendaylight.netconf.transport.crypto;
 
+import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Signature;
+import java.security.SignatureException;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.concurrent.ThreadLocalRandom;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.AsymmetricKeyPairGrouping;
@@ -22,7 +28,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.type
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010._private.key.grouping._private.key.type.CleartextPrivateKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 /**
  * Support for parsing public/private key pairs encoded as {@link AsymmetricKeyPairGrouping}.
  *
@@ -75,7 +80,7 @@ public final class KeyPairParser {
         }
 
         // Next up: public key is optional and composed of two parts. If any of them are missing derive the public key
-        //          from the private key
+        //          from the private key.
         final var pubBody = keyPair.getPublicKey();
         if (pubBody == null) {
             LOG.debug("Missing public key, deriving it from the private key");
@@ -86,11 +91,35 @@ public final class KeyPairParser {
             LOG.warn("Missing public key format, deriving public key from the private key");
             return privateOnlyKeyPair(privFormat, keyFactory, privKey);
         }
-
-        // We have both parts of the public key specification, let's try to parse it
         final var pubKey = PublicKeyParser.parsePublicKey(pubFormat, pubBody);
 
-        // FIXME: NETCONF-1506: check whether the private and public key match
+        // Validate we have a matching pair
+        // FIXME: NETCONF-1536: there just has to be a better of doing this
+        final var signAlgorithm = switch (privKey) {
+            case ECPrivateKey ec -> "SHA256withECDSA";
+            case RSAPrivateKey rsa -> "SHA256withRSA";
+            default -> throw new UnsupportedConfigurationException("Unsupported key type " + privKey);
+        };
+
+        try {
+            // test data
+            final byte[] original = new byte[1024];
+            ThreadLocalRandom.current().nextBytes(original);
+            // sign using the private key
+            final Signature signature = Signature.getInstance(signAlgorithm);
+            signature.initSign(privKey);
+            signature.update(original);
+            final byte[] signed = signature.sign();
+            // verify using the public key
+            signature.initVerify(pubKey);
+            signature.update(original);
+            if (!signature.verify(signed)) {
+                throw new UnsupportedConfigurationException("Private key mismatches Public key");
+            }
+        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+            throw new UnsupportedConfigurationException("Key pair validation failed", e);
+        }
+
         return new KeyPair(pubKey, privKey);
     }
 
