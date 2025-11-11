@@ -7,8 +7,6 @@
  */
 package org.opendaylight.netconf.transport.crypto;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.annotations.Beta;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -17,7 +15,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.cert.Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.InvalidKeySpecException;
@@ -45,39 +42,6 @@ import org.slf4j.LoggerFactory;
 @Beta
 @NonNullByDefault
 public final class KeyPairParser {
-    /**
-     * A {@link KeyPair} and a {@link Certificate}, i.e. the equivalent of {@link AsymmetricKeyPairWithCertGrouping}.
-     */
-    // Note: not a record to prevent outside construction
-    public static final class KeyPairWithCertificate {
-        private final KeyPair keyPair;
-        private final Certificate certificate;
-
-        KeyPairWithCertificate(final KeyPair keyPair, final Certificate certificate) {
-            this.keyPair = requireNonNull(keyPair);
-            this.certificate = requireNonNull(certificate);
-        }
-
-        /**
-         * {@return the {@link KeyPair}}
-         */
-        public KeyPair keyPair() {
-            return keyPair;
-        }
-
-        /**
-         * {@return the {@link Certificate}}
-         */
-        public Certificate certificate() {
-            return certificate;
-        }
-
-        @Override
-        public String toString() {
-            return "CertifiedKeyPair [keyPair=" + keyPair + ", certificate=" + certificate + "]";
-        }
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(KeyPairParser.class);
 
     private KeyPairParser() {
@@ -179,11 +143,11 @@ public final class KeyPairParser {
         }
         final var cert = CMSCertificateParser.parseCertificate(certData);
         final var keyPair = parseKeyPair(config);
-        // FIXME: NETCONF-1543: better key comparison
-        if (!keyPair.getPublic().equals(cert.getPublicKey())) {
-            throw new UnsupportedConfigurationException("Certificate does not match the public key");
+        try {
+            return new KeyPairWithCertificate(keyPair, cert);
+        } catch (IllegalArgumentException e) {
+            throw new UnsupportedOperationException(e.getMessage(), e);
         }
-        return new KeyPairWithCertificate(keyPair, cert);
     }
 
     // get the KeyFactory corresponding to a PrivateKeyFormat

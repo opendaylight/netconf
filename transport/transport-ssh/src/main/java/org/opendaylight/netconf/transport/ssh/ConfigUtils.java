@@ -21,7 +21,7 @@ import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatContr
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.crypto.CMSCertificateParser;
 import org.opendaylight.netconf.transport.crypto.KeyPairParser;
-import org.opendaylight.netconf.transport.crypto.KeyPairParser.KeyPairWithCertificate;
+import org.opendaylight.netconf.transport.crypto.KeyPairWithCertificate;
 import org.opendaylight.netconf.transport.crypto.PublicKeyParser;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore;
