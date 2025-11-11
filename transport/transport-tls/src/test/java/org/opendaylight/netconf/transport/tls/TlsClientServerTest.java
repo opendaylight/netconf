@@ -17,8 +17,6 @@ import static org.mockito.Mockito.when;
 import static org.opendaylight.netconf.transport.tls.KeyStoreUtils.buildKeyManagerFactory;
 import static org.opendaylight.netconf.transport.tls.KeyStoreUtils.buildTrustManagerFactory;
 import static org.opendaylight.netconf.transport.tls.KeyStoreUtils.newKeyStore;
-import static org.opendaylight.netconf.transport.tls.KeyUtils.EC_ALGORITHM;
-import static org.opendaylight.netconf.transport.tls.KeyUtils.RSA_ALGORITHM;
 import static org.opendaylight.netconf.transport.tls.TestUtils.buildEndEntityCertWithKeyGrouping;
 import static org.opendaylight.netconf.transport.tls.TestUtils.buildInlineOrTruststore;
 import static org.opendaylight.netconf.transport.tls.TestUtils.generateX509CertData;
@@ -135,7 +133,7 @@ class TlsClientServerTest {
     }
 
     @ParameterizedTest(name = "TLS using X.509 certificates: {0}")
-    @ValueSource(strings = {RSA_ALGORITHM, EC_ALGORITHM})
+    @ValueSource(strings = { TestUtils.RSA_ALGORITHM, TestUtils.EC_ALGORITHM })
     void itWithCertificateConfig(final String algorithm) throws Exception {
 
         final var data = generateX509CertData(algorithm);
@@ -197,8 +195,8 @@ class TlsClientServerTest {
     @DisplayName("External SslHandlerFactory integration")
     void sslHandlerFactory() throws Exception {
 
-        final var serverKs = buildKeystoreWithGeneratedCert(RSA_ALGORITHM);
-        final var clientKs = buildKeystoreWithGeneratedCert(EC_ALGORITHM);
+        final var serverKs = buildKeystoreWithGeneratedCert(TestUtils.RSA_ALGORITHM);
+        final var clientKs = buildKeystoreWithGeneratedCert(TestUtils.EC_ALGORITHM);
         final var serverContext = SslContextBuilder.forServer(buildKeyManagerFactory(serverKs))
             .clientAuth(ClientAuth.REQUIRE).trustManager(buildTrustManagerFactory(clientKs)).build();
         final var clientContext = SslContextBuilder.forClient()
@@ -255,8 +253,8 @@ class TlsClientServerTest {
     @DisplayName("Call-Home client + 2 servers with external SslHandlerFactory integration")
     void callHome() throws Exception {
 
-        final var serverKs = buildKeystoreWithGeneratedCert(RSA_ALGORITHM);
-        final var clientKs = buildKeystoreWithGeneratedCert(EC_ALGORITHM);
+        final var serverKs = buildKeystoreWithGeneratedCert(TestUtils.RSA_ALGORITHM);
+        final var clientKs = buildKeystoreWithGeneratedCert(TestUtils.EC_ALGORITHM);
         final var serverContext = SslContextBuilder.forServer(buildKeyManagerFactory(serverKs))
             .clientAuth(ClientAuth.REQUIRE)
             .trustManager(buildTrustManagerFactory(clientKs))
