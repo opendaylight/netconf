@@ -54,11 +54,11 @@ public final class CMSCertificateParser {
     /**
      * Parse an end-entity X.509 certificate encapsulated as {@link EndEntityCertCms}.
      *
-     * @param certificate the certificate
+     * @param config the {@link EndEntityCertCms}
      * @return A {@link Certificate}
      * @throws UnsupportedConfigurationException when the certificate cannot be parsed
      */
-    public static Certificate parseCertificate(final EndEntityCertCms certificate)
+    public static Certificate parseCertificate(final EndEntityCertCms config)
             throws UnsupportedConfigurationException {
         // FIXME: this not right as the definition is:
 
@@ -92,17 +92,17 @@ public final class CMSCertificateParser {
         //                 Cryptographic Message Syntax (CMS)";
         //          }
 
-        return parseX509Certificate(certificate.getValue());
+        return parseX509Certificate(config.getValue());
     }
 
     /**
      * Parse a trust anchor X.509 certificate encapsulated as {@link TrustAnchorCertCms}.
      *
-     * @param certificate the certificate
+     * @param config the {@link TrustAnchorCertCms}
      * @return A {@link Certificate}
      * @throws UnsupportedConfigurationException when the certificate cannot be parsed
      */
-    public static Certificate parseCertificate(final TrustAnchorCertCms certificate)
+    public static Certificate parseCertificate(final TrustAnchorCertCms config)
             throws UnsupportedConfigurationException {
         // FIXME: this is not right as the definition is:
         //
@@ -154,7 +154,7 @@ public final class CMSCertificateParser {
         //    List<? extends CRL> crls; // CRLs
         //  );
 
-        return parseX509Certificate(certificate.getValue());
+        return parseX509Certificate(config.getValue());
     }
 
     private static Certificate parseX509Certificate(final byte[] certificateBytes)
