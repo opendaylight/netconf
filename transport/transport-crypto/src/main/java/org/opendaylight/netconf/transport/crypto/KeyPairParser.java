@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.transport.crypto;
 
+import com.google.common.annotations.Beta;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
@@ -30,7 +31,8 @@ import org.slf4j.LoggerFactory;
  *
  * @since 10.0.1
  */
-// FIXME: NETCONF-1536: this should be a component with pluggable support for various formats
+// FIXME: NETCONF-1541: this should be a component working on injected {Private,Public}KeyParser instances
+@Beta
 @NonNullByDefault
 public final class KeyPairParser {
     private static final Logger LOG = LoggerFactory.getLogger(KeyPairParser.class);
@@ -112,7 +114,7 @@ public final class KeyPairParser {
     // return a KeyPair with public key derived from the private key
     private static KeyPair privateOnlyKeyPair(final PrivateKeyFormat format, final KeyFactory factory, PrivateKey key)
             throws UnsupportedOperationException {
-        // FIXME: NETCONF-1536: implement this
+        // FIXME: NETCONF-1544: implement this
         throw new UnsupportedOperationException("Cannot derive public keys for " + format);
     }
 }

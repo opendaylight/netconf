@@ -28,7 +28,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.type
  * @since 10.0.1
  */
 // TODO: consider making this a service
-// TODO: define X509CertificateSupport, which does degenerate version of this class
+// FIXME: NETCONF-1545: define X509CertificateSupport, which does degenerate version of this class
 //
 //    typedef trust-anchor-cert-x509 {
 //      type x509;
@@ -54,13 +54,13 @@ public final class CMSCertificateParser {
     /**
      * Parse an end-entity X.509 certificate encapsulated as {@link EndEntityCertCms}.
      *
-     * @param certificate the certificate
+     * @param config the {@link EndEntityCertCms}
      * @return A {@link Certificate}
      * @throws UnsupportedConfigurationException when the certificate cannot be parsed
      */
-    public static Certificate parseCertificate(final EndEntityCertCms certificate)
+    public static Certificate parseCertificate(final EndEntityCertCms config)
             throws UnsupportedConfigurationException {
-        // FIXME: this not right as the definition is:
+        // FIXME: NETCONF-1537: this not right as the definition is:
 
         //        typedef end-entity-cert-cms {
         //            type signed-data-cms;
@@ -92,19 +92,19 @@ public final class CMSCertificateParser {
         //                 Cryptographic Message Syntax (CMS)";
         //          }
 
-        return parseX509Certificate(certificate.getValue());
+        return parseX509Certificate(config.getValue());
     }
 
     /**
      * Parse a trust anchor X.509 certificate encapsulated as {@link TrustAnchorCertCms}.
      *
-     * @param certificate the certificate
+     * @param config the {@link TrustAnchorCertCms}
      * @return A {@link Certificate}
      * @throws UnsupportedConfigurationException when the certificate cannot be parsed
      */
-    public static Certificate parseCertificate(final TrustAnchorCertCms certificate)
+    public static Certificate parseCertificate(final TrustAnchorCertCms config)
             throws UnsupportedConfigurationException {
-        // FIXME: this is not right as the definition is:
+        // FIXME: NETCONF-1537: this is not right as the definition is:
         //
         //    typedef trust-anchor-cert-cms {
         //        type signed-data-cms;
@@ -154,7 +154,7 @@ public final class CMSCertificateParser {
         //    List<? extends CRL> crls; // CRLs
         //  );
 
-        return parseX509Certificate(certificate.getValue());
+        return parseX509Certificate(config.getValue());
     }
 
     private static Certificate parseX509Certificate(final byte[] certificateBytes)
