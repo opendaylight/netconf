@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.transport.tls;
 
-import static org.opendaylight.netconf.transport.tls.KeyUtils.validateKeyPair;
 import static org.opendaylight.netconf.transport.tls.KeyUtils.validatePublicKey;
 
 import com.google.common.collect.ImmutableMap;
@@ -98,10 +97,6 @@ final class ConfigUtils {
             throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
         }
         final var keyPair = KeyPairParser.parseKeyPair(inlineDef);
-        // ietf-crypto-types:grouping asymmetric-key-pair-grouping
-        // "A private key and its associated public key.  Implementations
-        // SHOULD ensure that the two keys are a matching pair."
-        validateKeyPair(keyPair.getPublic(), keyPair.getPrivate());
         try {
             // FIXME: the below line throws an exception bc keyStore does not support private key without certificate
             //        chain (belongs to implementation of raw public key feature support)
@@ -135,7 +130,6 @@ final class ConfigUtils {
         // ietf-crypto-types:asymmetric-key-pair-with-cert-grouping
         // "A private/public key pair and an associated certificate.
         // Implementations SHOULD assert that certificates contain the matching public key."
-        validateKeyPair(keyPair.getPublic(), keyPair.getPrivate());
         validatePublicKey(keyPair.getPublic(), certificate);
         try {
             keyStore.setCertificateEntry(DEFAULT_CERTIFICATE_ALIAS, certificate);
