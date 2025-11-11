@@ -109,10 +109,10 @@ public final class KeyPairParser {
     private static KeyFactory getKeyFactory(final PrivateKeyFormat format) throws UnsupportedConfigurationException {
         try {
             if (EcPrivateKeyFormat.VALUE.equals(format)) {
-                return KeyFactory.getInstance("EC");
+                return KeyFactory.getInstance("EC", BCHolder.PROV);
             }
             if (RsaPrivateKeyFormat.VALUE.equals(format)) {
-                return KeyFactory.getInstance("RSA");
+                return KeyFactory.getInstance("RSA", BCHolder.PROV);
             }
         } catch (NoSuchAlgorithmException e) {
             throw new UnsupportedConfigurationException("Unsupported private key format " + format, e);
