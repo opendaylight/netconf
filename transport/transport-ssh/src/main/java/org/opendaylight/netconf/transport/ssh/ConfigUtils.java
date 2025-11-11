@@ -24,7 +24,6 @@ import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.crypto.CMSCertificateParser;
 import org.opendaylight.netconf.transport.crypto.KeyPairParser;
 import org.opendaylight.netconf.transport.crypto.PublicKeyParser;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.AsymmetricKeyPairGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststoreCertsGrouping;
@@ -56,19 +55,7 @@ final class ConfigUtils {
         if (inlineDef == null) {
             throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
         }
-        return extractKeyPair(inlineDef);
-    }
-
-    private static KeyPair extractKeyPair(final AsymmetricKeyPairGrouping input)
-            throws UnsupportedConfigurationException {
-        final var keyPair = KeyPairParser.parseKeyPair(input);
-        /*
-            ietf-crypto-types:grouping asymmetric-key-pair-grouping
-            "A private key and its associated public key.  Implementations
-            SHOULD ensure that the two keys are a matching pair."
-         */
-        KeyUtils.validateKeyPair(keyPair.getPublic(), keyPair.getPrivate());
-        return keyPair;
+        return KeyPairParser.parseKeyPair(inlineDef);
     }
 
     static List<Certificate> extractCertificates(final @Nullable InlineOrTruststoreCertsGrouping input)
@@ -99,7 +86,7 @@ final class ConfigUtils {
         if (inlineDef == null) {
             throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
         }
-        final var keyPair = extractKeyPair(inlineDef);
+        final var keyPair = KeyPairParser.parseKeyPair(inlineDef);
         final var certificate = CMSCertificateParser.parseCertificate(inlineDef.requireCertData());
         /*
           ietf-crypto-types:asymmetric-key-pair-with-cert-grouping
