@@ -196,7 +196,7 @@ final class TransportSshServer extends SshServer {
                     case Certificate certificateType -> {
                         final var certificate = certificateType.getCertificate();
                         if (certificate != null) {
-                            keyPairsBuilder.add(ConfigUtils.extractCertificateEntry(certificate).getKey());
+                            keyPairsBuilder.add(ConfigUtils.extractCertificateEntry(certificate).keyPair());
                         }
                     }
                     default -> throw new UnsupportedConfigurationException("Unsupported server host key type " + type);

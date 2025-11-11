@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.transport.crypto;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.Beta;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -15,6 +17,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.cert.Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.InvalidKeySpecException;
@@ -23,6 +26,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.AsymmetricKeyPairGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.AsymmetricKeyPairWithCertGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.EcPrivateKeyFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.PrivateKeyFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.RsaPrivateKeyFormat;
@@ -41,6 +45,39 @@ import org.slf4j.LoggerFactory;
 @Beta
 @NonNullByDefault
 public final class KeyPairParser {
+    /**
+     * A {@link KeyPair} and a {@link Certificate}, i.e. the equivalent of {@link AsymmetricKeyPairWithCertGrouping}.
+     */
+    // Note: not a record to prevent outside construction
+    public static final class KeyPairWithCertificate {
+        private final KeyPair keyPair;
+        private final Certificate certificate;
+
+        KeyPairWithCertificate(final KeyPair keyPair, final Certificate certificate) {
+            this.keyPair = requireNonNull(keyPair);
+            this.certificate = requireNonNull(certificate);
+        }
+
+        /**
+         * {@return the {@link KeyPair}}
+         */
+        public KeyPair keyPair() {
+            return keyPair;
+        }
+
+        /**
+         * {@return the {@link Certificate}}
+         */
+        public Certificate certificate() {
+            return certificate;
+        }
+
+        @Override
+        public String toString() {
+            return "CertifiedKeyPair [keyPair=" + keyPair + ", certificate=" + certificate + "]";
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(KeyPairParser.class);
 
     private KeyPairParser() {
@@ -50,20 +87,20 @@ public final class KeyPairParser {
     /**
      * Parse an {@link AsymmetricKeyPairGrouping} into a {@link KeyPair}.
      *
-     * @param keyPair the {@link AsymmetricKeyPairGrouping}
+     * @param config the {@link AsymmetricKeyPairGrouping}
      * @return a {@link KeyPair}
      * @throws UnsupportedConfigurationException if the key pair cannot be parsed
      */
-    public static KeyPair parseKeyPair(final AsymmetricKeyPairGrouping keyPair)
+    public static KeyPair parseKeyPair(final AsymmetricKeyPairGrouping config)
             throws UnsupportedConfigurationException {
         // Private key is mandatory, interpret it first, which gives us the algorithm we ware supporting
-        final var privFormat = keyPair.getPrivateKeyFormat();
+        final var privFormat = config.getPrivateKeyFormat();
         if (privFormat == null) {
             throw new UnsupportedConfigurationException("Missing private key format");
         }
         final var keyFactory = getKeyFactory(privFormat);
 
-        final var privType = keyPair.getPrivateKeyType();
+        final var privType = config.getPrivateKeyType();
         final var privBody = switch (privType) {
             case CleartextPrivateKey clearText -> {
                 final var key = clearText.getCleartextPrivateKey();
@@ -84,12 +121,12 @@ public final class KeyPairParser {
 
         // Next up: public key is optional and composed of two parts. If any of them are missing derive the public key
         //          from the private key.
-        final var pubBody = keyPair.getPublicKey();
+        final var pubBody = config.getPublicKey();
         if (pubBody == null) {
             LOG.debug("Missing public key, deriving it from the private key");
             return privateOnlyKeyPair(privFormat, keyFactory, privKey);
         }
-        final var pubFormat = keyPair.getPublicKeyFormat();
+        final var pubFormat = config.getPublicKeyFormat();
         if (pubFormat == null) {
             LOG.warn("Missing public key format, deriving public key from the private key");
             return privateOnlyKeyPair(privFormat, keyFactory, privKey);
@@ -124,6 +161,29 @@ public final class KeyPairParser {
         }
 
         return new KeyPair(pubKey, privKey);
+    }
+
+    /**
+     * Parse an {@link AsymmetricKeyPairWithCertGrouping} into a {@link KeyPairWithCertificate}.
+     *
+     * @param config the {@link AsymmetricKeyPairWithCertGrouping}
+     * @return a {@link KeyPairWithCertificate}
+     * @throws UnsupportedConfigurationException if the key pair or certificate cannot be parsed or if the certificate's
+     *         public key does not match the kair pair
+     */
+    public static KeyPairWithCertificate parseKeyPairWithCertificate(final AsymmetricKeyPairWithCertGrouping config)
+            throws UnsupportedConfigurationException {
+        final var certData = config.getCertData();
+        if (certData == null) {
+            throw new UnsupportedConfigurationException("Missing certificate");
+        }
+        final var cert = CMSCertificateParser.parseCertificate(certData);
+        final var keyPair = parseKeyPair(config);
+        // FIXME: NETCONF-1536: better key comparison
+        if (!keyPair.getPublic().equals(cert.getPublicKey())) {
+            throw new UnsupportedConfigurationException("Certificate does not match the public key");
+        }
+        return new KeyPairWithCertificate(keyPair, cert);
     }
 
     // get the KeyFactory corresponding to a PrivateKeyFormat
