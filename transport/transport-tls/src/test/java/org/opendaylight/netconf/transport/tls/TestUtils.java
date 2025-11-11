@@ -25,6 +25,7 @@ import org.bouncycastle.crypto.util.OpenSSHPublicKeyUtil;
 import org.bouncycastle.crypto.util.PublicKeyFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.EndEntityCertCms;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.PrivateKeyFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.PublicKeyFormat;
@@ -38,6 +39,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.
 import org.opendaylight.yangtools.binding.util.BindingMap;
 
 final class TestUtils {
+    static final @NonNull String RSA_ALGORITHM = "RSA";
+    static final @NonNull String EC_ALGORITHM = "EC";
+
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private TestUtils() {
@@ -130,6 +134,6 @@ final class TestUtils {
     }
 
     static boolean isRSA(final String algorithm) {
-        return KeyUtils.RSA_ALGORITHM.equals(algorithm);
+        return RSA_ALGORITHM.equals(algorithm);
     }
 }
