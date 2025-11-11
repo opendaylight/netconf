@@ -7,11 +7,8 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
-import java.io.IOException;
 import java.security.InvalidKeyException;
-import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
@@ -20,63 +17,18 @@ import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
-import org.bouncycastle.crypto.params.ECPublicKeyParameters;
-import org.bouncycastle.crypto.params.RSAKeyParameters;
-import org.bouncycastle.crypto.util.OpenSSHPublicKeyUtil;
-import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 
 final class KeyUtils {
-
-    static final String RSA_ALGORITHM = "RSA";
-    static final String EC_ALGORITHM = "EC";
-    private static final String BC = BouncyCastleProvider.PROVIDER_NAME;
-
     static {
         Security.addProvider(new BouncyCastleProvider());
     }
 
     private KeyUtils() {
         // utility class
-    }
-
-    private static PublicKey buildX509PublicKey(final String keyAlgorithm, final byte[] bytes)
-            throws UnsupportedConfigurationException {
-        try {
-            return getKeyFactory(keyAlgorithm).generatePublic(new X509EncodedKeySpec(bytes));
-        } catch (InvalidKeySpecException e) {
-            throw new UnsupportedConfigurationException("Invalid public key for " + keyAlgorithm, e);
-        }
-    }
-
-    private static KeyFactory getKeyFactory(final String algorithm) throws UnsupportedConfigurationException {
-        try {
-            return KeyFactory.getInstance(algorithm, BC);
-        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-            throw new UnsupportedConfigurationException("Key algorithm " + algorithm + " is not supported", e);
-        }
-    }
-
-    static PublicKey buildPublicKeyFromSshEncoding(final byte[] bytes) throws UnsupportedConfigurationException {
-        try {
-            var parsed = OpenSSHPublicKeyUtil.parsePublicKey(bytes);
-            var converted = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(parsed).getEncoded();
-            if (parsed instanceof RSAKeyParameters rsaParams && !rsaParams.isPrivate()) {
-                return buildX509PublicKey(RSA_ALGORITHM, converted);
-            }
-            if (parsed instanceof ECPublicKeyParameters ecParams && !ecParams.isPrivate()) {
-                return buildX509PublicKey(EC_ALGORITHM, converted);
-            }
-            throw new UnsupportedConfigurationException("Invalid OpenSSH public key; "
-                    + "Expected RSA or EC public key; Current:" + parsed);
-        } catch (IOException e) {
-            throw new UnsupportedConfigurationException("Cannot parse OpenSSH public key", e);
-        }
     }
 
     static void validateKeyPair(final PublicKey publicKey, final PrivateKey privateKey)
