@@ -7,27 +7,18 @@
  */
 package org.opendaylight.netconf.transport.crypto;
 
-import java.io.IOException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.crypto.util.OpenSSHPublicKeyUtil;
-import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.AsymmetricKeyPairGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.EcPrivateKeyFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.PrivateKeyFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.RsaPrivateKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SshPublicKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SubjectPublicKeyInfoFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010._private.key.grouping._private.key.type.CleartextPrivateKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,14 +84,7 @@ public final class KeyPairParser {
         }
 
         // We have both parts of the public key specification, let's try to parse it
-        final PublicKey pubKey;
-        if (SubjectPublicKeyInfoFormat.VALUE.equals(pubFormat)) {
-            pubKey = parseX509(keyFactory, pubBody);
-        } else if (SshPublicKeyFormat.VALUE.equals(pubFormat)) {
-            pubKey = parseOpenSsh(pubBody);
-        } else {
-            throw new UnsupportedConfigurationException("Unsupported public key format " + pubFormat);
-        }
+        final var pubKey = PublicKeyParser.parsePublicKey(pubFormat, pubBody);
 
         // FIXME: NETCONF-1506: check whether the private and public key match
         return new KeyPair(pubKey, privKey);
@@ -126,35 +110,5 @@ public final class KeyPairParser {
             throws UnsupportedOperationException {
         // FIXME: NETCONF-1536: implement this
         throw new UnsupportedOperationException("Cannot derive public keys for " + format);
-    }
-
-    private static PublicKey parseOpenSsh(final byte[] body) throws UnsupportedConfigurationException {
-        final SubjectPublicKeyInfo spki;
-        try {
-            spki = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(OpenSSHPublicKeyUtil.parsePublicKey(body));
-        } catch (IllegalArgumentException | IllegalStateException | IOException e) {
-            throw new UnsupportedConfigurationException("Cannot parse OpenSSH public key: " + e.getMessage(), e);
-        }
-
-        final PublicKey publicKey;
-        try {
-            publicKey = BouncyCastleProvider.getPublicKey(spki);
-        } catch (IOException e) {
-            throw new UnsupportedConfigurationException("Cannot extract OpenSSH public key: " + e.getMessage(), e);
-        }
-        if (publicKey == null) {
-            throw new UnsupportedConfigurationException(
-                "Unsupported OpenSSH public key algorithm " + spki.getAlgorithm());
-        }
-        return publicKey;
-    }
-
-    private static PublicKey parseX509(final KeyFactory keyFactory, final byte[] body)
-            throws UnsupportedConfigurationException {
-        try {
-            return keyFactory.generatePublic(new X509EncodedKeySpec(body));
-        } catch (InvalidKeySpecException e) {
-            throw new UnsupportedConfigurationException("Invalid public key for " + keyFactory.getAlgorithm(), e);
-        }
     }
 }
