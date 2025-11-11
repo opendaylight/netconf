@@ -23,8 +23,8 @@ import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatContr
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.crypto.CMSCertificateParser;
 import org.opendaylight.netconf.transport.crypto.KeyPairParser;
+import org.opendaylight.netconf.transport.crypto.PublicKeyParser;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.AsymmetricKeyPairGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SshPublicKeyFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststoreCertsGrouping;
@@ -134,10 +134,7 @@ final class ConfigUtils {
 
         final var listBuilder = ImmutableList.<PublicKey>builder();
         for (var entry : publicKey.entrySet()) {
-            if (!SshPublicKeyFormat.VALUE.equals(entry.getValue().getPublicKeyFormat())) {
-                throw new UnsupportedConfigurationException("ssh public key format is expected");
-            }
-            listBuilder.add(KeyUtils.buildPublicKeyFromSshEncoding(entry.getValue().getPublicKey()));
+            listBuilder.add(PublicKeyParser.parsePublicKey(entry.getValue()));
         }
         return listBuilder.build();
     }
