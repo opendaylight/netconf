@@ -21,7 +21,6 @@ import java.security.cert.Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
@@ -46,16 +45,7 @@ final class KeyUtils {
         // utility class
     }
 
-    static PrivateKey buildPrivateKey(final String keyAlgorithm, final byte[] bytes)
-            throws UnsupportedConfigurationException {
-        try {
-            return getKeyFactory(keyAlgorithm).generatePrivate(new PKCS8EncodedKeySpec(bytes));
-        } catch (InvalidKeySpecException e) {
-            throw new UnsupportedConfigurationException("Invalid private key for " + keyAlgorithm, e);
-        }
-    }
-
-    static PublicKey buildX509PublicKey(final String keyAlgorithm, final byte[] bytes)
+    private static PublicKey buildX509PublicKey(final String keyAlgorithm, final byte[] bytes)
             throws UnsupportedConfigurationException {
         try {
             return getKeyFactory(keyAlgorithm).generatePublic(new X509EncodedKeySpec(bytes));

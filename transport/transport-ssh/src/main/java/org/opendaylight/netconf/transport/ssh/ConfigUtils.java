@@ -22,12 +22,9 @@ import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatController;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.crypto.CMSCertificateParser;
+import org.opendaylight.netconf.transport.crypto.KeyPairParser;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.AsymmetricKeyPairGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.EcPrivateKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.RsaPrivateKeyFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SshPublicKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SubjectPublicKeyInfoFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010._private.key.grouping._private.key.type.CleartextPrivateKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststoreCertsGrouping;
@@ -64,42 +61,14 @@ final class ConfigUtils {
 
     private static KeyPair extractKeyPair(final AsymmetricKeyPairGrouping input)
             throws UnsupportedConfigurationException {
-        final var keyFormat = input.getPrivateKeyFormat();
-        final String privateKeyAlgorithm;
-        if (EcPrivateKeyFormat.VALUE.equals(keyFormat)) {
-            privateKeyAlgorithm = KeyUtils.EC_ALGORITHM;
-        } else if (RsaPrivateKeyFormat.VALUE.equals(input.getPrivateKeyFormat())) {
-            privateKeyAlgorithm = KeyUtils.RSA_ALGORITHM;
-        } else {
-            throw new UnsupportedConfigurationException("Unsupported private key format " + keyFormat);
-        }
-        final byte[] privateKeyBytes;
-        if (!(input.getPrivateKeyType() instanceof CleartextPrivateKey clearText)) {
-            throw new UnsupportedConfigurationException("Unsupported private key type " + input.getPrivateKeyType());
-        }
-        privateKeyBytes = clearText.requireCleartextPrivateKey();
-
-        final var publicKeyFormat = input.getPublicKeyFormat();
-        final var publicKeyBytes = input.getPublicKey();
-        final boolean isSshPublicKey;
-        if (SubjectPublicKeyInfoFormat.VALUE.equals(publicKeyFormat)) {
-            isSshPublicKey = false;
-        } else if (SshPublicKeyFormat.VALUE.equals(publicKeyFormat)) {
-            isSshPublicKey = true;
-        } else {
-            throw new UnsupportedConfigurationException("Unsupported public key format " + publicKeyFormat);
-        }
-
-        final var privateKey = KeyUtils.buildPrivateKey(privateKeyAlgorithm, privateKeyBytes);
-        final var publicKey = isSshPublicKey ? KeyUtils.buildPublicKeyFromSshEncoding(publicKeyBytes)
-                : KeyUtils.buildX509PublicKey(privateKeyAlgorithm, publicKeyBytes);
+        final var keyPair = KeyPairParser.parseKeyPair(input);
         /*
             ietf-crypto-types:grouping asymmetric-key-pair-grouping
             "A private key and its associated public key.  Implementations
             SHOULD ensure that the two keys are a matching pair."
          */
-        KeyUtils.validateKeyPair(publicKey, privateKey);
-        return new KeyPair(publicKey, privateKey);
+        KeyUtils.validateKeyPair(keyPair.getPublic(), keyPair.getPrivate());
+        return keyPair;
     }
 
     static List<Certificate> extractCertificates(final @Nullable InlineOrTruststoreCertsGrouping input)
