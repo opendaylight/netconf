@@ -30,7 +30,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.type
  *
  * @since 10.0.1
  */
-// TODO: consider making this a service
+// FIXME: NETCONF-1536: this should be a component with pluggable support for various formats
 @Beta
 @NonNullByDefault
 public final class PublicKeyParser {
@@ -38,12 +38,19 @@ public final class PublicKeyParser {
         // Hidden on purpose
     }
 
-    public static PublicKey parsePublicKey(final PublicKeyGrouping publicKey) throws UnsupportedConfigurationException {
-        final var format = publicKey.getPublicKeyFormat();
+    /**
+     * Parse a {@link PublicKeyGrouping} into a {@link PublicKey}.
+     *
+     * @param config the {@link PublicKeyGrouping}
+     * @return the {@link PublicKey}
+     * @throws UnsupportedConfigurationException if the key cannot be parsed
+     */
+    public static PublicKey parsePublicKey(final PublicKeyGrouping config) throws UnsupportedConfigurationException {
+        final var format = config.getPublicKeyFormat();
         if (format == null) {
             throw new UnsupportedConfigurationException("Missing public key format");
         }
-        final var body = publicKey.getPublicKey();
+        final var body = config.getPublicKey();
         if (body == null) {
             throw new UnsupportedConfigurationException("Missing public key");
         }

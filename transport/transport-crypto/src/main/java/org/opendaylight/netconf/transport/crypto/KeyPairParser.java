@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.transport.crypto;
 
+import com.google.common.annotations.Beta;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
  * @since 10.0.1
  */
 // FIXME: NETCONF-1536: this should be a component with pluggable support for various formats
+@Beta
 @NonNullByDefault
 public final class KeyPairParser {
     private static final Logger LOG = LoggerFactory.getLogger(KeyPairParser.class);
