@@ -21,9 +21,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 
 final class KeyUtils {
-    static final String RSA_ALGORITHM = "RSA";
-    static final String EC_ALGORITHM = "EC";
-
     private KeyUtils() {
         // utility class
     }
