@@ -13,9 +13,7 @@ import java.security.KeyPair;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.time.Duration;
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.List;
-import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
@@ -23,6 +21,7 @@ import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatContr
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.crypto.CMSCertificateParser;
 import org.opendaylight.netconf.transport.crypto.KeyPairParser;
+import org.opendaylight.netconf.transport.crypto.KeyPairParser.KeyPairWithCertificate;
 import org.opendaylight.netconf.transport.crypto.PublicKeyParser;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore;
@@ -77,8 +76,8 @@ final class ConfigUtils {
         return listBuilder.build();
     }
 
-    static Map.Entry<KeyPair, List<Certificate>> extractCertificateEntry(
-            final InlineOrKeystoreEndEntityCertWithKeyGrouping input) throws UnsupportedConfigurationException {
+    static KeyPairWithCertificate extractCertificateEntry(final InlineOrKeystoreEndEntityCertWithKeyGrouping input)
+            throws UnsupportedConfigurationException {
         final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
                         .inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.Inline.class,
                 input.getInlineOrKeystore());
@@ -86,15 +85,7 @@ final class ConfigUtils {
         if (inlineDef == null) {
             throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
         }
-        final var keyPair = KeyPairParser.parseKeyPair(inlineDef);
-        final var certificate = CMSCertificateParser.parseCertificate(inlineDef.requireCertData());
-        /*
-          ietf-crypto-types:asymmetric-key-pair-with-cert-grouping
-          "A private/public key pair and an associated certificate.
-          Implementations SHOULD assert that certificates contain the matching public key."
-         */
-        KeyUtils.validatePublicKey(keyPair.getPublic(), certificate);
-        return new SimpleImmutableEntry<>(keyPair, List.of(certificate));
+        return KeyPairParser.parseKeyPairWithCertificate(inlineDef);
     }
 
     private static <T> T ofType(final Class<T> expectedType, final Object obj)

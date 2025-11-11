@@ -7,8 +7,6 @@
  */
 package org.opendaylight.netconf.transport.tls;
 
-import static org.opendaylight.netconf.transport.tls.KeyUtils.validatePublicKey;
-
 import com.google.common.collect.ImmutableMap;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -124,17 +122,14 @@ final class ConfigUtils {
         if (inlineDef == null) {
             throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
         }
-        final var keyPair = KeyPairParser.parseKeyPair(inlineDef);
-        final var certificate = CMSCertificateParser.parseCertificate(inlineDef.requireCertData());
+        final var keyPairWithCertificate = KeyPairParser.parseKeyPairWithCertificate(inlineDef);
+        final var keyPair = keyPairWithCertificate.keyPair();
+        final var certificate = keyPairWithCertificate.certificate();
 
-        // ietf-crypto-types:asymmetric-key-pair-with-cert-grouping
-        // "A private/public key pair and an associated certificate.
-        // Implementations SHOULD assert that certificates contain the matching public key."
-        validatePublicKey(keyPair.getPublic(), certificate);
         try {
             keyStore.setCertificateEntry(DEFAULT_CERTIFICATE_ALIAS, certificate);
-            keyStore.setKeyEntry(DEFAULT_PRIVATE_KEY_ALIAS, keyPair.getPrivate(),
-                    EMPTY_SECRET, new Certificate[]{certificate});
+            keyStore.setKeyEntry(DEFAULT_PRIVATE_KEY_ALIAS, keyPair.getPrivate(), EMPTY_SECRET,
+                new Certificate[] { certificate });
         } catch (KeyStoreException e) {
             throw new UnsupportedConfigurationException("Failed to load certificate and/or private key", e);
         }

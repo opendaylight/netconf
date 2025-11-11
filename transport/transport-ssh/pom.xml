@@ -172,6 +172,14 @@
                     </instructions>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <ignoredNonTestScopedDependencies>
+                        <ignoredNonTestScopedDependencies>org.bouncycastle:bcprov-jdk18on</ignoredNonTestScopedDependencies>
+                    </ignoredNonTestScopedDependencies>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
