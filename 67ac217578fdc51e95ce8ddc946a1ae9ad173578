@@ -16,6 +16,24 @@
       "message": "does this depend on the previous two patches?",
       "revId": "67ac217578fdc51e95ce8ddc946a1ae9ad173578",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a808323_823d3101",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-12T10:42:05Z",
+      "side": 1,
+      "message": "This change is not directly dependent on them. Previous patches make this more noticeable. So when the request is timed out, later reply from the device is an unsolicited message.\n\nI have rebased these changes on master branch.",
+      "parentUuid": "914e9f8b_ff019a4d",
+      "revId": "67ac217578fdc51e95ce8ddc946a1ae9ad173578",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
