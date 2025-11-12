@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "264158ac_06c084d6",
+        "filename": "transport/transport-http/pom.xml",
+        "patchSetId": 14
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-11-12T23:33:51Z",
+      "side": 1,
+      "message": "this is a layering violation",
+      "range": {
+        "startLine": 111,
+        "startChar": 24,
+        "endLine": 111,
+        "endChar": 43
+      },
+      "revId": "8728b287d6f9ce23981badd24abb58a8a9a64a67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
