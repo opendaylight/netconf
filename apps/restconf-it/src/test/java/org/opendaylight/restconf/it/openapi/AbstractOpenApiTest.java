@@ -91,8 +91,8 @@ import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.stack.grouping.Transport;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.HttpServerListenStackGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.transport.HttpOverTcp;
 import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecServices;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -166,14 +166,14 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
         port = randomBindablePort();
         host = localAddress + ":" + port;
         final var serverTransport = ConfigUtils.serverTransportTcp(localAddress, port);
-        final var serverStackGrouping = new HttpServerStackGrouping() {
+        final var serverStackGrouping = new HttpServerListenStackGrouping() {
             @Override
-            public Class<? extends HttpServerStackGrouping> implementedInterface() {
-                return HttpServerStackGrouping.class;
+            public Class<HttpServerListenStackGrouping> implementedInterface() {
+                return HttpServerListenStackGrouping.class;
             }
 
             @Override
-            public Transport getTransport() {
+            public HttpOverTcp getTransport() {
                 return serverTransport;
             }
         };
