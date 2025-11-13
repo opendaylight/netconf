@@ -72,7 +72,7 @@ class SchemaSetupTest extends AbstractTestModelTest {
             .getSchemaSource(any(), eq(YangTextSource.class));
 
         final var future = SchemaSetup.resolve(schemaRepository, contextFactory, DEVICE_ID,
-            Set.of(TEST_QNAME, TEST_QNAME2), NetconfSessionPreferences.fromStrings(Set.of()));
+            Set.of(TEST_QNAME, TEST_QNAME2));
 
         final var result = Futures.getDone(future);
         verify(contextFactory, times(2)).createEffectiveModelContext(anyCollection());
@@ -90,7 +90,7 @@ class SchemaSetupTest extends AbstractTestModelTest {
         doReturn(TEST_MODEL_FUTURE).when(contextFactory).createEffectiveModelContext(anyCollection());
 
         final var future = SchemaSetup.resolve(schemaRepository, contextFactory, DEVICE_ID,
-            Set.of(TEST_QNAME, TEST_QNAME2), NetconfSessionPreferences.fromStrings(Set.of()));
+            Set.of(TEST_QNAME, TEST_QNAME2));
 
         final var result = Futures.getDone(future);
         final ArgumentCaptor<Collection<SourceIdentifier>> captor = ArgumentCaptor.captor();
@@ -105,14 +105,16 @@ class SchemaSetupTest extends AbstractTestModelTest {
             .getSchemaSource(any(), eq(YangTextSource.class));
         doReturn(TEST_MODEL_FUTURE).when(contextFactory).createEffectiveModelContext(anyCollection());
 
-        final var future = SchemaSetup.resolve(schemaRepository, contextFactory, DEVICE_ID, Set.of(TEST_QNAME),
-            NetconfSessionPreferences.fromStrings(
-                Set.of(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION)));
+        final var future = SchemaSetup.resolve(schemaRepository, contextFactory, DEVICE_ID, Set.of(TEST_QNAME));
 
         final var result = Futures.getDone(future);
         assertEquals(Set.of(new AvailableCapabilityBuilder()
             .setCapability("(test:namespace?revision=2013-07-22)test-module")
             .setCapabilityOrigin(CapabilityOrigin.DeviceAdvertised)
-            .build()), result.capabilities().resolvedCapabilities());
+            .build()),
+            result.extractCapabilities(Set.of(TEST_QNAME),
+                NetconfSessionPreferences.fromStrings(
+                    Set.of(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION)))
+                .resolvedCapabilities());
     }
 }

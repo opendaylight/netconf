@@ -91,13 +91,16 @@ public final class DefaultDeviceNetconfSchemaProvider implements DeviceNetconfSc
         final var registrations = deviceSources.providedSources().stream()
             .flatMap(sources -> sources.registerWith(registry, Costs.REMOTE_IO.getValue()))
             .collect(Collectors.toUnmodifiableList());
-        final var future = SchemaSetup.resolve(repository, contextFactory, deviceId, requiredSources,
-            sessionPreferences);
+        final var future = SchemaSetup.resolve(repository, contextFactory, deviceId, requiredSources);
 
         // Unregister sources once resolution is complete
         future.addListener(() -> registrations.forEach(Registration::close), processingExecutor);
 
-        return future;
+        final var finalRequiredSources = requiredSources;
+        return Futures.transform(future,
+            result -> new DeviceNetconfSchema(result.extractCapabilities(finalRequiredSources, sessionPreferences),
+                result.modelContext()),
+            processingExecutor);
     }
 
     @Deprecated
