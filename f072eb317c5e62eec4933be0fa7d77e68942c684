@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "946377fc_01b29e85",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseOutput.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-11-13T10:33:24Z",
+      "side": 1,
+      "message": "naming: what is the difference between \u0027configChunkSize\u0027 and \u0027chunkSize\u0027?",
+      "range": {
+        "startLine": 43,
+        "startChar": 85,
+        "endLine": 43,
+        "endChar": 94
+      },
+      "revId": "f072eb317c5e62eec4933be0fa7d77e68942c684",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
