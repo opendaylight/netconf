@@ -71,7 +71,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
 
     private Collection<SourceIdentifier> requiredSources;
 
-    SchemaSetup(final SchemaRepository repository, final EffectiveModelContextFactory contextFactory,
+    private SchemaSetup(final SchemaRepository repository, final EffectiveModelContextFactory contextFactory,
             final RemoteDeviceId deviceId, final NetconfDeviceSchemas deviceSchemas,
             final NetconfSessionPreferences sessionPreferences) {
         this.repository = requireNonNull(repository);
@@ -101,9 +101,12 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
         requiredSources.removeAll(missingSources);
     }
 
-    ListenableFuture<DeviceNetconfSchema> startResolution() {
-        trySetupSchema();
-        return resultFuture;
+    static ListenableFuture<DeviceNetconfSchema> resolve(final SchemaRepository repository,
+            final EffectiveModelContextFactory contextFactory, final RemoteDeviceId deviceId,
+            final NetconfDeviceSchemas deviceSchemas, final NetconfSessionPreferences sessionPreferences) {
+        final var instance = new SchemaSetup(repository, contextFactory, deviceId, deviceSchemas, sessionPreferences);
+        instance.trySetupSchema();
+        return instance.resultFuture;
     }
 
     @Override
