@@ -28,9 +28,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice.EmptySchemaContextException;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
-import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.oper.available.capabilities.AvailableCapabilityBuilder;
@@ -48,44 +48,72 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Schema builder that tries to build schema context from provided sources or biggest subset of it.
+ * A single resolution attempt which tries to build an {@link EffectiveModelContext} from a set of sources. When
+ * failures occur, it tries to trim the sources required until either succeeds or runs out of sources.
  */
 final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
+    /**
+     * Successful result of a {@link SchemaSetup} run.
+     *
+     * @param modelContext the {@link EffectiveModelContext}
+     * @param sourceToReason the {@link FailureReason}s for exclusion, organized by the source being excluded
+     */
+    @NonNullByDefault
+    record Result(EffectiveModelContext modelContext, ImmutableMap<QName, FailureReason> sourceToReason) {
+        Result {
+            requireNonNull(modelContext);
+            requireNonNull(sourceToReason);
+        }
+
+        NetconfDeviceCapabilities extractCapabilities(final Set<QName> requiredSources,
+                final NetconfSessionPreferences sessionPreferences) {
+            final var filteredQNames = Sets.difference(requiredSources, sourceToReason.keySet());
+
+            return new NetconfDeviceCapabilities(sourceToReason, filteredQNames.stream()
+                .map(capability -> new AvailableCapabilityBuilder()
+                    .setCapability(capability.toString())
+                    .setCapabilityOrigin(sessionPreferences.capabilityOrigin(capability))
+                    .build())
+                .collect(ImmutableSet.toImmutableSet()), sessionPreferences.nonModuleCaps().keySet().stream()
+                .map(capability -> new AvailableCapabilityBuilder()
+                    .setCapability(capability)
+                    .setCapabilityOrigin(sessionPreferences.capabilityOrigin(capability))
+                    .build())
+                .collect(ImmutableSet.toImmutableSet()));
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(SchemaSetup.class);
 
-    private final SettableFuture<DeviceNetconfSchema> resultFuture = SettableFuture.create();
+    private final SettableFuture<SchemaSetup.Result> resultFuture = SettableFuture.create();
     private final HashMap<QName, FailureReason> unresolvedCapabilites = new HashMap<>();
     private final RemoteDeviceId deviceId;
     private final Set<QName> initialRequiredSources;
-    private final NetconfSessionPreferences sessionPreferences;
     private final SchemaRepository repository;
     private final EffectiveModelContextFactory contextFactory;
 
     private Collection<SourceIdentifier> requiredSources;
 
     private SchemaSetup(final SchemaRepository repository, final EffectiveModelContextFactory contextFactory,
-            final RemoteDeviceId deviceId, final Set<QName> initialRequiredSources,
-            final NetconfSessionPreferences sessionPreferences) {
+            final RemoteDeviceId deviceId, final Set<QName> initialRequiredSources) {
         this.repository = requireNonNull(repository);
         this.contextFactory = requireNonNull(contextFactory);
         this.deviceId = requireNonNull(deviceId);
         this.initialRequiredSources = requireNonNull(initialRequiredSources);
-        this.sessionPreferences = requireNonNull(sessionPreferences);
 
         requiredSources = initialRequiredSources.stream()
             .map(qname -> new SourceIdentifier(qname.getLocalName(), qname.getRevision().orElse(null)))
             .collect(Collectors.toList());
 
         final var missingSources = filterMissingSources(requiredSources);
-        addUnresolvedCapabilities(getQNameFromSourceIdentifiers(missingSources),
-            UnavailableCapability.FailureReason.MissingSource);
+        addUnresolvedCapabilities(getQNameFromSourceIdentifiers(missingSources), FailureReason.MissingSource);
         requiredSources.removeAll(missingSources);
     }
 
-    static ListenableFuture<DeviceNetconfSchema> resolve(final SchemaRepository repository,
+    static ListenableFuture<SchemaSetup.Result> resolve(final SchemaRepository repository,
             final EffectiveModelContextFactory contextFactory, final RemoteDeviceId deviceId,
-            final Set<QName> requiredSources, final NetconfSessionPreferences sessionPreferences) {
-        final var instance = new SchemaSetup(repository, contextFactory, deviceId, requiredSources, sessionPreferences);
+            final Set<QName> requiredSources) {
+        final var instance = new SchemaSetup(repository, contextFactory, deviceId, requiredSources);
         instance.trySetupSchema();
         return instance.resultFuture;
     }
@@ -93,25 +121,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     @Override
     public void onSuccess(final EffectiveModelContext result) {
         LOG.debug("{}: Schema context built successfully from {}", deviceId, requiredSources);
-
-        final var filteredQNames = Sets.difference(initialRequiredSources, unresolvedCapabilites.keySet());
-        final var resolvedCapabilities = filteredQNames.stream()
-            .map(capability -> new AvailableCapabilityBuilder()
-                .setCapability(capability.toString())
-                .setCapabilityOrigin(sessionPreferences.capabilityOrigin(capability))
-                .build())
-            .collect(Collectors.toSet());
-        final var nonModuleBasedCapabilities =
-            sessionPreferences.nonModuleCaps().keySet().stream()
-                .map(capability -> new AvailableCapabilityBuilder()
-                    .setCapability(capability)
-                    .setCapabilityOrigin(sessionPreferences.capabilityOrigin(capability))
-                    .build())
-                .collect(Collectors.toSet());
-
-        resultFuture.set(new DeviceNetconfSchema(new NetconfDeviceCapabilities(
-            ImmutableMap.copyOf(unresolvedCapabilites), ImmutableSet.copyOf(resolvedCapabilities),
-            ImmutableSet.copyOf(nonModuleBasedCapabilities)), result));
+        resultFuture.set(new Result(result, ImmutableMap.copyOf(unresolvedCapabilites)));
     }
 
     @Override
