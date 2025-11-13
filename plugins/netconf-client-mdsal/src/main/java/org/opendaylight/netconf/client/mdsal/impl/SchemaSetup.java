@@ -23,13 +23,11 @@ import com.google.common.util.concurrent.SettableFuture;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice.EmptySchemaContextException;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchema;
@@ -87,19 +85,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     static ListenableFuture<DeviceNetconfSchema> resolve(final SchemaRepository repository,
             final EffectiveModelContextFactory contextFactory, final RemoteDeviceId deviceId,
             final Set<QName> requiredSources, final NetconfSessionPreferences sessionPreferences) {
-        // If device supports notifications and does not contain necessary modules, add them automatically
-        final var initialRequiredSources = new HashSet<>(requiredSources);
-        if (sessionPreferences.containsNonModuleCapability(CapabilityURN.NOTIFICATION)) {
-            initialRequiredSources.add(
-                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                    .YangModuleInfoImpl.getInstance().getName());
-            initialRequiredSources.add(
-                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
-                    .YangModuleInfoImpl.getInstance().getName());
-        }
-
-        final var instance = new SchemaSetup(repository, contextFactory, deviceId, initialRequiredSources,
-            sessionPreferences);
+        final var instance = new SchemaSetup(repository, contextFactory, deviceId, requiredSources, sessionPreferences);
         instance.trySetupSchema();
         return instance.resultFuture;
     }
