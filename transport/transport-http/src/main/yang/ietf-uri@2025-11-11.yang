@@ -1,0 +1,119 @@
+module ietf-uri {
+  yang-version 1.1;
+  namespace "urn:ietf:params:xml:ns:yang:ietf-uri";
+  prefix uri;
+
+  import ietf-inet-types {
+    prefix inet;
+    reference
+      "RFC 6991: Common YANG Data Types";
+  }
+
+  import ietf-netconf-acm {
+    prefix nacm;
+    reference
+      "RFC 8341: Network Configuration Access Control Model";
+  }
+
+  organization
+    "IETF NETCONF (Network Configuration) Working Group";
+
+  contact
+    "WG Web:   https://datatracker.ietf.org/wg/netconf
+     WG List:  NETCONF WG list <mailto:netconf@ietf.org>
+     Author:   Kent Watsen <mailto:kent+ietf@watsen.net>";
+
+  description
+    "This module defines a grouping for the URI described
+     in Section 3 of RFC 3986.
+
+     Copyright (c) 2025 IETF Trust and the persons identified
+     as authors of the code. All rights reserved.
+
+     Redistribution and use in source and binary forms, with
+     or without modification, is permitted pursuant to, and
+     subject to the license terms contained in, the Revised
+     BSD License set forth in Section 4.c of the IETF Trust's
+     Legal Provisions Relating to IETF Documents
+     (https://trustee.ietf.org/license-info).
+
+     This version of this YANG module is part of RFC GGGG
+     (https://www.rfc-editor.org/info/rfcGGGG); see the RFC
+     itself for full legal notices.
+
+     The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL',
+     'SHALL NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED',
+     'NOT RECOMMENDED', 'MAY', and 'OPTIONAL' in this document
+     are to be interpreted as described in BCP 14 (RFC 2119)
+     (RFC 8174) when, and only when, they appear in all
+     capitals, as shown here.";
+
+  revision 2025-11-11 {
+    description
+      "Initial version";
+    reference
+      "RFC GGGG: YANG Groupings for HTTP Clients and HTTP Servers";
+  }
+
+  // Grouping
+
+  grouping uri {
+    description
+      "A grouping that defines leafs for each component of the
+       URI described in Section 3 of RFC 3986.  This grouping
+       may be preferred, to the 'uri' typedef in Section 4 of
+       RFC 6991, when validation is important.
+
+       This grouping does not define an outer container, e.g.,
+       called 'uri', thus enabling consuming YANG modules to
+       chose the appropriate name for the data model.";
+    reference
+      "RFC 3986: URI Generic Syntax
+       RFC 6991: Common YANG Data Types";
+    leaf scheme {
+      type string;
+      mandatory true;
+      description
+        "The 'Scheme' as described in Section 3.1 of RFC 3986.";
+    }
+    container authority {
+      presence
+        "Indicates that 'authority' has been configured.";
+      description
+        "The 'Authority' as described in Section 3.2 of RFC 3986.";
+      leaf userinfo {
+        nacm:default-deny-all;
+        type string;
+        description
+          "The 'User Information' as described in Section 3.2.1
+           of RFC 3986.";
+      }
+      leaf host {
+        type inet:host;
+        mandatory true;
+        description
+          "The 'Host' as described in Section 3.2.2 of RFC 3986.";
+      }
+      leaf port {
+        type inet:port-number;
+        description
+          "The 'Port' as described in Section 3.2.3 of RFC 3986.";
+      }
+    }
+    leaf path {
+      type string;
+      description
+        "The 'Path' as described in Section 3.3 of RFC 3986.";
+    }
+    leaf query {
+      type string;
+      description
+        "The 'Query' as described in Section 3.4 of RFC 3986.";
+    }
+    leaf fragment {
+      type string;
+      description
+        "The 'Fragment' as described in Section 3.5 of RFC 3986.";
+    }
+  }
+}

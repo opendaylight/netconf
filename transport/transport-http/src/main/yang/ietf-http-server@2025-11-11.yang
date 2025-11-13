@@ -33,6 +33,18 @@ module ietf-http-server {
       "RFC FFFF: YANG Groupings for TLS Clients and TLS Servers";
   }
 
+  import ietf-udp-server {
+    prefix udps;
+    reference
+      "RFC JJJJ: YANG Groupings for UDP Clients and UDP Servers";
+  }
+
+  import iana-http-versions {
+    prefix httpv;
+    reference
+      "RFC GGGG: YANG Groupings for HTTP Clients and HTTP Servers";
+  }
+
   organization
     "IETF NETCONF (Network Configuration) Working Group";
 
@@ -42,10 +54,10 @@ module ietf-http-server {
      Author:   Kent Watsen <mailto:kent+ietf@watsen.net>";
 
   description
-    "This module defines reusable groupings for HTTP servers that
-     can be used as a basis for specific HTTP server instances.
+    "This module defines groupings for HTTP servers that can
+     be used as a basis for specific HTTP server instances.
 
-     Copyright (c) 2024 IETF Trust and the persons identified
+     Copyright (c) 2025 IETF Trust and the persons identified
      as authors of the code. All rights reserved.
 
      Redistribution and use in source and binary forms, with
@@ -66,7 +78,7 @@ module ietf-http-server {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2024-02-08 {
+  revision 2025-11-11 {
     description
       "Initial version";
     reference
@@ -117,11 +129,25 @@ module ietf-http-server {
       "RFC 9110: HTTP Semantics";
   }
 
+  feature quic-supported {
+    description
+      "Indicates that the server supports configuring HTTP
+       servers to listen for HTTP/3 connections over QUIC.";
+    reference
+      "RFC 9114: HTTP/3";
+  }
+
+  feature version-discovery {
+    description
+      "Indicates that the server implements the discovery for
+       which HTTP versions are supported for HTTP servers.";
+  }
+
   // Groupings
 
   grouping http-server-grouping {
     description
-      "A reusable grouping for configuring an HTTP server.
+      "A grouping for configuring HTTP server level parameters.
 
        Note that this grouping uses fairly typical descendant
        node names such that a stack of 'uses' statements will
@@ -207,29 +233,65 @@ module ietf-http-server {
           }
         }
       }
-    } // container client-authentication
+    }
+
+    container protocol-versions {
+      presence
+        "If unconfigured, all supported HTTP versions are
+         acceptable.";
+      description
+        "HTTP protocol versions the server accepts.";
+      leaf-list protocol-version {
+        type httpv:http-protocol-version;
+        min-elements 1;
+        description
+          "Indicates that the server is configured to support
+           this HTTP version.  The value must be one of the
+           'supported-versions' values.";
+      }
+    }
+
+    container supported-versions {
+      if-feature "version-discovery";
+      config false;
+      description
+        "A container for a list of HTTP protocol versions supported
+         by the server.";
+      leaf-list supported-version {
+        type httpv:http-protocol-version;
+        description
+          "An HTTP protocol version supported by the server.";
+      }
+    }
+
   } // grouping http-server-grouping
 
-  grouping http-server-stack-grouping {
+
+  grouping http-server-listen-stack-grouping {
     description
-      "A grouping that defines common HTTP-based protocol stacks.";
+      "A grouping that defines a single instance of an HTTP-based
+       protocol stack to listen for HTTP connections.";
     choice transport {
       mandatory true;
       description
-        "Choice amongst various transports type.  TCP, with and
-         without TLS are defined here, with 'feature' statements
-         so that they may be disabled.  Other transports MAY be
-         augmented in as 'case' statements by future efforts.";
-      case tcp {
-        if-feature "tcp-supported";
-        container tcp {
+        "Choice amongst various transports type.";
+      case http-over-tcp {
+        container http-over-tcp {
           description
-            "Container for TCP-based HTTP protocols.";
+            "Container for TCP-based HTTP/1 or HTTP/2 protocols.";
           container tcp-server-parameters {
             description
               "TCP-level server parameters to
                listen for HTTP connections.";
-            uses tcps:tcp-server-grouping;
+            uses tcps:tcp-server-grouping {
+              refine "local-bind/local-port" {
+                default "80";
+                description
+                  "The HTTP server will attempt to connect
+                   to the IANA-assigned well-known port for
+                   'http' (80) if no value is specified.";
+              }
+            }
           }
           container http-server-parameters {
             description
@@ -239,16 +301,23 @@ module ietf-http-server {
           }
         }
       }
-      case tls {
-        if-feature "tls-supported";
-        container tls {
+      case http-over-tls {
+        container http-over-tls {
           description
-            "Container for TLS-based HTTP protocols.";
+            "Container for TLS-based HTTP/1 or HTTP/2 protocols.";
           container tcp-server-parameters {
             description
               "TCP-level server parameters to
                listen for HTTPS connections.";
-            uses tcps:tcp-server-grouping;
+            uses tcps:tcp-server-grouping {
+              refine "local-bind/local-port" {
+                default "443";
+                description
+                  "The HTTP server will attempt to connect
+                   to the IANA-assigned well-known port for
+                   'https' (443) if no value is specified.";
+              }
+            }
           }
           container tls-server-parameters {
             description
@@ -264,7 +333,29 @@ module ietf-http-server {
           }
         }
       }
+      case http-over-quic {
+        container http-over-quic {
+          description
+            "Container for the QUIC-based HTTP/3 protocol.";
+          container udp-server-parameters {
+            description
+              "UDP-level server parameters.";
+            uses udps:udp-server;
+          }
+          container tls-server-parameters {
+            description
+              "TLS-level server parameters.";
+            uses tlss:tls-server-grouping;
+          }
+          container http-server-parameters {
+            description
+              "HTTP-level server parameters.";
+            uses http-server-grouping;
+          }
+        }
+      }
     }
-  } // http-server-stack-grouping
+  } // http-server-listen-stack-grouping
 
 }
+
