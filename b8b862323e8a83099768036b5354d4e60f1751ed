@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b97fd8e_1ebaa2de",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/PipeliningIT.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2025-11-13T14:06:20Z",
+      "side": 1,
+      "message": "I dont like this usage of magic numbers, if the purpose is to check the order as described in comment above, I would rather do assertTrue(firstResponseSize \u003e secondResponseSize);",
+      "revId": "b8b862323e8a83099768036b5354d4e60f1751ed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51686cac_8e114cdb",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/PipeliningTest.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2025-11-13T14:06:20Z",
+      "side": 1,
+      "message": "Is 1 second enough? I would make this higher to prevent future test failures when running on slower machines or under heavy load",
+      "revId": "b8b862323e8a83099768036b5354d4e60f1751ed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
