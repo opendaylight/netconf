@@ -107,6 +107,13 @@ public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchem
             .build();
     }
 
+    /**
+     * Default constructor.
+     */
+    public NetconfStateSchemasResolverImpl() {
+        // Nothing else
+    }
+
     @Override
     public ListenableFuture<NetconfDeviceSchemas> resolve(final RemoteDeviceId deviceId,
             final NetconfSessionPreferences sessionPreferences, final NetconfRpcService deviceRpc,
@@ -407,7 +414,6 @@ public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchem
             LOG.debug("{}: Netconf device reported in hello: {}", deviceId, requiredSources);
             requiredSources.addAll(providedSourcesNotRequired);
         }
-
 
         return Futures.immediateFuture(new NetconfDeviceSchemas(requiredSources,
             // FIXME: determine features
