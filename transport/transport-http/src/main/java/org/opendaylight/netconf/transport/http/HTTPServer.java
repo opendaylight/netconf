@@ -18,9 +18,9 @@ import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.netconf.transport.tls.TLSServer;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.stack.grouping.transport.Tcp;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.stack.grouping.transport.Tls;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.HttpServerListenStackGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.transport.HttpOverTcp;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.transport.HttpOverTls;
 
 /**
  * A {@link HTTPTransportStack} acting as a server. When this stack is set up, {@link HTTPTransportChannel}s reported
@@ -46,7 +46,7 @@ public final class HTTPServer extends HTTPTransportStack {
      */
     public static @NonNull ListenableFuture<HTTPServer> listen(
             final TransportChannelListener<? super HTTPTransportChannel> listener, final ServerBootstrap bootstrap,
-            final HttpServerStackGrouping listenParams) throws UnsupportedConfigurationException {
+            final HttpServerListenStackGrouping listenParams) throws UnsupportedConfigurationException {
         return listen(listener, bootstrap, listenParams, null);
     }
 
@@ -64,20 +64,21 @@ public final class HTTPServer extends HTTPTransportStack {
      */
     public static @NonNull ListenableFuture<HTTPServer> listen(
             final TransportChannelListener<? super HTTPTransportChannel> listener, final ServerBootstrap bootstrap,
-            final HttpServerStackGrouping listenParams, final @Nullable AuthHandlerFactory authHandlerFactory)
+            final HttpServerListenStackGrouping listenParams, final @Nullable AuthHandlerFactory authHandlerFactory)
                 throws UnsupportedConfigurationException {
         final var transport = requireNonNull(listenParams).getTransport();
         return switch (transport) {
-            case Tcp tcpCase -> listen(listener, bootstrap, tcpCase);
-            case Tls tlsCase -> listen(listener, bootstrap, tlsCase);
+            case HttpOverTcp tcpCase -> listen(listener, bootstrap, tcpCase);
+            case HttpOverTls tlsCase -> listen(listener, bootstrap, tlsCase);
+            // FIXME: NETCONF-1520: case HttpOverQuic quicCase -> listen(listener, bootstrap, quicCase);
             default -> throw new UnsupportedConfigurationException("Unsupported transport: " + transport);
         };
     }
 
     private static @NonNull ListenableFuture<HTTPServer> listen(
             final TransportChannelListener<? super HTTPTransportChannel> listener, final ServerBootstrap bootstrap,
-            final Tcp tcpCase) throws UnsupportedConfigurationException {
-        final var tcp = tcpCase.getTcp();
+            final HttpOverTcp tcpCase) throws UnsupportedConfigurationException {
+        final var tcp = tcpCase.getHttpOverTcp();
         final var server = new HTTPServer(listener, HTTPScheme.HTTP);
         return transformUnderlay(server,
             TCPServer.listen(server.asListener(), bootstrap, tcp.nonnullTcpServerParameters()));
@@ -85,8 +86,8 @@ public final class HTTPServer extends HTTPTransportStack {
 
     private static @NonNull ListenableFuture<HTTPServer> listen(
             final TransportChannelListener<? super HTTPTransportChannel> listener, final ServerBootstrap bootstrap,
-            final Tls tlsCase) throws UnsupportedConfigurationException {
-        final var tls = tlsCase.getTls();
+            final HttpOverTls tlsCase) throws UnsupportedConfigurationException {
+        final var tls = tlsCase.getHttpOverTls();
         final var server = new HTTPServer(listener, HTTPScheme.HTTPS);
         return transformUnderlay(server,
             TLSServer.listen(server.asListener(), bootstrap, tls.nonnullTcpServerParameters(),

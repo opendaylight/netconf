@@ -16,10 +16,6 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.password.grouping.password.type.CleartextPassword;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.http.client.identity.grouping.client.identity.auth.type.Basic;
 
 /**
  * A client-side channel handler adding HTTP headers.
@@ -46,23 +42,29 @@ abstract sealed class ClientAuthProvider extends ChannelOutboundHandlerAdapter {
     private ClientAuthProvider() {
         // Hidden on purpose
     }
-
-    static @Nullable ClientAuthProvider ofNullable(final HttpClientGrouping httpParams) {
-        if (httpParams == null) {
-            return null;
-        }
-        final var clientIdentity = httpParams.getClientIdentity();
-        if (clientIdentity == null) {
-            return null;
-        }
-        final var authType = clientIdentity.getAuthType();
-        if (authType instanceof Basic basicAuth) {
-            // Basic authorization handler, sets authorization header on outgoing requests
-            final var basic = basicAuth.nonnullBasic();
-            return new ClientBasicAuthProvider(basic.getUserId(),
-                basic.getPasswordType() instanceof CleartextPassword clearText ? clearText.requireCleartextPassword()
-                    : "");
-        }
-        return null;
-    }
+//
+//    static @Nullable ClientAuthProvider ofNullable(final HttpClientGrouping httpParams) {
+//        if (httpParams == null) {
+//            return null;
+//        }
+//        final var uri = httpParams.getUri();
+//        if (uri == null) {
+//            return null;
+//        }
+//
+//
+//        final var clientIdentity = httpParams.getClientIdentity();
+//        if (clientIdentity == null) {
+//            return null;
+//        }
+//        final var authType = clientIdentity.getAuthType();
+//        if (authType instanceof Basic basicAuth) {
+//            // Basic authorization handler, sets authorization header on outgoing requests
+//            final var basic = basicAuth.nonnullBasic();
+//            return new ClientBasicAuthProvider(basic.getUserId(),
+//                basic.getPasswordType() instanceof CleartextPassword clearText ? clearText.requireCleartextPassword()
+//                    : "");
+//        }
+//        return null;
+//    }
 }

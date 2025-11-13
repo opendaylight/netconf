@@ -73,8 +73,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev260204.HttpClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.HttpServerListenStackGrouping;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
 @ExtendWith(MockitoExtension.class)
@@ -141,9 +141,9 @@ class HttpClientServerTest {
     private static String localAddress;
 
     @Mock
-    private HttpServerStackGrouping serverConfig;
+    private HttpServerListenStackGrouping serverConfig;
     @Mock
-    private HttpClientStackGrouping clientConfig;
+    private HttpClientGrouping clientConfig;
     @Mock
     private TransportChannelListener<TransportChannel> serverTransportListener;
     @Mock
