@@ -20,6 +20,75 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "22fc1972_2f85bb49",
+        "filename": "apps/restconf-it/pom.xml",
+        "patchSetId": 17
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-11-13T19:06:41Z",
+      "side": 1,
+      "message": "I really hate this dependency: so far this IT is JAX-RS independent.\n\nPlease file a follow-up issue to split out the openapi tests out.",
+      "range": {
+        "startLine": 58,
+        "startChar": 21,
+        "endLine": 58,
+        "endChar": 48
+      },
+      "revId": "f072eb317c5e62eec4933be0fa7d77e68942c684",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "612506d4_1066af71",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/EndpointConfiguration.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-11-13T19:06:41Z",
+      "side": 1,
+      "message": "three things:\n\n- Uint of appropriate width\n- check for size \u003e\u003d 1\n- create a compat constructor which will default to 256KiB",
+      "range": {
+        "startLine": 34,
+        "startChar": 98,
+        "endLine": 34,
+        "endChar": 101
+      },
+      "revId": "f072eb317c5e62eec4933be0fa7d77e68942c684",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ca76c0e_c22d72c8",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/EndpointConfiguration.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2025-11-13T19:06:41Z",
+      "side": 1,
+      "message": "squash to {@return ...}",
+      "range": {
+        "startLine": 78,
+        "startChar": 7,
+        "endLine": 78,
+        "endChar": 43
+      },
+      "revId": "f072eb317c5e62eec4933be0fa7d77e68942c684",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "946377fc_01b29e85",
         "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseOutput.java",
         "patchSetId": 17
