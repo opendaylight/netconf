@@ -1,0 +1,96 @@
+module iana-http-versions {
+  yang-version 1.1;
+  namespace "urn:ietf:params:xml:ns:yang:iana-http-versions";
+  prefix httpv;
+
+  organization
+    "Internet Assigned Numbers Authority (IANA)";
+
+  contact
+    "Postal: ICANN
+             12025 Waterfront Drive, Suite 300
+             Los Angeles, CA  90094-2536
+             United States of America
+     Tel:    +1 310 301 5800
+     Email:  iana@iana.org";
+
+  description
+    "This module defines enumerations for the HTTP versions
+     defined in the 'TLS Application-Layer Protocol Negotiation
+     (ALPN) Protocol IDs' sub-registry of the 'Transport Layer
+     Security (TLS) Extensions' registry maintained by IANA.
+
+     Copyright (c) 2025 IETF Trust and the persons identified as
+     authors of the code. All rights reserved.
+
+     Redistribution and use in source and binary forms, with
+     or without modification, is permitted pursuant to, and
+     subject to the license terms contained in, the Revised
+     BSD License set forth in Section 4.c of the IETF Trust's
+     Legal Provisions Relating to IETF Documents
+     (https://trustee.ietf.org/license-info).
+
+     The initial version of this YANG module is part of RFC GGGG
+     (https://www.rfc-editor.org/info/rfcGGGG); see the RFC
+     itself for full legal notices.
+
+     All versions of this module are published by IANA at
+     https://www.iana.org/assignments/yang-parameters.";
+
+  revision 2025-11-11 {
+    description
+      "This initial version of the module was manually created,
+       to reflect the 'HTTP' specific contents of the 'TLS
+       Application-Layer Protocol Negotiation (ALPN) Protocol
+       IDs' registry' (RFC 7301) maintained by IANA.";
+    reference
+      "RFC 7301: Transport Layer Security (TLS) Application-Layer
+                 Protocol Negotiation Extension";
+  }
+
+  typedef http-protocol-version {
+    type enumeration {
+      enum 'HTTP/0.9' {
+        description
+          "Enumeration for the 'HTTP/0.9' HTTP protocol version.";
+        reference
+          "RFC 1945: Hypertext Transfer Protocol -- HTTP/1.0";
+      }
+      enum 'HTTP/1.0' {
+        description
+          "Enumeration for the 'HTTP/1.0' HTTP protocol version.";
+        reference
+          "RFC 1945: Hypertext Transfer Protocol -- HTTP/1.0";
+      }
+      enum 'HTTP/1.1' {
+        description
+          "Enumeration for the 'HTTP/1.1' HTTP protocol version.";
+        reference
+          "RFC 9112: HTTP/1.1";
+      }
+      enum 'HTTP/2 over TLS' {
+        description
+          "Enumeration for the 'HTTP/2 over TLS' HTTP protocol
+           version.";
+        reference
+          "RFC 9113: HTTP/2";
+      }
+      enum 'HTTP/2 over TCP' {
+        description
+          "Enumeration for the 'HTTP/2 over TCP' HTTP protocol
+           version.";
+        reference
+          "RFC 9113: HTTP/2";
+      }
+      enum 'HTTP/3' {
+        description
+          "Enumeration for the 'HTTP/3' HTTP protocol version.";
+        reference
+          "RFC 9114: HTTP/3";
+      }
+    }
+    description
+      "An enumeration for HTTP protocol versions.";
+  }
+
+}
