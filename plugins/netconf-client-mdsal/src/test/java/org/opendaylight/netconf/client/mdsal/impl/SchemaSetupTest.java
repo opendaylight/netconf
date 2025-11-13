@@ -74,12 +74,12 @@ class SchemaSetupTest extends AbstractTestModelTest {
         doReturn(Futures.immediateFuture(source)).when(schemaRepository)
             .getSchemaSource(any(), eq(YangTextSource.class));
 
-        final var setup = new SchemaSetup(schemaRepository, contextFactory, DEVICE_ID,
+        final var future = SchemaSetup.resolve(schemaRepository, contextFactory, DEVICE_ID,
             new NetconfDeviceSchemas(Set.of(TEST_QNAME, TEST_QNAME2), FeatureSet.builder().build(), Set.of(),
                 List.of(new ProvidedSources<>(YangTextSource.class, sourceProvider, Set.of(TEST_QNAME, TEST_QNAME2)))),
             NetconfSessionPreferences.fromStrings(Set.of()));
 
-        final var result = Futures.getDone(setup.startResolution());
+        final var result = Futures.getDone(future);
         verify(contextFactory, times(2)).createEffectiveModelContext(anyCollection());
         assertSame(TEST_MODEL, result.modelContext());
     }
@@ -94,12 +94,12 @@ class SchemaSetupTest extends AbstractTestModelTest {
             .getSchemaSource(TEST_SID2, YangTextSource.class);
         doReturn(TEST_MODEL_FUTURE).when(contextFactory).createEffectiveModelContext(anyCollection());
 
-        final var setup = new SchemaSetup(schemaRepository, contextFactory, DEVICE_ID,
+        final var future = SchemaSetup.resolve(schemaRepository, contextFactory, DEVICE_ID,
             new NetconfDeviceSchemas(Set.of(TEST_QNAME, TEST_QNAME2), FeatureSet.builder().build(), Set.of(),
                 List.of(new ProvidedSources<>(YangTextSource.class, sourceProvider, Set.of(TEST_QNAME, TEST_QNAME2)))),
             NetconfSessionPreferences.fromStrings(Set.of()));
 
-        final var result = Futures.getDone(setup.startResolution());
+        final var result = Futures.getDone(future);
         final ArgumentCaptor<Collection<SourceIdentifier>> captor = ArgumentCaptor.captor();
         verify(contextFactory).createEffectiveModelContext(captor.capture());
         assertEquals(List.of(TEST_SID2), captor.getValue());
@@ -112,13 +112,13 @@ class SchemaSetupTest extends AbstractTestModelTest {
             .getSchemaSource(any(), eq(YangTextSource.class));
         doReturn(TEST_MODEL_FUTURE).when(contextFactory).createEffectiveModelContext(anyCollection());
 
-        final var setup = new SchemaSetup(schemaRepository, contextFactory, DEVICE_ID,
+        final var future = SchemaSetup.resolve(schemaRepository, contextFactory, DEVICE_ID,
             new NetconfDeviceSchemas(Set.of(TEST_QNAME), FeatureSet.builder().build(), Set.of(),
                 List.of(new ProvidedSources<>(YangTextSource.class, sourceProvider, Set.of(TEST_QNAME)))),
             NetconfSessionPreferences.fromStrings(
                 Set.of(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION)));
 
-        final var result = Futures.getDone(setup.startResolution());
+        final var result = Futures.getDone(future);
         assertEquals(Set.of(new AvailableCapabilityBuilder()
             .setCapability("(test:namespace?revision=2013-07-22)test-module")
             .setCapabilityOrigin(CapabilityOrigin.DeviceAdvertised)
