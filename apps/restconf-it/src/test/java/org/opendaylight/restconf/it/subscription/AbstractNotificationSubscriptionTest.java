@@ -80,8 +80,8 @@ import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.stack.grouping.Transport;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.HttpServerListenStackGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.transport.HttpOverTcp;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.IetfSubscribedNotificationsData;
 import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
 import org.opendaylight.yangtools.binding.runtime.api.BindingRuntimeContext;
@@ -169,14 +169,14 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
         final var port = randomBindablePort();
         host = localAddress + ":" + port;
         final var serverTransport = ConfigUtils.serverTransportTcp(localAddress, port);
-        final var serverStackGrouping = new HttpServerStackGrouping() {
+        final var serverStackGrouping = new HttpServerListenStackGrouping() {
             @Override
-            public Class<? extends HttpServerStackGrouping> implementedInterface() {
-                return HttpServerStackGrouping.class;
+            public Class<HttpServerListenStackGrouping> implementedInterface() {
+                return HttpServerListenStackGrouping.class;
             }
 
             @Override
-            public Transport getTransport() {
+            public HttpOverTcp getTransport() {
                 return serverTransport;
             }
         };

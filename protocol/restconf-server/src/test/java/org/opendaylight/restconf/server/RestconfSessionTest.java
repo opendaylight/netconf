@@ -30,7 +30,7 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.HttpServerListenStackGrouping;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -45,7 +45,7 @@ class RestconfSessionTest {
     @Mock
     private PrincipalService principalService;
     @Mock
-    private HttpServerStackGrouping httpServerStackGrouping;
+    private HttpServerListenStackGrouping httpServerStackGrouping;
     @Mock
     private HTTPTransportChannel transportChannel;
     @Mock

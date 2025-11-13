@@ -95,8 +95,8 @@ import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionI
 import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionOutput;
 import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.stack.grouping.Transport;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.HttpServerListenStackGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.transport.HttpOverTcp;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecServices;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -164,14 +164,14 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         final var port = randomBindablePort();
         host = localAddress + ":" + port;
         final var serverTransport = ConfigUtils.serverTransportTcp(localAddress, port);
-        final var serverStackGrouping = new HttpServerStackGrouping() {
+        final var serverStackGrouping = new HttpServerListenStackGrouping() {
             @Override
-            public Class<? extends HttpServerStackGrouping> implementedInterface() {
-                return HttpServerStackGrouping.class;
+            public Class<HttpServerListenStackGrouping> implementedInterface() {
+                return HttpServerListenStackGrouping.class;
             }
 
             @Override
-            public Transport getTransport() {
+            public HttpOverTcp getTransport() {
                 return serverTransport;
             }
         };
