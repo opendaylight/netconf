@@ -18,6 +18,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
+import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.client.mdsal.api.NetconfRpcService;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
@@ -60,26 +61,30 @@ public final class DefaultDeviceNetconfSchemaProvider implements DeviceNetconfSc
     public ListenableFuture<DeviceNetconfSchema> deviceNetconfSchemaFor(final RemoteDeviceId deviceId,
             final NetconfSessionPreferences sessionPreferences, final NetconfRpcService deviceRpc,
             final BaseNetconfSchema baseSchema, final Executor processingExecutor) {
-        // Acquire sources
-        final var sourceResolverFuture = resolver.resolve(deviceId, sessionPreferences, deviceRpc,
-            baseSchema.modelContext());
+        return Futures.transformAsync(
+            // Acquire sources
+            resolver.resolve(deviceId, sessionPreferences, deviceRpc, baseSchema.modelContext()),
+            // Set up the EffectiveModelContext for the device
+            deviceSources -> deviceNetconfSchemaFor(deviceId, sessionPreferences, deviceSources, processingExecutor),
+            processingExecutor);
+    }
 
-        // Set up the EffectiveModelContext for the device
-        return Futures.transformAsync(sourceResolverFuture, deviceSources -> {
-            LOG.debug("{}: Resolved device sources to {}", deviceId, deviceSources);
+    private ListenableFuture<DeviceNetconfSchema> deviceNetconfSchemaFor(final RemoteDeviceId deviceId,
+            final NetconfSessionPreferences sessionPreferences, final NetconfDeviceSchemas deviceSources,
+            final Executor processingExecutor) {
+        LOG.debug("{}: Resolved device sources to {}", deviceId, deviceSources);
 
-            // Register all sources with repository and start resolution
-            final var registrations = deviceSources.providedSources().stream()
-                .flatMap(sources -> sources.registerWith(registry, Costs.REMOTE_IO.getValue()))
-                .collect(Collectors.toUnmodifiableList());
-            final var future = new SchemaSetup(repository, contextFactory, deviceId, deviceSources, sessionPreferences)
-                .startResolution();
+        // Register all sources with repository and start resolution
+        final var registrations = deviceSources.providedSources().stream()
+            .flatMap(sources -> sources.registerWith(registry, Costs.REMOTE_IO.getValue()))
+            .collect(Collectors.toUnmodifiableList());
+        final var future = new SchemaSetup(repository, contextFactory, deviceId, deviceSources, sessionPreferences)
+            .startResolution();
 
-            // Unregister sources once resolution is complete
-            future.addListener(() -> registrations.forEach(Registration::close), processingExecutor);
+        // Unregister sources once resolution is complete
+        future.addListener(() -> registrations.forEach(Registration::close), processingExecutor);
 
-            return future;
-        }, processingExecutor);
+        return future;
     }
 
     @Deprecated
