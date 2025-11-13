@@ -12,9 +12,11 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.util.HashSet;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
@@ -74,11 +76,22 @@ public final class DefaultDeviceNetconfSchemaProvider implements DeviceNetconfSc
             final Executor processingExecutor) {
         LOG.debug("{}: Resolved device sources to {}", deviceId, deviceSources);
 
+        var requiredSources = deviceSources.requiredSources();
+
+        // If device supports notifications and does not contain necessary modules, add them automatically
+        if (sessionPreferences.containsNonModuleCapability(CapabilityURN.NOTIFICATION)) {
+            requiredSources = new HashSet<>(requiredSources);
+            requiredSources.add(org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                    .YangModuleInfoImpl.getInstance().getName());
+            requiredSources.add(org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
+                    .YangModuleInfoImpl.getInstance().getName());
+        }
+
         // Register all sources with repository and start resolution
         final var registrations = deviceSources.providedSources().stream()
             .flatMap(sources -> sources.registerWith(registry, Costs.REMOTE_IO.getValue()))
             .collect(Collectors.toUnmodifiableList());
-        final var future = SchemaSetup.resolve(repository, contextFactory, deviceId, deviceSources.requiredSources(),
+        final var future = SchemaSetup.resolve(repository, contextFactory, deviceId, requiredSources,
             sessionPreferences);
 
         // Unregister sources once resolution is complete
