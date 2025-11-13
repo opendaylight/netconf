@@ -27,7 +27,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.HttpServerListenStackGrouping;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.common.Uint64;
@@ -52,7 +52,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         NOT_PCHAR = unreserved.or(subDelims).or(CharMatcher.is('%')).or(CharMatcher.anyOf(":@")).negate().precomputed();
     }
 
-    private final @NonNull HttpServerStackGrouping transportConfiguration;
+    private final @NonNull HttpServerListenStackGrouping transportConfiguration;
     private final @NonNull List<String> apiRootPath;
     private final @NonNull MessageEncoding defaultEncoding;
     private final @NonNull Uint32 chunkSize;
@@ -71,7 +71,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
             final List<String> apiRootPath, final MessageEncoding defaultEncoding,
-            final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
+            final HttpServerListenStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
             final String altSvcHeaderValue, final Uint32 http3AltSvcMaxAgeSeconds, final Uint64 http3InitialMaxData,
             final Uint64 http3InitialMaxStreamDataBidirectionalRemote,
             final Uint32 http3InitialMaxStreamsBidirectional) {
@@ -84,7 +84,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
             final List<String> apiRootPath, final MessageEncoding defaultEncoding,
-            final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
+            final HttpServerListenStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
             final String altSvcHeaderValue, final @Nullable String bindAddress, final int bindPort,
             final @Nullable X509Certificate tlsCertificate, final @Nullable PrivateKey tlsPrivateKey,
             final Uint32 http3AltSvcMaxAgeSeconds, final Uint64 http3InitialMaxData,
@@ -146,7 +146,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
-            final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration,
+            final MessageEncoding defaultEncoding, final HttpServerListenStackGrouping transportConfiguration,
             final Uint32 chunkSize, final Uint32 frameSize, final String altSvcHeaderValue,
             final Uint32 http3AltSvcMaxAgeSeconds, final Uint64 http3InitialMaxData,
             final Uint64 http3InitialMaxStreamDataBidirectionalRemote,
@@ -159,7 +159,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
-            final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration,
+            final MessageEncoding defaultEncoding, final HttpServerListenStackGrouping transportConfiguration,
             final Uint32 chunkSize, final Uint32 frameSize, final String altSvcHeaderValue,
             final @Nullable String bindAddress, final int bindPort, final @Nullable X509Certificate tlsCertificate,
             final @Nullable PrivateKey tlsPrivateKey, final Uint32 http3AltSvcMaxAgeSeconds,
@@ -172,7 +172,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     }
 
     @Beta
-    public NettyEndpointConfiguration(final HttpServerStackGrouping transportConfiguration) {
+    public NettyEndpointConfiguration(final HttpServerListenStackGrouping transportConfiguration) {
         this(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO, Uint32.valueOf(10_000), "restconf",
             MessageEncoding.JSON, transportConfiguration, Uint32.valueOf(262144), Uint32.valueOf(16384),
             "h3=\":8443\"; ma=3600", Uint32.valueOf(3600), Uint64.valueOf(4L * 1024 * 1024),
@@ -241,11 +241,9 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     }
 
     /**
-     * Returns the HTTP endpoint configuration.
-     *
-     * @return the HTTP endpoint configuration
+     * {@return the HTTP endpoint configuration}
      */
-    public @NonNull HttpServerStackGrouping transportConfiguration() {
+    public @NonNull HttpServerListenStackGrouping transportConfiguration() {
         return transportConfiguration;
     }
 
