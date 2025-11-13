@@ -33,7 +33,6 @@ import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice.EmptySchemaContextException;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchema;
-import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.oper.available.capabilities.AvailableCapabilityBuilder;
@@ -59,7 +58,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     private final SettableFuture<DeviceNetconfSchema> resultFuture = SettableFuture.create();
     private final HashMap<QName, FailureReason> unresolvedCapabilites = new HashMap<>();
     private final RemoteDeviceId deviceId;
-    private final Set<QName> deviceRequiredSources;
+    private final Set<QName> initialRequiredSources;
     private final NetconfSessionPreferences sessionPreferences;
     private final SchemaRepository repository;
     private final EffectiveModelContextFactory contextFactory;
@@ -67,25 +66,15 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     private Collection<SourceIdentifier> requiredSources;
 
     private SchemaSetup(final SchemaRepository repository, final EffectiveModelContextFactory contextFactory,
-            final RemoteDeviceId deviceId, final NetconfDeviceSchemas deviceSchemas,
+            final RemoteDeviceId deviceId, final Set<QName> initialRequiredSources,
             final NetconfSessionPreferences sessionPreferences) {
         this.repository = requireNonNull(repository);
         this.contextFactory = requireNonNull(contextFactory);
         this.deviceId = requireNonNull(deviceId);
+        this.initialRequiredSources = requireNonNull(initialRequiredSources);
         this.sessionPreferences = requireNonNull(sessionPreferences);
 
-        // If device supports notifications and does not contain necessary modules, add them automatically
-        deviceRequiredSources = new HashSet<>(deviceSchemas.requiredSources());
-        if (sessionPreferences.containsNonModuleCapability(CapabilityURN.NOTIFICATION)) {
-            deviceRequiredSources.add(
-                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                    .YangModuleInfoImpl.getInstance().getName());
-            deviceRequiredSources.add(
-                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
-                    .YangModuleInfoImpl.getInstance().getName());
-        }
-
-        requiredSources = deviceRequiredSources.stream().map(SourceIdentifier::ofQName).collect(Collectors.toList());
+        requiredSources = initialRequiredSources.stream().map(SourceIdentifier::ofQName).collect(Collectors.toList());
 
         final var missingSources = filterMissingSources(requiredSources);
         addUnresolvedCapabilities(getQNameFromSourceIdentifiers(missingSources),
@@ -95,8 +84,20 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
 
     static ListenableFuture<DeviceNetconfSchema> resolve(final SchemaRepository repository,
             final EffectiveModelContextFactory contextFactory, final RemoteDeviceId deviceId,
-            final NetconfDeviceSchemas deviceSchemas, final NetconfSessionPreferences sessionPreferences) {
-        final var instance = new SchemaSetup(repository, contextFactory, deviceId, deviceSchemas, sessionPreferences);
+            final Set<QName> requiredSources, final NetconfSessionPreferences sessionPreferences) {
+        // If device supports notifications and does not contain necessary modules, add them automatically
+        final var initialRequiredSources = new HashSet<>(requiredSources);
+        if (sessionPreferences.containsNonModuleCapability(CapabilityURN.NOTIFICATION)) {
+            initialRequiredSources.add(
+                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                    .YangModuleInfoImpl.getInstance().getName());
+            initialRequiredSources.add(
+                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
+                    .YangModuleInfoImpl.getInstance().getName());
+        }
+
+        final var instance = new SchemaSetup(repository, contextFactory, deviceId, initialRequiredSources,
+            sessionPreferences);
         instance.trySetupSchema();
         return instance.resultFuture;
     }
@@ -105,7 +106,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     public void onSuccess(final EffectiveModelContext result) {
         LOG.debug("{}: Schema context built successfully from {}", deviceId, requiredSources);
 
-        final var filteredQNames = Sets.difference(deviceRequiredSources, unresolvedCapabilites.keySet());
+        final var filteredQNames = Sets.difference(initialRequiredSources, unresolvedCapabilites.keySet());
         final var resolvedCapabilities = filteredQNames.stream()
             .map(capability -> new AvailableCapabilityBuilder()
                 .setCapability(capability.toString())
@@ -237,7 +238,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
 
     private QName getQNameFromSourceIdentifier(final SourceIdentifier identifier) {
         // Required sources are all required and provided merged in DeviceSourcesResolver
-        for (final QName qname : deviceRequiredSources) {
+        for (final QName qname : initialRequiredSources) {
             if (!qname.getLocalName().equals(identifier.name().getLocalName())) {
                 continue;
             }
@@ -247,7 +248,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
             }
         }
         LOG.warn("Unable to map identifier to a devices reported capability: {} Available: {}", identifier,
-            deviceRequiredSources);
+            initialRequiredSources);
         // return null since we cannot find the QName,
         // this capability will be removed from required sources and not reported as unresolved-capability
         return null;
