@@ -22,7 +22,7 @@ module ietf-udp-client {
   description
     "Defines a generic grouping for UDP-based client applications.
 
-    Copyright (c) 2024 IETF Trust and the persons identified as
+    Copyright (c) 2025 IETF Trust and the persons identified as
     authors of the code.  All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -34,23 +34,23 @@ module ietf-udp-client {
     This version of this YANG module is part of RFC-to-be; see the RFC
     itself for full legal notices.";
 
-  revision 2024-10-04 {
+  revision 2025-06-10 {
     description
       "Initial revision";
     reference
       "RFC-to-be: YANG Groupings for UDP Clients and UDP Servers";
   }
 
-  feature local-binding-supported {
+  feature local-binding {
     description
       "Indicates that the UDP client supports configuring local
-       bindings (i.e., the local address and local port) for
-       UDP clients.";
+       bindings (i.e., the local address and local port number)
+       for UDP clients.";
   }
 
-  grouping udp-client-grouping {
+  grouping udp-client {
     description
-      "A reusable grouping for configuring a UDP client.
+      "A reusable grouping for UDP clients.
       
       Note that this grouping uses fairly typical descendant
       node names such that a stack of 'uses' statements will
@@ -66,12 +66,9 @@ module ietf-udp-client {
       mandatory true;
       description
         "The IP address or hostname of the remote UDP server.
-        If a domain name is configured, then the DNS resolution should
-        happen on each connection attempt. If the DNS resolution
-        results in multiple IP addresses, the IP addresses
-        are tried according to local preference order until
-        a connection has been established or until all IP
-        addresses have failed.";
+        If a domain name is configured, then the name resolution
+        should happen before each datagram is sent, unless a
+        previously resolved address is cached and still valid.";
     }
 
     leaf remote-port {
@@ -81,22 +78,22 @@ module ietf-udp-client {
     }
 
     leaf local-address {
-      if-feature "local-binding-supported";
+      if-feature "local-binding";
       type inet:ip-address;
       description
         "The local IP address to bind to when sending UDP
-        messages to the remote server. INADDR_ANY ('0.0.0.0') or
+        datagrams to the remote server. INADDR_ANY ('0.0.0.0') or
         INADDR6_ANY ('0:0:0:0:0:0:0:0' a.k.a. '::') may be used
-        so that the server can bind to any IPv4 or IPv6 address.";
+        so that the client can bind to any IPv4 or IPv6 address.";
     }
 
     leaf local-port {
-      if-feature "local-binding-supported";
+      if-feature "local-binding";
       type inet:port-number;
       default "0";
       description
         "The local port number to bind to when sending UDP
-        messages to the remote server. The port number '0',
+        datagrams to the remote server. The port number '0',
         which is the default value, indicates that any available
         local port number may be used.";
     }
