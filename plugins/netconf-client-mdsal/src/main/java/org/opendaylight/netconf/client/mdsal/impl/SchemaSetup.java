@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -37,7 +36,6 @@ import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.oper.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.oper.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.oper.unavailable.capabilities.UnavailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.oper.unavailable.capabilities.UnavailableCapability.FailureReason;
@@ -59,11 +57,8 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     private static final Logger LOG = LoggerFactory.getLogger(SchemaSetup.class);
 
     private final SettableFuture<DeviceNetconfSchema> resultFuture = SettableFuture.create();
-    private final Set<AvailableCapability> nonModuleBasedCapabilities = new HashSet<>();
-    private final Map<QName, FailureReason> unresolvedCapabilites = new HashMap<>();
-    private final Set<AvailableCapability> resolvedCapabilities = new HashSet<>();
+    private final HashMap<QName, FailureReason> unresolvedCapabilites = new HashMap<>();
     private final RemoteDeviceId deviceId;
-    private final NetconfDeviceSchemas deviceSchemas;
     private final Set<QName> deviceRequiredSources;
     private final NetconfSessionPreferences sessionPreferences;
     private final SchemaRepository repository;
@@ -77,7 +72,6 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
         this.repository = requireNonNull(repository);
         this.contextFactory = requireNonNull(contextFactory);
         this.deviceId = requireNonNull(deviceId);
-        this.deviceSchemas = requireNonNull(deviceSchemas);
         this.sessionPreferences = requireNonNull(sessionPreferences);
 
         // If device supports notifications and does not contain necessary modules, add them automatically
@@ -112,19 +106,19 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
         LOG.debug("{}: Schema context built successfully from {}", deviceId, requiredSources);
 
         final var filteredQNames = Sets.difference(deviceRequiredSources, unresolvedCapabilites.keySet());
-        resolvedCapabilities.addAll(filteredQNames.stream()
+        final var resolvedCapabilities = filteredQNames.stream()
             .map(capability -> new AvailableCapabilityBuilder()
                 .setCapability(capability.toString())
                 .setCapabilityOrigin(sessionPreferences.capabilityOrigin(capability))
                 .build())
-            .collect(Collectors.toList()));
-
-        nonModuleBasedCapabilities.addAll(sessionPreferences.nonModuleCaps().keySet().stream()
-            .map(capability -> new AvailableCapabilityBuilder()
-                .setCapability(capability)
-                .setCapabilityOrigin(sessionPreferences.capabilityOrigin(capability))
-                .build())
-            .collect(Collectors.toList()));
+            .collect(Collectors.toSet());
+        final var nonModuleBasedCapabilities =
+            sessionPreferences.nonModuleCaps().keySet().stream()
+                .map(capability -> new AvailableCapabilityBuilder()
+                    .setCapability(capability)
+                    .setCapabilityOrigin(sessionPreferences.capabilityOrigin(capability))
+                    .build())
+                .collect(Collectors.toSet());
 
         resultFuture.set(new DeviceNetconfSchema(new NetconfDeviceCapabilities(
             ImmutableMap.copyOf(unresolvedCapabilites), ImmutableSet.copyOf(resolvedCapabilities),
@@ -183,8 +177,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
         }
     }
 
-    private List<SourceIdentifier> handleMissingSchemaSourceException(
-            final MissingSchemaSourceException exception) {
+    private List<SourceIdentifier> handleMissingSchemaSourceException(final MissingSchemaSourceException exception) {
         // In case source missing, try without it
         final SourceIdentifier missingSource = exception.sourceId();
         LOG.warn("{}: Unable to build schema context, missing source {}, will reattempt without it",
