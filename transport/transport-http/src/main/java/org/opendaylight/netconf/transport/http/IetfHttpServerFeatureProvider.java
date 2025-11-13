@@ -10,10 +10,12 @@ package org.opendaylight.netconf.transport.http;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.kohsuke.MetaInfServices;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.BasicAuth;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.IetfHttpServerData;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.TcpSupported;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.TlsSupported;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.BasicAuth;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.ClientAuthSupported;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.IetfHttpServerData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.LocalUsersSupported;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.TcpSupported;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.TlsSupported;
 import org.opendaylight.yangtools.binding.YangFeature;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
@@ -30,6 +32,9 @@ public final class IetfHttpServerFeatureProvider implements YangFeatureProvider<
 
     @Override
     public Set<? extends YangFeature<?, IetfHttpServerData>> supportedFeatures() {
-        return Set.of(BasicAuth.VALUE, TcpSupported.VALUE, TlsSupported.VALUE);
+        // FIXME: NETCONF-1520: quic-supported
+        return Set.of(TcpSupported.VALUE, TlsSupported.VALUE,
+            // FIXME: version-discovery
+            BasicAuth.VALUE, ClientAuthSupported.VALUE, LocalUsersSupported.VALUE);
     }
 }
