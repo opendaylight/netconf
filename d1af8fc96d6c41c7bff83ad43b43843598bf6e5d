@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbbb7d4f_9ec15656",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-14T13:43:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "74e9828b_c076af9a",
+      "range": {
+        "startLine": 62,
+        "startChar": 43,
+        "endLine": 62,
+        "endChar": 51
+      },
+      "revId": "d1af8fc96d6c41c7bff83ad43b43843598bf6e5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "edd86c13_12ba96b3",
@@ -37,6 +61,30 @@
       "writtenOn": "2025-11-13T20:46:16Z",
       "side": 1,
       "message": "should check for initialization",
+      "range": {
+        "startLine": 209,
+        "startChar": 18,
+        "endLine": 209,
+        "endChar": 26
+      },
+      "revId": "d1af8fc96d6c41c7bff83ad43b43843598bf6e5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5085ed8a_b3139faf",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-14T13:43:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "edd86c13_12ba96b3",
       "range": {
         "startLine": 209,
         "startChar": 18,
