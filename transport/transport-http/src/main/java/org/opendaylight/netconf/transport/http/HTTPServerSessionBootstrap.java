@@ -9,9 +9,12 @@ package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
+import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
@@ -31,17 +34,18 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
 
     @Override
     public final void handlerAdded(final ChannelHandlerContext ctx) {
-        scheme.initializeServerPipeline(ctx);
+        scheme.initializeServerPipeline(ctx, buildHttp2ChildInitializer(ctx));
     }
 
     @Override
     public final void userEventTriggered(final ChannelHandlerContext ctx, final Object event) throws Exception {
         if (event instanceof HTTPServerPipelineSetup setup) {
             LOG.debug("{} resolved to {} semantics", ctx.channel(), setup);
-            ctx.pipeline().replace(this, null, switch (setup) {
-                case HTTP_11 -> configureHttp1(ctx);
-                case HTTP_2 -> configureHttp2(ctx);
-            });
+            switch (setup) {
+                case HTTP_11 -> ctx.pipeline().replace(this, null, configureHttp1(ctx));
+                case HTTP_2 -> ctx.pipeline().remove(this);
+                default -> throw new IllegalStateException("Unexpected event: " + setup);
+            }
         } else {
             super.userEventTriggered(ctx, event);
         }
@@ -57,11 +61,11 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
     protected abstract PipelinedHTTPServerSession configureHttp1(ChannelHandlerContext ctx);
 
     /**
-     * Configure the pipeline to receive HTTP/2 concurrent traffic and return the replacement handler.
+     * Build the per-stream initializer the HTTP/2 pipeline should install into {@link Http2MultiplexHandler}.
      *
-     * @param ctx the {@link ChannelHandlerContext} of this handler
-     * @return replacement {@link ChannelInboundHandler}
+     * @param ctx the {@link ChannelHandlerContext} associated with the parent HTTP/2 connection
+     * @return channel initializer configuring stream channels
      */
     @NonNullByDefault
-    protected abstract ConcurrentHTTPServerSession configureHttp2(ChannelHandlerContext ctx) ;
+    protected abstract ChannelInitializer<Channel> buildHttp2ChildInitializer(ChannelHandlerContext ctx);
 }
