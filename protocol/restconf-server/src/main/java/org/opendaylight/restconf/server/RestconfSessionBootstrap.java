@@ -9,9 +9,12 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.http2.Http2FrameCodecBuilder;
 import io.netty.handler.codec.http2.Http2MultiplexHandler;
+import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.ConcurrentHTTPServerSession;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
@@ -34,7 +37,14 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
 
     @Override
     protected Http2MultiplexHandler configureHttp2(final ChannelHandlerContext ctx) {
-        ctx.pipeline().addBefore(null, null, Http2FrameCodecBuilder.forServer().build());
-        return new Http2MultiplexHandler(new ConcurrentRestconfSession(scheme, ctx.channel().remoteAddress(), root));
+        final var childInit = new ChannelInitializer<>() {
+            @Override protected void initChannel(Channel ch) {
+                ch.pipeline()
+                    .addLast("h2-httpobj", new Http2StreamFrameToHttpObjectCodec(true))
+                    .addLast(new ConcurrentRestconfSession(scheme, ctx.channel().remoteAddress(), root));
+            }
+        };
+        ctx.pipeline().addBefore(ctx.name(), null, Http2FrameCodecBuilder.forServer().build());
+        return new Http2MultiplexHandler(childInit);
     }
 }
