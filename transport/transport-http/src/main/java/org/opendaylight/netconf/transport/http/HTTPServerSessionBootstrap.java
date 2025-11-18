@@ -9,10 +9,13 @@ package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.http2.Http2MultiplexHandler;
+import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
@@ -41,7 +44,13 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
             LOG.debug("{} resolved to {} semantics", ctx.channel(), setup);
             ctx.pipeline().replace(this, null, switch (setup) {
                 case HTTP_11 -> configureHttp1(ctx);
-                case HTTP_2 -> new Http2MultiplexHandler(configureHttp2(ctx));
+                case HTTP_2 -> new Http2MultiplexHandler(new ChannelInitializer<>() {
+                        @Override protected void initChannel(Channel ch) {
+                            ch.pipeline()
+                                .addLast("h2-httpobj", new Http2StreamFrameToHttpObjectCodec(true))
+                                .addLast(configureHttp2(ctx));
+                        }
+                    });
             });
         } else {
             super.userEventTriggered(ctx, event);
