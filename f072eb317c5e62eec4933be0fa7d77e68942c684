@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc4b66a8_9404c8f2",
+        "filename": "apps/restconf-it/pom.xml",
+        "patchSetId": 17
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-11-18T12:57:31Z",
+      "side": 1,
+      "message": "Removed.\nApproach was changed, and this dependency is no longer needed",
+      "parentUuid": "22fc1972_2f85bb49",
+      "range": {
+        "startLine": 58,
+        "startChar": 21,
+        "endLine": 58,
+        "endChar": 48
+      },
+      "revId": "f072eb317c5e62eec4933be0fa7d77e68942c684",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "612506d4_1066af71",
