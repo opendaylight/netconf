@@ -19,15 +19,12 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
 import io.netty.handler.codec.http.HttpServerUpgradeHandler;
 import io.netty.handler.codec.http2.CleartextHttp2ServerUpgradeHandler;
-import io.netty.handler.codec.http2.DefaultHttp2Connection;
-import io.netty.handler.codec.http2.DelegatingDecompressorFrameListener;
 import io.netty.handler.codec.http2.Http2CodecUtil;
+import io.netty.handler.codec.http2.Http2FrameCodec;
+import io.netty.handler.codec.http2.Http2FrameCodecBuilder;
 import io.netty.handler.codec.http2.Http2FrameLogger;
 import io.netty.handler.codec.http2.Http2ServerUpgradeCodec;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
-import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandler;
-import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandlerBuilder;
-import io.netty.handler.codec.http2.InboundHttp2ToHttpAdapterBuilder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.ssl.ApplicationProtocolNames;
 import io.netty.handler.ssl.ApplicationProtocolNegotiationHandler;
@@ -196,19 +193,7 @@ public enum HTTPScheme {
     }
 
     // External HTTP 2 to internal HTTP 1.1 adapter handler
-    private static HttpToHttp2ConnectionHandler http2toHttp1(final Http2FrameLogger frameLogger) {
-        final var connection = new DefaultHttp2Connection(true);
-        return new HttpToHttp2ConnectionHandlerBuilder()
-            .connection(connection)
-            .frameListener(new DelegatingDecompressorFrameListener(connection,
-                new InboundHttp2ToHttpAdapterBuilder(connection)
-                    .maxContentLength(HTTPServer.MAX_HTTP_CONTENT_LENGTH)
-                    .propagateSettings(true)
-                    .build(),
-                // FIXME: allow for maxAllocation control to prevent OutOfMemoryError
-                0))
-            .frameLogger(frameLogger)
-            .gracefulShutdownTimeoutMillis(0L)
-            .build();
+    private static Http2FrameCodec http2toHttp1(final Http2FrameLogger frameLogger) {
+        return Http2FrameCodecBuilder.forServer().frameLogger(frameLogger).build();
     }
 }
