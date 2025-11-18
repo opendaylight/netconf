@@ -20,7 +20,6 @@ import java.net.SocketAddress;
 import java.net.URI;
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -40,7 +39,6 @@ final class RestconfSession extends PipelinedHTTPServerSession {
     private final @NonNull DefaultTransportSession transportSession;
     private final @NonNull EndpointRoot root;
     private final @NonNull Deque<FullHttpRequest> blockedRequests = new ConcurrentLinkedDeque<>();
-    private final ReentrantLock queueLock = new ReentrantLock(true);
 
     @NonNullByDefault
     RestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root) {
@@ -75,15 +73,11 @@ final class RestconfSession extends PipelinedHTTPServerSession {
 
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
-        queueLock.lock();
-        try {
-            final var wasEmpty = blockedRequests.isEmpty();
+        if (blockedRequests.isEmpty()) {
             blockedRequests.offer(msg);
-            if (wasEmpty) {
-                super.channelRead0(ctx, msg);
-            }
-        } finally {
-            queueLock.unlock();
+            super.channelRead0(ctx, msg);
+        } else {
+            blockedRequests.offer(msg);
         }
     }
 
