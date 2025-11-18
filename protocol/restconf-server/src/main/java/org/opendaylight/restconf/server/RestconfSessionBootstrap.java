@@ -10,6 +10,8 @@ package org.opendaylight.restconf.server;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http2.Http2FrameCodecBuilder;
+import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.ConcurrentHTTPServerSession;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
@@ -32,6 +34,7 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
 
     @Override
     protected ConcurrentHTTPServerSession configureHttp2(final ChannelHandlerContext ctx) {
+        ctx.pipeline().addBefore(null, null, Http2FrameCodecBuilder.forServer().build());
         return new ConcurrentRestconfSession(scheme, ctx.channel().remoteAddress(), root);
     }
 }

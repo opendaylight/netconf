@@ -43,6 +43,7 @@ import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Authenticator;
