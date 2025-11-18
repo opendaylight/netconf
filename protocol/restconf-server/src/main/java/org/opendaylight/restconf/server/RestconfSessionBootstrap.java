@@ -9,7 +9,11 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.ConcurrentHTTPServerSession;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
@@ -19,6 +23,7 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 
 @NonNullByDefault
 final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
+    private static final int MAX_HTTP2_CONTENT_LENGTH = 16 * 1024;
     private final EndpointRoot root;
     private final Uint32 chunkSize;
 
@@ -27,6 +32,19 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
         super(scheme);
         this.root = requireNonNull(root);
         this.chunkSize = requireNonNull(chunkSize);
+    }
+
+    @Override
+    protected ChannelInitializer<Channel> buildHttp2ChildInitializer(final ChannelHandlerContext parentCtx) {
+        return new ChannelInitializer<>() {
+            @Override protected void initChannel(final Channel ch) {
+                final var pipeline = ch.pipeline();
+                pipeline.addLast(new Http2StreamFrameToHttpObjectCodec(true));
+                pipeline.addLast(new HttpObjectAggregator(MAX_HTTP2_CONTENT_LENGTH));
+                pipeline.addLast("restconf-session", new ConcurrentRestconfSession(scheme,
+                    parentCtx.channel().remoteAddress(), root, chunkSize));
+            }
+        };
     }
 
     @Override
