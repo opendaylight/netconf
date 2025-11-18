@@ -22,6 +22,7 @@ import io.netty.handler.codec.http2.CleartextHttp2ServerUpgradeHandler;
 import io.netty.handler.codec.http2.DefaultHttp2Connection;
 import io.netty.handler.codec.http2.DelegatingDecompressorFrameListener;
 import io.netty.handler.codec.http2.Http2CodecUtil;
+import io.netty.handler.codec.http2.Http2FrameCodecBuilder;
 import io.netty.handler.codec.http2.Http2FrameLogger;
 import io.netty.handler.codec.http2.Http2ServerUpgradeCodec;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
@@ -62,7 +63,8 @@ public enum HTTPScheme {
                             ? new Http2ServerUpgradeCodec(twoToOne) : null,
                         HTTPServer.MAX_HTTP_CONTENT_LENGTH),
                     twoToOne))
-                .addBefore(ctx.name(), null, new CleartextUpgradeHandler());
+                .addBefore(ctx.name(), null, new CleartextUpgradeHandler())
+                .addLast("h2-frame-codec", Http2FrameCodecBuilder.forServer().build());
         }
     },
     /**

@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
@@ -40,7 +41,7 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
             LOG.debug("{} resolved to {} semantics", ctx.channel(), setup);
             ctx.pipeline().replace(this, null, switch (setup) {
                 case HTTP_11 -> configureHttp1(ctx);
-                case HTTP_2 -> configureHttp2(ctx);
+                case HTTP_2 -> new Http2MultiplexHandler(configureHttp2(ctx));
             });
         } else {
             super.userEventTriggered(ctx, event);
@@ -63,5 +64,5 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
      * @return replacement {@link ChannelInboundHandler}
      */
     @NonNullByDefault
-    protected abstract ConcurrentHTTPServerSession configureHttp2(ChannelHandlerContext ctx) ;
+    protected abstract ConcurrentHTTPServerSession configureHttp2(ChannelHandlerContext ctx);
 }
