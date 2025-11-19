@@ -15,7 +15,6 @@ import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.http2.Http2MultiplexHandler;
-import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
@@ -35,7 +34,7 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
 
     @Override
     public final void handlerAdded(final ChannelHandlerContext ctx) {
-        scheme.initializeServerPipeline(ctx);
+        scheme.initializeServerPipeline(ctx, buildHttp2ChildInitializer(ctx));
     }
 
     @Override
@@ -44,13 +43,7 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
             LOG.debug("{} resolved to {} semantics", ctx.channel(), setup);
             ctx.pipeline().replace(this, null, switch (setup) {
                 case HTTP_11 -> configureHttp1(ctx);
-                case HTTP_2 -> new Http2MultiplexHandler(new ChannelInitializer<>() {
-                        @Override protected void initChannel(Channel ch) {
-                            ch.pipeline()
-                                .addLast("h2-httpobj", new Http2StreamFrameToHttpObjectCodec(true))
-                                .addLast(configureHttp2(ctx));
-                        }
-                    });
+                case HTTP_2 -> configureHttp2(ctx);
             });
         } else {
             super.userEventTriggered(ctx, event);
@@ -74,4 +67,13 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
      */
     @NonNullByDefault
     protected abstract ConcurrentHTTPServerSession configureHttp2(ChannelHandlerContext ctx);
+
+    /**
+     * Build the per-stream initializer the HTTP/2 pipeline should install into {@link Http2MultiplexHandler}.
+     *
+     * @param ctx the {@link ChannelHandlerContext} associated with the parent HTTP/2 connection
+     * @return channel initializer configuring stream channels
+     */
+    @NonNullByDefault
+    protected abstract ChannelInitializer<Channel> buildHttp2ChildInitializer(ChannelHandlerContext ctx);
 }

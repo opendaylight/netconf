@@ -9,7 +9,9 @@ package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpMessage;
 import io.netty.handler.codec.http.HttpMessage;
@@ -46,7 +48,9 @@ public enum HTTPScheme {
         private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.INFO, "Clear2To1");
 
         @Override
-        void initializeServerPipeline(final ChannelHandlerContext ctx) {
+        void initializeServerPipeline(final ChannelHandlerContext ctx,
+                final ChannelInitializer<Channel> childChannelInit) {
+            final var childInit = requireNonNull(childChannelInit);
             // Cleartext upgrade flow
             final var sourceCodec = new HttpServerCodec();
             final var http2FrameCodec = newHttp2FrameCodec(FRAME_LOGGER);
@@ -55,12 +59,13 @@ public enum HTTPScheme {
                     sourceCodec,
                     new HttpServerUpgradeHandler(
                         sourceCodec,
-                        protocol -> AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)
-                            ? new Http2ServerUpgradeCodec(http2FrameCodec,
-                            new Http2MultiplexHandler(
-                                // FIXME: ADD child channel initializer/channel handler
-                            ))
-                            : null,
+                        protocol -> {
+                            if (AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)) {
+                                return new Http2ServerUpgradeCodec(http2FrameCodec,
+                                    new Http2MultiplexHandler(childInit));
+                            }
+                            return null;
+                        },
                         HTTPServer.MAX_HTTP_CONTENT_LENGTH),
                     http2FrameCodec))
                 .addBefore(ctx.name(), null, new CleartextUpgradeHandler());
@@ -71,8 +76,9 @@ public enum HTTPScheme {
      */
     HTTPS(HttpScheme.HTTPS) {
         @Override
-        void initializeServerPipeline(final ChannelHandlerContext ctx) {
-            ctx.pipeline().addBefore(ctx.name(), null, new AlpnUpgradeHandler());
+        void initializeServerPipeline(final ChannelHandlerContext ctx,
+                final ChannelInitializer<Channel> childChannelInit) {
+            ctx.pipeline().addBefore(ctx.name(), null, new AlpnUpgradeHandler(childChannelInit));
         }
     };
 
@@ -82,9 +88,11 @@ public enum HTTPScheme {
     private static final class AlpnUpgradeHandler extends ApplicationProtocolNegotiationHandler {
         private static final Logger LOG = LoggerFactory.getLogger(AlpnUpgradeHandler.class);
         private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.INFO, "Alpn2To1");
+        private final ChannelInitializer<Channel> childChannelInit;
 
-        AlpnUpgradeHandler() {
+        AlpnUpgradeHandler(final ChannelInitializer<Channel> childChannelInit) {
             super(ApplicationProtocolNames.HTTP_1_1);
+            this.childChannelInit = requireNonNull(childChannelInit);
         }
 
         @Override
@@ -110,9 +118,7 @@ public enum HTTPScheme {
             LOG.debug("{}: using HTTP/2", ctx.channel());
             ctx.pipeline().replace(this, "h2-frame-codec", newHttp2FrameCodec(FRAME_LOGGER));
             ctx.pipeline().addAfter("h2-frame-codec", "h2-multiplexer",
-                new Http2MultiplexHandler(
-                    // FIXME: ADD child channel initializer/channel handler
-                ));
+                new Http2MultiplexHandler(childChannelInit));
             ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
         }
     }
@@ -190,7 +196,8 @@ public enum HTTPScheme {
      *
      * @param ctx reference {@link ChannelHandlerContext}
      */
-    abstract void initializeServerPipeline(ChannelHandlerContext ctx);
+    abstract void initializeServerPipeline(ChannelHandlerContext ctx,
+            ChannelInitializer<Channel> childChannelInit);
 
     @Override
     public String toString() {
