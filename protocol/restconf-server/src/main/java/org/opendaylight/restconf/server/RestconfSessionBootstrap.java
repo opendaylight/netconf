@@ -36,15 +36,7 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
     }
 
     @Override
-    protected Http2MultiplexHandler configureHttp2(final ChannelHandlerContext ctx) {
-        final var childInit = new ChannelInitializer<>() {
-            @Override protected void initChannel(Channel ch) {
-                ch.pipeline()
-                    .addLast("h2-httpobj", new Http2StreamFrameToHttpObjectCodec(true))
-                    .addLast(new ConcurrentRestconfSession(scheme, ctx.channel().remoteAddress(), root));
-            }
-        };
-        ctx.pipeline().addBefore(ctx.name(), null, Http2FrameCodecBuilder.forServer().build());
-        return new Http2MultiplexHandler(childInit);
+    protected ConcurrentHTTPServerSession configureHttp2(final ChannelHandlerContext ctx) {
+        return new ConcurrentRestconfSession(scheme, ctx.channel().remoteAddress(), root);
     }
 }

@@ -173,14 +173,14 @@ class HttpClientServerTest {
                 }
 
                 @Override
-                protected Http2MultiplexHandler configureHttp2(final ChannelHandlerContext ctx) {
-                    return new Http2MultiplexHandler(new ConcurrentHTTPServerSession(scheme) {
+                protected ConcurrentHTTPServerSession configureHttp2(final ChannelHandlerContext ctx) {
+                    return new ConcurrentHTTPServerSession(scheme) {
                         @Override
                         protected TestRequest prepareRequest(final ImplementedMethod method, final URI targetUri,
                                 final HttpHeaders headers) {
                             return new TestRequest(method, targetUri);
                         }
-                    });
+                    };
                 }
             });
             return null;
