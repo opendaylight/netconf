@@ -64,5 +64,5 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
      * @return replacement {@link ChannelInboundHandler}
      */
     @NonNullByDefault
-    protected abstract Http2MultiplexHandler configureHttp2(ChannelHandlerContext ctx) ;
+    protected abstract ConcurrentHTTPServerSession configureHttp2(ChannelHandlerContext ctx) ;
 }
