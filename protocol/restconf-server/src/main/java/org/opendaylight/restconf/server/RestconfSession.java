@@ -75,7 +75,6 @@ final class RestconfSession extends PipelinedHTTPServerSession {
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
         if (blockedRequests.isEmpty()) {
-            blockedRequests.offer(msg);
             super.channelRead0(ctx, msg);
         } else {
             blockedRequests.offer(msg);
