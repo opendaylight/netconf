@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
@@ -31,7 +30,7 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
     }
 
     @Override
-    public final void handlerAdded(final ChannelHandlerContext ctx) {
+    public void handlerAdded(final ChannelHandlerContext ctx) {
         scheme.initializeServerPipeline(ctx);
     }
 

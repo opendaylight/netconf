@@ -38,12 +38,15 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.UnpooledByteBufAllocator;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http2.Http2MultiplexHandler;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Authenticator;
@@ -161,6 +164,30 @@ class HttpClientServerTest {
         doAnswer(inv -> {
             final var channel = inv.<HTTPTransportChannel>getArgument(0);
             channel.channel().pipeline().addLast(new HTTPServerSessionBootstrap(channel.scheme()) {
+                @Override
+                public void handlerAdded(final ChannelHandlerContext ctx) {
+                    ctx.channel().attr(Http2Attributes.CHILD_INIT).set(buildChildInit(ctx));
+                    super.handlerAdded(ctx);
+                }
+
+                private ChannelInitializer<Channel> buildChildInit(final ChannelHandlerContext parentCtx) {
+                    return new ChannelInitializer<>() {
+                        @Override
+                        protected void initChannel(final Channel ch) {
+                            ch.pipeline().addLast(new Http2StreamFrameToHttpObjectCodec(true));
+                            ch.pipeline().addLast(new HttpObjectAggregator(HTTPServer.MAX_HTTP_CONTENT_LENGTH));
+                            // Handle each HTTP/2 stream like before:
+                            ch.pipeline().addLast(new ConcurrentHTTPServerSession(scheme) {
+                                @Override
+                                protected TestRequest prepareRequest(final ImplementedMethod method,
+                                        final URI targetUri, final HttpHeaders headers) {
+                                    return new TestRequest(method, targetUri);
+                                }
+                            });
+                        }
+                    };
+                }
+
                 @Override
                 protected PipelinedHTTPServerSession configureHttp1(final ChannelHandlerContext ctx) {
                     return new PipelinedHTTPServerSession(scheme) {

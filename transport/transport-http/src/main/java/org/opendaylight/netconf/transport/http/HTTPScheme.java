@@ -55,12 +55,14 @@ public enum HTTPScheme {
                     sourceCodec,
                     new HttpServerUpgradeHandler(
                         sourceCodec,
-                        protocol -> AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)
-                            ? new Http2ServerUpgradeCodec(http2FrameCodec,
-                            new Http2MultiplexHandler(
-                                // FIXME: ADD child channel initializer/channel handler
-                            ))
-                            : null,
+                        protocol -> {
+                            if (AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)) {
+                                final var childChannelInit = ctx.channel().attr(Http2Attributes.CHILD_INIT).get();
+                                return new Http2ServerUpgradeCodec(http2FrameCodec,
+                                    new Http2MultiplexHandler(childChannelInit));
+                            }
+                            return null;
+                        },
                         HTTPServer.MAX_HTTP_CONTENT_LENGTH),
                     http2FrameCodec))
                 .addBefore(ctx.name(), null, new CleartextUpgradeHandler());
@@ -108,11 +110,10 @@ public enum HTTPScheme {
 
         private void configureHttp2(final ChannelHandlerContext ctx) {
             LOG.debug("{}: using HTTP/2", ctx.channel());
+            final var childChannelInit = ctx.channel().attr(Http2Attributes.CHILD_INIT).get();
             ctx.pipeline().replace(this, "h2-frame-codec", newHttp2FrameCodec(FRAME_LOGGER));
             ctx.pipeline().addAfter("h2-frame-codec", "h2-multiplexer",
-                new Http2MultiplexHandler(
-                    // FIXME: ADD child channel initializer/channel handler
-                ));
+                new Http2MultiplexHandler(childChannelInit));
             ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
         }
     }
