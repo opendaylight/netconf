@@ -18,8 +18,8 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http2.Http2Exception;
 import java.net.SocketAddress;
 import java.net.URI;
+import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -38,7 +38,8 @@ import org.opendaylight.restconf.server.spi.DefaultTransportSession;
 final class RestconfSession extends PipelinedHTTPServerSession {
     private final @NonNull DefaultTransportSession transportSession;
     private final @NonNull EndpointRoot root;
-    private final @NonNull Deque<FullHttpRequest> blockedRequests = new ConcurrentLinkedDeque<>();
+    // stores requests to be invoked in FIFO pipeline one after one
+    private final @NonNull Deque<@NonNull FullHttpRequest> blockedRequests = new ArrayDeque<>();
 
     @NonNullByDefault
     RestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root) {
