@@ -48,6 +48,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "069b3b7d_73930244",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultDeviceNetconfSchemaProvider.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-19T09:40:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bea02b1d_436b8f02",
+      "range": {
+        "startLine": 105,
+        "startChar": 25,
+        "endLine": 105,
+        "endChar": 90
+      },
+      "revId": "4cd4c4f994b6b24060e80f4b0534cf359975c93f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "21d6405a_79c28b39",
@@ -65,6 +89,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5c9a15f_f1c00bea",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultDeviceNetconfSchemaProvider.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-19T09:40:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "21d6405a_79c28b39",
+      "revId": "4cd4c4f994b6b24060e80f4b0534cf359975c93f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "efe96b9f_4d15d71e",
@@ -78,6 +120,30 @@
       "writtenOn": "2025-11-13T12:02:41Z",
       "side": 1,
       "message": "YangConstants.NETCONF_NAMESPACE",
+      "range": {
+        "startLine": 63,
+        "startChar": 38,
+        "endLine": 63,
+        "endChar": 60
+      },
+      "revId": "4cd4c4f994b6b24060e80f4b0534cf359975c93f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a5d9554_ae26e1ae",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-19T09:40:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "efe96b9f_4d15d71e",
       "range": {
         "startLine": 63,
         "startChar": 38,
@@ -111,6 +177,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0f17e77_14594cdb",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-19T09:40:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e9afa3e_6f12c513",
+      "range": {
+        "startLine": 66,
+        "startChar": 34,
+        "endLine": 66,
+        "endChar": 60
+      },
+      "revId": "4cd4c4f994b6b24060e80f4b0534cf359975c93f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1fe6c330_16a46fce",
@@ -124,6 +214,30 @@
       "writtenOn": "2025-11-13T12:38:52Z",
       "side": 1,
       "message": "hmm, I don\u0027t think we should be doing this magic here, but rather in NetconfStateSchemasResolverImpl, where we can also provide the corresponding source",
+      "range": {
+        "startLine": 101,
+        "startChar": 8,
+        "endLine": 101,
+        "endChar": 34
+      },
+      "revId": "4cd4c4f994b6b24060e80f4b0534cf359975c93f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "83649406_fb6af5e2",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-19T09:40:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1fe6c330_16a46fce",
       "range": {
         "startLine": 101,
         "startChar": 8,
