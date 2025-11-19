@@ -78,7 +78,7 @@ final class RestconfSession extends PipelinedHTTPServerSession {
             blockedRequests.offer(msg);
             super.channelRead0(ctx, msg);
         } else {
-            blockedRequests.offer(msg);
+            blockedRequests.offer(msg.retain());
         }
     }
 
@@ -88,7 +88,10 @@ final class RestconfSession extends PipelinedHTTPServerSession {
         final var respond = super.respond(ctx, streamId, response);
         respond.addListener(future -> {
             ctx.executor().execute(() -> {
-                blockedRequests.poll();
+                // remove processed msg and push it up the channel
+                if (!blockedRequests.isEmpty()) {
+                    ctx.fireChannelRead(blockedRequests.poll());
+                }
                 if (future.isSuccess()) {
                     if (!blockedRequests.isEmpty()) {
                         super.channelRead0(ctx, blockedRequests.peek());
@@ -112,7 +115,11 @@ final class RestconfSession extends PipelinedHTTPServerSession {
     @Override
     protected void notifyRequestFinished(final ChannelHandlerContext ctx) {
         ctx.executor().execute(() -> {
-            blockedRequests.poll();
+            // remove processed msg and push it up the channel
+            if (!blockedRequests.isEmpty()) {
+                ctx.fireChannelRead(blockedRequests.poll());
+            }
+            // start processing the next msg if exists
             if (!blockedRequests.isEmpty()) {
                 super.channelRead0(ctx, blockedRequests.peek());
             }
