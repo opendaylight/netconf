@@ -31,7 +31,7 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
     }
 
     @Override
-    public final void handlerAdded(final ChannelHandlerContext ctx) {
+    public void handlerAdded(final ChannelHandlerContext ctx) {
         scheme.initializeServerPipeline(ctx);
     }
 
