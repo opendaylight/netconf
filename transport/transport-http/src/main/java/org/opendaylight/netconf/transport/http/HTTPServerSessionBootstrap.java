@@ -9,10 +9,11 @@ package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
 
     @Override
     public final void handlerAdded(final ChannelHandlerContext ctx) {
-        scheme.initializeServerPipeline(ctx);
+        scheme.initializeServerPipeline(ctx, buildHttp2ChildInitializer(ctx));
     }
 
     @Override
@@ -64,5 +65,14 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
      * @return replacement {@link ChannelInboundHandler}
      */
     @NonNullByDefault
-    protected abstract Http2MultiplexHandler configureHttp2(ChannelHandlerContext ctx);
+    protected abstract ConcurrentHTTPServerSession configureHttp2(ChannelHandlerContext ctx);
+
+    /**
+     * Build the per-stream initializer the HTTP/2 pipeline should install into {@link Http2MultiplexHandler}.
+     *
+     * @param ctx the {@link ChannelHandlerContext} associated with the parent HTTP/2 connection
+     * @return channel initializer configuring stream channels
+     */
+    @NonNullByDefault
+    protected abstract ChannelInitializer<Channel> buildHttp2ChildInitializer(ChannelHandlerContext ctx);
 }

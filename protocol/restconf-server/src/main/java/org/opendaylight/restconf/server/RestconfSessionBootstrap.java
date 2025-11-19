@@ -12,8 +12,7 @@ import static java.util.Objects.requireNonNull;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
-import io.netty.handler.codec.http2.Http2FrameCodecBuilder;
-import io.netty.handler.codec.http2.Http2MultiplexHandler;
+import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.ConcurrentHTTPServerSession;
@@ -23,11 +22,25 @@ import org.opendaylight.netconf.transport.http.PipelinedHTTPServerSession;
 
 @NonNullByDefault
 final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
+    private static final int MAX_HTTP_CONTENT_LENGTH = 16 * 1024;
     private final EndpointRoot root;
 
     RestconfSessionBootstrap(final HTTPScheme scheme, final EndpointRoot root) {
         super(scheme);
         this.root = requireNonNull(root);
+    }
+
+    @Override
+    protected ChannelInitializer<Channel> buildHttp2ChildInitializer(final ChannelHandlerContext parentCtx) {
+        return new ChannelInitializer<>() {
+            @Override protected void initChannel(final Channel ch) {
+                final var pipeline = ch.pipeline();
+                pipeline.addLast(new Http2StreamFrameToHttpObjectCodec(true));
+                pipeline.addLast(new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));
+                pipeline.addLast("restconf-session", new ConcurrentRestconfSession(scheme,
+                    parentCtx.channel().remoteAddress(), root));
+            }
+        };
     }
 
     @Override
