@@ -22,6 +22,30 @@
       },
       "revId": "66a18dd25634df98e9acd4f71530ec8144b3d2aa",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7cac84b_518c2929",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-19T08:33:39Z",
+      "side": 1,
+      "message": "ACK at least we know test are working:\n08:55:02 [ERROR]   PipeliningTest.testPipeliningQueue:49 expected: \u003c2\u003e but was: \u003c0\u003e\n\nUse git rebase -i to complete this chain without this patch.",
+      "parentUuid": "646361a0_78ca14e7",
+      "range": {
+        "startLine": 77,
+        "startChar": 7,
+        "endLine": 77,
+        "endChar": 38
+      },
+      "revId": "66a18dd25634df98e9acd4f71530ec8144b3d2aa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
