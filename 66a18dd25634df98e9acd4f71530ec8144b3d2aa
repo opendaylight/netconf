@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "646361a0_78ca14e7",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-11-19T08:16:15Z",
+      "side": 1,
+      "message": "But then we never add requests to queue, and when second request arrives, this is always empty, so it behaves like before implementing pipelining",
+      "range": {
+        "startLine": 77,
+        "startChar": 7,
+        "endLine": 77,
+        "endChar": 38
+      },
+      "revId": "66a18dd25634df98e9acd4f71530ec8144b3d2aa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
