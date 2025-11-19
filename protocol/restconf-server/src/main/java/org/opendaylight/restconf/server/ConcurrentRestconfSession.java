@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http2.Http2Exception;
 import java.net.SocketAddress;
@@ -23,6 +24,8 @@ import org.opendaylight.netconf.transport.http.ImplementedMethod;
 import org.opendaylight.netconf.transport.http.PreparedRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.DefaultTransportSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * HTTP/2+ RESTCONF session, as defined in <a href="https://www.rfc-editor.org/rfc/rfc8650#section-3.1">RFC8650</a>.
@@ -30,6 +33,7 @@ import org.opendaylight.restconf.server.spi.DefaultTransportSession;
  * <p>It acts as glue between a Netty channel and a RESTCONF server and services multiple HTTP/2+ logical connections.
  */
 final class ConcurrentRestconfSession extends ConcurrentHTTPServerSession {
+    private static final Logger LOG = LoggerFactory.getLogger(ConcurrentRestconfSession.class);
     private final @NonNull DefaultTransportSession transportSession;
     private final @NonNull EndpointRoot root;
 
@@ -45,6 +49,12 @@ final class ConcurrentRestconfSession extends ConcurrentHTTPServerSession {
         super.handlerAdded(ctx);
         final var authHandlerFactory = root.authHandlerFactory();
         ctx.pipeline().addBefore(ctx.name(), null, authHandlerFactory.create());
+    }
+
+    @Override
+    protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
+        LOG.info("FullHttpRequest message in ConcurrentRestconfSession: {}, with headers: {}", msg, msg.headers());
+        super.channelRead0(ctx, msg);
     }
 
     @Override
