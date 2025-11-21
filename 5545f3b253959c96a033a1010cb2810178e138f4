@@ -33,6 +33,46 @@
       "message": "recheck",
       "revId": "5545f3b253959c96a033a1010cb2810178e138f4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ed73d2e_bab90047",
+        "filename": "apps/restconf-nb/src/main/resources/restconf8040.cfg",
+        "patchSetId": 23
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-11-21T15:04:27Z",
+      "side": 1,
+      "message": "#http1-chunk-size\u003d262144",
+      "range": {
+        "startLine": 24,
+        "startChar": 17,
+        "endLine": 24,
+        "endChar": 22
+      },
+      "revId": "5545f3b253959c96a033a1010cb2810178e138f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5f162a9_f86b8158",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/EndpointConfiguration.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-11-21T15:04:27Z",
+      "side": 1,
+      "message": "is this needed?",
+      "revId": "5545f3b253959c96a033a1010cb2810178e138f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
