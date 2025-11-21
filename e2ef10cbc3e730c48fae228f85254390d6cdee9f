@@ -16,6 +16,80 @@
       "message": "recheck",
       "revId": "e2ef10cbc3e730c48fae228f85254390d6cdee9f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b105dd0c_a1107aa7",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ConcurrentRestconfSession.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-11-21T16:10:56Z",
+      "side": 1,
+      "message": "info?\nwhy this change?",
+      "range": {
+        "startLine": 56,
+        "startChar": 12,
+        "endLine": 56,
+        "endChar": 16
+      },
+      "revId": "e2ef10cbc3e730c48fae228f85254390d6cdee9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f699bd4_01bf7808",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-11-21T16:10:56Z",
+      "side": 1,
+      "message": "final",
+      "revId": "e2ef10cbc3e730c48fae228f85254390d6cdee9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6016bdc1_182203f0",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-11-21T16:10:56Z",
+      "side": 1,
+      "message": "final",
+      "revId": "e2ef10cbc3e730c48fae228f85254390d6cdee9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d80334cc_299b469e",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HttpClientServerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-11-21T16:10:56Z",
+      "side": 1,
+      "message": "indent",
+      "revId": "e2ef10cbc3e730c48fae228f85254390d6cdee9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
