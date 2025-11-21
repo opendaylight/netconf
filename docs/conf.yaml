@@ -1,4 +1,3 @@
 project_cfg: opendaylight
 project: NetConf
-version: Potassium
-
+version: Vanadium
