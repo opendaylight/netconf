@@ -222,30 +222,16 @@ public final class ResponseWriter extends ChannelInboundHandlerAdapter {
 
     private void drainOnEventLoop(final ChannelHandlerContext ctx) {
         final var channel = ctx.channel();
-        if (!channel.isActive()) {
-            state = Inactive.INSTANCE;
-            return;
-        }
-        if (!channel.isWritable()) {
-            state = Unwritable.INSTANCE;
-            return;
-        }
-        state = new Writable(ctx);
-
-        while (true) {
+        pendingChunks.forEach(chunk -> {
             if (!channel.isActive()) {
                 state = Inactive.INSTANCE;
                 return;
             }
             if (!channel.isWritable()) {
                 state = Unwritable.INSTANCE;
-                break;
+                return;
             }
-            final var httpObject = pendingChunks.poll();
-            if (httpObject == null) {
-                break;
-            }
-            ctx.writeAndFlush(httpObject);
-        }
+            ctx.writeAndFlush(chunk);
+        });
     }
 }
