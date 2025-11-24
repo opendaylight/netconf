@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "144be5d2_2cd3805c",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/ConcurrentRestconfSession.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-24T07:44:24Z",
+      "side": 1,
+      "message": "For test purposes, it will be eliminated in the final stage",
+      "parentUuid": "b105dd0c_a1107aa7",
+      "range": {
+        "startLine": 56,
+        "startChar": 12,
+        "endLine": 56,
+        "endChar": 16
+      },
+      "revId": "e2ef10cbc3e730c48fae228f85254390d6cdee9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4f699bd4_01bf7808",
