@@ -22,7 +22,7 @@ import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -57,7 +57,7 @@ public final class ResponseWriter extends ChannelInboundHandlerAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResponseWriter.class);
 
-    private final ArrayBlockingQueue<HttpObject> pendingChunks = new ArrayBlockingQueue<>(1);
+    private final LinkedBlockingQueue<HttpObject> pendingChunks = new LinkedBlockingQueue<>();
 
     private volatile @NonNull State state = Inactive.INSTANCE;
     private volatile @Nullable ChannelHandlerContext context;
