@@ -58,6 +58,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5c3c06e_b79c82f5",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-24T07:43:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f699bd4_01bf7808",
+      "revId": "e2ef10cbc3e730c48fae228f85254390d6cdee9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6016bdc1_182203f0",
@@ -75,6 +93,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f024daa3_3d765a85",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-24T07:43:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6016bdc1_182203f0",
+      "revId": "e2ef10cbc3e730c48fae228f85254390d6cdee9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d80334cc_299b469e",
@@ -88,6 +124,24 @@
       "writtenOn": "2025-11-21T16:10:56Z",
       "side": 1,
       "message": "indent",
+      "revId": "e2ef10cbc3e730c48fae228f85254390d6cdee9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3866f531_b55b239b",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HttpClientServerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-24T07:43:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d80334cc_299b469e",
       "revId": "e2ef10cbc3e730c48fae228f85254390d6cdee9f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
