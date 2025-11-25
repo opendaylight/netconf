@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f3aa0095_cc70e26a",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 601,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T08:54:05Z",
+      "side": 1,
+      "message": "IMO that makes our code dangerous using unchecked casts - the class hierarchy is broken and difficult to understand/use",
+      "parentUuid": "9bc10318_5c51aa71",
+      "revId": "72533f094d8fae33a782a44c988307fb3198fc46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a8074064_4a69fdc4",
         "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
         "patchSetId": 13
