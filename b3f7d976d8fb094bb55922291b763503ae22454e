@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "39117585_ec8fcfd6",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T07:23:53Z",
+      "side": 1,
+      "message": "IMO return for better clarity",
+      "revId": "b3f7d976d8fb094bb55922291b763503ae22454e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0bc3a12d_c01bd156",
         "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
         "patchSetId": 1
@@ -14,6 +31,24 @@
       "writtenOn": "2025-11-24T16:09:58Z",
       "side": 1,
       "message": "This way we can end up unnecessarily calling this multiple times is it ok/better?",
+      "revId": "b3f7d976d8fb094bb55922291b763503ae22454e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d594f82d_29a2245c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T07:23:53Z",
+      "side": 1,
+      "message": "IMO, its called just once",
+      "parentUuid": "0bc3a12d_c01bd156",
       "revId": "b3f7d976d8fb094bb55922291b763503ae22454e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
