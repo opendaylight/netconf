@@ -16,6 +16,24 @@
       "message": "keep variable like this for newHttp2FrameCodec(FRAME_LOGGER) as it\u0027s used 2 times,\nor maybe remove newHttp2FrameCodec()?",
       "revId": "ebaab19e5c345ccaa7a1d0fa024e6d9b0e6414e9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3dcda7c8_942800ac",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-25T08:45:18Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "15d75c92_ebc19f4d",
+      "revId": "ebaab19e5c345ccaa7a1d0fa024e6d9b0e6414e9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
