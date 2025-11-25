@@ -39,7 +39,6 @@ import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFacto
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 
 @ExtendWith(MockitoExtension.class)
 class SchemaSetupTest extends AbstractTestModelTest {
@@ -56,8 +55,6 @@ class SchemaSetupTest extends AbstractTestModelTest {
     private EffectiveModelContextFactory contextFactory;
     @Mock
     private SchemaRepository schemaRepository;
-    @Mock
-    private SchemaSourceProvider<YangTextSource> sourceProvider;
     @Mock
     private YangTextSource source;
 
