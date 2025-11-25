@@ -34,6 +34,24 @@
       "parentUuid": "bd340024_d52dfbc4",
       "revId": "f81f6bae1382397ae03ad820efcaf522670bc8d4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c50d26c_bfbc6ada",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T08:15:51Z",
+      "side": 1,
+      "message": "Tracked in https://lf-opendaylight.atlassian.net/browse/NETCONF-1556",
+      "parentUuid": "0d95ba88_dbbccfa2",
+      "revId": "f81f6bae1382397ae03ad820efcaf522670bc8d4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
