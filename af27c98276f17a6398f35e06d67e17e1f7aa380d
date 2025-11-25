@@ -16,6 +16,24 @@
       "message": "imo this variable is not needed, just use return",
       "revId": "af27c98276f17a6398f35e06d67e17e1f7aa380d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "384eebf1_1934dece",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultDeviceNetconfSchemaProvider.java",
+        "patchSetId": 38
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-25T13:26:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e9132fa_da01ca6d",
+      "revId": "af27c98276f17a6398f35e06d67e17e1f7aa380d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
