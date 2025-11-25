@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb8f2c37_aa9374dc",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/SubtreeEventStreamFilter.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T08:54:46Z",
+      "side": 1,
+      "message": "we usually do not repeat @NonNullByDefault when its in parent",
+      "revId": "67bb1403d9d9168dc948655d6fc40a57b52481b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
