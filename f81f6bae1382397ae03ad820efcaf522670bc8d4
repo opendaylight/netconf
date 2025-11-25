@@ -16,6 +16,24 @@
       "message": "The original idea was not to store the buffer in memory, but just to block the producer, with an unbounded LinkedBlockingQueue, we are storing all pending chunks in memory",
       "revId": "f81f6bae1382397ae03ad820efcaf522670bc8d4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d95ba88_dbbccfa2",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T07:11:17Z",
+      "side": 1,
+      "message": "ACK, we will see what this brings us, we would need to have test first, then split out to improvements.",
+      "parentUuid": "bd340024_d52dfbc4",
+      "revId": "f81f6bae1382397ae03ad820efcaf522670bc8d4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
