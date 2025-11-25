@@ -87,6 +87,24 @@
       "parentUuid": "d594f82d_29a2245c",
       "revId": "b3f7d976d8fb094bb55922291b763503ae22454e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "218b76e5_8c838331",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T07:47:41Z",
+      "side": 1,
+      "message": "do you mean new Writable(ctx)?",
+      "parentUuid": "14c70400_bc47786b",
+      "revId": "b3f7d976d8fb094bb55922291b763503ae22454e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
