@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "425ca871_5823fe10",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T14:26:45Z",
+      "side": 1,
+      "message": "requireNonNull?",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90046ea7_2071d496",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/RpcsTimeoutAndRecoveryHandler.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T14:26:45Z",
+      "side": 1,
+      "message": "```\n/**\n * {@inheritDoc}\n *\n * \u003cp\u003eWrap...\n```",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c3b0195_e7a707cd",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/RpcsTimeoutAndRecoveryHandler.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T14:26:45Z",
+      "side": 1,
+      "message": "private\n\ncan be even moved to its calling RequestTimeoutTask class?",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "289d19f3_05c19e63",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/RpcsTimeoutAndRecoveryHandler.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T14:26:45Z",
+      "side": 1,
+      "message": "listenableFuture is netconf operation result? do we have better name?",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3871ff7_cdea8fff",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/RpcsTimeoutAndRecoveryHandler.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T14:26:45Z",
+      "side": 1,
+      "message": "which session or which device? can we add it into log?",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd8e71e3_1e194542",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/api/RpcsHandler.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T14:26:45Z",
+      "side": 1,
+      "message": "RpcsHandler -\u003e RpcsDecorator or another more suitable name\n\nIn addition, please make it sealed and allow exactly the subclass we want - we do not want to risk someone will provide another harm with their decorators",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04b0340c_52f2c963",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T14:26:45Z",
+      "side": 1,
+      "message": "why not .setSalFacade(remoteDeviceHandler)?",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "870533f8_7eb911b3",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/MonitoringSchemaSourceProviderTest.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T14:26:45Z",
+      "side": 1,
+      "message": "why not `private`?",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "820cc44f_ca1ffd34",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/MonitoringSchemaSourceProviderTest.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T14:26:45Z",
+      "side": 1,
+      "message": "because requests took 3 seconds, can you clarify the comments?",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "049be6d3_180c09e7",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/MonitoringSchemaSourceProviderTest.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T14:26:45Z",
+      "side": 1,
+      "message": "2 or 3 :) seconds?",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
