@@ -16,6 +16,24 @@
       "message": "this does not remove elements from queue",
       "revId": "27d406f646910351c2a5507a2ce6aeccccbeac95",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e144d44_2109b9dd",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T08:08:45Z",
+      "side": 1,
+      "message": "OK, lets leave it as it was, the question is why do we need even to test writability in this method again?",
+      "parentUuid": "13d1096a_5b1ea77f",
+      "revId": "27d406f646910351c2a5507a2ce6aeccccbeac95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
