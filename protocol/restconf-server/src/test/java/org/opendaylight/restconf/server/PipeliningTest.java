@@ -45,8 +45,8 @@ class PipeliningTest extends AbstractRequestProcessorTest {
         dispatch(request2);
         dispatch(request3);
 
-        // We expect 2 of requests are in queue until first one is finished
-        assertEquals(2, blockedRequestsSize());
+        // We expect that all 3 requests are in queue until first one is finished
+        assertEquals(3, blockedRequestsSize());
         // After short delay we expect that all requests were addressed and queue is empty
         Awaitility.await().atMost(2, TimeUnit.SECONDS).until(() -> blockedRequestsSize() == 0);
     }
@@ -56,7 +56,7 @@ class PipeliningTest extends AbstractRequestProcessorTest {
             final var request = invocation.<ServerRequest<DataGetResult>>getArgument(0);
             CompletableFuture.runAsync(
                 () -> request.completeWith(result),
-                CompletableFuture.delayedExecutor(200, TimeUnit.MILLISECONDS)
+                CompletableFuture.delayedExecutor(600, TimeUnit.MILLISECONDS)
             );
             return null;
         };
