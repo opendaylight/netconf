@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8481f40_ce0009f1",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T15:05:20Z",
+      "side": 1,
+      "message": "add LOGging for reconnecting case",
+      "revId": "abac5cdfcf454797e4679468e1940579d9fa825e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5327e9e_cd579a2a",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T15:05:20Z",
+      "side": 1,
+      "message": "maybe just (isRequestCancelledException(e)) would be enough",
+      "revId": "abac5cdfcf454797e4679468e1940579d9fa825e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2672098a_e12dfc91",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-25T15:05:20Z",
+      "side": 1,
+      "message": "when we set reconnectingDevice back to false?",
+      "revId": "abac5cdfcf454797e4679468e1940579d9fa825e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
