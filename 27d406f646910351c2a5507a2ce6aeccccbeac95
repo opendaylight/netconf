@@ -34,6 +34,24 @@
       "parentUuid": "13d1096a_5b1ea77f",
       "revId": "27d406f646910351c2a5507a2ce6aeccccbeac95",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b09d3c93_85510e37",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-25T08:26:32Z",
+      "side": 1,
+      "message": "Since each write() adds bytes to the outbound buffer, it potentially can push the channel over the high water mark between two iterations, making isWritable() -false before Netty has a chance to fire channelWritabilityChanged()",
+      "parentUuid": "8e144d44_2109b9dd",
+      "revId": "27d406f646910351c2a5507a2ce6aeccccbeac95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ],
   "submitRequirementResults": [
