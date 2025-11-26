@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "78469db1_588bcc22",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-11-26T12:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8fdb4ca9_9b95e18e",
+      "revId": "cb8bac2b56ae33d8660ba42a25dc3e522ce81732",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dc1fb209_1a8e4743",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-11-25T09:12:45Z",
       "side": 1,
       "message": "introduce a constant",
+      "revId": "cb8bac2b56ae33d8660ba42a25dc3e522ce81732",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2909f2ce_cdd0c621",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-11-26T12:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc1fb209_1a8e4743",
       "revId": "cb8bac2b56ae33d8660ba42a25dc3e522ce81732",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "af851544_2925a684",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-11-26T12:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d4debb6b_155ddfe7",
+      "revId": "cb8bac2b56ae33d8660ba42a25dc3e522ce81732",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d2edc2b9_acfe93b2",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-11-25T09:12:45Z",
       "side": 1,
       "message": "IMO these are NOT: these are mirrored in JaxRsEndpointConfiguration",
+      "revId": "cb8bac2b56ae33d8660ba42a25dc3e522ce81732",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65fb87c2_aa7136d7",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-11-26T12:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d2edc2b9_acfe93b2",
       "revId": "cb8bac2b56ae33d8660ba42a25dc3e522ce81732",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b68e521_d6afc743",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-11-26T12:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d34fa1f7_1fd8ffc4",
+      "revId": "cb8bac2b56ae33d8660ba42a25dc3e522ce81732",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1787eb22_08883972",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-11-25T09:12:45Z",
       "side": 1,
       "message": "HTTP2 does not have chunk size - where is this used ATM in ConcurrentRestconfSession?",
+      "revId": "cb8bac2b56ae33d8660ba42a25dc3e522ce81732",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ba72578_1f8fc81d",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-11-26T12:39:55Z",
+      "side": 1,
+      "message": "Both PipelinedHTTPServerSession and ConcurrentRestconfSession extends abstract HTTPServerSession where we need chunk size for http1.\nAdded FIXME to remove it\nthis can be addressed during or after implementation of HTTP2",
+      "parentUuid": "1787eb22_08883972",
       "revId": "cb8bac2b56ae33d8660ba42a25dc3e522ce81732",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c4d747e_bb9f6911",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/AbstractRequestProcessorTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-11-26T12:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f61aef3_fa48a702",
+      "revId": "cb8bac2b56ae33d8660ba42a25dc3e522ce81732",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "15dd0d2a_bf1bf137",
@@ -133,6 +259,24 @@
       "writtenOn": "2025-11-25T09:12:45Z",
       "side": 1,
       "message": "IMO here its OK - its local usage only",
+      "revId": "cb8bac2b56ae33d8660ba42a25dc3e522ce81732",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d63d28c0_45e5262c",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/RestconfSessionTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-11-26T12:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "15dd0d2a_bf1bf137",
       "revId": "cb8bac2b56ae33d8660ba42a25dc3e522ce81732",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -154,6 +298,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "52469c7c_4a0eece0",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseOutput.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-11-26T12:39:55Z",
+      "side": 1,
+      "message": "no, reverted these changes, as they are not more needed",
+      "parentUuid": "a4e63c0a_ae8db93b",
+      "revId": "cb8bac2b56ae33d8660ba42a25dc3e522ce81732",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ac129e0d_102636d8",
@@ -167,6 +329,24 @@
       "writtenOn": "2025-11-25T09:12:45Z",
       "side": 1,
       "message": "@NonNull",
+      "revId": "cb8bac2b56ae33d8660ba42a25dc3e522ce81732",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42f53aff_1ce3e0eb",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerRequestExecutor.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-11-26T12:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ac129e0d_102636d8",
       "revId": "cb8bac2b56ae33d8660ba42a25dc3e522ce81732",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
