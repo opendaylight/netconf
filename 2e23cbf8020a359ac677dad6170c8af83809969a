@@ -16,6 +16,24 @@
       "message": "This would be needed after NETCONF-1474 cherry-pick.",
       "revId": "2e23cbf8020a359ac677dad6170c8af83809969a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a4bc1d4_0351cf0a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-26T09:20:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d2e1337f_a96f9fdf",
+      "revId": "2e23cbf8020a359ac677dad6170c8af83809969a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ],
   "submitRequirementResults": [
