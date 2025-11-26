@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5255a8ac_ce07cd58",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/ModulesRequestProcessorTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-26T08:25:13Z",
+      "side": 1,
+      "message": "Why not just use same approach as in https://git.opendaylight.org/gerrit/c/netconf/+/119450/8/protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/ErrorHandlerTest.java?",
+      "revId": "ee07a79c12b393cbf87412cf3b1f4970f86e1fd9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
