@@ -104,6 +104,24 @@
       "parentUuid": "2672098a_e12dfc91",
       "revId": "abac5cdfcf454797e4679468e1940579d9fa825e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d8623ec_d89da343",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-27T09:55:32Z",
+      "side": 1,
+      "message": "aha, please document it in the class javadocs",
+      "parentUuid": "99a1892c_cd48926c",
+      "revId": "abac5cdfcf454797e4679468e1940579d9fa825e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

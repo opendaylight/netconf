@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "d68cb15e6ad1069d4cbcbf2da01fc3222dc4894c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab3a2032_cf2635b1",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-27T09:55:32Z",
+      "side": 1,
+      "message": "no more single attempt?",
+      "revId": "d68cb15e6ad1069d4cbcbf2da01fc3222dc4894c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
