@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30efcb91_18d0ef48",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-27T15:18:49Z",
+      "side": 1,
+      "message": "no, we would like to make HTTP1 to HTTP2 transformation in parent channel",
+      "revId": "3a36e1bc5b134727e6cb15cb88fa836a8aa67b47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "634ea8bf_64c90453",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-27T15:18:49Z",
+      "side": 1,
+      "message": "pipeline",
+      "revId": "3a36e1bc5b134727e6cb15cb88fa836a8aa67b47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
