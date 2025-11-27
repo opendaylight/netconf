@@ -68,6 +68,23 @@
       "parentUuid": "1d2c8761_8b92fd26",
       "revId": "9dacbfe02916d94ae636ec0a258a615f0884596d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a12185d5_68a6024f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-27T15:22:35Z",
+      "side": 1,
+      "message": "what about to use this?\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/117579/11/transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+      "revId": "9dacbfe02916d94ae636ec0a258a615f0884596d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
