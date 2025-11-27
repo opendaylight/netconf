@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e9b84f38_1f3f471b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-27T15:51:05Z",
+      "side": 1,
+      "message": "could we follow: https://lf-opendaylight.atlassian.net/browse/NETCONF-1497?focusedCommentId\u003d49177?",
+      "revId": "71d9eea5edcee95d6a4ed2535ea5b0fc7744e807",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e143c751_b8ba071e",
         "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http2Attributes.java",
         "patchSetId": 7
