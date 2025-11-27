@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "52b2c26b_d6364afb",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-27T08:32:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "425ca871_5823fe10",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90046ea7_2071d496",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-11-25T14:26:45Z",
       "side": 1,
       "message": "```\n/**\n * {@inheritDoc}\n *\n * \u003cp\u003eWrap...\n```",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa4fbdc8_ea927a5e",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/RpcsTimeoutAndRecoveryHandler.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-27T08:32:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "90046ea7_2071d496",
       "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8de4097c_470c9a01",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/RpcsTimeoutAndRecoveryHandler.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-27T08:32:58Z",
+      "side": 1,
+      "message": "Moved to RequestTimeoutTask class.",
+      "parentUuid": "8c3b0195_e7a707cd",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "289d19f3_05c19e63",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-11-25T14:26:45Z",
       "side": 1,
       "message": "listenableFuture is netconf operation result? do we have better name?",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc8d7c71_1f39f862",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/RpcsTimeoutAndRecoveryHandler.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-27T08:32:58Z",
+      "side": 1,
+      "message": "Yes, it is an invoked RPC to a Netconf device. I have renamed it to invokedRpc.",
+      "parentUuid": "289d19f3_05c19e63",
       "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "00c0da9f_d3bc127b",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/RpcsTimeoutAndRecoveryHandler.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-27T08:32:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b3871ff7_cdea8fff",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd8e71e3_1e194542",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-11-25T14:26:45Z",
       "side": 1,
       "message": "RpcsHandler -\u003e RpcsDecorator or another more suitable name\n\nIn addition, please make it sealed and allow exactly the subclass we want - we do not want to risk someone will provide another harm with their decorators",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "19b3367c_ceade873",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/api/RpcsHandler.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-27T08:32:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd8e71e3_1e194542",
       "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e3122b3_f580ec08",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-27T08:32:58Z",
+      "side": 1,
+      "message": "fixed",
+      "parentUuid": "04b0340c_52f2c963",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "870533f8_7eb911b3",
@@ -133,6 +259,24 @@
       "writtenOn": "2025-11-25T14:26:45Z",
       "side": 1,
       "message": "why not `private`?",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b33d2bbe_b254f664",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/MonitoringSchemaSourceProviderTest.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-27T08:32:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "870533f8_7eb911b3",
       "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -154,6 +298,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "274c3030_8ffb02ad",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/MonitoringSchemaSourceProviderTest.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-27T08:32:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "820cc44f_ca1ffd34",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "049be6d3_180c09e7",
@@ -167,6 +329,24 @@
       "writtenOn": "2025-11-25T14:26:45Z",
       "side": 1,
       "message": "2 or 3 :) seconds?",
+      "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "640faee4_4b42728d",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/MonitoringSchemaSourceProviderTest.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-27T08:32:58Z",
+      "side": 1,
+      "message": "The TRANSACTION_DELAY is configured for two seconds, and the process is waiting 3s to invoke the CancellationException. I have described it in the inline comments.",
+      "parentUuid": "049be6d3_180c09e7",
       "revId": "2b87f7c30a4b02c145c6435fbaf9c956f57a724c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
