@@ -50,6 +50,24 @@
       "message": "I would expect Http2FrameCodecBuilder be added in HTTPScheme",
       "revId": "9dacbfe02916d94ae636ec0a258a615f0884596d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b66015de_fd4e4a49",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-27T15:21:36Z",
+      "side": 1,
+      "message": "like here: https://git.opendaylight.org/gerrit/c/netconf/+/118272/1/transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+      "parentUuid": "1d2c8761_8b92fd26",
+      "revId": "9dacbfe02916d94ae636ec0a258a615f0884596d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
