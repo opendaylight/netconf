@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "741466dc_32c2cb6f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-27T15:10:04Z",
+      "side": 1,
+      "message": "pipeline",
+      "revId": "9dacbfe02916d94ae636ec0a258a615f0884596d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff9a77fd_ae7957e6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-27T15:10:04Z",
+      "side": 1,
+      "message": "stage.",
+      "revId": "9dacbfe02916d94ae636ec0a258a615f0884596d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d2c8761_8b92fd26",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-27T15:10:04Z",
+      "side": 1,
+      "message": "I would expect Http2FrameCodecBuilder be added in HTTPScheme",
+      "revId": "9dacbfe02916d94ae636ec0a258a615f0884596d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
