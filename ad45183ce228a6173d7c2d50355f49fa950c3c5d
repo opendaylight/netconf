@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92a120bd_975a99f4",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/EndpointConfiguration.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-27T14:10:46Z",
+      "side": 1,
+      "message": "we use chunk size for Netty only",
+      "revId": "ad45183ce228a6173d7c2d50355f49fa950c3c5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3e0b3ba_fd5256d3",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-27T14:10:46Z",
+      "side": 1,
+      "message": "this constructor seem to me like using the default - so final Uint32 chunkSize should not be in parameters",
+      "revId": "ad45183ce228a6173d7c2d50355f49fa950c3c5d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
