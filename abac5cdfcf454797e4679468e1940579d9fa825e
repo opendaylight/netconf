@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "69780a3f_65be48a4",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-27T09:34:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b8481f40_ce0009f1",
+      "revId": "abac5cdfcf454797e4679468e1940579d9fa825e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5327e9e_cd579a2a",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "76cbb31b_913e3675",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-27T09:34:02Z",
+      "side": 1,
+      "message": "Yes, it would be enough, but if it was previously set, there is no need to check for a CancellationException or set the same value on the AtomicBoolean.\n\nIf you would like to remove it, please reopen this comment.",
+      "parentUuid": "b5327e9e_cd579a2a",
+      "revId": "abac5cdfcf454797e4679468e1940579d9fa825e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2672098a_e12dfc91",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-11-25T15:05:20Z",
       "side": 1,
       "message": "when we set reconnectingDevice back to false?",
+      "revId": "abac5cdfcf454797e4679468e1940579d9fa825e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99a1892c_cd48926c",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-27T09:34:02Z",
+      "side": 1,
+      "message": "We do not. If the reconnectingDevice is set to true, it means that the SchemaSetup was not constructed correctly. Since the device is reconnecting, this instance will be removed, and a new SchemaSetup instance will be prepared with a new connection.",
+      "parentUuid": "2672098a_e12dfc91",
       "revId": "abac5cdfcf454797e4679468e1940579d9fa825e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
