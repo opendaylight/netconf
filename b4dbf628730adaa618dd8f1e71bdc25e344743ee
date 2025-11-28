@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c7a111ec_5d84c9f9",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultDeviceNetconfSchemaProvider.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-28T13:27:05Z",
+      "side": 1,
+      "message": "IMO: IDK but its too late to add here nonnull requirement - in general private methods does not need such annotations because we have them under control",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4acfa4d2_91a3c5aa",
         "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultDeviceNetconfSchemaProvider.java",
         "patchSetId": 39
@@ -31,6 +48,40 @@
       "writtenOn": "2025-11-28T13:25:00Z",
       "side": 1,
       "message": "Use rather Javadoc for describing method functionality.",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ea1429f_b53625f6",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultDeviceNetconfSchemaProvider.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-28T13:27:05Z",
+      "side": 1,
+      "message": "But even private method can have standard Javadoc.",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5373301_92645b3c",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NC1474Test.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-28T13:27:05Z",
+      "side": 1,
+      "message": "can we extend AbstractTestModelTest and make not TEST_MODEL_FUTURE public?",
       "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
