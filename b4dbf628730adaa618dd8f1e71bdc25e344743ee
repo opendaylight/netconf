@@ -156,6 +156,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cc5ed8a3_0771215e",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NC1474Test.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-28T13:36:23Z",
+      "side": 1,
+      "message": "I would prefer method javadoc to describe test purpose 😊 and inline for important steps - how already proposed.",
+      "parentUuid": "5acfc588_c7dea5ec",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a956a97e_76b75dc1",
         "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NC1474Test.java",
         "patchSetId": 39
