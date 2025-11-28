@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d283fab9_9fb726b5",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultDeviceNetconfSchemaProvider.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-28T13:25:00Z",
+      "side": 1,
+      "message": "RFC6241_SOURCE_ID",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4acfa4d2_91a3c5aa",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultDeviceNetconfSchemaProvider.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-28T13:25:00Z",
+      "side": 1,
+      "message": "Use rather Javadoc for describing method functionality.",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f498c1ff_e181f413",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NC1474Test.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-28T13:25:00Z",
+      "side": 1,
+      "message": "Move this variable to line 89 closer to its actual usage.",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f208202a_c999cbc6",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NC1474Test.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-28T13:25:00Z",
+      "side": 1,
+      "message": "Create DEVICE_ID constant instead.",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1880029_a80b806d",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NC1474Test.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-28T13:25:00Z",
+      "side": 1,
+      "message": "Create constant EXPECTED_ID",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5acfc588_c7dea5ec",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NC1474Test.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-28T13:25:00Z",
+      "side": 1,
+      "message": "Add inline description to each important steps in this test. For example here. I do not understand why not use this:\n\n```\n            if (!YangTextSource.class.equals(type) || !expectedId.equals(id)) {\n                fail(\"Missing ietf-netconf with revision 2011-06-01\");\n            }\n            return Futures.immediateFuture(source);\n```\n\n\nCurrently, if you revert DefaultDeviceNetconfSchemaProvider.java changes, this test does not tell you what is wrong.",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a956a97e_76b75dc1",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NC1474Test.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-11-28T13:25:00Z",
+      "side": 1,
+      "message": "final var ids \u003d invocation.getArgument(0, Collection.class);\n\nAnd you can remove @SuppressWarnings(\"unchecked\").",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
