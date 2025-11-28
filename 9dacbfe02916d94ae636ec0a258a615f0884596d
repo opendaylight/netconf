@@ -106,6 +106,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b13ea73f_8a3cf335",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-28T09:26:55Z",
+      "side": 1,
+      "message": "```\n11:25:41.158 WARN [odl-restconf-nb-worker-0] An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.\njava.lang.NullPointerException: name\n        at io.netty.util.internal.ObjectUtil.checkNotNull(ObjectUtil.java:40) ~[?:?]\n        at io.netty.channel.DefaultChannelPipeline.context(DefaultChannelPipeline.java:662) ~[?:?]\n        at io.netty.channel.DefaultChannelPipeline.getContextOrDie(DefaultChannelPipeline.java:1092) ~[?:?]\n        at io.netty.channel.DefaultChannelPipeline.internalAdd(DefaultChannelPipeline.java:179) ~[?:?]\n        at io.netty.channel.DefaultChannelPipeline.addBefore(DefaultChannelPipeline.java:246) ~[?:?]\n        at io.netty.channel.DefaultChannelPipeline.addBefore(DefaultChannelPipeline.java:240) ~[?:?]\n        at org.opendaylight.restconf.server.RestconfSessionBootstrap.configureHttp2(RestconfSessionBootstrap.java:37) ~[?:?]\n        at org.opendaylight.netconf.transport.http.HTTPServerSessionBootstrap.userEventTriggered(HTTPServerSessionBootstrap.java:44) ~[?:?]\n        at io.netty.channel.AbstractChannelHandlerContext.fireUserEventTriggered(AbstractChannelHandlerContext.java:323) ~[?:?]\n        at org.opendaylight.netconf.transport.http.HTTPScheme$CleartextUpgradeHandler.userEventTriggered(HTTPScheme.java:142) ~[?:?]\n        at io.netty.channel.AbstractChannelHandlerContext.fireUserEventTriggered(AbstractChannelHandlerContext.java:323) ~[?:?]\n        at io.netty.handler.codec.http2.Http2FrameCodec.onUpgradeEvent(Http2FrameCodec.java:716) ~[?:?]\n        at io.netty.handler.codec.http2.Http2FrameCodec.userEventTriggered(Http2FrameCodec.java:272) ~[?:?]\n        at io.netty.channel.AbstractChannelHandlerContext.fireUserEventTriggered(AbstractChannelHandlerContext.java:323) ~[?:?]\n        at io.netty.handler.codec.http.HttpServerUpgradeHandler.upgrade(HttpServerUpgradeHandler.java:444) ~[?:?]\n        at io.netty.handler.codec.http.HttpServerUpgradeHandler.decode(HttpServerUpgradeHandler.java:325) ~[?:?]\n        at io.netty.handler.codec.http.HttpServerUpgradeHandler.decode(HttpServerUpgradeHandler.java:41) ~[?:?]\n        at io.netty.handler.codec.MessageToMessageDecoder.channelRead(MessageToMessageDecoder.java:91) ~[?:?]\n        at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:356) ~[?:?]\n        at io.netty.channel.CombinedChannelDuplexHandler$DelegatingChannelHandlerContext.fireChannelRead(CombinedChannelDuplexHandler.java:434) ~[?:?]\n        at io.netty.handler.codec.ByteToMessageDecoder.fireChannelRead(ByteToMessageDecoder.java:346) ~[?:?]\n        at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:318) ~[?:?]\n        at io.netty.channel.CombinedChannelDuplexHandler.channelRead(CombinedChannelDuplexHandler.java:249) ~[?:?]\n        at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:354) ~[?:?]\n        at io.netty.handler.codec.ByteToMessageDecoder.handlerRemoved(ByteToMessageDecoder.java:266) ~[?:?]\n        at io.netty.handler.codec.ByteToMessageDecoder.decodeRemovalReentryProtection(ByteToMessageDecoder.java:537) ~[?:?]\n        at io.netty.handler.codec.ByteToMessageDecoder.callDecode(ByteToMessageDecoder.java:469) ~[?:?]\n        at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:290) ~[?:?]\n        at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:356) ~[?:?]\n        at io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1429) ~[?:?]\n        at io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:918) ~[?:?]\n        at io.netty.channel.epoll.AbstractEpollStreamChannel$EpollStreamUnsafe.epollInReady(AbstractEpollStreamChannel.java:794) ~[?:?]\n        at io.netty.channel.epoll.AbstractEpollChannel$AbstractEpollUnsafe.handle(AbstractEpollChannel.java:482) ~[?:?]\n        at io.netty.channel.epoll.EpollIoHandler$DefaultEpollIoRegistration.handle(EpollIoHandler.java:317) ~[?:?]\n        at io.netty.channel.epoll.EpollIoHandler.processReady(EpollIoHandler.java:515) ~[?:?]\n        at io.netty.channel.epoll.EpollIoHandler.run(EpollIoHandler.java:460) ~[?:?]\n        at io.netty.channel.SingleThreadIoEventLoop.runIo(SingleThreadIoEventLoop.java:225) ~[?:?]\n        at io.netty.channel.SingleThreadIoEventLoop.run(SingleThreadIoEventLoop.java:196) ~[?:?]\n        at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:1193) ~[?:?]\n        at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) ~[?:?]\n        at java.lang.Thread.run(Thread.java:1583) [?:?]\n```",
+      "parentUuid": "b66015de_fd4e4a49",
+      "revId": "9dacbfe02916d94ae636ec0a258a615f0884596d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a12185d5_68a6024f",
@@ -119,6 +137,24 @@
       "writtenOn": "2025-11-27T15:22:35Z",
       "side": 1,
       "message": "what about to use this?\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/117579/11/transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+      "revId": "9dacbfe02916d94ae636ec0a258a615f0884596d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c57a9e93_f717178f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-28T09:26:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a12185d5_68a6024f",
       "revId": "9dacbfe02916d94ae636ec0a258a615f0884596d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
