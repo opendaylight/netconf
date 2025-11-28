@@ -33,6 +33,24 @@
       "message": "why do we need this class?\n\nI would expect Http2MultiplexHandler handles child channel automatically for us.",
       "revId": "71d9eea5edcee95d6a4ed2535ea5b0fc7744e807",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5bf6624_533029d0",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http2Attributes.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-28T08:44:10Z",
+      "side": 1,
+      "message": "It avoids a circular dependency between the transport-http (HTTPScheme) and restconf-server (RestconfSessionBootstrap) packages. The RESTCONF bootstrap sets the initializer onto the parent channel; the transport picks it up when constructing Http2MultiplexHandler.",
+      "parentUuid": "e143c751_b8ba071e",
+      "revId": "71d9eea5edcee95d6a4ed2535ea5b0fc7744e807",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
