@@ -16,6 +16,24 @@
       "message": "check your spelling, and use . at the end of sentences",
       "revId": "a38ad608c9c5a36af5f9520d5125dff278772811",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a0449cc_6d6a71a2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-11-28T08:22:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "038e4091_05c9c1e2",
+      "revId": "a38ad608c9c5a36af5f9520d5125dff278772811",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
