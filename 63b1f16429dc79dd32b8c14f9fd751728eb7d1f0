@@ -16,6 +16,24 @@
       "message": "Rebase on 2574bb0a333ba376c3a85f06c1e55b8daaffdd6f",
       "revId": "63b1f16429dc79dd32b8c14f9fd751728eb7d1f0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42c0b09e_dc2c2edc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-11-28T11:47:29Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/119471",
+      "parentUuid": "5006138f_88e7b076",
+      "revId": "63b1f16429dc79dd32b8c14f9fd751728eb7d1f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
