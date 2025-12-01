@@ -1537,6 +1537,270 @@ using RESTCONF by invoking:
 GET
 http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=netopeer/yang-ext:mount?content:config
 
+SSH transport configuration
+---------------------------
+
+Configuration of SSH transport parameters offers control over which algorithms are advertised when
+SSH connection is established with NETCONF device. This can be useful for example when connecting device
+which supports only legacy algorithms or when some security guidelines have to be satisfied.
+
+This configuration can be device specific or topology default values can be configured, too.
+
+Topology default configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Topology default configuration is used for every device without its own specific configuration.
+Modifying this configuration will result in reconnection of all devices and new configuration will be used.
+
+To access initial or modified topology default configuration invoke GET request to:
+
+.. code-block::
+
+    http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/topology-types/netconf-node-topology:topology-netconf/ssh-transport-topology-parameters
+
+To change this configuration use PUT request to:
+
+.. code-block::
+
+    http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/topology-types/netconf-node-topology:topology-netconf/ssh-transport-topology-parameters
+
+.. tabs::
+
+   .. tab:: XML
+
+      **Content-type:** ``application/xml``
+
+      **Accept:** ``application/xml``
+
+      .. code-block:: xml
+
+        <ssh-transport-topology-parameters xmlns="urn:opendaylight:netconf-node-topology">
+            <mac>
+                <mac-alg>hmac-sha2-256</mac-alg>
+                <mac-alg>hmac-sha2-512</mac-alg>
+                <mac-alg>hmac-sha1</mac-alg>
+            </mac>
+            <host-key>
+                <host-key-alg>ecdsa-sha2-nistp256</host-key-alg>
+                <host-key-alg>ecdsa-sha2-nistp384</host-key-alg>
+                <host-key-alg>ecdsa-sha2-nistp521</host-key-alg>
+                <host-key-alg>ssh-ed25519</host-key-alg>
+                <host-key-alg>rsa-sha2-512</host-key-alg>
+                <host-key-alg>rsa-sha2-256</host-key-alg>
+                <host-key-alg>ssh-rsa</host-key-alg>
+            </host-key>
+            <encryption>
+                <encryption-alg>chacha20-poly1305</encryption-alg>
+                <encryption-alg>aes128-ctr</encryption-alg>
+                <encryption-alg>aes192-ctr</encryption-alg>
+                <encryption-alg>aes256-ctr</encryption-alg>
+                <encryption-alg>AEAD_AES_128_GCM</encryption-alg>
+                <encryption-alg>AEAD_AES_256_GCM</encryption-alg>
+                <encryption-alg>aes128-cbc</encryption-alg>
+                <encryption-alg>aes192-cbc</encryption-alg>
+                <encryption-alg>aes256-cbc</encryption-alg>
+            </encryption>
+            <key-exchange>
+                <key-exchange-alg>sntrup761x25519-sha512</key-exchange-alg>
+                <key-exchange-alg>mlkem768x25519-sha256</key-exchange-alg>
+                <key-exchange-alg>mlkem1024nistp384-sha384</key-exchange-alg>
+                <key-exchange-alg>mlkem768nistp256-sha256</key-exchange-alg>
+                <key-exchange-alg>curve25519-sha256</key-exchange-alg>
+                <key-exchange-alg>curve448-sha512</key-exchange-alg>
+                <key-exchange-alg>ecdh-sha2-nistp521</key-exchange-alg>
+                <key-exchange-alg>ecdh-sha2-nistp384</key-exchange-alg>
+                <key-exchange-alg>ecdh-sha2-nistp256</key-exchange-alg>
+                <key-exchange-alg>diffie-hellman-group-exchange-sha256</key-exchange-alg>
+                <key-exchange-alg>diffie-hellman-group18-sha512</key-exchange-alg>
+                <key-exchange-alg>diffie-hellman-group17-sha512</key-exchange-alg>
+                <key-exchange-alg>diffie-hellman-group16-sha512</key-exchange-alg>
+                <key-exchange-alg>diffie-hellman-group15-sha512</key-exchange-alg>
+                <key-exchange-alg>diffie-hellman-group14-sha256</key-exchange-alg>
+            </key-exchange>
+        </ssh-transport-topology-parameters>
+
+   .. tab:: JSON
+
+      **Content-type:** ``application/json``
+
+      **Accept:** ``application/json``
+
+      .. code-block:: json
+
+         {
+            "netconf-node-topology:ssh-transport-topology-parameters": {
+                "mac": {
+                    "mac-alg": [
+                        "hmac-sha2-256",
+                        "hmac-sha2-512",
+                        "hmac-sha1"
+                    ]
+                },
+                "host-key": {
+                    "host-key-alg": [
+                        "ecdsa-sha2-nistp256",
+                        "ecdsa-sha2-nistp384",
+                        "ecdsa-sha2-nistp521",
+                        "ssh-ed25519",
+                        "rsa-sha2-512",
+                        "rsa-sha2-256",
+                        "ssh-rsa"
+                    ]
+                },
+                "encryption": {
+                    "encryption-alg": [
+                        "chacha20-poly1305",
+                        "aes128-ctr",
+                        "aes192-ctr",
+                        "aes256-ctr",
+                        "AEAD_AES_128_GCM",
+                        "AEAD_AES_256_GCM",
+                        "aes128-cbc",
+                        "aes192-cbc",
+                        "aes256-cbc"
+                    ]
+                },
+                "key-exchange": {
+                    "key-exchange-alg": [
+                        "sntrup761x25519-sha512",
+                        "mlkem768x25519-sha256",
+                        "mlkem1024nistp384-sha384",
+                        "mlkem768nistp256-sha256",
+                        "curve25519-sha256",
+                        "curve448-sha512",
+                        "ecdh-sha2-nistp521",
+                        "ecdh-sha2-nistp384",
+                        "ecdh-sha2-nistp256",
+                        "diffie-hellman-group-exchange-sha256",
+                        "diffie-hellman-group18-sha512",
+                        "diffie-hellman-group17-sha512",
+                        "diffie-hellman-group16-sha512",
+                        "diffie-hellman-group15-sha512",
+                        "diffie-hellman-group14-sha256"
+                    ]
+                }
+            }
+        }
+
+For custom list of advertised algorithms, exact algorithm names can be found in yang enums defined by RFC9644 RFC:
+iana-ssh-encryption-algs, iana-ssh-key-exchange-algs, iana-ssh-mac-algs, iana-ssh-public-key-algs accessible
+`here <https://github.com/opendaylight/ietf/tree/master/model/iana>`__.
+
+Not all algorithms listed are supported by ODL, supported algorithms can be found
+`here <https://github.com/apache/mina-sshd/blob/master/docs/standards.md>`__
+or listed in map inside relevant implementations of
+`AlgorithmPolicy <https://github.com/opendaylight/netconf/blob/master/transport/transport-ssh/src/main/java/org
+/opendaylight/netconf/transport/ssh/AlgorithmPolicy.java>`__ class.
+
+Device specific configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Device specific configuration can be set when mounting device or later with PUT request to:
+
+.. code-block::
+
+    http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device
+
+.. tabs::
+
+   .. tab:: XML
+
+      **Content-type:** ``application/xml``
+
+      **Accept:** ``application/xml``
+
+      .. code-block:: xml
+
+         <node xmlns="urn:TBD:params:xml:ns:yang:network-topology">
+           <node-id>17830-sim-device</node-id>
+           <netconf-node xmlns="urn:opendaylight:netconf-node-topology">
+             <host xmlns="urn:opendaylight:netconf-node-topology">127.0.0.1</host>
+             <port xmlns="urn:opendaylight:netconf-node-topology">17830</port>
+             <login-password-unencrypted xmlns="urn:opendaylight:netconf-node-topology">
+               <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
+               <password xmlns="urn:opendaylight:netconf-node-topology">admin</password>
+             </login-password-unencrypted>
+             <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
+             <!-- non-mandatory fields with default values, you can safely remove these if you do not wish to override any of these values-->
+             <reconnect-on-changed-schema xmlns="urn:opendaylight:netconf-node-topology">false</reconnect-on-changed-schema>
+             <connection-timeout-millis xmlns="urn:opendaylight:netconf-node-topology">20000</connection-timeout-millis>
+             <max-connection-attempts xmlns="urn:opendaylight:netconf-node-topology">0</max-connection-attempts>
+             <min-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">2000</min-backoff-millis>
+             <max-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">1800000</max-backoff-millis>
+             <backoff-multiplier xmlns="urn:opendaylight:netconf-node-topology">1.5</backoff-multiplier>
+             <!-- keepalive-delay set to 0 turns off keepalives-->
+             <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">120</keepalive-delay>
+             <protocol>
+               <ssh-transport-parameters>
+                 <mac>
+                   <mac-alg>hmac-sha2-256</mac-alg>
+                 </mac>
+                 <host-key>
+                   <host-key-alg>rsa-sha2-512</host-key-alg>
+                 </host-key>
+                 <encryption>
+                   <encryption-alg>aes256-ctr</encryption-alg>
+                 </encryption>
+                 <key-exchange>
+                   <key-exchange-alg>diffie-hellman-group18-sha512</key-exchange-alg>
+                 </key-exchange>
+               </ssh-transport-parameters>
+            </protocol>
+           </netconf-node>
+        </node>
+
+   .. tab:: JSON
+
+      **Content-type:** ``application/json``
+
+      **Accept:** ``application/json``
+
+      .. code-block:: json
+
+        {
+          "node": [
+            {
+                "node-id": "17830-sim-device",
+                "netconf-node": {
+                    "netconf-node-topology:host": "127.0.0.1",
+                    "netconf-node-topology:port": 17830,
+                    "netconf-node-topology:keepalive-delay": 30,
+                    "netconf-node-topology:schemaless": false,
+                    "netconf-node-topology:tcp-only": false,
+                    "netconf-node-topology:protocol": {
+                    "ssh-transport-parameters": {
+                        "host-key": {
+                            "host-key-alg": [
+                                "rsa-sha2-512"
+                            ]
+                        },
+                        "key-exchange": {
+                            "key-exchange-alg": [
+                                "diffie-hellman-group18-sha512"
+                            ]
+                        },
+                        "encryption": {
+                            "encryption-alg": [
+                                "aes256-ctr"
+                            ]
+                        },
+                        "mac": {
+                            "mac-alg": [
+                                "hmac-sha2-256"
+                            ]
+                        }
+                    }
+                    "netconf-node-topology:login-password-unencrypted": {
+                        "password": "admin",
+                        "username": "admin"
+                    }
+                }
+            }
+          ]
+        }
+
+This configuration overrides topology default and if left empty topology default are used. Modifying this configuration
+will result in device immediate reconnection with new config being used.
+
 Northbound (NETCONF servers)
 ----------------------------
 
