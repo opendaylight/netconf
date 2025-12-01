@@ -87,6 +87,24 @@
       "parentUuid": "461a01d9_c09f4926",
       "revId": "d68cb15e6ad1069d4cbcbf2da01fc3222dc4894c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5d689a1_86e9039d",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-01T09:15:13Z",
+      "side": 1,
+      "message": "Practically, its still single attempt. For new device/connection we have a new instance of this class.",
+      "parentUuid": "cfd90c1d_a7adde7d",
+      "revId": "d68cb15e6ad1069d4cbcbf2da01fc3222dc4894c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
