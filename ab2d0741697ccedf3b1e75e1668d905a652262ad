@@ -78,6 +78,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "205dd588_1f49b925",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-01T14:03:42Z",
+      "side": 1,
+      "message": "IDK I am not sure if FIXME has been fixed - create a separate patch for it.",
+      "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "adce9fe4_de0a9473",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-01T14:03:42Z",
+      "side": 1,
+      "message": "RpcsHandler - old naming used at multiple places",
+      "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "16c03204_1754e40d",
         "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
         "patchSetId": 22
