@@ -16,6 +16,24 @@
       "message": "Some of the comments are not really done or documented correctly - please check al of them.",
       "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "885ee384_fff175aa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-01T12:32:19Z",
+      "side": 1,
+      "message": "They are resolved in patchest 22 😊",
+      "parentUuid": "70a8b603_a0195fe1",
+      "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
