@@ -16,6 +16,57 @@
       "message": "recheck",
       "revId": "382ac4be5bdecde4dd273e5f9986d894e928b2cb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c24c546_1eab5bb5",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-01T13:32:46Z",
+      "side": 1,
+      "message": "If we really have new instance of this class when we have new connection/reconnect why doe we need to track the state?",
+      "revId": "382ac4be5bdecde4dd273e5f9986d894e928b2cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe497931_be3d5a45",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-01T13:32:46Z",
+      "side": 1,
+      "message": "Wouldn\u0027t it be easier to do not call again trySetupSchema() on failure instead? Then we do not need any more Boolean.",
+      "revId": "382ac4be5bdecde4dd273e5f9986d894e928b2cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95ed20b3_c424452f",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-01T13:32:46Z",
+      "side": 1,
+      "message": "here we have just new/fresh SchemaSetup instance - how its possible that device is reconnecting?",
+      "revId": "382ac4be5bdecde4dd273e5f9986d894e928b2cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
