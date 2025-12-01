@@ -105,6 +105,24 @@
       "parentUuid": "cfd90c1d_a7adde7d",
       "revId": "d68cb15e6ad1069d4cbcbf2da01fc3222dc4894c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98b5b4cc_9adeba2f",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-01T09:15:40Z",
+      "side": 1,
+      "message": "Resolved by me 😄",
+      "parentUuid": "d5d689a1_86e9039d",
+      "revId": "d68cb15e6ad1069d4cbcbf2da01fc3222dc4894c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
