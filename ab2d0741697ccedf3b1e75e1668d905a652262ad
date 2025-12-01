@@ -34,6 +34,40 @@
       "parentUuid": "70a8b603_a0195fe1",
       "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36fb75e3_82017346",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceBuilder.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-01T12:47:18Z",
+      "side": 1,
+      "message": "msg should be: RpcsDecorator is not initialized",
+      "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16c03204_1754e40d",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-01T12:47:18Z",
+      "side": 1,
+      "message": "it would be better to mock - interface instead of concrete class (which can be instantiated)",
+      "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
