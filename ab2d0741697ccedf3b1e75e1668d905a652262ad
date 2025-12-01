@@ -68,6 +68,23 @@
       "message": "it would be better to mock - interface instead of concrete class (which can be instantiated)",
       "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfcf6354_8bb37724",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-01T13:00:37Z",
+      "side": 1,
+      "message": "can you document the purpose of the test?",
+      "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
