@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70a8b603_a0195fe1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-01T12:22:19Z",
+      "side": 1,
+      "message": "Some of the comments are not really done or documented correctly - please check al of them.",
+      "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
