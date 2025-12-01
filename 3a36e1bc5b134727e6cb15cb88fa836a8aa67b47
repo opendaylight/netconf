@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d2f3aead_b65e0237",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-12-01T09:06:25Z",
+      "side": 1,
+      "message": "According to the Netty documentation for Http2MultiplexHandler: https://netty.io/4.1/api/io/netty/handler/codec/http2/Http2MultiplexHandler.html\n\n```When a new stream is created, a new Http2StreamChannel is created for it. Applications send and receive Http2StreamFrames on the created channel. ByteBufs cannot be processed by the channel; all writes that reach the head of the pipeline must be an instance of Http2StreamFrame. Writes that reach the head of the pipeline are processed directly by this handler and cannot be intercepted.```\n\nBecause the parent channel sees all streams interleaved, it cannot reconstruct a per-stream HTTP/1 message flow. Only the child Http2StreamChannel provides the required per-stream isolation and ordering.",
+      "parentUuid": "30efcb91_18d0ef48",
+      "revId": "3a36e1bc5b134727e6cb15cb88fa836a8aa67b47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "634ea8bf_64c90453",
         "filename": "/COMMIT_MSG",
         "patchSetId": 3
@@ -31,6 +49,24 @@
       "writtenOn": "2025-11-27T15:18:49Z",
       "side": 1,
       "message": "pipeline",
+      "revId": "3a36e1bc5b134727e6cb15cb88fa836a8aa67b47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1faf6ea5_39a9a563",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-12-01T09:06:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "634ea8bf_64c90453",
       "revId": "3a36e1bc5b134727e6cb15cb88fa836a8aa67b47",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
