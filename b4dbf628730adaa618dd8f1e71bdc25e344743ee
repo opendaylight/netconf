@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc81b61f_12794155",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultDeviceNetconfSchemaProvider.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-12-01T08:05:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d283fab9_9fb726b5",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c7a111ec_5d84c9f9",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-11-28T13:27:05Z",
       "side": 1,
       "message": "IMO: IDK but its too late to add here nonnull requirement - in general private methods does not need such annotations because we have them under control",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea588750_69b93184",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultDeviceNetconfSchemaProvider.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-12-01T08:05:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7a111ec_5d84c9f9",
       "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0be0d840_bf185874",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultDeviceNetconfSchemaProvider.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-12-01T08:05:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ea1429f_b53625f6",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d22f26e6_5e4b13a4",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultDeviceNetconfSchemaProvider.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-12-01T08:05:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4acfa4d2_91a3c5aa",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5373301_92645b3c",
@@ -82,6 +154,24 @@
       "writtenOn": "2025-11-28T13:27:05Z",
       "side": 1,
       "message": "can we extend AbstractTestModelTest and make not TEST_MODEL_FUTURE public?",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98f6db16_febd795f",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NC1474Test.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-12-01T08:05:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5373301_92645b3c",
       "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -103,6 +193,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "57df2285_c41fff11",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NC1474Test.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-12-01T08:05:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f498c1ff_e181f413",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f208202a_c999cbc6",
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8caea067_9567394d",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NC1474Test.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-12-01T08:05:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f208202a_c999cbc6",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c1880029_a80b806d",
@@ -133,6 +259,24 @@
       "writtenOn": "2025-11-28T13:25:00Z",
       "side": 1,
       "message": "Create constant EXPECTED_ID",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a74b77e_e9ccde4b",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NC1474Test.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-12-01T08:05:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c1880029_a80b806d",
       "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -172,6 +316,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "02632786_8c739ce4",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NC1474Test.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-12-01T08:05:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cc5ed8a3_0771215e",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a956a97e_76b75dc1",
@@ -185,6 +347,24 @@
       "writtenOn": "2025-11-28T13:25:00Z",
       "side": 1,
       "message": "final var ids \u003d invocation.getArgument(0, Collection.class);\n\nAnd you can remove @SuppressWarnings(\"unchecked\").",
+      "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f1a8f55_0d5d3b3a",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NC1474Test.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-12-01T08:05:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a956a97e_76b75dc1",
       "revId": "b4dbf628730adaa618dd8f1e71bdc25e344743ee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
