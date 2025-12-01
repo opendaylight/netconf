@@ -21,7 +21,6 @@ import org.opendaylight.netconf.shaded.sshd.common.io.IoWriteFuture;
 import org.opendaylight.netconf.shaded.sshd.common.util.buffer.Buffer;
 import org.opendaylight.netconf.shaded.sshd.common.util.buffer.ByteArrayBuffer;
 import org.opendaylight.netconf.shaded.sshd.common.util.io.functors.IOFunction;
-import org.opendaylight.netconf.shaded.sshd.common.util.threads.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,11 +87,7 @@ final class OutboundChannelHandler extends ChannelOutboundHandlerAdapter {
 
         final IoWriteFuture writeFuture;
         try {
-            // Note: we may end up in KeyExchangeMessageHandler if a key exchange is ongoing -- and it must not block
-            //       us, as we *might* be executing on the Netty IO thread. Hence we mark ourselves as internal thread.
-            // TODO: this is a bit expensive, adding and removing a ThreadLocal, hence at some point we want to have
-            //       an aligned stack so we can end up being blocked here
-            writeFuture = ThreadUtils.runAsInternal(sshBuf, outWriteBuffer);
+            writeFuture = outWriteBuffer.apply(sshBuf);
         } catch (IOException e) {
             failWrites(promise, e);
             return;
