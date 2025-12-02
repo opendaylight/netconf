@@ -22,6 +22,7 @@ import org.opendaylight.yangtools.yang.model.api.stmt.FeatureSet;
  * {@link EffectiveModelContext}.
  *
  * @param requiredSources the set of sources that are required to form the accurate model of the device
+ * @param features the set of features provided by device
  * @param librarySources additional sources that should be presented to YANG parser, typically to resolve submodules
  *                       when the originator of this object is Just Not Sure(tm)
  * @param providedSources {@link ProvidedSources} grouped by their representation
