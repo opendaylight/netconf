@@ -85,7 +85,7 @@ making three distinct assuptions:
   [framing mechanism](https://www.rfc-editor.org/rfc/rfc6242#section-4.1) over both SSH and TLS.
   An HTTP client does not imply TCP connect, an HTTP server does not imply TCP listen -- we want to include the
   support call-home, where a network element (a RESTCONF server) is the first one to initiate the contact
-  to its a network controller (a RESTCONF client).
+  to a network controller (a RESTCONF client).
 * the two protocol implementations:
   * share the Content layer, centered around YANG Tools'
     [NormalizedNode](https://www.javadoc.io/doc/org.opendaylight.yangtools/yangtools-docs/latest/org/opendaylight/yangtools/yang/data/api/schema/NormalizedNode.html)
@@ -97,7 +97,7 @@ making three distinct assuptions:
 
 # The gory details
 There are sorts of things here:
-* supported supported [usecases](usecases) and their integration tests
+* supported [usecases](usecases) and their integration tests
 * basic project infrastructure, including [the BOM](artifacts), [Karaf features](features) and the [Common Maven Parent](parent)
 * [YANG models](model) relating to this project
 * [IETF Key Store](keystore/README.md) implementation
