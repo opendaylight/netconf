@@ -45,7 +45,11 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 class NC1474Test extends AbstractTestModelTest {
     private static final RemoteDeviceId DEVICE_ID = new RemoteDeviceId("test",
         InetSocketAddress.createUnresolved("foo", 12345));
-    private static final SourceIdentifier EXPECTED_ID = new SourceIdentifier("ietf-netconf", Revision.of("2011-06-01"));
+    // netconf revision internally supported by ODL
+    public static final Revision IETF_NETCONF = Revision.of("2011-06-01");
+    private static final SourceIdentifier EXPECTED_ID = new SourceIdentifier("ietf-netconf", IETF_NETCONF);
+    // quirk revision provided by more recent devices
+    public static final Revision IETF_NETCONF_QUIRK = Revision.of("2013-09-29");
 
     @Mock
     private NetconfRpcService deviceRpc;
@@ -84,7 +88,7 @@ class NC1474Test extends AbstractTestModelTest {
         doAnswer(invocation -> {
             final var id = invocation.getArgument(0, SourceIdentifier.class);
             if (EXPECTED_ID.name().getLocalName().equals(id.name().getLocalName())) {
-                if (Revision.of("2013-09-29").equals(id.revision())) {
+                if (IETF_NETCONF_QUIRK.equals(id.revision())) {
                     // Quirk failed: provider should have downgraded to 2011-06-01
                     fail("Missing ietf-netconf with revision 2011-06-01");
                 }
@@ -117,5 +121,6 @@ class NC1474Test extends AbstractTestModelTest {
 
         final var deviceNetconfSchema = future.get(5, TimeUnit.SECONDS);
         assertNotNull(deviceNetconfSchema);
+        assertEquals(3, deviceNetconfSchema.modelContext().getModuleStatements().size());
     }
 }
