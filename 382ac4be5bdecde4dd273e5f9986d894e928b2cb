@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bfdb36af_70ea4262",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-02T12:43:57Z",
+      "side": 1,
+      "message": "Setting this flag prevents the building of the EffectiveModelContext and interrupts further RPC requests.\n\nOnce a request is cancelled, the device starts to reconnect.\nIn this state, it is pointless to send more get-schema requests\nor attempt to build the schema context from incomplete sources.",
+      "parentUuid": "5c24c546_1eab5bb5",
+      "revId": "382ac4be5bdecde4dd273e5f9986d894e928b2cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fe497931_be3d5a45",
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ae80279_3558b0de",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-02T12:43:57Z",
+      "side": 1,
+      "message": "The Boolean flag reconnectingDevice is not used only in this location. As I mentioned in the Javadoc, it serves two purposes:\n\n\"Setting this flag prevents the building of EffectiveModelContext and interrupts further RPC requests.\"\n\nThe trySetupSchema method is used to build a schema context if the device does not provide any models from the advertised capabilities. This functionality allows us to establish a connection with such devices.\n\nI would prefer to keep this functionality, as it is unrelated to the current task. If this behavior is undesirable, we should create a separate task to remove it.",
+      "parentUuid": "fe497931_be3d5a45",
+      "revId": "382ac4be5bdecde4dd273e5f9986d894e928b2cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95ed20b3_c424452f",
@@ -65,6 +101,24 @@
       "writtenOn": "2025-12-01T13:32:46Z",
       "side": 1,
       "message": "here we have just new/fresh SchemaSetup instance - how its possible that device is reconnecting?",
+      "revId": "382ac4be5bdecde4dd273e5f9986d894e928b2cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cdaee30d_83877fed",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-02T12:43:57Z",
+      "side": 1,
+      "message": "This method is called only within the SchemaSetup constructor. Therefore, a  \"new/fresh SchemaSetup instance\" does not yet exist.\n\n\n- how its possible that device is reconnecting?\n\nInside the SchemaSetup constructor (here), we send get-schema requests to the device in a loop. If a request fails with a CancelledException, it indicates that the RpcsTimeoutAndRecoveryHandler timed out on the current request and initiated a reconnection. The reconnectingDevice flag ensures that subsequent requests are not invoked, as the device should already be disconnected.",
+      "parentUuid": "95ed20b3_c424452f",
       "revId": "382ac4be5bdecde4dd273e5f9986d894e928b2cb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
