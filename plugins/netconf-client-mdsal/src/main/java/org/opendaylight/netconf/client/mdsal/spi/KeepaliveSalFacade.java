@@ -319,7 +319,6 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public ListenableFuture<? extends DOMRpcResult> invokeNetconf(final QName type, final ContainerNode input) {
-            // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
             // Keep-alive messages are temporarily disabled before the RPC invocation.
             disableKeepalive();
             // If the invoked RPC completes successfully, the keep-alive messages are re-enabled. If the RPC throws
@@ -342,7 +341,6 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public ListenableFuture<? extends DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
-            // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
             // Keep-alive messages are temporarily disabled before the RPC invocation.
             disableKeepalive();
             // If the invoked RPC completes successfully, the keep-alive messages are re-enabled. If the RPC throws
@@ -372,7 +370,6 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public ListenableFuture<? extends DOMRpcResult> invokeNetconf(final QName type, final ContainerNode input) {
-            // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
             // Keep-alive messages are temporarily disabled before the RPC invocation.
             disableKeepalive();
             // If the invoked RPC completes successfully, the keep-alive messages are re-enabled. If the RPC throws
@@ -395,7 +392,6 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public ListenableFuture<? extends DOMSource> invokeRpc(final QName type, final DOMSource payload) {
-            // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
             // Keep-alive messages are temporarily disabled before the RPC invocation.
             disableKeepalive();
             // If the invoked RPC completes successfully, the keep-alive messages are re-enabled. If the RPC throws
