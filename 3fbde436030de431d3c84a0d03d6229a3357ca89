@@ -16,6 +16,24 @@
       "message": "TEST_MODULE_FUTURE includes 3 models `test-model`, `ietf-netconf`, `ietf-inet-types`\n```\nmodelContext\u003dEffectiveSchemaContext{modules\u003d[ModuleEffectiveStatementImpl{argument\u003dUnqualified{localName\u003dietf-inet-types}}, ModuleEffectiveStatementImpl{argument\u003dUnqualified{localName\u003dietf-netconf}}, ModuleEffectiveStatementImpl{argument\u003dUnqualified{localName\u003dtest-module}}]}]\n```",
       "revId": "3fbde436030de431d3c84a0d03d6229a3357ca89",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af50e885_a6e8d841",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/NC1474Test.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-12-02T12:27:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "018ed219_646b1ce9",
+      "revId": "3fbde436030de431d3c84a0d03d6229a3357ca89",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
