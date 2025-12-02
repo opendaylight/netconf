@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a86e9498_b12540a7",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceBuilder.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-02T12:06:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "36fb75e3_82017346",
+      "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8862468f_e3ed2a54",
@@ -66,6 +84,30 @@
       "writtenOn": "2025-12-01T13:33:55Z",
       "side": 1,
       "message": "this is bit confusing it should be RpcsDecorator? or rpcs handler?",
+      "range": {
+        "startLine": 325,
+        "startChar": 102,
+        "endLine": 325,
+        "endChar": 113
+      },
+      "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfc82df2_abfdb218",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-02T12:06:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8862468f_e3ed2a54",
       "range": {
         "startLine": 325,
         "startChar": 102,
@@ -93,6 +135,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bb995fe_f91c3bae",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-02T12:06:27Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/119602/1",
+      "parentUuid": "205dd588_1f49b925",
+      "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "adce9fe4_de0a9473",
@@ -106,6 +166,24 @@
       "writtenOn": "2025-12-01T14:03:42Z",
       "side": 1,
       "message": "RpcsHandler - old naming used at multiple places",
+      "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d481d327_80ab1475",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-02T12:06:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "adce9fe4_de0a9473",
       "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -127,6 +205,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "688fd174_5a35321a",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-02T12:06:27Z",
+      "side": 1,
+      "message": "Yes, it would, but mocking sealed interface is not allowed.\nhttps://stackoverflow.com/questions/68435772/is-there-any-way-to-mock-a-sealed-interface",
+      "parentUuid": "16c03204_1754e40d",
+      "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dfcf6354_8bb37724",
@@ -140,6 +236,24 @@
       "writtenOn": "2025-12-01T13:00:37Z",
       "side": 1,
       "message": "can you document the purpose of the test?",
+      "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12d57ac8_72a5f9ea",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-02T12:06:27Z",
+      "side": 1,
+      "message": "Added inline comments and updated test name with purpose of test.",
+      "parentUuid": "dfcf6354_8bb37724",
       "revId": "ab2d0741697ccedf3b1e75e1668d905a652262ad",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
