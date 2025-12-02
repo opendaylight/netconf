@@ -122,7 +122,7 @@ public final class OSGiNorthbound {
 
         @AttributeDefinition(
             name = "HTTP/1.1 outbound chunk size (bytes)",
-            description = "Size of each chunk emitted in HTTP/1.1 responses. Must be >= 1.",
+            description = "Maximum size of a data chunk emitted in HTTP/1.1 responses. Must be >= 1.",
             min = "1")
         int http1$_$chunk$_$size() default 262144; // 256 KiB
     }
