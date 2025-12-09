@@ -43,6 +43,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.NetconfNodeAugment;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.NetconfCallhomeServer;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.AllowedDevices;
@@ -69,6 +70,8 @@ class CallHomeMountServiceTest {
     private CallHomeTopology topology;
     @Mock
     private NetconfClientSessionListener sessionListener;
+    @Mock
+    private SSHNegotiatedAlgListener algListener;
     @Mock
     private ClientSession sshSession;
     @Mock
@@ -194,7 +197,7 @@ class CallHomeMountServiceTest {
                         AbstractNetconfTopology.defaultSshParams())
                     .withSessionListener(sessionListener).build();
                 try {
-                    netconfSessionFuture = service.createClientFactory().createClient(config);
+                    netconfSessionFuture = service.createClientFactory().createClient(config, algListener);
                 } catch (UnsupportedConfigurationException e) {
                     netconfSessionFuture = null;
                 }
