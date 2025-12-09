@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.netconf.transport.api.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -48,6 +49,8 @@ abstract class AbstractClientServerTest {
     SshClientGrouping sshClientConfig;
     @Mock
     TransportChannelListener<TransportChannel> clientListener;
+    @Mock
+    SSHNegotiatedAlgListener algListener;
     @Mock
     SshServerGrouping sshServerConfig;
     @Mock
