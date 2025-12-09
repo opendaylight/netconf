@@ -105,10 +105,15 @@ import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFa
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactoryImpl;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
+import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshEncryptionAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.ConnectionOper.ConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.LoginPwUnencryptedBuilder;
@@ -248,7 +253,6 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         deleteCacheDir();
 
         schemaAssembler = new NetconfTopologySchemaAssembler(1);
-
         resourceManager = new DefaultSchemaResourceManager(new DefaultYangParserFactory(), TEST_ROOT_DIRECTORY,
             TEST_DEFAULT_SUBDIR);
 
@@ -291,7 +295,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         setupSlave();
 
         yangNodeInstanceId = bindingToNormalized.toYangInstanceIdentifier(NODE_INSTANCE_ID);
-        doReturn(mock(ListenableFuture.class)).when(mockClientFactory).createClient(any());
+        doReturn(mock(ListenableFuture.class)).when(mockClientFactory).createClient(any(), any());
 
         LOG.info("****** Setup complete");
     }
