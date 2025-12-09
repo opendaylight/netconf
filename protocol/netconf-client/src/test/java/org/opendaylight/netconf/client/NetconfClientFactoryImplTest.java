@@ -51,6 +51,7 @@ import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.client.auth.password.PasswordIdentityProvider;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
+import org.opendaylight.netconf.transport.api.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
@@ -105,6 +106,8 @@ class NetconfClientFactoryImplTest {
     private TransportChannelListener<TransportChannel> serverTransportListener;
     @Mock
     private SshServerGrouping sshServerParams;
+    @Mock
+    private SSHNegotiatedAlgListener algListener;
 
     private NetconfClientFactory factory;
     private TcpServerGrouping tcpServerParams;
@@ -160,7 +163,7 @@ class NetconfClientFactoryImplTest {
             final var clientConfig = NetconfClientConfigurationBuilder.create()
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
                 .withTcpParameters(tcpClientParams).withSessionListener(sessionListener).build();
-            assertNotNull(factory.createClient(clientConfig));
+            assertNotNull(factory.createClient(clientConfig, algListener));
             verify(serverTransportListener, timeout(1000L))
                 .onTransportChannelEstablished(any(TransportChannel.class));
         } finally {
@@ -193,7 +196,7 @@ class NetconfClientFactoryImplTest {
                 .withTcpParameters(tcpClientParams)
                 .withSslHandlerFactory(new FixedSslHandlerFactory(clientContext))
                 .withSessionListener(sessionListener).build();
-            assertNotNull(factory.createClient(clientConfig));
+            assertNotNull(factory.createClient(clientConfig, algListener));
             verify(serverTransportListener, timeout(1000L))
                 .onTransportChannelEstablished(any(TransportChannel.class));
         } finally {
@@ -231,6 +234,7 @@ class NetconfClientFactoryImplTest {
         doReturn(buildSshClientAuth()).when(sshServerParams).getClientAuthentication();
         doReturn(null).when(sshServerParams).getTransportParams();
         doReturn(null).when(sshServerParams).getKeepalives();
+        doNothing().when(algListener).onAlgorithmsNegotiated(any(), any(), any(), any());
 
         final var server = SERVER_FACTORY.listenServer("netconf", serverTransportListener, tcpServerParams,
             sshServerParams).get(10, TimeUnit.SECONDS);
@@ -248,7 +252,7 @@ class NetconfClientFactoryImplTest {
                 .withSessionListener(sessionListener)
                 .withConnectionTimeoutMillis(10_000)
                 .build();
-            assertNotNull(factory.createClient(clientConfig));
+            assertNotNull(factory.createClient(clientConfig, algListener));
             verify(serverTransportListener, timeout(10_000L))
                 .onTransportChannelEstablished(any(TransportChannel.class));
         } finally {
@@ -292,6 +296,7 @@ class NetconfClientFactoryImplTest {
 
     @Test
     void sshClientWithConfigurator() throws Exception {
+        doNothing().when(algListener).onAlgorithmsNegotiated(any(), any(), any(), any());
         final ServerFactoryManagerConfigurator serverConfigurator = factoryManager -> {
             factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
             factoryManager.setPasswordAuthenticator(
@@ -319,7 +324,7 @@ class NetconfClientFactoryImplTest {
                 .withSessionListener(sessionListener)
                 .withConnectionTimeoutMillis(10_000)
                 .build();
-            assertNotNull(factory.createClient(clientConfig));
+            assertNotNull(factory.createClient(clientConfig, algListener));
             verify(serverTransportListener, timeout(10_000L))
                 .onTransportChannelEstablished(any(TransportChannel.class));
         } finally {
