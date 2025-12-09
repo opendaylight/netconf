@@ -43,6 +43,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.spi.KeepaliveSalFacade;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.transport.api.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
@@ -221,10 +222,16 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
                 return;
             }
         }
+        final var algListener = new SSHNegotiatedAlgListener() {
+            @Override
+            public void onKexNegotiated(String kexAlgorithm) {
 
+
+            }
+        };
         final ListenableFuture<NetconfClientSession> connectFuture;
         try {
-            connectFuture = clientFactory.createClient(clientConfig);
+            connectFuture = clientFactory.createClient(clientConfig, algListener);
         } catch (UnsupportedConfigurationException e) {
             onDeviceFailed(e);
             return;
