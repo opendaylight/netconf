@@ -23,6 +23,7 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -43,7 +44,7 @@ import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFa
 import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
-import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.api.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
@@ -279,12 +280,19 @@ public final class CallHomeMountService implements AutoCloseable {
         return new NetconfClientFactory() {
             @Override
             public ListenableFuture<NetconfClientSession> createClient(
-                    final NetconfClientConfiguration clientConfiguration) throws UnsupportedConfigurationException {
+                    final NetconfClientConfiguration clientConfiguration,
+                    final @Nullable SSHNegotiatedAlgListener algListener) {
                 final var future = SettableFuture.<NetconfClientSession>create();
                 final var pending = new NetconfLayer(clientConfiguration.getName(),
                     clientConfiguration.getSessionListener(), future);
                 netconfLayerMapping.put(pending.id, pending);
                 return future;
+            }
+
+            @Override
+            public ListenableFuture<NetconfClientSession> createClient(
+                    final NetconfClientConfiguration clientConfiguration) {
+                return createClient(clientConfiguration, null);
             }
 
             @Override

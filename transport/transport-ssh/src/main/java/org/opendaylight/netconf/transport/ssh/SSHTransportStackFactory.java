@@ -12,7 +12,9 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
+import org.opendaylight.netconf.transport.api.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
@@ -37,9 +39,10 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
     }
 
     public @NonNull ListenableFuture<SSHClient> connectClient(final String subsystem,
-            final TransportChannelListener<? super SSHTransportChannel> listener, final TcpClientGrouping connectParams,
+            final TransportChannelListener<? super SSHTransportChannel> listener,
+            final @Nullable SSHNegotiatedAlgListener algListener, final TcpClientGrouping connectParams,
             final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, null)
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, algListener, clientParams, null)
             .connect(newBootstrap(), connectParams);
     }
 
@@ -55,17 +58,19 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
      * @throws NullPointerException if any of required parameters is null
      */
     public @NonNull ListenableFuture<SSHClient> connectClient(final String subsystem,
-            final TransportChannelListener<? super SSHTransportChannel> listener, final TcpClientGrouping connectParams,
+            final TransportChannelListener<? super SSHTransportChannel> listener,
+            final @Nullable SSHNegotiatedAlgListener algListener, final TcpClientGrouping connectParams,
             final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
             throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, configurator)
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, algListener, clientParams, configurator)
             .connect(newBootstrap(), connectParams);
     }
 
     public @NonNull ListenableFuture<SSHClient> listenClient(final String subsystem,
-            final TransportChannelListener<? super SSHTransportChannel> listener, final TcpServerGrouping listenParams,
+            final TransportChannelListener<? super SSHTransportChannel> listener,
+            final @Nullable SSHNegotiatedAlgListener algListener, final TcpServerGrouping listenParams,
             final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, null)
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, algListener, clientParams, null)
             .listen(newServerBootstrap(), listenParams);
     }
 
@@ -85,7 +90,7 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
             final TransportChannelListener<? super SSHTransportChannel> listener, final TcpServerGrouping listenParams,
             final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
             throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, configurator)
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, null, clientParams, configurator)
             .listen(newServerBootstrap(), listenParams);
     }
 
