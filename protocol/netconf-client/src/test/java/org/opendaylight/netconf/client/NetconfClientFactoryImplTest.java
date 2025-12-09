@@ -54,6 +54,7 @@ import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHo
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
+import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.ssh.ServerFactoryManagerConfigurator;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
@@ -101,6 +102,8 @@ class NetconfClientFactoryImplTest {
 
     @Mock
     private NetconfClientSessionListener sessionListener;
+    @Mock
+    private SSHNegotiatedAlgListener algListener;
     @Mock
     private TransportChannelListener<TransportChannel> serverTransportListener;
     @Mock
@@ -160,7 +163,7 @@ class NetconfClientFactoryImplTest {
             final var clientConfig = NetconfClientConfigurationBuilder.create()
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
                 .withTcpParameters(tcpClientParams).withSessionListener(sessionListener).build();
-            assertNotNull(factory.createClient(clientConfig));
+            assertNotNull(factory.createClient(clientConfig, algListener));
             verify(serverTransportListener, timeout(1000L))
                 .onTransportChannelEstablished(any(TransportChannel.class));
         } finally {
@@ -193,7 +196,7 @@ class NetconfClientFactoryImplTest {
                 .withTcpParameters(tcpClientParams)
                 .withSslHandlerFactory(new FixedSslHandlerFactory(clientContext))
                 .withSessionListener(sessionListener).build();
-            assertNotNull(factory.createClient(clientConfig));
+            assertNotNull(factory.createClient(clientConfig, algListener));
             verify(serverTransportListener, timeout(1000L))
                 .onTransportChannelEstablished(any(TransportChannel.class));
         } finally {
@@ -248,7 +251,7 @@ class NetconfClientFactoryImplTest {
                 .withSessionListener(sessionListener)
                 .withConnectionTimeoutMillis(10_000)
                 .build();
-            assertNotNull(factory.createClient(clientConfig));
+            assertNotNull(factory.createClient(clientConfig, algListener));
             verify(serverTransportListener, timeout(10_000L))
                 .onTransportChannelEstablished(any(TransportChannel.class));
         } finally {
@@ -319,7 +322,7 @@ class NetconfClientFactoryImplTest {
                 .withSessionListener(sessionListener)
                 .withConnectionTimeoutMillis(10_000)
                 .build();
-            assertNotNull(factory.createClient(clientConfig));
+            assertNotNull(factory.createClient(clientConfig, algListener));
             verify(serverTransportListener, timeout(10_000L))
                 .onTransportChannelEstablished(any(TransportChannel.class));
         } finally {

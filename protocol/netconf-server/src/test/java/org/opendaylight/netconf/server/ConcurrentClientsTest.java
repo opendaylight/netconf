@@ -67,6 +67,7 @@ import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFac
 import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
+import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
@@ -109,6 +110,8 @@ class ConcurrentClientsTest {
 
     private static NetconfMessage getConfigMessage;
     private static NetconfMessage clientHelloMessage;
+    @Mock
+    private static SSHNegotiatedAlgListener algListener;
 
     private BootstrapFactory serverBootstrapFactory;
     private NetconfClientFactory clientFactory;
@@ -335,7 +338,7 @@ class ConcurrentClientsTest {
             final var sessionListener = new SimpleNetconfClientSessionListener();
             final var clientConfig = NetconfClientConfigurationBuilder.create()
                 .withTcpParameters(clientParams).withSessionListener(sessionListener).build();
-            try (var session = factory.createClient(clientConfig).get()) {
+            try (var session = factory.createClient(clientConfig, algListener).get()) {
                 final var sessionId = session.sessionId();
                 LOG.info("Client with session id {}: hello exchanged", sessionId);
                 final var result = sessionListener.sendRequest(getConfigMessage).get();

@@ -49,6 +49,8 @@ abstract class AbstractClientServerTest {
     @Mock
     TransportChannelListener<TransportChannel> clientListener;
     @Mock
+    SSHNegotiatedAlgListener algListener;
+    @Mock
     SshServerGrouping sshServerConfig;
     @Mock
     TransportChannelListener<TransportChannel> serverListener;
