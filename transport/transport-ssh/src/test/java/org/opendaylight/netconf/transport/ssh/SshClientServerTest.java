@@ -100,7 +100,7 @@ class SshClientServerTest extends AbstractClientServerTest {
         when(sshServerConfig.getClientAuthentication()).thenReturn(clientAuth);
         integrationTest(
             () -> FACTORY.listenServer(SUBSYSTEM, serverListener, tcpServerConfig, sshServerConfig),
-            () -> FACTORY.connectClient(SUBSYSTEM, clientListener, tcpClientConfig, sshClientConfig));
+            () -> FACTORY.connectClient(SUBSYSTEM, clientListener, null, tcpClientConfig, sshClientConfig));
     }
 
     private static Stream<Arguments> itServerKeyVerifyArgs() throws Exception {
@@ -129,7 +129,7 @@ class SshClientServerTest extends AbstractClientServerTest {
         when(sshServerConfig.getClientAuthentication()).thenReturn(clientAuth);
         integrationTest(
             () -> FACTORY.listenServer(SUBSYSTEM, serverListener, tcpServerConfig, sshServerConfig),
-            () -> FACTORY.connectClient(SUBSYSTEM, clientListener, tcpClientConfig, sshClientConfig));
+            () -> FACTORY.connectClient(SUBSYSTEM, clientListener, null, tcpClientConfig, sshClientConfig));
     }
 
     private static Stream<Arguments> itUserAuthArgs() throws Exception {
@@ -203,7 +203,7 @@ class SshClientServerTest extends AbstractClientServerTest {
         when(sshClientConfig.getServerAuthentication()).thenReturn(null);
         integrationTest(
             () -> FACTORY.listenServer(SUBSYSTEM, serverListener, tcpServerConfig, null, serverConfigurator(username)),
-            () -> FACTORY.connectClient(SUBSYSTEM, clientListener, tcpClientConfig, sshClientConfig,
+            () -> FACTORY.connectClient(SUBSYSTEM, clientListener, null, tcpClientConfig, sshClientConfig,
                 clientConfigurator()));
     }
 
@@ -324,8 +324,8 @@ class SshClientServerTest extends AbstractClientServerTest {
                 serverConfigurator(username)).get(2, TimeUnit.SECONDS);
         try {
             // connect with client
-            final var client = FACTORY.connectClient(SUBSYSTEM, clientListener, tcpClientConfig, sshClientConfig,
-                clientConfigurator()).get(2, TimeUnit.SECONDS);
+            final var client = FACTORY.connectClient(SUBSYSTEM, clientListener, null, tcpClientConfig,
+                sshClientConfig, clientConfigurator()).get(2, TimeUnit.SECONDS);
             try {
                 verify(clientListener, timeout(10_000)).onTransportChannelEstablished(any(TransportChannel.class));
             } finally {
