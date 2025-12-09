@@ -42,6 +42,7 @@ import org.opendaylight.netconf.shaded.sshd.common.io.IoSession;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionListener;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
+import org.opendaylight.netconf.transport.api.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.spi.NettyTransportSupport;
 
 class NC1423Test extends AbstractClientServerTest {
@@ -125,7 +126,7 @@ class NC1423Test extends AbstractClientServerTest {
             return sessionListenerInv.callRealMethod();
         }).when(transportSshSpy).addSessionListener(any());
 
-        sshClient = SSHClient.of(SUBSYSTEM, clientListener, transportSshSpy);
+        sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
         sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
 
         // Execute connect.
@@ -175,7 +176,7 @@ class NC1423Test extends AbstractClientServerTest {
             return sessionListenerInv.callRealMethod();
         }).when(transportSshSpy).addSessionListener(any());
 
-        sshClient = SSHClient.of(SUBSYSTEM, clientListener, transportSshSpy);
+        sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
         sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
 
         // Execute connect.
@@ -211,7 +212,7 @@ class NC1423Test extends AbstractClientServerTest {
             return sessionListenerInv.callRealMethod();
         }).when(transportSshSpy).addSessionListener(any());
 
-        sshClient = SSHClient.of(SUBSYSTEM, clientListener, transportSshSpy);
+        sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
         sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
 
         // Execute connect.
@@ -247,7 +248,7 @@ class NC1423Test extends AbstractClientServerTest {
             return sessionListenerInv.callRealMethod();
         }).when(transportSshSpy).addSessionListener(any());
 
-        sshClient = SSHClient.of(SUBSYSTEM, clientListener, transportSshSpy);
+        sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
         sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
 
         // Execute connect.
@@ -281,7 +282,7 @@ class NC1423Test extends AbstractClientServerTest {
             return sessionListenerInv.callRealMethod();
         }).when(transportSshSpy).addSessionListener(any());
 
-        sshClient = SSHClient.of(SUBSYSTEM, clientListener, transportSshSpy);
+        sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
         sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
 
         // Execute connect.

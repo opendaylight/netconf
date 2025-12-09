@@ -12,7 +12,9 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
+import org.opendaylight.netconf.transport.api.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
@@ -37,9 +39,10 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
     }
 
     public @NonNull ListenableFuture<SSHClient> connectClient(final String subsystem,
-            final TransportChannelListener<? super SSHTransportChannel> listener, final TcpClientGrouping connectParams,
+            final TransportChannelListener<? super SSHTransportChannel> listener,
+            final SSHNegotiatedAlgListener algListener, final TcpClientGrouping connectParams,
             final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, null)
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, algListener, clientParams, null)
             .connect(newBootstrap(), connectParams);
     }
 
@@ -48,6 +51,7 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
      * @param subsystem bound subsystem name
      * @param listener client channel listener, required
      * @param connectParams TCP transport configuration addressing server to connect, required
+     * @param algListener listener for negotiated transport parameters
      * @param clientParams SSH overlay configuration, required, should contain username
      * @param configurator client factory manager configurator, optional
      * @return a future producing {@link SSHClient}
@@ -55,17 +59,19 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
      * @throws NullPointerException if any of required parameters is null
      */
     public @NonNull ListenableFuture<SSHClient> connectClient(final String subsystem,
-            final TransportChannelListener<? super SSHTransportChannel> listener, final TcpClientGrouping connectParams,
+            final TransportChannelListener<? super SSHTransportChannel> listener,
+            final SSHNegotiatedAlgListener algListener, final TcpClientGrouping connectParams,
             final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
             throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, configurator)
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, algListener, clientParams, configurator)
             .connect(newBootstrap(), connectParams);
     }
 
     public @NonNull ListenableFuture<SSHClient> listenClient(final String subsystem,
-            final TransportChannelListener<? super SSHTransportChannel> listener, final TcpServerGrouping listenParams,
+            final TransportChannelListener<? super SSHTransportChannel> listener,
+            final SSHNegotiatedAlgListener algListener, final TcpServerGrouping listenParams,
             final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, null)
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, algListener, clientParams, null)
             .listen(newServerBootstrap(), listenParams);
     }
 
@@ -82,10 +88,11 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
      * @throws NullPointerException if any of required parameters is null
      */
     public @NonNull ListenableFuture<SSHClient> listenClient(final String subsystem,
-            final TransportChannelListener<? super SSHTransportChannel> listener, final TcpServerGrouping listenParams,
+            final TransportChannelListener<? super SSHTransportChannel> listener,
+            final SSHNegotiatedAlgListener algListener, final TcpServerGrouping listenParams,
             final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
             throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, configurator)
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, algListener, clientParams, configurator)
             .listen(newServerBootstrap(), listenParams);
     }
 
