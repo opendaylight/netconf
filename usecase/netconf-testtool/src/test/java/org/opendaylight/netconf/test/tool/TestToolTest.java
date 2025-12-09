@@ -39,6 +39,7 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
 import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
+import org.opendaylight.netconf.transport.api.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.password.grouping.password.type.CleartextPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
@@ -170,7 +171,7 @@ public class TestToolTest {
         final var clientConfig = getClientConfig(port, protocol, sessionListener);
         final var request = new NetconfMessage(XmlUtil.readXmlToDocument(xml));
         NetconfMessage response;
-        try (NetconfClientSession ignored = clientFactory.createClient(clientConfig)
+        try (NetconfClientSession ignored = clientFactory.createClient(clientConfig, null)
             .get(RESPONSE_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
             response = sessionListener.sendRequest(request).get(RESPONSE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
         }

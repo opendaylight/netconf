@@ -30,6 +30,13 @@ public interface RemoteDeviceHandler extends AutoCloseable {
     // FIXME: document this node
     void onNotification(DOMNotification domNotification);
 
+    /**
+     * Method to set SSH algorithms once they are negotiated.
+     *
+     * @param negotiatedSshAlg {@link NegotiatedSshAlg}
+     */
+    void onTransportParamNegotiated(NegotiatedSshAlg negotiatedSshAlg);
+
     @Override
     void close();
 }
