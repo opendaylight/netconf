@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -46,6 +47,11 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
     @Override
     public synchronized void onNotification(final DOMNotification domNotification) {
         mount.publish(domNotification);
+    }
+
+    @Override
+    public void onSshAlgorithmsNegotiated(final NegotiatedSshAlg negotiatedSshAlg) {
+        // No-op
     }
 
     @Override
