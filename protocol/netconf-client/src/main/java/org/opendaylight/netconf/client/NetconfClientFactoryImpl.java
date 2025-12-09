@@ -21,6 +21,7 @@ import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
 import org.opendaylight.netconf.transport.tls.FixedSslHandlerFactory;
@@ -57,14 +58,14 @@ public final class NetconfClientFactoryImpl implements NetconfClientFactory {
     }
 
     @Override
-    public ListenableFuture<NetconfClientSession> createClient(final NetconfClientConfiguration configuration)
-            throws UnsupportedConfigurationException {
+    public ListenableFuture<NetconfClientSession> createClient(final NetconfClientConfiguration configuration,
+            final SSHNegotiatedAlgListener algListener) throws UnsupportedConfigurationException {
         final var sessionListener = configuration.getSessionListener();
         final var transportListener = new ClientTransportChannelListener(new ClientChannelInitializer(
             createNegotiatorFactory(configuration), sessionListener));
 
         final var stackFuture = switch (configuration.getProtocol()) {
-            case SSH -> factory.connectClient(TransportConstants.SSH_SUBSYSTEM, transportListener,
+            case SSH -> factory.connectClient(TransportConstants.SSH_SUBSYSTEM, transportListener, algListener,
                 configuration.getTcpParameters(), configuration.getSshParameters(), configuration.getSshConfigurator());
             case TCP -> TCPClient.connect(transportListener, factory.newBootstrap(), configuration.getTcpParameters());
             case TLS -> {
