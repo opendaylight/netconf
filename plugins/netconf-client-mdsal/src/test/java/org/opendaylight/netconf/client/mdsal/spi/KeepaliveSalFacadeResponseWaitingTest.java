@@ -36,6 +36,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshKeys;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -295,6 +296,11 @@ class KeepaliveSalFacadeResponseWaitingTest {
 
         @Override
         public void onNotification(final DOMNotification domNotification) {
+            // No-op
+        }
+
+        @Override
+        public void onAlgorithmsNegotiated(final NegotiatedSshKeys kexAlgorithm) {
             // No-op
         }
 

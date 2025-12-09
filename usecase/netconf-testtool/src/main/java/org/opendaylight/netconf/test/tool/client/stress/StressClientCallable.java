@@ -18,6 +18,7 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
+import org.opendaylight.netconf.transport.api.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public class StressClientCallable implements Callable<Boolean> {
 
         LOG.info("Connecting to netconf server {}:{}", params.ip, params.port);
         try {
-            netconfClientSession = netconfClientFactory.createClient(cfg).get();
+            netconfClientSession = netconfClientFactory.createClient(cfg, null).get();
         } catch (final InterruptedException | ExecutionException | UnsupportedConfigurationException e) {
             throw new IllegalStateException("Unable to connect", e);
         }

@@ -132,6 +132,7 @@ module netconf-node-topology {
             uses ond:credentials;
             uses netconf-node-fields;
             uses ond:connection-oper;
+            uses ond:negotiated-ssh-parameters;
             ext:mount;
         }
     }

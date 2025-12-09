@@ -113,7 +113,7 @@ class NetconfDeviceTopologyAdapterTest {
         // FIXME: exact match
         doNothing().when(mockTx).put(eq(LogicalDatastoreType.OPERATIONAL), any(DataObjectIdentifier.class),
             any(NetconfNode.class));
-        adapter.updateDeviceData(true, NetconfDeviceCapabilities.empty(), new SessionIdType(Uint32.ONE));
+        adapter.updateDeviceData(true, NetconfDeviceCapabilities.empty(), new SessionIdType(Uint32.ONE), null);
 
         verify(mockChain, times(2)).newWriteOnlyTransaction();
         verify(mockTx, times(1)).put(any(LogicalDatastoreType.class), any(DataObjectIdentifier.class), any(Node.class));

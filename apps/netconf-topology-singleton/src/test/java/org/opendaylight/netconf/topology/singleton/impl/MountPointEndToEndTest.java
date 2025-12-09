@@ -292,7 +292,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         setupSlave();
 
         yangNodeInstanceId = bindingToNormalized.toYangInstanceIdentifier(NODE_INSTANCE_ID);
-        doReturn(mock(ListenableFuture.class)).when(mockClientFactory).createClient(any());
+        doReturn(mock(ListenableFuture.class)).when(mockClientFactory).createClient(any(), any());
 
         LOG.info("****** Setup complete");
     }

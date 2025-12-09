@@ -125,7 +125,7 @@ class NetconfDeficeTopologyAdapterIntegrationTest {
         wtx.put(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf, augmentNode);
         wtx.commit().get(5, TimeUnit.SECONDS);
 
-        adapter.updateDeviceData(true, NetconfDeviceCapabilities.empty(), new SessionIdType(Uint32.ONE));
+        adapter.updateDeviceData(true, NetconfDeviceCapabilities.empty(), new SessionIdType(Uint32.ONE), null);
 
         assertEquals(Optional.of(dataTestId), domDataBroker.newReadOnlyTransaction()
             .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf)

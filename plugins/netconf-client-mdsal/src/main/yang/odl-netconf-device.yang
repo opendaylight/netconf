@@ -401,25 +401,27 @@ module odl-netconf-device {
     }
   }
 
-  grouping negotiated-ssh-transport-parameters {
-    leaf host-key-alg {
-      type string;
-      config false;
-    }
+  grouping negotiated-ssh-parameters {
+    container negotiated-ssh-transport-parameters {
+      leaf host-key-alg {
+        type string;
+        config false;
+      }
 
-    leaf key-exchange-alg {
-      type string;
-      config false;
-    }
+      leaf key-exchange-alg {
+        type string;
+        config false;
+      }
 
-    leaf encryption-alg {
-      type string;
-      config false;
-    }
+      leaf encryption-alg {
+        type string;
+        config false;
+      }
 
-    leaf mac-alg {
-      type string;
-      config false;
+      leaf mac-alg {
+        type string;
+        config false;
+      }
     }
   }
   
