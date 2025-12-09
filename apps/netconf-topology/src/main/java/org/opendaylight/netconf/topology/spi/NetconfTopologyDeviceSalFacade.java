@@ -54,7 +54,8 @@ public class NetconfTopologyDeviceSalFacade extends NetconfDeviceSalFacade {
             return;
         }
         super.onDeviceConnected(deviceSchema, sessionPreferences, services);
-        datastoreAdapter.updateDeviceData(true, deviceSchema.capabilities(), sessionPreferences.sessionId());
+        datastoreAdapter.updateDeviceData(true, deviceSchema.capabilities(), sessionPreferences.sessionId(),
+            negotiatedSshKeys());
     }
 
     @Override
@@ -63,7 +64,7 @@ public class NetconfTopologyDeviceSalFacade extends NetconfDeviceSalFacade {
             LOG.warn("{}: Device adapter was closed before device disconnected setup finished.", id);
             return;
         }
-        datastoreAdapter.updateDeviceData(false, NetconfDeviceCapabilities.empty(), null);
+        datastoreAdapter.updateDeviceData(false, NetconfDeviceCapabilities.empty(), null, null);
         super.onDeviceDisconnected();
     }
 

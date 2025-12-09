@@ -318,6 +318,38 @@ class MountPointE2ETest extends AbstractE2ETest {
             }""");
     }
 
+    @Test
+    void negotiatedSshParametersTest() throws Exception {
+        startDeviceSimulator(true);
+        mountDeviceJson();
+
+        final var response = invokeRequest(HttpMethod.GET,
+            "/rests/data/network-topology:network-topology/topology=topology-netconf");
+        assertEquals(HttpResponseStatus.OK, response.status());
+
+        final var expected = """
+            {
+              "network-topology:topology": [
+                {
+                  "node": [
+                    {
+                      "netconf-node-topology:netconf-node": {
+                        "negotiated-ssh-transport-parameters": {
+                          "encryption-alg": "chacha20-poly1305@openssh.com",
+                          "host-key-alg": "rsa-sha2-512",
+                          "mac-alg": "aead",
+                          "key-exchange-alg": "sntrup761x25519-sha512"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+        assertContentJson(response, expected);
+    }
+
     private void startDeviceSimulator(final boolean mdsal) throws Exception {
         // mdsal = true --> settable mode, mdsal datastore
         // mdsal = false --> simulated mode, data is taken from conf files
