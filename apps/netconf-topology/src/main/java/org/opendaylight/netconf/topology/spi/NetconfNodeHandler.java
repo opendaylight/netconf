@@ -35,6 +35,7 @@ import org.opendaylight.netconf.client.mdsal.SchemalessNetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
@@ -43,6 +44,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.spi.KeepaliveSalFacade;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.transport.api.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
@@ -221,10 +223,16 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
                 return;
             }
         }
-
+        final var algListener = new SSHNegotiatedAlgListener() {
+            @Override
+            public void onAlgorithmsNegotiated(final String kexAlgorithm, final String hostKey, final String encryption,
+                    final String mac) {
+                onSshAlgorithmsNegotiated(new NegotiatedSshAlg(kexAlgorithm, hostKey, encryption, mac));
+            }
+        };
         final ListenableFuture<NetconfClientSession> connectFuture;
         try {
-            connectFuture = clientFactory.createClient(clientConfig);
+            connectFuture = clientFactory.createClient(clientConfig, algListener);
         } catch (UnsupportedConfigurationException e) {
             onDeviceFailed(e);
             return;
@@ -304,6 +312,11 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     @Override
     public void onNotification(final DOMNotification domNotification) {
         delegate.onNotification(domNotification);
+    }
+
+    @Override
+    public void onSshAlgorithmsNegotiated(final NegotiatedSshAlg negotiatedSshAlg) {
+        delegate.onSshAlgorithmsNegotiated(negotiatedSshAlg);
     }
 
     private void reconnectOrFail() {
