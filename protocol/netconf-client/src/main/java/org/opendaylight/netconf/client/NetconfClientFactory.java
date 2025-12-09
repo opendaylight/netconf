@@ -8,7 +8,9 @@
 package org.opendaylight.netconf.client;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
+import org.opendaylight.netconf.transport.api.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 
 /**
@@ -25,4 +27,16 @@ public interface NetconfClientFactory extends AutoCloseable {
      */
     ListenableFuture<NetconfClientSession> createClient(NetconfClientConfiguration clientConfiguration)
         throws UnsupportedConfigurationException;
+
+    /**
+     * Method for creating a NETCONF client with listener for negotiated SSH algorithms.
+     * @see #createClient(NetconfClientConfiguration)
+     *
+     * @param clientConfiguration client configuration
+     * @param algListener listener notified of negotiated SSH algorithms
+     * @return a future producing the {@link NetconfClientSession}
+     * @throws UnsupportedConfigurationException if any transport configuration parameter is invalid
+     */
+    ListenableFuture<NetconfClientSession> createClient(NetconfClientConfiguration clientConfiguration,
+        @Nullable SSHNegotiatedAlgListener algListener) throws UnsupportedConfigurationException;
 }
