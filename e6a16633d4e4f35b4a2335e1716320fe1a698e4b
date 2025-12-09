@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c71f71c0_1f3bc490",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-12-09T08:32:38Z",
+      "side": 1,
+      "message": "why rename this?",
+      "range": {
+        "startLine": 140,
+        "startChar": 20,
+        "endLine": 140,
+        "endChar": 44
+      },
+      "revId": "e6a16633d4e4f35b4a2335e1716320fe1a698e4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1949233d_794b253f",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/Subscriber.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-12-09T08:32:38Z",
+      "side": 1,
+      "message": "private?\nsetFilter?",
+      "range": {
+        "startLine": 175,
+        "startChar": 4,
+        "endLine": 175,
+        "endChar": 14
+      },
+      "revId": "e6a16633d4e4f35b4a2335e1716320fe1a698e4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
