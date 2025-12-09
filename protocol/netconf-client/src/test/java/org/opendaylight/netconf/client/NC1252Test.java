@@ -25,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
+import org.opendaylight.netconf.transport.api.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
@@ -38,6 +39,8 @@ class NC1252Test {
 
     @Mock
     private NetconfClientSessionListener sessionListener;
+    @Mock
+    private SSHNegotiatedAlgListener algListener;
 
     @BeforeAll
     static void beforeAll() {
@@ -67,7 +70,7 @@ class NC1252Test {
                 .build())
             .withSessionListener(sessionListener)
             .build();
-        final var future = FACTORY.createClient(clientConfig);
+        final var future = FACTORY.createClient(clientConfig, algListener);
 
         final var ex = assertThrows(ExecutionException.class, () -> future.get(1, TimeUnit.SECONDS)).getCause();
         assertInstanceOf(ConnectException.class, ex);

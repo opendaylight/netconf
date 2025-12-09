@@ -39,7 +39,7 @@ public class StressClientCallable implements Callable<Boolean> {
 
         LOG.info("Connecting to netconf server {}:{}", params.ip, params.port);
         try {
-            netconfClientSession = netconfClientFactory.createClient(cfg).get();
+            netconfClientSession = netconfClientFactory.createClient(cfg, null).get();
         } catch (final InterruptedException | ExecutionException | UnsupportedConfigurationException e) {
             throw new IllegalStateException("Unable to connect", e);
         }
