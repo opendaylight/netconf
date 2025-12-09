@@ -67,7 +67,7 @@ class NC1252Test {
                 .build())
             .withSessionListener(sessionListener)
             .build();
-        final var future = FACTORY.createClient(clientConfig);
+        final var future = FACTORY.createClient(clientConfig, null);
 
         final var ex = assertThrows(ExecutionException.class, () -> future.get(1, TimeUnit.SECONDS)).getCause();
         assertInstanceOf(ConnectException.class, ex);
