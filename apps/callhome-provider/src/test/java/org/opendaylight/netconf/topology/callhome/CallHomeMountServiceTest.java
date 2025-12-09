@@ -194,7 +194,7 @@ class CallHomeMountServiceTest {
                         AbstractNetconfTopology.defaultSshParams())
                     .withSessionListener(sessionListener).build();
                 try {
-                    netconfSessionFuture = service.createClientFactory().createClient(config);
+                    netconfSessionFuture = service.createClientFactory().createClient(config, null);
                 } catch (UnsupportedConfigurationException e) {
                     netconfSessionFuture = null;
                 }

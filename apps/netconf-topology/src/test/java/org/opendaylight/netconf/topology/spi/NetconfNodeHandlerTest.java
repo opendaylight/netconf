@@ -208,7 +208,7 @@ class NetconfNodeHandlerTest {
 
         // and when we run the task, we get a clientDispatcher invocation, but attempts are still the same
         timerCaptor.getValue().run(timeout);
-        verify(clientFactory, times(2)).createClient(any());
+        verify(clientFactory, times(2)).createClient(any(), any());
         assertEquals(2, handler.attempts());
     }
 
@@ -226,7 +226,7 @@ class NetconfNodeHandlerTest {
 
         // and when we run the task, we get a clientDispatcher invocation, but attempts are still the same
         timerCaptor.getValue().run(timeout);
-        verify(clientFactory, times(2)).createClient(any());
+        verify(clientFactory, times(2)).createClient(any(), any());
         assertEquals(1, handler.attempts());
     }
 
@@ -234,7 +234,7 @@ class NetconfNodeHandlerTest {
     void socketFailuresAreRetried() throws Exception {
         final var firstFuture = SettableFuture.create();
         final var secondFuture = SettableFuture.create();
-        doReturn(firstFuture, secondFuture).when(clientFactory).createClient(any());
+        doReturn(firstFuture, secondFuture).when(clientFactory).createClient(any(), any());
         handler.connect();
         assertEquals(1, handler.attempts());
 
@@ -245,7 +245,7 @@ class NetconfNodeHandlerTest {
 
         // and when we run the task, we get a clientDispatcher invocation, but attempts are still the same
         timerCaptor.getValue().run(timeout);
-        verify(clientFactory, times(2)).createClient(any());
+        verify(clientFactory, times(2)).createClient(any(), any());
         assertEquals(2, handler.attempts());
 
         // now report the second failure
@@ -261,9 +261,9 @@ class NetconfNodeHandlerTest {
     // Initiate connect() which results in immediate clientDispatcher report. No interactions with delegate may occur,
     // as this is just a prelude to a follow-up callback
     private void assertSuccessfulConnect() throws Exception {
-        doReturn(Futures.immediateFuture(clientSession)).when(clientFactory).createClient(any());
+        doReturn(Futures.immediateFuture(clientSession)).when(clientFactory).createClient(any(), any());
         handler.connect();
-        verify(clientFactory).createClient(any());
+        verify(clientFactory).createClient(any(), any());
         verifyNoInteractions(delegate);
     }
 

@@ -170,7 +170,7 @@ public class TestToolTest {
         final var clientConfig = getClientConfig(port, protocol, sessionListener);
         final var request = new NetconfMessage(XmlUtil.readXmlToDocument(xml));
         NetconfMessage response;
-        try (NetconfClientSession ignored = clientFactory.createClient(clientConfig)
+        try (NetconfClientSession ignored = clientFactory.createClient(clientConfig, null)
             .get(RESPONSE_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
             response = sessionListener.sendRequest(request).get(RESPONSE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
         }
