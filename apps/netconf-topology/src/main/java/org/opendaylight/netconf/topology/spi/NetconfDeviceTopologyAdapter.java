@@ -22,6 +22,7 @@ import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
@@ -32,6 +33,8 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.oper.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.oper.unavailable.capabilities.UnavailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.negotiated.ssh.transport.parameters.NegotiatedSshTransportParameters;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.negotiated.ssh.transport.parameters.NegotiatedSshTransportParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.NetconfNodeAugment;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.NetconfNodeAugmentBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNode;
@@ -99,23 +102,25 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
     }
 
     public synchronized void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities,
-            final SessionIdType sessionId) {
+            final SessionIdType sessionId, final NegotiatedSshAlg negotiatedSshAlg) {
         final var tx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.", id, tx.getIdentifier());
-        tx.put(LogicalDatastoreType.OPERATIONAL, netconfNodePath(),
-            newNetconfNodeBuilder(up, capabilities, sessionId).build());
+        tx.put(LogicalDatastoreType.OPERATIONAL, netconfNodePath(), newNetconfNodeBuilder(up, capabilities, sessionId)
+            .setNegotiatedSshTransportParameters(buildNegotiatedParameters(negotiatedSshAlg)).build());
         LOG.trace("{}: Update device state transaction {} merging operational data ended.", id, tx.getIdentifier());
         commitTransaction(tx, "update");
     }
 
     public synchronized void updateClusteredDeviceData(final boolean up, final String masterAddress,
-            final NetconfDeviceCapabilities capabilities, final SessionIdType sessionId) {
+            final NetconfDeviceCapabilities capabilities, final SessionIdType sessionId,
+            final NegotiatedSshAlg negotiatedSshAlg) {
         final var tx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.", id, tx.getIdentifier());
         tx.put(LogicalDatastoreType.OPERATIONAL, netconfNodePath(), newNetconfNodeBuilder(up, capabilities, sessionId)
             .setClusteredConnectionStatus(new ClusteredConnectionStatusBuilder()
                 .setNetconfMasterNode(masterAddress)
                 .build())
+            .setNegotiatedSshTransportParameters(buildNegotiatedParameters(negotiatedSshAlg))
             .build());
         LOG.trace("{}: Update device state transaction {} merging operational data ended.", id, tx.getIdentifier());
         commitTransaction(tx, "update");
@@ -224,6 +229,26 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
     public synchronized void onSuccess(final Empty result) {
         LOG.trace("{}: transaction chain SUCCESSFUL", id);
         closeFuture.set(Empty.value());
+    }
+
+    private static NegotiatedSshTransportParameters buildNegotiatedParameters(
+            final NegotiatedSshAlg negotiatedSshAlg) {
+        final var params = new NegotiatedSshTransportParametersBuilder();
+        if (negotiatedSshAlg != null) {
+            if (negotiatedSshAlg.negotiatedKexAlg() != null) {
+                params.setKeyExchangeAlg(negotiatedSshAlg.negotiatedKexAlg());
+            }
+            if (negotiatedSshAlg.negotiatedHostKeyAlg() != null) {
+                params.setHostKeyAlg(negotiatedSshAlg.negotiatedHostKeyAlg());
+            }
+            if (negotiatedSshAlg.negotiatedEncryptionAlg() != null) {
+                params.setEncryptionAlg(negotiatedSshAlg.negotiatedEncryptionAlg());
+            }
+            if (negotiatedSshAlg.negotiatedMacAlg() != null) {
+                params.setMacAlg(negotiatedSshAlg.negotiatedMacAlg());
+            }
+        }
+        return params.build();
     }
 
     private static @NonNull String extractReason(final Throwable throwable) {
