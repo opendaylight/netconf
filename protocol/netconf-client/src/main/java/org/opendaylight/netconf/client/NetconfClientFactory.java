@@ -9,6 +9,7 @@ package org.opendaylight.netconf.client;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
+import org.opendaylight.netconf.transport.api.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 
 /**
@@ -23,6 +24,6 @@ public interface NetconfClientFactory extends AutoCloseable {
      * @return A future producing the {@link NetconfClientSession}
      * @throws UnsupportedConfigurationException if any transport configuration parameters is invalid
      */
-    ListenableFuture<NetconfClientSession> createClient(NetconfClientConfiguration clientConfiguration)
-        throws UnsupportedConfigurationException;
+    ListenableFuture<NetconfClientSession> createClient(NetconfClientConfiguration clientConfiguration,
+        SSHNegotiatedAlgListener algListener) throws UnsupportedConfigurationException;
 }
