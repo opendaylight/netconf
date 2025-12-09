@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.auth.AuthProvider;
@@ -39,6 +40,7 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
 import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
+import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.password.grouping.password.type.CleartextPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
@@ -57,6 +59,9 @@ public class TestToolTest {
     private static final String PASSWORD = "pa$$W0rd";
     private static final AuthProvider AUTH_PROVIDER = (user, passw) -> USERNAME.equals(user) && PASSWORD.equals(passw);
     private static final Path CUSTOM_RPC_CONFIG = Path.of("src", "test", "resources", "customrpc.xml");
+
+    @Mock
+    private static SSHNegotiatedAlgListener algListener;
 
     private static final String RFC7950_4_2_9_REQUEST = """
         <rpc message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
@@ -170,7 +175,7 @@ public class TestToolTest {
         final var clientConfig = getClientConfig(port, protocol, sessionListener);
         final var request = new NetconfMessage(XmlUtil.readXmlToDocument(xml));
         NetconfMessage response;
-        try (NetconfClientSession ignored = clientFactory.createClient(clientConfig)
+        try (NetconfClientSession ignored = clientFactory.createClient(clientConfig, algListener)
             .get(RESPONSE_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
             response = sessionListener.sendRequest(request).get(RESPONSE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
         }

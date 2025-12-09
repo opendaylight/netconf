@@ -248,7 +248,6 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         deleteCacheDir();
 
         schemaAssembler = new NetconfTopologySchemaAssembler(1);
-
         resourceManager = new DefaultSchemaResourceManager(new DefaultYangParserFactory(), TEST_ROOT_DIRECTORY,
             TEST_DEFAULT_SUBDIR);
 
@@ -291,7 +290,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         setupSlave();
 
         yangNodeInstanceId = bindingToNormalized.toYangInstanceIdentifier(NODE_INSTANCE_ID);
-        doReturn(mock(ListenableFuture.class)).when(mockClientFactory).createClient(any());
+        doReturn(mock(ListenableFuture.class)).when(mockClientFactory).createClient(any(), any());
 
         LOG.info("****** Setup complete");
     }
