@@ -26,6 +26,7 @@ import org.opendaylight.netconf.shaded.sshd.client.auth.pubkey.UserAuthPublicKey
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionListener;
+import org.opendaylight.netconf.transport.api.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
 import org.opendaylight.netconf.transport.ssh.SSHClient;
@@ -35,6 +36,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240814.netconf.client.initiate.stack.grouping.transport.ssh.ssh.SshClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240814.netconf.client.listen.stack.grouping.transport.ssh.ssh.TcpServerParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentityBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshEncryptionAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
 import org.opendaylight.yangtools.binding.util.BindingMap;
@@ -67,6 +72,14 @@ public final class CallHomeSshServer implements AutoCloseable {
         final var transportChannelListener =
             new CallHomeTransportChannelListener(negotiatorFactory, contextManager, statusRecorder);
 
+        final var algListener = new SSHNegotiatedAlgListener() {
+            @Override
+            public void onAlgorithmsNegotiated(final SshKeyExchangeAlgorithm kexAlgorithm,
+                    final SshPublicKeyAlgorithm hostKey, final SshEncryptionAlgorithm encryption,
+                    final SshMacAlgorithm mac) {
+            }
+        };
+
         // SSH transport layer configuration
         // NB actual username will be assigned dynamically but predefined one is required for transport initialization
         final var sshClientParams = new SshClientParametersBuilder().setClientIdentity(
@@ -85,7 +98,7 @@ public final class CallHomeSshServer implements AutoCloseable {
         };
         try {
             client = transportStackFactory.listenClient(TransportConstants.SSH_SUBSYSTEM, transportChannelListener,
-                tcpServerParams, sshClientParams, configurator).get(timeoutMillis, TimeUnit.MILLISECONDS);
+                algListener, tcpServerParams, sshClientParams, configurator).get(timeoutMillis, TimeUnit.MILLISECONDS);
         } catch (UnsupportedConfigurationException | InterruptedException | ExecutionException | TimeoutException e) {
             throw new IllegalStateException("Could not start SSH Call-Home server", e);
         }

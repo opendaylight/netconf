@@ -18,7 +18,12 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
+import org.opendaylight.netconf.transport.api.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshEncryptionAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,11 +40,19 @@ public class StressClientCallable implements Callable<Boolean> {
                                 final NetconfClientConfiguration baseConfiguration,
                                 final List<NetconfMessage> preparedMessages) {
         sessionListener = getSessionListener(params.getInetAddress(), params.concurrentMessageLimit);
+        final var algListener = new SSHNegotiatedAlgListener() {
+            @Override
+            public void onAlgorithmsNegotiated(final SshKeyExchangeAlgorithm kexAlgorithm,
+                final SshPublicKeyAlgorithm hostKey, final SshEncryptionAlgorithm encryption,
+                final SshMacAlgorithm mac) {
+                // No-op
+            }
+        };
         final var cfg = getNetconfClientConfiguration(baseConfiguration, sessionListener);
 
         LOG.info("Connecting to netconf server {}:{}", params.ip, params.port);
         try {
-            netconfClientSession = netconfClientFactory.createClient(cfg).get();
+            netconfClientSession = netconfClientFactory.createClient(cfg, algListener).get();
         } catch (final InterruptedException | ExecutionException | UnsupportedConfigurationException e) {
             throw new IllegalStateException("Unable to connect", e);
         }
