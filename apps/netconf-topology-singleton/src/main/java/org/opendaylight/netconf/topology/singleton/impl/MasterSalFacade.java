@@ -26,6 +26,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -128,7 +129,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     @Override
     public void onDeviceDisconnected() {
         LOG.info("Device {} disconnected - unregistering master mount point", id);
-        datastoreAdapter.updateDeviceData(false, NetconfDeviceCapabilities.empty(), null);
+        datastoreAdapter.updateDeviceData(false, NetconfDeviceCapabilities.empty(), null, null);
         mount.onDeviceDisconnected();
     }
 
@@ -141,6 +142,11 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     @Override
     public void onNotification(final DOMNotification domNotification) {
         mount.publish(domNotification);
+    }
+
+    @Override
+    public void onTransportParamNegotiated(final NegotiatedSshAlg negotiatedSshAlg) {
+        // No-op
     }
 
     @Override
