@@ -125,7 +125,7 @@ class NC1423Test extends AbstractClientServerTest {
             return sessionListenerInv.callRealMethod();
         }).when(transportSshSpy).addSessionListener(any());
 
-        sshClient = SSHClient.of(SUBSYSTEM, clientListener, transportSshSpy);
+        sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
         sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
 
         // Execute connect.
@@ -175,7 +175,7 @@ class NC1423Test extends AbstractClientServerTest {
             return sessionListenerInv.callRealMethod();
         }).when(transportSshSpy).addSessionListener(any());
 
-        sshClient = SSHClient.of(SUBSYSTEM, clientListener, transportSshSpy);
+        sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
         sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
 
         // Execute connect.
@@ -211,7 +211,7 @@ class NC1423Test extends AbstractClientServerTest {
             return sessionListenerInv.callRealMethod();
         }).when(transportSshSpy).addSessionListener(any());
 
-        sshClient = SSHClient.of(SUBSYSTEM, clientListener, transportSshSpy);
+        sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
         sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
 
         // Execute connect.
@@ -247,7 +247,7 @@ class NC1423Test extends AbstractClientServerTest {
             return sessionListenerInv.callRealMethod();
         }).when(transportSshSpy).addSessionListener(any());
 
-        sshClient = SSHClient.of(SUBSYSTEM, clientListener, transportSshSpy);
+        sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
         sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
 
         // Execute connect.
@@ -281,7 +281,7 @@ class NC1423Test extends AbstractClientServerTest {
             return sessionListenerInv.callRealMethod();
         }).when(transportSshSpy).addSessionListener(any());
 
-        sshClient = SSHClient.of(SUBSYSTEM, clientListener, transportSshSpy);
+        sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
         sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
 
         // Execute connect.

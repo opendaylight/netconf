@@ -39,6 +39,7 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
 import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
+import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.password.grouping.password.type.CleartextPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
@@ -47,6 +48,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.cli
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240814.netconf.client.listen.stack.grouping.transport.ssh.ssh.SshClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentityBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.client.identity.PasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshEncryptionAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.w3c.dom.Document;
 
@@ -170,7 +175,14 @@ public class TestToolTest {
         final var clientConfig = getClientConfig(port, protocol, sessionListener);
         final var request = new NetconfMessage(XmlUtil.readXmlToDocument(xml));
         NetconfMessage response;
-        try (NetconfClientSession ignored = clientFactory.createClient(clientConfig)
+        final var algListener = new SSHNegotiatedAlgListener() {
+            @Override
+            public void onAlgorithmsNegotiated(final SshKeyExchangeAlgorithm kexAlgorithm,
+                final SshPublicKeyAlgorithm hostKey, final SshEncryptionAlgorithm encryption,
+                final SshMacAlgorithm mac) {
+            }
+        };
+        try (NetconfClientSession ignored = clientFactory.createClient(clientConfig, algListener)
             .get(RESPONSE_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
             response = sessionListener.sendRequest(request).get(RESPONSE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
         }
