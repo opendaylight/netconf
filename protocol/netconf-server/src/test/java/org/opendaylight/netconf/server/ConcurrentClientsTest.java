@@ -335,7 +335,7 @@ class ConcurrentClientsTest {
             final var sessionListener = new SimpleNetconfClientSessionListener();
             final var clientConfig = NetconfClientConfigurationBuilder.create()
                 .withTcpParameters(clientParams).withSessionListener(sessionListener).build();
-            try (var session = factory.createClient(clientConfig).get()) {
+            try (var session = factory.createClient(clientConfig, null).get()) {
                 final var sessionId = session.sessionId();
                 LOG.info("Client with session id {}: hello exchanged", sessionId);
                 final var result = sessionListener.sendRequest(getConfigMessage).get();
