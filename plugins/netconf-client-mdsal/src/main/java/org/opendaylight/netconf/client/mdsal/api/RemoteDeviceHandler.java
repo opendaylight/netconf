@@ -30,6 +30,9 @@ public interface RemoteDeviceHandler extends AutoCloseable {
     // FIXME: document this node
     void onNotification(DOMNotification domNotification);
 
+    void onAlgorithmsNegotiated(NegotiatedSshKeys kexAlgorithm);
+
+
     @Override
     void close();
 }

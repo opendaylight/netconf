@@ -19,8 +19,10 @@ import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
+import org.opendaylight.netconf.shaded.sshd.common.kex.KexProposalOption;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
+import org.opendaylight.netconf.transport.api.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -39,10 +41,12 @@ public final class SSHClient extends SSHTransportStack {
     private static final Logger LOG = LoggerFactory.getLogger(SSHClient.class);
 
     private final String subsystem;
+    private final SSHNegotiatedAlgListener algListener;
 
     private SSHClient(final String subsystem, final TransportChannelListener<? super SSHTransportChannel> listener,
-            final TransportSshClient sshClient) {
+            final SSHNegotiatedAlgListener algListener, final TransportSshClient sshClient) {
         super(listener, sshClient, sshClient.getSessionFactory());
+        this.algListener = algListener;
         // Mirrors check in ChannelSubsystem's constructor
         if (subsystem.isBlank()) {
             throw new IllegalArgumentException("Blank subsystem");
@@ -52,9 +56,11 @@ public final class SSHClient extends SSHTransportStack {
 
     static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory,
             final ScheduledExecutorService executorService, final String subsystem,
-            final TransportChannelListener<? super SSHTransportChannel> listener, final SshClientGrouping clientParams,
+            final TransportChannelListener<? super SSHTransportChannel> listener,
+            final SSHNegotiatedAlgListener algListener, final SshClientGrouping clientParams,
             final ClientFactoryManagerConfigurator configurator) throws UnsupportedConfigurationException {
-        return new SSHClient(subsystem, listener, new TransportSshClient.Builder(ioServiceFactory, executorService)
+        return new SSHClient(subsystem, listener, algListener,
+            new TransportSshClient.Builder(ioServiceFactory, executorService)
             .transportParams(clientParams.getTransportParams())
             .keepAlives(clientParams.getKeepalives())
             .clientIdentity(clientParams.getClientIdentity())
@@ -65,8 +71,9 @@ public final class SSHClient extends SSHTransportStack {
 
     @VisibleForTesting
     static SSHClient of(final String subsystem, final TransportChannelListener<? super SSHTransportChannel> listener,
-            final TransportSshClient transportSshClient) throws UnsupportedConfigurationException {
-        return new SSHClient(subsystem, listener, transportSshClient);
+            final SSHNegotiatedAlgListener algListener, final TransportSshClient transportSshClient)
+            throws UnsupportedConfigurationException {
+        return new SSHClient(subsystem, listener, algListener, transportSshClient);
     }
 
     @NonNull ListenableFuture<SSHClient> connect(final Bootstrap bootstrap, final TcpClientGrouping connectParams)
@@ -91,6 +98,13 @@ public final class SSHClient extends SSHTransportStack {
         final var sessionId = sessionId(clientSession);
         LOG.debug("Authenticating session {}", sessionId);
         clientSession.auth().addListener(future -> onAuthComplete(future, sessionId));
+        if (algListener != null) {
+            algListener.onKexNegotiated(
+                clientSession.getNegotiatedKexParameter(KexProposalOption.ALGORITHMS),
+                clientSession.getNegotiatedKexParameter(KexProposalOption.SERVERKEYS),
+                clientSession.getNegotiatedKexParameter(KexProposalOption.C2SENC),
+                clientSession.getNegotiatedKexParameter(KexProposalOption.C2SMAC));
+        }
     }
 
     private void onAuthComplete(final AuthFuture future, final Long sessionId) {
