@@ -11,6 +11,10 @@ module odl-netconf-device {
   import ietf-netconf { prefix nc; }
   import ietf-ssh-common { prefix sshcmn; }
 
+  revision 2025-12-05 {
+    description "Add negotiated transport parameters.";
+  }
+
   revision 2025-10-28 {
     description "Add configurable parameters of the SSH transport layer.";
   }
@@ -395,6 +399,32 @@ module odl-netconf-device {
         is available verbatim under this container through the
         mount extension.";
     }
+  }
+
+  grouping negotiated-ssh-transport-parameters {
+    container negotiated-ssh-transport-parameters {
+      leaf host-key-alg {
+        type sshcmn:ssh-public-key-algorithm;
+        config false;
+      }
+
+      leaf key-exchange-alg {
+        type sshcmn:ssh-public-key-algorithm;
+        config false;
+      }
+
+      leaf encryption-alg {
+        type sshcmn:ssh-public-key-algorithm;
+        config false;
+      }
+
+      leaf mac-alg {
+        type sshcmn:ssh-public-key-algorithm;
+        config false;
+      }
+    }
+    description
+      "Transport parameters negotiated during device connection process";
   }
   
   grouping netconf-schema-storage {
