@@ -14,6 +14,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import java.util.Optional;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -22,6 +23,7 @@ import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
@@ -32,6 +34,8 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.oper.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.oper.unavailable.capabilities.UnavailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.negotiated.ssh.transport.parameters.NegotiatedSshTransportParameters;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.negotiated.ssh.transport.parameters.NegotiatedSshTransportParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.NetconfNodeAugment;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.NetconfNodeAugmentBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNode;
@@ -97,11 +101,11 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
     }
 
     public synchronized void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities,
-            final SessionIdType sessionId) {
+            final SessionIdType sessionId, final NegotiatedSshAlg negotiatedSshAlg) {
         final var tx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.", id, tx.getIdentifier());
-        tx.put(LogicalDatastoreType.OPERATIONAL, netconfNodePath(),
-            newNetconfNodeBuilder(up, capabilities, sessionId).build());
+        tx.put(LogicalDatastoreType.OPERATIONAL, netconfNodePath(),newNetconfNodeBuilder(up, capabilities, sessionId)
+            .setNegotiatedSshTransportParameters(getNegotiatedParameters(negotiatedSshAlg)).build());
         LOG.trace("{}: Update device state transaction {} merging operational data ended.", id, tx.getIdentifier());
         commitTransaction(tx, "update");
     }
@@ -222,6 +226,17 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
     public synchronized void onSuccess(final Empty result) {
         LOG.trace("{}: transaction chain SUCCESSFUL", id);
         closeFuture.set(Empty.value());
+    }
+
+    private NegotiatedSshTransportParameters getNegotiatedParameters(final NegotiatedSshAlg negotiatedSshAlg) {
+        final var params = new NegotiatedSshTransportParametersBuilder();
+        if (negotiatedSshAlg != null) {
+            Optional.ofNullable(negotiatedSshAlg.negotiatedKexAlg()).ifPresent(params::setKeyExchangeAlg);
+            Optional.ofNullable(negotiatedSshAlg.negotiatedHostKeyAlg()).ifPresent(params::setHostKeyAlg);
+            Optional.ofNullable(negotiatedSshAlg.negotiatedEncryptionAlg()).ifPresent(params::setEncryptionAlg);
+            Optional.ofNullable(negotiatedSshAlg.negotiatedMacAlg()).ifPresent(params::setMacAlg);
+        }
+        return params.build();
     }
 
     private static @NonNull String extractReason(final Throwable throwable) {

@@ -32,6 +32,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -175,6 +176,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
             localTask.recordActivity();
         }
         deviceHandler.onNotification(domNotification);
+    }
+
+    @Override
+    public void onSshAlgorithmsNegotiated(final NegotiatedSshAlg negotiatedSshAlg) {
+        deviceHandler.onSshAlgorithmsNegotiated(negotiatedSshAlg);
     }
 
     @Override
