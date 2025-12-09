@@ -14,6 +14,7 @@ module org.opendaylight.netconf.transport.api {
     requires transitive io.netty.common;
     requires transitive io.netty.transport;
     requires transitive org.opendaylight.yangtools.yang.common;
+    requires org.opendaylight.yang.gen.ietf.ssh.common.rfc9644;
     requires io.netty.transport.classes.epoll;
     requires jdk.net;
     requires org.slf4j;
