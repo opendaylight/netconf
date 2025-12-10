@@ -249,6 +249,41 @@ public abstract class AbstractNetconfTopology {
         nodeHandler.connect();
     }
 
+    private synchronized void lockedEnsureNode(final NetconfNodeHandler oldHandler) {
+        final var nodeId = oldHandler.nodeId();
+        final var netconfNode = oldHandler.netconfNode();
+        // FIXME: NETCONF-925: preserve values of oldHandler
+        final NetconfNodeAugmentedOptional nodeOptional = null;
+        LOG.info("RemoteDevice{{}} disconnecting", nodeId);
+        oldHandler.close();
+
+        final RemoteDeviceId deviceId;
+        try {
+            deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, oldHandler.netconfNode());
+        } catch (NoSuchElementException e) {
+            LOG.warn("RemoteDevice{{}} has invalid configuration, not connecting it", nodeId, e);
+            return;
+        }
+
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Connecting RemoteDevice{{}}, with unchanged config.", nodeId);
+        }
+
+        // Instantiate new handler ...
+        final var deviceSalFacade = createSalFacade(deviceId, netconfNode.getCredentials(),
+            netconfNode.requireLockDatastore());
+
+        final NetconfNodeHandler nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemaProvider,
+            schemaManager, schemaAssembler, builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId,
+            netconfNode, nodeOptional, sshParams);
+
+        // ... record it ...
+        activeConnectors.put(nodeId, nodeHandler);
+
+        // ... and start it
+        nodeHandler.connect();
+    }
+
     // Non-final for testing
     protected void deleteNode(final NodeId nodeId) {
         lockedDeleteNode(nodeId);
@@ -288,6 +323,11 @@ public abstract class AbstractNetconfTopology {
             public void onSuccess(final CommitInfo result) {
                 LOG.debug("Topology ssh parameters updated successfully");
                 sshParams = rootNode;
+
+                //recreate all nodes so new topology config comes in to effect
+                for (var node : activeConnectors.values()) {
+                    lockedEnsureNode(node);
+                }
             }
 
             @Override
