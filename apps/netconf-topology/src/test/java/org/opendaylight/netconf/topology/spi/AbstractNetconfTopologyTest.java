@@ -53,6 +53,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.cr
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.credentials.credentials.login.pw.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.NetconfNodeAugmentBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.netconf.node.augment.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -95,28 +96,24 @@ class AbstractNetconfTopologyTest {
     void hideCredentials() {
         final String userName = "admin";
         final String password = "pa$$word";
-        final Node node = new NodeBuilder()
-                .addAugmentation(new NetconfNodeAugmentBuilder()
-                    .setNetconfNode(new NetconfNodeBuilder()
-                        .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                        .setPort(new PortNumber(Uint16.valueOf(9999)))
-                        .setReconnectOnChangedSchema(true)
-                        .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-                        .setMinBackoffMillis(Uint16.valueOf(100))
-                        .setKeepaliveDelay(Uint32.valueOf(1000))
-                        .setTcpOnly(false)
-                        .setProtocol(new ProtocolBuilder().setName(Name.TLS).build())
-                        .setCredentials(new LoginPwUnencryptedBuilder()
-                            .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
-                                .setUsername(userName)
-                                .setPassword(password)
-                                .build())
-                            .build())
-                        .build())
+        final NetconfNode node = new NetconfNodeBuilder()
+            .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+            .setPort(new PortNumber(Uint16.valueOf(9999)))
+            .setReconnectOnChangedSchema(true)
+            .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
+            .setMinBackoffMillis(Uint16.valueOf(100))
+            .setKeepaliveDelay(Uint32.valueOf(1000))
+            .setTcpOnly(false)
+            .setProtocol(new ProtocolBuilder().setName(Name.TLS).build())
+            .setCredentials(new LoginPwUnencryptedBuilder()
+                .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
+                    .setUsername(userName)
+                    .setPassword(password)
                     .build())
-                .setNodeId(NodeId.getDefaultInstance("junos"))
-                .build();
-        final String transformedNetconfNode = AbstractNetconfTopology.hideCredentials(node);
+                .build())
+            .build();
+        final String transformedNetconfNode = AbstractNetconfTopology
+            .hideCredentials(node, NodeId.getDefaultInstance("junos"));
         assertTrue(transformedNetconfNode.contains("credentials=***"));
         assertFalse(transformedNetconfNode.contains(userName));
         assertFalse(transformedNetconfNode.contains(password));
@@ -124,20 +121,15 @@ class AbstractNetconfTopologyTest {
 
     @Test
     void hideNullCredentials() {
-        final Node node = new NodeBuilder()
-            .setNodeId(new NodeId("id"))
-            .addAugmentation(new NetconfNodeAugmentBuilder()
-                .setNetconfNode(new NetconfNodeBuilder()
-                    .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                    .setPort(new PortNumber(Uint16.valueOf(9999)))
-                    .setSchemaless(false)
-                    .setReconnectOnChangedSchema(false)
-                    .setMaxConnectionAttempts(Uint32.ZERO)
-                    .setLockDatastore(true)
-                    .build())
-                .build())
+        final NetconfNode node = new NetconfNodeBuilder()
+            .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+            .setPort(new PortNumber(Uint16.valueOf(9999)))
+            .setSchemaless(false)
+            .setReconnectOnChangedSchema(false)
+            .setMaxConnectionAttempts(Uint32.ZERO)
+            .setLockDatastore(true)
             .build();
-        assertNotNull(AbstractNetconfTopology.hideCredentials(node));
+        assertNotNull(AbstractNetconfTopology.hideCredentials(node, new NodeId("id")));
     }
 
     @Test
