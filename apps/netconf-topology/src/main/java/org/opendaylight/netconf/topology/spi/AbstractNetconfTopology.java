@@ -40,6 +40,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev22
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.NetconfNodeAugment;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.TopologyTypes1;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.TopologyTypes1Builder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.netconf.node.augment.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.network.topology.topology.topology.types.TopologyNetconf;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.network.topology.topology.topology.types.TopologyNetconfBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
@@ -221,6 +222,23 @@ public abstract class AbstractNetconfTopology {
             LOG.warn("RemoteDevice{{}} is missing NETCONF node configuration, not connecting it", nodeId);
             return;
         }
+
+        final var nodeOptional = node.augmentation(NetconfNodeAugmentedOptional.class);
+        connectNode(netconfNode, nodeId, nodeOptional, hideCredentials(node));
+    }
+
+    private synchronized void reconnectNode(final NetconfNodeHandler oldHandler) {
+        final var nodeId = oldHandler.nodeId();
+        final var netconfNode = oldHandler.netconfNode();
+        LOG.info("RemoteDevice{{}} disconnecting", nodeId);
+        oldHandler.close();
+
+        // FIXME: NETCONF-925: preserve NetconfNodeAugmentedOptional of oldHandler
+        connectNode(netconfNode, nodeId, null, "unchanged");
+    }
+
+    private synchronized void connectNode(final NetconfNode netconfNode, final NodeId nodeId,
+            final NetconfNodeAugmentedOptional nodeOptional, final String configMsg) {
         final RemoteDeviceId deviceId;
         try {
             deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode);
@@ -230,11 +248,9 @@ public abstract class AbstractNetconfTopology {
         }
 
         if (LOG.isInfoEnabled()) {
-            LOG.info("Connecting RemoteDevice{{}}, with config {}", nodeId, hideCredentials(node));
+            LOG.info("Connecting RemoteDevice{{}}, with config {}", nodeId, configMsg);
         }
-
         // Instantiate the handler ...
-        final var nodeOptional = node.augmentation(NetconfNodeAugmentedOptional.class);
         final var deviceSalFacade = createSalFacade(deviceId, netconfNode.getCredentials(),
             netconfNode.requireLockDatastore());
 
@@ -288,6 +304,11 @@ public abstract class AbstractNetconfTopology {
             public void onSuccess(final CommitInfo result) {
                 LOG.debug("Topology ssh parameters updated successfully");
                 sshParams = rootNode;
+
+                //recreate all nodes so new topology config comes in to effect
+                for (var node : activeConnectors.values()) {
+                    reconnectNode(node);
+                }
             }
 
             @Override
