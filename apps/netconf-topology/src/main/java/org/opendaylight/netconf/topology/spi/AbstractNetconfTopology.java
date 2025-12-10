@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.MoreObjects;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev22
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.NetconfNodeAugment;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.TopologyTypes1;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.TopologyTypes1Builder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.netconf.node.augment.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.network.topology.topology.topology.types.TopologyNetconf;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.network.topology.topology.topology.types.TopologyNetconfBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
@@ -221,6 +223,29 @@ public abstract class AbstractNetconfTopology {
             LOG.warn("RemoteDevice{{}} is missing NETCONF node configuration, not connecting it", nodeId);
             return;
         }
+
+        final var nodeOptional = node.augmentation(NetconfNodeAugmentedOptional.class);
+        connectNode(netconfNode, nodeId, nodeOptional);
+    }
+
+    /**
+     * Reconnect node based on existing NetconfNodeHandler.
+     *
+     * @param oldHandler existing {@link NetconfNodeHandler} of node to be reconnected
+     */
+    private synchronized void reconnectNode(final NetconfNodeHandler oldHandler) {
+        final var nodeId = oldHandler.nodeId();
+        final var netconfNode = oldHandler.netconfNode();
+        LOG.info("RemoteDevice{{}} disconnecting", nodeId);
+        // disconnect the old NetconfNodeHandler
+        oldHandler.close();
+
+        // FIXME: NETCONF-925: preserve NetconfNodeAugmentedOptional of oldHandler
+        connectNode(netconfNode, nodeId, null);
+    }
+
+    private synchronized void connectNode(final NetconfNode netconfNode, final NodeId nodeId,
+            final NetconfNodeAugmentedOptional nodeOptional) {
         final RemoteDeviceId deviceId;
         try {
             deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode);
@@ -230,11 +255,9 @@ public abstract class AbstractNetconfTopology {
         }
 
         if (LOG.isInfoEnabled()) {
-            LOG.info("Connecting RemoteDevice{{}}, with config {}", nodeId, hideCredentials(node));
+            LOG.info("Connecting RemoteDevice{{}}, with config {}", nodeId, hideCredentials(netconfNode, nodeId));
         }
-
         // Instantiate the handler ...
-        final var nodeOptional = node.augmentation(NetconfNodeAugmentedOptional.class);
         final var deviceSalFacade = createSalFacade(deviceId, netconfNode.getCredentials(),
             netconfNode.requireLockDatastore());
 
@@ -288,6 +311,11 @@ public abstract class AbstractNetconfTopology {
             public void onSuccess(final CommitInfo result) {
                 LOG.debug("Topology ssh parameters updated successfully");
                 sshParams = rootNode;
+
+                //recreate all nodes so new topology config comes in to effect
+                for (var node : activeConnectors.values()) {
+                    reconnectNode(node);
+                }
             }
 
             @Override
@@ -322,18 +350,20 @@ public abstract class AbstractNetconfTopology {
     /**
      * Hiding of private credentials from node configuration (credentials data is replaced by asterisks).
      *
-     * @param nodeConfiguration Node configuration container.
+     * @param nodeConfiguration NetconfNode configuration container.
+     * @param nodeId NodeId of given NetconfNode.
      * @return String representation of node configuration with credentials replaced by asterisks.
      */
     @VisibleForTesting
-    static final String hideCredentials(final Node nodeConfiguration) {
-        final var nodeConfigurationString = nodeConfiguration.toString();
-        final var netconfNodeAugmentation = nodeConfiguration.augmentation(NetconfNodeAugment.class);
-        final var netconfNode = netconfNodeAugmentation != null ? netconfNodeAugmentation.getNetconfNode() : null;
-        if (netconfNode != null && netconfNode.getCredentials() != null) {
-            final var nodeCredentials = netconfNode.getCredentials().toString();
-            return nodeConfigurationString.replace(nodeCredentials, "***");
+    static final String hideCredentials(final NetconfNode nodeConfiguration, final NodeId nodeId) {
+        final var helper = MoreObjects.toStringHelper("Node");
+        helper.add("nodeId", nodeId);
+        helper.add("netconfNode", nodeConfiguration);
+        final var credentials = nodeConfiguration.getCredentials();
+        if (credentials != null) {
+            final var nodeCredentials = credentials.toString();
+            return helper.toString().replace(nodeCredentials, "***");
         }
-        return nodeConfigurationString;
+        return helper.toString();
     }
 }
