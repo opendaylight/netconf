@@ -211,6 +211,14 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         lockedConnect();
     }
 
+    @NonNull NetconfNode netconfNode() {
+        return node;
+    }
+
+    @NonNull NodeId nodeId() {
+        return nodeId;
+    }
+
     @Holding("this")
     private void lockedConnect() {
         if (clientConfig == null) {
