@@ -375,6 +375,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
             public void onSuccess(final CommitInfo result) {
                 LOG.debug("Topology ssh parameters updated successfully");
                 sshParams = rootNode;
+                contexts.values().forEach(context -> context.refreshSshConfig(sshParams));
             }
 
             @Override
