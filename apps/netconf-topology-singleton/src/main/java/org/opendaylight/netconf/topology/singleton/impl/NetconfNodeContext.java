@@ -27,6 +27,7 @@ import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFa
 import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.NetconfNodeAugment;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,9 +39,9 @@ final class NetconfNodeContext implements AutoCloseable {
     private final NetconfClientConfigurationBuilderFactory builderFactory;
     private final DOMMountPointService mountPointService;
     private final RemoteDeviceId remoteDeviceId;
-    private final NetconfTopologySetup setup;
     private final Timeout actorResponseWaitTime;
 
+    private NetconfTopologySetup setup;
     private ActorRef masterActorRef;
     private MasterSalFacade masterSalFacade;
     private NetconfNodeManager netconfNodeManager;
@@ -87,6 +88,7 @@ final class NetconfNodeContext implements AutoCloseable {
 
     void refreshSetupConnection(final NetconfTopologySetup netconfTopologyDeviceSetup, final RemoteDeviceId device) {
         dropNode();
+        setup = requireNonNull(netconfTopologyDeviceSetup);
 
         Patterns.ask(masterActorRef, new RefreshSetupMasterActorData(netconfTopologyDeviceSetup, device),
             actorResponseWaitTime).onComplete(
@@ -103,8 +105,65 @@ final class NetconfNodeContext implements AutoCloseable {
                 }, netconfTopologyDeviceSetup.getActorSystem().dispatcher());
     }
 
+    void refreshSetupConnection(final SshTransportTopologyParameters sshParams, final RemoteDeviceId device) {
+        dropNode();
+        final var newSetup =  NetconfTopologySetup.builder()
+            .setClusterSingletonServiceProvider(setup.getClusterSingletonServiceProvider())
+            .setBaseSchemaProvider(setup.getBaseSchemaProvider())
+            .setDataBroker(setup.getDataBroker())
+            .setInstanceIdentifier(setup.getInstanceIdentifier())
+            .setNode(setup.getNode())
+            .setActorSystem(setup.getActorSystem())
+            .setTimer(setup.getTimer())
+            .setSchemaAssembler(setup.getSchemaAssembler())
+            .setTopologyId(setup.getTopologyId())
+            .setNetconfClientFactory(setup.getNetconfClientFactory())
+            .setDeviceSchemaProvider(setup.getDeviceSchemaProvider())
+            .setIdleTimeout(setup.getIdleTimeout())
+            .setSshParams(sshParams)
+            .build();
+
+        setup = requireNonNull(newSetup);
+
+        Patterns.ask(masterActorRef, new RefreshSetupMasterActorData(newSetup, device),
+            actorResponseWaitTime).onComplete(
+            new OnComplete<>() {
+                @Override
+                public void onComplete(final Throwable failure, final Object success) {
+                    if (failure != null) {
+                        LOG.error("Failed to refresh master actor data", failure);
+                        return;
+                    }
+                    LOG.debug("Succeed to refresh Master Action data. Creating Connector...");
+                    connectNode();
+                }
+            }, newSetup.getActorSystem().dispatcher());
+    }
+
     void refreshDevice(final NetconfTopologySetup netconfTopologyDeviceSetup, final RemoteDeviceId deviceId) {
+        setup = requireNonNull(netconfTopologyDeviceSetup);
         netconfNodeManager.refreshDevice(netconfTopologyDeviceSetup, deviceId);
+    }
+
+    void refreshDevice(final SshTransportTopologyParameters sshParams, final RemoteDeviceId deviceId) {
+        final var newSetup =  NetconfTopologySetup.builder()
+            .setClusterSingletonServiceProvider(setup.getClusterSingletonServiceProvider())
+            .setBaseSchemaProvider(setup.getBaseSchemaProvider())
+            .setDataBroker(setup.getDataBroker())
+            .setInstanceIdentifier(setup.getInstanceIdentifier())
+            .setNode(setup.getNode())
+            .setActorSystem(setup.getActorSystem())
+            .setTimer(setup.getTimer())
+            .setSchemaAssembler(setup.getSchemaAssembler())
+            .setTopologyId(setup.getTopologyId())
+            .setNetconfClientFactory(setup.getNetconfClientFactory())
+            .setDeviceSchemaProvider(setup.getDeviceSchemaProvider())
+            .setIdleTimeout(setup.getIdleTimeout())
+            .setSshParams(sshParams)
+            .build();
+
+        setup = requireNonNull(newSetup);
+        netconfNodeManager.refreshDevice(newSetup, deviceId);
     }
 
     private void registerNodeManager() {
