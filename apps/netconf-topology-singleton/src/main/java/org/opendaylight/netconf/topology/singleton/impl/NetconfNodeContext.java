@@ -27,6 +27,7 @@ import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFa
 import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.NetconfNodeAugment;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,9 +39,9 @@ final class NetconfNodeContext implements AutoCloseable {
     private final NetconfClientConfigurationBuilderFactory builderFactory;
     private final DOMMountPointService mountPointService;
     private final RemoteDeviceId remoteDeviceId;
-    private final NetconfTopologySetup setup;
     private final Timeout actorResponseWaitTime;
 
+    private NetconfTopologySetup setup;
     private ActorRef masterActorRef;
     private MasterSalFacade masterSalFacade;
     private NetconfNodeManager netconfNodeManager;
@@ -103,8 +104,31 @@ final class NetconfNodeContext implements AutoCloseable {
                 }, netconfTopologyDeviceSetup.getActorSystem().dispatcher());
     }
 
+    /**
+     * Refresh connection using new topology ssh parameters.
+     *
+     * @param sshParams  new topology ssh parameters
+     * @param device     {@link RemoteDeviceId} of affected device
+     */
+    void refreshSshParamsConnection(final SshTransportTopologyParameters sshParams, final RemoteDeviceId device) {
+        dropNode();
+        setup = requireNonNull(setupWithNewSshParams(sshParams));
+        refreshSetupConnection(setup, device);
+    }
+
     void refreshDevice(final NetconfTopologySetup netconfTopologyDeviceSetup, final RemoteDeviceId deviceId) {
         netconfNodeManager.refreshDevice(netconfTopologyDeviceSetup, deviceId);
+    }
+
+    /**
+     * Refresh device using new topology ssh parameters.
+     *
+     * @param sshParams  new topology ssh parameters
+     * @param deviceId   {@link RemoteDeviceId} of affected device
+     */
+    void refreshDevice(final SshTransportTopologyParameters sshParams, final RemoteDeviceId deviceId) {
+        setup = requireNonNull(setupWithNewSshParams(sshParams));
+        netconfNodeManager.refreshDevice(setup, deviceId);
     }
 
     private void registerNodeManager() {
@@ -153,6 +177,30 @@ final class NetconfNodeContext implements AutoCloseable {
             nodeHandler.close();
             nodeHandler = null;
         }
+    }
+
+    /**
+     * Update setup with new topology ssh parameters.
+     *
+     * @param  sshParams new topology ssh parameters
+     * @return updated setup
+     */
+    private NetconfTopologySetup setupWithNewSshParams(final SshTransportTopologyParameters sshParams) {
+        return NetconfTopologySetup.builder()
+            .setClusterSingletonServiceProvider(setup.getClusterSingletonServiceProvider())
+            .setBaseSchemaProvider(setup.getBaseSchemaProvider())
+            .setDataBroker(setup.getDataBroker())
+            .setInstanceIdentifier(setup.getInstanceIdentifier())
+            .setNode(setup.getNode())
+            .setActorSystem(setup.getActorSystem())
+            .setTimer(setup.getTimer())
+            .setSchemaAssembler(setup.getSchemaAssembler())
+            .setTopologyId(setup.getTopologyId())
+            .setNetconfClientFactory(setup.getNetconfClientFactory())
+            .setDeviceSchemaProvider(setup.getDeviceSchemaProvider())
+            .setIdleTimeout(setup.getIdleTimeout())
+            .setSshParams(sshParams)
+            .build();
     }
 
     @VisibleForTesting
