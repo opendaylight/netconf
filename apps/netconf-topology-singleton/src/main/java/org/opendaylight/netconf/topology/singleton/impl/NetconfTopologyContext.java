@@ -23,6 +23,7 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySet
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.NetconfNodeAugment;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,6 +91,15 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             singleton.refreshSetupConnection(setup, remoteDeviceId);
         } else {
             singleton.refreshDevice(setup, remoteDeviceId);
+        }
+    }
+
+    void refreshSShConfig(final @NonNull SshTransportTopologyParameters sshParams) {
+        final var singleton = getTopologySingleton();
+        if (isMaster) {
+            singleton.refreshSetupConnection(sshParams, remoteDeviceId);
+        } else {
+            singleton.refreshDevice(sshParams, remoteDeviceId);
         }
     }
 
