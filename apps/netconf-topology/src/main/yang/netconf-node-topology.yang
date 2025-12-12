@@ -9,6 +9,10 @@ module netconf-node-topology {
     import odl-netconf-device { prefix ond; }
     import ietf-ssh-common { prefix sshcmn; }
 
+    revision 2025-12-05 {
+        description "Add negotiated SSH parameters to netconf node augment";
+    }
+
     revision 2025-11-03 {
         description "Fix misplaced container ssh-transport-topology-parameters. It should be placed
                      inside of container topology-netconf, not augmented directly into nt:topology-types";
@@ -132,6 +136,7 @@ module netconf-node-topology {
             uses ond:credentials;
             uses netconf-node-fields;
             uses ond:connection-oper;
+            uses ond:negotiated-ssh-transport-parameters;
             ext:mount;
         }
     }
