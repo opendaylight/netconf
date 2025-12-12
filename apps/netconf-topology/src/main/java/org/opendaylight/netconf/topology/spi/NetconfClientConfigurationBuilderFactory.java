@@ -9,8 +9,8 @@ package org.opendaylight.netconf.topology.spi;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.netconf.node.augment.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 
 /**
