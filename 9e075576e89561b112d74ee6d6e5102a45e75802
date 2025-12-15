@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2dc9e04_2fbf92da",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-15T13:45:25Z",
+      "side": 0,
+      "message": "maybe we can switch to if (!resolutionException.getUnsatisfiedImports.isEmpty) {}",
+      "revId": "9e075576e89561b112d74ee6d6e5102a45e75802",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
