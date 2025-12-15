@@ -36,7 +36,6 @@ import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.oper.available.capabilities.AvailableCapabilityBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.oper.unavailable.capabilities.UnavailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.connection.oper.unavailable.capabilities.UnavailableCapability.FailureReason;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -94,7 +93,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     private static final Logger LOG = LoggerFactory.getLogger(SchemaSetup.class);
 
     private final SettableFuture<SchemaSetup.Result> resultFuture = SettableFuture.create();
-    private final HashMap<QName, FailureReason> unresolvedCapabilites = new HashMap<>();
+    private final HashMap<QName, FailureReason> unresolvedCapabilities = new HashMap<>();
     private final RemoteDeviceId deviceId;
     private final Set<QName> initialRequiredSources;
     private final SchemaRepository repository;
@@ -128,7 +127,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     @Override
     public void onSuccess(final EffectiveModelContext result) {
         LOG.debug("{}: Schema context built successfully from {}", deviceId, requiredSources);
-        resultFuture.set(new Result(result, ImmutableMap.copyOf(unresolvedCapabilites)));
+        resultFuture.set(new Result(result, ImmutableMap.copyOf(unresolvedCapabilities)));
     }
 
     @Override
@@ -136,10 +135,10 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
         // schemaBuilderFuture.checkedGet() throws only SchemaResolutionException
         // that might be wrapping a MissingSchemaSourceException so we need to look
         // at the cause of the exception to make sure we don't misinterpret it.
-        if (cause instanceof MissingSchemaSourceException) {
-            requiredSources = handleMissingSchemaSourceException((MissingSchemaSourceException) cause);
-        } else if (cause instanceof SchemaResolutionException) {
-            requiredSources = handleSchemaResolutionException((SchemaResolutionException) cause);
+        if (cause instanceof MissingSchemaSourceException missingSourceException) {
+            requiredSources = handleMissingSchemaSourceException(missingSourceException);
+        } else if (cause instanceof SchemaResolutionException schemaResolutionException) {
+            requiredSources = handleSchemaResolutionException(schemaResolutionException);
         } else {
             LOG.debug("Unhandled failure", cause);
             resultFuture.setException(cause);
@@ -190,7 +189,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
 
     private void addUnresolvedCapabilities(final Collection<QName> capabilities, final FailureReason reason) {
         for (QName s : capabilities) {
-            unresolvedCapabilites.put(s, reason);
+            unresolvedCapabilities.put(s, reason);
         }
     }
 
@@ -203,36 +202,22 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
             deviceId, missingSource, exception);
         final var qNameOfMissingSource = getQNameFromSourceIdentifiers(Sets.newHashSet(missingSource));
         if (!qNameOfMissingSource.isEmpty()) {
-            addUnresolvedCapabilities(qNameOfMissingSource, UnavailableCapability.FailureReason.MissingSource);
+            addUnresolvedCapabilities(qNameOfMissingSource, FailureReason.MissingSource);
         }
         return stripUnavailableSource(missingSource);
     }
 
     private Collection<SourceIdentifier> handleSchemaResolutionException(
             final SchemaResolutionException resolutionException) {
-        // In case resolution error, try only with resolved sources
-        // There are two options why schema resolution exception occurred : unsatisfied imports or flawed model
-        // FIXME Do we really have assurance that these two cases cannot happen at once?
         final var failedSourceId = resolutionException.sourceId();
-        if (failedSourceId != null) {
-            // flawed model - exclude it
-            LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
-                deviceId, failedSourceId);
-            LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
-                deviceId, failedSourceId, resolutionException);
-            addUnresolvedCapabilities(getQNameFromSourceIdentifiers(List.of(failedSourceId)),
-                    UnavailableCapability.FailureReason.UnableToResolve);
-            return stripUnavailableSource(failedSourceId);
-        }
-        // unsatisfied imports
-        addUnresolvedCapabilities(
-            getQNameFromSourceIdentifiers(resolutionException.getUnsatisfiedImports().keySet()),
-            UnavailableCapability.FailureReason.UnableToResolve);
-        LOG.warn("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only",
-            deviceId, resolutionException.getUnsatisfiedImports());
-        LOG.debug("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only",
-            deviceId, resolutionException.getUnsatisfiedImports(), resolutionException);
-        return resolutionException.getResolvedSources();
+        // flawed model - exclude it
+        LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
+            deviceId, failedSourceId);
+        LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
+            deviceId, failedSourceId, resolutionException);
+        addUnresolvedCapabilities(getQNameFromSourceIdentifiers(List.of(failedSourceId)),
+            FailureReason.UnableToResolve);
+        return stripUnavailableSource(failedSourceId);
     }
 
     private List<SourceIdentifier> stripUnavailableSource(final SourceIdentifier sourceIdToRemove) {
