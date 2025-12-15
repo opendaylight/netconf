@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa43ca93_774041ee",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 24
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-15T11:35:17Z",
+      "side": 1,
+      "message": "Remove this as this is not true: Keepalive salfacade just sends keepalives which have timeouts - it does not generally adds timeout to any other requests.",
+      "revId": "6207a3fb466fa1705b42bc8dbddfc18bcc8894f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
