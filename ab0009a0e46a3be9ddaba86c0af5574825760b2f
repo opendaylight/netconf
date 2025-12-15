@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "846e13ca_0475cb9a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-15T13:46:41Z",
+      "side": 1,
+      "message": "fix typo, change warn to debug, use automatic cast - can be one commit",
+      "revId": "ab0009a0e46a3be9ddaba86c0af5574825760b2f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0059903_4ff966e9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-15T13:46:41Z",
+      "side": 1,
+      "message": "this one can be another one",
+      "revId": "ab0009a0e46a3be9ddaba86c0af5574825760b2f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
