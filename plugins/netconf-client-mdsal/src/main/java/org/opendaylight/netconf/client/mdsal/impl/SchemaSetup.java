@@ -209,29 +209,15 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
 
     private Collection<SourceIdentifier> handleSchemaResolutionException(
             final SchemaResolutionException resolutionException) {
-        // In case resolution error, try only with resolved sources
-        // There are two options why schema resolution exception occurred : unsatisfied imports or flawed model
-        // FIXME Do we really have assurance that these two cases cannot happen at once?
         final var failedSourceId = resolutionException.sourceId();
-        if (failedSourceId != null) {
-            // flawed model - exclude it
-            LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
-                deviceId, failedSourceId);
-            LOG.debug("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
-                deviceId, failedSourceId, resolutionException);
-            addUnresolvedCapabilities(getQNameFromSourceIdentifiers(List.of(failedSourceId)),
-                FailureReason.UnableToResolve);
-            return stripUnavailableSource(failedSourceId);
-        }
-        // unsatisfied imports
-        addUnresolvedCapabilities(
-            getQNameFromSourceIdentifiers(resolutionException.getUnsatisfiedImports().keySet()),
+        // flawed model - exclude it
+        LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
+            deviceId, failedSourceId);
+        LOG.debug("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
+            deviceId, failedSourceId, resolutionException);
+        addUnresolvedCapabilities(getQNameFromSourceIdentifiers(List.of(failedSourceId)),
             FailureReason.UnableToResolve);
-        LOG.warn("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only",
-            deviceId, resolutionException.getUnsatisfiedImports());
-        LOG.debug("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only",
-            deviceId, resolutionException.getUnsatisfiedImports(), resolutionException);
-        return resolutionException.getResolvedSources();
+        return stripUnavailableSource(failedSourceId);
     }
 
     private List<SourceIdentifier> stripUnavailableSource(final SourceIdentifier sourceIdToRemove) {
