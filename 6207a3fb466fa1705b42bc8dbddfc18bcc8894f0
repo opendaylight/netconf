@@ -16,6 +16,23 @@
       "message": "Remove this as this is not true: Keepalive salfacade just sends keepalives which have timeouts - it does not generally adds timeout to any other requests.",
       "revId": "6207a3fb466fa1705b42bc8dbddfc18bcc8894f0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a21648c_c52b0272",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/api/RpcsDecorator.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-15T11:38:40Z",
+      "side": 1,
+      "message": "* @param service {@link Rpcs} - i.e. just one space",
+      "revId": "6207a3fb466fa1705b42bc8dbddfc18bcc8894f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
