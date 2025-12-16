@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3132159f_acd908f8",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1565,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-16T08:39:52Z",
+      "side": 1,
+      "message": "This PUT will replace the whole topology - with all devices? Please check the behavior - more appropriate would be to PUT directly into ssh-transport-topology-parameters. Alternative could be to use MERGE - but I prefer #1 option.",
+      "revId": "a4adfbd35beb3aae76fb23f5d628fef425efe190",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69075734_9b27b12a",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1575,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-16T08:39:52Z",
+      "side": 1,
+      "message": "we usually do not add authentication - becasue it depends on user settings",
+      "revId": "a4adfbd35beb3aae76fb23f5d628fef425efe190",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f3d5907_15d1eca3",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1693,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-16T08:39:52Z",
+      "side": 1,
+      "message": "can be found",
+      "revId": "a4adfbd35beb3aae76fb23f5d628fef425efe190",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b29546ee_811f9920",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1694,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-16T08:39:52Z",
+      "side": 1,
+      "message": "use datatracker for RFCs and that mina should refer to something more up-to-date, for example diffie-hellman-group14-sha1 is no more supported, see: https://git.opendaylight.org/gerrit/q/diffie-hellman-group14-sha1",
+      "revId": "a4adfbd35beb3aae76fb23f5d628fef425efe190",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
