@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0693cba6_948b89f2",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1565,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-12-16T15:59:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3132159f_acd908f8",
+      "revId": "a4adfbd35beb3aae76fb23f5d628fef425efe190",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "69075734_9b27b12a",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-12-16T08:39:52Z",
       "side": 1,
       "message": "we usually do not add authentication - becasue it depends on user settings",
+      "revId": "a4adfbd35beb3aae76fb23f5d628fef425efe190",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a6bde38_21a499c1",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1575,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-12-16T15:59:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "69075734_9b27b12a",
       "revId": "a4adfbd35beb3aae76fb23f5d628fef425efe190",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ae7ba8c_238cf4a0",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1693,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-12-16T15:59:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f3d5907_15d1eca3",
+      "revId": "a4adfbd35beb3aae76fb23f5d628fef425efe190",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b29546ee_811f9920",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-12-16T08:39:52Z",
       "side": 1,
       "message": "use datatracker for RFCs and that mina should refer to something more up-to-date, for example diffie-hellman-group14-sha1 is no more supported, see: https://git.opendaylight.org/gerrit/q/diffie-hellman-group14-sha1",
+      "revId": "a4adfbd35beb3aae76fb23f5d628fef425efe190",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f24434c_69311d3a",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1694,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-12-16T15:59:34Z",
+      "side": 1,
+      "message": "the mina-sshd list is list of supported algorithms not default ones.",
+      "parentUuid": "b29546ee_811f9920",
       "revId": "a4adfbd35beb3aae76fb23f5d628fef425efe190",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
