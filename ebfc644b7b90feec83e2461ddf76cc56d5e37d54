@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "40e9dfc5_1651cbce",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-12-16T13:49:46Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/119390/comment/cbe23c98_e492ae27/",
+      "parentUuid": "f7c14734_65a7d886",
+      "revId": "ebfc644b7b90feec83e2461ddf76cc56d5e37d54",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ea87a8ce_11f97e8a",
@@ -70,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "862e06dd_f5d26dfe",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-12-16T13:49:46Z",
+      "side": 1,
+      "message": "During Upgrade: h2c, Netty runs the upgrade synchronously inside HttpServerUpgradeHandler -\u003e Http2ServerUpgradeCodec.upgradeTo(...). In that upgradeTo(...) step Netty not only installs HTTP/2 handlers, it also translates the original HTTP/1.1 upgrade request into HTTP/2 stream 1 so it can be handled as a normal request.\n\nIf Http2MultiplexHandler(childInit) is not already in the pipeline at that moment, there is nowhere to route stream 1, and the first request can be dropped or end up as a protocol error. UpgradeEvent is emitted after upgradeTo(...) completed, so adding the multiplexer there is inherently racy for the initial request.",
+      "parentUuid": "fed21da4_e4fd19c5",
+      "revId": "ebfc644b7b90feec83e2461ddf76cc56d5e37d54",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cbe23c98_e492ae27",
@@ -83,6 +119,24 @@
       "writtenOn": "2025-12-16T08:28:26Z",
       "side": 1,
       "message": "we already have configureHttp2 - would be better if we introduce a new class to setup child channel with `ConcurrentRestconfSession` that creating a new method here",
+      "revId": "ebfc644b7b90feec83e2461ddf76cc56d5e37d54",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75abfceb_c382fb4c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2025-12-16T13:49:46Z",
+      "side": 1,
+      "message": "We already have a natural integration point via the childChannelInit passed into HTTPScheme.initializeServerPipeline(), so I’d prefer not to introduce a separate “child channel setup” class just to wrap ConcurrentRestconfSession.\n\nAlso, with this approach we can remove configureHttp2() entirely: the RESTCONF handler(ConcurrentRestconfSession) is attached during the pipeline initialization stage (via the provided childChannelInit), and HTTP/2 core setup remains owned by HTTPScheme (Http2FrameCodec + Http2MultiplexHandler(childInit)).",
+      "parentUuid": "cbe23c98_e492ae27",
       "revId": "ebfc644b7b90feec83e2461ddf76cc56d5e37d54",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
