@@ -44,7 +44,7 @@ import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,17 +135,14 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
         // schemaBuilderFuture.checkedGet() throws only SchemaResolutionException
         // that might be wrapping a MissingSchemaSourceException so we need to look
         // at the cause of the exception to make sure we don't misinterpret it.
-        if (cause instanceof MissingSchemaSourceException missingSourceException) {
-            requiredSources = handleMissingSchemaSourceException(missingSourceException);
-        } else if (cause instanceof SchemaResolutionException schemaResolutionException) {
-            requiredSources = handleSchemaResolutionException(schemaResolutionException);
+        if (cause instanceof SchemaSourceException schemaSourceException) {
+            requiredSources = handleSchemaSourceException(schemaSourceException);
         } else {
             LOG.debug("Unhandled failure", cause);
             resultFuture.setException(cause);
             // No more trying...
             return;
         }
-
         trySetupSchema();
     }
 
@@ -193,31 +190,16 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
         }
     }
 
-    private List<SourceIdentifier> handleMissingSchemaSourceException(final MissingSchemaSourceException exception) {
-        // In case source missing, try without it
-        final SourceIdentifier missingSource = exception.sourceId();
-        LOG.warn("{}: Unable to build schema context, missing source {}, will reattempt without it",
-            deviceId, missingSource);
-        LOG.debug("{}: Unable to build schema context, missing source {}, will reattempt without it",
-            deviceId, missingSource, exception);
-        final var qNameOfMissingSource = getQNameFromSourceIdentifiers(Sets.newHashSet(missingSource));
-        if (!qNameOfMissingSource.isEmpty()) {
-            addUnresolvedCapabilities(qNameOfMissingSource, FailureReason.MissingSource);
-        }
-        return stripUnavailableSource(missingSource);
-    }
-
-    private Collection<SourceIdentifier> handleSchemaResolutionException(
-            final SchemaResolutionException resolutionException) {
-        final var failedSourceId = resolutionException.sourceId();
+    private List<SourceIdentifier> handleSchemaSourceException(final SchemaSourceException exception) {
         // flawed model - exclude it
+        final var sourceId = exception.sourceId();
         LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
-            deviceId, failedSourceId);
+            deviceId, sourceId);
         LOG.debug("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
-            deviceId, failedSourceId, resolutionException);
-        addUnresolvedCapabilities(getQNameFromSourceIdentifiers(List.of(failedSourceId)),
-            FailureReason.UnableToResolve);
-        return stripUnavailableSource(failedSourceId);
+            deviceId, sourceId, exception);
+        final var qNameOfMissingSource = getQNameFromSourceIdentifiers(List.of(sourceId));
+        addUnresolvedCapabilities(qNameOfMissingSource, FailureReason.UnableToResolve);
+        return stripUnavailableSource(sourceId);
     }
 
     private List<SourceIdentifier> stripUnavailableSource(final SourceIdentifier sourceIdToRemove) {
