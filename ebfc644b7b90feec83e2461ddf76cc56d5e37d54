@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7c14734_65a7d886",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-16T08:28:26Z",
+      "side": 1,
+      "message": "this should be a child channel initializer",
+      "revId": "ebfc644b7b90feec83e2461ddf76cc56d5e37d54",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea87a8ce_11f97e8a",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-16T08:28:26Z",
+      "side": 1,
+      "message": "one line separated from static members",
+      "revId": "ebfc644b7b90feec83e2461ddf76cc56d5e37d54",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fed21da4_e4fd19c5",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-16T08:28:26Z",
+      "side": 1,
+      "message": "we are going to make buildHttp2ChildInitializer here - on event that we are going o use HTTP/2",
+      "revId": "ebfc644b7b90feec83e2461ddf76cc56d5e37d54",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbe23c98_e492ae27",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-16T08:28:26Z",
+      "side": 1,
+      "message": "we already have configureHttp2 - would be better if we introduce a new class to setup child channel with `ConcurrentRestconfSession` that creating a new method here",
+      "revId": "ebfc644b7b90feec83e2461ddf76cc56d5e37d54",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
