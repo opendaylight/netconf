@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "aacc0cd9_bae7bfdf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 24
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2025-12-16T09:46:10Z",
+      "side": 1,
+      "message": "Its enough to point me to one line in code which says something different.",
+      "parentUuid": "fa43ca93_774041ee",
+      "revId": "6207a3fb466fa1705b42bc8dbddfc18bcc8894f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4a21648c_c52b0272",
         "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/api/RpcsDecorator.java",
         "patchSetId": 24
