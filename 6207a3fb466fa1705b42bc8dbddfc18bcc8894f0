@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "51416aa0_74488ffc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 24
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-16T10:49:31Z",
+      "side": 1,
+      "message": "When KeepaliveSalFacade is initialized, all RPCs go through it, and the default-request-timeout-millis is scheduled for them. If KeepaliveSalFacade is not initialized, we lose timeouts for all requests.\nhttps://github.com/opendaylight/netconf/blob/master/plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java#L384\n\nThis commit separates this functionality and applies it to all requests.",
+      "parentUuid": "fa43ca93_774041ee",
+      "revId": "6207a3fb466fa1705b42bc8dbddfc18bcc8894f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4a21648c_c52b0272",
@@ -49,6 +67,24 @@
       "writtenOn": "2025-12-15T11:38:40Z",
       "side": 1,
       "message": "* @param service {@link Rpcs} - i.e. just one space",
+      "revId": "6207a3fb466fa1705b42bc8dbddfc18bcc8894f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46426cdf_4e109376",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/api/RpcsDecorator.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-16T10:49:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a21648c_c52b0272",
       "revId": "6207a3fb466fa1705b42bc8dbddfc18bcc8894f0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -70,6 +106,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "028a9cb0_a27a997e",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/api/RpcsTimeoutAndRecoveryHandler.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-16T10:49:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c520e00_8bc01465",
+      "revId": "6207a3fb466fa1705b42bc8dbddfc18bcc8894f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e56070e5_61c960ff",
@@ -87,6 +141,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c12aff67_d553166a",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-16T10:49:31Z",
+      "side": 1,
+      "message": "Yes, this would require making RpcsTimeoutAndRecoveryHandler#NormalizedTimeoutRpcs public.\nIn fact, this would improve the code because KeepAliveSalFacade should expect only instances of that type.\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/117596/24..25/plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+      "parentUuid": "e56070e5_61c960ff",
+      "revId": "6207a3fb466fa1705b42bc8dbddfc18bcc8894f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5df7e84_f575cc23",
@@ -100,6 +172,24 @@
       "writtenOn": "2025-12-15T12:19:02Z",
       "side": 1,
       "message": "please use \"\"\" java string syntax",
+      "revId": "6207a3fb466fa1705b42bc8dbddfc18bcc8894f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f6ea0ca_04685444",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-16T10:49:31Z",
+      "side": 1,
+      "message": "Not required anymore.",
+      "parentUuid": "b5df7e84_f575cc23",
       "revId": "6207a3fb466fa1705b42bc8dbddfc18bcc8894f0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
