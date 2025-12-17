@@ -16,6 +16,24 @@
       "message": "abcd order please",
       "revId": "8518e387643c4ab8aa1e4cac852dcfa03c774d4e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73742bbd_4affd491",
+        "filename": "apps/netconf-topology-singleton/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2025-12-17T12:45:42Z",
+      "side": 1,
+      "message": "netconf-test-util was at wrong place, moved it to correct order",
+      "parentUuid": "9c9be672_78b81285",
+      "revId": "8518e387643c4ab8aa1e4cac852dcfa03c774d4e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
