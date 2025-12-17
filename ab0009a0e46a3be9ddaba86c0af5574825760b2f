@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "17687240_32b3f0e9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-17T08:46:57Z",
+      "side": 1,
+      "message": "Done:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/119880/1",
+      "parentUuid": "846e13ca_0475cb9a",
+      "revId": "ab0009a0e46a3be9ddaba86c0af5574825760b2f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f0059903_4ff966e9",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-12-15T13:46:41Z",
       "side": 1,
       "message": "this one can be another one",
+      "revId": "ab0009a0e46a3be9ddaba86c0af5574825760b2f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d5dec6a_c74eea3d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-17T08:46:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0059903_4ff966e9",
       "revId": "ab0009a0e46a3be9ddaba86c0af5574825760b2f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

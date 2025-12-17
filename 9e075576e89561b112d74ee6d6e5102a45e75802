@@ -16,6 +16,24 @@
       "message": "maybe we can switch to if (!resolutionException.getUnsatisfiedImports.isEmpty) {}",
       "revId": "9e075576e89561b112d74ee6d6e5102a45e75802",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b214f587_9f0df48b",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2025-12-17T08:46:57Z",
+      "side": 0,
+      "message": "This would be incorrect because:\n1) This exception is thrown because the model with the provided sourceId is the reason why schemaContext cannot be created. Therefore, we want to remove sourceId from requiredSources.\n\n2) If we attempt to build schemaContext from requiredSources (1) and some sources are not provided to satisfy the import of the sourceId model, removing them again will throw an IllegalStateException in the stripUnavailableSource (2) method, as we have not provided those models in requiredSources.\n\n(1) -\u003e https://github.com/opendaylight/netconf/blob/v10.0.2/plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java#L148\n\n(2) -\u003e https://github.com/opendaylight/netconf/blob/v10.0.2/plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/SchemaSetup.java#L220",
+      "parentUuid": "f2dc9e04_2fbf92da",
+      "revId": "9e075576e89561b112d74ee6d6e5102a45e75802",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
