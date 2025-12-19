@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19c20d86_097a4ba5",
+        "filename": "apps/netconf-topology-singleton/pom.xml",
+        "patchSetId": 16
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2025-12-19T16:06:57Z",
+      "side": 1,
+      "message": "is this needed?",
+      "revId": "cab8cda3cb95fce23eb118245e82bbc85dea9bb3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
