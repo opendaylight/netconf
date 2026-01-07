@@ -28,8 +28,8 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
     private final Uint32 chunkSize;
 
     RestconfSessionBootstrap(final HTTPScheme scheme, final EndpointRoot root,
-            final Uint32 chunkSize) {
-        super(scheme);
+            final Uint32 chunkSize, final Uint32 frameSize) {
+        super(scheme, frameSize);
         this.root = requireNonNull(root);
         this.chunkSize = requireNonNull(chunkSize);
     }
