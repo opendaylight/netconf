@@ -27,6 +27,7 @@ import io.netty.handler.codec.http2.Http2FrameCodecBuilder;
 import io.netty.handler.codec.http2.Http2FrameLogger;
 import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import io.netty.handler.codec.http2.Http2ServerUpgradeCodec;
+import io.netty.handler.codec.http2.Http2Settings;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.ssl.ApplicationProtocolNames;
 import io.netty.handler.ssl.ApplicationProtocolNegotiationHandler;
@@ -34,6 +35,7 @@ import io.netty.util.AsciiString;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,11 +51,11 @@ public enum HTTPScheme {
 
         @Override
         void initializeServerPipeline(final ChannelHandlerContext ctx,
-                final ChannelInitializer<Channel> childChannelInit) {
+                final ChannelInitializer<Channel> childChannelInit, final Uint32 frameSize) {
             final var childInit = requireNonNull(childChannelInit);
             // Cleartext upgrade flow
             final var sourceCodec = new HttpServerCodec();
-            final var http2FrameCodec = newHttp2FrameCodec(FRAME_LOGGER);
+            final var http2FrameCodec = newHttp2FrameCodec(FRAME_LOGGER, frameSize);
             ctx.pipeline()
                 .addBefore(ctx.name(), null, new CleartextHttp2ServerUpgradeHandler(
                     sourceCodec,
@@ -77,8 +79,8 @@ public enum HTTPScheme {
     HTTPS(HttpScheme.HTTPS) {
         @Override
         void initializeServerPipeline(final ChannelHandlerContext ctx,
-                final ChannelInitializer<Channel> childChannelInit) {
-            ctx.pipeline().addBefore(ctx.name(), null, new AlpnUpgradeHandler(childChannelInit));
+                final ChannelInitializer<Channel> childChannelInit, final Uint32 frameSize) {
+            ctx.pipeline().addBefore(ctx.name(), null, new AlpnUpgradeHandler(childChannelInit, frameSize));
         }
     };
 
@@ -90,10 +92,12 @@ public enum HTTPScheme {
         private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.INFO, "Alpn2To1");
 
         private final ChannelInitializer<Channel> childChannelInit;
+        private final Uint32 frameSize;
 
-        AlpnUpgradeHandler(final ChannelInitializer<Channel> childChannelInit) {
+        AlpnUpgradeHandler(final ChannelInitializer<Channel> childChannelInit, final Uint32 frameSize) {
             super(ApplicationProtocolNames.HTTP_1_1);
             this.childChannelInit = requireNonNull(childChannelInit);
+            this.frameSize = frameSize;
         }
 
         @Override
@@ -117,7 +121,7 @@ public enum HTTPScheme {
 
         private void configureHttp2(final ChannelHandlerContext ctx) {
             LOG.debug("{}: using HTTP/2", ctx.channel());
-            ctx.pipeline().replace(this, "h2-frame-codec", newHttp2FrameCodec(FRAME_LOGGER));
+            ctx.pipeline().replace(this, "h2-frame-codec", newHttp2FrameCodec(FRAME_LOGGER, frameSize));
             ctx.pipeline().addAfter("h2-frame-codec", "h2-multiplexer",
                 new Http2MultiplexHandler(childChannelInit));
             ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
@@ -197,15 +201,18 @@ public enum HTTPScheme {
      *
      * @param ctx reference {@link ChannelHandlerContext}
      */
-    abstract void initializeServerPipeline(ChannelHandlerContext ctx, ChannelInitializer<Channel> childChannelInit);
+    abstract void initializeServerPipeline(ChannelHandlerContext ctx, ChannelInitializer<Channel> childChannelInit,
+            Uint32 frameSize);
 
     @Override
     public String toString() {
         return netty.toString();
     }
 
-    private static Http2FrameCodec newHttp2FrameCodec(final Http2FrameLogger frameLogger) {
+    private static Http2FrameCodec newHttp2FrameCodec(final Http2FrameLogger frameLogger, final Uint32 frameSize) {
+        final var settings = Http2Settings.defaultSettings().maxFrameSize(frameSize.intValue());
         return Http2FrameCodecBuilder.forServer()
+            .initialSettings(settings)
             .frameLogger(frameLogger)
             .gracefulShutdownTimeoutMillis(0L)
             .build();
