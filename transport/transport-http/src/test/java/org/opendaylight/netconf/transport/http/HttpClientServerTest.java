@@ -165,7 +165,8 @@ class HttpClientServerTest {
         // TODO: this looks like a spy() on a real implementation
         doAnswer(inv -> {
             final var channel = inv.<HTTPTransportChannel>getArgument(0);
-            channel.channel().pipeline().addLast(new HTTPServerSessionBootstrap(channel.scheme()) {
+            channel.channel().pipeline().addLast(new HTTPServerSessionBootstrap(channel.scheme(),
+                Uint32.valueOf(16384)) {
                 @Override
                 protected PipelinedHTTPServerSession configureHttp1(final ChannelHandlerContext ctx) {
                     return new PipelinedHTTPServerSession(scheme, CHUNK_SIZE) {
