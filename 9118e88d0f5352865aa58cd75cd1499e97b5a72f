@@ -33,6 +33,24 @@
       "message": "would it be possible to make this \ntype ssh-public-key-algorithm (module ietf-ssh-common)\nor use sshcmn:transport-params-grouping?\nto stay consistent with configuration.\n\nfor example by using KeyExchangePolicy to parse result of getNegotiatedKexParameter?",
       "revId": "9118e88d0f5352865aa58cd75cd1499e97b5a72f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d25414f3_9fcd77b7",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 6
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-07T12:52:32Z",
+      "side": 1,
+      "message": "I used type ssh-public-key-algorithm for leaf-s types\ntransport-params-grouping would create a list for each algorithm, which is not needed",
+      "parentUuid": "06179eaf_1d20ef50",
+      "revId": "9118e88d0f5352865aa58cd75cd1499e97b5a72f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
