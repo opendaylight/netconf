@@ -157,6 +157,24 @@
       "parentUuid": "4f24434c_69311d3a",
       "revId": "a4adfbd35beb3aae76fb23f5d628fef425efe190",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "256b9ae8_60181a94",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1694,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-01-07T13:23:44Z",
+      "side": 1,
+      "message": "I made this section more clear that it is meant to show available algorithms to chose from and what exact names to use when creating custom list of algorithms to be advertised.\n\nThe list which algorithms are advertised can be get by invoking GET request(line 1554).",
+      "parentUuid": "005946f2_e86d82de",
+      "revId": "a4adfbd35beb3aae76fb23f5d628fef425efe190",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
