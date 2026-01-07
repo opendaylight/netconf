@@ -16,6 +16,24 @@
       "message": "is this needed?",
       "revId": "cab8cda3cb95fce23eb118245e82bbc85dea9bb3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61b29554_dec61d65",
+        "filename": "apps/netconf-topology-singleton/pom.xml",
+        "patchSetId": 16
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-07T13:13:10Z",
+      "side": 1,
+      "message": "Yes, even when I just pass null as listener in test, maven still sees it as usage from transpor-api",
+      "parentUuid": "19c20d86_097a4ba5",
+      "revId": "cab8cda3cb95fce23eb118245e82bbc85dea9bb3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
