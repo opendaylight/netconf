@@ -134,6 +134,16 @@ public final class OSGiNorthbound {
                 """,
                 min = "1")
         int http$_$chunk$_$size() default 262144; // 256 KiB
+
+        @AttributeDefinition(
+            name = "HTTP/2 max frame size (bytes)",
+            description = """
+                Maximum HTTP/2 DATA frame payload size (SETTINGS_MAX_FRAME_SIZE) this server
+                is willing to accept from clients. If not overridden, the RFC7540 default
+                16384 is used. Valid range 16384–16777215.
+                """,
+            min = "16384", max = "16777215")
+        int http2$_$max$_$frame$_$size() default 16384; // 16 KiB
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
@@ -246,7 +256,8 @@ public final class OSGiNorthbound {
             Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
             Uint32.valueOf(configuration.heartbeat$_$interval()), configuration.api$_$root$_$path(),
             parseDefaultEncoding(configuration.default$_$encoding()), new HttpServerStackConfiguration(transport),
-            Uint32.valueOf(configuration.http$_$chunk$_$size()))
+            Uint32.valueOf(configuration.http$_$chunk$_$size()),
+            Uint32.valueOf(configuration.http2$_$max$_$frame$_$size()))
         );
     }
 

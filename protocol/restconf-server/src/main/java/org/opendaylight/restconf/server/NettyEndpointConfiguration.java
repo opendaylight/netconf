@@ -52,11 +52,12 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     private final @NonNull List<String> apiRootPath;
     private final @NonNull MessageEncoding defaultEncoding;
     private final @NonNull Uint32 chunkSize;
+    private final @NonNull Uint32 frameSize;
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
             final List<String> apiRootPath, final MessageEncoding defaultEncoding,
-            final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize) {
+            final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize) {
         super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
         this.transportConfiguration = requireNonNull(transportConfiguration);
         this.defaultEncoding = requireNonNull(defaultEncoding);
@@ -65,6 +66,12 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             throw new IllegalArgumentException("Chunks have to have at least one byte");
         }
         this.chunkSize = chunkSize;
+
+        if (frameSize.intValue() < 16384 || frameSize.intValue() > 16777215) {
+            throw new IllegalArgumentException("Frame size must be between 16 KiB (16384 bytes) and 16 MiB (16777215 "
+                + "bytes)");
+        }
+        this.frameSize = frameSize;
 
         if (apiRootPath.isEmpty()) {
             throw new IllegalArgumentException("empty apiRootPath");
@@ -78,15 +85,15 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
             final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration,
-            final Uint32 chunkSize) {
+            final Uint32 chunkSize, final Uint32 frameSize) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
-            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize);
+            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize);
     }
 
     @Beta
     public NettyEndpointConfiguration(final HttpServerStackGrouping transportConfiguration) {
         this(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO, Uint32.valueOf(10_000), "restconf",
-            MessageEncoding.JSON, transportConfiguration, Uint32.valueOf(262144));
+            MessageEncoding.JSON, transportConfiguration, Uint32.valueOf(262144), Uint32.valueOf(16384));
     }
 
     /**
@@ -169,6 +176,13 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
      */
     public Uint32 chunkSize() {
         return chunkSize;
+    }
+
+    /**
+     * {@return max size of HTTP/2 request frame}
+     */
+    public Uint32 frameSize() {
+        return frameSize;
     }
 
     @Override
