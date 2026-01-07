@@ -31,6 +31,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
     private final EndpointRoot root;
     private final Uint32 chunkSize;
+    private final Uint32 frameSize;
 
     RestconfTransportChannelListener(final RestconfServer server, final RestconfStream.Registry streamRegistry,
             final PrincipalService principalService, final NettyEndpointConfiguration configuration) {
@@ -62,6 +63,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
             new SubscriptionsResource(invariants, streamRegistry, heartbeatIntervalMillis, maximumFragmentLength)));
 
         chunkSize = configuration.chunkSize();
+        frameSize = configuration.frameSize();
 
         LOG.info("Initialized with service {}", server.getClass());
         LOG.info("Initialized with base path: {}, default encoding: {}, default pretty print: {}", restconf,
@@ -74,7 +76,8 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
     @Override
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
-        channel.channel().pipeline().addLast(new RestconfSessionBootstrap(channel.scheme(), root, chunkSize));
+        channel.channel().pipeline().addLast(new RestconfSessionBootstrap(channel.scheme(), root, chunkSize,
+            frameSize));
     }
 
     @Override
