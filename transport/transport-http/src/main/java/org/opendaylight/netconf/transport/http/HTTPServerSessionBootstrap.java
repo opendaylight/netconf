@@ -17,6 +17,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,14 +28,16 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
     private static final Logger LOG = LoggerFactory.getLogger(HTTPServerSessionBootstrap.class);
 
     protected final @NonNull HTTPScheme scheme;
+    protected final @NonNull Uint32 frameSize;
 
-    protected HTTPServerSessionBootstrap(final HTTPScheme scheme) {
+    protected HTTPServerSessionBootstrap(final HTTPScheme scheme, final Uint32 frameSize) {
         this.scheme = requireNonNull(scheme);
+        this.frameSize = frameSize;
     }
 
     @Override
     public final void handlerAdded(final ChannelHandlerContext ctx) {
-        scheme.initializeServerPipeline(ctx, buildHttp2ChildInitializer(ctx));
+        scheme.initializeServerPipeline(ctx, buildHttp2ChildInitializer(ctx), frameSize);
     }
 
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
