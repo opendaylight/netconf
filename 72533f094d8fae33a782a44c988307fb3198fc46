@@ -90,6 +90,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c05778b_8234d76e",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/RestconfStream.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 601,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-08T07:27:46Z",
+      "side": 1,
+      "message": "EventFilter now implements EventStreamFilter, so hierarchy should be corrected now",
+      "parentUuid": "07b5859e_fe0f1914",
+      "revId": "72533f094d8fae33a782a44c988307fb3198fc46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a8074064_4a69fdc4",
