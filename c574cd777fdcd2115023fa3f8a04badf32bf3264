@@ -54,6 +54,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ded4d3b8_07b08541",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 1686,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-09T15:21:16Z",
+      "side": 1,
+      "message": "https://github.com/apache/mina-sshd/blob/master/docs/standards.md",
+      "revId": "c574cd777fdcd2115023fa3f8a04badf32bf3264",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4ed25d46_859434bf",
         "filename": "docs/user-guide.rst",
         "patchSetId": 9
