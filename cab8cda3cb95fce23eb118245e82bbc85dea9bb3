@@ -34,6 +34,24 @@
       "parentUuid": "19c20d86_097a4ba5",
       "revId": "cab8cda3cb95fce23eb118245e82bbc85dea9bb3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52e82ab0_e29617da",
+        "filename": "apps/netconf-topology-singleton/pom.xml",
+        "patchSetId": 16
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-09T15:53:54Z",
+      "side": 1,
+      "message": "interesting, since there is already another one from that package, can you try again?",
+      "parentUuid": "61b29554_dec61d65",
+      "revId": "cab8cda3cb95fce23eb118245e82bbc85dea9bb3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
