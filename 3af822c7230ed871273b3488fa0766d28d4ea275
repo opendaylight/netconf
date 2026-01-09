@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6193e1c7_5095920c",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-09T15:48:51Z",
+      "side": 1,
+      "message": "why we lost nonnullbydefault?",
+      "revId": "3af822c7230ed871273b3488fa0766d28d4ea275",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5102a36_0be032f9",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/XPathEventFilter.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-09T15:48:51Z",
+      "side": 1,
+      "message": "why false? is it implemeted?",
+      "revId": "3af822c7230ed871273b3488fa0766d28d4ea275",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
