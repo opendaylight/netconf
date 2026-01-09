@@ -34,6 +34,23 @@
       "parentUuid": "62e45efb_5db7509e",
       "revId": "ff76038ad7df1dc6e7f026f82c93bc79ba89bb9e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cb3aadb_ec8f6e08",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-09T14:13:26Z",
+      "side": 0,
+      "message": "why retain is removed?",
+      "revId": "ff76038ad7df1dc6e7f026f82c93bc79ba89bb9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
