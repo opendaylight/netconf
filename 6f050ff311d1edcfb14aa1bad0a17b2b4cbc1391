@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e674e9f5_ffc67058",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-09T13:06:08Z",
+      "side": 1,
+      "message": "https://cbea.ms/git-commit/#imperative",
+      "revId": "6f050ff311d1edcfb14aa1bad0a17b2b4cbc1391",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61d9ab62_aab446f3",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-09T13:06:08Z",
+      "side": 1,
+      "message": "nullable?",
+      "revId": "6f050ff311d1edcfb14aa1bad0a17b2b4cbc1391",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
