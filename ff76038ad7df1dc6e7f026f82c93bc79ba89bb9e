@@ -51,6 +51,24 @@
       "message": "why retain is removed?",
       "revId": "ff76038ad7df1dc6e7f026f82c93bc79ba89bb9e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22a87fdf_beafab61",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-01-09T22:38:50Z",
+      "side": 0,
+      "message": "`retain()` was only needed in the old implementation because we manually re-fired `upgrade.upgradeRequest()` down the pipeline (`ctx.fireChannelRead(...)`), so we had to bump the refcount to prevent the request from being released by the upgrade flow. With Http2ServerUpgradeCodec + Http2MultiplexHandler, Netty delivers the upgrade request as HTTP/2 stream 1 automatically, and we no longer re-inject the request, so there’s nothing to retain.",
+      "parentUuid": "8cb3aadb_ec8f6e08",
+      "revId": "ff76038ad7df1dc6e7f026f82c93bc79ba89bb9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
