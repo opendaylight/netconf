@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2084c11c_8346757c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-01-09T13:04:22Z",
+      "side": 1,
+      "message": "[ERROR] src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java:[44,13] (coding) MissingSwitchDefault: switch without \"default\" clause.",
+      "parentUuid": "9544c618_38e26bf8",
+      "revId": "06641ee197c451c7a2bc1acd61f546067d51d06e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ee3d1bac_e576fc0f",
         "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HttpClientServerTest.java",
         "patchSetId": 17
