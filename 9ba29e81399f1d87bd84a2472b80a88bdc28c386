@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "9ba29e81399f1d87bd84a2472b80a88bdc28c386",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebcd410c_61b1521c",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-09T15:43:12Z",
+      "side": 1,
+      "message": "IMO, the whole container can be config\u003dfalse",
+      "revId": "9ba29e81399f1d87bd84a2472b80a88bdc28c386",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ac85a06_dd925f9c",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-09T15:43:12Z",
+      "side": 1,
+      "message": "IMO there is not the same type for every leaf, see:\nhttps://github.com/opendaylight/ietf/blob/v1.0.2/model/rfc/rfc9644-ietf-ssh-common/src/main/yang/ietf-ssh-common%402024-10-10.yang#L252",
+      "revId": "9ba29e81399f1d87bd84a2472b80a88bdc28c386",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
