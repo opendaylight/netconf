@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e975f2c5_50983d44",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-09T14:22:48Z",
+      "side": 1,
+      "message": "See https://lf-opendaylight.atlassian.net/browse/NETCONF-1497?focusedCommentId\u003d51624",
+      "revId": "b510b07ca9bcb1b0b69e9ecdba4335afe2945c27",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
