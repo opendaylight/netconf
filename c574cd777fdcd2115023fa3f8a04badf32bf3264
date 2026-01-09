@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "234c674e_040577be",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 1547,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-09T14:48:42Z",
+      "side": 1,
+      "message": ", too.",
+      "revId": "c574cd777fdcd2115023fa3f8a04badf32bf3264",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f31475a4_2e6cb20f",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 1685,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-09T14:48:42Z",
+      "side": 1,
+      "message": "too long lines",
+      "revId": "c574cd777fdcd2115023fa3f8a04badf32bf3264",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89833ec2_188383d3",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 1686,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-09T14:48:42Z",
+      "side": 1,
+      "message": "separate with line\n\n\u003cline\u003e\nNot all ...",
+      "revId": "c574cd777fdcd2115023fa3f8a04badf32bf3264",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ed25d46_859434bf",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 1709,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-09T14:48:42Z",
+      "side": 1,
+      "message": "wrong node-id",
+      "revId": "c574cd777fdcd2115023fa3f8a04badf32bf3264",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0fe53bd4_3be226a8",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 1797,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-09T14:48:42Z",
+      "side": 1,
+      "message": "immediate reconnection",
+      "revId": "c574cd777fdcd2115023fa3f8a04badf32bf3264",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
