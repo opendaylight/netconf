@@ -33,7 +33,7 @@ public class NC1440Test extends AbstractOpenApiTest {
 
     @BeforeEach
     @Override
-    void beforeEach() throws Exception {
+    protected void beforeEach() throws Exception {
         super.beforeEach();
         // topology
         topologyService = setupTopology();
@@ -50,7 +50,7 @@ public class NC1440Test extends AbstractOpenApiTest {
 
     @AfterEach
     @Override
-    void afterEach() throws Exception {
+    protected void afterEach() throws Exception {
         if (deviceSimulator != null) {
             deviceSimulator.close();
             deviceSimulator = null;
