@@ -112,18 +112,18 @@ import org.slf4j.LoggerFactory;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 
-abstract class AbstractE2ETest extends AbstractDataBrokerTest {
-    static final JSONParserConfiguration JSON_PARSER_CONFIGURATION = new JSONParserConfiguration().withStrictMode();
-
+public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractE2ETest.class);
-    private static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
-    private static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
-    private static final String USERNAME = "username";
-    private static final String PASSWORD = "pa$$w0Rd";
     private static final Map<String, String> NS_CONTEXT = Map.of("r", "urn:ietf:params:xml:ns:yang:ietf-restconf");
     private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
     private static final Uint32 FRAME_SIZE = Uint32.valueOf(16384);
 
+    protected static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
+        new JSONParserConfiguration().withStrictMode();
+    protected static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
+    protected static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
+    protected static final String USERNAME = "username";
+    protected static final String PASSWORD = "pa$$w0Rd";
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String APPLICATION_XML = "application/xml";
 
@@ -133,15 +133,15 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected HttpClientStackGrouping clientStackGrouping;
     protected HttpClientStackGrouping invalidClientStackGrouping;
     protected DOMMountPointService domMountPointService;
-    private DOMRpcRouter domRpcRouter;
     protected RpcProviderService rpcProviderService;
     protected ActionProviderService actionProviderService;
+    protected String host;
 
     protected volatile EventStreamService clientStreamService;
     protected volatile EventStreamService.StreamControl streamControl;
 
+    private DOMRpcRouter domRpcRouter;
     private SimpleNettyEndpoint endpoint;
-    private String host;
     private DOMNotificationRouter domNotificationRouter;
     private MdsalRestconfStreamRegistry streamRegistry;
 
@@ -153,7 +153,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     }
 
     @BeforeEach
-    void beforeEach() throws Exception {
+    protected void beforeEach() throws Exception {
         // transport configuration
         final var port = randomBindablePort();
         host = localAddress + ":" + port;
@@ -232,7 +232,7 @@ abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     }
 
     @AfterEach
-    void afterEach() throws Exception {
+     protected void afterEach() throws Exception {
         endpoint.close();
         streamRegistry.close();
         domNotificationRouter.close();
