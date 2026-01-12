@@ -1,30 +1,29 @@
 /*
- * Copyright (c) 2024 PANTHEON.tech s.r.o. and others. All rights reserved.
+ * Copyright (c) 2026 PANTHEON.tech s.r.o. and others. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.it.server;
+package org.opendaylight.restconf.it.server.http2;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.ssl.SslContextBuilder;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
@@ -40,14 +39,13 @@ import org.opendaylight.netconf.topology.impl.NetconfTopologyImpl;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactoryImpl;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.it.server.NullAAAEncryptionService;
 import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 
-class MountPointE2ETest extends AbstractE2ETest {
+class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
     private static final YangModuleInfo DEVICE_YANG_MODEL =
         org.opendaylight.yang.svc.v1.test.device.simulator.rev240917.YangModuleInfoImpl.getInstance();
     private static final YangModuleInfo NOTIFICATION_MODEL = org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns
@@ -131,12 +129,20 @@ class MountPointE2ETest extends AbstractE2ETest {
                     }]
                 }
             }""";
-        var response = invokeRequest(HttpMethod.POST, DEVICE_MOUNT_URI, APPLICATION_JSON, initialData);
-        assertEquals(HttpResponseStatus.CREATED, response.status());
+
+        var response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri(DEVICE_MOUNT_URI))
+            .POST(HttpRequest.BodyPublishers.ofString(initialData))
+            .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
+            .build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpClient.Version.HTTP_2, response.version());
+        assertEquals(HttpResponseStatus.CREATED.code(), response.statusCode());
         assertContentJson(DEVICE_DATA_ROOT_URI, initialData);
 
         // update (merge)
-        response = invokeRequest(HttpMethod.PATCH, DEVICE_DATA_ROOT_URI, APPLICATION_JSON, """
+        response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri(DEVICE_DATA_ROOT_URI))
+            .method("PATCH", HttpRequest.BodyPublishers.ofString("""
             {
                 "device-sim:data-root": {
                     "properties" : [{
@@ -144,8 +150,11 @@ class MountPointE2ETest extends AbstractE2ETest {
                         "value" : "value-updated"
                     }]
                 }
-            }""");
-        assertEquals(HttpResponseStatus.OK, response.status());
+            }"""))
+            .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
+            .build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpResponseStatus.OK.code(), response.statusCode());
+        assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertContentJson(DEVICE_DATA_ROOT_URI, """
             {
                 "device-sim:data-root": {
@@ -169,86 +178,30 @@ class MountPointE2ETest extends AbstractE2ETest {
                     }]
                 }
             }""";
-        response = invokeRequest(HttpMethod.PUT, DEVICE_DATA_ROOT_URI, APPLICATION_JSON, replaceData);
-        assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
+        response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri(DEVICE_DATA_ROOT_URI))
+            .PUT(HttpRequest.BodyPublishers.ofString(replaceData))
+            .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
+            .build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpResponseStatus.NO_CONTENT.code(), response.statusCode());
+        assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertContentJson(DEVICE_DATA_ROOT_URI, replaceData);
 
         // delete
-        response = invokeRequest(HttpMethod.DELETE, DEVICE_DATA_ROOT_URI);
-        assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
+        response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri(DEVICE_DATA_ROOT_URI))
+            .DELETE()
+            .build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpResponseStatus.NO_CONTENT.code(), response.statusCode());
+        assertEquals(HttpClient.Version.HTTP_2, response.version());
+
         // validate deleted
-        response = invokeRequest(HttpMethod.GET, DEVICE_DATA_ROOT_URI);
+        response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri(DEVICE_DATA_ROOT_URI))
+            .GET()
+            .build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
-    }
-
-    @Disabled
-    @Test
-    void notificationStreamJsonTest() throws Exception {
-        startDeviceSimulator(false);
-        mountDeviceJson();
-
-        var response = invokeRequest(HttpMethod.POST, """
-            /rests/operations/network-topology:network-topology/topology=topology-netconf/node=device-sim\
-            /yang-ext:mount/notifications:create-subscription""",
-            APPLICATION_JSON, """
-                {
-                   "input": {
-                       "stream": "NETCONF"
-                   }
-                }""");
-        assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
-
-        // create notification stream
-        response = invokeRequest(HttpMethod.POST,
-            "/rests/operations/odl-device-notification:subscribe-device-notification",
-            APPLICATION_JSON, """
-                {
-                    "input": {
-                        "path": "/network-topology:network-topology/topology[topology-id='topology-netconf']\
-                /node[node-id='device-sim']"
-                    }
-                }""");
-        assertEquals(HttpResponseStatus.OK, response.status());
-        //  {
-        //      "odl-device-notification:output": {
-        //          "stream-name": "urn:uuid:01a56682-f2ab-419f-8a77-9cf995a52220"
-        //      }
-        //  }
-        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8), JSON_PARSER_CONFIGURATION);
-        final var streamName = json.getJSONObject("odl-device-notification:output").getString("stream-name");
-        assertNotNull(streamName, "Stream name is undefined");
-
-        // get stream URL from restconf-state
-        final var streamUrl = getStreamUrlJson(streamName);
-        assertNotNull(streamUrl, "Stream URL not found");
-
-        // start stream
-        final var streamClient = startStreamClient();
-        try {
-            final var eventListener = startStream(streamUrl.getPath());
-
-            // NB: testing single predefined event with 2 sec delay
-            // due to device simulator starts sending events immediately after subscription
-            // so restconf server may drop events occurred in interval between stream start
-            // via netconf and actual consumption via restconf.
-            // Also devise simulator does not respect defined events order.
-
-            JSONAssert.assertEquals("""
-                {
-                    "ietf-restconf:notification": {
-                        "device-sim:device-event": {
-                            "event-message": "Event message"
-                        }
-                    }
-                }""", eventListener.readNext(), JSONCompareMode.LENIENT);
-
-            // terminate stream
-            streamControl.close();
-            await().atMost(Duration.ofSeconds(1)).until(eventListener::ended);
-
-        } finally {
-            streamClient.shutdown().get(2, TimeUnit.SECONDS);
-        }
     }
 
     @Test
@@ -257,8 +210,7 @@ class MountPointE2ETest extends AbstractE2ETest {
         mountDeviceJson();
 
         // CRUD
-        var response = invokeRequest(HttpMethod.PATCH, DEVICE_DATA_ROOT_URI, MediaTypes.APPLICATION_YANG_PATCH_JSON,
-            MediaTypes.APPLICATION_YANG_DATA_JSON, """
+        var body = """
             {
                 "ietf-yang-patch:yang-patch" : {
                     "patch-id" : "patch1",
@@ -299,8 +251,15 @@ class MountPointE2ETest extends AbstractE2ETest {
                         }
                     ]
                 }
-            }""");
-        assertEquals(HttpResponseStatus.OK, response.status());
+            }""";
+        var response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri(DEVICE_DATA_ROOT_URI))
+            .method("PATCH", HttpRequest.BodyPublishers.ofString(body))
+            .header(HttpHeaderNames.ACCEPT.toString(), MediaTypes.APPLICATION_YANG_DATA_JSON)
+            .header(HttpHeaderNames.CONTENT_TYPE.toString(), MediaTypes.APPLICATION_YANG_PATCH_JSON)
+            .build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpResponseStatus.OK.code(), response.statusCode());
+        assertEquals(HttpClient.Version.HTTP_2, response.version());
 
         // read (validate result)
         assertContentJson(DEVICE_DATA_ROOT_URI, """
@@ -365,17 +324,27 @@ class MountPointE2ETest extends AbstractE2ETest {
                }]
             }
             """.formatted(localAddress, devicePort, DEVICE_USERNAME, DEVICE_PASSWORD);
-        final var response = invokeRequest(HttpMethod.POST, TOPOLOGY_URI, APPLICATION_JSON, input);
-        assertEquals(HttpResponseStatus.CREATED, response.status());
+
+        final var response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri(TOPOLOGY_URI))
+            .POST(HttpRequest.BodyPublishers.ofString(input))
+            .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
+            .build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpResponseStatus.CREATED.code(), response.statusCode());
+        assertEquals(HttpClient.Version.HTTP_2, response.version());
         // wait till connected
         await().atMost(Duration.ofSeconds(5)).pollInterval(Duration.ofMillis(500))
             .until(this::deviceConnectedJson);
     }
 
     private boolean deviceConnectedJson() throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, DEVICE_STATUS_URI);
-        assertEquals(HttpResponseStatus.OK, response.status());
-        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8), JSON_PARSER_CONFIGURATION);
+        final var response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri(DEVICE_STATUS_URI))
+            .GET()
+            .build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpResponseStatus.OK.code(), response.statusCode());
+        assertEquals(HttpClient.Version.HTTP_2, response.version());
+        final var json = new JSONObject(response.body(), JSON_PARSER_CONFIGURATION);
         //{
         //  "netconf-node-topology:netconf-node": {
         //    "connection-status": "connected"
