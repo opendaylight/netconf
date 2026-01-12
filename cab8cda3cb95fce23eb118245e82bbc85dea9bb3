@@ -52,6 +52,24 @@
       "parentUuid": "61b29554_dec61d65",
       "revId": "cab8cda3cb95fce23eb118245e82bbc85dea9bb3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bf13075_ba9934cd",
+        "filename": "apps/netconf-topology-singleton/pom.xml",
+        "patchSetId": 16
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-12T12:02:43Z",
+      "side": 1,
+      "message": "without it we are getting this error from maven build:\n Used undeclared dependencies found:\n    org.opendaylight.netconf:transport-api:jar:10.0.3-SNAPSHOT:compile\n Non-test scoped test only dependencies found:\n    org.opendaylight.netconf:transport-api:jar:10.0.3-SNAPSHOT:compile",
+      "parentUuid": "52e82ab0_e29617da",
+      "revId": "cab8cda3cb95fce23eb118245e82bbc85dea9bb3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
