@@ -101,7 +101,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-class AbstractOpenApiTest extends AbstractDataBrokerTest {
+public class AbstractOpenApiTest extends AbstractDataBrokerTest {
     private static final JSONParserConfiguration JSON_PARSER_CONFIGURATION = new JSONParserConfiguration()
         .withStrictMode();
 
@@ -155,7 +155,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
     }
 
     @BeforeEach
-    void beforeEach() throws Exception {
+    protected void beforeEach() throws Exception {
         // transport configuration
         port = randomBindablePort();
         host = localAddress + ":" + port;
@@ -234,7 +234,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
     }
 
     @AfterEach
-    void afterEach() throws Exception {
+    protected void afterEach() throws Exception {
         endpoint.close();
         streamRegistry.close();
         domNotificationRouter.close();
@@ -351,7 +351,7 @@ class AbstractOpenApiTest extends AbstractDataBrokerTest {
         JSONAssert.assertEquals(expectedContent, content, JSONCompareMode.LENIENT);
     }
 
-    NetconfTopologyImpl setupTopology() {
+    protected NetconfTopologyImpl setupTopology() {
         final var dataBroker = getDataBroker();
         final var netconfTimer = new DefaultNetconfTimer();
         final var encryptionService = new NullAAAEncryptionService();
