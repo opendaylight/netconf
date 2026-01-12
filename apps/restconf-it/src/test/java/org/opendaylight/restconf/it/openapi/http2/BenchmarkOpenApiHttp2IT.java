@@ -1,18 +1,16 @@
 /*
- * Copyright (c) 2024 PANTHEON.tech s.r.o. and others. All rights reserved.
+ * Copyright (c) 2026 PANTHEON.tech s.r.o. and others. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.it.openapi;
+package org.opendaylight.restconf.it.openapi.http2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
-import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -25,7 +23,7 @@ import org.opendaylight.netconf.test.tool.NetconfDeviceSimulator;
 import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
 import org.opendaylight.netconf.topology.impl.NetconfTopologyImpl;
 
-public class BenchmarkOpenApiIT extends AbstractOpenApiTest {
+public class BenchmarkOpenApiHttp2IT extends AbstractOpenApiHttp2Test {
     private NetconfDeviceSimulator deviceSimulator;
     private NetconfTopologyImpl topologyService;
     private int devicePort;
@@ -56,36 +54,65 @@ public class BenchmarkOpenApiIT extends AbstractOpenApiTest {
     void benchmarkTest() throws Exception {
         startDeviceSimulator();
         mountDeviceJson(devicePort);
-        final var client = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_1_1)
-            .authenticator(new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(
-                        USERNAME,
-                        PASSWORD.toCharArray());
-                }
-            })
-            .build();
 
         // Due to size of the response, we discard the body.
-        final var headers = client.send(HttpRequest.newBuilder()
+        final var headers = http2Client.send(HttpRequest.newBuilder()
             .GET()
-            .uri(new URI("http://" + host + API_V3_PATH + "/mounts/1"))
+            .uri(createApiUri("/mounts/1"))
             .timeout(Duration.ofMinutes(5))
             .build(), HttpResponse.BodyHandlers.discarding());
-        assertEquals(200, headers.statusCode());
-        assertEquals("chunked", headers.headers().firstValue("Transfer-Encoding").orElseThrow());
 
-        final var response = client.send(HttpRequest.newBuilder()
+        assertEquals(200, headers.statusCode());
+        assertEquals(HttpClient.Version.HTTP_2, headers.version());
+
+        final var response = http2Client.send(HttpRequest.newBuilder()
             .GET()
-            .uri(new URI("http://" + host + API_V3_PATH + "/mounts/1?depth=1&width=1"))
+            .uri(createApiUri("/mounts/1?depth=1&width=1"))
             .build(), HttpResponse.BodyHandlers.ofString());
+
         assertEquals(200, response.statusCode());
+        assertEquals(HttpClient.Version.HTTP_2, response.version());
         // The response is still too large for whole comparison, so just check some random rpc, to verify the data
         assertTrue(response.body().contains("junos-conf-root:configuration"));
         assertTrue(response.body().contains("junos-rpc-services:get-l2tp-disconnect-cause-summary"));
         assertTrue(response.body().contains("junos-rpc-unified-edge_get-sgw-cac-statistics_input"));
+    }
+
+    @Test
+    void multiplexingTest() throws Exception {
+        startDeviceSimulator();
+        mountDeviceJson(devicePort);
+
+        final var request = HttpRequest.newBuilder()
+            .GET()
+            .uri(createApiUri("/mounts/1"))
+            .timeout(Duration.ofMinutes(3))
+            .build();
+
+        // Send two request for junos models asynchronously
+        final var response1 = http2Client.sendAsync(request, HttpResponse.BodyHandlers.discarding());
+        final var response2 = http2Client.sendAsync(request, HttpResponse.BodyHandlers.discarding());
+
+        // Send request for single
+        final var response = http2Client.send(HttpRequest.newBuilder()
+            .GET()
+            .uri(createApiUri("/single"))
+            .timeout(Duration.ofMinutes(5))
+            .build(), HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(200, response.statusCode());
+        assertEquals(HttpClient.Version.HTTP_2, response.version());
+
+        // Assert junos responses are not done yet, implying that previous request was done
+        // while these were still in progress
+        assertFalse(response1.isDone());
+        assertFalse(response2.isDone());
+
+        // Wait for junos responses and check their success
+        response1.join();
+        response2.join();
+        assertEquals(200, response1.get().statusCode());
+        assertEquals(200, response2.get().statusCode());
     }
 
     private void startDeviceSimulator() {
