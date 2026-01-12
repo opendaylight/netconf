@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab283be1_9bc80c00",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-12T13:48:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ebcd410c_61b1521c",
+      "revId": "9ba29e81399f1d87bd84a2472b80a88bdc28c386",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4ac85a06_dd925f9c",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-01-09T15:43:12Z",
       "side": 1,
       "message": "IMO there is not the same type for every leaf, see:\nhttps://github.com/opendaylight/ietf/blob/v1.0.2/model/rfc/rfc9644-ietf-ssh-common/src/main/yang/ietf-ssh-common%402024-10-10.yang#L252",
+      "revId": "9ba29e81399f1d87bd84a2472b80a88bdc28c386",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "034c63d9_ac85485e",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-12T13:48:31Z",
+      "side": 1,
+      "message": "corrected",
+      "parentUuid": "4ac85a06_dd925f9c",
       "revId": "9ba29e81399f1d87bd84a2472b80a88bdc28c386",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
