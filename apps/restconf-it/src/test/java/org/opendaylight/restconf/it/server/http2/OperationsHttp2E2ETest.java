@@ -1,16 +1,20 @@
 /*
- * Copyright (c) 2024 PANTHEON.tech s.r.o. and others. All rights reserved.
+ * Copyright (c) 2026 PANTHEON.tech s.r.o. and others. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.it.server;
+package org.opendaylight.restconf.it.server.http2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,10 +22,11 @@ import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.eos.dom.simple.SimpleDOMEntityOwnershipService;
 import org.opendaylight.mdsal.singleton.impl.EOSClusterSingletonServiceProvider;
 import org.opendaylight.netconf.keystore.legacy.impl.DefaultNetconfKeystoreService;
+import org.opendaylight.restconf.it.server.NullAAAEncryptionService;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
-class OperationsE2ETest extends AbstractE2ETest {
+class OperationsHttp2E2ETest extends AbstractHttp2E2ETest {
     private static final String OPERATIONS_URI = "/rests/operations";
     private static final String SUBSCRIBE_DEVICE_NOTIFICATIONS_URI =
         OPERATIONS_URI + "/odl-device-notification:subscribe-device-notification";
@@ -73,8 +78,7 @@ class OperationsE2ETest extends AbstractE2ETest {
 
     @Test
     void createKeystoreEntryTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.POST, ADD_KEYSTORE_ENTRY,
-            APPLICATION_XML, """
+        final var body = """
             <input xmlns="urn:opendaylight:netconf:keystore">
                 <key-credential>
                     <key-id>key-id</key-id>
@@ -107,8 +111,15 @@ class OperationsE2ETest extends AbstractE2ETest {
             -----END RSA PRIVATE KEY-----</private-key>
                     <passphrase></passphrase>
                 </key-credential>
-            </input>""");
-        assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
+            </input>""";
+        final var response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri(ADD_KEYSTORE_ENTRY))
+            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_XML)
+            .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_XML)
+            .build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpResponseStatus.NO_CONTENT.code(), response.statusCode());
+        assertEquals(HttpClient.Version.HTTP_2, response.version());
 
         // validate content
         assertContentXml("/rests/data/netconf-keystore:keystore/key-credential=key-id", """
@@ -141,63 +152,75 @@ class OperationsE2ETest extends AbstractE2ETest {
 
     @Test
     void invalidOperationErrorXMLTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.POST,
-            "/rests/operations/netconf-keystore:invalid-operation",
-            APPLICATION_XML, """
-                <input xmlns="urn:opendaylight:netconf:keystore" />""");
+        final var response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri("/rests/operations/netconf-keystore:invalid-operation"))
+            .POST(HttpRequest.BodyPublishers.ofString("<input xmlns=\"urn:opendaylight:netconf:keystore\" />"))
+            .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_XML)
+            .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_XML)
+            .build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertErrorResponseXml(response, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
 
     @Test
     void missingDataErrorXmlTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.POST,
-            ADD_KEYSTORE_ENTRY,
-            APPLICATION_XML,
-            """
+        final var response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri(ADD_KEYSTORE_ENTRY))
+            .POST(HttpRequest.BodyPublishers.ofString("""
                 <input xmlns="urn:opendaylight:netconf:keystore">
                     <key-credential>
                         <key-id>key-id</key-id>
                         <passphrase></passphrase>
                     </key-credential>
-                </input>""");
+                </input>"""))
+            .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_XML)
+            .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_XML)
+            .build(), HttpResponse.BodyHandlers.ofString());
         assertErrorResponseXml(response, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
     }
 
     @Test
     void invalidDataErrorXmlTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.POST,
-            ADD_KEYSTORE_ENTRY,
-            APPLICATION_XML,
-            """
+        final var response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri(ADD_KEYSTORE_ENTRY))
+            .POST(HttpRequest.BodyPublishers.ofString("""
                 <input xmlns="urn:opendaylight:netconf:keystore">
                     <key-credential>
                         <key-id>key-id</key-id>
                         <private-key>bad-content</private-key>
                         <passphrase></passphrase>
                     </key-credential>
-                </input>""");
+                </input>"""))
+            .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_XML)
+            .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_XML)
+            .build(), HttpResponse.BodyHandlers.ofString());
         assertErrorResponseXml(response, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
     }
 
     @Test
     void invalidMediaTypeTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.POST, ADD_KEYSTORE_ENTRY, WRONG_TYPE,"""
-                <input xmlns="urn:opendaylight:netconf:keystore" />""");
-        assertEquals(HttpResponseStatus.NOT_ACCEPTABLE, response.status());
+        final var response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri(ADD_KEYSTORE_ENTRY))
+            .POST(HttpRequest.BodyPublishers.ofString("<input xmlns=\"urn:opendaylight:netconf:keystore\" />"))
+            .header(HttpHeaderNames.CONTENT_TYPE.toString(), WRONG_TYPE)
+            .header(HttpHeaderNames.ACCEPT.toString(), WRONG_TYPE)
+            .build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpResponseStatus.NOT_ACCEPTABLE.code(), response.statusCode());
     }
 
     @Test
     void unimplementedRpcErrorTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.POST,
-            "/rests/operations/example-jukebox:play",
-            APPLICATION_JSON,
-            """
+        final var response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri("/rests/operations/example-jukebox:play"))
+            .POST(HttpRequest.BodyPublishers.ofString("""
                 {
                     "input": {
                         "playlist": "playlist name",
                         "song-number": 1
                     }
-                }""");
+                }"""))
+            .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
+            .build(), HttpResponse.BodyHandlers.ofString());
         assertErrorResponseJson(response, ErrorType.RPC, ErrorTag.OPERATION_FAILED);
     }
 

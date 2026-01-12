@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2024 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ * Copyright (c) 2026 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.it.openapi;
+package org.opendaylight.restconf.it.openapi.http2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
@@ -28,7 +30,7 @@ import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-class MountPointDocumentTest extends AbstractOpenApiTest {
+class MountPointDocumentHttp2Test extends AbstractOpenApiHttp2Test {
     private static final YangModuleInfo TOASTER_YANG_MODEL =
         org.opendaylight.yang.svc.v1.http.netconfcentral.org.ns.toaster.rev091120.YangModuleInfoImpl.getInstance();
     private static final YangModuleInfo TOASTER_OLD_YANG_MODEL =
@@ -73,10 +75,15 @@ class MountPointDocumentTest extends AbstractOpenApiTest {
     void getMountDocTest() throws Exception {
         final var expectedJson = getExpectedDoc("openapi-documents/device-all.json");
 
-        final var response = invokeRequest(HttpMethod.GET, API_V3_PATH + "/mounts/1");
-        assertEquals(HttpResponseStatus.OK, response.status());
+        final var response = http2Client.send(HttpRequest.newBuilder()
+            .GET()
+            .uri(createApiUri("/mounts/1"))
+            .build(), HttpResponse.BodyHandlers.ofString());
 
-        final var resultDoc = response.content().toString(StandardCharsets.UTF_8);
+        assertEquals(HttpResponseStatus.OK.code(), response.statusCode());
+        assertEquals(HttpClient.Version.HTTP_2, response.version());
+
+        final var resultDoc = response.body();
         JSONAssert.assertEquals(expectedJson, resultDoc, JSONCompareMode.NON_EXTENSIBLE);
     }
 
@@ -87,12 +94,17 @@ class MountPointDocumentTest extends AbstractOpenApiTest {
     @MethodSource
     void getMountDocByModuleTest(final String revision, final String jsonPath) throws Exception {
         final var expectedJson = getExpectedDoc("openapi-documents/" + jsonPath);
-        final var uri = API_V3_PATH + "/mounts/1/" + TOASTER + "?revision=" + revision;
+        final var uri = "/mounts/1/" + TOASTER + "?revision=" + revision;
 
-        final var response = invokeRequest(HttpMethod.GET, uri);
-        assertEquals(HttpResponseStatus.OK, response.status());
+        final var response = http2Client.send(HttpRequest.newBuilder()
+            .GET()
+            .uri(createApiUri(uri))
+            .build(), HttpResponse.BodyHandlers.ofString());
 
-        final var resultDoc = response.content().toString(StandardCharsets.UTF_8);
+        assertEquals(HttpResponseStatus.OK.code(), response.statusCode());
+        assertEquals(HttpClient.Version.HTTP_2, response.version());
+
+        final var resultDoc = response.body();
         JSONAssert.assertEquals(fillPort(expectedJson, port), resultDoc, JSONCompareMode.NON_EXTENSIBLE);
     }
 
@@ -120,7 +132,7 @@ class MountPointDocumentTest extends AbstractOpenApiTest {
 
     private static String getExpectedDoc(final String jsonPath) throws Exception {
         return MAPPER.writeValueAsString(MAPPER.readTree(
-            MountPointDocumentTest.class.getClassLoader().getResourceAsStream(jsonPath)));
+            MountPointDocumentHttp2Test.class.getClassLoader().getResourceAsStream(jsonPath)));
     }
 
     protected void startDeviceSimulator() {
@@ -130,7 +142,6 @@ class MountPointDocumentTest extends AbstractOpenApiTest {
             .setDeviceCount(1)
             .setSsh(true)
             .setAuthProvider((usr, pwd) -> DEVICE_USERNAME.equals(usr) && DEVICE_PASSWORD.equals(pwd))
-            .setMdSal(true)
             .setModels(Set.of(TOASTER_YANG_MODEL, TOASTER_OLD_YANG_MODEL));
         deviceSimulator = new NetconfDeviceSimulator(configBuilder.build());
         deviceSimulator.start();
