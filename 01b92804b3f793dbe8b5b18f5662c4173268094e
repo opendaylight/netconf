@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "16401c6c_b58ebfdc",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-01-12T09:03:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d69ef53_ceb25403",
+      "revId": "01b92804b3f793dbe8b5b18f5662c4173268094e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f0446dce_5e6b81e9",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a666c6e7_4927d75f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-01-12T09:03:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0446dce_5e6b81e9",
+      "revId": "01b92804b3f793dbe8b5b18f5662c4173268094e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "14f67545_9eea9216",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-01-09T14:10:27Z",
       "side": 1,
       "message": "add 4 more spaces",
+      "revId": "01b92804b3f793dbe8b5b18f5662c4173268094e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84227a95_d65f4d96",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HttpClientServerTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-01-12T09:03:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14f67545_9eea9216",
       "revId": "01b92804b3f793dbe8b5b18f5662c4173268094e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
