@@ -16,6 +16,24 @@
       "message": "can we use generated YANG types according to model?",
       "revId": "0156bd16d7ad191d5978f9cdf1844eefa59716bb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4e66da9_47feeef6",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/api/NegotiatedSshAlg.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-12T09:42:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "706356ac_52f9e81f",
+      "revId": "0156bd16d7ad191d5978f9cdf1844eefa59716bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
