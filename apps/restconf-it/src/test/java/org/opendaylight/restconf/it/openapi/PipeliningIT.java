@@ -28,14 +28,14 @@ class PipeliningIT extends AbstractOpenApiTest {
 
     @BeforeEach
     @Override
-    void beforeEach() throws Exception {
+    protected void beforeEach() throws Exception {
         super.beforeEach();
         topologyService = setupTopology();
     }
 
     @AfterEach
     @Override
-    void afterEach() throws Exception {
+    protected void afterEach() throws Exception {
         if (deviceSimulator != null) {
             deviceSimulator.close();
             deviceSimulator = null;
