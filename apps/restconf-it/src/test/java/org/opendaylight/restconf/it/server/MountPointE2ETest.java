@@ -73,7 +73,7 @@ class MountPointE2ETest extends AbstractE2ETest {
 
     @BeforeEach
     @Override
-    void beforeEach() throws Exception {
+    protected void beforeEach() throws Exception {
         super.beforeEach();
 
         // topology
@@ -96,7 +96,7 @@ class MountPointE2ETest extends AbstractE2ETest {
 
     @AfterEach
     @Override
-    void afterEach() throws Exception {
+    protected void afterEach() throws Exception {
         if (deviceSimulator != null) {
             deviceSimulator.close();
             deviceSimulator = null;

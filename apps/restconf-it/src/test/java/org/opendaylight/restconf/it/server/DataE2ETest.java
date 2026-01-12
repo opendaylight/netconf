@@ -47,7 +47,7 @@ class DataE2ETest extends AbstractE2ETest {
 
     @BeforeEach
     @Override
-    void beforeEach() throws Exception {
+    protected void beforeEach() throws Exception {
         super.beforeEach();
         resetDataNode();
     }

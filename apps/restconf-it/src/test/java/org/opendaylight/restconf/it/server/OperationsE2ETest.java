@@ -32,7 +32,7 @@ class OperationsE2ETest extends AbstractE2ETest {
 
     @BeforeEach
     @Override
-    void beforeEach() throws Exception {
+    protected void beforeEach() throws Exception {
         super.beforeEach();
         final var cssService = new EOSClusterSingletonServiceProvider(new SimpleDOMEntityOwnershipService());
         netconfKeystoreService = new DefaultNetconfKeystoreService(getDataBroker(), rpcProviderService,
@@ -41,7 +41,7 @@ class OperationsE2ETest extends AbstractE2ETest {
 
     @AfterEach
     @Override
-    void afterEach() throws Exception {
+    protected void afterEach() throws Exception {
         netconfKeystoreService.close();
         netconfKeystoreService = null;
         super.afterEach();
