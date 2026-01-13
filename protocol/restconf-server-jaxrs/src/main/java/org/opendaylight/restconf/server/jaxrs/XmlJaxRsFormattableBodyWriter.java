@@ -17,7 +17,8 @@ import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 
 @Provider
-@Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+@Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YIN_XML, MediaType.APPLICATION_XML,
+    MediaType.TEXT_XML })
 public final class XmlJaxRsFormattableBodyWriter extends JaxRsFormattableBodyWriter {
     @Override
     void writeTo(final FormattableBody body, final PrettyPrintParam prettyPrint, final OutputStream out)
