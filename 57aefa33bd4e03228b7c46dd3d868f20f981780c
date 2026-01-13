@@ -16,6 +16,24 @@
       "message": "needs to be more clarified that this setting (inbound) has nothing with chunk size (outbound)",
       "revId": "57aefa33bd4e03228b7c46dd3d868f20f981780c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb38c5a9_82a21ed5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-01-13T11:12:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c88f21e3_a56e0ea8",
+      "revId": "57aefa33bd4e03228b7c46dd3d868f20f981780c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
