@@ -44,6 +44,18 @@ public final class MediaTypes {
      * @see <a href="https://www.rfc-editor.org/rfc/rfc8072#section-4.2.1">RFC8072, section 4.2.2</a>
      */
     public static final String APPLICATION_YANG_PATCH_JSON = "application/yang-patch+json";
+    /**
+     * A {@code String} constant representing {@value #APPLICATION_YANG} media type.
+     *
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc6020#section-14.1">RFC6020, section 14.1</a>
+     */
+    public static final String APPLICATION_YANG = "application/yang";
+    /**
+     * A {@code String} constant representing {@value #APPLICATION_YIN_XML} media type.
+     *
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc6020#section-14.2">RFC6020, section 14.2</a>
+     */
+    public static final String APPLICATION_YIN_XML = "application/yin+xml";
 
     private MediaTypes() {
         // Hidden on purpose
