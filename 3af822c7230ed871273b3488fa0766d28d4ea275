@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "79d770eb_05c69584",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-13T09:05:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6193e1c7_5095920c",
+      "revId": "3af822c7230ed871273b3488fa0766d28d4ea275",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a5102a36_0be032f9",
