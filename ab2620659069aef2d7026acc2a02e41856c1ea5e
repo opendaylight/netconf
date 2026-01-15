@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "ab2620659069aef2d7026acc2a02e41856c1ea5e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d04ef3af_5016682e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-01-15T08:59:53Z",
+      "side": 1,
+      "message": "verify if OPERATIONAL datastor is updated properly",
+      "revId": "ab2620659069aef2d7026acc2a02e41856c1ea5e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
