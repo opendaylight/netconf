@@ -121,10 +121,19 @@ public final class OSGiNorthbound {
         String api$_$root$_$path() default "restconf";
 
         @AttributeDefinition(
-            name = "HTTP/1.1 outbound chunk size (bytes)",
-            description = "Maximum size of a data chunk emitted in HTTP/1.1 responses. Must be >= 1.",
-            min = "1")
-        int http1$_$chunk$_$size() default 262144; // 256 KiB
+            name = "HTTP outbound data object (chunk) size (bytes)",
+            description = """
+                Maximum size of a data chunk emitted during response streaming. Must be >= 1.
+
+                This parameter is used in all HTTP implementations we provide including HTTP/1.1, HTTP/2 and HTTP/3.
+                It represents the size of HTTP object we are pushing forward to Netty pipeline. This object is then
+                formatted by appropriate Netty's H1.1, H2 or H3 codec to proper HttpObject(s)
+                or Http2Frame(s)/Http3Frame(s).
+
+                Its main purpose is to avoid out-of-memory issues when sending large response.
+                """,
+                min = "1")
+        int http$_$chunk$_$size() default 262144; // 256 KiB
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
@@ -237,7 +246,7 @@ public final class OSGiNorthbound {
             Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
             Uint32.valueOf(configuration.heartbeat$_$interval()), configuration.api$_$root$_$path(),
             parseDefaultEncoding(configuration.default$_$encoding()), new HttpServerStackConfiguration(transport),
-            Uint32.valueOf(configuration.http1$_$chunk$_$size()))
+            Uint32.valueOf(configuration.http$_$chunk$_$size()))
         );
     }
 
