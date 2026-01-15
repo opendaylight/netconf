@@ -41,9 +41,6 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
 
     @Override
     protected ChannelInitializer<Channel> buildHttp2ChildInitializer(final ChannelHandlerContext ctx) {
-        // FIXME: Do not use chunk size for Http2
-        //        PipelinedHTTPServerSession and ConcurrentRestconfSession extends abstract HTTPServerSession where
-        //        we need chunk size only for HTTP1. Remove it from this implementation
         return new ChannelInitializer<>() {
             @Override protected void initChannel(final Channel ch) {
                 final var pipeline = ch.pipeline();
