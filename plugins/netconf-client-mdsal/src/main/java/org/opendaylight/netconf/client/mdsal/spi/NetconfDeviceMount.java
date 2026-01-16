@@ -31,8 +31,8 @@ import org.opendaylight.restconf.mdsal.spi.DOMServerActionOperations;
 import org.opendaylight.restconf.mdsal.spi.DOMServerRpcOperations;
 import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
 import org.opendaylight.restconf.server.spi.CompositeServerStrategy;
+import org.opendaylight.restconf.server.spi.ExportingServerModulesOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
-import org.opendaylight.restconf.server.spi.NotSupportedServerModulesOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerMountPointResolver;
 import org.opendaylight.restconf.server.spi.NotSupportedServerRpcOperations;
 import org.opendaylight.restconf.server.spi.ServerActionOperations;
@@ -102,9 +102,10 @@ public class NetconfDeviceMount implements AutoCloseable {
             actionOps = NotSupportedServerActionOperations.INSTANCE;
         }
 
+        final var modulesOps = new ExportingServerModulesOperations(initialCtx);
+
         mountBuilder.addService(DOMServerStrategy.class, new DOMServerStrategy(new CompositeServerStrategy(databind,
-            NotSupportedServerMountPointResolver.INSTANCE, actionOps, dataOps,
-            NotSupportedServerModulesOperations.INSTANCE, rpcOps)));
+            NotSupportedServerMountPointResolver.INSTANCE, actionOps, dataOps, modulesOps, rpcOps)));
 
         if (broker != null) {
             mountBuilder.addService(DOMDataBroker.class, broker);
