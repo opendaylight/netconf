@@ -16,6 +16,91 @@
       "message": "recheck",
       "revId": "00ee34397c7ff561dcf90480cc02cf84e1a90392",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a75291a_cbc70ff3",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-19T15:19:08Z",
+      "side": 1,
+      "message": "bad formatting, even unused exception",
+      "revId": "00ee34397c7ff561dcf90480cc02cf84e1a90392",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dbfcfa98_787aabe5",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeMountServiceTest.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-19T15:19:08Z",
+      "side": 1,
+      "message": "this should end with NPE?",
+      "revId": "00ee34397c7ff561dcf90480cc02cf84e1a90392",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93e0f581_61492165",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-19T15:19:08Z",
+      "side": 1,
+      "message": "does this patch works with devices used in netconf-clustered-topology?",
+      "revId": "00ee34397c7ff561dcf90480cc02cf84e1a90392",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb8e21ad_9b5b2342",
+        "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientFactory.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-19T15:19:08Z",
+      "side": 1,
+      "message": "mark nullability please",
+      "revId": "00ee34397c7ff561dcf90480cc02cf84e1a90392",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71d57405_0dc1160d",
+        "filename": "protocol/netconf-client/src/test/java/org/opendaylight/netconf/client/NC1252Test.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-19T15:19:08Z",
+      "side": 1,
+      "message": "NPE?",
+      "revId": "00ee34397c7ff561dcf90480cc02cf84e1a90392",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
