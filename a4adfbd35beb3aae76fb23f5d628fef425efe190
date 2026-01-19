@@ -175,6 +175,24 @@
       "parentUuid": "005946f2_e86d82de",
       "revId": "a4adfbd35beb3aae76fb23f5d628fef425efe190",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9b6e3b3_42a3ddb6",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1694,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-19T13:50:38Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "256b9ae8_60181a94",
+      "revId": "a4adfbd35beb3aae76fb23f5d628fef425efe190",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
