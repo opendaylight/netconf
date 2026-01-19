@@ -378,6 +378,16 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         return streamClient;
     }
 
+    HTTPClient startStreamHttp2Client() throws Exception {
+        final var transportListener = new TestTransportChannelListener(channel ->
+            clientStreamService = SseUtils.enableClientSse(channel));
+        final var streamClient = HTTPClient.connect(transportListener, bootstrapFactory.newBootstrap(),
+            clientStackGrouping, true).get(2, TimeUnit.SECONDS);
+        await().atMost(Duration.ofSeconds(2)).until(transportListener::initialized);
+        assertNotNull(clientStreamService);
+        return streamClient;
+    }
+
     TestEventStreamListener startSubscriptionStream(final String subscriptionId) throws Exception {
         subscriptionStreamClient = startStreamClient();
         final var eventListener = new TestEventStreamListener();

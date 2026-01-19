@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
@@ -18,6 +19,7 @@ import static org.opendaylight.restconf.server.TestUtils.ERROR_TAG_MAPPING;
 
 import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.DefaultChannelPromise;
@@ -26,6 +28,7 @@ import io.netty.handler.codec.http.DefaultLastHttpContent;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpObject;
+import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.ImmediateEventExecutor;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -90,6 +93,12 @@ class AbstractRequestProcessorTest {
     @Mock
     private ChannelHandlerContext ctx;
     @Mock
+    private ChannelHandlerContext ctx2;
+    @Mock
+    private EventExecutor executor;
+    @Mock
+    private ChannelHandler contextHandler;
+    @Mock
     private Channel channel;
     @Mock
     private ChannelPipeline pipeline;
@@ -128,6 +137,15 @@ class AbstractRequestProcessorTest {
     void mockWriteAndFlush() {
         doReturn(new DefaultChannelPromise(channel, ImmediateEventExecutor.INSTANCE).setSuccess())
             .when(ctx).writeAndFlush(any());
+    }
+
+    void mockRegistry(final RestconfStream<?> stream) {
+        doReturn(stream).when(streamRegistry).lookupStream(any());
+        doReturn(pipeline).when(pipeline).replace(any(ChannelHandler.class), anyString(), any(ChannelHandler.class));
+        doReturn(pipeline).when(channel).pipeline();
+        doReturn(ctx2).when(pipeline).context(anyString());
+        doReturn(executor).when(ctx2).executor();
+        doReturn(contextHandler).when(ctx).handler();
     }
 
     @SuppressWarnings("checkstyle:illegalCatch")

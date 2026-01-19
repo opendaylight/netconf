@@ -10,13 +10,14 @@ package org.opendaylight.restconf.server;
 import static java.util.Objects.requireNonNull;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.netty.handler.codec.http2.Http2ChannelDuplexHandler;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
 
 /**
  * A {@link Sender} bound to a logical stream. This is how event streams are delivered over HTTP/2: other requests can
  * be executed concurrently and the sender can be terminated when the stream is terminated.
  */
-final class StreamSender implements Sender {
+final class StreamSender extends Http2ChannelDuplexHandler implements Sender {
     @SuppressFBWarnings("URF_UNREAD_FIELD") //FIXME: Just to pass check, remove when in use.
     private final Integer streamId;
 
