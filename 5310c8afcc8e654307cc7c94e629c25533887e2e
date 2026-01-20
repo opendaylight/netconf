@@ -16,6 +16,24 @@
       "message": "why protected?",
       "revId": "5310c8afcc8e654307cc7c94e629c25533887e2e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b882e4d8_1fd68d0f",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http2/MountPointDocumentHttp2Test.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-20T10:40:55Z",
+      "side": 1,
+      "message": "corrected in both versions",
+      "parentUuid": "fe519250_f2d2a9d8",
+      "revId": "5310c8afcc8e654307cc7c94e629c25533887e2e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

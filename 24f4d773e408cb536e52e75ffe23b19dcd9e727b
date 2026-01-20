@@ -33,6 +33,24 @@
       "message": "With JUnit 5 we no longer make classes nor test-cases and before/after methods pub lic",
       "revId": "24f4d773e408cb536e52e75ffe23b19dcd9e727b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5233a097_c041d16b",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http2/BenchmarkOpenApiHttp2IT.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-20T10:40:55Z",
+      "side": 1,
+      "message": "corrected in both versions",
+      "parentUuid": "93d99d1c_4d393ada",
+      "revId": "24f4d773e408cb536e52e75ffe23b19dcd9e727b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
