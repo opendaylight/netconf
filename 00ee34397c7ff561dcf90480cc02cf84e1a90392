@@ -69,6 +69,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c425f66_b2a5dfcf",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-20T13:19:59Z",
+      "side": 1,
+      "message": "It did not, added it also to updateClusteredDeviceData()",
+      "parentUuid": "93e0f581_61492165",
+      "revId": "00ee34397c7ff561dcf90480cc02cf84e1a90392",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bb8e21ad_9b5b2342",
