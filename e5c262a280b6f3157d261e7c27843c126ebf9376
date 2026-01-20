@@ -16,6 +16,24 @@
       "message": "What about Netty based endpoint?",
       "revId": "e5c262a280b6f3157d261e7c27843c126ebf9376",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75f15184_d4aa5ea6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-01-20T09:29:20Z",
+      "side": 1,
+      "message": "Already include these media types in https://github.com/opendaylight/netconf/blob/b7fafe2c0cc120933eeabeac5ca983613c676de0/protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyMediaTypes.java#L46",
+      "parentUuid": "fc31fac1_0dd31b9a",
+      "revId": "e5c262a280b6f3157d261e7c27843c126ebf9376",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
