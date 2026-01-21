@@ -128,8 +128,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 case SUSPENDED -> addReceiver(request, sender, State.Suspended);
                 case END -> {
                     LOG.debug("Subscription for id {} is not active", id());
-                    // TODO: this should be mapped to 404 Not Found
-                    request.failWith(new RequestException("Subscription terminated"));
+                    request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                        "Subscription terminated"));
                 }
             }
         }
