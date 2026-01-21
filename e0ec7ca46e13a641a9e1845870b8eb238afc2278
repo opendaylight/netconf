@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4052d1a6_b5c20987",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-21T12:28:35Z",
+      "side": 1,
+      "message": "please document why and the approach used",
+      "revId": "e0ec7ca46e13a641a9e1845870b8eb238afc2278",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6a4291f_32d6d392",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-21T12:28:35Z",
+      "side": 1,
+      "message": "please document",
+      "revId": "e0ec7ca46e13a641a9e1845870b8eb238afc2278",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26648616_fdd66bda",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-21T12:28:35Z",
+      "side": 1,
+      "message": "please document",
+      "revId": "e0ec7ca46e13a641a9e1845870b8eb238afc2278",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c5f516b_6c63cd8c",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-21T12:28:35Z",
+      "side": 1,
+      "message": "static",
+      "revId": "e0ec7ca46e13a641a9e1845870b8eb238afc2278",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
