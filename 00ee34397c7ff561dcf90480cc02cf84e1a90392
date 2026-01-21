@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bad082ad_e523c384",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-21T12:46:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a75291a_cbc70ff3",
+      "revId": "00ee34397c7ff561dcf90480cc02cf84e1a90392",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dbfcfa98_787aabe5",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-01-19T15:19:08Z",
       "side": 1,
       "message": "this should end with NPE?",
+      "revId": "00ee34397c7ff561dcf90480cc02cf84e1a90392",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a317f92b_231e6a50",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeMountServiceTest.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-21T12:46:27Z",
+      "side": 1,
+      "message": "this listener is nullable",
+      "parentUuid": "dbfcfa98_787aabe5",
       "revId": "00ee34397c7ff561dcf90480cc02cf84e1a90392",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -104,6 +140,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc641435_c00dc67a",
+        "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientFactory.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-21T12:46:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb8e21ad_9b5b2342",
+      "revId": "00ee34397c7ff561dcf90480cc02cf84e1a90392",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "71d57405_0dc1160d",
@@ -117,6 +171,24 @@
       "writtenOn": "2026-01-19T15:19:08Z",
       "side": 1,
       "message": "NPE?",
+      "revId": "00ee34397c7ff561dcf90480cc02cf84e1a90392",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51c797c9_4ca4b135",
+        "filename": "protocol/netconf-client/src/test/java/org/opendaylight/netconf/client/NC1252Test.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-21T12:46:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "71d57405_0dc1160d",
       "revId": "00ee34397c7ff561dcf90480cc02cf84e1a90392",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
