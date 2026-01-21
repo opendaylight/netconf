@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c17ffba1_602ccf32",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 1791,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-01-21T09:14:17Z",
+      "side": 1,
+      "message": "missed comma },",
+      "revId": "01789568c2e6320cbe60f2507865c3f86627ddf9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
