@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4e8fe50_9d39a4f8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-21T12:25:10Z",
+      "side": 1,
+      "message": "document why and the approach used",
+      "revId": "2669fc07b23a04ba33190ccb89c9d857dd6a5ea9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03560392_6983248a",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-21T12:25:10Z",
+      "side": 1,
+      "message": "please document the logic - what does mean unchanged?",
+      "revId": "2669fc07b23a04ba33190ccb89c9d857dd6a5ea9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
