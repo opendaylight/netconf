@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbda6ce3_94ad5252",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-01-22T17:22:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4052d1a6_b5c20987",
+      "revId": "e0ec7ca46e13a641a9e1845870b8eb238afc2278",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f6a4291f_32d6d392",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-01-21T12:28:35Z",
       "side": 1,
       "message": "please document",
+      "revId": "e0ec7ca46e13a641a9e1845870b8eb238afc2278",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "50e2b96e_1819fac5",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-01-22T17:22:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f6a4291f_32d6d392",
       "revId": "e0ec7ca46e13a641a9e1845870b8eb238afc2278",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e712c45a_b1f4ced2",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-01-22T17:22:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "26648616_fdd66bda",
+      "revId": "e0ec7ca46e13a641a9e1845870b8eb238afc2278",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6c5f516b_6c63cd8c",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-01-21T12:28:35Z",
       "side": 1,
       "message": "static",
+      "revId": "e0ec7ca46e13a641a9e1845870b8eb238afc2278",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c5a3e94_beeae1cc",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-01-22T17:22:39Z",
+      "side": 1,
+      "message": "not possible since we want to update current setup.",
+      "parentUuid": "6c5f516b_6c63cd8c",
       "revId": "e0ec7ca46e13a641a9e1845870b8eb238afc2278",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
