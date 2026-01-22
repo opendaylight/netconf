@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "99302de6_7a3c11bf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-01-22T17:21:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a4e8fe50_9d39a4f8",
+      "revId": "2669fc07b23a04ba33190ccb89c9d857dd6a5ea9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "03560392_6983248a",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-01-21T12:25:10Z",
       "side": 1,
       "message": "please document the logic - what does mean unchanged?",
+      "revId": "2669fc07b23a04ba33190ccb89c9d857dd6a5ea9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de3237a6_579fd148",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-01-22T17:21:33Z",
+      "side": 1,
+      "message": "the \"unchanged\" is used in instead of logging config of the node, since we just with new topology config and config of node stay the same.\n\nI chose this option since it\u0027s the most simple one. Alternative would by to build Node with NetconfNode of existing Handler and generate config with hideCredentials() method.\nOr refactor hideCredentials() (or make similar method) to generate this config to be logged.",
+      "parentUuid": "03560392_6983248a",
       "revId": "2669fc07b23a04ba33190ccb89c9d857dd6a5ea9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
