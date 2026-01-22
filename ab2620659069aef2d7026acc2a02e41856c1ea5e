@@ -33,6 +33,29 @@
       "message": "verify if OPERATIONAL datastor is updated properly",
       "revId": "ab2620659069aef2d7026acc2a02e41856c1ea5e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3edcfc2a_d3d16168",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-01-22T11:52:54Z",
+      "side": 1,
+      "message": "we probably should also update RemoteDeviceId?\nit consist of address and port can be changed",
+      "range": {
+        "startLine": 88,
+        "startChar": 93,
+        "endLine": 88,
+        "endChar": 108
+      },
+      "revId": "ab2620659069aef2d7026acc2a02e41856c1ea5e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
