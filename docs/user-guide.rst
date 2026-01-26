@@ -1801,6 +1801,72 @@ Device specific configuration can be set when mounting device or later with PUT 
 This configuration overrides topology default and if left empty topology default are used. Modifying this configuration
 will result in device immediate reconnection with new config being used.
 
+Showing negotiated SSH parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+After the device successfully connects, the negotiated SSH transport parameters
+are stored in the operational datastore. They can be examined by invoking:
+
+GET http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device?content=nonconfig
+
+The response shows the negotiated algorithms in the
+negotiated-ssh-transport-parameters container:
+
+.. tabs::
+
+   .. tab:: XML
+
+      .. code-block:: xml
+
+        <node xmlns="urn:TBD:params:xml:ns:yang:network-topology">
+            <node-id>17830-sim-device</node-id>
+            <netconf-node xmlns="urn:opendaylight:netconf-node-topology">
+                <port>17830</port>
+                <negotiated-ssh-transport-parameters>
+                    <encryption-alg>chacha20-poly1305@openssh.com</encryption-alg>
+                    <host-key-alg>rsa-sha2-512</host-key-alg>
+                    <mac-alg>aead</mac-alg>
+                    <key-exchange-alg>sntrup761x25519-sha512</key-exchange-alg>
+                </negotiated-ssh-transport-parameters>
+                <session-id>1</session-id>
+                <connection-status>connected</connection-status>
+                <login-password-unencrypted>
+                    <username>admin</username>
+                    <password>admin</password>
+                </login-password-unencrypted>
+                <host>127.0.0.1</host>
+            </netconf-node>
+        </node>
+
+   .. tab:: JSON
+
+      .. code-block:: json
+
+          {
+              "network-topology:node": [
+                  {
+                      "node-id": "17830-sim-device",
+                      "netconf-node-topology:netconf-node": {
+                          "port": 17830,
+                          "negotiated-ssh-transport-parameters": {
+                              "encryption-alg": "chacha20-poly1305@openssh.com",
+                              "host-key-alg": "rsa-sha2-512",
+                              "mac-alg": "aead",
+                              "key-exchange-alg": "sntrup761x25519-sha512"
+                          },
+                          "session-id": 1,
+                          "connection-status": "connected",
+                          "login-password-unencrypted": {
+                              "username": "admin",
+                              "password": "admin"
+                          },
+                          "host": "127.0.0.1"
+                      }
+                  }
+              ]
+          }
+
+
 Northbound (NETCONF servers)
 ----------------------------
 
