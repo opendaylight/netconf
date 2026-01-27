@@ -156,6 +156,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "04866725_d4765461",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfTopologyDeviceSalFacade.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-27T13:11:33Z",
+      "side": 1,
+      "message": "should not be this logic part directly of onDeviceConnected?",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d9c4d39_2a478d1c",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-27T13:11:33Z",
+      "side": 1,
+      "message": "if not using null here would help you to test this feature - as is its uncovered",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5b449387_d9b0e2ee",
         "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceSalFacade.java",
         "patchSetId": 29
@@ -184,6 +218,23 @@
       "writtenOn": "2026-01-27T12:49:43Z",
       "side": 1,
       "message": "why @Nullable?",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a78908d_1913a297",
+        "filename": "transport/transport-api/src/main/java/org/opendaylight/netconf/transport/api/SSHNegotiatedAlgListener.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-27T13:11:33Z",
+      "side": 1,
+      "message": "this probably need to be relocated closer to its implementation and usage, then we do not need to add new dependencies to transport-api",
       "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
