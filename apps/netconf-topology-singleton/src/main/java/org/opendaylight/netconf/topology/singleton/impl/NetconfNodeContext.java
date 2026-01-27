@@ -15,6 +15,9 @@ import org.apache.pekko.cluster.Cluster;
 import org.apache.pekko.dispatch.OnComplete;
 import org.apache.pekko.pattern.Patterns;
 import org.apache.pekko.util.Timeout;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -25,6 +28,7 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUti
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.NetconfNodeAugment;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251103.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
@@ -34,19 +38,20 @@ import org.slf4j.LoggerFactory;
 final class NetconfNodeContext implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeContext.class);
 
-    private final DeviceActionFactory deviceActionFactory;
-    private final SchemaResourceManager schemaManager;
-    private final NetconfClientConfigurationBuilderFactory builderFactory;
-    private final DOMMountPointService mountPointService;
-    private final RemoteDeviceId remoteDeviceId;
-    private final Timeout actorResponseWaitTime;
+    private final @NonNull DeviceActionFactory deviceActionFactory;
+    private final @NonNull SchemaResourceManager schemaManager;
+    private final @NonNull NetconfClientConfigurationBuilderFactory builderFactory;
+    private final @NonNull DOMMountPointService mountPointService;
+    private final @NonNull RemoteDeviceId remoteDeviceId;
+    private final @NonNull Timeout actorResponseWaitTime;
 
-    private NetconfTopologySetup setup;
-    private ActorRef masterActorRef;
-    private MasterSalFacade masterSalFacade;
-    private NetconfNodeManager netconfNodeManager;
-    private NetconfNodeHandler nodeHandler;
+    private @NonNull NetconfTopologySetup setup;
+    private @Nullable ActorRef masterActorRef;
+    private @Nullable MasterSalFacade masterSalFacade;
+    private @NonNull NetconfNodeManager netconfNodeManager;
+    private @Nullable NetconfNodeHandler nodeHandler;
 
+    @NonNullByDefault
     NetconfNodeContext(final NetconfTopologySetup setup, final SchemaResourceManager schemaManager,
             final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final RemoteDeviceId remoteDeviceId,
@@ -57,7 +62,7 @@ final class NetconfNodeContext implements AutoCloseable {
         this.builderFactory = requireNonNull(builderFactory);
         this.deviceActionFactory = deviceActionFactory;
         this.remoteDeviceId = requireNonNull(remoteDeviceId);
-        this.actorResponseWaitTime = actorResponseWaitTime;
+        this.actorResponseWaitTime = requireNonNull(actorResponseWaitTime);
         registerNodeManager();
     }
 
@@ -155,14 +160,14 @@ final class NetconfNodeContext implements AutoCloseable {
     private void connectNode() {
         final var configNode = setup.getNode();
 
-        final var netconfNode = configNode.augmentation(NetconfNodeAugment.class).getNetconfNode();
+        final var netconfNode = requireNonNull(configNode.augmentation(NetconfNodeAugment.class)).getNetconfNode();
         final var nodeOptional = configNode.augmentation(NetconfNodeAugmentedOptional.class);
 
         requireNonNull(netconfNode.getHost());
         requireNonNull(netconfNode.getPort());
 
         // Instantiate the handler ...
-        masterSalFacade = createSalFacade(netconfNode.requireLockDatastore());
+        masterSalFacade = createSalFacade(netconfNode.getCredentials(), netconfNode.getLockDatastore());
 
         nodeHandler = new NetconfNodeHandler(setup.getNetconfClientFactory(), setup.getTimer(),
             setup.getBaseSchemaProvider(), schemaManager, setup.getSchemaAssembler(), builderFactory,
@@ -203,10 +208,8 @@ final class NetconfNodeContext implements AutoCloseable {
     }
 
     @VisibleForTesting
-    MasterSalFacade createSalFacade(final boolean lockDatastore) {
-        return new MasterSalFacade(remoteDeviceId, requireNonNull(setup.getNode())
-            .augmentation(NetconfNodeAugment.class).getNetconfNode().getCredentials(),
-            setup.getActorSystem(), masterActorRef, actorResponseWaitTime,
-            mountPointService, setup.getDataBroker(), lockDatastore);
+    MasterSalFacade createSalFacade(final Credentials credentials, final boolean lockDatastore) {
+        return new MasterSalFacade(remoteDeviceId, credentials, setup.getActorSystem(), masterActorRef,
+            actorResponseWaitTime, mountPointService, setup.getDataBroker(), lockDatastore);
     }
 }
