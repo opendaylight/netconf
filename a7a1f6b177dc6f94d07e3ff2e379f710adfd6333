@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47c3e15a_8357b2c3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 29
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-27T12:18:30Z",
+      "side": 1,
+      "message": "Topology configuration says, there is no device configuration:\n```\n           \"mac\": {\n              \"mac-alg\": [\n                \"hmac-sha2-256\",\n                \"hmac-sha2-512\",\n                \"hmac-sha1\"\n              ]\n            }\n```\n\nbut we have in the device negotiated:\n\n```\n\"mac-alg\": \"aead\",\n```",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
