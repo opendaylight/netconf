@@ -111,6 +111,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.ConnectionOper.ConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.credentials.credentials.LoginPwUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251028.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.Keystore;
@@ -345,7 +346,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                         .newDeviceDataBroker(any(DatabindContext.class), any(NetconfSessionPreferences.class));
                     masterSalFacadeFuture.set(spiedFacade);
                     return spiedFacade;
-                }).when(spiedSingleton).createSalFacade(any(boolean.class));
+                }).when(spiedSingleton).createSalFacade(any(Credentials.class), any(boolean.class));
                 doReturn(spiedSingleton).when(spiedContext).getTopologySingleton();
                 return spiedContext;
             }
