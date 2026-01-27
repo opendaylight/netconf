@@ -345,7 +345,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                         .newDeviceDataBroker(any(DatabindContext.class), any(NetconfSessionPreferences.class));
                     masterSalFacadeFuture.set(spiedFacade);
                     return spiedFacade;
-                }).when(spiedSingleton).createSalFacade(any(boolean.class));
+                }).when(spiedSingleton).createSalFacade(any(NetconfNode.class));
                 doReturn(spiedSingleton).when(spiedContext).getTopologySingleton();
                 return spiedContext;
             }
