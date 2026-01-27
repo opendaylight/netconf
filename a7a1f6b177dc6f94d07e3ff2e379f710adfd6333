@@ -33,6 +33,23 @@
       "message": "In the result we have:\n```\n\"encryption-alg\": \"chacha20-poly1305@openssh.com\",\n```\n\nBut in configuration:\n```\nchacha20-poly1305\n```\n\nCan we remove the remaining part?",
       "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9892fbfd_01ee8fd9",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStackFactory.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-27T12:31:27Z",
+      "side": 1,
+      "message": "document new parameter in javadoc",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
