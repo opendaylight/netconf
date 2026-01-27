@@ -71,6 +71,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6fc07cd2_2557f04f",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-27T12:49:43Z",
+      "side": 1,
+      "message": "static",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fb2644f8_86c13f90",
         "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfDeviceTopologyAdapter.java",
         "patchSetId": 29
@@ -99,6 +116,23 @@
       "writtenOn": "2026-01-27T12:38:14Z",
       "side": 1,
       "message": "this would be rather implemented here than in its only one inheritor?",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f7d9f12_e48fa24d",
+        "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientFactory.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-27T12:49:43Z",
+      "side": 1,
+      "message": "why @Nullable?",
       "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
