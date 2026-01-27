@@ -16,6 +16,24 @@
       "message": "i don\u0027t think this will result in 404, imo this would get mapped to 400 by using ErrorTagMapping",
       "revId": "0459208e7d803668c0abdc7a6ad847437951fca1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d12dcc9_4244f712",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-27T14:50:49Z",
+      "side": 1,
+      "message": "acording to https://datatracker.ietf.org/doc/html/rfc8040#section-7\nMapping from \u003cerror-tag\u003e to Status Code, there is only INVALID_VALUE where there is 404, but specified also with 400 and 406, \n| invalid-value           | 400, 404, or 406 |\n\nno other error-tag contain status code 404",
+      "parentUuid": "fdf1c9e6_bc6a055d",
+      "revId": "0459208e7d803668c0abdc7a6ad847437951fca1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
