@@ -15,6 +15,9 @@ import org.apache.pekko.cluster.Cluster;
 import org.apache.pekko.dispatch.OnComplete;
 import org.apache.pekko.pattern.Patterns;
 import org.apache.pekko.util.Timeout;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -34,19 +37,21 @@ import org.slf4j.LoggerFactory;
 final class NetconfNodeContext implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeContext.class);
 
-    private final DeviceActionFactory deviceActionFactory;
-    private final SchemaResourceManager schemaManager;
-    private final NetconfClientConfigurationBuilderFactory builderFactory;
-    private final DOMMountPointService mountPointService;
-    private final RemoteDeviceId remoteDeviceId;
-    private final Timeout actorResponseWaitTime;
+    private final @NonNull DeviceActionFactory deviceActionFactory;
+    private final @NonNull SchemaResourceManager schemaManager;
+    private final @NonNull NetconfClientConfigurationBuilderFactory builderFactory;
+    private final @NonNull DOMMountPointService mountPointService;
+    private final @NonNull RemoteDeviceId remoteDeviceId;
+    private final @NonNull Timeout actorResponseWaitTime;
 
-    private NetconfTopologySetup setup;
-    private ActorRef masterActorRef;
-    private MasterSalFacade masterSalFacade;
-    private NetconfNodeManager netconfNodeManager;
-    private NetconfNodeHandler nodeHandler;
+    // FIXME make setup private final again, ssh config can be a separate field in NetconfNodeContext
+    private @NonNull NetconfTopologySetup setup;
+    private @Nullable ActorRef masterActorRef;
+    private @Nullable MasterSalFacade masterSalFacade;
+    private @NonNull NetconfNodeManager netconfNodeManager;
+    private @Nullable NetconfNodeHandler nodeHandler;
 
+    @NonNullByDefault
     NetconfNodeContext(final NetconfTopologySetup setup, final SchemaResourceManager schemaManager,
             final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final RemoteDeviceId remoteDeviceId,
@@ -57,7 +62,7 @@ final class NetconfNodeContext implements AutoCloseable {
         this.builderFactory = requireNonNull(builderFactory);
         this.deviceActionFactory = deviceActionFactory;
         this.remoteDeviceId = requireNonNull(remoteDeviceId);
-        this.actorResponseWaitTime = actorResponseWaitTime;
+        this.actorResponseWaitTime = requireNonNull(actorResponseWaitTime);
         registerNodeManager();
     }
 
@@ -156,7 +161,7 @@ final class NetconfNodeContext implements AutoCloseable {
     private void connectNode() {
         final var configNode = setup.getNode();
 
-        final var netconfNode = configNode.augmentation(NetconfNodeAugment.class).getNetconfNode();
+        final var netconfNode = requireNonNull(configNode.augmentation(NetconfNodeAugment.class)).getNetconfNode();
         final var nodeOptional = configNode.augmentation(NetconfNodeAugmentedOptional.class);
 
         requireNonNull(netconfNode.getHost());
@@ -205,8 +210,8 @@ final class NetconfNodeContext implements AutoCloseable {
 
     @VisibleForTesting
     MasterSalFacade createSalFacade(final boolean lockDatastore) {
-        return new MasterSalFacade(remoteDeviceId, requireNonNull(setup.getNode())
-            .augmentation(NetconfNodeAugment.class).getNetconfNode().getCredentials(),
+        return new MasterSalFacade(remoteDeviceId, requireNonNull(setup.getNode()
+            .augmentation(NetconfNodeAugment.class)).getNetconfNode().getCredentials(),
             setup.getActorSystem(), masterActorRef, actorResponseWaitTime,
             mountPointService, setup.getDataBroker(), lockDatastore);
     }
