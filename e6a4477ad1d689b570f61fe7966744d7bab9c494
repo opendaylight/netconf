@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2da48538_32a93c53",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-01-27T22:31:15Z",
+      "side": 1,
+      "message": "keep this on one line",
+      "range": {
+        "startLine": 213,
+        "startChar": 51,
+        "endLine": 214,
+        "endChar": 52
+      },
+      "revId": "e6a4477ad1d689b570f61fe7966744d7bab9c494",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
