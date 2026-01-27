@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba7f1837_b462ddf5",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1815,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-27T13:21:22Z",
+      "side": 1,
+      "message": "what about XML example?",
+      "revId": "80df71dad5851eb4c3a433a2bd7e29a0d94174e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2252597c_3ba3b24f",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1826,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-27T13:21:22Z",
+      "side": 1,
+      "message": "we have never configured aead",
+      "revId": "80df71dad5851eb4c3a433a2bd7e29a0d94174e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
