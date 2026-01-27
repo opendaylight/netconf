@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43971931_348bef58",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-01-27T22:31:56Z",
+      "side": 0,
+      "message": "duplicate access to setup.getNode()",
+      "range": {
+        "startLine": 208,
+        "startChar": 51,
+        "endLine": 208,
+        "endChar": 82
+      },
+      "revId": "2cb4ddcfb739cb25876a8ac0fb609eba7f8a07ea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
