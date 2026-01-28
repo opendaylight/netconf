@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ebf7ec1f_55808ab4",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-01-28T08:01:33Z",
+      "side": 1,
+      "message": "in the end I think this can\u0027t be final anyways due to this bug:\nhttps://lf-opendaylight.atlassian.net/browse/NETCONF-1558\nhttps://git.opendaylight.org/gerrit/c/netconf/+/119814",
+      "revId": "e6a4477ad1d689b570f61fe7966744d7bab9c494",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2da48538_32a93c53",
         "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
         "patchSetId": 2
