@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfe7cfa5_e5e2d62f",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-01-28T08:11:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3e42534_c804b249",
+      "revId": "6c9ff162f5247e2c6b798fa0ba02050113a6d319",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0df369e0_f604f7e6",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-01-27T15:08:11Z",
       "side": 1,
       "message": "should be located with place where its used?",
+      "revId": "6c9ff162f5247e2c6b798fa0ba02050113a6d319",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a389294_57c12a50",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-01-28T08:11:55Z",
+      "side": 1,
+      "message": "I think it fits logically here with lockedEnsureNode() and connectNode()",
+      "parentUuid": "0df369e0_f604f7e6",
       "revId": "6c9ff162f5247e2c6b798fa0ba02050113a6d319",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
