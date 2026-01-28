@@ -1,0 +1,119 @@
+/*
+ * Copyright (c) 2026 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+package org.opendaylight.netconf.dagger.mdsal;
+
+import dagger.Module;
+import dagger.Provides;
+import jakarta.inject.Singleton;
+import java.lang.annotation.Annotation;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
+import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
+import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
+import org.opendaylight.mdsal.dom.broker.RouterDOMActionService;
+import org.opendaylight.mdsal.dom.broker.RouterDOMNotificationService;
+import org.opendaylight.mdsal.dom.broker.RouterDOMPublishNotificationService;
+import org.opendaylight.mdsal.dom.broker.RouterDOMRpcProviderService;
+import org.opendaylight.mdsal.dom.broker.RouterDOMRpcService;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.netconf.dagger.config.ConfigLoader;
+import org.opendaylight.netconf.dagger.mdsal.MdsalQualifiers.SchemaServiceContext;
+import org.opendaylight.odlparent.dagger.ResourceSupport;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+
+@Module
+public abstract class MdsalDomBrokerModule {
+
+    @Provides
+    @Singleton
+    public static DOMMountPointService domMountPointService() {
+        return new DOMMountPointServiceImpl();
+    }
+
+    @Provides
+    @Singleton
+    public static DOMNotificationRouter domNotificationRouter(final ResourceSupport resourceSupport,
+            final ConfigLoader configLoader) {
+        final var config = configLoader.getConfig(DOMNotificationRouterConfig.class,
+            "", "org.opendaylight.mdsal.dom.notification.cfg");
+        final var domNotificationRouter = new DOMNotificationRouter(config);
+        resourceSupport.register(domNotificationRouter);
+        return domNotificationRouter;
+    }
+
+    @Provides
+    @Singleton
+    public static DOMRpcRouter domRpcRouter(final DOMSchemaService schemaService,
+            final ResourceSupport resourceSupport) {
+        final var domRpcRouter = new DOMRpcRouter(schemaService);
+        resourceSupport.register(domRpcRouter);
+        return domRpcRouter;
+    }
+
+    @Provides
+    public static DOMSchemaService domSchemaService(
+            @SchemaServiceContext final EffectiveModelContext effectiveModel) {
+        return new FixedDOMSchemaService(effectiveModel);
+    }
+
+    @Provides
+    @Singleton
+    public static DOMActionService domActionService(final DOMRpcRouter router) {
+        return new RouterDOMActionService(router);
+    }
+
+    @Provides
+    @Singleton
+    public static DOMNotificationService domNotificationService(
+            final DOMNotificationRouter notificationRouter) {
+        return new RouterDOMNotificationService(notificationRouter);
+    }
+
+    @Provides
+    @Singleton
+    public static DOMNotificationPublishService domNotificationPublishService(
+            final DOMNotificationRouter notificationRouter) {
+        return new RouterDOMPublishNotificationService(notificationRouter);
+    }
+
+    @Provides
+    @Singleton
+    public static DOMRpcProviderService domRpcProviderService(final DOMRpcRouter router) {
+        return new RouterDOMRpcProviderService(router);
+    }
+
+    @Provides
+    @Singleton
+    public static DOMRpcService domRpcService(final DOMRpcRouter router) {
+        return new RouterDOMRpcService(router);
+    }
+
+    public static class DOMNotificationRouterConfig implements DOMNotificationRouter.Config {
+        private int notificationQueueDepth;
+
+        @Override
+        public Class<? extends Annotation> annotationType() {
+            return null;
+        }
+
+        @Override
+        public int queueDepth() {
+            return notificationQueueDepth;
+        }
+
+        public void setNotificationQueueDepth(final int notificationQueueDepth) {
+            this.notificationQueueDepth = notificationQueueDepth;
+        }
+    }
+}
