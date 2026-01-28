@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb96f9f8_d958c86a",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-28T09:19:33Z",
+      "side": 1,
+      "message": "Pass the same netconf node config with node id. - It means rework hideCredentials a bit.",
+      "revId": "3735a066b2bbb0f6d948e4a3e29484cfa5c0c9f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
