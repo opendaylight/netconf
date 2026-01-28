@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f44423b5_26c9b2eb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 28
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-28T09:08:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9a7c6d5_0ce1e332",
+      "revId": "61f7bcb604ed3bc919fe1a691d91c8f5a17cf796",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "50348a7e_aa451dcc",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-01-28T08:46:02Z",
       "side": 1,
       "message": "extra empty line",
+      "revId": "61f7bcb604ed3bc919fe1a691d91c8f5a17cf796",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb957a63_5bb26ee4",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-01-28T09:08:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "50348a7e_aa451dcc",
       "revId": "61f7bcb604ed3bc919fe1a691d91c8f5a17cf796",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
