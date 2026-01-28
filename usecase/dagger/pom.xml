@@ -29,6 +29,7 @@
 
     <modules>
         <module>dagger-config-api</module>
+        <module>dagger-mdsal</module>
         <module>dagger-springboot-confg</module>
     </modules>
 </project>
