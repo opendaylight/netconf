@@ -88,6 +88,24 @@
       "parentUuid": "db31cbee_378e4a76",
       "revId": "0459208e7d803668c0abdc7a6ad847437951fca1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4cf2429d_fba5a7dd",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-01-28T12:13:35Z",
+      "side": 1,
+      "message": "well but when I was checking how this gets resolved to actual response,\nthis should end up as MappingServerRequest.onFailure() and ErrorTagMapping\nresolves ErrorTag.INVALID_VALUE to HttpStatusCode.BAD_REQUEST, but pls verify\nbecause nothing results in HttpStatusCode.NOT_FOUND for RFC8040 version",
+      "parentUuid": "bed631a3_b364f551",
+      "revId": "0459208e7d803668c0abdc7a6ad847437951fca1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
