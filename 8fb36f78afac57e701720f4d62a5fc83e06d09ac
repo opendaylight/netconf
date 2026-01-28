@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72658672_c80f74a4",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http2/BenchmarkOpenApiHttp2IT.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-28T08:35:16Z",
+      "side": 1,
+      "message": "no need to be public",
+      "revId": "8fb36f78afac57e701720f4d62a5fc83e06d09ac",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
