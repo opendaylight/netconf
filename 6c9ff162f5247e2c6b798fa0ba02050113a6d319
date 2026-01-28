@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "57128158_be08a82d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-01-28T11:23:10Z",
+      "side": 1,
+      "message": "updated it a bit. but in the end both patches achieve the same thing one fore netconf-topology and other for clustered topology",
+      "parentUuid": "5e564123_a02a7a58",
+      "revId": "6c9ff162f5247e2c6b798fa0ba02050113a6d319",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d3e42534_c804b249",
