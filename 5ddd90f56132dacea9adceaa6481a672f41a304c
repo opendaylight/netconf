@@ -39,6 +39,30 @@
       },
       "revId": "5ddd90f56132dacea9adceaa6481a672f41a304c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "66b17753_ef89242f",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MountPointEndToEndTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-01-28T15:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f6e9179_7c27cd43",
+      "range": {
+        "startLine": 511,
+        "startChar": 22,
+        "endLine": 511,
+        "endChar": 34
+      },
+      "revId": "5ddd90f56132dacea9adceaa6481a672f41a304c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
