@@ -63,7 +63,6 @@ import org.opendaylight.mdsal.binding.api.TransactionChain;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBrokerTest;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -209,7 +208,6 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private final DOMMountPointService masterMountPointService = new DOMMountPointServiceImpl();
     private Rpcs.Normalized deviceRpcService;
 
-    private EOSClusterSingletonServiceProvider masterClusterSingletonServiceProvider;
     private DataBroker masterDataBroker;
     private DOMDataBroker deviceDOMDataBroker;
     private ActorSystem masterSystem;
@@ -306,6 +304,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     void tearDown() {
         deleteCacheDir();
         TestKit.shutdownActorSystem(slaveSystem, true);
+        masterNetconfTopologyManager.close();
         TestKit.shutdownActorSystem(masterSystem, true);
         schemaAssembler.close();
     }
@@ -318,7 +317,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         masterSystem = ActorSystem.create(ACTOR_SYSTEM_NAME, ConfigFactory.load().getConfig("Master"));
 
-        masterClusterSingletonServiceProvider = new EOSClusterSingletonServiceProvider(
+        final var masterClusterSingletonServiceProvider = new EOSClusterSingletonServiceProvider(
             new SimpleDOMEntityOwnershipService());
 
         final var resources =  resourceManager.getSchemaResources(TEST_DEFAULT_SUBDIR, "test");
@@ -383,7 +382,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         verifyTopologyNodesCreated(slaveDataBroker);
 
         slaveTxChain = slaveDataBroker.createTransactionChain();
-        slaveTxChain.addCallback(new FutureCallback<Empty>() {
+        slaveTxChain.addCallback(new FutureCallback<>() {
             @Override
             public void onSuccess(final Empty result) {
                 // No-op
@@ -409,7 +408,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         testCleanup();
     }
 
-    private MasterSalFacade testMaster() throws Exception {
+    private void testMaster() throws Exception {
         LOG.info("****** Testing master");
 
         writeNetconfNode(TEST_DEFAULT_SUBDIR, masterDataBroker);
@@ -429,7 +428,6 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         LOG.info("****** Testing master DOMRpcService");
 
         testDOMRpcService(getDOMRpcService(masterMountPoint));
-        return masterSalFacade;
     }
 
     private void testSlave() throws Exception {
@@ -508,8 +506,9 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 Optional<Node> node = readTx.read(LogicalDatastoreType.OPERATIONAL,
                         NODE_INSTANCE_ID).get(5, TimeUnit.SECONDS);
                 assertTrue(node.isPresent());
-                final NetconfNode netconfNode = node.orElseThrow().augmentation(NetconfNodeAugment.class)
-                    .getNetconfNode();
+                final var nodeAugment = node.orElseThrow().augmentation(NetconfNodeAugment.class);
+                assertNotNull(nodeAugment);
+                final NetconfNode netconfNode = nodeAugment.getNetconfNode();
                 return netconfNode.getConnectionStatus() != ConnectionStatus.Connected;
             }
         });
@@ -715,10 +714,6 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
     private static DOMRpcService getDOMRpcService(final DOMMountPoint mountPoint) {
         return getMountPointService(mountPoint, DOMRpcService.class);
-    }
-
-    private static DOMActionService getDomActionService(final DOMMountPoint mountPoint) {
-        return getMountPointService(mountPoint, DOMActionService.class);
     }
 
     private static <T extends DOMService<T, E>, E extends DOMService.Extension<T, E>> T getMountPointService(
