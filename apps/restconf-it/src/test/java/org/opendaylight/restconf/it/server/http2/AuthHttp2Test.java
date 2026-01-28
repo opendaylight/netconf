@@ -65,7 +65,6 @@ class AuthHttp2Test extends AbstractHttp2E2ETest {
 
         assertResponse(response, HttpResponseStatus.UNAUTHORIZED);
         assertEquals(HttpClient.Version.HTTP_2, response.version());
-
     }
 
     @Disabled

@@ -65,7 +65,7 @@ class MountPointDocumentHttp2Test extends AbstractOpenApiHttp2Test {
         super.afterEach();
     }
 
-    // FIXME: Fails because of HTTPClient maximum content length limitation. Enable after fix.
+    // FIXME NETCONF-1566: Fails because of HTTPClient maximum content length limitation. Enable after fix.
     /**
      * Tests the swagger document that is result of the call to the '/mounts/1' endpoint.
      */
