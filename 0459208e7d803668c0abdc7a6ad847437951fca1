@@ -34,6 +34,24 @@
       "parentUuid": "fdf1c9e6_bc6a055d",
       "revId": "0459208e7d803668c0abdc7a6ad847437951fca1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bcbbd242_2b887aa2",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-28T09:49:34Z",
+      "side": 1,
+      "message": "gemini says:\nIf a client attempts to \"listen\" (GET/stream) or interact with a subscription ID that has already reached the END state, the server should respond with:\n\nHTTP Status Code: 404 Not Found\n\nRESTCONF Error Tag: invalid-value or resource-denied",
+      "parentUuid": "0d12dcc9_4244f712",
+      "revId": "0459208e7d803668c0abdc7a6ad847437951fca1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
