@@ -10,12 +10,17 @@
  */
 module org.opendaylight.netconf.dagger {
     exports org.opendaylight.netconf.dagger.springboot.config;
+    exports org.opendaylight.netconf.dagger.mdsal;
 
     opens org.opendaylight.netconf.dagger.springboot.config to spring.core, spring.beans;
 
+    requires transitive org.opendaylight.odlparent.dagger;
     requires spring.beans;
     requires spring.boot;
     requires spring.core;
+    requires org.opendaylight.mdsal.dom.api;
+    requires org.opendaylight.mdsal.dom.broker;
+
 
     requires static transitive com.google.errorprone.annotations;
     requires static dagger;
