@@ -117,7 +117,6 @@ final class NetconfNodeContext implements AutoCloseable {
      * @param device     {@link RemoteDeviceId} of affected device
      */
     void refreshSshParamsConnection(final SshTransportTopologyParameters sshParams, final RemoteDeviceId device) {
-        dropNode();
         setup = requireNonNull(setupWithNewSshParams(sshParams));
         refreshSetupConnection(setup, device);
     }
