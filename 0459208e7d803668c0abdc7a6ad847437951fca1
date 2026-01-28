@@ -70,6 +70,24 @@
       "parentUuid": "bcbbd242_2b887aa2",
       "revId": "0459208e7d803668c0abdc7a6ad847437951fca1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bed631a3_b364f551",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-28T09:53:48Z",
+      "side": 1,
+      "message": "Scenario,HTTP Status,Error Tag\nID never existed,404 Not Found,invalid-value\nID existed but was deleted/ended,404 Not Found,resource-denied\n\"ID exists but is \"\"Locked\"\"\",409 Conflict,in-use",
+      "parentUuid": "db31cbee_378e4a76",
+      "revId": "0459208e7d803668c0abdc7a6ad847437951fca1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
