@@ -1,0 +1,23 @@
+resource:
+  alfa:
+    # Netty endpoint related settings
+    #bind-address: 0.0.0.0
+    # Server bind port
+    bind-port: 8182
+    # The path to RESTCONF API root, as a RFC3986 'path-rootless' string.
+    api-root-path: "restconf"
+    # The number of Netty boss threads. 0 means the Netty default, which is usually twice the number of CPU cores.
+    boss-threads: 0
+    ciphers:
+      - "aes256-ctr"
+      - "aes192-ctr"
+      - "aes128-ctr"
+  beta:
+    # Valid range is 16384–16777215.
+    http2-max-frame-size: 16384
+    # Netty Tls transport configuration.
+    # Both certificate and private key are required in order to enable.
+    # X509 certificate file in PEM format
+    tls-certificate: "etc/tls/cert.pem"
+    # Private key file in PEM format
+    tls-private-key: "etc/tls/key.pem"

@@ -31,6 +31,7 @@
     <modules>
         <module>artifacts</module>
         <module>bnd-parent</module>
+        <module>dagger</module>
         <module>parent</module>
         <module>features</module>
         <module>model</module>
