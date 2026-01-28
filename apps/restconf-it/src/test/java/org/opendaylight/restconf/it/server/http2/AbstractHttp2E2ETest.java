@@ -44,7 +44,7 @@ import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class AbstractHttp2E2ETest extends AbstractE2ETest {
+abstract class AbstractHttp2E2ETest extends AbstractE2ETest {
     protected HttpClient http2Client;
 
     @BeforeAll
