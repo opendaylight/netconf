@@ -52,6 +52,24 @@
       "parentUuid": "0d12dcc9_4244f712",
       "revId": "0459208e7d803668c0abdc7a6ad847437951fca1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db31cbee_378e4a76",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-28T09:52:01Z",
+      "side": 1,
+      "message": "{\n  \"ietf-restconf:errors\": {\n    \"error\": [\n      {\n        \"error-type\": \"application\",\n        \"error-tag\": \"invalid-value\",\n        \"error-message\": \"The subscription ID does not exist or has already transitioned to the END state.\"\n      }\n    ]\n  }\n}",
+      "parentUuid": "bcbbd242_2b887aa2",
+      "revId": "0459208e7d803668c0abdc7a6ad847437951fca1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
