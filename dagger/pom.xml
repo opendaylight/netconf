@@ -29,5 +29,6 @@
 
     <modules>
         <module>dagger-config</module>
+        <module>dagger-mdsal</module>
     </modules>
 </project>
