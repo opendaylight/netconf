@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "784e9c26_2d421ef8",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/StreamsResourceTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-29T07:34:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c0b0c8ee_369d6b8e",
+      "revId": "d7782d02373c0fe96e7bbc3768f7c5a770f614c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cfd6b2b1_77837d3a",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-01-27T13:23:19Z",
       "side": 1,
       "message": "why protected?",
+      "revId": "d7782d02373c0fe96e7bbc3768f7c5a770f614c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "960cb308_d75402fd",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/StreamsResourceTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-01-29T07:34:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cfd6b2b1_77837d3a",
       "revId": "d7782d02373c0fe96e7bbc3768f7c5a770f614c1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
