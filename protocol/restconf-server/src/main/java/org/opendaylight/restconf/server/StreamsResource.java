@@ -12,14 +12,9 @@ import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.handler.codec.http2.Http2Exception;
-import io.netty.handler.codec.http2.HttpConversionUtil;
-import io.netty.util.AsciiString;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -45,9 +40,6 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 final class StreamsResource extends AbstractEventStreamResource {
     private static final Logger LOG = LoggerFactory.getLogger(StreamsResource.class);
-    private static final AsciiString STREAM_ID = HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.text();
-
-    private final Map<Integer, Registration> senders = new HashMap<>();
 
     StreamsResource(final EndpointInvariants invariants, final RestconfStream.Registry streamRegistry,
             final int sseHeartbeatIntervalMillis, final int sseMaximumFragmentLength) {
@@ -100,12 +92,10 @@ final class StreamsResource extends AbstractEventStreamResource {
             return new EmptyResponse(HttpResponseStatus.NOT_ACCEPTABLE);
         }
 
-        final var streamId = headers.getInt(STREAM_ID);
-        return streamId != null ? addEventStream(streamId, stream, encoding, streamParams)
-            : switchToEventStream(stream, encoding, streamParams);
+        return switchToEventStream(stream, encoding, streamParams);
     }
 
-    // HTTP/1 event stream start. This amounts to a 'long GET', i.e. if our subscription attempt is successful, we will
+    // This amounts to a 'long GET', i.e. if our subscription attempt is successful, we will
     // not be servicing any other requests.
     private PreparedRequest switchToEventStream(final RestconfStream<?> stream,
             final RestconfStream.EncodingName encoding, final EventStreamGetParams params) {
@@ -119,6 +109,7 @@ final class StreamsResource extends AbstractEventStreamResource {
         return new EventStreamResponse(HttpResponseStatus.OK, sender, sseHeartbeatIntervalMillis);
     }
 
+<<<<<<< HEAD
     // HTTP/2 event stream start.
     private PreparedRequest addEventStream(final Integer streamId, final RestconfStream<?> stream,
             final RestconfStream.EncodingName encoding, final EventStreamGetParams params) {
@@ -133,6 +124,8 @@ final class StreamsResource extends AbstractEventStreamResource {
         return EmptyResponse.OK;
     }
 
+=======
+>>>>>>> 2ad7299388 (Remove StreamSender)
     private static @Nullable Registration registerSender(final RestconfStream<?> stream,
             final RestconfStream.EncodingName encoding, final EventStreamGetParams params,
             final RestconfStream.Sender sender) {
@@ -144,14 +137,5 @@ final class StreamsResource extends AbstractEventStreamResource {
             return null;
         }
         return reg;
-    }
-
-    public Boolean exceptionCaught(final Http2Exception.StreamException se) {
-        final var sender = senders.remove(se.streamId());
-        if (sender != null) {
-            sender.close();
-            return true;
-        }
-        return false;
     }
 }
