@@ -21,6 +21,7 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
 import io.netty.handler.codec.http.HttpServerUpgradeHandler;
 import io.netty.handler.codec.http2.CleartextHttp2ServerUpgradeHandler;
+import io.netty.handler.codec.http2.CleartextHttp2ServerUpgradeHandler.PriorKnowledgeUpgradeEvent;
 import io.netty.handler.codec.http2.Http2CodecUtil;
 import io.netty.handler.codec.http2.Http2FrameCodec;
 import io.netty.handler.codec.http2.Http2FrameCodecBuilder;
@@ -70,7 +71,7 @@ public enum HTTPScheme {
                         },
                         HTTPServer.MAX_HTTP_CONTENT_LENGTH),
                     http2FrameCodec))
-                .addBefore(ctx.name(), null, new CleartextUpgradeHandler());
+                .addBefore(ctx.name(), null, new CleartextUpgradeHandler(childInit));
         }
     },
     /**
@@ -134,8 +135,11 @@ public enum HTTPScheme {
     private static final class CleartextUpgradeHandler extends SimpleChannelInboundHandler<HttpMessage> {
         private static final Logger LOG = LoggerFactory.getLogger(CleartextUpgradeHandler.class);
 
-        CleartextUpgradeHandler() {
+        private final ChannelInitializer<Channel> childChannelInit;
+
+        CleartextUpgradeHandler(final ChannelInitializer<Channel> childChannelInit) {
             super(HttpMessage.class, false);
+            this.childChannelInit = childChannelInit;
         }
 
         @Override
@@ -157,6 +161,12 @@ public enum HTTPScheme {
             // need for downstream handlers to see this event.
             if (event instanceof HttpServerUpgradeHandler.UpgradeEvent) {
                 LOG.debug("{}: upgraded to HTTP/2", ctx.channel());
+                ctx.pipeline().remove(this);
+                ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
+            } else if (event instanceof PriorKnowledgeUpgradeEvent) {
+                // Prior-knowledge h2: CleartextHttp2ServerUpgradeHandler has already installed Http2FrameCodec,
+                LOG.debug("{}: using HTTP/2 prior knowledge", ctx.channel());
+                ctx.pipeline().addLast("h2-multiplexer", new Http2MultiplexHandler(childChannelInit));
                 ctx.pipeline().remove(this);
                 ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
             } else {
