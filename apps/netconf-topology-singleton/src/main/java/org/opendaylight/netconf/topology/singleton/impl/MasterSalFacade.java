@@ -62,9 +62,9 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private NetconfDeviceSchema currentSchema = null;
     private NetconfSessionPreferences netconfSessionPreferences = null;
     private RemoteDeviceServices deviceServices = null;
-    private DOMDataBroker deviceDataBroker = null;
-    private DataStoreService dataStoreService = null;
-    private NegotiatedSshAlg negotiatedSshKeys = null;
+    private DOMDataBroker deviceDataBroker;
+    private DataStoreService dataStoreService;
+    private NegotiatedSshAlg negotiatedSshKeys;
 
     /**
      * MasterSalFacade is responsible for handling the connection and disconnection
