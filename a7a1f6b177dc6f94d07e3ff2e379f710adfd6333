@@ -176,6 +176,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "265458a5_bb1d131f",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T13:04:56Z",
+      "side": 1,
+      "message": "for currentSchema, deviceServices and netconfSessionPreferences they are necessary, removed rest:\n[INFO] Total bugs: 5\n[ERROR] Low: MasterSalFacade.currentSchema not initialized in constructor and dereferenced in org.opendaylight.netconf.topology.singleton.impl.MasterSalFacade.sendInitialDataToActor() [org.opendaylight.netconf.topology.singleton.impl.MasterSalFacade] At MasterSalFacade.java:[line 202] UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR\n[ERROR] Low: MasterSalFacade.currentSchema not initialized in constructor and dereferenced in org.opendaylight.netconf.topology.singleton.impl.MasterSalFacade.updateDeviceData() [org.opendaylight.netconf.topology.singleton.impl.MasterSalFacade] At MasterSalFacade.java:[line 215] UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR\n[ERROR] Low: MasterSalFacade.deviceServices not initialized in constructor and dereferenced in org.opendaylight.netconf.topology.singleton.impl.MasterSalFacade.newDataStoreService(DatabindContext, NetconfSessionPreferences) [org.opendaylight.netconf.topology.singleton.impl.MasterSalFacade] At MasterSalFacade.java:[line 197] UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR\n[ERROR] Low: MasterSalFacade.deviceServices not initialized in constructor and dereferenced in org.opendaylight.netconf.topology.singleton.impl.MasterSalFacade.newDeviceDataBroker(DatabindContext, NetconfSessionPreferences) [org.opendaylight.netconf.topology.singleton.impl.MasterSalFacade] At MasterSalFacade.java:[line 192] UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR\n[ERROR] Low: MasterSalFacade.netconfSessionPreferences not initialized in constructor and dereferenced in org.opendaylight.netconf.topology.singleton.impl.MasterSalFacade.updateDeviceData() [org.opendaylight.netconf.topology.singleton.impl.MasterSalFacade] At MasterSalFacade.java:[line 216] UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR",
+      "parentUuid": "92f5b7e0_85799e3b",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d8c86ff3_c120dc43",
