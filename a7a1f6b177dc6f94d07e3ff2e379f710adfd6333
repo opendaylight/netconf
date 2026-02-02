@@ -226,6 +226,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b7e15f4_5bd8f3b2",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T07:16:00Z",
+      "side": 1,
+      "message": "clientSession.getNegotiatedKexParameter() method used to get algorithms can return null",
+      "parentUuid": "fb2644f8_86c13f90",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "04866725_d4765461",
