@@ -52,6 +52,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "706a22c0_f897c024",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T06:34:46Z",
+      "side": 1,
+      "message": "We do not anymore",
+      "parentUuid": "7b77de5f_24c79a99",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "33144194_857b097f",
@@ -103,6 +121,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "290c6d6c_b67bdcbd",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T06:34:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8c86ff3_c120dc43",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6fc07cd2_2557f04f",
@@ -133,6 +169,42 @@
       "writtenOn": "2026-01-27T12:58:57Z",
       "side": 1,
       "message": "buildNegotiatedParameters() or any other better name",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "688cb91f_715a3aa3",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T06:34:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6fc07cd2_2557f04f",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ff9aa6c_8a6860a1",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T06:34:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72186e5f_b5e9e4e6",
       "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -223,6 +295,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e1735c1_6fe76d05",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceSalFacade.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T06:34:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b449387_d9b0e2ee",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4f7d9f12_e48fa24d",
@@ -236,6 +326,24 @@
       "writtenOn": "2026-01-27T12:49:43Z",
       "side": 1,
       "message": "why @Nullable?",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68e43863_f4ce8488",
+        "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientFactory.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T06:34:46Z",
+      "side": 1,
+      "message": "Not anymore",
+      "parentUuid": "4f7d9f12_e48fa24d",
       "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -270,6 +378,24 @@
       "writtenOn": "2026-01-27T12:31:27Z",
       "side": 1,
       "message": "document new parameter in javadoc",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f58c9545_9ea17e98",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStackFactory.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T06:34:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9892fbfd_01ee8fd9",
       "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
