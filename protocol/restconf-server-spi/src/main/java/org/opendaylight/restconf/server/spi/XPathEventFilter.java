@@ -23,8 +23,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.api.NamespaceURN;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
@@ -84,7 +82,7 @@ public abstract non-sealed class XPathEventFilter<T> extends EventFilter<T> {
     }
 
     @Override
-    final boolean matches(final EffectiveModelContext modelContext, final T event) {
+    final boolean test(final EffectiveModelContext modelContext, final T event) {
         final Document doc;
         try {
             doc = DBF.newDocumentBuilder().newDocument();
@@ -136,10 +134,5 @@ public abstract non-sealed class XPathEventFilter<T> extends EventFilter<T> {
         try (var nodeWriter = NormalizedNodeWriter.forStreamWriter(writer)) {
             nodeWriter.write(body);
         }
-    }
-
-    @Override
-    public boolean test(final YangInstanceIdentifier path, final ContainerNode body) {
-        throw new UnsupportedOperationException("XPathEventFilter does not support path/body-based filtering");
     }
 }
