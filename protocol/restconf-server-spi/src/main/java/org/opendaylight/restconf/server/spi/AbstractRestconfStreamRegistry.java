@@ -74,12 +74,10 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.common.Uint64;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
@@ -98,7 +96,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     @Beta
     @NonNullByDefault
     public interface EventStreamFilter {
-        boolean test(YangInstanceIdentifier path, ContainerNode body);
+        boolean matches(Object event);
     }
 
     /**
@@ -391,7 +389,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         void setFilter(final EventStreamFilter newFilter) {
             filter = newFilter;
             for (final var receiver : receivers) {
-                receiver.eventStreamFilter(newFilter);
+                receiver.setFilter(newFilter);
             }
         }
 

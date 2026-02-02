@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server.spi;
 
 import static org.opendaylight.netconf.databind.subtree.SubtreeMatcher.permitsPath;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import java.util.List;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
@@ -20,7 +21,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public final class SubtreeEventStreamFilter extends EventFilter<DOMNotification> {
     private final SubtreeFilter filter;
@@ -30,15 +30,18 @@ public final class SubtreeEventStreamFilter extends EventFilter<DOMNotification>
     }
 
     @Override
-    public boolean test(final YangInstanceIdentifier path, final ContainerNode body) {
-        return permitsPath(filter, path) && new SubtreeMatcher(filter, body, path).matches();
-    }
-
-    @Override
-    boolean matches(final EffectiveModelContext modelContext, final DOMNotification event) {
+    boolean test(final DOMNotification event) {
         final var path = extractPath(event);
         final var body  = extractBody(event);
-        return path != null && body != null && test(path, body);
+        if (path != null && body != null) {
+            return permitsPath(filter, path) && new SubtreeMatcher(filter, body, path).matches();
+        }
+        return false;
+    }
+
+    @VisibleForTesting
+    boolean testInternal(final YangInstanceIdentifier path, final ContainerNode body) {
+        return permitsPath(filter, path) && new SubtreeMatcher(filter, body, path).matches();
     }
 
     private static <T> YangInstanceIdentifier extractPath(final T event) {

@@ -23,8 +23,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.api.NamespaceURN;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
@@ -71,6 +69,7 @@ public abstract non-sealed class XPathEventFilter<T> extends EventFilter<T> {
 
     private final String expression;
     private final XPathExpression filter;
+    private final EffectiveModelContext modelContext;
 
     protected XPathEventFilter(final String expression) throws XPathExpressionException {
         this.expression = requireNonNull(expression);
@@ -80,11 +79,12 @@ public abstract non-sealed class XPathEventFilter<T> extends EventFilter<T> {
             xpath = XPF.newXPath();
         }
         // FIXME: NETCONF-369: we need to bind the namespace context here and for that we need the SchemaContext
+        this.modelContext = null;
         filter = xpath.compile(expression);
     }
 
     @Override
-    final boolean matches(final EffectiveModelContext modelContext, final T event) {
+    boolean test(final T event) {
         final Document doc;
         try {
             doc = DBF.newDocumentBuilder().newDocument();
@@ -136,10 +136,5 @@ public abstract non-sealed class XPathEventFilter<T> extends EventFilter<T> {
         try (var nodeWriter = NormalizedNodeWriter.forStreamWriter(writer)) {
             nodeWriter.write(body);
         }
-    }
-
-    @Override
-    public boolean test(final YangInstanceIdentifier path, final ContainerNode body) {
-        throw new UnsupportedOperationException("XPathEventFilter does not support path/body-based filtering");
     }
 }
