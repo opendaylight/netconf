@@ -35,6 +35,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b58f48b_52533c46",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 29
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T11:53:42Z",
+      "side": 1,
+      "message": "chacha20-poly1305 is a generic name of algorithm we require \nchacha20-poly1305@openssh.com is a specific implementation of algorithm that was used",
+      "parentUuid": "2d28956f_85af3357",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29b232dd_1099fbc4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 29
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T11:53:42Z",
+      "side": 1,
+      "message": "aead a mode of encryption that combines multiple functionalities and include multiple algorithms\nIt is valid result",
+      "parentUuid": "47c3e15a_8357b2c3",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7b77de5f_24c79a99",
@@ -118,6 +154,24 @@
       "writtenOn": "2026-01-27T12:43:08Z",
       "side": 1,
       "message": "these nulls are useless - you can remove them in follow-up patch",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92f5b7e0_85799e3b",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T11:53:42Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/120457",
+      "parentUuid": "447eb676_f2d24095",
       "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -279,6 +333,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e85129d_e7c9ca2b",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfTopologyDeviceSalFacade.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T11:53:42Z",
+      "side": 1,
+      "message": "this implementation was removed.\nthis is called when parameters are negotiated before onDeviceConnected is called, onDeviceConnected just use this variable when that happens,",
+      "parentUuid": "04866725_d4765461",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d9c4d39_2a478d1c",
@@ -310,6 +382,24 @@
       "side": 1,
       "message": "https://docs.opendaylight.org/en/latest/contributor-guides/coding-guidelines/coding-guidelines-java.html#pre-review-guidance",
       "parentUuid": "3d9c4d39_2a478d1c",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9201f01_c137ce75",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T11:53:42Z",
+      "side": 1,
+      "message": "added proper test to MountPointE2ETest",
+      "parentUuid": "7ca39cd6_72df8d64",
       "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
