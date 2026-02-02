@@ -80,7 +80,7 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
         private State receiverState;
 
         Rfc8639Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter,
-                final EventFilter<T> filter, final String receiverName, final State receiverState) {
+                final EventStreamFilter filter, final String receiverName, final State receiverState) {
             super(stream, sender, formatter, filter);
             this.receiverName = requireNonNull(receiverName);
             this.receiverState = requireNonNull(receiverState);
@@ -137,10 +137,6 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
             return Uint64.fromLongBits((long) vh.getAcquire(this));
         }
 
-        public void eventStreamFilter(final EventStreamFilter newEventStreamFilter) {
-            setFilter((EventFilter<T>) newEventStreamFilter);
-        }
-
         public void setReceiverState(final State newState) {
             receiverState = requireNonNull(newState);
         }
@@ -150,17 +146,17 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
     private final EventFormatter<T> formatter;
     private final Sender sender;
 
-    private EventFilter<T> filter;
+    private EventStreamFilter filter;
 
     Subscriber(final RestconfStream<T> stream, final Sender sender, final EventFormatter<T> formatter,
-            final EventFilter<T> filter) {
+            final EventStreamFilter filter) {
         this.stream = requireNonNull(stream);
         this.sender = requireNonNull(sender);
         this.formatter = requireNonNull(formatter);
         this.filter = requireNonNull(filter);
     }
 
-    final EventFilter<T> filter() {
+    final EventStreamFilter filter() {
         return filter;
     }
 
@@ -172,7 +168,7 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
         return sender;
     }
 
-    final void setFilter(final EventFilter<T> newFilter) {
+    final void setFilter(final EventStreamFilter newFilter) {
         this.filter = requireNonNull(newFilter);
     }
 
