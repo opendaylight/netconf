@@ -108,7 +108,7 @@ class SubtreeEventStreamFilterTest {
         final var path = YangInstanceIdentifier.of(NodeIdentifier.create(INTERFACES_QNAME),
             NodeIdentifierWithPredicates.of(INTERFACE_QNAME, NAME_QNAME, "eth1"));
         final var streamFilter = new SubtreeEventStreamFilter(subtreeFilter);
-        assertTrue(streamFilter.test(path, notificationBody()));
+        assertTrue(streamFilter.testInternal(path, notificationBody()));
     }
 
     @Test
@@ -117,7 +117,7 @@ class SubtreeEventStreamFilterTest {
         final var invalidPath = YangInstanceIdentifier.of(NodeIdentifier.create(INTERFACES_QNAME))
             .node(NodeIdentifier.create(fooQname));
         final var streamFilter = new SubtreeEventStreamFilter(subtreeFilter);
-        assertFalse(streamFilter.test(invalidPath, notificationBody()));
+        assertFalse(streamFilter.testInternal(invalidPath, notificationBody()));
     }
 
     private static ContainerNode notificationBody() {
