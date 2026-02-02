@@ -87,6 +87,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b660e662_72bdaf02",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T08:06:10Z",
+      "side": 1,
+      "message": "Reverted back",
+      "parentUuid": "33144194_857b097f",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "447eb676_f2d24095",
@@ -379,6 +397,24 @@
       "writtenOn": "2026-01-27T13:11:33Z",
       "side": 1,
       "message": "this probably need to be relocated closer to its implementation and usage, then we do not need to add new dependencies to transport-api",
+      "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a170327_5b4605b7",
+        "filename": "transport/transport-api/src/main/java/org/opendaylight/netconf/transport/api/SSHNegotiatedAlgListener.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T08:06:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a78908d_1913a297",
       "revId": "a7a1f6b177dc6f94d07e3ff2e379f710adfd6333",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
