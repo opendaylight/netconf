@@ -33,6 +33,24 @@
       "message": "we have never configured aead",
       "revId": "80df71dad5851eb4c3a433a2bd7e29a0d94174e6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5b382aa_a0c11f44",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1826,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T15:11:55Z",
+      "side": 1,
+      "message": "aead a mode of encryption that combines multiple functionalities and include multiple algorithms\nIt is valid result",
+      "parentUuid": "2252597c_3ba3b24f",
+      "revId": "80df71dad5851eb4c3a433a2bd7e29a0d94174e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
