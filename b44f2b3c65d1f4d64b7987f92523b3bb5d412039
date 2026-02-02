@@ -16,6 +16,57 @@
       "message": "recheck",
       "revId": "b44f2b3c65d1f4d64b7987f92523b3bb5d412039",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29b94186_e905cb9a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-02T11:44:16Z",
+      "side": 1,
+      "message": "Please provide a unit test to verify this functionality.",
+      "revId": "b44f2b3c65d1f4d64b7987f92523b3bb5d412039",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b64038c_d6586e7a",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-02T11:44:16Z",
+      "side": 1,
+      "message": "final",
+      "revId": "b44f2b3c65d1f4d64b7987f92523b3bb5d412039",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7488baae_40446724",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-02T11:44:16Z",
+      "side": 1,
+      "message": "else if",
+      "revId": "b44f2b3c65d1f4d64b7987f92523b3bb5d412039",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
