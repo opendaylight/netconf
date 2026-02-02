@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f78cd6a_ed29e32e",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1815,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-02T15:12:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba7f1837_b462ddf5",
+      "revId": "80df71dad5851eb4c3a433a2bd7e29a0d94174e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2252597c_3ba3b24f",
