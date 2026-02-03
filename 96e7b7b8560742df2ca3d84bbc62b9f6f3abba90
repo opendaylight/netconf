@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb1af8ca_352884e8",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHNegotiatedAlgListener.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-02-03T13:01:09Z",
+      "side": 1,
+      "message": "wrong indent?",
+      "revId": "96e7b7b8560742df2ca3d84bbc62b9f6f3abba90",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f0f521d_965ac9ed",
+        "filename": "usecase/netconf-testtool/src/test/java/org/opendaylight/netconf/test/tool/TestToolTest.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-02-03T13:01:09Z",
+      "side": 1,
+      "message": "no op",
+      "revId": "96e7b7b8560742df2ca3d84bbc62b9f6f3abba90",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

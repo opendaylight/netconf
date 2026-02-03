@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5d0899e_164f7b7b",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-02-03T13:01:09Z",
+      "side": 0,
+      "message": "should fit on one line",
+      "revId": "d6d87e9a5a2704d12269f4e3f223b972e7a08c56",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "807b3875_2f1f7f73",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MountPointEndToEndTest.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-02-03T13:01:09Z",
+      "side": 0,
+      "message": "don\u0027t change",
+      "revId": "d6d87e9a5a2704d12269f4e3f223b972e7a08c56",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
