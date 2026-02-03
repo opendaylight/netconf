@@ -9,7 +9,6 @@ package org.opendaylight.restconf.server.spi;
 
 import static org.opendaylight.netconf.databind.subtree.SubtreeMatcher.permitsPath;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import java.util.List;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
@@ -38,11 +37,6 @@ public final class SubtreeEventStreamFilter extends EventFilter<DOMNotification>
             return testInternal(path, body);
         }
         return false;
-    }
-
-    @VisibleForTesting
-    boolean testInternal(final YangInstanceIdentifier path, final ContainerNode body) {
-        return permitsPath(filter, path) && new SubtreeMatcher(filter, body, path).matches();
     }
 
     private static <T> YangInstanceIdentifier extractPath(final T event) {

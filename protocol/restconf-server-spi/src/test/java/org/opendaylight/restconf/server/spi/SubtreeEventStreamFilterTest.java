@@ -12,10 +12,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent.Rfc7950;
 import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -25,6 +28,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
@@ -108,7 +112,7 @@ class SubtreeEventStreamFilterTest {
         final var path = YangInstanceIdentifier.of(NodeIdentifier.create(INTERFACES_QNAME),
             NodeIdentifierWithPredicates.of(INTERFACE_QNAME, NAME_QNAME, "eth1"));
         final var streamFilter = new SubtreeEventStreamFilter(subtreeFilter);
-        assertTrue(streamFilter.testInternal(path, notificationBody()));
+        assertTrue(streamFilter.test(MODEL_CONTEXT, notification(path)));
     }
 
     @Test
@@ -117,7 +121,11 @@ class SubtreeEventStreamFilterTest {
         final var invalidPath = YangInstanceIdentifier.of(NodeIdentifier.create(INTERFACES_QNAME))
             .node(NodeIdentifier.create(fooQname));
         final var streamFilter = new SubtreeEventStreamFilter(subtreeFilter);
-        assertFalse(streamFilter.testInternal(invalidPath, notificationBody()));
+        assertFalse(streamFilter.test(MODEL_CONTEXT, notification(invalidPath)));
+    }
+
+    private static DOMNotification notification(final YangInstanceIdentifier path) {
+        return new Rfc7950(Absolute.of(INTERFACE_ENABLED_QNAME), path, notificationBody(), Instant.now());
     }
 
     private static ContainerNode notificationBody() {
