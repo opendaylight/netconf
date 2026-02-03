@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6c4bd265_c9cfb6d2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-02-03T15:46:07Z",
+      "side": 1,
+      "message": ".. and we are missing module.info.java, see https://github.com/opendaylight/odlparent/tree/master/lib/dagger-example",
+      "revId": "41001c240d4103b927aaa8cdb7106f27695060f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "28c0a916_37d0983e",
         "filename": "dagger/dagger-config/pom.xml",
         "patchSetId": 4
