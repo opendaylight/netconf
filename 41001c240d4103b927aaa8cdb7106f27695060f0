@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e274bded_443972c5",
+        "filename": "dagger/dagger-config/src/main/java/org/opendaylight/netconf/dagger/config/SpringbootConfigLoader.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-02-03T12:58:40Z",
+      "side": 1,
+      "message": "please use static factory injection, just like we do everywhere else",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 5
+      },
+      "revId": "41001c240d4103b927aaa8cdb7106f27695060f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d8cc8212_62868343",
         "filename": "dagger/dagger-mdsal/pom.xml",
         "patchSetId": 4
