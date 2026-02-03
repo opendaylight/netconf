@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bf3eea07_d8159f80",
+        "filename": "dagger/dagger-config/src/main/java/org/opendaylight/netconf/dagger/config/ConfigLoader.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-02-03T12:58:08Z",
+      "side": 1,
+      "message": "why naked String and not a Path?",
+      "range": {
+        "startLine": 31,
+        "startChar": 59,
+        "endLine": 31,
+        "endChar": 65
+      },
+      "revId": "41001c240d4103b927aaa8cdb7106f27695060f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d8cc8212_62868343",
         "filename": "dagger/dagger-mdsal/pom.xml",
         "patchSetId": 4
