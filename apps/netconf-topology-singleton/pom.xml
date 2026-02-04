@@ -240,6 +240,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+            <artifactId>rfc9643-ietf-tcp-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>keystore-legacy</artifactId>
             <scope>test</scope>
