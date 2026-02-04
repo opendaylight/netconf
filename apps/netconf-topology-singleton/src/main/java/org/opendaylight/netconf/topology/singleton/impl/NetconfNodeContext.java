@@ -42,9 +42,9 @@ final class NetconfNodeContext implements AutoCloseable {
     private final @NonNull SchemaResourceManager schemaManager;
     private final @NonNull NetconfClientConfigurationBuilderFactory builderFactory;
     private final @NonNull DOMMountPointService mountPointService;
-    private final @NonNull RemoteDeviceId remoteDeviceId;
     private final @NonNull Timeout actorResponseWaitTime;
 
+    private @NonNull RemoteDeviceId remoteDeviceId;
     private @NonNull NetconfTopologySetup setup;
     private @Nullable ActorRef masterActorRef;
     private @Nullable MasterSalFacade masterSalFacade;
@@ -91,7 +91,10 @@ final class NetconfNodeContext implements AutoCloseable {
         }
     }
 
-    void refreshSetupConnection(final NetconfTopologySetup netconfTopologyDeviceSetup, final RemoteDeviceId device) {
+    void refreshSetupConnection(final @NonNull NetconfTopologySetup netconfTopologyDeviceSetup,
+            final @NonNull RemoteDeviceId device) {
+        setup = requireNonNull(netconfTopologyDeviceSetup);
+        remoteDeviceId = requireNonNull(device);
         dropNode();
 
         Patterns.ask(masterActorRef, new RefreshSetupMasterActorData(netconfTopologyDeviceSetup, device),
@@ -115,12 +118,15 @@ final class NetconfNodeContext implements AutoCloseable {
      * @param sshParams  new topology ssh parameters
      * @param device     {@link RemoteDeviceId} of affected device
      */
-    void refreshSshParamsConnection(final SshTransportTopologyParameters sshParams, final RemoteDeviceId device) {
-        setup = requireNonNull(setupWithNewSshParams(sshParams));
-        refreshSetupConnection(setup, device);
+    void refreshSshParamsConnection(final @NonNull SshTransportTopologyParameters sshParams,
+            final @NonNull RemoteDeviceId device) {
+        refreshSetupConnection(setupWithNewSshParams(sshParams), device);
     }
 
-    void refreshDevice(final NetconfTopologySetup netconfTopologyDeviceSetup, final RemoteDeviceId deviceId) {
+    void refreshDevice(final @NonNull NetconfTopologySetup netconfTopologyDeviceSetup,
+            final @NonNull RemoteDeviceId deviceId) {
+        setup = requireNonNull(netconfTopologyDeviceSetup);
+        remoteDeviceId = requireNonNull(deviceId);
         netconfNodeManager.refreshDevice(netconfTopologyDeviceSetup, deviceId);
     }
 
@@ -130,7 +136,8 @@ final class NetconfNodeContext implements AutoCloseable {
      * @param sshParams  new topology ssh parameters
      * @param deviceId   {@link RemoteDeviceId} of affected device
      */
-    void refreshDevice(final SshTransportTopologyParameters sshParams, final RemoteDeviceId deviceId) {
+    void refreshDevice(final @NonNull SshTransportTopologyParameters sshParams,
+            final @NonNull RemoteDeviceId deviceId) {
         setup = requireNonNull(setupWithNewSshParams(sshParams));
         netconfNodeManager.refreshDevice(setup, deviceId);
     }
