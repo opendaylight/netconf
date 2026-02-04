@@ -212,6 +212,11 @@
             <artifactId>mdsal-binding-test-utils</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc9643-ietf-tcp-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
             <artifactId>mdsal-dom-broker</artifactId>
             <scope>test</scope>
