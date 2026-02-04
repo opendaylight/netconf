@@ -106,6 +106,24 @@
       "parentUuid": "bed631a3_b364f551",
       "revId": "0459208e7d803668c0abdc7a6ad847437951fca1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "563916a7_42c43dcd",
+        "filename": "protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-04T07:24:24Z",
+      "side": 1,
+      "message": "Only tag that can result to 404 Not found acording to ErrorTagMapping enum is data-missing, and that apply only for ERRATA_5565 config, for RFC8040 config, that will result into 409 Conflict\n\nhttps://github.com/opendaylight/netconf/blob/b385ebcf7859702887fd60e5c4a65e3990002b2f/protocol/restconf-server-spi/src/main/java/org/opendaylight/restconf/server/spi/ErrorTagMapping.java#L34",
+      "parentUuid": "4cf2429d_fba5a7dd",
+      "revId": "0459208e7d803668c0abdc7a6ad847437951fca1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
