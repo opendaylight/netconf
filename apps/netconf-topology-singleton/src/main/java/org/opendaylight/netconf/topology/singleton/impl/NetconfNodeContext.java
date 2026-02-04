@@ -37,14 +37,14 @@ final class NetconfNodeContext implements AutoCloseable {
     private final SchemaResourceManager schemaManager;
     private final NetconfClientConfigurationBuilderFactory builderFactory;
     private final DOMMountPointService mountPointService;
-    private final RemoteDeviceId remoteDeviceId;
-    private final NetconfTopologySetup setup;
     private final Timeout actorResponseWaitTime;
 
     private ActorRef masterActorRef;
     private MasterSalFacade masterSalFacade;
     private NetconfNodeManager netconfNodeManager;
     private NetconfNodeHandler nodeHandler;
+    private RemoteDeviceId remoteDeviceId;
+    private NetconfTopologySetup setup;
 
     NetconfNodeContext(final NetconfTopologySetup setup, final SchemaResourceManager schemaManager,
             final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
@@ -86,6 +86,8 @@ final class NetconfNodeContext implements AutoCloseable {
     }
 
     void refreshSetupConnection(final NetconfTopologySetup netconfTopologyDeviceSetup, final RemoteDeviceId device) {
+        setup = requireNonNull(netconfTopologyDeviceSetup);
+        remoteDeviceId = requireNonNull(device);
         dropNode();
 
         Patterns.ask(masterActorRef, new RefreshSetupMasterActorData(netconfTopologyDeviceSetup, device),
@@ -104,6 +106,8 @@ final class NetconfNodeContext implements AutoCloseable {
     }
 
     void refreshDevice(final NetconfTopologySetup netconfTopologyDeviceSetup, final RemoteDeviceId deviceId) {
+        setup = requireNonNull(netconfTopologyDeviceSetup);
+        remoteDeviceId = requireNonNull(deviceId);
         netconfNodeManager.refreshDevice(netconfTopologyDeviceSetup, deviceId);
     }
 
