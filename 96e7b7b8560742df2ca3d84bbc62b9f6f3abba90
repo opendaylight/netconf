@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9c8e37b_eac9308d",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHNegotiatedAlgListener.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-04T07:29:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fb1af8ca_352884e8",
+      "revId": "96e7b7b8560742df2ca3d84bbc62b9f6f3abba90",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6f0f521d_965ac9ed",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-02-03T13:01:09Z",
       "side": 1,
       "message": "no op",
+      "revId": "96e7b7b8560742df2ca3d84bbc62b9f6f3abba90",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b0b7224_5e73fcb1",
+        "filename": "usecase/netconf-testtool/src/test/java/org/opendaylight/netconf/test/tool/TestToolTest.java",
+        "patchSetId": 45
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-04T07:29:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f0f521d_965ac9ed",
       "revId": "96e7b7b8560742df2ca3d84bbc62b9f6f3abba90",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
