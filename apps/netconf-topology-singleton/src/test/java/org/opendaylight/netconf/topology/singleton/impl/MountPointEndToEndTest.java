@@ -183,6 +183,10 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
     private static final String TEST_ROOT_DIRECTORY = "test-cache-root";
     private static final String TEST_DEFAULT_SUBDIR = "test-schema";
+    private static final Host HOST = new Host(new IpAddress(new Ipv4Address("127.0.0.1")));
+    private static final Host UPDATED_HOST = new Host(new IpAddress(new Ipv4Address("127.0.0.2")));
+    private static final PortNumber PORT = new PortNumber(Uint16.valueOf(1234));
+    private static final PortNumber UPDATED_PORT = new PortNumber(Uint16.valueOf(9876));
 
     @Mock
     private RpcProviderService mockRpcProviderService;
@@ -411,7 +415,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private void testMaster() throws Exception {
         LOG.info("****** Testing master");
 
-        writeNetconfNode(TEST_DEFAULT_SUBDIR, masterDataBroker);
+        writeNetconfNode(TEST_DEFAULT_SUBDIR, masterDataBroker, HOST, PORT);
 
         final var masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
         masterSalFacade.onDeviceConnected(
@@ -433,7 +437,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private void testSlave() throws Exception {
         LOG.info("****** Testing slave");
 
-        writeNetconfNode("slave", slaveDataBroker);
+        writeNetconfNode("slave", slaveDataBroker, HOST, PORT);
 
         verify(mockSlaveClusterSingletonServiceProvider, timeout(5000)).registerClusterSingletonService(any());
 
@@ -474,7 +478,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         slaveMountPointService.registerProvisionListener(slaveMountPointListener);
 
         masterSalFacadeFuture = SettableFuture.create();
-        writeNetconfNode(TEST_DEFAULT_SUBDIR, masterDataBroker);
+        writeNetconfNode(TEST_DEFAULT_SUBDIR, masterDataBroker, UPDATED_HOST, UPDATED_PORT);
 
         verify(masterMountPointListener, timeout(5000)).onMountPointRemoved(yangNodeInstanceId);
 
@@ -490,6 +494,9 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         verify(slaveMountPointListener, timeout(5000)).onMountPointRemoved(yangNodeInstanceId);
         verify(slaveMountPointListener, timeout(5000)).onMountPointCreated(mountPointCaptor.capture());
         assertEquals(yangNodeInstanceId, mountPointCaptor.getValue().getIdentifier());
+
+        // verify the node was correctly updated in operational datastore
+        verifyTopologyNodesUpdated(masterDataBroker);
 
         return masterSalFacade;
     }
@@ -635,13 +642,14 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         assertTrue(readTx.cancel());
     }
 
-    private static void writeNetconfNode(final String cacheDir, final DataBroker dataBroker) throws Exception {
+    private static void writeNetconfNode(final String cacheDir, final DataBroker dataBroker, final Host host,
+            final PortNumber port) throws Exception {
         putData(dataBroker, NODE_INSTANCE_ID, new NodeBuilder()
             .withKey(NODE_INSTANCE_ID.key())
             .addAugmentation(new NetconfNodeAugmentBuilder()
                 .setNetconfNode(new NetconfNodeBuilder()
-                    .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                    .setPort(new PortNumber(Uint16.valueOf(1234)))
+                    .setHost(host)
+                    .setPort(port)
                     .setActorResponseWaitTime(Uint16.valueOf(10))
                     .setTcpOnly(Boolean.TRUE)
                     .setSchemaless(Boolean.FALSE)
@@ -680,6 +688,22 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             try (ReadTransaction readTx = dataBroker.newReadOnlyTransaction()) {
                 return readTx.exists(LogicalDatastoreType.OPERATIONAL,
                     NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
+            }
+        });
+    }
+
+    private static void verifyTopologyNodesUpdated(final DataBroker dataBroker) {
+        await().atMost(5, TimeUnit.SECONDS).until(() -> {
+            try (ReadTransaction readTx = dataBroker.newReadOnlyTransaction()) {
+                Optional<Node> node = readTx.read(LogicalDatastoreType.OPERATIONAL,
+                    NODE_INSTANCE_ID).get(5, TimeUnit.SECONDS);
+                assertTrue(node.isPresent());
+                final var nodeAugment = node.orElseThrow().augmentation(NetconfNodeAugment.class);
+                assertNotNull(nodeAugment);
+                final var netconfNode = nodeAugment.getNetconfNode();
+                assertEquals(UPDATED_HOST, netconfNode.getHost());
+                assertEquals(UPDATED_PORT, netconfNode.getPort());
+                return true;
             }
         });
     }
