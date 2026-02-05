@@ -61,7 +61,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private static final YangInstanceIdentifier RFC8528_SCHEMA_MOUNTS = YangInstanceIdentifier.of(
         NodeIdentifier.create(RFC8528_SCHEMA_MOUNTS_QNAME));
 
-    protected final RemoteDeviceId id;
+    private final RemoteDeviceId id;
     private final BaseNetconfSchemaProvider baseSchemaProvider;
     private final DeviceNetconfSchemaProvider deviceSchemaProvider;
     private final Executor processingExecutor;
