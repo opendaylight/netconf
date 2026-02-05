@@ -16,6 +16,24 @@
       "message": "move this to container",
       "revId": "c8bf00e0424a055efd945b4f761269af7166eaef",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cc45336_7b7ab67a",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 13
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-02-05T15:11:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3584c80a_44e3a7c5",
+      "revId": "c8bf00e0424a055efd945b4f761269af7166eaef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
