@@ -48,8 +48,8 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
      *
      * @param subsystem bound subsystem name
      * @param listener client channel listener, required
-     * @param connectParams TCP transport configuration addressing server to connect, required
      * @param algListener listener for negotiated transport parameters
+     * @param connectParams TCP transport configuration addressing server to connect, required
      * @param clientParams SSH overlay configuration, required, should contain username
      * @param configurator client factory manager configurator, optional
      * @return a future producing {@link SSHClient}
@@ -78,6 +78,7 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
      *
      * @param subsystem bound subsystem name
      * @param listener client channel listener, required
+     * @param algListener listener for negotiated transport parameters
      * @param listenParams TCP transport configuration addressing inbound connection, required
      * @param clientParams SSH overlay configuration, required, should contain username
      * @param configurator client factory manager configurator, optional
@@ -133,8 +134,8 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
     /**
      * Builds and starts SSH Server.
      *
-     * @param listener server channel listener, required
      * @param subsystem bound subsystem name
+     * @param listener server channel listener, required
      * @param listenParams TCP transport configuration, required
      * @param serverParams SSH overlay configuration, optional if configurator is defined, required otherwise
      * @param configurator server factory manager configurator, optional if serverParams is defined, required otherwise
