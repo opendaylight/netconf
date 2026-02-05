@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d68891c_55412781",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-05T08:38:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "29b94186_e905cb9a",
+      "revId": "b44f2b3c65d1f4d64b7987f92523b3bb5d412039",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9b64038c_d6586e7a",
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9de304d1_eac8817f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-05T08:38:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b64038c_d6586e7a",
+      "revId": "b44f2b3c65d1f4d64b7987f92523b3bb5d412039",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7488baae_40446724",
@@ -65,6 +101,24 @@
       "writtenOn": "2026-02-02T11:44:16Z",
       "side": 1,
       "message": "else if",
+      "revId": "b44f2b3c65d1f4d64b7987f92523b3bb5d412039",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2bd64b0_040752b5",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-05T08:38:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7488baae_40446724",
       "revId": "b44f2b3c65d1f4d64b7987f92523b3bb5d412039",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
