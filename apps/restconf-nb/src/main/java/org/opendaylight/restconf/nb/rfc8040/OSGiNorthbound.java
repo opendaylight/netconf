@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.netconf.transport.http.HttpServerStackConfiguration;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
@@ -144,6 +145,16 @@ public final class OSGiNorthbound {
                 """,
             min = "16384", max = "16777215")
         int http2$_$max$_$frame$_$size() default 16384; // 16 KiB
+
+        @AttributeDefinition(
+            name = "HTTP/3 Alt-Svc max-age (seconds)",
+            description = """
+                Max-Age (ma) value advertised in Alt-Svc header for HTTP/3 (h3).
+                The advertised port is always bind-port.
+                Set to 0 to disable Alt-Svc advertisement.
+                """,
+            min = "0")
+        int http3$_$alt$_$svc$_$max$_$age() default 3600;
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
@@ -250,6 +261,10 @@ public final class OSGiNorthbound {
                 tlsCertKey.certificate(), tlsCertKey.privateKey())
             : ConfigUtils.serverTransportTcp(configuration.bind$_$address(), configuration.bind$_$port());
 
+        final var altSvc = tlsCertKey != null
+            ? buildAltSvcHeader(configuration.bind$_$port(), configuration.http3$_$alt$_$svc$_$max$_$age())
+            : null;
+
         return OSGiNettyEndpoint.props(bootstrapFactory, new NettyEndpointConfiguration(
             configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
             PrettyPrintParam.of(configuration.pretty$_$print()),
@@ -257,7 +272,8 @@ public final class OSGiNorthbound {
             Uint32.valueOf(configuration.heartbeat$_$interval()), configuration.api$_$root$_$path(),
             parseDefaultEncoding(configuration.default$_$encoding()), new HttpServerStackConfiguration(transport),
             Uint32.valueOf(configuration.http$_$chunk$_$size()),
-            Uint32.valueOf(configuration.http2$_$max$_$frame$_$size()))
+            Uint32.valueOf(configuration.http2$_$max$_$frame$_$size()),
+            altSvc)
         );
     }
 
@@ -269,5 +285,15 @@ public final class OSGiNorthbound {
         } else {
             throw new IllegalArgumentException("Invalid default-encoding '" + str + "'");
         }
+    }
+
+    private static @Nullable String buildAltSvcHeader(final int bindPort, final int maxAgeSeconds) {
+        if (maxAgeSeconds <= 0) {
+            return null;
+        }
+        if (bindPort <= 0 || bindPort > 65535) {
+            throw new IllegalArgumentException("Invalid bind port " + bindPort);
+        }
+        return "h3=\":%d\"; ma=%d".formatted(bindPort, maxAgeSeconds);
     }
 }
