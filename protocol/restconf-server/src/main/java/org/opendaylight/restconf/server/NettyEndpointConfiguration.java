@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
@@ -53,14 +54,17 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     private final @NonNull MessageEncoding defaultEncoding;
     private final @NonNull Uint32 chunkSize;
     private final @NonNull Uint32 frameSize;
+    private final @Nullable String altSvcHeaderValue;
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
             final List<String> apiRootPath, final MessageEncoding defaultEncoding,
-            final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize) {
+            final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
+            final String altSvcHeaderValue) {
         super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
         this.transportConfiguration = requireNonNull(transportConfiguration);
         this.defaultEncoding = requireNonNull(defaultEncoding);
+        this.altSvcHeaderValue = altSvcHeaderValue;
 
         if (chunkSize.intValue() < 1) {
             throw new IllegalArgumentException("Chunks have to have at least one byte");
@@ -87,13 +91,22 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration,
             final Uint32 chunkSize, final Uint32 frameSize) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
-            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize);
+            apiRootPath, defaultEncoding, transportConfiguration, chunkSize, frameSize, null);
+    }
+
+    public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
+            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
+            final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration,
+            final Uint32 chunkSize, final Uint32 frameSize, final String altSvcHeaderValue) {
+        this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
+            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize,
+            altSvcHeaderValue);
     }
 
     @Beta
     public NettyEndpointConfiguration(final HttpServerStackGrouping transportConfiguration) {
         this(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO, Uint32.valueOf(10_000), "restconf",
-            MessageEncoding.JSON, transportConfiguration, Uint32.valueOf(262144), Uint32.valueOf(16384));
+            MessageEncoding.JSON, transportConfiguration, Uint32.valueOf(262144), Uint32.valueOf(16384), null);
     }
 
     /**
@@ -185,10 +198,14 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         return frameSize;
     }
 
+    public @Nullable String altSvcHeaderValue() {
+        return altSvcHeaderValue;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(errorTagMapping(), prettyPrint(), sseMaximumFragmentLength(), sseHeartbeatIntervalMillis(),
-            apiRootPath, transportConfiguration, defaultEncoding);
+            apiRootPath, transportConfiguration, defaultEncoding, altSvcHeaderValue);
     }
 
     @Override
@@ -198,7 +215,8 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             && sseMaximumFragmentLength().equals(other.sseMaximumFragmentLength())
             && sseHeartbeatIntervalMillis().equals(other.sseHeartbeatIntervalMillis())
             && apiRootPath.equals(other.apiRootPath) && transportConfiguration.equals(other.transportConfiguration)
-            && defaultEncoding.equals(other.defaultEncoding);
+            && defaultEncoding.equals(other.defaultEncoding)
+            && Objects.equals(altSvcHeaderValue, other.altSvcHeaderValue);
     }
 
     @Override
@@ -208,6 +226,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
                 .map(segment -> URLEncoder.encode(segment, StandardCharsets.UTF_8))
                 .collect(Collectors.joining("/")))
             .add("defaultEncoding", defaultEncoding)
-            .add("transportConfiguration", transportConfiguration);
+            .add("transportConfiguration", transportConfiguration)
+            .add("altSvcHeaderValue", altSvcHeaderValue);
     }
 }
