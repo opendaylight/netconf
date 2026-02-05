@@ -126,6 +126,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected static final String PASSWORD = "pa$$w0Rd";
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String APPLICATION_XML = "application/xml";
+    private static final String ALT_SVC_HEADER = "h3=\":8443\"; ma=3600";
 
     protected static String localAddress;
     protected static BootstrapFactory bootstrapFactory;
@@ -230,7 +231,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
             ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000),
-            "rests", MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE);
+            "rests", MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, ALT_SVC_HEADER);
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory, configuration);
     }
 

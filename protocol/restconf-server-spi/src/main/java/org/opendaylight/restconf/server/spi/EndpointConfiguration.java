@@ -78,7 +78,7 @@ public abstract class EndpointConfiguration {
 
     @Override
     public final String toString() {
-        return addToStringAttributes(MoreObjects.toStringHelper(this)).toString();
+        return addToStringAttributes(MoreObjects.toStringHelper(this).omitNullValues()).toString();
     }
 
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
