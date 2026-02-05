@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d30fb27_bd83b02f",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 47
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-02-05T15:27:33Z",
+      "side": 1,
+      "message": "this method is always called with negotiatedSshAlg \u003d null",
+      "revId": "db7b20670eda8e64ddfd8f8037a07fbcd392dbdb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
