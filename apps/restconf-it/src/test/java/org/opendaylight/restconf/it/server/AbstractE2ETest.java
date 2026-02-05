@@ -116,6 +116,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractE2ETest.class);
     private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
     private static final Uint32 FRAME_SIZE = Uint32.valueOf(16 * 1024);
+    private static final String ALT_SVC_HEADER = "h3=\":8443\"; ma=3600";
 
     protected static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
         new JSONParserConfiguration().withStrictMode();
@@ -230,7 +231,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
             ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000),
-            "rests", MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE);
+            "rests", MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, ALT_SVC_HEADER);
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory, configuration);
     }
 

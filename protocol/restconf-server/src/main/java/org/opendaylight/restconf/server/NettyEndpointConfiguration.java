@@ -53,14 +53,17 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     private final @NonNull MessageEncoding defaultEncoding;
     private final @NonNull Uint32 chunkSize;
     private final @NonNull Uint32 frameSize;
+    private final @NonNull String altSvcHeaderValue;
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
             final List<String> apiRootPath, final MessageEncoding defaultEncoding,
-            final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize) {
+            final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
+            final String altSvcHeaderValue) {
         super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
         this.transportConfiguration = requireNonNull(transportConfiguration);
         this.defaultEncoding = requireNonNull(defaultEncoding);
+        this.altSvcHeaderValue = requireNonNull(altSvcHeaderValue);
 
         if (chunkSize.intValue() < 1) {
             throw new IllegalArgumentException("Chunks have to have at least one byte");
@@ -85,15 +88,17 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
             final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration,
-            final Uint32 chunkSize, final Uint32 frameSize) {
+            final Uint32 chunkSize, final Uint32 frameSize, final String altSvcHeaderValue) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
-            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize);
+            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize,
+            altSvcHeaderValue);
     }
 
     @Beta
     public NettyEndpointConfiguration(final HttpServerStackGrouping transportConfiguration) {
         this(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO, Uint32.valueOf(10_000), "restconf",
-            MessageEncoding.JSON, transportConfiguration, Uint32.valueOf(262144), Uint32.valueOf(16384));
+            MessageEncoding.JSON, transportConfiguration, Uint32.valueOf(262144), Uint32.valueOf(16384),
+            "h3=\":8443\"; ma=3600");
     }
 
     /**
@@ -185,10 +190,17 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         return frameSize;
     }
 
+    /**
+     * {@return {@code Alt-Svc} header value, or {@code null} if Alt-Svc advertisement is disabled}
+     */
+    public @NonNull String altSvcHeaderValue() {
+        return altSvcHeaderValue;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(errorTagMapping(), prettyPrint(), sseMaximumFragmentLength(), sseHeartbeatIntervalMillis(),
-            apiRootPath, transportConfiguration, defaultEncoding);
+            apiRootPath, transportConfiguration, defaultEncoding, altSvcHeaderValue);
     }
 
     @Override
@@ -198,7 +210,8 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             && sseMaximumFragmentLength().equals(other.sseMaximumFragmentLength())
             && sseHeartbeatIntervalMillis().equals(other.sseHeartbeatIntervalMillis())
             && apiRootPath.equals(other.apiRootPath) && transportConfiguration.equals(other.transportConfiguration)
-            && defaultEncoding.equals(other.defaultEncoding);
+            && defaultEncoding.equals(other.defaultEncoding)
+            && Objects.equals(altSvcHeaderValue, other.altSvcHeaderValue);
     }
 
     @Override
@@ -208,6 +221,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
                 .map(segment -> URLEncoder.encode(segment, StandardCharsets.UTF_8))
                 .collect(Collectors.joining("/")))
             .add("defaultEncoding", defaultEncoding)
-            .add("transportConfiguration", transportConfiguration);
+            .add("transportConfiguration", transportConfiguration)
+            .add("altSvcHeaderValue", altSvcHeaderValue);
     }
 }
