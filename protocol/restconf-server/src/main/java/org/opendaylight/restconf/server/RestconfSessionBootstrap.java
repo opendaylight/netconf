@@ -26,16 +26,20 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
 
     private final EndpointRoot root;
     private final Uint32 chunkSize;
+    private final AltSvcAdvertiser altSvcAdvertiser;
 
     RestconfSessionBootstrap(final HTTPScheme scheme, final EndpointRoot root,
-            final Uint32 chunkSize, final Uint32 frameSize) {
+            final Uint32 chunkSize, final Uint32 frameSize, final AltSvcAdvertiser altSvcAdvertiser) {
         super(scheme, frameSize);
         this.root = requireNonNull(root);
         this.chunkSize = requireNonNull(chunkSize);
+        this.altSvcAdvertiser = requireNonNull(altSvcAdvertiser);
     }
 
     @Override
     protected PipelinedHTTPServerSession configureHttp1(final ChannelHandlerContext ctx) {
+        final var pipeline = ctx.channel().pipeline();
+        pipeline.addBefore(ctx.name(), null, altSvcAdvertiser);
         return new RestconfSession(scheme, ctx.channel().remoteAddress(), root, chunkSize);
     }
 
@@ -46,6 +50,7 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
                 final var pipeline = ch.pipeline();
                 pipeline.addLast(new Http2StreamFrameToHttpObjectCodec(true));
                 pipeline.addLast(new HttpObjectAggregator(MAX_HTTP2_CONTENT_LENGTH));
+                pipeline.addLast(altSvcAdvertiser);
                 pipeline.addLast("restconf-session", new ConcurrentRestconfSession(scheme,
                     ctx.channel().remoteAddress(), root, chunkSize));
             }
