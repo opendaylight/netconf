@@ -117,6 +117,7 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
     private static final String RESTCONF = "restconf";
     private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
     private static final Uint32 FRAME_SIZE = Uint32.valueOf(16 * 1024);
+    private static final String ALT_SVC_HEADER = "h3=\":8443\"; ma=3600";
 
     static final String MODIFY_SUBSCRIPTION_URI =
         "/restconf/operations/ietf-subscribed-notifications:modify-subscription";
@@ -227,7 +228,7 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
             ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000), RESTCONF,
-            MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE);
+            MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, ALT_SVC_HEADER);
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory,
             configuration);
     }
