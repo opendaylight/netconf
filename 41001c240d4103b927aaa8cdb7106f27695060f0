@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7009a254_1d09e288",
+        "filename": "dagger/dagger-config/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-05T13:44:34Z",
+      "side": 1,
+      "message": "Adding spring-boot-dependencies to the dependency management section here will override our existing dependency management, as it will be closer to the project root (source).\n\nFurthermore, spring-boot-dependencies might misleadingly provide dependency management for other third-party dependencies to projects that include dagger-config as a dependency.",
+      "parentUuid": "28c0a916_37d0983e",
+      "revId": "41001c240d4103b927aaa8cdb7106f27695060f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bf3eea07_d8159f80",
@@ -335,6 +353,30 @@
       "writtenOn": "2026-02-03T12:57:34Z",
       "side": 1,
       "message": "this should be in usecase/ and named reflecting the precise use case that is being packaged.",
+      "range": {
+        "startLine": 34,
+        "startChar": 16,
+        "endLine": 34,
+        "endChar": 22
+      },
+      "revId": "41001c240d4103b927aaa8cdb7106f27695060f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "847cf5ae_a2d44d62",
+        "filename": "pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-05T13:44:34Z",
+      "side": 1,
+      "message": "This package contains daggerized upstream components required to prepare a specific use case application.\n\nWe are temporarily hosting these components here to allow for easier manipulation while resolving implementation issues. Once the use case application is complete, all daggerized components will be moved to their corresponding upstream projects.",
+      "parentUuid": "f808e3e5_8249d704",
       "range": {
         "startLine": 34,
         "startChar": 16,
