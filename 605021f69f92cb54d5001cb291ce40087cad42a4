@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7c00ec6_85929abe",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-05T10:24:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "663b666d_a5c94150",
+      "revId": "605021f69f92cb54d5001cb291ce40087cad42a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b05dbf49_cd37b970",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-02-05T10:17:01Z",
       "side": 1,
       "message": "Happy new year! 😊",
+      "revId": "605021f69f92cb54d5001cb291ce40087cad42a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "27b3a703_1e562f9d",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPSchemePriorKnowledgeTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-05T10:24:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b05dbf49_cd37b970",
       "revId": "605021f69f92cb54d5001cb291ce40087cad42a4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
