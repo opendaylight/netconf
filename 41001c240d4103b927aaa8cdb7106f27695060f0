@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "64edc764_2151d023",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-05T13:28:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6c4bd265_c9cfb6d2",
+      "revId": "41001c240d4103b927aaa8cdb7106f27695060f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "28c0a916_37d0983e",
@@ -58,6 +76,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "66b361a2_6de71391",
+        "filename": "dagger/dagger-config/src/main/java/org/opendaylight/netconf/dagger/config/ConfigLoader.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-05T13:28:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf3eea07_d8159f80",
+      "range": {
+        "startLine": 31,
+        "startChar": 59,
+        "endLine": 31,
+        "endChar": 65
+      },
+      "revId": "41001c240d4103b927aaa8cdb7106f27695060f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e274bded_443972c5",
@@ -71,6 +113,30 @@
       "writtenOn": "2026-02-03T12:58:40Z",
       "side": 1,
       "message": "please use static factory injection, just like we do everywhere else",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 5
+      },
+      "revId": "41001c240d4103b927aaa8cdb7106f27695060f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ade6e32_49382fca",
+        "filename": "dagger/dagger-config/src/main/java/org/opendaylight/netconf/dagger/config/SpringbootConfigLoader.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-05T13:28:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e274bded_443972c5",
       "range": {
         "startLine": 32,
         "startChar": 0,
@@ -98,6 +164,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca7308a5_6054e2ff",
+        "filename": "dagger/dagger-mdsal/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-05T13:28:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8cc8212_62868343",
+      "revId": "41001c240d4103b927aaa8cdb7106f27695060f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4f22def2_aa97361c",
@@ -111,6 +195,24 @@
       "writtenOn": "2026-02-03T11:26:44Z",
       "side": 1,
       "message": "ABC order, test scope at the end",
+      "revId": "41001c240d4103b927aaa8cdb7106f27695060f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "557e29aa_09b8b208",
+        "filename": "dagger/dagger-mdsal/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-05T13:28:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f22def2_aa97361c",
       "revId": "41001c240d4103b927aaa8cdb7106f27695060f0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -132,6 +234,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "633e0bb8_9117a788",
+        "filename": "dagger/dagger-mdsal/src/main/java/org/opendaylight/netconf/dagger/mdsal/MdsalDomBrokerModule.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-05T13:28:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c405b4fe_6f4dbd97",
+      "revId": "41001c240d4103b927aaa8cdb7106f27695060f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ec73010_aebb9b02",
@@ -149,6 +269,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6a08952_2176ea45",
+        "filename": "dagger/dagger-mdsal/src/test/java/org/opendaylight/netconf/dagger/mdsal/MdsalDomBrokerTestFactory.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-05T13:28:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2ec73010_aebb9b02",
+      "revId": "41001c240d4103b927aaa8cdb7106f27695060f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ac34179_66c3171c",
@@ -162,6 +300,24 @@
       "writtenOn": "2026-02-03T14:49:59Z",
       "side": 1,
       "message": "@Module\n@DoNotMock\n@NonNullByDefault",
+      "revId": "41001c240d4103b927aaa8cdb7106f27695060f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "449481fd_bb911edb",
+        "filename": "dagger/dagger-mdsal/src/test/java/org/opendaylight/netconf/dagger/mdsal/MdsalSchemaContextTestModule.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-05T13:28:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8ac34179_66c3171c",
       "revId": "41001c240d4103b927aaa8cdb7106f27695060f0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
