@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "408bdaa1_16d66d3f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-06T09:09:28Z",
+      "side": 1,
+      "message": "At MasterSalFacade.java:[line 216] UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR",
+      "revId": "390c94a0faf3442eeae211ce737a415c1252dce4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
