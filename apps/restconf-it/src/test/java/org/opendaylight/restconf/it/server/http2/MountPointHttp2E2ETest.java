@@ -284,6 +284,43 @@ class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
             }""");
     }
 
+    @Test
+    void negotiatedSshParametersTest() throws Exception {
+        startDeviceSimulator(true);
+        mountDeviceJson();
+
+        final var response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri("/rests/data/network-topology:network-topology/topology=topology-netconf"))
+            .GET()
+            .header(HttpHeaderNames.ACCEPT.toString(), MediaTypes.APPLICATION_YANG_DATA_JSON)
+            .build(), HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(HttpResponseStatus.OK.code(), response.statusCode());
+        assertEquals(HttpClient.Version.HTTP_2, response.version());
+
+        final var expected = """
+            {
+              "network-topology:topology": [
+                {
+                  "node": [
+                    {
+                      "netconf-node-topology:netconf-node": {
+                        "negotiated-ssh-transport-parameters": {
+                          "encryption-alg": "chacha20-poly1305@openssh.com",
+                          "host-key-alg": "rsa-sha2-512",
+                          "mac-alg": "aead",
+                          "key-exchange-alg": "sntrup761x25519-sha512"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+        assertContentJson(response, expected);
+    }
+
     private void startDeviceSimulator(final boolean mdsal) throws Exception {
         // mdsal = true --> settable mode, mdsal datastore
         // mdsal = false --> simulated mode, data is taken from conf files
