@@ -64,7 +64,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
 
     @AfterEach
     @Override
-    void afterEach() throws Exception {
+    protected void afterEach() throws Exception {
         if (streamClient != null) {
             streamClient.shutdown().get(2, TimeUnit.SECONDS);
         }
