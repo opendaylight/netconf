@@ -30,5 +30,6 @@
         <module>karaf-static</module>
         <module>netconf-test-perf</module>
         <module>netconf-testtool</module>
+        <module>odl-dagger-prototype</module>
     </modules>
 </project>
