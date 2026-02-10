@@ -94,7 +94,7 @@ import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTest {
+public abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTest {
     static final JSONParserConfiguration JSON_PARSER_CONFIGURATION = new JSONParserConfiguration().withStrictMode();
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationSubscriptionTest.class);
@@ -114,8 +114,8 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
                     snapshot);
             }
         });
-    private static final String USERNAME = "username";
-    private static final String PASSWORD = "pa$$w0Rd";
+    protected static final String USERNAME = "username";
+    protected static final String PASSWORD = "pa$$w0Rd";
     private static final String RESTCONF = "restconf";
     private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
     private static final Uint32 FRAME_SIZE = Uint32.valueOf(16 * 1024);
@@ -157,7 +157,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     }
 
     @BeforeEach
-    void beforeEach() throws Exception {
+    protected void beforeEach() throws Exception {
         // transport configuration
         final var port = randomBindablePort();
         host = localAddress + ":" + port;
@@ -232,7 +232,7 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     }
 
     @AfterEach
-    void afterEach() throws Exception {
+    protected void afterEach() throws Exception {
         if (clientStreamService != null) {
             clientStreamService = null;
         }
@@ -358,29 +358,34 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         }
     }
 
-    FullHttpResponse invokeRequestKeepClient(final HTTPClient streamHttpClient, final HttpMethod method,
-            final String uri, final String contentType, final String content, final String acceptType) {
+    protected FullHttpResponse invokeRequestKeepClient(final HTTPClient streamHttpClient, final HttpMethod method,
+        final String uri, final String contentType, final String content, final String acceptType) {
         final var callback = new TestRequestCallback();
         streamHttpClient.invoke(buildRequest(method, uri, contentType, content, acceptType), callback);
         // await for response
-        await().atMost(Duration.ofSeconds(2)).until(callback::completed);
+        await().atMost(Duration.ofSeconds(15)).until(callback::completed);
         final var response = callback.response();
         assertNotNull(response);
         return response;
     }
 
-    HTTPClient startStreamClient() throws Exception {
+    protected HTTPClient startStreamClient(final boolean http2) throws Exception {
         final var transportListener = new TestTransportChannelListener(channel ->
             clientStreamService = SseUtils.enableClientSse(channel));
         final var streamClient = HTTPClient.connect(transportListener, bootstrapFactory.newBootstrap(),
-            clientStackGrouping, false).get(2, TimeUnit.SECONDS);
-        await().atMost(Duration.ofSeconds(2)).until(transportListener::initialized);
+            clientStackGrouping, http2).get(4, TimeUnit.SECONDS);
+        await().atMost(Duration.ofSeconds(6)).until(transportListener::initialized);
         assertNotNull(clientStreamService);
         return streamClient;
     }
 
-    TestEventStreamListener startSubscriptionStream(final String subscriptionId) throws Exception {
-        subscriptionStreamClient = startStreamClient();
+    HTTPClient startStreamClient() throws Exception {
+        return startStreamClient(false);
+    }
+
+    protected TestEventStreamListener startSubscriptionStream(final String subscriptionId, final boolean http2)
+            throws Exception {
+        subscriptionStreamClient = startStreamClient(http2);
         final var eventListener = new TestEventStreamListener();
         clientStreamService.startEventStream("localhost", "/subscriptions/" + subscriptionId, eventListener,
             new EventStreamService.StartCallback() {
@@ -394,12 +399,16 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
                     LOG.error("Stream was not started", cause);
                 }
             });
-        await().atMost(Duration.ofSeconds(2)).until(eventListener::started);
+        await().atMost(Duration.ofSeconds(15)).until(eventListener::started);
         assertNotNull(streamControl);
         return eventListener;
     }
 
-    final DOMNotificationPublishService publishService() {
+    TestEventStreamListener startSubscriptionStream(final String subscriptionId) throws Exception {
+        return startSubscriptionStream(subscriptionId, false);
+    }
+
+    protected final DOMNotificationPublishService publishService() {
         return notificationPublishService;
     }
 
