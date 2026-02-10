@@ -72,6 +72,8 @@ public final class CallHomeSshServer implements AutoCloseable {
         final var transportChannelListener =
             new CallHomeTransportChannelListener(negotiatorFactory, contextManager, statusRecorder);
 
+        // FIXME: NETCONF-1579, This listener is triggered too late. Way to pass algorithms to NetconfDeviceSalFacade
+        //  is via createContext() in verifyServerKey() which runs earlier than when we have them.
         final var algListener = new SSHNegotiatedAlgListener() {
             @Override
             public void onAlgorithmsNegotiated(final SshKeyExchangeAlgorithm kexAlgorithm,
