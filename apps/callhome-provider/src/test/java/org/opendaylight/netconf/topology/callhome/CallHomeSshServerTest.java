@@ -36,6 +36,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
 import org.opendaylight.netconf.server.NetconfServerSession;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
@@ -136,7 +137,8 @@ class CallHomeSshServerTest {
         final var contextManager = new CallHomeSshSessionContextManager() {
             // inject netconf session listener
             @Override
-            public CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession) {
+            public CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession,
+                    final NegotiatedSshAlg sshAlg) {
                 return new CallHomeSshSessionContext(id, clientSession.getRemoteAddress(), clientSession,
                     clientSessionListener, SettableFuture.create());
             }

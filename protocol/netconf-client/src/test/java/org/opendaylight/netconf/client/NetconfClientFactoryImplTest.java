@@ -12,6 +12,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import io.netty.handler.ssl.SslContextBuilder;
@@ -75,6 +76,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.cli
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240814.netconf.client.listen.stack.grouping.transport.ssh.ssh.TcpServerParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentityBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.client.identity.PasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshEncryptionAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ClientAuthentication;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ClientAuthenticationBuilder;
@@ -327,6 +332,46 @@ class NetconfClientFactoryImplTest {
             assertNotNull(factory.createClient(clientConfig, algListener));
             verify(serverTransportListener, timeout(10_000L))
                 .onTransportChannelEstablished(any(TransportChannel.class));
+        } finally {
+            server.shutdown().get(1, TimeUnit.SECONDS);
+        }
+    }
+
+    @Test
+    void algorithmListenerTest() throws Exception {
+        doReturn(buildSshServerIdentity()).when(sshServerParams).getServerIdentity();
+        doReturn(buildSshClientAuth()).when(sshServerParams).getClientAuthentication();
+        doReturn(null).when(sshServerParams).getTransportParams();
+        doReturn(null).when(sshServerParams).getKeepalives();
+        doNothing().when(algListener).onAlgorithmsNegotiated(any(SshKeyExchangeAlgorithm.class),
+            any(SshPublicKeyAlgorithm.class), any(SshEncryptionAlgorithm.class), any(SshMacAlgorithm.class));
+
+        final var server = SERVER_FACTORY.listenServer("netconf", serverTransportListener, tcpServerParams,
+            sshServerParams).get(10, TimeUnit.SECONDS);
+
+        try {
+            final var clientConfig = NetconfClientConfigurationBuilder.create()
+                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
+                .withTcpParameters(tcpClientParams)
+                .withSshParameters(new SshClientParametersBuilder()
+                    .setClientIdentity(new ClientIdentityBuilder().setUsername(USERNAME)
+                        .setPassword(new PasswordBuilder().setPasswordType(
+                            new CleartextPasswordBuilder().setCleartextPassword(PASSWORD)
+                                .build()).build()).build())
+                    .build())
+                .withSessionListener(sessionListener)
+                .withConnectionTimeoutMillis(10_000)
+                .build();
+            assertNotNull(factory.createClient(clientConfig, algListener));
+            verify(serverTransportListener, timeout(10_000L))
+                .onTransportChannelEstablished(any(TransportChannel.class));
+
+            // Verify listener was invoked with expected algorithms
+            final var kex = new SshKeyExchangeAlgorithm("sntrup761x25519-sha512");
+            final var hostKey = new SshPublicKeyAlgorithm("rsa-sha2-512");
+            final var encryption = new SshEncryptionAlgorithm("chacha20-poly1305@openssh.com");
+            final var mac = new SshMacAlgorithm("aead");
+            verify(algListener, times(1)).onAlgorithmsNegotiated(kex, hostKey, encryption, mac);
         } finally {
             server.shutdown().get(1, TimeUnit.SECONDS);
         }

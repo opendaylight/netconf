@@ -12,6 +12,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
@@ -35,7 +36,7 @@ class CallHomeTopology extends AbstractNetconfTopology {
         deleteNode(nodeId);
     }
 
-    void enableNode(final Node node) {
-        ensureNode(node);
+    void enableNode(final Node node, final NegotiatedSshAlg sshAlg) {
+        ensureNode(node, sshAlg);
     }
 }
