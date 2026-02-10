@@ -28,6 +28,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
@@ -87,6 +88,8 @@ class NetconfTopologyImplTest {
     private DataObjectModification<Node> objMod;
     @Mock
     private DataTreeModification<Node> treeMod;
+    @Mock
+    private NegotiatedSshAlg sshAlg;
 
     @Test
     void testOnDataTreeChange() throws Exception {
@@ -141,7 +144,7 @@ class NetconfTopologyImplTest {
 
             doReturn(objMod).when(treeMod).getRootNode();
             spyTopology.onDataTreeChanged(changes);
-            verify(spyTopology).ensureNode(node);
+            verify(spyTopology).ensureNode(node, null);
 
             doReturn(DataObjectModification.ModificationType.DELETE).when(objMod).modificationType();
             spyTopology.onDataTreeChanged(changes);
@@ -151,7 +154,7 @@ class NetconfTopologyImplTest {
             spyTopology.onDataTreeChanged(changes);
 
             // one in previous creating and deleting node and one in updating
-            verify(spyTopology, times(2)).ensureNode(node);
+            verify(spyTopology, times(2)).ensureNode(node, null);
         }
     }
 
@@ -167,7 +170,7 @@ class NetconfTopologyImplTest {
         }
 
         @Override
-        public void ensureNode(final Node configNode) {
+        public void ensureNode(final Node configNode, final NegotiatedSshAlg sshAlg) {
             // No-op
         }
 

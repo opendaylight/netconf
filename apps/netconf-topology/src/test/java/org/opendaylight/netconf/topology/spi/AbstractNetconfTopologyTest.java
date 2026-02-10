@@ -35,6 +35,7 @@ import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
@@ -88,6 +89,8 @@ class AbstractNetconfTopologyTest {
     private WriteTransaction wtx;
     @Mock
     private RemoteDeviceHandler delegate;
+    @Mock
+    private NegotiatedSshAlg sshAlg;
 
     @Captor
     private ArgumentCaptor<Throwable> exceptionCaptor;
@@ -179,6 +182,7 @@ class AbstractNetconfTopologyTest {
 
         doNothing().when(delegate).onDeviceFailed(exceptionCaptor.capture());
         doNothing().when(delegate).close();
+        doNothing().when(delegate).onSshAlgorithmsNegotiated(any());
         doThrow(new GeneralSecurityException()).when(encryptionService).decrypt(any());
 
         topology.onDataTreeChanged(testNode, ModificationType.WRITE);
@@ -205,7 +209,7 @@ class AbstractNetconfTopologyTest {
         // Want to simulate on data tree change
         public void onDataTreeChanged(final Node node, final ModificationType type) {
             switch (type) {
-                case WRITE -> ensureNode(node);
+                case WRITE -> ensureNode(node, sshAlg);
                 case DELETE -> deleteNode(node.getNodeId());
                 default -> throw new IllegalArgumentException("Unexpected modification type: " + type);
             }

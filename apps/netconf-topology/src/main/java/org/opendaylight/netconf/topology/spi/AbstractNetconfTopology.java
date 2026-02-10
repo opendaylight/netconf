@@ -24,6 +24,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
@@ -206,11 +207,11 @@ public abstract class AbstractNetconfTopology {
     }
 
     // Non-final for testing
-    protected void ensureNode(final Node node) {
-        lockedEnsureNode(node);
+    protected void ensureNode(final Node node, final NegotiatedSshAlg sshAlg) {
+        lockedEnsureNode(node, sshAlg);
     }
 
-    private synchronized void lockedEnsureNode(final Node node) {
+    private synchronized void lockedEnsureNode(final Node node, final NegotiatedSshAlg sshAlg) {
         final var nodeId = node.requireNodeId();
         final var prev = activeConnectors.remove(nodeId);
         if (prev != null) {
@@ -225,7 +226,7 @@ public abstract class AbstractNetconfTopology {
         }
 
         final var nodeOptional = node.augmentation(NetconfNodeAugmentedOptional.class);
-        connectNode(netconfNode, nodeId, nodeOptional);
+        connectNode(netconfNode, nodeId, nodeOptional, sshAlg);
     }
 
     /**
@@ -241,11 +242,11 @@ public abstract class AbstractNetconfTopology {
         oldHandler.close();
 
         // FIXME: NETCONF-925: preserve NetconfNodeAugmentedOptional of oldHandler
-        connectNode(netconfNode, nodeId, null);
+        connectNode(netconfNode, nodeId, null, null);
     }
 
     private synchronized void connectNode(final NetconfNode netconfNode, final NodeId nodeId,
-            final NetconfNodeAugmentedOptional nodeOptional) {
+            final NetconfNodeAugmentedOptional nodeOptional, final NegotiatedSshAlg sshAlg) {
         final RemoteDeviceId deviceId;
         try {
             deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode);
@@ -260,6 +261,7 @@ public abstract class AbstractNetconfTopology {
         // Instantiate the handler ...
         final var deviceSalFacade = createSalFacade(deviceId, netconfNode.getCredentials(),
             netconfNode.requireLockDatastore());
+        deviceSalFacade.onSshAlgorithmsNegotiated(sshAlg);
 
         final NetconfNodeHandler nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemaProvider,
             schemaManager, schemaAssembler, builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId,
