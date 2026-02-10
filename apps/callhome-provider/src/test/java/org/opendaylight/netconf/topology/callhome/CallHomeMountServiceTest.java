@@ -40,6 +40,7 @@ import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -73,6 +74,8 @@ class CallHomeMountServiceTest {
     @Mock
     private SSHNegotiatedAlgListener algListener;
     @Mock
+    private NegotiatedSshAlg sshAlg;
+    @Mock
     private ClientSession sshSession;
     @Mock
     private Channel nettyChannel;
@@ -97,7 +100,7 @@ class CallHomeMountServiceTest {
         final var sshSessionContextManager = service.createSshSessionContextManager();
 
         // id 1 -- netconf layer created
-        final var context = sshSessionContextManager.createContext(ID1, sshSession);
+        final var context = sshSessionContextManager.createContext(ID1, sshSession, sshAlg);
         assertNotNull(context);
         assertEquals(ID1, context.id());
         assertEquals(SOCKET_ADDRESS, context.remoteAddress());
@@ -106,10 +109,10 @@ class CallHomeMountServiceTest {
         assertNotNull(context.settableFuture());
         assertSame(netconfSessionFuture, context.settableFuture());
         // id 2 -- netconf layer omitted
-        assertNull(sshSessionContextManager.createContext(ID2, sshSession));
+        assertNull(sshSessionContextManager.createContext(ID2, sshSession, sshAlg));
 
         // verify that node is enabled with SSH
-        verify(topology, times(1)).enableNode(node1);
+        verify(topology, times(1)).enableNode(node1, sshAlg);
 
         // remove context
         sshSessionContextManager.remove(ID1);
@@ -134,7 +137,7 @@ class CallHomeMountServiceTest {
         assertNull(tlsSessionContextManager.createContext(ID2, nettyChannel));
 
         // verify that node is enabled with TLS
-        verify(topology, times(1)).enableNode(node1);
+        verify(topology, times(1)).enableNode(node1, null);
 
         // remove context
         tlsSessionContextManager.remove(ID1);
@@ -205,7 +208,7 @@ class CallHomeMountServiceTest {
                 netconfSessionFuture = null;
             }
             return null;
-        }).when(topology).enableNode(any(Node.class));
+        }).when(topology).enableNode(any(Node.class), any());
         doNothing().when(topology).disableNode(any(NodeId.class));
     }
 
