@@ -195,6 +195,7 @@ class AbstractNetconfTopologyTest {
 
         doNothing().when(delegate).onDeviceFailed(exceptionCaptor.capture());
         doNothing().when(delegate).close();
+        doNothing().when(delegate).onSshAlgorithmsNegotiated(any());
         doThrow(new GeneralSecurityException()).when(encryptionService).decrypt(any());
 
         doReturn(testNode).when(dataObjectWritten).dataAfter();
@@ -229,7 +230,7 @@ class AbstractNetconfTopologyTest {
         public void onDataTreeChanged(final List<DataTreeModification<Node>> changes) {
             for (var change : changes) {
                 switch (change.getRootNode()) {
-                    case DataObjectWritten<Node> written -> ensureNode(written.dataAfter());
+                    case DataObjectWritten<Node> written -> ensureNode(written.dataAfter(), null);
                     case DataObjectDeleted<Node> deleted ->
                         deleteNode(deleted.coerceKeyStep(Node.class).key().getNodeId());
                     case DataObjectModified<Node> modified ->
