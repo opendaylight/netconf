@@ -35,6 +35,7 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
@@ -329,7 +330,8 @@ public final class CallHomeMountService implements AutoCloseable {
     public CallHomeSshSessionContextManager createSshSessionContextManager() {
         return new CallHomeSshSessionContextManager() {
             @Override
-            public CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession) {
+            public CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession,
+                    final NegotiatedSshAlg sshAlg) {
                 final var remoteAddr = clientSession.getRemoteAddress();
                 topology.enableNode(asNode(id, remoteAddr, new ProtocolBuilder().setName(Protocol.Name.SSH)
                     .setSpecification(new SshCaseBuilder().setSshTransportParameters(new SshTransportParametersBuilder()
@@ -338,7 +340,7 @@ public final class CallHomeMountService implements AutoCloseable {
                         .setKeyExchange(parseKeyExchange(config.key$_$exchange()))
                         .setMac(parseMac(config.macs()))
                         .build()).build())
-                    .build()));
+                    .build()), sshAlg);
                 final var netconfLayer = netconfLayerMapping.remove(id);
                 return netconfLayer == null ? null : new CallHomeSshSessionContext(id, remoteAddr, clientSession,
                     netconfLayer.sessionListener, netconfLayer.netconfSessionFuture);
@@ -357,7 +359,7 @@ public final class CallHomeMountService implements AutoCloseable {
         return new CallHomeTlsSessionContextManager(authProvider, statusRecorder) {
             @Override
             public CallHomeTlsSessionContext createContext(final String id, final Channel channel) {
-                topology.enableNode(asNode(id, channel.remoteAddress(), TLS_PROTOCOL));
+                topology.enableNode(asNode(id, channel.remoteAddress(), TLS_PROTOCOL), null);
                 final var netconfLayer = netconfLayerMapping.remove(id);
                 return netconfLayer == null ? null : new CallHomeTlsSessionContext(id, channel,
                     netconfLayer.sessionListener, netconfLayer.netconfSessionFuture());

@@ -20,6 +20,7 @@ import java.util.concurrent.TimeoutException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.client.auth.pubkey.UserAuthPublicKeyFactory;
@@ -57,6 +58,8 @@ public final class CallHomeSshServer implements AutoCloseable {
     private final CallHomeSshSessionContextManager contextManager;
     private final SSHClient client;
 
+    private NegotiatedSshAlg sshAlg;
+
     @VisibleForTesting
     CallHomeSshServer(final TcpServerGrouping tcpServerParams, final long timeoutMillis,
             final SSHTransportStackFactory transportStackFactory,
@@ -72,12 +75,14 @@ public final class CallHomeSshServer implements AutoCloseable {
         final var transportChannelListener =
             new CallHomeTransportChannelListener(negotiatorFactory, contextManager, statusRecorder);
 
+        // FIXME: NETCONF-1579, This listener is triggered too late. Way to pass algorithms to NetconfDeviceSalFacade
+        //  is via createContext() in verifyServerKey() which runs earlier than when we have them.
         final var algListener = new SSHNegotiatedAlgListener() {
             @Override
             public void onAlgorithmsNegotiated(final SshKeyExchangeAlgorithm kexAlgorithm,
                     final SshPublicKeyAlgorithm hostKey, final SshEncryptionAlgorithm encryption,
                     final SshMacAlgorithm mac) {
-                // No-op
+                sshAlg = new NegotiatedSshAlg(kexAlgorithm, hostKey, encryption, mac);
             }
         };
 
@@ -141,7 +146,7 @@ public final class CallHomeSshServer implements AutoCloseable {
                 authSettings.id(), remoteAddress);
             return false;
         }
-        final var context = contextManager.createContext(authSettings.id(), clientSession);
+        final var context = contextManager.createContext(authSettings.id(), clientSession, sshAlg);
         if (context == null) {
             // if there is an issue creating context then the cause expected to be
             // logged within overridden createContext() method
