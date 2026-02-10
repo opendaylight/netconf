@@ -80,6 +80,30 @@
       },
       "revId": "ab2620659069aef2d7026acc2a02e41856c1ea5e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bb3cb65_1b66390e",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-02-10T13:49:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "79aecb0e_9800c746",
+      "range": {
+        "startLine": 88,
+        "startChar": 93,
+        "endLine": 88,
+        "endChar": 108
+      },
+      "revId": "ab2620659069aef2d7026acc2a02e41856c1ea5e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
