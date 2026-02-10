@@ -1,33 +1,30 @@
 /*
- * Copyright (c) 2025 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ * Copyright (c) 2026 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.it.subscription;
+package org.opendaylight.restconf.it.subscription.http2;
 
-import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 import org.awaitility.core.ConditionTimeoutException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.it.server.TestEventStreamListener;
+import org.opendaylight.restconf.it.subscription.AbstractNotificationSubscriptionTest;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterRestocked;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -35,7 +32,7 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-class NotificationSubscriptionListeningTest extends AbstractNotificationSubscriptionTest {
+class NotificationSubscriptionListeningHttp2Test extends AbstractNotificationSubscriptionTest {
     private static final String TERMINATED_NOTIFICATION = """
         {
           "ietf-restconf:notification" : {
@@ -50,12 +47,12 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
     private static TestEventStreamListener eventListener;
 
     @BeforeEach
-    public void beforeEach() throws Exception {
+    protected void beforeEach() throws Exception {
         super.beforeEach();
         streamClient = startStreamClient();
-
-        // Establish subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+        final String uri =
+            "/restconf/operations/ietf-subscribed-notifications:establish-subscription";
+        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, uri,
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {
@@ -72,7 +69,7 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
         final var subscriptionId = jsonContent.getJSONObject("ietf-subscribed-notifications:output").getLong("id");
 
         // Start listening on notifications
-        eventListener = startSubscriptionStream(String.valueOf(subscriptionId));
+        eventListener = startSubscriptionStream(String.valueOf(subscriptionId), true);
     }
 
     @AfterEach
@@ -108,36 +105,6 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
             }""", eventListener.readNext(), JSONCompareMode.LENIENT);
     }
 
-    /**
-     * Tests receiving subscription modified notification.
-     */
-    @Disabled("Will be disabled until NETCONF-1466 has been resolved")
-    @Test
-    void testListenModifiedNotification() throws Exception {
-        // Modify the subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST,
-            "/restconf/operations/ietf-subscribed-notifications:modify-subscription",
-            MediaTypes.APPLICATION_YANG_DATA_XML, """
-             <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
-               <id>2147483648</id>
-               <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
-             </input>""", MediaTypes.APPLICATION_YANG_DATA_JSON);
-
-        assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
-        JSONAssert.assertEquals("""
-            {
-                "ietf-restconf:notification": {
-                    "ietf-subscribed-notifications:subscription-modified" : {
-                        "stream" : "NETCONF",
-                        "id" : 2147483648,
-                        "stream-subtree-filter": {
-                            "users" : {}
-                        },
-                        "encoding" : "ietf-subscribed-notifications:encode-json"
-                    }
-                }
-            }""", eventListener.readNext(), JSONCompareMode.LENIENT);
-    }
 
     /**
      * Tests receiving notification after deleting subscription.
@@ -159,30 +126,6 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
         JSONAssert.assertEquals(TERMINATED_NOTIFICATION, eventListener.readNext(), JSONCompareMode.LENIENT);
 
         // Assert exception when try to listen to subscription after it should be terminated
-        assertThrows(ConditionTimeoutException.class, () -> startSubscriptionStream("2147483648"));
-        // Verify notification listening ended
-        await().atMost(Duration.ofSeconds(5)).until(eventListener::ended);
-        assertTrue(eventListener.ended());
-    }
-
-    /**
-     * Tests receiving notification after killing subscription.
-     */
-    @Disabled("Disabled until KillSubscriptionRpc is enabled after NETCONF-1353 is resolved")
-    @Test
-    void testListenKillNotification() throws Exception {
-        // Kill the subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST,
-            "/restconf/operations/ietf-subscribed-notifications:kill-subscription",
-            MediaTypes.APPLICATION_YANG_DATA_JSON,
-            """
-                {
-                  "input": {
-                    "id": 2147483648
-                  }
-                }""", MediaTypes.APPLICATION_YANG_DATA_JSON);
-
-        assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
-        JSONAssert.assertEquals(TERMINATED_NOTIFICATION, eventListener.readNext(), JSONCompareMode.LENIENT);
+        assertThrows(ConditionTimeoutException.class, () -> startSubscriptionStream("2147483648", true));
     }
 }
