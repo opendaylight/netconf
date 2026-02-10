@@ -57,14 +57,14 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
     private static HTTPClient streamClient;
 
     @BeforeEach
-    void beforeEach() throws Exception {
+    protected void beforeEach() throws Exception {
         super.beforeEach();
         streamClient = startStreamClient();
     }
 
     @AfterEach
     @Override
-    void afterEach() throws Exception {
+    protected void afterEach() throws Exception {
         if (streamClient != null) {
             streamClient.shutdown().get(2, TimeUnit.SECONDS);
         }
