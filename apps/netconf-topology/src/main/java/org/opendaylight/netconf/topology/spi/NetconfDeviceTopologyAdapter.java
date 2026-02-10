@@ -229,7 +229,7 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
         closeFuture.set(Empty.value());
     }
 
-    private static NegotiatedSshTransportParameters buildNegotiatedParameters(
+    public static NegotiatedSshTransportParameters buildNegotiatedParameters(
             final NegotiatedSshAlg negotiatedSshAlg) {
         final var params = new NegotiatedSshTransportParametersBuilder();
         if (negotiatedSshAlg != null) {

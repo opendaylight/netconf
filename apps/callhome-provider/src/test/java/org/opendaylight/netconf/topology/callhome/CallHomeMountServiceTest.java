@@ -97,7 +97,7 @@ class CallHomeMountServiceTest {
         final var sshSessionContextManager = service.createSshSessionContextManager();
 
         // id 1 -- netconf layer created
-        final var context = sshSessionContextManager.createContext(ID1, sshSession);
+        final var context = sshSessionContextManager.createContext(ID1, sshSession, null);
         assertNotNull(context);
         assertEquals(ID1, context.id());
         assertEquals(SOCKET_ADDRESS, context.remoteAddress());
@@ -106,10 +106,10 @@ class CallHomeMountServiceTest {
         assertNotNull(context.settableFuture());
         assertSame(netconfSessionFuture, context.settableFuture());
         // id 2 -- netconf layer omitted
-        assertNull(sshSessionContextManager.createContext(ID2, sshSession));
+        assertNull(sshSessionContextManager.createContext(ID2, sshSession, null));
 
         // verify that node is enabled with SSH
-        verify(topology, times(1)).enableNode(node1);
+        verify(topology, times(1)).enableNode(eq(node1), any());
 
         // remove context
         sshSessionContextManager.remove(ID1);
@@ -134,7 +134,7 @@ class CallHomeMountServiceTest {
         assertNull(tlsSessionContextManager.createContext(ID2, nettyChannel));
 
         // verify that node is enabled with TLS
-        verify(topology, times(1)).enableNode(node1);
+        verify(topology, times(1)).enableNode(node1, null);
 
         // remove context
         tlsSessionContextManager.remove(ID1);
@@ -205,7 +205,7 @@ class CallHomeMountServiceTest {
                 netconfSessionFuture = null;
             }
             return null;
-        }).when(topology).enableNode(any(Node.class));
+        }).when(topology).enableNode(any(Node.class), any());
         doNothing().when(topology).disableNode(any(NodeId.class));
     }
 

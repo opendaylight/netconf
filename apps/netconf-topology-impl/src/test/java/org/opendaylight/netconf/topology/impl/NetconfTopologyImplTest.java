@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.topology.impl;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -30,6 +32,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
@@ -145,7 +148,7 @@ class NetconfTopologyImplTest {
 
             doReturn(objWritten).when(treeMod).getRootNode();
             spyTopology.onDataTreeChanged(changes);
-            verify(spyTopology).ensureNode(node);
+            verify(spyTopology).ensureNode(eq(node), any());
 
             doReturn(TOPOLOGY_PATH.toBuilder().child(Node.class, key).build()).when(treeMod).path();
             doReturn(objDeleted).when(treeMod).getRootNode();
@@ -157,7 +160,7 @@ class NetconfTopologyImplTest {
             spyTopology.onDataTreeChanged(changes);
 
             // one in previous creating and deleting node and one in updating
-            verify(spyTopology, times(2)).ensureNode(node);
+            verify(spyTopology, times(2)).ensureNode(eq(node), any());
         }
     }
 
@@ -173,7 +176,7 @@ class NetconfTopologyImplTest {
         }
 
         @Override
-        public void ensureNode(final Node configNode) {
+        public void ensureNode(final Node configNode, final NegotiatedSshAlg sshAlg) {
             // No-op
         }
 
