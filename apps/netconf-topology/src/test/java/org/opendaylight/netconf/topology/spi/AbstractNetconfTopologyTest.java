@@ -41,6 +41,7 @@ import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
@@ -104,6 +105,9 @@ class AbstractNetconfTopologyTest {
     private DataObjectDeleted<Node> dataObjectDeleted;
     @Mock
     private DataObjectIdentifierWithKey<Node, NodeKey> path;
+    @Mock
+    private NegotiatedSshAlg sshAlg;
+
 
     @Captor
     private ArgumentCaptor<Throwable> exceptionCaptor;
@@ -195,6 +199,7 @@ class AbstractNetconfTopologyTest {
 
         doNothing().when(delegate).onDeviceFailed(exceptionCaptor.capture());
         doNothing().when(delegate).close();
+        doNothing().when(delegate).onSshAlgorithmsNegotiated(any());
         doThrow(new GeneralSecurityException()).when(encryptionService).decrypt(any());
 
         doReturn(testNode).when(dataObjectWritten).dataAfter();
@@ -229,7 +234,7 @@ class AbstractNetconfTopologyTest {
         public void onDataTreeChanged(final List<DataTreeModification<Node>> changes) {
             for (var change : changes) {
                 switch (change.getRootNode()) {
-                    case DataObjectWritten<Node> written -> ensureNode(written.dataAfter());
+                    case DataObjectWritten<Node> written -> ensureNode(written.dataAfter(), sshAlg);
                     case DataObjectDeleted<Node> deleted ->
                         deleteNode(deleted.coerceKeyStep(Node.class).key().getNodeId());
                     case DataObjectModified<Node> modified ->

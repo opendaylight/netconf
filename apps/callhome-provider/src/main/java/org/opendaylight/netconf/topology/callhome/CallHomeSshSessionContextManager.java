@@ -15,6 +15,7 @@ import java.net.SocketAddress;
 import java.util.Map;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 
 public class CallHomeSshSessionContextManager extends AbstractCallHomeSessionContextManager<CallHomeSshSessionContext> {
@@ -50,7 +51,8 @@ public class CallHomeSshSessionContextManager extends AbstractCallHomeSessionCon
      * @param clientSession SSH session instance
      * @return created object or {@code null} if it cannot be created for some reason
      */
-    public @Nullable CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession) {
+    public @Nullable CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession,
+            final NegotiatedSshAlg sshAlg) {
         return new CallHomeSshSessionContext(id, clientSession.getRemoteAddress(), clientSession,
             new SimpleNetconfClientSessionListener(), SettableFuture.create());
     }
