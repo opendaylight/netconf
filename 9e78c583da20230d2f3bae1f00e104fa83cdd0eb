@@ -46,6 +46,30 @@
       },
       "revId": "9e78c583da20230d2f3bae1f00e104fa83cdd0eb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "627a3efd_2775fa8c",
+        "filename": "dagger/dagger-config/src/main/java/org/opendaylight/netconf/dagger/config/SpringbootConfigLoader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-11T12:17:38Z",
+      "side": 1,
+      "message": "Thiw was resolved in patchset 4. You have commented patch-set 1.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/120377/4..5/dagger/dagger-config/src/main/java/org/opendaylight/netconf/dagger/config/SpringbootConfigLoader.java\n\nAnd now this class in separate commit.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/120593/2",
+      "parentUuid": "2950c0bd_ab0f270b",
+      "range": {
+        "startLine": 32,
+        "startChar": 5,
+        "endLine": 32,
+        "endChar": 11
+      },
+      "revId": "9e78c583da20230d2f3bae1f00e104fa83cdd0eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
