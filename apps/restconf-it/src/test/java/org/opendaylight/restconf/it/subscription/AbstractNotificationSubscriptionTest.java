@@ -119,6 +119,10 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
     private static final String RESTCONF = "restconf";
     private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
     private static final Uint32 FRAME_SIZE = Uint32.valueOf(16 * 1024);
+    public static final int HTTP3_ALT_SVC_MAX_AGE_SECONDS = 3600;
+    public static final long HTTP3_INITIAL_MAX_DATA = 4L * 1024 * 1024;
+    public static final long HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE = 256L * 1024;
+    public static final long HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL = 100;
 
     static final String MODIFY_SUBSCRIPTION_URI =
         "/restconf/operations/ietf-subscribed-notifications:modify-subscription";
@@ -226,7 +230,9 @@ abstract class AbstractNotificationSubscriptionTest extends AbstractDataBrokerTe
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
             ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000), RESTCONF,
-            MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE);
+            MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, HTTP3_ALT_SVC_MAX_AGE_SECONDS,
+            HTTP3_INITIAL_MAX_DATA,
+            HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE, HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory,
             configuration);
     }
