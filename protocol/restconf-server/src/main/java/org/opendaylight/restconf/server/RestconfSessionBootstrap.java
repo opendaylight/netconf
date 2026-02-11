@@ -22,8 +22,6 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 
 @NonNullByDefault
 final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
-    private static final int MAX_HTTP2_CONTENT_LENGTH = 16 * 1024;
-
     private final EndpointRoot root;
     private final Uint32 chunkSize;
     private final AltSvcAdvertiser altSvcAdvertiser;
@@ -49,7 +47,7 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
             @Override protected void initChannel(final Channel ch) {
                 final var pipeline = ch.pipeline();
                 pipeline.addLast(new Http2StreamFrameToHttpObjectCodec(true));
-                pipeline.addLast(new HttpObjectAggregator(MAX_HTTP2_CONTENT_LENGTH));
+                pipeline.addLast(new HttpObjectAggregator(NettyEndpoint.MAX_CONTENT_LENGTH));
                 pipeline.addLast(altSvcAdvertiser);
                 pipeline.addLast("restconf-session", new ConcurrentRestconfSession(scheme,
                     ctx.channel().remoteAddress(), root, chunkSize));
