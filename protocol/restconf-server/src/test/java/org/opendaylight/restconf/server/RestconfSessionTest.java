@@ -37,6 +37,8 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 
 @ExtendWith(MockitoExtension.class)
 class RestconfSessionTest {
+    private static final int HTTP3_ALT_SVC_MAX_AGE_SECONDS = 3600;
+
     @Mock
     private RestconfServer server;
     @Mock
@@ -75,7 +77,8 @@ class RestconfSessionTest {
         // default config just for testing purposes
         final var configuration = new NettyEndpointConfiguration(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE,
             Uint16.ZERO, Uint32.valueOf(10_000), "restconf",
-            MessageEncoding.JSON, httpServerStackGrouping, Uint32.valueOf(256 * 1024), Uint32.valueOf(16 * 1024));
+            MessageEncoding.JSON, httpServerStackGrouping, Uint32.valueOf(256 * 1024), Uint32.valueOf(16 * 1024),
+            HTTP3_ALT_SVC_MAX_AGE_SECONDS, 4L * 1024 * 1024, 256L * 1024, 100);
 
         final var listener = new RestconfTransportChannelListener(server, streamRegistry, principalService,
             configuration);

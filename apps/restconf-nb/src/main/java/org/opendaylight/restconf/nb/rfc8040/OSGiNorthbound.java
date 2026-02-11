@@ -155,6 +155,27 @@ public final class OSGiNorthbound {
                 """,
             min = "0")
         int http3$_$alt$_$svc$_$max$_$age() default 3600;
+
+        @AttributeDefinition(
+            name = "HTTP/3 initial max data (bytes)",
+            description = "QUIC connection-level initial max data limit for HTTP/3.",
+            min = "1")
+        long http3$_$initial$_$max$_$data() default 4L * 1024 * 1024;
+
+        @AttributeDefinition(
+            name = "HTTP/3 initial max stream data bidirectional remote (bytes)",
+            description = """
+                QUIC initial max stream data limit for remotely-initiated bidirectional streams.
+                Locally-initiated bidirectional stream limit is fixed to 262144 bytes.
+                """,
+            min = "1")
+        long http3$_$initial$_$max$_$stream$_$data$_$bidirectional$_$remote() default 256L * 1024;
+
+        @AttributeDefinition(
+            name = "HTTP/3 initial max bidirectional streams",
+            description = "QUIC initial max number of bidirectional streams.",
+            min = "1")
+        long http3$_$initial$_$max$_$streams$_$bidirectional() default 100;
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
@@ -270,7 +291,15 @@ public final class OSGiNorthbound {
             Uint32.valueOf(configuration.http$_$chunk$_$size()),
             Uint32.valueOf(configuration.http2$_$max$_$frame$_$size()),
             buildAltSvcHeader(configuration.bind$_$port(), configuration.http3$_$alt$_$svc$_$max$_$age(),
-                tlsCertKey != null))
+                tlsCertKey != null),
+            configuration.bind$_$address(),
+            configuration.bind$_$port(),
+            tlsCertKey != null ? tlsCertKey.certificate() : null,
+            tlsCertKey != null ? tlsCertKey.privateKey() : null,
+            configuration.http3$_$alt$_$svc$_$max$_$age(),
+            configuration.http3$_$initial$_$max$_$data(),
+            configuration.http3$_$initial$_$max$_$stream$_$data$_$bidirectional$_$remote(),
+            configuration.http3$_$initial$_$max$_$streams$_$bidirectional())
         );
     }
 
