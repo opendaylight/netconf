@@ -16,6 +16,8 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -55,16 +57,37 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     private final @NonNull Uint32 chunkSize;
     private final @NonNull Uint32 frameSize;
     private final @Nullable String altSvcHeaderValue;
+    private final @Nullable String bindAddress;
+    private final int bindPort;
+    private final int http3AltSvcMaxAgeSeconds;
+    private final @Nullable X509Certificate tlsCertificate;
+    private final @Nullable PrivateKey tlsPrivateKey;
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
             final List<String> apiRootPath, final MessageEncoding defaultEncoding,
             final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
             final String altSvcHeaderValue) {
+        this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis, apiRootPath,
+            defaultEncoding, transportConfiguration, chunkSize, frameSize, altSvcHeaderValue, null, 0, 0, null, null);
+    }
+
+    public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
+            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
+            final List<String> apiRootPath, final MessageEncoding defaultEncoding,
+            final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
+            final String altSvcHeaderValue, final @Nullable String bindAddress, final int bindPort,
+            final int http3AltSvcMaxAgeSeconds,
+            final @Nullable X509Certificate tlsCertificate, final @Nullable PrivateKey tlsPrivateKey) {
         super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
         this.transportConfiguration = requireNonNull(transportConfiguration);
         this.defaultEncoding = requireNonNull(defaultEncoding);
         this.altSvcHeaderValue = altSvcHeaderValue;
+        this.bindAddress = bindAddress;
+        this.bindPort = bindPort;
+        this.http3AltSvcMaxAgeSeconds = http3AltSvcMaxAgeSeconds;
+        this.tlsCertificate = tlsCertificate;
+        this.tlsPrivateKey = tlsPrivateKey;
 
         if (chunkSize.intValue() < 1) {
             throw new IllegalArgumentException("Chunks have to have at least one byte");
@@ -101,6 +124,18 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
             parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize,
             altSvcHeaderValue);
+    }
+
+    public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
+            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
+            final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration,
+            final Uint32 chunkSize, final Uint32 frameSize, final String altSvcHeaderValue,
+            final @Nullable String bindAddress, final int bindPort, final int http3AltSvcMaxAgeSeconds,
+            final @Nullable X509Certificate tlsCertificate, final @Nullable PrivateKey tlsPrivateKey) {
+        this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
+            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize,
+            altSvcHeaderValue, bindAddress, bindPort, http3AltSvcMaxAgeSeconds, tlsCertificate,
+            tlsPrivateKey);
     }
 
     @Beta
@@ -202,6 +237,22 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         return altSvcHeaderValue;
     }
 
+    public @Nullable String bindAddress() {
+        return bindAddress;
+    }
+
+    public int bindPort() {
+        return bindPort;
+    }
+
+    public @Nullable X509Certificate tlsCertificate() {
+        return tlsCertificate;
+    }
+
+    public @Nullable PrivateKey tlsPrivateKey() {
+        return tlsPrivateKey;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(errorTagMapping(), prettyPrint(), sseMaximumFragmentLength(), sseHeartbeatIntervalMillis(),
@@ -216,7 +267,10 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             && sseHeartbeatIntervalMillis().equals(other.sseHeartbeatIntervalMillis())
             && apiRootPath.equals(other.apiRootPath) && transportConfiguration.equals(other.transportConfiguration)
             && defaultEncoding.equals(other.defaultEncoding)
-            && Objects.equals(altSvcHeaderValue, other.altSvcHeaderValue);
+            && Objects.equals(altSvcHeaderValue, other.altSvcHeaderValue)
+            && tlsPrivateKey.equals(other.tlsPrivateKey)
+            && tlsCertificate.equals(other.tlsCertificate)
+            && bindAddress.equals(other.bindAddress);
     }
 
     @Override
@@ -227,6 +281,8 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
                 .collect(Collectors.joining("/")))
             .add("defaultEncoding", defaultEncoding)
             .add("transportConfiguration", transportConfiguration)
-            .add("altSvcHeaderValue", altSvcHeaderValue);
+            .add("altSvcHeaderValue", altSvcHeaderValue)
+            .add("bindAddress", bindAddress)
+            .add("bindPort", bindPort);
     }
 }
