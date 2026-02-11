@@ -270,7 +270,12 @@ public final class OSGiNorthbound {
             Uint32.valueOf(configuration.http$_$chunk$_$size()),
             Uint32.valueOf(configuration.http2$_$max$_$frame$_$size()),
             buildAltSvcHeader(configuration.bind$_$port(), configuration.http3$_$alt$_$svc$_$max$_$age(),
-                tlsCertKey != null))
+                tlsCertKey != null),
+            configuration.bind$_$address(),
+            configuration.bind$_$port(),
+            configuration.http3$_$alt$_$svc$_$max$_$age(),
+            tlsCertKey != null ? tlsCertKey.certificate() : null,
+            tlsCertKey != null ? tlsCertKey.privateKey() : null)
         );
     }
 
