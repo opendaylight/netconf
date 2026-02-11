@@ -16,17 +16,21 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.common.Uint64;
 
 /**
  * Configuration of the Netty RESTCONF server endpoint.
@@ -54,16 +58,47 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     private final @NonNull Uint32 chunkSize;
     private final @NonNull Uint32 frameSize;
     private final @NonNull String altSvcHeaderValue;
+    private final @Nullable String bindAddress;
+    private final @NonNull Uint32 http3AltSvcMaxAgeSeconds;
+    private final @Nullable X509Certificate tlsCertificate;
+    private final @Nullable PrivateKey tlsPrivateKey;
+    private final @NonNull Uint64 http3InitialMaxData;
+    private final @NonNull Uint64 http3InitialMaxStreamDataBidirectionalRemote;
+    private final @NonNull Uint32 http3InitialMaxStreamsBidirectional;
+
+    private final int bindPort;
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
             final List<String> apiRootPath, final MessageEncoding defaultEncoding,
             final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
-            final String altSvcHeaderValue) {
+            final String altSvcHeaderValue, final Uint32 http3AltSvcMaxAgeSeconds, final Uint64 http3InitialMaxData,
+            final Uint64 http3InitialMaxStreamDataBidirectionalRemote,
+            final Uint32 http3InitialMaxStreamsBidirectional) {
+        this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis, apiRootPath,
+            defaultEncoding, transportConfiguration, chunkSize, frameSize, altSvcHeaderValue, null, 0, null, null,
+            http3AltSvcMaxAgeSeconds, http3InitialMaxData, http3InitialMaxStreamDataBidirectionalRemote,
+            http3InitialMaxStreamsBidirectional);
+    }
+
+    public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
+            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
+            final List<String> apiRootPath, final MessageEncoding defaultEncoding,
+            final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
+            final String altSvcHeaderValue, final @Nullable String bindAddress, final int bindPort,
+            final @Nullable X509Certificate tlsCertificate, final @Nullable PrivateKey tlsPrivateKey,
+            final Uint32 http3AltSvcMaxAgeSeconds, final Uint64 http3InitialMaxData,
+            final Uint64 http3InitialMaxStreamDataBidirectionalRemote,
+            final Uint32 http3InitialMaxStreamsBidirectional) {
         super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
         this.transportConfiguration = requireNonNull(transportConfiguration);
         this.defaultEncoding = requireNonNull(defaultEncoding);
         this.altSvcHeaderValue = altSvcHeaderValue;
+        this.bindAddress = bindAddress;
+        this.bindPort = bindPort;
+        this.tlsCertificate = tlsCertificate;
+        this.tlsPrivateKey = tlsPrivateKey;
+        this.http3AltSvcMaxAgeSeconds = requireNonNull(http3AltSvcMaxAgeSeconds);
 
         if (chunkSize.intValue() < 1) {
             throw new IllegalArgumentException("Chunks have to have at least one byte");
@@ -75,6 +110,30 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
                 "HTTP/2 frame size must be between 16384 bytes (16 KiB) and 16777215 bytes (16 MiB)");
         }
         this.frameSize = frameSize;
+
+        final var initialMaxData = requireNonNull(http3InitialMaxData);
+        final var initMaxData = initialMaxData.longValue();
+        if (initMaxData < 0 || initMaxData > 4611686018427387903L) {
+            throw new IllegalArgumentException("HTTP/3 initial max data must not exceed 4611686018427387903");
+        }
+        this.http3InitialMaxData = initialMaxData;
+
+        final var initialMaxStreamDataBidirectionalRemote =
+            requireNonNull(http3InitialMaxStreamDataBidirectionalRemote);
+        final var remoteBidiMaxData = initialMaxStreamDataBidirectionalRemote.longValue();
+        if (remoteBidiMaxData < 0 || remoteBidiMaxData > 4611686018427387903L) {
+            throw new IllegalArgumentException(
+                "HTTP/3 initial max stream data (bidirectional remote) must not exceed 4611686018427387903");
+        }
+        this.http3InitialMaxStreamDataBidirectionalRemote = initialMaxStreamDataBidirectionalRemote;
+
+        final var initialMaxStreamsBidirectional = requireNonNull(http3InitialMaxStreamsBidirectional);
+        final var maxBidiStreams = initialMaxStreamsBidirectional.longValue();
+        if (maxBidiStreams < 0 || maxBidiStreams > 1152921504606846976L) {
+            throw new IllegalArgumentException("HTTP/3 initial max bidirectional streams must not exceed "
+                + "1152921504606846976");
+        }
+        this.http3InitialMaxStreamsBidirectional = initialMaxStreamsBidirectional;
 
         if (apiRootPath.isEmpty()) {
             throw new IllegalArgumentException("empty apiRootPath");
@@ -88,24 +147,48 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
             final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration,
-            final Uint32 chunkSize, final Uint32 frameSize) {
+            final Uint32 chunkSize, final Uint32 frameSize, final Uint32 http3AltSvcMaxAgeSeconds,
+            final Uint64 http3InitialMaxData, final Uint64 http3InitialMaxStreamDataBidirectionalRemote,
+            final Uint32 http3InitialMaxStreamsBidirectional) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
-            apiRootPath, defaultEncoding, transportConfiguration, chunkSize, frameSize, null);
+            apiRootPath, defaultEncoding, transportConfiguration, chunkSize, frameSize, null,
+            http3AltSvcMaxAgeSeconds, http3InitialMaxData, http3InitialMaxStreamDataBidirectionalRemote,
+            http3InitialMaxStreamsBidirectional);
     }
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
             final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration,
-            final Uint32 chunkSize, final Uint32 frameSize, final String altSvcHeaderValue) {
+            final Uint32 chunkSize, final Uint32 frameSize, final String altSvcHeaderValue,
+            final Uint32 http3AltSvcMaxAgeSeconds, final Uint64 http3InitialMaxData,
+            final Uint64 http3InitialMaxStreamDataBidirectionalRemote,
+            final Uint32 http3InitialMaxStreamsBidirectional) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
             parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize,
-            altSvcHeaderValue);
+            altSvcHeaderValue, http3AltSvcMaxAgeSeconds, http3InitialMaxData,
+            http3InitialMaxStreamDataBidirectionalRemote, http3InitialMaxStreamsBidirectional);
+    }
+
+    public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
+            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
+            final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration,
+            final Uint32 chunkSize, final Uint32 frameSize, final String altSvcHeaderValue,
+            final @Nullable String bindAddress, final int bindPort, final @Nullable X509Certificate tlsCertificate,
+            final @Nullable PrivateKey tlsPrivateKey, final Uint32 http3AltSvcMaxAgeSeconds,
+            final Uint64 http3InitialMaxData, final Uint64 http3InitialMaxStreamDataBidirectionalRemote,
+            final Uint32 http3InitialMaxStreamsBidirectional) {
+        this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
+            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize,
+            altSvcHeaderValue, bindAddress, bindPort, tlsCertificate, tlsPrivateKey, http3AltSvcMaxAgeSeconds,
+            http3InitialMaxData, http3InitialMaxStreamDataBidirectionalRemote, http3InitialMaxStreamsBidirectional);
     }
 
     @Beta
     public NettyEndpointConfiguration(final HttpServerStackGrouping transportConfiguration) {
         this(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO, Uint32.valueOf(10_000), "restconf",
-            MessageEncoding.JSON, transportConfiguration, Uint32.valueOf(262144), Uint32.valueOf(16384), null);
+            MessageEncoding.JSON, transportConfiguration, Uint32.valueOf(262144), Uint32.valueOf(16384), null,
+            Uint32.valueOf(3600), Uint64.valueOf(4L * 1024 * 1024), Uint64.valueOf(256L * 1024),
+            Uint32.valueOf(100));
     }
 
     /**
@@ -204,10 +287,44 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         return altSvcHeaderValue;
     }
 
+    public @Nullable String bindAddress() {
+        return bindAddress;
+    }
+
+    public int bindPort() {
+        return bindPort;
+    }
+
+    public Uint32 http3AltSvcMaxAgeSeconds() {
+        return http3AltSvcMaxAgeSeconds;
+    }
+
+    public @Nullable X509Certificate tlsCertificate() {
+        return tlsCertificate;
+    }
+
+    public @Nullable PrivateKey tlsPrivateKey() {
+        return tlsPrivateKey;
+    }
+
+    public Uint64 http3InitialMaxData() {
+        return http3InitialMaxData;
+    }
+
+    public Uint64 http3InitialMaxStreamDataBidirectionalRemote() {
+        return http3InitialMaxStreamDataBidirectionalRemote;
+    }
+
+    public Uint32 http3InitialMaxStreamsBidirectional() {
+        return http3InitialMaxStreamsBidirectional;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(errorTagMapping(), prettyPrint(), sseMaximumFragmentLength(), sseHeartbeatIntervalMillis(),
-            apiRootPath, transportConfiguration, defaultEncoding, altSvcHeaderValue);
+            apiRootPath, transportConfiguration, defaultEncoding, chunkSize, frameSize, altSvcHeaderValue,
+            bindAddress, bindPort, http3AltSvcMaxAgeSeconds, tlsCertificate, tlsPrivateKey, http3InitialMaxData,
+            http3InitialMaxStreamDataBidirectionalRemote, http3InitialMaxStreamsBidirectional);
     }
 
     @Override
@@ -217,8 +334,16 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             && sseMaximumFragmentLength().equals(other.sseMaximumFragmentLength())
             && sseHeartbeatIntervalMillis().equals(other.sseHeartbeatIntervalMillis())
             && apiRootPath.equals(other.apiRootPath) && transportConfiguration.equals(other.transportConfiguration)
-            && defaultEncoding.equals(other.defaultEncoding)
-            && Objects.equals(altSvcHeaderValue, other.altSvcHeaderValue);
+            && defaultEncoding.equals(other.defaultEncoding) && chunkSize.equals(other.chunkSize)
+            && frameSize.equals(other.frameSize)
+            && Objects.equals(altSvcHeaderValue, other.altSvcHeaderValue)
+            && Objects.equals(bindAddress, other.bindAddress) && bindPort == other.bindPort
+            && http3AltSvcMaxAgeSeconds.equals(other.http3AltSvcMaxAgeSeconds)
+            && Objects.equals(tlsPrivateKey, other.tlsPrivateKey)
+            && Objects.equals(tlsCertificate, other.tlsCertificate)
+            && http3InitialMaxData.equals(other.http3InitialMaxData)
+            && http3InitialMaxStreamDataBidirectionalRemote.equals(other.http3InitialMaxStreamDataBidirectionalRemote)
+            && http3InitialMaxStreamsBidirectional.equals(other.http3InitialMaxStreamsBidirectional);
     }
 
     @Override
@@ -229,6 +354,12 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
                 .collect(Collectors.joining("/")))
             .add("defaultEncoding", defaultEncoding)
             .add("transportConfiguration", transportConfiguration)
-            .add("altSvcHeaderValue", altSvcHeaderValue);
+            .add("altSvcHeaderValue", altSvcHeaderValue)
+            .add("bindAddress", bindAddress)
+            .add("bindPort", bindPort)
+            .add("http3AltSvcMaxAgeSeconds", http3AltSvcMaxAgeSeconds)
+            .add("http3InitialMaxData", http3InitialMaxData)
+            .add("http3InitialMaxStreamDataBidirectionalRemote", http3InitialMaxStreamDataBidirectionalRemote)
+            .add("http3InitialMaxStreamsBidirectional", http3InitialMaxStreamsBidirectional);
     }
 }
