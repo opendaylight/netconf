@@ -26,6 +26,7 @@ import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.common.Uint64;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.ComponentFactory;
 import org.osgi.service.component.ComponentInstance;
@@ -155,6 +156,27 @@ public final class OSGiNorthbound {
                 """,
             min = "0")
         int http3$_$alt$_$svc$_$max$_$age() default 3600;
+
+        @AttributeDefinition(
+            name = "HTTP/3 initial max data (bytes)",
+            description = "QUIC connection-level initial max data limit for HTTP/3.",
+            min = "1")
+        long http3$_$initial$_$max$_$data() default 4L * 1024 * 1024;
+
+        @AttributeDefinition(
+            name = "HTTP/3 initial max stream data bidirectional remote (bytes)",
+            description = """
+                QUIC initial max stream data limit for remotely-initiated bidirectional streams.
+                Locally-initiated bidirectional stream limit is fixed to 262144 bytes.
+                """,
+            min = "1")
+        long http3$_$initial$_$max$_$stream$_$data$_$bidirectional$_$remote() default 256L * 1024;
+
+        @AttributeDefinition(
+            name = "HTTP/3 initial max bidirectional streams",
+            description = "QUIC initial max number of bidirectional streams.",
+            min = "1")
+        long http3$_$initial$_$max$_$streams$_$bidirectional() default 100;
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
@@ -273,7 +295,13 @@ public final class OSGiNorthbound {
             parseDefaultEncoding(configuration.default$_$encoding()), new HttpServerStackConfiguration(transport),
             Uint32.valueOf(configuration.http$_$chunk$_$size()),
             Uint32.valueOf(configuration.http2$_$max$_$frame$_$size()),
-            altSvc)
+            altSvc, configuration.bind$_$address(), configuration.bind$_$port(),
+            tlsCertKey != null ? tlsCertKey.certificate() : null,
+            tlsCertKey != null ? tlsCertKey.privateKey() : null,
+            Uint32.valueOf(configuration.http3$_$alt$_$svc$_$max$_$age()),
+            Uint64.valueOf(configuration.http3$_$initial$_$max$_$data()),
+            Uint64.valueOf(configuration.http3$_$initial$_$max$_$stream$_$data$_$bidirectional$_$remote()),
+            Uint32.valueOf(configuration.http3$_$initial$_$max$_$streams$_$bidirectional()))
         );
     }
 
@@ -287,13 +315,13 @@ public final class OSGiNorthbound {
         }
     }
 
-    private static @Nullable String buildAltSvcHeader(final int bindPort, final int maxAgeSeconds) {
-        if (maxAgeSeconds <= 0) {
+    private static @Nullable String buildAltSvcHeader(final int bindPort, final Uint32 maxAgeSeconds) {
+        if (maxAgeSeconds.intValue() == 0) {
             return null;
         }
         if (bindPort <= 0 || bindPort > 65535) {
             throw new IllegalArgumentException("Invalid bind port " + bindPort);
         }
-        return "h3=\":%d\"; ma=%d".formatted(bindPort, maxAgeSeconds);
+        return "h3=\":%d\"; ma=%d".formatted(bindPort, maxAgeSeconds.intValue());
     }
 }
