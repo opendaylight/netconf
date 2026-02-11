@@ -22,7 +22,7 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 
 @NonNullByDefault
 final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
-    private static final int MAX_HTTP2_CONTENT_LENGTH = 16 * 1024;
+    static final int MAX_HTTP2_CONTENT_LENGTH = 16 * 1024;
 
     private final EndpointRoot root;
     private final Uint32 chunkSize;
