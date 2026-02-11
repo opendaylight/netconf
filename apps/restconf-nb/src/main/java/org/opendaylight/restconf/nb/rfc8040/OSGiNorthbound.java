@@ -25,6 +25,7 @@ import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.common.Uint64;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.ComponentFactory;
 import org.osgi.service.component.ComponentInstance;
@@ -154,6 +155,27 @@ public final class OSGiNorthbound {
                 """,
             min = "0", max = "2147483647")
         long http3$_$alt$_$svc$_$max$_$age() default 3600;
+
+        @AttributeDefinition(
+            name = "HTTP/3 initial max data (bytes)",
+            description = "QUIC connection-level initial max data limit for HTTP/3.",
+            min = "1", max = "4611686018427387903")
+        long http3$_$initial$_$max$_$data() default 4L * 1024 * 1024;
+
+        @AttributeDefinition(
+            name = "HTTP/3 initial max stream data bidirectional remote (bytes)",
+            description = """
+                QUIC initial max stream data limit for remotely-initiated bidirectional streams.
+                Locally-initiated bidirectional stream limit is fixed to 262144 bytes.
+                """,
+            min = "0", max = "4611686018427387903")
+        long http3$_$initial$_$max$_$stream$_$data$_$bidirectional$_$remote() default 256L * 1024;
+
+        @AttributeDefinition(
+            name = "HTTP/3 initial max bidirectional streams",
+            description = "QUIC initial max number of bidirectional streams.",
+            min = "0", max = "1152921504606846976")
+        long http3$_$initial$_$max$_$streams$_$bidirectional() default 100;
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
@@ -273,7 +295,13 @@ public final class OSGiNorthbound {
             parseDefaultEncoding(configuration.default$_$encoding()), new HttpServerStackConfiguration(transport),
             Uint32.valueOf(configuration.http$_$chunk$_$size()),
             Uint32.valueOf(configuration.http2$_$max$_$frame$_$size()),
-            altSvc)
+            altSvc, configuration.bind$_$address(), configuration.bind$_$port(),
+            tlsCertKey != null ? tlsCertKey.certificate() : null,
+            tlsCertKey != null ? tlsCertKey.privateKey() : null,
+            Uint32.valueOf(configuration.http3$_$alt$_$svc$_$max$_$age()),
+            Uint64.valueOf(configuration.http3$_$initial$_$max$_$data()),
+            Uint64.valueOf(configuration.http3$_$initial$_$max$_$stream$_$data$_$bidirectional$_$remote()),
+            Uint32.valueOf(configuration.http3$_$initial$_$max$_$streams$_$bidirectional()))
         );
     }
 
