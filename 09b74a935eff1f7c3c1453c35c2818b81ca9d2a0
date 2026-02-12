@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fb8e860_6d708940",
+        "filename": "dagger/dagger-mdsal/src/main/java/org/opendaylight/netconf/dagger/mdsal/MdsalDomBrokerModule.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-12T09:45:46Z",
+      "side": 1,
+      "message": "Thanks, seems that Dagger tutorial is outdated :)\nhttps://dagger.dev/tutorial/07-two-for-the-price-of-one",
+      "parentUuid": "da2feda2_5de1b035",
+      "range": {
+        "startLine": 48,
+        "startChar": 6,
+        "endLine": 48,
+        "endChar": 22
+      },
+      "revId": "09b74a935eff1f7c3c1453c35c2818b81ca9d2a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7016e359_f30ed818",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-02-11T11:37:12Z",
       "side": 1,
       "message": "DOMNotificationRouter.Config.class ?",
+      "range": {
+        "startLine": 129,
+        "startChar": 19,
+        "endLine": 129,
+        "endChar": 23
+      },
+      "revId": "09b74a935eff1f7c3c1453c35c2818b81ca9d2a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "901b1207_7c1f7268",
+        "filename": "dagger/dagger-mdsal/src/main/java/org/opendaylight/netconf/dagger/mdsal/MdsalDomBrokerModule.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-12T09:45:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7016e359_f30ed818",
       "range": {
         "startLine": 129,
         "startChar": 19,
