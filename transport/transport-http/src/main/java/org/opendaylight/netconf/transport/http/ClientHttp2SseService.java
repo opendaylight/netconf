@@ -94,6 +94,7 @@ final class ClientHttp2SseService extends ChannelInboundHandlerAdapter
         // send SSE stream request through channel so it passes AuthHandler
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, requestUri, EMPTY_BUFFER);
         request.headers()
+            .set(HttpHeaderNames.HOST, host)
             .set(HttpHeaderNames.ACCEPT, HttpHeaderValues.TEXT_EVENT_STREAM)
             .set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE)
             .set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED)
