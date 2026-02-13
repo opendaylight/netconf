@@ -165,7 +165,7 @@ public class PropertyEntity {
     }
 
     /**
-     * Resolve parent namespace
+     * Resolve parent namespace.
      *
      * <p>This method used to solve duplicity issues when node, and it's augmentation have the same name by adding name
      * of the module before name of the node to specify that this exact node if coming from augmentation.
