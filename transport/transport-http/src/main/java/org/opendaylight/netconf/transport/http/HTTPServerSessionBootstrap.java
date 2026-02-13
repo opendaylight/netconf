@@ -14,7 +14,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
+import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http2.Http2MultiplexHandler;
+import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
+import io.netty.util.ReferenceCountUtil;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -37,7 +40,7 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
 
     @Override
     public final void handlerAdded(final ChannelHandlerContext ctx) {
-        scheme.initializeServerPipeline(ctx, buildHttp2ChildInitializer(ctx), frameSize);
+        scheme.initializeServerPipeline(ctx, frameSize);
     }
 
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
@@ -47,7 +50,21 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
             LOG.debug("{} resolved to {} semantics", ctx.channel(), setup);
             switch (setup) {
                 case HTTP_11 -> ctx.pipeline().replace(this, null, configureHttp1(ctx));
-                case HTTP_2 -> ctx.pipeline().remove(this);
+                case HTTP_2 -> ctx.pipeline().replace(this, null, new Http2MultiplexHandler(
+                    configureHttp2(ctx),
+                    new ChannelInitializer<>() {
+                        @Override
+                        protected void initChannel(final Channel ch) {
+                            ch.pipeline().addLast(new Http2StreamFrameToHttpObjectCodec(true));
+                            ch.pipeline().addLast(new HttpObjectAggregator(HTTPServer.MAX_HTTP_CONTENT_LENGTH));
+                        }
+
+                        @Override
+                        public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+                            super.channelRead(ctx, msg);
+                            ctx.fireChannelRead(ReferenceCountUtil.retain(msg));
+                        }
+                    }));
             }
         } else {
             super.userEventTriggered(ctx, event);
@@ -70,5 +87,5 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
      * @return channel initializer configuring stream channels
      */
     @NonNullByDefault
-    protected abstract ChannelInitializer<Channel> buildHttp2ChildInitializer(ChannelHandlerContext ctx);
+    protected abstract ChannelInitializer<Channel> configureHttp2(ChannelHandlerContext ctx);
 }
