@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc70d3fd_ed2cc621",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-02-13T13:14:29Z",
+      "side": 1,
+      "message": "When using h2c and prior knowledge on the same server we should use two parameters Http2MultiplexHandle constructor:\n\n```\nThe Javadoc for the constructor Http2MultiplexHandler(ChannelHandler inboundStreamHandler, ChannelHandler upgradeStreamHandler) explicitly defines the \"ownership\" of the first stream:\n\nupgradeStreamHandler: \"The handler to add to the pipeline for the upgrade stream (the stream that was upgraded from HTTP/1.1).\"\n\nIf this is omitted (passed as null), and an upgrade occurs, the Http2MultiplexHandler will not have a child pipeline to inject for Stream 1. This results in the initial request—the very thing the client is trying to do—getting \"lost\" in the transition between the HttpServerCodec and the Http2FrameCodec.\n```\n\nMaybe something like this?\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/120645",
+      "revId": "f1f7fbab06d76963f91f3b135d1396113bb14f8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
