@@ -11,7 +11,7 @@
 module org.opendaylight.netconf.dagger.config {
     exports org.opendaylight.netconf.dagger.config;
 
-    opens org.opendaylight.netconf.dagger.config to spring.core, spring.beans;
+    opens org.opendaylight.netconf.dagger.config to spring.core, spring.beans, io.smallrye.config;
 
     requires spring.boot;
     requires spring.core;
@@ -23,4 +23,6 @@ module org.opendaylight.netconf.dagger.config {
     requires static org.eclipse.jdt.annotation;
     requires static jakarta.inject;
     requires static java.compiler;
+    requires org.eclipse.microprofile.config;
+    requires io.smallrye.config.source.yaml;
 }

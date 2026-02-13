@@ -13,7 +13,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
-import org.opendaylight.netconf.dagger.config.SpringbootConfigLoaderModule;
+import org.opendaylight.netconf.dagger.config.SmallRyeConfigLoaderModule;
 import org.opendaylight.odlparent.dagger.AutoCloseableComponent;
 import org.opendaylight.odlparent.dagger.ResourceSupportModule;
 
@@ -22,7 +22,7 @@ import org.opendaylight.odlparent.dagger.ResourceSupportModule;
 @Component(modules = {
     MdsalDomBrokerModule.class,
     MdsalSchemaContextTestModule.class,
-    SpringbootConfigLoaderModule.class,
+    SmallRyeConfigLoaderModule.class,
     ResourceSupportModule.class
 })
 public interface MdsalDomBrokerTestFactory extends AutoCloseableComponent {

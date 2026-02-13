@@ -11,12 +11,16 @@
 module org.opendaylight.netconf.dagger.mdsal {
     exports org.opendaylight.netconf.dagger.mdsal;
 
+    opens org.opendaylight.netconf.dagger.mdsal to io.smallrye.config;
+
     requires org.opendaylight.mdsal.dom.api;
     requires org.opendaylight.mdsal.dom.broker;
     requires org.opendaylight.netconf.dagger.config;
+    requires java.annotation;
 
     requires static transitive com.google.errorprone.annotations;
 
     requires transitive org.opendaylight.odlparent.dagger;
     requires spring.boot;
+    requires io.smallrye.config;
 }
