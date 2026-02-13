@@ -9,9 +9,7 @@ package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpMessage;
 import io.netty.handler.codec.http.HttpMessage;
@@ -26,7 +24,6 @@ import io.netty.handler.codec.http2.Http2CodecUtil;
 import io.netty.handler.codec.http2.Http2FrameCodec;
 import io.netty.handler.codec.http2.Http2FrameCodecBuilder;
 import io.netty.handler.codec.http2.Http2FrameLogger;
-import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import io.netty.handler.codec.http2.Http2ServerUpgradeCodec;
 import io.netty.handler.codec.http2.Http2Settings;
 import io.netty.handler.logging.LogLevel;
@@ -51,9 +48,7 @@ public enum HTTPScheme {
         private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.DEBUG, "Clear2To1");
 
         @Override
-        void initializeServerPipeline(final ChannelHandlerContext ctx,
-                final ChannelInitializer<Channel> childChannelInit, final Uint32 frameSize) {
-            final var childInit = requireNonNull(childChannelInit);
+        void initializeServerPipeline(final ChannelHandlerContext ctx, final Uint32 frameSize) {
             // Cleartext upgrade flow
             final var sourceCodec = new HttpServerCodec();
             final var http2FrameCodec = newHttp2FrameCodec(FRAME_LOGGER, frameSize);
@@ -64,14 +59,13 @@ public enum HTTPScheme {
                         sourceCodec,
                         protocol -> {
                             if (AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)) {
-                                return new Http2ServerUpgradeCodec(http2FrameCodec,
-                                    new Http2MultiplexHandler(childInit));
+                                return new Http2ServerUpgradeCodec(http2FrameCodec);
                             }
                             return null;
                         },
                         HTTPServer.MAX_HTTP_CONTENT_LENGTH),
                     http2FrameCodec))
-                .addBefore(ctx.name(), null, new CleartextUpgradeHandler(childInit));
+                .addBefore(ctx.name(), null, new CleartextUpgradeHandler());
         }
     },
     /**
@@ -79,9 +73,8 @@ public enum HTTPScheme {
      */
     HTTPS(HttpScheme.HTTPS) {
         @Override
-        void initializeServerPipeline(final ChannelHandlerContext ctx,
-                final ChannelInitializer<Channel> childChannelInit, final Uint32 frameSize) {
-            ctx.pipeline().addBefore(ctx.name(), null, new AlpnUpgradeHandler(childChannelInit, frameSize));
+        void initializeServerPipeline(final ChannelHandlerContext ctx, final Uint32 frameSize) {
+            ctx.pipeline().addBefore(ctx.name(), null, new AlpnUpgradeHandler(frameSize));
         }
     };
 
@@ -92,12 +85,10 @@ public enum HTTPScheme {
         private static final Logger LOG = LoggerFactory.getLogger(AlpnUpgradeHandler.class);
         private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.INFO, "Alpn2To1");
 
-        private final ChannelInitializer<Channel> childChannelInit;
         private final Uint32 frameSize;
 
-        AlpnUpgradeHandler(final ChannelInitializer<Channel> childChannelInit, final Uint32 frameSize) {
+        AlpnUpgradeHandler(final Uint32 frameSize) {
             super(ApplicationProtocolNames.HTTP_1_1);
-            this.childChannelInit = requireNonNull(childChannelInit);
             this.frameSize = frameSize;
         }
 
@@ -123,8 +114,6 @@ public enum HTTPScheme {
         private void configureHttp2(final ChannelHandlerContext ctx) {
             LOG.debug("{}: using HTTP/2", ctx.channel());
             ctx.pipeline().replace(this, "h2-frame-codec", newHttp2FrameCodec(FRAME_LOGGER, frameSize));
-            ctx.pipeline().addAfter("h2-frame-codec", "h2-multiplexer",
-                new Http2MultiplexHandler(childChannelInit));
             ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
         }
     }
@@ -135,11 +124,8 @@ public enum HTTPScheme {
     private static final class CleartextUpgradeHandler extends SimpleChannelInboundHandler<HttpMessage> {
         private static final Logger LOG = LoggerFactory.getLogger(CleartextUpgradeHandler.class);
 
-        private final ChannelInitializer<Channel> childChannelInit;
-
-        CleartextUpgradeHandler(final ChannelInitializer<Channel> childChannelInit) {
+        CleartextUpgradeHandler() {
             super(HttpMessage.class, false);
-            this.childChannelInit = childChannelInit;
         }
 
         @Override
@@ -166,7 +152,6 @@ public enum HTTPScheme {
             } else if (event instanceof PriorKnowledgeUpgradeEvent) {
                 // Prior-knowledge h2: CleartextHttp2ServerUpgradeHandler has already installed Http2FrameCodec,
                 LOG.debug("{}: using HTTP/2 prior knowledge", ctx.channel());
-                ctx.pipeline().addLast("h2-multiplexer", new Http2MultiplexHandler(childChannelInit));
                 ctx.pipeline().remove(this);
                 ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
             } else {
@@ -211,8 +196,7 @@ public enum HTTPScheme {
      *
      * @param ctx reference {@link ChannelHandlerContext}
      */
-    abstract void initializeServerPipeline(ChannelHandlerContext ctx, ChannelInitializer<Channel> childChannelInit,
-            Uint32 frameSize);
+    abstract void initializeServerPipeline(ChannelHandlerContext ctx, Uint32 frameSize);
 
     @Override
     public String toString() {
