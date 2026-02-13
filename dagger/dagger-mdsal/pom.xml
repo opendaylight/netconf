@@ -17,6 +17,17 @@
 
     <artifactId>dagger-mdsal</artifactId>
 
+    <dependencyManagement>
+        <dependencies>
+            <!-- FIXME: Remove when Karaf bump jakarta.annotation-api to version 2.1.1 -->
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>2.1.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>com.google.dagger</groupId>
@@ -36,6 +47,15 @@
             <groupId>jakarta.inject</groupId>
             <artifactId>jakarta.inject-api</artifactId>
             <optional>true</optional>
+        </dependency>
+        <!-- FIXME: Remove when mdsal-dom-broker no longer requires java.annotation transitively. Bumping to a newer
+                    version of jakarta.annotation-api removes this transitive dependency.-->
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+            <version>1.3.2</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jdt</groupId>
@@ -59,7 +79,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>dagger-springboot-confg</artifactId>
+            <artifactId>dagger-smallrye-config</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.odlparent</groupId>
@@ -81,21 +101,4 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-configuration-processor</artifactId>
-                            <version>4.0.2</version>
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
