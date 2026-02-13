@@ -33,6 +33,24 @@
       "message": ".. but anyway - we can have an implementation which works at least on the second try?",
       "revId": "114c2eba190694cdaf1bef197f446f2614d81c66",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dce2d06b_366c775f",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeSshServer.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-13T14:53:53Z",
+      "side": 1,
+      "message": "with current patchset it works on second connection of device",
+      "parentUuid": "48f61f32_d3004b93",
+      "revId": "114c2eba190694cdaf1bef197f446f2614d81c66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
