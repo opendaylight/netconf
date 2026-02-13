@@ -20,6 +20,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "45f7ee5f_76fa4117",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-02-13T20:52:48Z",
+      "side": 1,
+      "message": "these checks have to be done before we call dropNode() -- otherwise supplying null will drop the node and then throw NPE without recovery",
+      "range": {
+        "startLine": 96,
+        "startChar": 16,
+        "endLine": 96,
+        "endChar": 30
+      },
+      "revId": "fb75bc27a86bee456bade4393786a4d21c8341e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "77d9f460_3e730203",
         "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
         "patchSetId": 7
