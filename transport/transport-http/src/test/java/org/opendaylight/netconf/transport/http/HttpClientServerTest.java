@@ -179,7 +179,7 @@ class HttpClientServerTest {
                 }
 
                 @Override
-                protected ChannelInitializer<Channel> buildHttp2ChildInitializer(final ChannelHandlerContext ctx) {
+                protected ChannelInitializer<Channel> configureHttp2(final ChannelHandlerContext ctx) {
                     return new ChannelInitializer<>() {
                         @Override
                         protected void initChannel(final Channel ch) {
