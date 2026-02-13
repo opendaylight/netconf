@@ -5,13 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.dagger.config;
+package org.opendaylight.netconf.dagger.springboot.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.file.Path;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opendaylight.netconf.dagger.config.ConfigLoader;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.Name;
 
@@ -23,9 +24,9 @@ class SpringbootConfigLoaderTest {
     private static final int HTTP2_MAX_FRAME_SIZE = 16384;
     private static final String TLS_CERTIFICATE = "etc/tls/cert.pem";
     private static final String TLS_PRIVATE_KEY = "etc/tls/key.pem";
-    private static final Path YAML_CONFIG = Path.of("config.yaml");
-    private static final Path ALFA_JP_CONFIG = Path.of("config/alfa.cfg");
-    private static final Path BETA_JP_CONFIG = Path.of("resource.beta.cfg");
+    private static final Path YAML_CONFIG = Path.of("../dagger-config/src/test/resources/config.yaml");
+    private static final Path ALFA_JP_CONFIG = Path.of("../dagger-config/src/test/resources/config/alfa.cfg");
+    private static final Path BETA_JP_CONFIG = Path.of("../dagger-config/src/test/resources/resource.beta.cfg");
 
     private final ConfigLoader configLoader = new SpringbootConfigLoader();
 

@@ -11,7 +11,6 @@ import com.google.errorprone.annotations.DoNotMock;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
-import java.lang.annotation.Annotation;
 import java.nio.file.Path;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
@@ -32,12 +31,9 @@ import org.opendaylight.mdsal.dom.broker.RouterDOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dagger.config.ConfigLoader;
 import org.opendaylight.netconf.dagger.mdsal.MdsalQualifiers.SchemaServiceContext;
+import org.opendaylight.netconf.dagger.smallrye.config.dto.DOMNotificationRouterConfig;
 import org.opendaylight.odlparent.dagger.ResourceSupport;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.bind.ConstructorBinding;
-import org.springframework.boot.context.properties.bind.DefaultValue;
-import org.springframework.boot.context.properties.bind.Name;
 
 /**
  * A Dagger module providing {@code mdsal-dom-broker} services.
@@ -111,27 +107,4 @@ public interface MdsalDomBrokerModule {
         return new RouterDOMRpcService(router);
     }
 
-    /**
-     * Implementation of OSGi DOMNotificationRouter configuration used for components that are not initialized
-     * or managed by the OSGi.
-     */
-    @ConfigurationProperties
-    class DOMNotificationRouterConfig implements DOMNotificationRouter.Config {
-        private int queueDepth = 65536;
-
-        @ConstructorBinding
-        public DOMNotificationRouterConfig(@Name("notification-queue-depth") @DefaultValue("65536") int queueDepth) {
-            this.queueDepth = queueDepth;
-        }
-
-        @Override
-        public Class<? extends Annotation> annotationType() {
-            return DOMNotificationRouter.Config.class;
-        }
-
-        @Override
-        public int queueDepth() {
-            return queueDepth;
-        }
-    }
 }

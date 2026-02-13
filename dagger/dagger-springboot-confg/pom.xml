@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
- Copyright © 2026 PANTHEON.tech, s.r.o. and others.
-
- This program and the accompanying materials are made available under the
- terms of the Eclipse Public License v1.0 which accompanies this distribution,
- and is available at http://www.eclipse.org/legal/epl-v10.html
- -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
@@ -15,17 +10,8 @@
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>dagger-mdsal</artifactId>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>jakarta.annotation</groupId>
-                <artifactId>jakarta.annotation-api</artifactId>
-                <version>2.1.1</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <artifactId>dagger-springboot-confg</artifactId>
 
     <dependencies>
         <dependency>
@@ -37,9 +23,9 @@
             <artifactId>error_prone_annotations</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <version>1.3.2</version>
+            <groupId>com.guicedee.services</groupId>
+            <artifactId>javax.inject</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>jakarta.annotation</groupId>
@@ -58,41 +44,22 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>mdsal-dom-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal</groupId>
             <artifactId>mdsal-dom-broker</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>mdsal-dom-spi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>dagger-config</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>dagger-smallrye-config</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.odlparent</groupId>
-            <artifactId>dagger</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+            <version>4.0.2</version>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-model-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.ietf.model</groupId>
-            <artifactId>rfc6241</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>binding-runtime-spi</artifactId>
-            <scope>test</scope>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.5</version>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
@@ -113,4 +80,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

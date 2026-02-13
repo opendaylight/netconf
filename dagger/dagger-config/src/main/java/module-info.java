@@ -11,16 +11,5 @@
 module org.opendaylight.netconf.dagger.config {
     exports org.opendaylight.netconf.dagger.config;
 
-    opens org.opendaylight.netconf.dagger.config to spring.core, spring.beans;
-
-    requires spring.boot;
-    requires spring.core;
-    requires spring.beans;
-
-    requires static transitive com.google.errorprone.annotations;
-
-    requires static dagger;
     requires static org.eclipse.jdt.annotation;
-    requires static jakarta.inject;
-    requires static java.compiler;
 }

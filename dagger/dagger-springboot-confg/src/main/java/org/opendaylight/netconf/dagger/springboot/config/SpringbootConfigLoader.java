@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.dagger.config;
+package org.opendaylight.netconf.dagger.springboot.config;
 
 import jakarta.inject.Singleton;
 import java.io.IOException;
@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.netconf.dagger.config.ConfigLoader;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
 import org.springframework.boot.env.YamlPropertySourceLoader;

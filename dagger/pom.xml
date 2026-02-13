@@ -30,5 +30,7 @@
     <modules>
         <module>dagger-config</module>
         <module>dagger-mdsal</module>
+        <module>dagger-smallrye-config</module>
+        <module>dagger-springboot-confg</module>
     </modules>
 </project>
