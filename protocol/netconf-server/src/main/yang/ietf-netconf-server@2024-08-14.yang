@@ -13,7 +13,7 @@ module ietf-netconf-server {
     prefix x509c2n;
     reference
       "RFC 7407: A YANG Data Model for SNMP Configuration";
-  }  
+  }
 
   import ietf-tcp-client {
     prefix tcpc;

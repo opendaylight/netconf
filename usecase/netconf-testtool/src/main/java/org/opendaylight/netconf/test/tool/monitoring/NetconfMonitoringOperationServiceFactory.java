@@ -46,4 +46,3 @@ public class NetconfMonitoringOperationServiceFactory implements NetconfOperatio
         // No-op
     }
 }
-

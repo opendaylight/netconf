@@ -31,4 +31,3 @@ public interface YangLibrarySchemaSourceUrlProvider {
     @NonNull Set<Uri> getSchemaSourceUrl(@NonNull String moduleSetName, @NonNull String moduleName,
         @Nullable Revision revision);
 }
-

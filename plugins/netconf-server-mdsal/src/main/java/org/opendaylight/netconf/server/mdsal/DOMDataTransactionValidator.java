@@ -60,4 +60,3 @@ public interface DOMDataTransactionValidator extends Extension {
         }
     }
 }
-
