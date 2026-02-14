@@ -423,7 +423,7 @@ module odl-netconf-device {
         "Transport parameters negotiated during device connection process";
     }
   }
-  
+
   grouping netconf-schema-storage {
     leaf schema-cache-directory {
       config true;
