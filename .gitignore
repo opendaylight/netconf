@@ -37,3 +37,7 @@ maven-metadata-local.xml
 # Sphinx documentation
 .tox/
 docs/_build/
+.cache/
+node_modules/
+.cache/
+node_modules/
