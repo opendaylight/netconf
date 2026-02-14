@@ -1,53 +1,53 @@
 ---
-project: 'netconf'
-project_creation_date: '2020-06-25'
-project_category: ''
-lifecycle_state: 'Incubation'
+project: "netconf"
+project_creation_date: "2020-06-25"
+project_category: ""
+lifecycle_state: "Incubation"
 project_lead: &odl_netconf_ptl
-    name: 'Robert Varga'
-    email: 'nite@hq.sk'
-    company: ''
-    id: 'rovarga'
-    timezone: 'Europe/Bratislava'
+  name: "Robert Varga"
+  email: "nite@hq.sk"
+  company: ""
+  id: "rovarga"
+  timezone: "Europe/Bratislava"
 primary_contact: *odl_netconf_ptl
 issue_tracking:
-    type: 'jira'
-    url: 'https://jira.opendaylight.org/projects/'
-    key: 'netconf'
+  type: "jira"
+  url: "https://jira.opendaylight.org/projects/"
+  key: "netconf"
 mailing_list:
-    type: 'groups.io'
-    url: 'app-dev@lists.opendaylight.org'
-    tag: '[]'
+  type: "groups.io"
+  url: "app-dev@lists.opendaylight.org"
+  tag: "[]"
 realtime_discussion:
-    type: 'irc'
-    server: 'freenode.net'
-    channel: '#opendaylight'
+  type: "irc"
+  server: "freenode.net"
+  channel: "#opendaylight"
 meetings:
-    - type: 'gotomeeting+irc'
-      agenda: 'https://wiki.opendaylight.org'
-      url: ''
-      server: 'freenode.net'
-      channel: '#opendaylight'
-      repeats: ''
-      time: ''
+  - type: "gotomeeting+irc"
+    agenda: "https://wiki.opendaylight.org"
+    url: ""
+    server: "freenode.net"
+    channel: "#opendaylight"
+    repeats: ""
+    time: ""
 repositories:
-    - netconf
+  - netconf
 committers:
-    - <<: *odl_netconf_ptl
-    - name: 'Tomáš Cére'
-      email: 'tomas.cere@pantheon.tech'
-      company: 'pantheon'
-      id: 'tcere'
-      timezone: 'Europe/Bratislava'
-    - name: 'Ivan Hraško'
-      email: 'ivan.hrasko@pantheon.tech'
-      company: 'pantheon'
-      id: 'ivanhrasko'
-      timezone: 'Europe/Bratislava'
+  - <<: *odl_netconf_ptl
+  - name: "Tomáš Cére"
+    email: "tomas.cere@pantheon.tech"
+    company: "pantheon"
+    id: "tcere"
+    timezone: "Europe/Bratislava"
+  - name: "Ivan Hraško"
+    email: "ivan.hrasko@pantheon.tech"
+    company: "pantheon"
+    id: "ivanhrasko"
+    timezone: "Europe/Bratislava"
 tsc:
-    # yamllint disable rule:line-length
-    approval: 'https://lists.opendaylight.org/pipermail/release/2015-July/003099.html'
-    changes:
-        - type: ''
-          name: ''
-          link: ''
+  # yamllint disable rule:line-length
+  approval: "https://lists.opendaylight.org/pipermail/release/2015-July/003099.html"
+  changes:
+    - type: ""
+      name: ""
+      link: ""
