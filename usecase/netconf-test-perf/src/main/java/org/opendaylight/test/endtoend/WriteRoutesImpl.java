@@ -102,4 +102,3 @@ record WriteRoutesImpl(MountPointService mountPointService) implements WriteRout
             MoreExecutors.directExecutor());
     }
 }
-

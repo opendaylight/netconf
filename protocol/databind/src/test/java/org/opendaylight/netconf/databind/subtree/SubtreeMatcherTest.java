@@ -416,4 +416,3 @@ class SubtreeMatcherTest {
         assertFalse(new SubtreeMatcher(filter, notif).matches(), "Extra <name> leaf must cause mismatch");
     }
 }
-

@@ -210,4 +210,3 @@ class SubtreeFilterPrettyTreeTest {
                 .build()));
     }
 }
-

@@ -49,4 +49,3 @@ for i in `cat check_strings3.txt`; do
         find "$root" -name \*.class | xargs fgrep -l "$i"
     fi
 done
-

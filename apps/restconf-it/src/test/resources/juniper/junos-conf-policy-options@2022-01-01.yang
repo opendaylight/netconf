@@ -6934,7 +6934,7 @@
        }
        case case_2 {
          leaf orhigher {
-           description "Match higher or equal	values";
+           description "Match higher or equal   values";
            type empty;
          }
        }
