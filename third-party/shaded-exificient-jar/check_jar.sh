@@ -24,7 +24,7 @@ fi
 
 if [ ! -f check_strings1.txt ]; then
     echo "Looking for strings ..."
-    find "$root" -name \*.class | xargs strings | sort -u | fgrep shaded/ | sed 's/;/ /g' | sed "s/'//g"> check_strings1.txt
+    find "$root" -name \*.class -print0 | xargs -0 strings | sort -u | fgrep shaded/ | sed 's/;/ /g' | sed "s/'//g"> check_strings1.txt
     rm -f check_strings2.txt
 fi
 
@@ -46,6 +46,6 @@ for i in `cat check_strings3.txt`; do
     if [ $count -eq 0 ]; then
         echo ">>> Missing $i"
         echo "    References:"
-        find "$root" -name \*.class | xargs fgrep -l "$i"
+        find "$root" -name \*.class -print0 | xargs -0 fgrep -l "$i"
     fi
 done
