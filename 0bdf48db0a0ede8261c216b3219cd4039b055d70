@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34f69eb5_41f020c3",
+        "filename": "apps/restconf-it/src/test/resources/juniper/junos-conf-policy-options@2022-01-01.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 6937,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-02-16T10:47:14Z",
+      "side": 1,
+      "message": "test resources: we *really* want to keep them as they are",
+      "range": {
+        "startLine": 6937,
+        "startChar": 45,
+        "endLine": 6937,
+        "endChar": 48
+      },
+      "revId": "0bdf48db0a0ede8261c216b3219cd4039b055d70",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d0b1b0f_b437ba7f",
+        "filename": "plugins/netconf-server-mdsal/src/test/resources/messages/mapping/copyConfigs/config_file_invalid.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-02-16T10:47:14Z",
+      "side": 1,
+      "message": "while understand the desire to have a newline at the last line, that is largely not appropriate for XML files:\n- here it changes the detected string\n- in well-formed XML files that trailing \\n is actually superfluous whitespace",
+      "revId": "0bdf48db0a0ede8261c216b3219cd4039b055d70",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
