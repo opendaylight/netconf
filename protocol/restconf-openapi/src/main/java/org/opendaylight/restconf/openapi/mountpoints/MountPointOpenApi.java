@@ -128,7 +128,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     }
 
     public DocumentEntity getMountPointApi(final URI uri, final long id, final String module, final String revision,
-            final int width, final int depth) throws IOException  {
+            final int width, final int depth, final String basePath) throws IOException  {
         final var mountId = longToMountId.get(id);
         if (mountId == null) {
             return null;
@@ -142,14 +142,14 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final String deviceName = extractDeviceName(mountId);
 
         if (DATASTORES_LABEL.equals(module) && DATASTORES_REVISION.equals(revision)) {
-            return generateDataStoreOpenApi(modelContext, uri, urlPrefix, deviceName, width, depth);
+            return generateDataStoreOpenApi(modelContext, uri, urlPrefix, deviceName, width, depth, basePath);
         }
         return openApiGenerator.getApiDeclaration(module, revision, uri, modelContext, urlPrefix, deviceName,
-            width, depth);
+            width, depth, basePath);
     }
 
     public DocumentEntity getMountPointApi(final URI uri, final long id, final int width, final int depth,
-            final int offset, final int limit) throws IOException {
+            final int offset, final int limit, final String basePath) throws IOException {
         final var mountId = longToMountId.get(id);
         if (mountId == null) {
             return null;
@@ -170,7 +170,6 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var host = openApiGenerator.createHostFromUri(uri);
         final var title = deviceName + " modules of RESTCONF";
         final var url = schema + "://" + host + "/";
-        final var basePath = openApiGenerator.getBasePath();
         return new DocumentEntity(modelContext, title, url, SECURITY, deviceName, urlPrefix, false, includeDataStore,
             portionOfModules, basePath, width, depth);
     }
@@ -195,11 +194,11 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     }
 
     private DocumentEntity generateDataStoreOpenApi(final EffectiveModelContext modelContext, final URI uri,
-            final String urlPrefix, final String deviceName, final int width, final int depth) throws IOException {
+            final String urlPrefix, final String deviceName, final int width, final int depth, final String basePath)
+            throws IOException {
         final var schema = openApiGenerator.createSchemaFromUri(uri);
         final var host = openApiGenerator.createHostFromUri(uri);
         final var url = schema + "://" + host + "/";
-        final var basePath = openApiGenerator.getBasePath();
         final var modules = BaseYangOpenApiGenerator.getModulesWithoutDuplications(modelContext);
         return new DocumentEntity(modelContext, urlPrefix, url, SECURITY, deviceName, urlPrefix, true, false,
             modules, basePath, width, depth);
