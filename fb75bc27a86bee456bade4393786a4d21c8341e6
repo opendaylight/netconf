@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fde27a3c_ea4ebbad",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-02-16T08:43:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c744aeda_0db86062",
+      "revId": "fb75bc27a86bee456bade4393786a4d21c8341e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "45f7ee5f_76fa4117",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-02-13T20:52:48Z",
       "side": 1,
       "message": "these checks have to be done before we call dropNode() -- otherwise supplying null will drop the node and then throw NPE without recovery",
+      "range": {
+        "startLine": 96,
+        "startChar": 16,
+        "endLine": 96,
+        "endChar": 30
+      },
+      "revId": "fb75bc27a86bee456bade4393786a4d21c8341e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc7cd197_596d3934",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-02-16T08:43:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45f7ee5f_76fa4117",
       "range": {
         "startLine": 96,
         "startChar": 16,
@@ -58,6 +100,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "82cb76e1_724ce569",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-02-16T08:43:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "77d9f460_3e730203",
+      "revId": "fb75bc27a86bee456bade4393786a4d21c8341e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b85a8eda_70267097",
@@ -71,6 +131,24 @@
       "writtenOn": "2026-02-13T10:41:25Z",
       "side": 1,
       "message": "add @NonNull to arguments",
+      "revId": "fb75bc27a86bee456bade4393786a4d21c8341e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a8d42be_8444c4bc",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-02-16T08:43:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b85a8eda_70267097",
       "revId": "fb75bc27a86bee456bade4393786a4d21c8341e6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
