@@ -46,5 +46,5 @@ public interface WebHostResourceProvider extends Immutable {
      * @throws NullPointerException if {@code path} is {@code null}
      */
     // TODO: List<String> path
-    WebHostResourceInstance createInstance(String path);
+    WebHostResourceInstance createInstance(String path, String basePath);
 }
