@@ -79,10 +79,10 @@ final class EndpointRoot {
     }
 
     @NonNullByDefault
-    Registration registerProvider(final WebHostResourceProvider provider) {
+    Registration registerProvider(final WebHostResourceProvider provider, final String basePath) {
         for (var path = provider.defaultPath(); ; path = provider.defaultPath() + "-" + UUID.randomUUID()) {
             @SuppressWarnings("resource")
-            final var resource = provider.createInstance(path);
+            final var resource = provider.createInstance(path, basePath);
             final var prev = resources.putIfAbsent(path, resource);
             if (prev == null) {
                 LOG.info("registered {} -> {}", path, resource);
