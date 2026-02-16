@@ -65,9 +65,9 @@ public final class OpenApiServiceImpl implements OpenApiService {
 
     @Override
     public DocumentEntity getAllModulesDoc(final URI uri, final @Nullable Integer width, final @Nullable Integer depth,
-            final @Nullable Integer offset, final @Nullable Integer limit) throws IOException {
+            final @Nullable Integer offset, final @Nullable Integer limit, final String basePath) throws IOException {
         return openApiGeneratorRFC8040.getControllerModulesDoc(uri, unboxOrZero(width), unboxOrZero(depth),
-            unboxOrZero(offset), unboxOrZero(limit));
+            unboxOrZero(offset), unboxOrZero(limit), basePath);
     }
 
     @Override
@@ -81,8 +81,9 @@ public final class OpenApiServiceImpl implements OpenApiService {
      */
     @Override
     public DocumentEntity getDocByModule(final String module, final String revision, final URI uri,
-            final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
-        return openApiGeneratorRFC8040.getApiDeclaration(module, revision, uri, unboxOrZero(width), unboxOrZero(depth));
+            final @Nullable Integer width, final @Nullable Integer depth, final String basePath) throws IOException {
+        return openApiGeneratorRFC8040.getApiDeclaration(module, revision, uri, unboxOrZero(width), unboxOrZero(depth),
+            basePath);
     }
 
     @Override
@@ -92,17 +93,18 @@ public final class OpenApiServiceImpl implements OpenApiService {
 
     @Override
     public DocumentEntity getMountDocByModule(final long instanceNum, final String module, final String revision,
-            final URI uri, final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
+            final URI uri, final @Nullable Integer width, final @Nullable Integer depth, final String basePath)
+            throws IOException {
         return mountPointOpenApiRFC8040.getMountPointApi(uri, instanceNum, module, revision, unboxOrZero(width),
-            unboxOrZero(depth));
+            unboxOrZero(depth), basePath);
     }
 
     @Override
     public DocumentEntity getMountDoc(final long instanceNum, final URI uri, final @Nullable Integer width,
-            final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
-            throws IOException {
+            final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit,
+            final String basePath) throws IOException {
         return mountPointOpenApiRFC8040.getMountPointApi(uri, instanceNum, unboxOrZero(width), unboxOrZero(depth),
-            unboxOrZero(offset), unboxOrZero(limit));
+            unboxOrZero(offset), unboxOrZero(limit), basePath);
     }
 
     @Override

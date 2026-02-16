@@ -45,13 +45,12 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public DocumentEntity getControllerModulesDoc(final URI uri, final int width, final int depth,
-            final int offset, final int limit) throws IOException {
+            final int offset, final int limit, final String basePath) throws IOException {
         final var modelContext = modelContext();
         final var schema = createSchemaFromUri(uri);
         final var host = createHostFromUri(uri);
         final var title = "Controller modules of RESTCONF";
         final var url = schema + "://" + host + "/";
-        final var basePath = getBasePath();
         final var modulesWithoutDuplications = getModulesWithoutDuplications(modelContext);
         final var portionOfModels = getModelsSublist(modulesWithoutDuplications, offset, limit);
         return new DocumentEntity(modelContext, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "", false, true,
@@ -65,13 +64,14 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public DocumentEntity getApiDeclaration(final String module, final String revision, final URI uri, final int width,
-            final int depth) throws IOException {
-        return getApiDeclaration(module, revision, uri, modelContext(), "", CONTROLLER_RESOURCE_NAME, width, depth);
+            final int depth, final String basePath) throws IOException {
+        return getApiDeclaration(module, revision, uri, modelContext(), "", CONTROLLER_RESOURCE_NAME, width, depth,
+            basePath);
     }
 
     public DocumentEntity getApiDeclaration(final String moduleName, final String revision, final URI uri,
             final EffectiveModelContext modelContext, final String urlPrefix, final @NonNull String deviceName,
-            final int width, final int depth) throws IOException {
+            final int width, final int depth, final String basePath) throws IOException {
         final Optional<Revision> rev;
 
         try {
@@ -87,7 +87,6 @@ public abstract class BaseYangOpenApiGenerator {
         final var host = createHostFromUri(uri);
         final var title = module.getName();
         final var url = schema + "://" + host + "/";
-        final var basePath = getBasePath();
         final var modules = List.of(module);
         return new DocumentEntity(modelContext, title, url, SECURITY, deviceName, urlPrefix, true, false,
             modules, basePath, width, depth);
