@@ -40,7 +40,7 @@ public final class OpenApiResourceProvider implements WebHostResourceProvider {
     }
 
     @Override
-    public WebHostResourceInstance createInstance(final String path) {
-        return new OpenApiResourceInstance(path, service);
+    public WebHostResourceInstance createInstance(final String path, final String basePath) {
+        return new OpenApiResourceInstance(path, service, basePath);
     }
 }
