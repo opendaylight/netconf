@@ -26,9 +26,11 @@ import org.opendaylight.restconf.openapi.api.OpenApiService;
 @Path("/")
 public final class JaxRsOpenApi {
     private final OpenApiService openApiService;
+    private final String basePath;
 
-    public JaxRsOpenApi(final OpenApiService openApiService) {
+    public JaxRsOpenApi(final OpenApiService openApiService, final String basePath) {
         this.openApiService = requireNonNull(openApiService);
+        this.basePath = "/" + requireNonNull(basePath) + "/";
     }
 
     @GET
@@ -37,7 +39,8 @@ public final class JaxRsOpenApi {
     public Response getAllModulesDoc(@Context final UriInfo uriInfo, @QueryParam("width") final Integer width,
             @QueryParam("depth") final Integer depth, @QueryParam("offset") final Integer offset,
             @QueryParam("limit") final Integer limit) throws IOException {
-        final var resultStream = openApiService.getAllModulesDoc(uriInfo.getRequestUri(), width, depth, offset, limit);
+        final var resultStream = openApiService.getAllModulesDoc(uriInfo.getRequestUri(), width, depth, offset, limit,
+            basePath);
         return Response.ok(resultStream).build();
     }
 
@@ -56,7 +59,8 @@ public final class JaxRsOpenApi {
     public Response getDocByModule(@PathParam("module") final String module,
             @QueryParam("revision") final String revision, @Context final UriInfo uriInfo,
             @QueryParam("width") final Integer width, @QueryParam("depth") final Integer depth) throws IOException {
-        final var resultStream = openApiService.getDocByModule(module, revision, uriInfo.getRequestUri(), width, depth);
+        final var resultStream = openApiService.getDocByModule(module, revision, uriInfo.getRequestUri(), width, depth,
+            basePath);
         return Response.ok(resultStream).build();
     }
 
@@ -83,7 +87,7 @@ public final class JaxRsOpenApi {
             @Context final UriInfo uriInfo, @QueryParam("width") final Integer width,
             @QueryParam("depth") final Integer depth) throws IOException {
         final var resultStream = openApiService.getMountDocByModule(instanceNum, module, revision,
-            uriInfo.getRequestUri(), width, depth);
+            uriInfo.getRequestUri(), width, depth, basePath);
         return Response.ok(resultStream).build();
     }
 
@@ -95,7 +99,7 @@ public final class JaxRsOpenApi {
             @QueryParam("width") final Integer width, @QueryParam("depth") final Integer depth,
             @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit) throws IOException {
         final var resultStream = openApiService.getMountDoc(instanceNum, uriInfo.getRequestUri(), width, depth, offset,
-            limit);
+            limit, basePath);
         return Response.ok(resultStream).build();
     }
 
