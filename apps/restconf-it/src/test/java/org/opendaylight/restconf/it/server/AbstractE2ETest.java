@@ -449,10 +449,14 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     }
 
     protected HTTPClient startStreamClient() throws Exception {
+        return startStreamClient(false);
+    }
+
+    protected HTTPClient startStreamClient(final boolean http2) throws Exception {
         final var transportListener = new TestTransportChannelListener(channel ->
             clientStreamService = SseUtils.enableClientSse(channel));
         final var streamClient = HTTPClient.connect(transportListener, bootstrapFactory.newBootstrap(),
-            clientStackGrouping, false).get(2, TimeUnit.SECONDS);
+            clientStackGrouping, http2).get(2, TimeUnit.SECONDS);
         await().atMost(Duration.ofSeconds(2)).until(transportListener::initialized);
         assertNotNull(clientStreamService);
         return streamClient;
