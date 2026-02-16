@@ -16,6 +16,24 @@
       "message": "When using h2c and prior knowledge on the same server we should use two parameters Http2MultiplexHandle constructor:\n\n```\nThe Javadoc for the constructor Http2MultiplexHandler(ChannelHandler inboundStreamHandler, ChannelHandler upgradeStreamHandler) explicitly defines the \"ownership\" of the first stream:\n\nupgradeStreamHandler: \"The handler to add to the pipeline for the upgrade stream (the stream that was upgraded from HTTP/1.1).\"\n\nIf this is omitted (passed as null), and an upgrade occurs, the Http2MultiplexHandler will not have a child pipeline to inject for Stream 1. This results in the initial request—the very thing the client is trying to do—getting \"lost\" in the transition between the HttpServerCodec and the Http2FrameCodec.\n```\n\nMaybe something like this?\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/120645",
       "revId": "f1f7fbab06d76963f91f3b135d1396113bb14f8f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64a06144_b87b334f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-16T09:06:02Z",
+      "side": 1,
+      "message": "Unfortunatly we can’t use the new Http2MultiplexHandler(inboundStreamHandler, upgradeStreamHandler) in the way proposed here.\nFor h2c upgrade, the first HTTP/1.1 request is converted into HTTP/2 stream 1 during `upgradeTo()`. That means the HTTP/2 core pipeline (frame codec + multiplexer) and per-stream handler must already be installed at upgrade time. If we postpone multiplex setup until later (after `HTTPServerPipelineSetup.HTTP_2`), the upgrade request can be delivered before the stream pipeline exists, which risks losing the first request or triggering protocol errors.\n\nThe 2-arg constructor applies `upgradeStreamHandler` only to the single upgraded stream, while all subsequent streams get `inboundStreamHandler`. In our case RESTCONF does not need a special pipeline for the upgrade stream, so splitting pipelines like this is unnecessary and easy to misconfigure.\n\nTherefore we’ll stick with the established server-side pattern (as in Netty’s multiplex server upgrade example): install the multiplexer directly inside `Http2ServerUpgradeCodec(...)`, `new Http2ServerUpgradeCodec(http2FrameCodec, new Http2MultiplexHandler(childInit))`, and keep a single per-stream initializer for all streams (including stream 1).",
+      "parentUuid": "dc70d3fd_ed2cc621",
+      "revId": "f1f7fbab06d76963f91f3b135d1396113bb14f8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
