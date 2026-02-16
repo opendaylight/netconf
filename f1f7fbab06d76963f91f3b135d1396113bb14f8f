@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e0871cf8_c45e6917",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-02-16T17:46:48Z",
+      "side": 0,
+      "message": "// transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java\n\npublic enum HTTPScheme {\n    HTTP, HTTPS;\n\n    // Phase 1 \u0026 2: Detection and Signaling\n    public void configureDetection(ChannelPipeline pipeline, HTTPServerSessionBootstrap bootstrap) {\n        if (this \u003d\u003d HTTPS) {\n            // SSL/ALPN Path\n            pipeline.addLast(new ApplicationProtocolNegotiationHandler(HTTPServerSessionBootstrap.HTTP_11) {\n                @Override\n                protected void configurePipeline(ChannelHandlerContext ctx, String protocol) {\n                    // Fire the Signal Phase event\n                    ctx.fireUserEventTriggered(new ProtocolDetectionEvent(protocol));\n                }\n            });\n        } else {\n            // Cleartext Path: h2c + Prior Knowledge\n            HttpServerCodec sourceCodec \u003d new HttpServerCodec();\n            \n            // Standard h2c Upgrade Handler\n            HttpServerUpgradeHandler upgradeHandler \u003d new HttpServerUpgradeHandler(sourceCodec, protocol -\u003e {\n                if (AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)) {\n                    // Fire event rather than injecting directly to keep logic in Bootstrap\n                    return new Http2ServerUpgradeCodec(new ChannelHandlerAdapter() {\n                        @Override\n                        public void handlerAdded(ChannelHandlerContext ctx) {\n                            ctx.fireUserEventTriggered(new ProtocolDetectionEvent(HTTPServerSessionBootstrap.HTTP_2));\n                        }\n                    });\n                }\n                return null;\n            });\n\n            // Prior Knowledge Detection\n            pipeline.addLast(new CleartextHttp2ServerUpgradeHandler(sourceCodec, upgradeHandler, \n                new ChannelInboundHandlerAdapter() {\n                    @Override\n                    public void channelActive(ChannelHandlerContext ctx) {\n                        ctx.fireUserEventTriggered(new ProtocolDetectionEvent(HTTPServerSessionBootstrap.HTTP_2));\n                        ctx.pipeline().remove(this);\n                    }\n                }));\n        }\n    }\n}",
+      "revId": "f1f7fbab06d76963f91f3b135d1396113bb14f8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c5c97d42_23556369",
         "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
         "patchSetId": 2
@@ -14,6 +31,23 @@
       "writtenOn": "2026-02-16T17:43:17Z",
       "side": 0,
       "message": "why we are not just using our own implementation from this class?",
+      "revId": "f1f7fbab06d76963f91f3b135d1396113bb14f8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e52fb12d_20aaf1e8",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-02-16T17:46:48Z",
+      "side": 0,
+      "message": "// transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java\n\npublic class HTTPServerSessionBootstrap extends ChannelInboundHandlerAdapter {\n    public static final String HTTP_11 \u003d \"http/1.1\";\n    public static final String HTTP_2 \u003d \"h2\";\n\n    // Phase 3: Construction Phase\n    @Override\n    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {\n        if (evt instanceof ProtocolDetectionEvent) {\n            ProtocolDetectionEvent detection \u003d (ProtocolDetectionEvent) evt;\n            // Phase 4: Injection Phase\n            completePipelineConfiguration(ctx, detection.protocol());\n        }\n        super.userEventTriggered(ctx, evt);\n    }\n\n    private void completePipelineConfiguration(ChannelHandlerContext ctx, String protocol) {\n        if (HTTP_2.equals(protocol)) {\n            // Atomic Injection of Codec and Multiplexer\n            Http2FrameCodec frameCodec \u003d Http2FrameCodecBuilder.forServer().build();\n            \n            // Use the two-parameter constructor to prevent h2c upgrade freezes (Stream 1)\n            Http2MultiplexHandler multiplexer \u003d new Http2MultiplexHandler(\n                new NetconfHttp2StreamHandler(),  // For normal streams\n                new NetconfHttp2StreamHandler()   // For the upgrade stream (Stream 1)\n            );\n\n            ctx.pipeline().addAfter(ctx.name(), null, frameCodec);\n            ctx.pipeline().addAfter(frameCodec.getClass().getName(), null, multiplexer);\n            \n            LOG.debug(\"HTTP/2 pipeline injected successfully.\");\n        } else {\n            // Standard HTTP/1.1 fallback\n            ctx.pipeline().addAfter(ctx.name(), null, new HttpServerCodec());\n            ctx.pipeline().addLast(new NetconfHttp1Handler());\n        }\n        \n        // Remove the bootstrap handler once the pipeline is finalized\n        ctx.pipeline().remove(this);\n    }\n}",
       "revId": "f1f7fbab06d76963f91f3b135d1396113bb14f8f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
