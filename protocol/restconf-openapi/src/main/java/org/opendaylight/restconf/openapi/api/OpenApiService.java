@@ -48,12 +48,13 @@ public interface OpenApiService {
      *      of a YANG module.
      * @param offset First model to read. 0 means read from the first model.
      * @param limit The number of models to read. 0 means read all models.
+     * @param basePath Base path for restconf.
      * @return the OpenAPI document for number of modules specified by {@code offset} and {@code limit}, with number
      *         child nodes specified by {@code width}.
      * @throws IOException When I/O error occurs.
      */
-    DocumentEntity getAllModulesDoc(URI uri, Integer width, Integer depth, Integer offset, Integer limit)
-        throws IOException;
+    DocumentEntity getAllModulesDoc(URI uri, Integer width, Integer depth, Integer offset, Integer limit,
+        String basePath) throws IOException;
 
     /**
      * Generate a metadata document for all or paginated modules of the controller schema context.
@@ -75,8 +76,8 @@ public interface OpenApiService {
     /**
      * Generates Swagger compliant document listing APIs for module.
      */
-    DocumentEntity getDocByModule(String module, String revision, URI uri, Integer width, Integer depth)
-        throws IOException;
+    DocumentEntity getDocByModule(String module, String revision, URI uri, Integer width, Integer depth,
+        String basePath) throws IOException;
 
     /**
      * Generates index document for Swagger UI. This document lists out all modules with link to get APIs for each
@@ -95,11 +96,12 @@ public interface OpenApiService {
      *      processed in depth. For example, depth=1 means that the module will be processed with it's children, but
      *      their children will be ignored. Value set to 0 or lesser means ignore depth and to process all child nodes
      *      of a YANG module.
+     * @param basePath Base path for restconf.
      * @return the OpenAPI document for all modules with number child nodes specified by {@code width}.
      * @throws IOException When I/O error occurs.
      */
     DocumentEntity getMountDocByModule(long instanceNum, String module, String revision, URI uri, Integer width,
-        Integer depth) throws IOException;
+        Integer depth, String basePath) throws IOException;
 
     /**
      * Generate OpenAPI specification document listing APIs for all modules of mount point. Generates OpenAPI
@@ -129,12 +131,13 @@ public interface OpenApiService {
      *      of a YANG module.
      * @param offset First model to read. 0 means read from the first model.
      * @param limit The number of models to read. 0 means read all models.
+     * @param basePath Base path for restconf.
      * @return the OpenAPI document for number of modules specified by {@code offset} and {@code limit} with number
      *         child nodes specified by {@code width}.
      * @throws IOException When I/O error occurs.
      */
     DocumentEntity getMountDoc(long instanceNum, URI uri, Integer width, Integer depth, Integer offset,
-        Integer limit) throws IOException;
+        Integer limit, String basePath) throws IOException;
 
     /**
      * Generate a metadata document for all or paginated modules of the mount point schema context.

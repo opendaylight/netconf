@@ -15,15 +15,15 @@ import org.opendaylight.yangtools.concepts.Immutable;
 
 /**
  * {@link WebHostResource} injection mechanism. Instances of this interface are expected to be injected into
- * {@link HTTPServerSession} implementations, which are expected to invoke {@link #createInstance(String)} with a unique
- * path and wire invocations of {@code HTTPServerSession.prepareRequest()} to
+ * {@link HTTPServerSession} implementations, which are expected to invoke {@link #createInstance(String, String)} with
+ * a unique path and wire invocations of {@code HTTPServerSession.prepareRequest()} to
  * {@link WebHostResource#prepare(org.opendaylight.netconf.transport.http.ImplementedMethod, java.net.URI,
  * io.netty.handler.codec.http.HttpHeaders, org.opendaylight.netconf.transport.http.SegmentPeeler, XRD)}.
  *
  * <p>This maps directly to <a href="https://en.wikipedia.org/wiki/Whiteboard_Pattern">the whiteboard pattern</a>, with
  * this interface being the registered {@code Service}. Each instance maps to an individual {code Event listener}.
  * Entity associated with a {@link HTTPServer} would typically act is the {@code Event source}, starting each lifecycle
- * with a call to {@link #createInstance(String)}.
+ * with a call to {@link #createInstance(String, String)}.
  *
  * <p>Implementations are required to be {@link Immutable effectively immutable}.
  */
@@ -42,9 +42,10 @@ public interface WebHostResourceProvider extends Immutable {
      * Create a new {@link WebHostResourceInstance} of this resource at specified path.
      *
      * @param path instance path
+     * @param basePath Base path for restconf.
      * @return a new {@link WebHostResourceInstance}
      * @throws NullPointerException if {@code path} is {@code null}
      */
     // TODO: List<String> path
-    WebHostResourceInstance createInstance(String path);
+    WebHostResourceInstance createInstance(String path, String basePath);
 }
