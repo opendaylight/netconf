@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "25a049e9_6e65817a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-16T09:03:51Z",
+      "side": 1,
+      "message": "I would prefer to follow the Netty example: https://github.com/netty/netty/blob/4.2/example/src/main/java/io/netty/example/http2/helloworld/multiplex/server/Http2ServerInitializer.java.",
+      "revId": "30d56ff936d5ac5572eac3582c8760bba6d5b221",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "24d3102a_7da57c3b",
