@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5c97d42_23556369",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-02-16T17:43:17Z",
+      "side": 0,
+      "message": "why we are not just using our own implementation from this class?",
+      "revId": "f1f7fbab06d76963f91f3b135d1396113bb14f8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

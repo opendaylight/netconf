@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05e6f498_6886b5f6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-02-16T17:43:17Z",
+      "side": 1,
+      "message": "The overall process should be:\n\nDetection Phase: The detector (SSL/ALPN or CleartextHttp2ServerUpgradeHandler) identifies the protocol.\n\nSignal Phase: The detector fires the User Event (HTTP_2 or HTTP_11).\n\nConstruction Phase: Your Bootstrap/Setup handler catches the event.\n\nInjection Phase: You create the Http2FrameCodec and the Http2MultiplexHandler together and add them to the pipeline.",
+      "revId": "e69ce1a3ee0db216c13f8f7039290fdc46a20e01",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
