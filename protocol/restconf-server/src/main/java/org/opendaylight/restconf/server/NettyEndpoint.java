@@ -26,10 +26,12 @@ import org.opendaylight.yangtools.yang.common.Empty;
 public abstract class NettyEndpoint {
     private final HTTPServer httpServer;
     private final EndpointRoot root;
+    private final NettyEndpointConfiguration configuration;
 
     protected NettyEndpoint(final RestconfServer server, final PrincipalService principalService,
             final RestconfStream.Registry streamRegistry, final BootstrapFactory bootstrapFactory,
             final NettyEndpointConfiguration configuration) {
+        this.configuration = configuration;
         final var listener = new RestconfTransportChannelListener(server, streamRegistry, principalService,
             configuration);
         try {
@@ -44,7 +46,7 @@ public abstract class NettyEndpoint {
 
     @NonNullByDefault
     public final Registration registerWebResource(final WebHostResourceProvider provider) {
-        return root.registerProvider(provider);
+        return root.registerProvider(provider, String.join("/", configuration.apiRootPath()));
     }
 
     protected final ListenableFuture<Empty> shutdown() {
