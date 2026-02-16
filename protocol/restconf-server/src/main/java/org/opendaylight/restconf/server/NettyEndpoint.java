@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.concurrent.ExecutionException;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.http.HTTPServer;
@@ -26,10 +27,12 @@ import org.opendaylight.yangtools.yang.common.Empty;
 public abstract class NettyEndpoint {
     private final HTTPServer httpServer;
     private final EndpointRoot root;
+    private final NettyEndpointConfiguration configuration;
 
     protected NettyEndpoint(final RestconfServer server, final PrincipalService principalService,
             final RestconfStream.Registry streamRegistry, final BootstrapFactory bootstrapFactory,
             final NettyEndpointConfiguration configuration) {
+        this.configuration = configuration;
         final var listener = new RestconfTransportChannelListener(server, streamRegistry, principalService,
             configuration);
         try {
@@ -44,7 +47,7 @@ public abstract class NettyEndpoint {
 
     @NonNullByDefault
     public final Registration registerWebResource(final WebHostResourceProvider provider) {
-        return root.registerProvider(provider);
+        return root.registerProvider(provider, String.join("/", configuration.apiRootPath()));
     }
 
     protected final ListenableFuture<Empty> shutdown() {

@@ -70,7 +70,7 @@ abstract class AbstractDocumentTest {
     protected static String getAllModulesDoc(final int width, final int depth, final int offset, final int limit)
             throws Exception {
         return assertOpenApiEntity(openApiService.getAllModulesDoc(new URI(URI + "single"), width, depth, offset,
-            limit));
+            limit, "rests"));
     }
 
     protected static String getDocByModule(final String moduleName, final String revision) throws Exception {
@@ -78,18 +78,19 @@ abstract class AbstractDocumentTest {
         if (revision != null) {
             uri = uri + "(" + revision + ")";
         }
-        return assertOpenApiEntity(openApiService.getDocByModule(moduleName, revision, new URI(uri), 0, 0));
+        return assertOpenApiEntity(openApiService.getDocByModule(moduleName, revision, new URI(uri), 0, 0,
+            "rests"));
     }
 
     protected static String getMountDoc(final int width, final int depth, final int offset, final int limit)
             throws Exception {
         return assertOpenApiEntity(openApiService.getMountDoc(1, new URI(URI + "mounts/1"), width, depth, offset,
-            limit));
+            limit, "rests"));
     }
 
     protected static String getMountDocByModule(final String moduleName, final String revision) throws Exception {
         return assertOpenApiEntity(openApiService.getMountDocByModule(1, moduleName, revision,
-            new URI(URI + "mounts/1/" + moduleName), 0, 0));
+            new URI(URI + "mounts/1/" + moduleName), 0, 0, "rests"));
     }
 
     private static String assertOpenApiEntity(final DocumentEntity entity) {
