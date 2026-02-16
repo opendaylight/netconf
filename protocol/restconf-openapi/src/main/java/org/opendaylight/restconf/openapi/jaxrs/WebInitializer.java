@@ -21,6 +21,7 @@ import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
+import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -40,8 +41,8 @@ public final class WebInitializer implements AutoCloseable {
     @Inject
     @Activate
     public WebInitializer(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
-            @Reference final ServletSupport servletSupport, @Reference final OpenApiService openApiService)
-                throws ServletException {
+            @Reference final ServletSupport servletSupport, @Reference final OpenApiService openApiService,
+            @Reference final JaxRsEndpoint endpoint) throws ServletException {
         final var webContextBuilder = WebContext.builder()
             .name("OpenAPI")
             .contextPath("/openapi")
@@ -50,7 +51,7 @@ public final class WebInitializer implements AutoCloseable {
                 .servlet(servletSupport.createHttpServletBuilder(new Application() {
                     @Override
                     public Set<Object> getSingletons() {
-                        return Set.of(new JaxRsOpenApi(openApiService),
+                        return Set.of(new JaxRsOpenApi(openApiService, endpoint.configuration().restconf()),
                             new OpenApiBodyWriter(new JsonFactoryBuilder().build()));
                     }
                 }).build())
