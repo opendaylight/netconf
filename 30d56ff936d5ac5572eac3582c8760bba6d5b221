@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "33f76435_07da003d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-16T09:06:17Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/120418/comment/dc70d3fd_ed2cc621/",
+      "parentUuid": "25a049e9_6e65817a",
+      "revId": "30d56ff936d5ac5572eac3582c8760bba6d5b221",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "24d3102a_7da57c3b",
