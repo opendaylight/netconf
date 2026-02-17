@@ -3120,7 +3120,7 @@
        }
      }
      leaf profile-id {
-       description "Profile id that is matched against GTP charging characteristic or  	     AAA charging profile number (applicable only in the case of ggsn-pgw)";
+       description "Profile id that is matched against GTP charging characteristic or        AAA charging profile number (applicable only in the case of ggsn-pgw)";
        type union {
          type string {
            pattern "<.*>|$.*";
