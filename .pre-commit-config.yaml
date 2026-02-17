@@ -16,10 +16,11 @@ repos:
       - id: trailing-whitespace
         exclude: '^.*\.(bin|patch|diff)$'
       - id: end-of-file-fixer
-        exclude: '^.*\.(bin|patch|diff)$'
+        exclude: '^.*\.(bin|patch|diff|xml|XML)$'
       - id: check-yaml
         args: [--allow-multiple-documents]
       - id: check-xml
+        exclude: '.*(bad-key|invalid|with_auth)\.xml$'
       - id: check-json
       - id: check-added-large-files
         args: ["--maxkb=10240"] # 10MB
