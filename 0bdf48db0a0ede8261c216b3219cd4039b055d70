@@ -39,6 +39,24 @@
       "message": "while understand the desire to have a newline at the last line, that is largely not appropriate for XML files:\n- here it changes the detected string\n- in well-formed XML files that trailing \\n is actually superfluous whitespace",
       "revId": "0bdf48db0a0ede8261c216b3219cd4039b055d70",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1cb77c2_c24f9f75",
+        "filename": "plugins/netconf-server-mdsal/src/test/resources/messages/mapping/copyConfigs/config_file_invalid.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 6258
+      },
+      "writtenOn": "2026-02-17T03:10:57Z",
+      "side": 1,
+      "message": "sure, we can skip the xml files. I have updated the pre-commit config to exclude these files, https://git.opendaylight.org/gerrit/c/netconf/+/120744\nonce this is merged, I rebase and update this change to exclude these file sets. then should only be limited to dangling white spaces in .java files.",
+      "parentUuid": "7d0b1b0f_b437ba7f",
+      "revId": "0bdf48db0a0ede8261c216b3219cd4039b055d70",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
