@@ -33,7 +33,7 @@ module config {
                 type string;
             }
         }
-        
+
         list mapping-node {
             key "id";
             leaf id {

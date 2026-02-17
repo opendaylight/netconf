@@ -4530,7 +4530,7 @@
            description "Routing instance through which client is reachable";
            junos:must "(\"routing-instances $$\")";
            junos:must-message "Referenced routing-instance must be defined under
-		    [edit routing-instances] hierarchy";
+            [edit routing-instances] hierarchy";
            type string {
              junos:posix-pattern "!^((__.*__)|(all)|(.*[ ].*)|(\"\")|(.{129,}))$";
              junos:pattern-message "Must be a non-reserved string of 128 characters or less with no spaces.";
