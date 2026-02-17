@@ -17,12 +17,12 @@ import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
  *
  * @author Thomas Pantelis
  */
-public class MountPointOpenApiGeneratorRFC8040 extends BaseYangOpenApiGeneratorRFC8040 implements AutoCloseable {
+public class MountPointOpenApiGeneratorRFC8040 extends BaseYangOpenApiGenerator implements AutoCloseable {
     private final MountPointOpenApi mountPointOpenApi;
 
     public MountPointOpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService,
-            final @NonNull DOMMountPointService mountService, final @NonNull String basePath) {
-        super(schemaService, basePath);
+            final @NonNull DOMMountPointService mountService) {
+        super(schemaService);
         mountPointOpenApi = new MountPointOpenApi(schemaService, mountService, this);
         mountPointOpenApi.init();
     }
