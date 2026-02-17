@@ -20,4 +20,3 @@ public interface DeviceActionFactory {
      */
     @NonNull Actions createDeviceAction(ActionTransformer messageTransformer, RemoteDeviceCommunicator listener);
 }
-
