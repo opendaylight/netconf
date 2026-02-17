@@ -222,6 +222,8 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
                 LOG.warn("Netconf session backed by channel {} was not established after {}", channel,
                     connectionTimeoutMillis);
                 failAndClose();
+                promise.setFailure(new IllegalStateException("Netconf session backed by channel " + channel
+                    + " was not established after " + connectionTimeoutMillis));
             }
         } else if (channel.isOpen()) {
             channel.pipeline().remove(NAME_OF_EXCEPTION_HANDLER);
