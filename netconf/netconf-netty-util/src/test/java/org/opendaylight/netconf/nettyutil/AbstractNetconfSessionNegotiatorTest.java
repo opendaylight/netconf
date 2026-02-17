@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -183,6 +184,21 @@ class AbstractNetconfSessionNegotiatorTest {
         final RuntimeException cause = new RuntimeException("failure cause");
         channel.pipeline().fireExceptionCaught(cause);
         verify(promise).setFailure(cause);
+    }
+
+    @Test
+    void testNegotiationTimeout() throws Exception {
+        doReturn(false).when(promise).isDone();
+        doReturn(false).when(promise).isCancelled();
+
+        final var captor = ArgumentCaptor.forClass(TimerTask.class);
+        doReturn(timeout).when(timer).newTimeout(captor.capture(), eq(100L), eq(TimeUnit.MILLISECONDS));
+        negotiator.startNegotiation();
+
+        captor.getValue().run(timeout);
+        channel.runPendingTasks();
+        verify(promise).setFailure(argThat(e ->
+            e instanceof IllegalStateException && e.getMessage().equals("Session was not established after 100")));
     }
 
     private void enableTimerTask() {
