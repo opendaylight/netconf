@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.net.URI;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -23,7 +22,6 @@ import org.opendaylight.restconf.openapi.model.DocumentEntity;
 import org.opendaylight.restconf.openapi.model.MetadataEntity;
 import org.opendaylight.restconf.openapi.model.MountPointsEntity;
 import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
-import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -42,16 +40,10 @@ public final class OpenApiServiceImpl implements OpenApiService {
 
     @Inject
     @Activate
-    public OpenApiServiceImpl(final @Reference DOMSchemaService schemaService,
-            final @Reference DOMMountPointService mountPointService,
-            final @Reference JaxRsEndpoint jaxrsEndpoint) {
-        this(schemaService, mountPointService, jaxrsEndpoint.configuration().restconf());
-    }
-
-    private OpenApiServiceImpl(final DOMSchemaService schemaService, final DOMMountPointService mountPointService,
-            final @NonNull String restconf) {
-        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService, restconf),
-            new OpenApiGeneratorRFC8040(schemaService, restconf));
+    public OpenApiServiceImpl(@Reference final DOMSchemaService schemaService,
+            @Reference final DOMMountPointService mountPointService) {
+        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService),
+            new OpenApiGeneratorRFC8040(schemaService));
     }
 
     // FIXME Public for end-to-end testing openapi over Netty. Constructor that uses NettyEndpoint should be used
