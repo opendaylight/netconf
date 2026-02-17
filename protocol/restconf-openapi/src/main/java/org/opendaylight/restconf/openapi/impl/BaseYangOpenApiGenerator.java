@@ -105,8 +105,6 @@ public abstract class BaseYangOpenApiGenerator {
         return uri.getScheme();
     }
 
-    public abstract String getBasePath();
-
     public static List<Module> getModulesWithoutDuplications(final @NonNull EffectiveModelContext modelContext) {
         return List.copyOf(modelContext.getModules()
             .stream()

@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import static java.util.Objects.requireNonNull;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 
@@ -18,16 +16,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
  * @author Thomas Pantelis
  */
 public abstract class BaseYangOpenApiGeneratorRFC8040 extends BaseYangOpenApiGenerator {
-    private final String basePath;
-
-    protected BaseYangOpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService,
-            final @NonNull String basePath) {
+    protected BaseYangOpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService) {
         super(schemaService);
-        this.basePath = requireNonNull(basePath);
-    }
-
-    @Override
-    public String getBasePath() {
-        return "/" + basePath + "/";
     }
 }
