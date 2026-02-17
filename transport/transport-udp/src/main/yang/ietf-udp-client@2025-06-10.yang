@@ -51,7 +51,7 @@ module ietf-udp-client {
   grouping udp-client {
     description
       "A reusable grouping for UDP clients.
-      
+
       Note that this grouping uses fairly typical descendant
       node names such that a stack of 'uses' statements will
       have name conflicts.  It is intended that the consuming
