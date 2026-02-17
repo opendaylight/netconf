@@ -21,8 +21,8 @@ public class MountPointOpenApiGeneratorRFC8040 extends BaseYangOpenApiGeneratorR
     private final MountPointOpenApi mountPointOpenApi;
 
     public MountPointOpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService,
-            final @NonNull DOMMountPointService mountService, final @NonNull String basePath) {
-        super(schemaService, basePath);
+            final @NonNull DOMMountPointService mountService) {
+        super(schemaService);
         mountPointOpenApi = new MountPointOpenApi(schemaService, mountService, this);
         mountPointOpenApi.init();
     }

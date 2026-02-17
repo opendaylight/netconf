@@ -56,8 +56,8 @@ abstract class AbstractDocumentTest {
         final var service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
 
-        final var mountPointRFC8040 = new MountPointOpenApiGeneratorRFC8040(schemaService, service, "rests");
-        final var openApiGeneratorRFC8040 = new OpenApiGeneratorRFC8040(schemaService, "rests");
+        final var mountPointRFC8040 = new MountPointOpenApiGeneratorRFC8040(schemaService, service);
+        final var openApiGeneratorRFC8040 = new OpenApiGeneratorRFC8040(schemaService);
         mountPointRFC8040.getMountPointOpenApi().onMountPointCreated(mountPoint);
         openApiService = new OpenApiServiceImpl(mountPointRFC8040, openApiGeneratorRFC8040);
     }
