@@ -185,6 +185,20 @@ class AbstractNetconfSessionNegotiatorTest {
         verify(promise).setFailure(cause);
     }
 
+    @Test
+    void testNegotiationTimeout() throws Exception {
+        doReturn(false).when(promise).isDone();
+        doReturn(false).when(promise).isCancelled();
+
+        final var captor = ArgumentCaptor.forClass(TimerTask.class);
+        doReturn(timeout).when(timer).newTimeout(captor.capture(), eq(100L), eq(TimeUnit.MILLISECONDS));
+        negotiator.startNegotiation();
+
+        captor.getValue().run(timeout);
+        channel.runPendingTasks();
+        verify(promise).setFailure(any());
+    }
+
     private void enableTimerTask() {
         doReturn(timeout).when(timer).newTimeout(any(), eq(100L), eq(TimeUnit.MILLISECONDS));
     }
