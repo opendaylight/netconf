@@ -67,6 +67,7 @@ class AuthHttp2Test extends AbstractHttp2E2ETest {
         assertEquals(HttpClient.Version.HTTP_2, response.version());
     }
 
+    // FIXME: NETCONF-1590, disable replay and enable the test
     @Disabled
     @Test
     void testStreamAuthorized() throws Exception {
@@ -81,6 +82,7 @@ class AuthHttp2Test extends AbstractHttp2E2ETest {
         assertEquals(HttpClient.Version.HTTP_2, response.version());
     }
 
+    // FIXME: NETCONF-1590, disable replay and enable the test
     @Disabled
     @Test
     void testStreamUnauthorized() throws Exception {
