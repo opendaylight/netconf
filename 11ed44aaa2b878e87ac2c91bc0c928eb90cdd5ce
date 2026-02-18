@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6f7f00d_19bcd9e0",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeMountServiceTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-02-18T13:22:04Z",
+      "side": 1,
+      "message": "why do we not verify some non-null algListener?",
+      "revId": "11ed44aaa2b878e87ac2c91bc0c928eb90cdd5ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9118b352_d60dace6",
+        "filename": "apps/netconf-topology-impl/src/test/java/org/opendaylight/netconf/topology/impl/NetconfTopologyImplTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-02-18T13:22:04Z",
+      "side": 1,
+      "message": "Can we verify some algListener here?",
+      "revId": "11ed44aaa2b878e87ac2c91bc0c928eb90cdd5ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "474cdf72_5e578f2d",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-02-18T13:22:04Z",
+      "side": 1,
+      "message": "why public?",
+      "revId": "11ed44aaa2b878e87ac2c91bc0c928eb90cdd5ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
