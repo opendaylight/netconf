@@ -111,7 +111,6 @@ jobs:
       GERRIT_PROJECT: ${{ inputs.GERRIT_PROJECT }}
       GERRIT_REFSPEC: ${{ inputs.GERRIT_REFSPEC }}
       TOX_ENVS: '["docs"]'
-      ENV_VARS: ${{ toJSON(vars) }}
 
   pre-commit-linting:
     needs: prepare
@@ -127,7 +126,6 @@ jobs:
       GERRIT_PATCHSET_REVISION: ${{ inputs.GERRIT_PATCHSET_REVISION }}
       GERRIT_PROJECT: ${{ inputs.GERRIT_PROJECT }}
       GERRIT_REFSPEC: ${{ inputs.GERRIT_REFSPEC }}
-      ENV_VARS: ${{ toJSON(vars) }}
 
   vote:
     if: ${{ always() }}
