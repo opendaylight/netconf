@@ -48,6 +48,7 @@ class AuthTest extends AbstractE2ETest {
     }
 
     @Disabled
+    // FIXME: NETCONF-1590, disable replay enable the test
     @Test
     void testStreamAuthorized() throws Exception {
         final var response = invokeRequest(HttpMethod.GET,
@@ -55,6 +56,7 @@ class AuthTest extends AbstractE2ETest {
         assertResponse(response, HttpResponseStatus.OK);
     }
 
+    // FIXME: NETCONF-1590, disable replay enable the test
     @Disabled
     @Test
     void testStreamUnauthorized() throws Exception {
