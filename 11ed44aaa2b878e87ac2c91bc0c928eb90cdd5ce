@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f52c952_1b8b3e00",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-02-18T13:23:16Z",
+      "side": 1,
+      "message": "So I don\u0027t think this is correct approach.\n\nIMO the issue why this does not work for call-home is the algListener end up being unused here:\nhttps://github.com/opendaylight/netconf/blob/411585d86d92113804426232ab9bbd1edb41f962/apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java#L282\n\nIdeally we would want trigger it with this one? Somehow join them? https://github.com/opendaylight/netconf/blob/411585d86d92113804426232ab9bbd1edb41f962/apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeSshServer.java#L80\n\nBut maybe it would be too complicated and we want to make better rework in NETCONF-1579.",
+      "revId": "11ed44aaa2b878e87ac2c91bc0c928eb90cdd5ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a6f7f00d_19bcd9e0",
