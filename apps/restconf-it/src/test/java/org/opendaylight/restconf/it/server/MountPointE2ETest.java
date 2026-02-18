@@ -181,6 +181,7 @@ class MountPointE2ETest extends AbstractE2ETest {
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
 
+    // FIXME: NETCONF-1590, disable replay and enable the test
     @Disabled
     @Test
     void notificationStreamJsonTest() throws Exception {
