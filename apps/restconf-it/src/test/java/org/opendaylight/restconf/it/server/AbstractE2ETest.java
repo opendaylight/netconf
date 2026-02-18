@@ -191,6 +191,9 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         // MDSAL services
         setup();
         final var domDataBroker = getDomBroker();
+        // FIXME: NETCONF-1590, creating model context like this create context where ietf-subscribed-notifications has
+        //  the replay feature enabled, and replay-log-creation-time becomes mandatory field and stream fails to be
+        //  added to datastore
         final var schemaContext = getRuntimeContext().modelContext();
         final var schemaService = new FixedDOMSchemaService(schemaContext);
         final var dataBindProvider = new MdsalDatabindProvider(schemaService);

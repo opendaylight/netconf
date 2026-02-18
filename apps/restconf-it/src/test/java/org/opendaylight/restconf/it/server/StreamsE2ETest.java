@@ -37,6 +37,7 @@ class StreamsE2ETest extends AbstractE2ETest {
         super.afterEach();
     }
 
+    // FIXME: NETCONF-1590, disable replay and enable the test
     @Disabled
     @Test
     void dataChangeEventStreamJsonTest() throws Exception {

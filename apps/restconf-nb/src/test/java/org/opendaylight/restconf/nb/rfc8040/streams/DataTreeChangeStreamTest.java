@@ -70,7 +70,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlunit.assertj.XmlAssert;
 
-// FIXME: disable replay
+// FIXME: NETCONF-1590, disable replay
 @Ignore
 // TODO: Migrate this test to JUnit5 after migrating the mdsal tests.
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
