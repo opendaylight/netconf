@@ -182,6 +182,7 @@ class MountPointE2ETest extends AbstractE2ETest {
     }
 
     @Disabled
+    // FIXME: NETCONF-1590, disable replay enable the test
     @Test
     void notificationStreamJsonTest() throws Exception {
         startDeviceSimulator(false);
