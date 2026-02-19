@@ -106,6 +106,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbf823a0_09060714",
+        "filename": "apps/netconf-topology-impl/src/test/java/org/opendaylight/netconf/topology/impl/NetconfTopologyImplTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-19T11:08:27Z",
+      "side": 1,
+      "message": "added UT for listener to NetconfClientFactoryImplTest",
+      "parentUuid": "d30e1890_cffc1d51",
+      "revId": "11ed44aaa2b878e87ac2c91bc0c928eb90cdd5ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "474cdf72_5e578f2d",
