@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6b07a97_8bea1805",
+        "filename": "apps/restconf-it/src/test/resources/juniper/junos-conf-policy-options@2022-01-01.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 6937,
+      "author": {
+        "id": 6258
+      },
+      "writtenOn": "2026-02-19T04:06:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "34f69eb5_41f020c3",
+      "range": {
+        "startLine": 6937,
+        "startChar": 45,
+        "endLine": 6937,
+        "endChar": 48
+      },
+      "revId": "0bdf48db0a0ede8261c216b3219cd4039b055d70",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7d0b1b0f_b437ba7f",
@@ -55,6 +79,24 @@
       "side": 1,
       "message": "sure, we can skip the xml files. I have updated the pre-commit config to exclude these files, https://git.opendaylight.org/gerrit/c/netconf/+/120744\nonce this is merged, I rebase and update this change to exclude these file sets. then should only be limited to dangling white spaces in .java files.",
       "parentUuid": "7d0b1b0f_b437ba7f",
+      "revId": "0bdf48db0a0ede8261c216b3219cd4039b055d70",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98265518_bc3f6b61",
+        "filename": "plugins/netconf-server-mdsal/src/test/resources/messages/mapping/copyConfigs/config_file_invalid.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 6258
+      },
+      "writtenOn": "2026-02-19T04:06:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c1cb77c2_c24f9f75",
       "revId": "0bdf48db0a0ede8261c216b3219cd4039b055d70",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
