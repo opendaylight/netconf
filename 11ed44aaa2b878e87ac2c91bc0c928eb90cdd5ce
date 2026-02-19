@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e127af69_7e3f2348",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeMountServiceTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-19T08:21:32Z",
+      "side": 1,
+      "message": "It\u0027s not listener but negotiated algorithms. Replaced it by implementation of NegotiatedSshAlg",
+      "parentUuid": "a6f7f00d_19bcd9e0",
+      "revId": "11ed44aaa2b878e87ac2c91bc0c928eb90cdd5ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9118b352_d60dace6",
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "23e6aaae_44e6b337",
+        "filename": "apps/netconf-topology-impl/src/test/java/org/opendaylight/netconf/topology/impl/NetconfTopologyImplTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-19T08:21:32Z",
+      "side": 1,
+      "message": "It\u0027s not listener but negotiated algorithms, and in this case it comes from onDataTreeChanged() and its always null, so changed expected value to null",
+      "parentUuid": "9118b352_d60dace6",
+      "revId": "11ed44aaa2b878e87ac2c91bc0c928eb90cdd5ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "474cdf72_5e578f2d",
@@ -65,6 +101,24 @@
       "writtenOn": "2026-02-18T13:22:04Z",
       "side": 1,
       "message": "why public?",
+      "revId": "11ed44aaa2b878e87ac2c91bc0c928eb90cdd5ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eca2c36b_f4de6057",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-19T08:21:32Z",
+      "side": 1,
+      "message": "Forgotten leftover from different approach, reverted back.",
+      "parentUuid": "474cdf72_5e578f2d",
       "revId": "11ed44aaa2b878e87ac2c91bc0c928eb90cdd5ce",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
