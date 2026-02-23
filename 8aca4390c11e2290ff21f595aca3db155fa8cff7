@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed41b81e_24404f60",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/http2/NotificationSubscriptionListeningHttp2Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-23T13:37:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0cf06502_65045bd4",
+      "range": {
+        "startLine": 111,
+        "startChar": 51,
+        "endLine": 111,
+        "endChar": 56
+      },
+      "revId": "8aca4390c11e2290ff21f595aca3db155fa8cff7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4a7f4243_354104fe",
@@ -54,6 +78,24 @@
       "writtenOn": "2026-02-23T12:34:38Z",
       "side": 1,
       "message": "Used the HTTP1 protocol",
+      "revId": "8aca4390c11e2290ff21f595aca3db155fa8cff7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02fd8429_07b7057b",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/http2/NotificationSubscriptionListeningHttp2Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-23T13:37:04Z",
+      "side": 1,
+      "message": "This is just to establish subscriptions, not for listening to them.\nWhen using HTTP/2 here, the way how this client behave, stream is closed after response with subscriptionId is received, which triggers fireChannelInactive() and that removes subscription right after it was created",
+      "parentUuid": "4a7f4243_354104fe",
       "revId": "8aca4390c11e2290ff21f595aca3db155fa8cff7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
