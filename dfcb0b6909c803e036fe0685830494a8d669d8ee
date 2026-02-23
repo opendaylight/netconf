@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8622a09a_ba831ecd",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-23T13:26:48Z",
+      "side": 1,
+      "message": "Please fix formating.",
+      "revId": "dfcb0b6909c803e036fe0685830494a8d669d8ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8eecdafa_a1a45aaf",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/Http3ServerBootstrap.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-23T13:26:48Z",
+      "side": 1,
+      "message": "@NonNullByDefault",
+      "revId": "dfcb0b6909c803e036fe0685830494a8d669d8ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ac445fa_853e5003",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/Http3ServerBootstrap.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-23T13:26:48Z",
+      "side": 1,
+      "message": "Redundant @Nullable annotation.",
+      "revId": "dfcb0b6909c803e036fe0685830494a8d669d8ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "397d1c97_65a02f3f",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/Http3ServerBootstrap.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-23T13:26:48Z",
+      "side": 1,
+      "message": "Please check nullable remoteAddress().",
+      "revId": "dfcb0b6909c803e036fe0685830494a8d669d8ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d77c16a_8b673959",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-23T13:26:48Z",
+      "side": 1,
+      "message": "If http3AltSvcMaxAgeSeconds should not be a negative value, can we use Uint16 instead?",
+      "revId": "dfcb0b6909c803e036fe0685830494a8d669d8ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
