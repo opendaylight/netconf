@@ -16,6 +16,46 @@
       "message": "recheck",
       "revId": "8aca4390c11e2290ff21f595aca3db155fa8cff7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0cf06502_65045bd4",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/http2/NotificationSubscriptionListeningHttp2Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-23T12:34:38Z",
+      "side": 1,
+      "message": "typo",
+      "range": {
+        "startLine": 111,
+        "startChar": 51,
+        "endLine": 111,
+        "endChar": 56
+      },
+      "revId": "8aca4390c11e2290ff21f595aca3db155fa8cff7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a7f4243_354104fe",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/http2/NotificationSubscriptionListeningHttp2Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-23T12:34:38Z",
+      "side": 1,
+      "message": "Used the HTTP1 protocol",
+      "revId": "8aca4390c11e2290ff21f595aca3db155fa8cff7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
