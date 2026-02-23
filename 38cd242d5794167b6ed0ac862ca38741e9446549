@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "692c84b3_23622e8b",
+        "filename": "netconf/netconf-netty-util/src/test/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiatorTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-02-23T14:02:02Z",
+      "side": 1,
+      "message": "Use a specific exception here instead of any(), similar to the test above. Currently, I can see you are verifying:\nMethod threw \u0027org.opendaylight.mockito.UnstubbedMethodException\u0027 exception. Cannot evaluate io.netty.util.concurrent.Promise$MockitoMock$Lek5wxbt.toString()",
+      "revId": "38cd242d5794167b6ed0ac862ca38741e9446549",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
