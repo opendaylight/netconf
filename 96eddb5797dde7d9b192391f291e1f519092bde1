@@ -16,6 +16,24 @@
       "message": "let\u0027s keep it consistent order as in others \n\n\u003ctype\u003exml\u003c/type\u003e\n\u003cclassifier\u003efeatures\u003c/classifier\u003e",
       "revId": "96eddb5797dde7d9b192391f291e1f519092bde1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "821ce9dc_af3a9a73",
+        "filename": "features/odl-restconf-nb/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-25T12:10:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "013cc51f_64fb25e2",
+      "revId": "96eddb5797dde7d9b192391f291e1f519092bde1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
