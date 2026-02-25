@@ -16,6 +16,24 @@
       "message": "what about to reuse existing warn message which provides more detail?",
       "revId": "4542f8632243f4bddc7c29cd3d0a19071f8705d5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbb42d49_10f7471b",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/NetconfSessionNegotiator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-02-25T16:09:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf494e95_9dc570da",
+      "revId": "4542f8632243f4bddc7c29cd3d0a19071f8705d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
