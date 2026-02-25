@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eeb55257_874e75f1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-02-25T13:08:58Z",
+      "side": 1,
+      "message": "we are missing these two patches to complete Netty based OpenAPI server in 8.0.x",
+      "revId": "69774a6cd9c26105e257a53698be63dd908c415d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
