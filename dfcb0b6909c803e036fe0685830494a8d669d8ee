@@ -192,6 +192,24 @@
       "parentUuid": "c89a1e94_6db37b7f",
       "revId": "dfcb0b6909c803e036fe0685830494a8d669d8ee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a0f8687_1491026e",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-25T09:45:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "12ce2abb_849dc9e1",
+      "revId": "dfcb0b6909c803e036fe0685830494a8d669d8ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
