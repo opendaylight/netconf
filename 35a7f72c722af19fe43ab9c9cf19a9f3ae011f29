@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0433cff_cbe3216d",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/http2/NotificationSubscriptionListeningHttp2Test.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-02-25T16:10:56Z",
+      "side": 1,
+      "message": "any assertion on stream id?",
+      "revId": "35a7f72c722af19fe43ab9c9cf19a9f3ae011f29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
