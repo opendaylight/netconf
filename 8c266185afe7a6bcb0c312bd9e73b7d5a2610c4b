@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a2d8c3e_602ae974",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-26T13:03:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d2dc576c_90c49f1a",
+      "range": {
+        "startLine": 289,
+        "startChar": 12,
+        "endLine": 289,
+        "endChar": 23
+      },
+      "revId": "8c266185afe7a6bcb0c312bd9e73b7d5a2610c4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "07005eee_1c9e0bd7",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-02-26T10:52:57Z",
       "side": 1,
       "message": "accessed twice...",
+      "range": {
+        "startLine": 35,
+        "startChar": 20,
+        "endLine": 35,
+        "endChar": 38
+      },
+      "revId": "8c266185afe7a6bcb0c312bd9e73b7d5a2610c4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63a0598c_1f4078f4",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AltSvcAdvertiser.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-26T13:03:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07005eee_1c9e0bd7",
       "range": {
         "startLine": 35,
         "startChar": 20,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d49650f_59e86472",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-26T13:03:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "18bbcc43_17ba41aa",
+      "range": {
+        "startLine": 201,
+        "startChar": 4,
+        "endLine": 201,
+        "endChar": 49
+      },
+      "revId": "8c266185afe7a6bcb0c312bd9e73b7d5a2610c4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "031f85c5_1fffef7b",
@@ -93,6 +165,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5177193_ebbf2faf",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-26T13:03:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "031f85c5_1fffef7b",
+      "range": {
+        "startLine": 230,
+        "startChar": 38,
+        "endLine": 230,
+        "endChar": 55
+      },
+      "revId": "8c266185afe7a6bcb0c312bd9e73b7d5a2610c4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4276ed34_403632f9",
@@ -106,6 +202,30 @@
       "writtenOn": "2026-02-26T10:52:57Z",
       "side": 1,
       "message": "accessed twice",
+      "range": {
+        "startLine": 43,
+        "startChar": 43,
+        "endLine": 43,
+        "endChar": 56
+      },
+      "revId": "8c266185afe7a6bcb0c312bd9e73b7d5a2610c4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e158454_dc82b950",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-02-26T13:03:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4276ed34_403632f9",
       "range": {
         "startLine": 43,
         "startChar": 43,
