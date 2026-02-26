@@ -16,6 +16,24 @@
       "message": "any assertion on stream id?",
       "revId": "35a7f72c722af19fe43ab9c9cf19a9f3ae011f29",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df50d640_b5be3f4f",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/http2/NotificationSubscriptionListeningHttp2Test.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-02-26T08:09:58Z",
+      "side": 1,
+      "message": "we don\u0027t have an access to that information here, stream ID is managed internally",
+      "parentUuid": "f0433cff_cbe3216d",
+      "revId": "35a7f72c722af19fe43ab9c9cf19a9f3ae011f29",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
