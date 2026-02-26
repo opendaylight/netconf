@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c730fa50_68ab1b84",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-02-26T11:04:21Z",
+      "side": 1,
+      "message": "as I stated above \n\nRemoteDeviceId consist of \nString name - Which is NodeId\nInetSocketAddress address - which consist of host, port and ipAddress. And this could be modified when we changed device configuration.\n\nNot updating RemoteDeviceId result in incorrect update to operational datastore done by NetconfDeviceTopologyAdapter.",
+      "parentUuid": "25c640b1_94119f4d",
+      "revId": "a5f40836ac94e7850c80183a2f716783adfbfb13",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0c2ae323_302a3c07",
         "filename": "apps/netconf-topology-singleton/pom.xml",
         "patchSetId": 9
