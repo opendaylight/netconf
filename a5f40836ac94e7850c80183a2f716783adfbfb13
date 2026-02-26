@@ -92,6 +92,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4db797bb_73c1df02",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-02-26T11:17:13Z",
+      "side": 1,
+      "message": "Just based on quick look.\nIf we don\u0027t want to change RemoteDeviceId here, we can make a change to pass host, and port directly instead when creating NetconfDeviceTopologyAdapter.\n\nOtherwise RemoteDeviceId seem to be mainly used in logs so not updating it would also result in logging unchanged host and port.\n\nDo we want to remove InetSocketAddress from RemoteDeviceId?\nIt would just be NodeId in the end.\nAt that point we could remove RemoteDeviceId and pass host and port when needed.",
+      "parentUuid": "c730fa50_68ab1b84",
+      "revId": "a5f40836ac94e7850c80183a2f716783adfbfb13",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0c2ae323_302a3c07",
         "filename": "apps/netconf-topology-singleton/pom.xml",
         "patchSetId": 9
