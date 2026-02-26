@@ -22,6 +22,98 @@
       },
       "revId": "8c266185afe7a6bcb0c312bd9e73b7d5a2610c4b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07005eee_1c9e0bd7",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AltSvcAdvertiser.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-02-26T10:52:57Z",
+      "side": 1,
+      "message": "accessed twice...",
+      "range": {
+        "startLine": 35,
+        "startChar": 20,
+        "endLine": 35,
+        "endChar": 38
+      },
+      "revId": "8c266185afe7a6bcb0c312bd9e73b7d5a2610c4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18bbcc43_17ba41aa",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-02-26T10:52:57Z",
+      "side": 1,
+      "message": "missing javadoc",
+      "range": {
+        "startLine": 201,
+        "startChar": 4,
+        "endLine": 201,
+        "endChar": 49
+      },
+      "revId": "8c266185afe7a6bcb0c312bd9e73b7d5a2610c4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "031f85c5_1fffef7b",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-02-26T10:52:57Z",
+      "side": 1,
+      "message": "does this emit \"\u003dnull\" or not?",
+      "range": {
+        "startLine": 230,
+        "startChar": 38,
+        "endLine": 230,
+        "endChar": 55
+      },
+      "revId": "8c266185afe7a6bcb0c312bd9e73b7d5a2610c4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4276ed34_403632f9",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-02-26T10:52:57Z",
+      "side": 1,
+      "message": "accessed twice",
+      "range": {
+        "startLine": 43,
+        "startChar": 43,
+        "endLine": 43,
+        "endChar": 56
+      },
+      "revId": "8c266185afe7a6bcb0c312bd9e73b7d5a2610c4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
