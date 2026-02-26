@@ -64,7 +64,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             return;
         }
         isMaster = true;
-        getTopologySingleton().becomeTopologyLeader();
+        getTopologySingleton().becomeTopologyLeader(remoteDeviceId);
     }
 
     // called when master is down/changed to slave
@@ -76,7 +76,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             LOG.warn("Instance is already closed.");
             return FluentFutures.immediateNullFluentFuture();
         }
-        getTopologySingleton().becomeTopologyFollower();
+        getTopologySingleton().becomeTopologyFollower(remoteDeviceId);
         return FluentFutures.immediateNullFluentFuture();
     }
 
