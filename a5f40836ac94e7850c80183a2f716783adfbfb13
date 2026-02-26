@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "25c640b1_94119f4d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-02-26T10:06:07Z",
+      "side": 1,
+      "message": "I would expect that id is something that uniquely identifies the device, need a closer look.",
+      "parentUuid": "b6e57367_af5badb0",
+      "revId": "a5f40836ac94e7850c80183a2f716783adfbfb13",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0c2ae323_302a3c07",
         "filename": "apps/netconf-topology-singleton/pom.xml",
         "patchSetId": 9
