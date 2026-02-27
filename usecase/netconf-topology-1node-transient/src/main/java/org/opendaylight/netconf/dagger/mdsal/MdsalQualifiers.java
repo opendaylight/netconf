@@ -27,4 +27,11 @@ public final class MdsalQualifiers {
     @Qualifier
     @Retention(RUNTIME)
     public @interface SchemaServiceContext {}
+
+    /**
+     * Qualifier for the {@code Set<YangModuleInfo>} injection.
+     */
+    @Qualifier
+    @Retention(RUNTIME)
+    public @interface ClassPathYangModules {}
 }
