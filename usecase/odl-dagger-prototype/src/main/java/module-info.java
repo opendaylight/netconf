@@ -12,14 +12,32 @@ module org.opendaylight.netconf.dagger {
     exports org.opendaylight.netconf.dagger.springboot.config;
     exports org.opendaylight.netconf.dagger.mdsal;
 
+    uses org.opendaylight.yangtools.binding.meta.YangModelBindingProvider;
+
     opens org.opendaylight.netconf.dagger.springboot.config to spring.core, spring.beans;
 
     requires transitive org.opendaylight.odlparent.dagger;
     requires spring.beans;
     requires spring.boot;
     requires spring.core;
+    requires org.opendaylight.mdsal.binding.dom.adapter;
     requires org.opendaylight.mdsal.dom.api;
     requires org.opendaylight.mdsal.dom.broker;
+    requires org.opendaylight.yangtools.binding.generator;
+    requires org.opendaylight.yangtools.binding.runtime.spi;
+    requires org.opendaylight.yangtools.odlext.parser.support;
+    requires org.opendaylight.yangtools.openconfig.parser.support;
+    requires org.opendaylight.yangtools.rfc6241.parser.support;
+    requires org.opendaylight.yangtools.rfc6536.parser.support;
+    requires org.opendaylight.yangtools.rfc6643.parser.support;
+    requires org.opendaylight.yangtools.rfc7952.parser.support;
+    requires org.opendaylight.yangtools.rfc8040.parser.support;
+    requires org.opendaylight.yangtools.rfc8528.parser.support;
+    requires org.opendaylight.yangtools.rfc8639.parser.support;
+    requires org.opendaylight.yangtools.rfc8819.parser.support;
+    requires org.opendaylight.yangtools.yang.parser.api;
+    requires org.opendaylight.yangtools.yang.parser.rfc7950;
+    requires org.opendaylight.yangtools.yang.xpath.impl;
 
     requires static transitive com.google.errorprone.annotations;
     requires static dagger;
