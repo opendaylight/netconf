@@ -12,12 +12,30 @@ module org.opendaylight.netconf.dagger {
     exports org.opendaylight.netconf.dagger.mdsal;
     exports org.opendaylight.netconf.dagger.springboot.config;
 
+    uses org.opendaylight.yangtools.binding.meta.YangModelBindingProvider;
+
     opens org.opendaylight.netconf.dagger.springboot.config to spring.core, spring.beans;
 
+    requires transitive org.opendaylight.mdsal.binding.dom.adapter;
     requires transitive org.opendaylight.mdsal.dom.api;
     requires transitive org.opendaylight.mdsal.dom.broker;
     requires transitive org.opendaylight.odlparent.dagger;
+    requires transitive org.opendaylight.yangtools.binding.generator;
+    requires transitive org.opendaylight.yangtools.binding.runtime.spi;
+    requires transitive org.opendaylight.yangtools.odlext.parser.support;
+    requires transitive org.opendaylight.yangtools.openconfig.parser.support;
+    requires transitive org.opendaylight.yangtools.rfc6241.parser.support;
+    requires transitive org.opendaylight.yangtools.rfc6536.parser.support;
+    requires transitive org.opendaylight.yangtools.rfc6643.parser.support;
+    requires transitive org.opendaylight.yangtools.rfc7952.parser.support;
+    requires transitive org.opendaylight.yangtools.rfc8040.parser.support;
+    requires transitive org.opendaylight.yangtools.rfc8528.parser.support;
+    requires transitive org.opendaylight.yangtools.rfc8639.parser.support;
+    requires transitive org.opendaylight.yangtools.rfc8819.parser.support;
     requires transitive org.opendaylight.yangtools.yang.model.api;
+    requires transitive org.opendaylight.yangtools.yang.parser.api;
+    requires transitive org.opendaylight.yangtools.yang.parser.rfc7950;
+    requires transitive org.opendaylight.yangtools.yang.xpath.impl;
     requires transitive spring.boot;
     requires spring.beans;
     requires spring.core;
