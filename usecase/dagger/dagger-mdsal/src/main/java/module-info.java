@@ -16,6 +16,9 @@ module org.opendaylight.netconf.dagger.mdsal {
     requires org.opendaylight.mdsal.dom.broker;
     requires org.opendaylight.netconf.dagger.config.api;
     requires spring.boot;
+    requires org.opendaylight.mdsal.binding.dom.adapter;
+    requires org.opendaylight.yangtools.yang.parser.api;
+    requires org.opendaylight.yangtools.binding.runtime.spi;
 
     requires static transitive com.google.errorprone.annotations;
 }
