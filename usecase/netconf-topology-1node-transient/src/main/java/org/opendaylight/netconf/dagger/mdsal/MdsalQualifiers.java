@@ -24,4 +24,9 @@ public final class MdsalQualifiers {
     @Qualifier
     @Retention(RUNTIME)
     public @interface SchemaServiceContext {}
+
+    @Qualifier
+    @Retention(RUNTIME)
+    public @interface ClassPathYangModules {
+    }
 }

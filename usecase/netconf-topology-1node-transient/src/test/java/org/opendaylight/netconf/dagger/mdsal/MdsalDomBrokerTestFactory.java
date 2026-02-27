@@ -10,18 +10,21 @@ package org.opendaylight.netconf.dagger.mdsal;
 import dagger.Component;
 import jakarta.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.mdsal.binding.api.NotificationPublishService;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
+import org.opendaylight.netconf.dagger.mdsal.MdsalQualifiers.SchemaServiceContext;
 import org.opendaylight.netconf.dagger.springboot.config.SpringbootConfigLoaderModule;
 import org.opendaylight.odlparent.dagger.AutoCloseableComponent;
 import org.opendaylight.odlparent.dagger.ResourceSupportModule;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @Singleton
 @NonNullByDefault
 @Component(modules = {
     MdsalDomBrokerModule.class,
-    MdsalSchemaContextTestModule.class,
+    MdsalBindingDomAdapterModule.class,
     SpringbootConfigLoaderModule.class,
     ResourceSupportModule.class
 })
@@ -32,4 +35,8 @@ public interface MdsalDomBrokerTestFactory extends AutoCloseableComponent {
     DOMActionService domActionService();
 
     DOMRpcRouter domRpcRouter();
+
+    NotificationPublishService notificationPublishService();
+
+    @SchemaServiceContext EffectiveModelContext modelContext();
 }
