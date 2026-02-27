@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.dagger.mdsal;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -16,6 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opendaylight.yangtools.yang.model.api.ModuleLike;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 
 class MdsalDomBrokerTest {
     private MdsalDomBrokerTestFactory component;
@@ -37,6 +40,8 @@ class MdsalDomBrokerTest {
         assertNotNull(component.domActionService(), "Action Service should be initialized");
         assertNotNull(component.domNotificationRouter(), "Notification Router should be initialized");
         assertNotNull(component.domRpcRouter(), "RPC Router should be initialized");
+        assertNotNull(component.notificationPublishService(), "Notification publish should be initialized");
+        assertNotNull(component.modelContext(), "Model context should be initialized");
     }
 
     @Test
@@ -45,6 +50,22 @@ class MdsalDomBrokerTest {
         assertFalse(domRpcRouter.isClosed(), "RPC Router should not be closed");
         component.close();
         assertTrue(domRpcRouter.isClosed(), "Service should be closed after component is closed");
+    }
+
+    @Test
+    void testLoadedSchemaContextFromClassPath() {
+        final var modelContext = component.modelContext();
+        final var classPathModels = modelContext.getModules();
+        assertThat(classPathModels)
+            .hasSize(3)
+            .extracting(ModuleLike::getSourceIdentifier)
+            .extracting(SourceIdentifier::toYangFilename)
+            .containsExactlyInAnyOrder(
+                "ietf-inet-types@2013-07-15.yang",
+                "ietf-netconf@2011-06-01.yang",
+                "odl-codegen-extensions@2024-06-27.yang"
+            );
+
     }
 
     @Test
