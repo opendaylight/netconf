@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.it.server.http2;
+package org.opendaylight.restconf.it.server.http3;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,9 +14,7 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.ssl.SslContextBuilder;
 import java.io.File;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Set;
@@ -47,7 +45,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification.
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
-class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
+class MountPointHttp3E2ETest extends AbstractHttp3E2ETest {
     private static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
         new JSONParserConfiguration().withStrictMode();
     private static final String DEVICE_USERNAME = "device-username";
@@ -114,7 +112,7 @@ class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
         mountDeviceJson();
 
         // create
-        var initialData = """
+        final var initialData = """
             {
                 "device-sim:data-root": {
                     "name": "device",
@@ -126,18 +124,17 @@ class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
                 }
             }""";
 
-        var response = http2Client.send(HttpRequest.newBuilder()
+        var response = client().send(HttpRequest.newBuilder()
             .uri(createUri(DEVICE_MOUNT_URI))
             .POST(HttpRequest.BodyPublishers.ofString(initialData))
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
-        assertEquals(HttpResponseStatus.CREATED.code(), response.statusCode());
+        assertEquals(HttpResponseStatus.CREATED, response.status());
         assertContentJson(DEVICE_DATA_ROOT_URI, initialData);
 
         // update (merge)
-        response = http2Client.send(HttpRequest.newBuilder()
+        response = client().send(HttpRequest.newBuilder()
             .uri(createUri(DEVICE_DATA_ROOT_URI))
             .method("PATCH", HttpRequest.BodyPublishers.ofString("""
             {
@@ -149,10 +146,9 @@ class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
                 }
             }"""))
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpResponseStatus.OK.code(), response.statusCode());
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
+        assertEquals(HttpResponseStatus.OK, response.status());
         assertContentJson(DEVICE_DATA_ROOT_URI, """
             {
                 "device-sim:data-root": {
@@ -176,33 +172,30 @@ class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
                     }]
                 }
             }""";
-        response = http2Client.send(HttpRequest.newBuilder()
+        response = client().send(HttpRequest.newBuilder()
             .uri(createUri(DEVICE_DATA_ROOT_URI))
             .PUT(HttpRequest.BodyPublishers.ofString(replaceData))
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpResponseStatus.NO_CONTENT.code(), response.statusCode());
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
+        assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
         assertContentJson(DEVICE_DATA_ROOT_URI, replaceData);
 
         // delete
-        response = http2Client.send(HttpRequest.newBuilder()
+        response = client().send(HttpRequest.newBuilder()
             .uri(createUri(DEVICE_DATA_ROOT_URI))
             .DELETE()
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpResponseStatus.NO_CONTENT.code(), response.statusCode());
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
+        assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
 
         // validate deleted
-        response = http2Client.send(HttpRequest.newBuilder()
+        response = client().send(HttpRequest.newBuilder()
             .uri(createUri(DEVICE_DATA_ROOT_URI))
             .GET()
             .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
 
@@ -212,7 +205,7 @@ class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
         mountDeviceJson();
 
         // CRUD
-        var body = """
+        final var body = """
             {
                 "ietf-yang-patch:yang-patch" : {
                     "patch-id" : "patch1",
@@ -254,15 +247,14 @@ class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
                     ]
                 }
             }""";
-        var response = http2Client.send(HttpRequest.newBuilder()
+        final var response = client().send(HttpRequest.newBuilder()
             .uri(createUri(DEVICE_DATA_ROOT_URI))
             .method("PATCH", HttpRequest.BodyPublishers.ofString(body))
             .header(HttpHeaderNames.ACCEPT.toString(), MediaTypes.APPLICATION_YANG_DATA_JSON)
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), MediaTypes.APPLICATION_YANG_PATCH_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpResponseStatus.OK.code(), response.statusCode());
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
+        assertEquals(HttpResponseStatus.OK, response.status());
 
         // read (validate result)
         assertContentJson(DEVICE_DATA_ROOT_URI, """
@@ -285,14 +277,13 @@ class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
         startDeviceSimulator(true);
         mountDeviceJson();
 
-        final var response = http2Client.send(HttpRequest.newBuilder()
+        final var response = client().send(HttpRequest.newBuilder()
             .uri(createUri("/rests/data/network-topology:network-topology/topology=topology-netconf"))
             .GET()
             .header(HttpHeaderNames.ACCEPT.toString(), MediaTypes.APPLICATION_YANG_DATA_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpResponseStatus.OK.code(), response.statusCode());
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
+        assertEquals(HttpResponseStatus.OK, response.status());
 
         final var expected = """
             {
@@ -366,29 +357,27 @@ class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
             }
             """.formatted(localAddress, devicePort, DEVICE_USERNAME, DEVICE_PASSWORD);
 
-        final var response = http2Client.send(HttpRequest.newBuilder()
+        final var response = client().send(HttpRequest.newBuilder()
             .uri(createUri(TOPOLOGY_URI))
             .POST(HttpRequest.BodyPublishers.ofString(input))
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpResponseStatus.CREATED.code(), response.statusCode());
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
+        assertEquals(HttpResponseStatus.CREATED, response.status());
         // wait till connected
         await().atMost(Duration.ofSeconds(5)).pollInterval(Duration.ofMillis(500))
             .until(this::deviceConnectedJson);
     }
 
     private boolean deviceConnectedJson() throws Exception {
-        final var response = http2Client.send(HttpRequest.newBuilder()
+        final var response = client().send(HttpRequest.newBuilder()
             .uri(createUri(DEVICE_STATUS_URI))
             .GET()
             .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpResponseStatus.OK.code(), response.statusCode());
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
-        final var json = new JSONObject(response.body(), JSON_PARSER_CONFIGURATION);
+        assertEquals(HttpResponseStatus.OK, response.status());
+        final var json = new JSONObject(response.content(), JSON_PARSER_CONFIGURATION);
         //{
         //  "netconf-node-topology:netconf-node": {
         //    "connection-status": "connected"
