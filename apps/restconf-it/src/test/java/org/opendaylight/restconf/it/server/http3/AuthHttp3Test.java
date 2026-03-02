@@ -5,24 +5,24 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.it.server.http2;
+package org.opendaylight.restconf.it.server.http3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opendaylight.restconf.it.openapi.http3.Http3NettyTestClient.Http3Response;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.List;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opendaylight.restconf.it.openapi.http3.Http3NettyTestClient;
 
-class AuthHttp2Test extends AbstractHttp2E2ETest {
+class AuthHttp3Test extends AbstractHttp3E2ETest {
     private static List<String> targets() {
         return List.of("/rests/data",
             "/rests/operations",
@@ -34,23 +34,20 @@ class AuthHttp2Test extends AbstractHttp2E2ETest {
     @ParameterizedTest
     @MethodSource("targets")
     void authorized(final String uri) throws Exception {
-        var response = http2Client.send(HttpRequest.newBuilder()
+        var response = client.send(HttpRequest.newBuilder()
             .uri(createUri(uri))
             .GET()
             .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
         assertResponse(response, HttpResponseStatus.OK);
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
     }
 
     @ParameterizedTest
     @MethodSource("targets")
     void unauthorized(final String uri) throws Exception {
         // Setup client without authorization
-        final var invalidHttp2Client = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_2)
-            .build();
+        final var clientNoAuth = new Http3NettyTestClient();
 
         // Send request with incorrect credentials in authorization header
         final var request = HttpRequest.newBuilder()
@@ -59,47 +56,39 @@ class AuthHttp2Test extends AbstractHttp2E2ETest {
             .header(HttpHeaderNames.AUTHORIZATION.toString(), "Basic dXNlcm5hbWU6d3JvbmdfcGFzc3dvcmQ=")
             .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_JSON)
             .build();
-
-        var response = invalidHttp2Client.send(request, HttpResponse.BodyHandlers.ofString());
-        invalidHttp2Client.close();
+        var response = clientNoAuth.send(request);
+        clientNoAuth.close();
 
         assertResponse(response, HttpResponseStatus.UNAUTHORIZED);
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
     }
 
     @Disabled
     @Test
     void testStreamAuthorized() throws Exception {
-        var response = http2Client.send(HttpRequest.newBuilder()
+        var response = client.send(HttpRequest.newBuilder()
             .uri(createUri("/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream=" + createStream()))
             .GET()
             .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
-
+            .build());
         assertResponse(response, HttpResponseStatus.OK);
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
     }
 
     @Disabled
     @Test
     void testStreamUnauthorized() throws Exception {
         // Setup client without authorization
-        final var invalidHttp2Client = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_2)
-            .build();
+        final var clientNoAuth = new Http3NettyTestClient();
 
         // Send request with incorrect credentials in authorization header
         final var request = HttpRequest.newBuilder()
-            .uri(createUri("/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream="
-                         + createStream()))
+            .uri(createUri("/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream=" + createStream()))
             .GET()
             .header(HttpHeaderNames.AUTHORIZATION.toString(), "Basic dXNlcm5hbWU6d3JvbmdfcGFzc3dvcmQ=")
             .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_JSON)
             .build();
-        var response = invalidHttp2Client.send(request, HttpResponse.BodyHandlers.ofString());
+        var response = clientNoAuth.send(request);
 
         assertResponse(response, HttpResponseStatus.UNAUTHORIZED);
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
     }
 
     private String createStream() throws Exception {
@@ -118,11 +107,10 @@ class AuthHttp2Test extends AbstractHttp2E2ETest {
             .header(HttpHeaderNames.AUTHORIZATION.toString(), "Basic dXNlcm5hbWU6d3JvbmdfcGFzc3dvcmQ=")
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
             .build();
-        final var response = http2Client.send(request, HttpResponse.BodyHandlers.ofString());
+        final var response = client.send(request);
 
-        assertEquals(HttpResponseStatus.OK.code(), response.statusCode());
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
-        return extractStreamNameJson(response.body());
+        assertEquals(HttpResponseStatus.OK, response.status());
+        return extractStreamNameJson(response.content());
     }
 
     private static String extractStreamNameJson(final String content) {
@@ -130,8 +118,8 @@ class AuthHttp2Test extends AbstractHttp2E2ETest {
         return json.getJSONObject("sal-remote:output").getString("stream-name");
     }
 
-    private static void assertResponse(final HttpResponse<String> response, final HttpResponseStatus expectedStatus) {
+    private static void assertResponse(final Http3Response response, final HttpResponseStatus expectedStatus) {
         assertNotNull(response);
-        assertEquals(expectedStatus.code(), response.statusCode());
+        assertEquals(expectedStatus, response.status());
     }
 }
