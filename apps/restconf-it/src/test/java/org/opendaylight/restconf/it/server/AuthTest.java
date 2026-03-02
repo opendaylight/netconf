@@ -23,7 +23,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 
 class AuthTest extends AbstractE2ETest {
-
     private static List<String> targets() {
         return List.of("/rests/data",
             "/rests/operations",
