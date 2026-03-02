@@ -114,6 +114,9 @@ import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 
 public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
+    static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
+        new JSONParserConfiguration().withStrictMode();
+
     private static final Logger LOG = LoggerFactory.getLogger(AbstractE2ETest.class);
     private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
     private static final Uint32 FRAME_SIZE = Uint32.valueOf(16 * 1024);
@@ -121,15 +124,13 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     private static final Uint64 HTTP3_INITIAL_MAX_DATA = Uint64.valueOf(4L * 1024 * 1024);
     private static final Uint64 HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE = Uint64.valueOf(256L * 1024);
     private static final Uint32 HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL = Uint32.valueOf(100);
+    private static final Map<String, String> NS_CONTEXT = Map.of("r", "urn:ietf:params:xml:ns:yang:ietf-restconf");
+    private static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
+    private static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "pa$$w0Rd";
+    private static final String RESTS = "rests";
 
-
-    protected static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
-        new JSONParserConfiguration().withStrictMode();
-    protected static final Map<String, String> NS_CONTEXT = Map.of("r", "urn:ietf:params:xml:ns:yang:ietf-restconf");
-    protected static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
-    protected static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
-    protected static final String USERNAME = "username";
-    protected static final String PASSWORD = "pa$$w0Rd";
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String APPLICATION_XML = "application/xml";
 
@@ -233,7 +234,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
             ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000),
-            "rests", MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE,
+            RESTS, MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE,
             HTTP3_ALT_SVC_MAX_AGE_SECONDS, HTTP3_INITIAL_MAX_DATA, HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE,
             HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory, configuration);
@@ -485,7 +486,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         return eventListener;
     }
 
-    static final class ExampleActionImpl implements ExampleAction {
+    public static final class ExampleActionImpl implements ExampleAction {
         @Override
         public ListenableFuture<RpcResult<ExampleActionOutput>> invoke(final DataObjectIdentifier<Root> path,
                 final ExampleActionInput input) {

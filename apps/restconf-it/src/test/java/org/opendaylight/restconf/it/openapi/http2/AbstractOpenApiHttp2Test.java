@@ -25,6 +25,9 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractOpenApiHttp2Test extends AbstractOpenApiTest {
+    private static final String TOPOLOGY_URI =
+        "/rests/data/network-topology:network-topology/topology=topology-netconf";
+
     protected HttpClient http2Client;
 
     @BeforeAll
