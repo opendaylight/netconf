@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.json.JSONObject;
+import org.json.JSONParserConfiguration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
@@ -45,6 +46,9 @@ import org.xmlunit.diff.ElementSelectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractHttp2E2ETest extends AbstractE2ETest {
+    static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
+        new JSONParserConfiguration().withStrictMode();
+
     protected HttpClient http2Client;
 
     @BeforeAll

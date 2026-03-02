@@ -105,7 +105,6 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 public class AbstractOpenApiTest extends AbstractDataBrokerTest {
     private static final JSONParserConfiguration JSON_PARSER_CONFIGURATION = new JSONParserConfiguration()
         .withStrictMode();
-
     private static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
     private static final String TOPOLOGY_URI =
         "/rests/data/network-topology:network-topology/topology=topology-netconf";
@@ -152,6 +151,7 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
     private SimpleNettyEndpoint endpoint;
     private DOMNotificationRouter domNotificationRouter;
     private MdsalRestconfStreamRegistry streamRegistry;
+    private HttpServerStackGrouping serverStackGrouping;
 
     @BeforeAll
     static void beforeAll() {
@@ -165,8 +165,8 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
         // transport configuration
         port = randomBindablePort();
         host = localAddress + ":" + port;
-        final var serverTransport = ConfigUtils.serverTransportTcp(localAddress, port);
-        final var serverStackGrouping = new HttpServerStackGrouping() {
+        final var serverTransport = createTransport();
+        serverStackGrouping = new HttpServerStackGrouping() {
             @Override
             public Class<? extends HttpServerStackGrouping> implementedInterface() {
                 return HttpServerStackGrouping.class;
@@ -219,11 +219,7 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
             List.of());
 
         // Netty endpoint
-        final var configuration = new NettyEndpointConfiguration(
-            ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000),
-            RESTS, MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, ALT_SVC_HEADER,
-            HTTP3_ALT_SVC_MAX_AGE_SECONDS, HTTP3_INITIAL_MAX_DATA, HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE,
-            HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
+        final var configuration = createEndpointConfiguration();
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory,
             configuration);
 
@@ -253,6 +249,27 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
     static void afterAll() {
         bootstrapFactory.close();
         sshTransportStackFactory.close();
+    }
+
+    protected Transport createTransport() {
+        return ConfigUtils.serverTransportTcp(localAddress, port);
+    }
+
+    protected NettyEndpointConfiguration createEndpointConfiguration() {
+        return new NettyEndpointConfiguration(
+            ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000),
+            "rests", MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, ALT_SVC_HEADER,
+            HTTP3_ALT_SVC_MAX_AGE_SECONDS, HTTP3_INITIAL_MAX_DATA, HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE,
+            HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
+    }
+
+    /**
+     * Return the serverStackGrouping.
+     *
+     * @return the serverStackGrouping
+     */
+    protected final HttpServerStackGrouping serverStackGrouping() {
+        return serverStackGrouping;
     }
 
     protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri) throws Exception {
@@ -403,13 +420,18 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
 
     /**
      * Finds a servers node in schema and replaces port value inside with new port value. Used in tests to replace port
-     * in json schema file with random port that was used in transport configuration.
+     * in JSON schema file with random port that was used in transport configuration.
      *
      * @return a schema with correct port
      */
-    protected static final String fillPort(final String jsonString, final int port) throws JsonProcessingException {
+    protected static String fillPort(final String jsonString, final int port, final String scheme)
+            throws JsonProcessingException {
         final var json = (ObjectNode) MAPPER.readTree(jsonString);
-        json.putArray("servers").add(MAPPER.readTree("{\"url\": \"http://127.0.0.1:" + port + "/\"}"));
+        json.putArray("servers").add(MAPPER.readTree("{\"url\": \"" + scheme + "://127.0.0.1:" + port + "/\"}"));
         return MAPPER.writeValueAsString(json);
+    }
+
+    protected static String fillPort(final String jsonString, final int port) throws JsonProcessingException {
+        return fillPort(jsonString, port, "http");
     }
 }
