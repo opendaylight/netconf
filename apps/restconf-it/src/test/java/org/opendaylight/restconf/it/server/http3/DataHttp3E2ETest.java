@@ -5,16 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.it.server.http2;
+package org.opendaylight.restconf.it.server.http3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +20,7 @@ import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
-class DataHttp2E2ETest extends AbstractHttp2E2ETest {
+class DataHttp3E2ETest extends AbstractHttp3E2ETest {
     private static final String DATA_URI = "/rests/data";
     private static final String PARENT_URI = DATA_URI + "/example-jukebox:jukebox/library";
     private static final String ACTIONS_URI = DATA_URI + "/example-action:root";
@@ -57,14 +55,13 @@ class DataHttp2E2ETest extends AbstractHttp2E2ETest {
     @Test
     void dataCRUDJsonTest() throws Exception {
         // create
-        var response = http2Client.send(HttpRequest.newBuilder()
+        var response = client().send(HttpRequest.newBuilder()
             .uri(createUri(PARENT_URI))
             .POST(HttpRequest.BodyPublishers.ofString(INITIAL_NODE_JSON))
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpResponseStatus.CREATED.code(), response.statusCode());
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
+        assertEquals(HttpResponseStatus.CREATED, response.status());
 
         // read (validate created)
         assertContentJson(ITEM_URI, INITIAL_NODE_JSON);
@@ -83,14 +80,13 @@ class DataHttp2E2ETest extends AbstractHttp2E2ETest {
                         }
                     ]
                 }""";
-        response = http2Client.send(HttpRequest.newBuilder()
+        response = client().send(HttpRequest.newBuilder()
             .uri(createUri(ITEM_URI))
             .method("PATCH", HttpRequest.BodyPublishers.ofString(body))
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpResponseStatus.OK.code(), response.statusCode());
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
+        assertEquals(HttpResponseStatus.OK, response.status());
 
         // validate updated
         assertContentJson(ITEM_URI, """
@@ -122,93 +118,85 @@ class DataHttp2E2ETest extends AbstractHttp2E2ETest {
                     ]
                 }""";
 
-        response = http2Client.send(HttpRequest.newBuilder()
+        response = client().send(HttpRequest.newBuilder()
             .uri(createUri(ITEM_URI))
             .PUT(HttpRequest.BodyPublishers.ofString(replaceNode))
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpResponseStatus.NO_CONTENT.code(), response.statusCode());
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
+        assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
 
         // validate replaced
         assertContentJson(ITEM_URI, replaceNode);
 
         // delete
-        response = http2Client.send(HttpRequest.newBuilder()
+        response = client().send(HttpRequest.newBuilder()
             .uri(createUri(ITEM_URI))
             .DELETE()
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpResponseStatus.NO_CONTENT.code(), response.statusCode());
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
+        assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
 
         // validate deleted
-        response = http2Client.send(HttpRequest.newBuilder()
+        response = client().send(HttpRequest.newBuilder()
             .uri(createUri(ITEM_URI))
             .GET()
             .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
 
     @Test
     void dataExistsErrorJsonTest() throws Exception {
         // insert data first time
-        var response = http2Client.send(HttpRequest.newBuilder()
+        var response = client().send(HttpRequest.newBuilder()
             .uri(createUri(PARENT_URI))
             .POST(HttpRequest.BodyPublishers.ofString(INITIAL_NODE_JSON))
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
-        assertEquals(HttpResponseStatus.CREATED.code(), response.statusCode());
+        assertEquals(HttpResponseStatus.CREATED, response.status());
 
         // subsequent insert of same node
-        response = http2Client.send(HttpRequest.newBuilder()
+        response = client().send(HttpRequest.newBuilder()
             .uri(createUri(PARENT_URI))
             .POST(HttpRequest.BodyPublishers.ofString(INITIAL_NODE_JSON))
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS);
     }
 
     @Test
     void dataMissingErrorJsonTest() throws Exception {
         // GET case
-        var response = http2Client.send(HttpRequest.newBuilder()
+        var response = client().send(HttpRequest.newBuilder()
             .uri(createUri(ITEM_URI))
             .GET()
             .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
 
         // DELETE case
-        response = http2Client.send(HttpRequest.newBuilder()
+        response = client().send(HttpRequest.newBuilder()
             .uri(createUri(ITEM_URI))
             .DELETE()
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
 
     @Test
     void invokeActionTest() throws Exception {
         // invoke action
-        final var response = http2Client.send(HttpRequest.newBuilder()
+        final var response = client().send(HttpRequest.newBuilder()
             .uri(createUri(ACTIONS_URI + "/example-action"))
             .POST(HttpRequest.BodyPublishers.ofString(ACTION_INPUT_JSON))
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertContentJson(response, """
             {
                 "example-action:output": {
@@ -220,7 +208,7 @@ class DataHttp2E2ETest extends AbstractHttp2E2ETest {
     @Test
     void invokeActionWithBadInputsTest() throws Exception {
         // invoke action
-        final var response = http2Client.send(HttpRequest.newBuilder()
+        final var response = client().send(HttpRequest.newBuilder()
             .uri(createUri(ACTIONS_URI + "/example-action"))
             .POST(HttpRequest.BodyPublishers.ofString(
                 """
@@ -230,24 +218,22 @@ class DataHttp2E2ETest extends AbstractHttp2E2ETest {
                         }
                     }"""))
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
-        assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR.code(), response.statusCode());
+        assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR, response.status());
         assertEquals("Schema node with name wrong-data was not found under (example:action?revision=2024-09-19)input.",
-            response.body());
+            response.content());
     }
 
     @Test
     void invokeNotImplementedActionTest() throws Exception {
         // invoke not implemented action
-        final var response = http2Client.send(HttpRequest.newBuilder()
+        final var response = client().send(HttpRequest.newBuilder()
             .uri(createUri(ACTIONS_URI + "/not-implemented"))
             .POST(HttpRequest.BodyPublishers.ofString(ACTION_INPUT_JSON))
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertErrorResponseJson(response, ErrorType.RPC, ErrorTag.OPERATION_FAILED);
     }
 
@@ -304,15 +290,14 @@ class DataHttp2E2ETest extends AbstractHttp2E2ETest {
                 }
             }""";
 
-        final var response = http2Client.send(HttpRequest.newBuilder()
+        final var response = client().send(HttpRequest.newBuilder()
             .uri(createUri(ITEM_URI))
             .method("PATCH", HttpRequest.BodyPublishers.ofString(body))
             .header(HttpHeaderNames.ACCEPT.toString(), MediaTypes.APPLICATION_YANG_DATA_JSON)
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), MediaTypes.APPLICATION_YANG_PATCH_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpResponseStatus.OK.code(), response.statusCode());
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
+        assertEquals(HttpResponseStatus.OK, response.status());
 
         // read (validate result)
         assertContentJson(ITEM_URI, """
@@ -335,7 +320,7 @@ class DataHttp2E2ETest extends AbstractHttp2E2ETest {
     @Test
     void yangPatchDataMissingErrorTest() throws Exception {
         // One correct edit, one - not
-        var body = """
+        final var body = """
             {
                 "ietf-yang-patch:yang-patch" : {
                     "patch-id" : "patch1",
@@ -360,14 +345,13 @@ class DataHttp2E2ETest extends AbstractHttp2E2ETest {
                     ]
                 }
             }""";
-        final var response = http2Client.send(HttpRequest.newBuilder()
+        final var response = client().send(HttpRequest.newBuilder()
             .uri(createUri(ITEM_URI))
             .method("PATCH", HttpRequest.BodyPublishers.ofString(body))
             .header(HttpHeaderNames.ACCEPT.toString(), MediaTypes.APPLICATION_YANG_DATA_JSON)
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), MediaTypes.APPLICATION_YANG_PATCH_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertContentJson(response, """
             {
                 "ietf-yang-patch:yang-patch-status": {
@@ -399,7 +383,7 @@ class DataHttp2E2ETest extends AbstractHttp2E2ETest {
     @Test
     void yangPatchDataExistsErrorTest() throws Exception {
         // One correct edit, one - not
-        var body = """
+        final var body = """
             {
                 "ietf-yang-patch:yang-patch" : {
                     "patch-id" : "patch1",
@@ -431,14 +415,13 @@ class DataHttp2E2ETest extends AbstractHttp2E2ETest {
                     ]
                 }
             }""";
-        final var response = http2Client.send(HttpRequest.newBuilder()
+        final var response = client().send(HttpRequest.newBuilder()
             .uri(createUri(ITEM_URI))
             .method("PATCH", HttpRequest.BodyPublishers.ofString(body))
             .header(HttpHeaderNames.ACCEPT.toString(), MediaTypes.APPLICATION_YANG_DATA_JSON)
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), MediaTypes.APPLICATION_YANG_PATCH_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertContentJson(response, """
             {
                 "ietf-yang-patch:yang-patch-status": {
@@ -473,22 +456,20 @@ class DataHttp2E2ETest extends AbstractHttp2E2ETest {
             MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_XML,
             MediaTypes.APPLICATION_YANG_PATCH_JSON, MediaTypes.APPLICATION_YANG_PATCH_XML);
         // root
-        var response = http2Client.send(HttpRequest.newBuilder()
+        var response = client().send(HttpRequest.newBuilder()
             .uri(createUri(DATA_URI))
             .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertOptionsResponse(response, Set.of("GET", "POST", "PUT", "PATCH", "OPTIONS", "HEAD"));
         assertHeaderValue(response, HttpHeaderNames.ACCEPT_PATCH.toString(), patchAcceptTypes);
 
         // non-root also deletable
-        response = http2Client.send(HttpRequest.newBuilder()
+        response = client().send(HttpRequest.newBuilder()
             .uri(createUri(PARENT_URI))
             .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertOptionsResponse(response, Set.of("GET", "POST", "PUT", "PATCH", "OPTIONS", "HEAD", "DELETE"));
         assertHeaderValue(response, HttpHeaderNames.ACCEPT_PATCH.toString(), patchAcceptTypes);
     }
@@ -500,7 +481,7 @@ class DataHttp2E2ETest extends AbstractHttp2E2ETest {
 
     private void resetDataNode() throws Exception {
         // ensure data node exists before we insert a child node
-        final var response = http2Client.send(HttpRequest.newBuilder()
+        final var response = client().send(HttpRequest.newBuilder()
             .uri(createUri("/rests/data/example-jukebox:jukebox"))
             .PUT(HttpRequest.BodyPublishers.ofString("""
                 {
@@ -509,10 +490,9 @@ class DataHttp2E2ETest extends AbstractHttp2E2ETest {
                     }
                 }"""))
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
-            .build(), HttpResponse.BodyHandlers.ofString());
+            .build());
 
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
-        final var status = response.statusCode();
+        final var status = response.status().code();
         assertTrue(status == HttpResponseStatus.OK.code() || status ==  HttpResponseStatus.CREATED.code());
     }
 }
