@@ -106,18 +106,18 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
     private static final JSONParserConfiguration JSON_PARSER_CONFIGURATION = new JSONParserConfiguration()
         .withStrictMode();
 
-    private static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
+    protected static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
     private static final String TOPOLOGY_URI =
         "/rests/data/network-topology:network-topology/topology=topology-netconf";
     private static final String DEVICE_NODE_URI = TOPOLOGY_URI + "/node=device-sim";
     private static final String DEVICE_STATUS_URI =
         DEVICE_NODE_URI + "/netconf-node-topology:netconf-node?fields=connection-status";
-    private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
-    private static final Uint32 FRAME_SIZE = Uint32.valueOf(16 * 1024);
-    private static final Uint32 HTTP3_ALT_SVC_MAX_AGE_SECONDS = Uint32.valueOf(3600);
-    private static final Uint64 HTTP3_INITIAL_MAX_DATA = Uint64.valueOf(4L * 1024 * 1024);
-    private static final Uint64 HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE = Uint64.valueOf(256L * 1024);
-    private static final Uint32 HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL = Uint32.valueOf(100);
+    protected static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
+    protected static final Uint32 FRAME_SIZE = Uint32.valueOf(16 * 1024);
+    protected static final Uint32 HTTP3_ALT_SVC_MAX_AGE_SECONDS = Uint32.valueOf(3600);
+    protected static final Uint64 HTTP3_INITIAL_MAX_DATA = Uint64.valueOf(4L * 1024 * 1024);
+    protected static final Uint64 HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE = Uint64.valueOf(256L * 1024);
+    protected static final Uint32 HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL = Uint32.valueOf(100);
 
     protected static final String DEVICE_USERNAME = "device-username";
     protected static final String DEVICE_PASSWORD = "device-password";
@@ -147,10 +147,11 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
 
     @TempDir
     private File tmpDir;
-    private DOMRpcRouter domRpcRouter;
-    private SimpleNettyEndpoint endpoint;
-    private DOMNotificationRouter domNotificationRouter;
-    private MdsalRestconfStreamRegistry streamRegistry;
+
+    protected DOMRpcRouter domRpcRouter;
+    protected SimpleNettyEndpoint endpoint;
+    protected DOMNotificationRouter domNotificationRouter;
+    protected MdsalRestconfStreamRegistry streamRegistry;
 
     @BeforeAll
     static void beforeAll() {
@@ -402,13 +403,18 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
 
     /**
      * Finds a servers node in schema and replaces port value inside with new port value. Used in tests to replace port
-     * in json schema file with random port that was used in transport configuration.
+     * in JSON schema file with random port that was used in transport configuration.
      *
      * @return a schema with correct port
      */
-    protected static final String fillPort(final String jsonString, final int port) throws JsonProcessingException {
+    protected static String fillPort(final String jsonString, final int port, final String scheme)
+            throws JsonProcessingException {
         final var json = (ObjectNode) MAPPER.readTree(jsonString);
-        json.putArray("servers").add(MAPPER.readTree("{\"url\": \"http://127.0.0.1:" + port + "/\"}"));
+        json.putArray("servers").add(MAPPER.readTree("{\"url\": \"" + scheme + "://127.0.0.1:" + port + "/\"}"));
         return MAPPER.writeValueAsString(json);
+    }
+
+    protected static String fillPort(final String jsonString, final int port) throws JsonProcessingException {
+        return fillPort(jsonString, port, "http");
     }
 }
