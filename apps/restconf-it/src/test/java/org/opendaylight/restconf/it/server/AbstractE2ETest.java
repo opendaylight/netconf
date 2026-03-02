@@ -114,6 +114,9 @@ import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 
 public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
+    static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
+        new JSONParserConfiguration().withStrictMode();
+
     private static final Logger LOG = LoggerFactory.getLogger(AbstractE2ETest.class);
     private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
     private static final Uint32 FRAME_SIZE = Uint32.valueOf(16 * 1024);
@@ -122,9 +125,6 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     private static final Uint64 HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE = Uint64.valueOf(256L * 1024);
     private static final Uint32 HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL = Uint32.valueOf(100);
 
-
-    protected static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
-        new JSONParserConfiguration().withStrictMode();
     protected static final Map<String, String> NS_CONTEXT = Map.of("r", "urn:ietf:params:xml:ns:yang:ietf-restconf");
     protected static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
     protected static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
@@ -136,7 +136,6 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected static String localAddress;
     protected static BootstrapFactory bootstrapFactory;
     protected static SSHTransportStackFactory sshTransportStackFactory;
-    protected HttpClientStackGrouping clientStackGrouping;
     protected HttpClientStackGrouping invalidClientStackGrouping;
     protected DOMMountPointService domMountPointService;
     protected RpcProviderService rpcProviderService;
@@ -146,6 +145,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected volatile EventStreamService clientStreamService;
     protected volatile EventStreamService.StreamControl streamControl;
 
+    private HttpClientStackGrouping clientStackGrouping;
     private DOMRpcRouter domRpcRouter;
     private SimpleNettyEndpoint endpoint;
     private DOMNotificationRouter domNotificationRouter;
@@ -492,7 +492,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         return eventListener;
     }
 
-    static final class ExampleActionImpl implements ExampleAction {
+    public static final class ExampleActionImpl implements ExampleAction {
         @Override
         public ListenableFuture<RpcResult<ExampleActionOutput>> invoke(final DataObjectIdentifier<Root> path,
                 final ExampleActionInput input) {
