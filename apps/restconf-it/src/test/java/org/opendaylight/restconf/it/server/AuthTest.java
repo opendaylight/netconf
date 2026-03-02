@@ -16,6 +16,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.json.JSONObject;
+import org.json.JSONParserConfiguration;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,6 +24,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 
 class AuthTest extends AbstractE2ETest {
+    private static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
+        new JSONParserConfiguration().withStrictMode();
 
     private static List<String> targets() {
         return List.of("/rests/data",

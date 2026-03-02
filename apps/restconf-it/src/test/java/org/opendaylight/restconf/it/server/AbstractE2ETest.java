@@ -98,7 +98,7 @@ import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionO
 import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.HttpServerListenStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.transport.HttpOverTcp;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.Transport;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecServices;
 import org.opendaylight.yangtools.dagger.yang.parser.DaggerDefaultYangParserComponent;
@@ -120,6 +120,8 @@ import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 
 public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
+    private static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
+        new JSONParserConfiguration().withStrictMode();
     private static final Logger LOG = LoggerFactory.getLogger(AbstractE2ETest.class);
     private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
     private static final Uint32 FRAME_SIZE = Uint32.valueOf(16 * 1024);
@@ -134,9 +136,6 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected static final @NonNull YangParserFactory PARSER_FACTORY =
         DaggerDefaultYangParserComponent.create().parserFactory();
     protected static final @NonNull YangTextToIRSourceTransformer TEXT_TO_IR = YangIRSourceModule.provideTextToIR();
-
-    protected static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
-        new JSONParserConfiguration().withStrictMode();
     protected static final Map<String, String> NS_CONTEXT = Map.of("r", "urn:ietf:params:xml:ns:yang:ietf-restconf");
     protected static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
     protected static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
@@ -148,16 +147,18 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected static String localAddress;
     protected static BootstrapFactory bootstrapFactory;
     protected static SSHTransportStackFactory sshTransportStackFactory;
-    protected HttpClientStackGrouping clientStackGrouping;
     protected HttpClientStackGrouping invalidClientStackGrouping;
     protected DOMMountPointService domMountPointService;
     protected RpcProviderService rpcProviderService;
     protected ActionProviderService actionProviderService;
     protected String host;
 
+    protected int port;
+
     protected volatile EventStreamService clientStreamService;
     protected volatile EventStreamService.StreamControl streamControl;
 
+    private HttpClientStackGrouping clientStackGrouping;
     private DOMRpcRouter domRpcRouter;
     private SimpleNettyEndpoint endpoint;
     private DOMNotificationRouter domNotificationRouter;
@@ -173,9 +174,9 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     @BeforeEach
     protected void beforeEach() throws Exception {
         // transport configuration
-        final var port = randomBindablePort();
+        port = randomBindablePort();
         host = localAddress + ":" + port;
-        final var serverTransport = HTTPServerOverTcp.of(localAddress, port);
+        final var serverTransport = createTransport();
         final var serverStackGrouping = new HttpServerListenStackGrouping() {
             @Override
             public Class<HttpServerListenStackGrouping> implementedInterface() {
@@ -183,7 +184,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
             }
 
             @Override
-            public HttpOverTcp getTransport() {
+            public Transport getTransport() {
                 return serverTransport;
             }
         };
@@ -196,7 +197,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         final var securityManager = new DefaultWebSecurityManager(new AuthenticatingRealm() {
             @Override
             protected AuthenticationInfo doGetAuthenticationInfo(final AuthenticationToken token)
-                throws AuthenticationException {
+                    throws AuthenticationException {
                 final var principal = (String) token.getPrincipal();
                 final var credentials = new String((char[]) token.getCredentials());
                 if (USERNAME.equals(principal) && PASSWORD.equals(credentials)) {
@@ -246,11 +247,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
             rpcImplementations);
 
         // Netty endpoint
-        final var configuration = new NettyEndpointConfiguration(
-            ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000),
-            "rests", MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
-            WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS, HTTP3_INITIAL_MAX_DATA,
-            HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE, HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
+        final var configuration = createEndpointConfiguration(serverStackGrouping);
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory, configuration);
     }
 
@@ -279,6 +276,19 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         } catch (IOException e) {
             throw new AssertionError(e);
         }
+    }
+
+    protected Transport createTransport() {
+        return HTTPServerOverTcp.of(localAddress, port);
+    }
+
+    protected NettyEndpointConfiguration createEndpointConfiguration(
+            final HttpServerListenStackGrouping serverStackGrouping) {
+        return new NettyEndpointConfiguration(
+            ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000),
+            "rests", MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
+            WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS, HTTP3_INITIAL_MAX_DATA,
+            HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE, HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
     }
 
     protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri) throws Exception {
@@ -504,7 +514,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         return eventListener;
     }
 
-    static final class ExampleActionImpl implements ExampleAction {
+    public static final class ExampleActionImpl implements ExampleAction {
         @Override
         public ListenableFuture<RpcResult<ExampleActionOutput>> invoke(final DataObjectIdentifier<Root> path,
                 final ExampleActionInput input) {
