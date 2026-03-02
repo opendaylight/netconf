@@ -16,6 +16,24 @@
       "message": "IIRC there was an idea got with Spring 4 - how is this related?",
       "revId": "2f584cd5761dba609a795f4d01a3b4f9014700e1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6310581d_9dddf391",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-02T07:40:29Z",
+      "side": 1,
+      "message": "why do we need to add this library? - describe in commit msg",
+      "parentUuid": "dd4d9723_15becc68",
+      "revId": "2f584cd5761dba609a795f4d01a3b4f9014700e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
