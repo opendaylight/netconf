@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.xmlunit.matchers.CompareMatcher.isSimilarTo;
 import static org.xmlunit.matchers.EvaluateXPathMatcher.hasXPath;
 
+import com.google.common.base.Splitter;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.net.Authenticator;
@@ -32,10 +33,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.json.JSONObject;
+import org.json.JSONParserConfiguration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.opendaylight.restconf.it.server.AbstractE2ETest;
+import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -45,6 +48,15 @@ import org.xmlunit.diff.ElementSelectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractHttp2E2ETest extends AbstractE2ETest {
+    static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
+        new JSONParserConfiguration().withStrictMode();
+
+    private static final Map<String, String> NS_CONTEXT = Map.of("r", "urn:ietf:params:xml:ns:yang:ietf-restconf");
+    private static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
+    private static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "pa$$w0Rd";
+
     protected HttpClient http2Client;
 
     @BeforeAll

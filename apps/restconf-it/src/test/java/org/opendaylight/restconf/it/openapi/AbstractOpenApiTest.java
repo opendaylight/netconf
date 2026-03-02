@@ -103,7 +103,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 public class AbstractOpenApiTest extends AbstractDataBrokerTest {
-    private static final JSONParserConfiguration JSON_PARSER_CONFIGURATION = new JSONParserConfiguration()
+    static final JSONParserConfiguration JSON_PARSER_CONFIGURATION = new JSONParserConfiguration()
         .withStrictMode();
 
     private static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
@@ -147,10 +147,11 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
 
     @TempDir
     private File tmpDir;
-    private DOMRpcRouter domRpcRouter;
-    private SimpleNettyEndpoint endpoint;
-    private DOMNotificationRouter domNotificationRouter;
-    private MdsalRestconfStreamRegistry streamRegistry;
+
+    protected DOMRpcRouter domRpcRouter;
+    protected SimpleNettyEndpoint endpoint;
+    protected DOMNotificationRouter domNotificationRouter;
+    protected MdsalRestconfStreamRegistry streamRegistry;
 
     @BeforeAll
     static void beforeAll() {
@@ -402,13 +403,18 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
 
     /**
      * Finds a servers node in schema and replaces port value inside with new port value. Used in tests to replace port
-     * in json schema file with random port that was used in transport configuration.
+     * in JSON schema file with random port that was used in transport configuration.
      *
      * @return a schema with correct port
      */
-    protected static final String fillPort(final String jsonString, final int port) throws JsonProcessingException {
+    protected static String fillPort(final String jsonString, final int port, final String scheme)
+            throws JsonProcessingException {
         final var json = (ObjectNode) MAPPER.readTree(jsonString);
-        json.putArray("servers").add(MAPPER.readTree("{\"url\": \"http://127.0.0.1:" + port + "/\"}"));
+        json.putArray("servers").add(MAPPER.readTree("{\"url\": \"" + scheme + "://127.0.0.1:" + port + "/\"}"));
         return MAPPER.writeValueAsString(json);
+    }
+
+    protected static String fillPort(final String jsonString, final int port) throws JsonProcessingException {
+        return fillPort(jsonString, port, "http");
     }
 }
