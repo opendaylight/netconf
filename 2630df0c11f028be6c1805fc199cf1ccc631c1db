@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49bcf8af_f199fc2d",
+        "filename": "transport/transport-http/src/main/resources/xrd-1.0-os.xsd",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-02T07:29:43Z",
+      "side": 1,
+      "message": "we come to conclusion to not change xml files, IIRC",
+      "revId": "2630df0c11f028be6c1805fc199cf1ccc631c1db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da4f5311_b58caf9a",
+        "filename": "transport/transport-udp/src/main/yang/ietf-udp-client@2025-06-10.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-02T07:29:43Z",
+      "side": 1,
+      "message": "this was just a copy from IETF RFC",
+      "revId": "2630df0c11f028be6c1805fc199cf1ccc631c1db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
