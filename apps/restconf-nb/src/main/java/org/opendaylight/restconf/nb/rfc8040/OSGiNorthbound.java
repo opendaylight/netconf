@@ -152,6 +152,10 @@ public final class OSGiNorthbound {
             description = """
                 Max-Age (ma) value advertised in Alt-Svc header for HTTP/3 (h3).
                 The advertised port is always bind-port.
+                Alt-Svc is defined by RFC7838(https://www.rfc-editor.org/rfc/rfc7838.html#section-3.1).
+                HTTP/3 identifies itself via the "h3" ALPN token defined
+                by RFC9114(https://www.rfc-editor.org/rfc/rfc9114.html#name-http-alternative-services).
+                The advertised alternative service always uses bind-port.
                 Set to 0 to disable Alt-Svc advertisement.
                 """,
             min = "0", max = "2147483647")
@@ -159,7 +163,11 @@ public final class OSGiNorthbound {
 
         @AttributeDefinition(
             name = "HTTP/3 initial max data (bytes)",
-            description = "QUIC connection-level initial max data limit for HTTP/3.",
+            description = """
+                QUIC connection-level initial max data limit for HTTP/3.
+                This configures the QUIC initial_max_data transport parameter defined in
+                RFC9000(https://www.rfc-editor.org/rfc/rfc9000.html#section-18.2-4.14.1)
+                """,
             min = "1", max = "4611686018427387903")
         long http3$_$initial$_$max$_$data() default 4L * 1024 * 1024;
 
@@ -167,6 +175,8 @@ public final class OSGiNorthbound {
             name = "HTTP/3 initial max stream data bidirectional remote (bytes)",
             description = """
                 QUIC initial max stream data limit for remotely-initiated bidirectional streams.
+                This configures the QUIC initial_max_stream_data_bidi_remote transport parameter defined in
+                RFC9000(https://www.rfc-editor.org/rfc/rfc9000.html#section-18.2-4.18.1).
                 Locally-initiated bidirectional stream limit is fixed to 262144 bytes.
                 """,
             min = "0", max = "4611686018427387903")
@@ -174,7 +184,11 @@ public final class OSGiNorthbound {
 
         @AttributeDefinition(
             name = "HTTP/3 initial max bidirectional streams",
-            description = "QUIC initial max number of bidirectional streams.",
+            description = """
+                QUIC initial max number of bidirectional streams.
+                This configures the QUIC initial_max_streams_bidi transport parameter defined in
+                RFC9000(https://www.rfc-editor.org/rfc/rfc9000.html#section-18.2-4.22.1),
+                """,
             min = "0", max = "1152921504606846976")
         long http3$_$initial$_$max$_$streams$_$bidirectional() default 100;
     }
