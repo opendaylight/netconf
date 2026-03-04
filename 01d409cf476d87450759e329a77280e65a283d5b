@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e255ac9_716cbc76",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-04T15:59:54Z",
+      "side": 1,
+      "message": "Duplicate tlsCertKey !\u003d null check (I think this is what Robert is referring to [1]). We can store this in a variable and reuse it instead of checking for null multiple times.\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/120591/19/apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java#300\n\n\n[1] -\u003e https://git.opendaylight.org/gerrit/c/netconf/+/120515/comment/d2dc576c_90c49f1a/",
+      "revId": "01d409cf476d87450759e329a77280e65a283d5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
