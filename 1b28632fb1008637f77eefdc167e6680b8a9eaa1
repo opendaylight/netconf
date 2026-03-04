@@ -16,6 +16,24 @@
       "message": "can we have spring version at one place?",
       "revId": "1b28632fb1008637f77eefdc167e6680b8a9eaa1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7dabe33f_7f8520e8",
+        "filename": "usecase/dagger/dagger-mdsal/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-04T11:09:50Z",
+      "side": 1,
+      "message": "Done with maven property.",
+      "parentUuid": "d5b1e318_43fecfcd",
+      "revId": "1b28632fb1008637f77eefdc167e6680b8a9eaa1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
