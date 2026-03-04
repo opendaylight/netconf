@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e24af3c4_ea25156a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-04T10:05:21Z",
+      "side": 1,
+      "message": "we are no more looking for spring alternative, this could be tracked as part of the \"main\" effort",
+      "revId": "4280737ab957633b3c9d2b9abc3ff22c7369b0f7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
