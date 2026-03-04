@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "50a25db3_42492218",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-04T09:58:01Z",
+      "side": 1,
+      "message": "Based on the description of task NETCONF-1569, I was looking for a better alternative to the Spring Boot binder, and this is it.\n\nSince we are preparing a POC for Dagger in Netconf, the Spring Boot binder is suitable for now. In the future, when this moves to upstream project, we can consider this as an alternative.\n\nFor now, I am closing this patch.",
+      "parentUuid": "6310581d_9dddf391",
+      "revId": "2f584cd5761dba609a795f4d01a3b4f9014700e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0d908a2e_013b4720",
@@ -53,6 +71,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4cd728a0_9e7cdacf",
+        "filename": "dagger/dagger-mdsal/src/main/java/module-info.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-04T09:58:01Z",
+      "side": 1,
+      "message": "Done in odl-dagger-prototype module-info.java file.",
+      "parentUuid": "0d908a2e_013b4720",
+      "revId": "2f584cd5761dba609a795f4d01a3b4f9014700e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5465c6f_a185b5b0",
@@ -66,6 +102,24 @@
       "writtenOn": "2026-03-02T07:43:01Z",
       "side": 1,
       "message": "abcd order",
+      "revId": "2f584cd5761dba609a795f4d01a3b4f9014700e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bad35571_8628b542",
+        "filename": "dagger/dagger-smallrye-config/src/main/java/module-info.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-04T09:58:01Z",
+      "side": 1,
+      "message": "Done in odl-dagger-prototype module-info.java file.",
+      "parentUuid": "b5465c6f_a185b5b0",
       "revId": "2f584cd5761dba609a795f4d01a3b4f9014700e1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
