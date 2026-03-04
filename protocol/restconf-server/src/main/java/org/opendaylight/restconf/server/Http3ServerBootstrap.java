@@ -19,13 +19,16 @@ import io.netty.handler.codec.http3.Http3ServerConnectionHandler;
 import io.netty.handler.codec.quic.QuicChannel;
 import io.netty.handler.codec.quic.QuicSslContextBuilder;
 import io.netty.handler.codec.quic.QuicStreamChannel;
+import io.netty.handler.codec.quic.QuicTransportParameters;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.AttributeKey;
 import java.net.InetSocketAddress;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import javax.net.ssl.SSLException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.netconf.transport.spi.NettyTransportSupport;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -37,6 +40,8 @@ import org.slf4j.LoggerFactory;
 final class Http3ServerBootstrap implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(Http3ServerBootstrap.class);
     private static final int MAX_HTTP3_CONTENT_LENGTH = 16 * 1024;
+    private static final AttributeKey<Uint32> MAX_CHUNK_SIZE = AttributeKey.valueOf(Http3ServerBootstrap.class,
+        "maxChunkSize");
 
     private final Channel channel;
     private final EventLoopGroup quicGroup;
@@ -59,11 +64,12 @@ final class Http3ServerBootstrap implements AutoCloseable {
             @Override
             protected void initChannel(final QuicStreamChannel stream) {
                 final var pipeline = stream.pipeline();
+                final var maxChunkSize = stream.parent().attr(MAX_CHUNK_SIZE).get();
                 pipeline.addLast("h3-stream-log", new LoggingHandler(LogLevel.DEBUG));
                 pipeline.addLast(new Http3FrameToHttpObjectCodec(true));
                 pipeline.addLast(new HttpObjectAggregator(MAX_HTTP3_CONTENT_LENGTH));
                 pipeline.addLast("restconf-session", new ConcurrentRestconfSession(HTTPScheme.HTTPS,
-                    requireNonNull(stream.parent().remoteAddress()), root, chunkSize));
+                    requireNonNull(stream.parent().remoteAddress()), root, maxChunkSize));
             }
         };
 
@@ -75,6 +81,7 @@ final class Http3ServerBootstrap implements AutoCloseable {
             .handler(new ChannelInitializer<QuicChannel>() {
                 @Override
                 protected void initChannel(final QuicChannel ch) {
+                    ch.attr(MAX_CHUNK_SIZE).set(maxChunkSize(ch.peerTransportParameters(), chunkSize));
                     ch.pipeline().addLast(new Http3ServerConnectionHandler(streamInitializer));
                 }
             })
@@ -110,5 +117,28 @@ final class Http3ServerBootstrap implements AutoCloseable {
     public void close() {
         quicGroup.shutdownGracefully();
         channel.close().syncUninterruptibly();
+    }
+
+    /**
+     * Compute an effective maximum response chunk size for an HTTP/3 connection.
+     *
+     * <p>The peer-advertised {@code max_udp_payload_size} applies to the UDP payload on the wire, while
+     * {@code chunkSize} represents application payload bytes. A fixed overhead of 64 bytes is subtracted to leave
+     * headroom for QUIC/HTTP/3 framing (varint-encoded headers, STREAM/DATA framing) and the AEAD tag, plus
+     * occasional coalesced control frames.
+     *
+     * <p>The resulting bound is clamped to a minimum of 256 bytes to avoid pathological tiny chunks when a peer
+     * advertises a very small {@code max_udp_payload_size}, which would otherwise amplify per-chunk overhead and
+     * increase flush pressure.
+     *
+     * @param parameters peer QUIC transport parameters, or {@code null} if unavailable
+     * @param chunkSize configured response chunk size (application payload bytes)
+     * @return effective maximum chunk size for this connection
+     */
+    private static Uint32 maxChunkSize(final @Nullable QuicTransportParameters parameters, final Uint32 chunkSize) {
+        final var overhead = 64;
+        final var peerMaxUdp = parameters != null ? parameters.maxUdpPayloadSize() : Long.MAX_VALUE;
+        final var peerBound = peerMaxUdp == Long.MAX_VALUE ? Long.MAX_VALUE : Math.max(256L, peerMaxUdp - overhead);
+        return Uint32.valueOf(Math.min(chunkSize.longValue(), peerBound));
     }
 }
