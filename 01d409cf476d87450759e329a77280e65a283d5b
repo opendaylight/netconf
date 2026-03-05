@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "feb68c57_3ec64d37",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-05T16:45:13Z",
+      "side": 1,
+      "message": "we have max also, see: https://www.rfc-editor.org/rfc/rfc7234#section-1.2.1",
+      "revId": "01d409cf476d87450759e329a77280e65a283d5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0e255ac9_716cbc76",
         "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
         "patchSetId": 11
@@ -32,6 +49,74 @@
       "side": 1,
       "message": "The mentioned caller was probably here: https://git.opendaylight.org/gerrit/c/netconf/+/120515/10..11/apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java#b273",
       "parentUuid": "0e255ac9_716cbc76",
+      "revId": "01d409cf476d87450759e329a77280e65a283d5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "304c007a_5c6229c9",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-05T16:45:13Z",
+      "side": 1,
+      "message": "why we do not validate min, max and do not throws exception as in case with bindPort?",
+      "revId": "01d409cf476d87450759e329a77280e65a283d5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b5b905f_2dacaac2",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AltSvcAdvertiser.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-05T16:45:13Z",
+      "side": 1,
+      "message": "we do not need general purpose advertiser - our server just supports h3, let\u0027s advertise it, even with value of ma \u003d 0 in worst case",
+      "revId": "01d409cf476d87450759e329a77280e65a283d5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c67dc040_4e7060aa",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AltSvcAdvertiser.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-05T16:45:13Z",
+      "side": 1,
+      "message": "can you please try it - I do not see Alt-svc header when making curl h/1.1 request",
+      "revId": "01d409cf476d87450759e329a77280e65a283d5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "376981dd_72cb55a8",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-05T16:45:13Z",
+      "side": 1,
+      "message": "what about to have it nonnull and use value 0 when not advertized?",
       "revId": "01d409cf476d87450759e329a77280e65a283d5b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
