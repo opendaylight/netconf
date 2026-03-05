@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac061745_b2cb5151",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-05T17:16:53Z",
+      "side": 1,
+      "message": "do we have min, max values?",
+      "revId": "e81fb2efd882443c88b27484e0f3b8cd16680e5f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0dd1f1e5_a23d90ea",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-05T17:16:53Z",
+      "side": 1,
+      "message": "unrelated changes, why to use intValue?",
+      "revId": "e81fb2efd882443c88b27484e0f3b8cd16680e5f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b02a3ca_d225c47c",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpoint.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-05T17:16:53Z",
+      "side": 1,
+      "message": "why nullable?",
+      "revId": "e81fb2efd882443c88b27484e0f3b8cd16680e5f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a35dbb18_09a86d57",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-05T17:16:53Z",
+      "side": 1,
+      "message": "separate primitive types below after one empty line",
+      "revId": "e81fb2efd882443c88b27484e0f3b8cd16680e5f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "745a356a_dee86a73",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-05T17:16:53Z",
+      "side": 1,
+      "message": "do we have better location for this const?",
+      "revId": "e81fb2efd882443c88b27484e0f3b8cd16680e5f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
