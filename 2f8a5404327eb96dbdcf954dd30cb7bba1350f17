@@ -16,6 +16,24 @@
       "message": "2026?",
       "revId": "2f8a5404327eb96dbdcf954dd30cb7bba1350f17",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da81d5c9_60794286",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/AbstractOpenApiHttp3Test.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-05T14:02:42Z",
+      "side": 1,
+      "message": "that will be corrected, multiple times here",
+      "parentUuid": "fcdd7179_279ea36e",
+      "revId": "2f8a5404327eb96dbdcf954dd30cb7bba1350f17",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
