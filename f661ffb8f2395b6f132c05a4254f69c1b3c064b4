@@ -16,6 +16,24 @@
       "message": "can we also skip swagger UI?",
       "revId": "f661ffb8f2395b6f132c05a4254f69c1b3c064b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9785b51_f40e5441",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-05T14:05:43Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "34b951e6_a41daadc",
+      "revId": "f661ffb8f2395b6f132c05a4254f69c1b3c064b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
