@@ -14,6 +14,8 @@ import org.opendaylight.mdsal.binding.api.NotificationPublishService;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
+import org.opendaylight.mdsal.eos.binding.api.EntityOwnershipService;
+import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.dagger.mdsal.MdsalQualifiers.SchemaServiceContext;
 import org.opendaylight.netconf.dagger.springboot.config.SpringbootConfigLoaderModule;
 import org.opendaylight.odlparent.dagger.AutoCloseableComponent;
@@ -25,6 +27,9 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 @Component(modules = {
     MdsalDomBrokerModule.class,
     MdsalBindingDomAdapterModule.class,
+    MdsalEosBindingAdapterModule.class,
+    MdsalEosDomSimpleModule.class,
+    MdsalSingletonImplModule.class,
     SpringbootConfigLoaderModule.class,
     ResourceSupportModule.class
 })
@@ -39,4 +44,8 @@ public interface MdsalDomBrokerTestFactory extends AutoCloseableComponent {
     NotificationPublishService notificationPublishService();
 
     @SchemaServiceContext EffectiveModelContext modelContext();
+
+    ClusterSingletonServiceProvider clusterSingletonServiceProvider();
+
+    EntityOwnershipService entityOwnershipService();
 }
