@@ -23,6 +23,11 @@ module org.opendaylight.netconf.dagger {
     requires org.opendaylight.mdsal.binding.dom.adapter;
     requires org.opendaylight.mdsal.dom.api;
     requires org.opendaylight.mdsal.dom.broker;
+    requires org.opendaylight.mdsal.eos.binding.dom.adapter;
+    requires org.opendaylight.mdsal.eos.dom.api;
+    requires org.opendaylight.mdsal.eos.dom.simple;
+    requires org.opendaylight.mdsal.singleton.api;
+    requires org.opendaylight.mdsal.singleton.impl;
     requires org.opendaylight.yangtools.binding.generator;
     requires org.opendaylight.yangtools.binding.runtime.spi;
     requires org.opendaylight.yangtools.odlext.parser.support;
