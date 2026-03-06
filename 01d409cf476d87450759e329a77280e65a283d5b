@@ -104,6 +104,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2525332c_2b44c37a",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AltSvcAdvertiser.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-03-06T09:15:30Z",
+      "side": 1,
+      "message": "$ curl --http1.1 -u admin:admin -k -I https://localhost:8443/restconf/operations\nHTTP/1.1 200 OK\ncontent-type: application/yang-data+json\ncontent-length: 0\nAlt-Svc: h3\u003d\":8443\"; ma\u003d3600",
+      "parentUuid": "c67dc040_4e7060aa",
+      "revId": "01d409cf476d87450759e329a77280e65a283d5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "376981dd_72cb55a8",
