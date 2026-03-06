@@ -33,6 +33,24 @@
       "message": "try to limit opening of fields as much as possible, investigate anotehr alternatives",
       "revId": "c146eceef58a84d2d2cc7a02e757bea084d76c17",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad682390_3ea935fd",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-06T13:26:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a3215ea_d3703f00",
+      "revId": "c146eceef58a84d2d2cc7a02e757bea084d76c17",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
