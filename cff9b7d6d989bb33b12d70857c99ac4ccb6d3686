@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "cff9b7d6d989bb33b12d70857c99ac4ccb6d3686",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eae4cf0e_dd1f7075",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http2/AbstractHttp2E2ETest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-06T14:38:56Z",
+      "side": 1,
+      "message": "private then?",
+      "revId": "cff9b7d6d989bb33b12d70857c99ac4ccb6d3686",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
