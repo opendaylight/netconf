@@ -122,6 +122,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a271c8f_796db54e",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/AltSvcAdvertiser.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-03-06T10:12:55Z",
+      "side": 1,
+      "message": "Alt-Svc is advertised only if the server has a certificate and TLS is configured",
+      "parentUuid": "2525332c_2b44c37a",
+      "revId": "01d409cf476d87450759e329a77280e65a283d5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "376981dd_72cb55a8",
