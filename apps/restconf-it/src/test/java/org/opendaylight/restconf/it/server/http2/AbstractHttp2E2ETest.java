@@ -106,7 +106,7 @@ abstract class AbstractHttp2E2ETest extends AbstractE2ETest {
             final ErrorType expectedErrorType, final ErrorTag expectedErrorTag) {
         assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertEquals(ERROR_TAG_MAPPING.statusOf(expectedErrorTag).code(), response.statusCode());
-        final var json = new JSONObject(response.body(), JSON_PARSER_CONFIGURATION);
+        final var json = new JSONObject(response.body(), jsonParserConfiguration());
         final var error = json.getJSONObject("errors").getJSONArray("error").getJSONObject(0);
         assertNotNull(error);
         assertEquals(expectedErrorType.elementBody(), error.getString("error-type"));
@@ -179,7 +179,7 @@ abstract class AbstractHttp2E2ETest extends AbstractE2ETest {
     }
 
     protected URI createUri(final String path) throws URISyntaxException {
-        return new URI("http://" + host + path);
+        return new URI("http://" + host() + path);
     }
 
     private static Map<String, List<String>> normalizeHeaders(final HttpResponse<String> response) {

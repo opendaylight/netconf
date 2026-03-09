@@ -52,7 +52,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.opendaylight.mdsal.binding.api.ActionProviderService;
 import org.opendaylight.mdsal.binding.api.ActionSpec;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.dom.adapter.BindingAdapterFactory;
@@ -115,6 +114,8 @@ import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 
 public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
+    private static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
+        new JSONParserConfiguration().withStrictMode();
     private static final Logger LOG = LoggerFactory.getLogger(AbstractE2ETest.class);
     private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
     private static final Uint32 FRAME_SIZE = Uint32.valueOf(16 * 1024);
@@ -126,8 +127,6 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     private static final Uint32 WRITE_BUFFER_LOW_WATER_MARK = Uint32.valueOf(32 * 1024);
     private static final Uint32 WRITE_BUFFER_HIGH_WATER_MARK = Uint32.valueOf(64 * 1024);
 
-    protected static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
-        new JSONParserConfiguration().withStrictMode();
     protected static final Map<String, String> NS_CONTEXT = Map.of("r", "urn:ietf:params:xml:ns:yang:ietf-restconf");
     protected static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
     protected static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
@@ -136,29 +135,24 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String APPLICATION_XML = "application/xml";
 
-    protected static String localAddress;
-    protected static BootstrapFactory bootstrapFactory;
-    protected static SSHTransportStackFactory sshTransportStackFactory;
-    protected HttpClientStackGrouping invalidClientStackGrouping;
-    protected DOMMountPointService domMountPointService;
-    protected RpcProviderService rpcProviderService;
-    protected ActionProviderService actionProviderService;
-    protected String host;
+    private static String localAddress;
+    private static BootstrapFactory bootstrapFactory;
+    private static SSHTransportStackFactory sshTransportStackFactory;
 
-    protected final int port;
-
-    protected volatile EventStreamService clientStreamService;
-    protected volatile EventStreamService.StreamControl streamControl;
-
+    private HttpClientStackGrouping invalidClientStackGrouping;
+    private DOMMountPointService domMountPointService;
+    private RpcProviderService rpcProviderService;
+    private String host;
     private HttpClientStackGrouping clientStackGrouping;
     private DOMRpcRouter domRpcRouter;
     private SimpleNettyEndpoint endpoint;
     private DOMNotificationRouter domNotificationRouter;
     private MdsalRestconfStreamRegistry streamRegistry;
 
-    protected AbstractE2ETest() {
-        this.port = randomBindablePort();
-    }
+    private int port;
+
+    private volatile EventStreamService clientStreamService;
+    private volatile EventStreamService.StreamControl streamControl;
 
     @BeforeAll
     static void beforeAll() {
@@ -170,6 +164,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     @BeforeEach
     protected void beforeEach() throws Exception {
         // transport configuration
+        port = randomBindablePort();
         host = localAddress + ":" + port;
         final var serverTransport = createTransport();
         final var serverStackGrouping = new HttpServerListenStackGrouping() {
@@ -216,7 +211,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         domMountPointService = new DOMMountPointServiceImpl();
         final var adapterContext = new ConstantAdapterContext(new DefaultBindingDOMCodecServices(getRuntimeContext()));
         final var adapterFactory = new BindingAdapterFactory(adapterContext);
-        actionProviderService = adapterFactory.createActionProviderService(
+        final var actionProviderService = adapterFactory.createActionProviderService(
             new RouterDOMActionProviderService(domRpcRouter));
         // action implementations
         actionProviderService.registerImplementation(
@@ -252,12 +247,81 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         streamRegistry.close();
         domNotificationRouter.close();
         domRpcRouter.close();
+        if (clientStreamService != null) {
+            clientStreamService = null;
+        }
+        if (streamControl != null) {
+            streamControl = null;
+        }
     }
 
     @AfterAll
     static void afterAll() {
         bootstrapFactory.close();
         sshTransportStackFactory.close();
+    }
+
+    /**
+     * {@return the localAddress}
+     */
+    protected static String localAddress() {
+        return localAddress;
+    }
+
+    /**
+     * {@return the sshTransportStackFactory}
+     */
+    protected static SSHTransportStackFactory sshTransportStackFactory() {
+        return sshTransportStackFactory;
+    }
+
+    /**
+     * {@return the invalidClientStackGrouping}
+     */
+    protected final HttpClientStackGrouping invalidClientStackGrouping() {
+        return invalidClientStackGrouping;
+    }
+
+    /**
+     * {@return the domMountPointService}
+     */
+    protected final DOMMountPointService domMountPointService() {
+        return domMountPointService;
+    }
+
+    /**
+     * {@return the rpcProviderService}
+     */
+    protected final RpcProviderService rpcProviderService() {
+        return rpcProviderService;
+    }
+
+    /**
+     * {@return the host}
+     */
+    protected final String host() {
+        return host;
+    }
+
+    /**
+     * {@return the port}
+     */
+    protected final int port() {
+        return port;
+    }
+
+    /**
+     * {@return the streamControl}
+     */
+    protected final EventStreamService.StreamControl streamControl() {
+        return streamControl;
+    }
+
+    /**
+     * {@return the JSON parser configuration}
+     */
+    protected static JSONParserConfiguration jsonParserConfiguration() {
+        return JSON_PARSER_CONFIGURATION;
     }
 
     /**
