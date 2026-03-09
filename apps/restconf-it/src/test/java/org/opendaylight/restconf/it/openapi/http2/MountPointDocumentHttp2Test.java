@@ -104,7 +104,7 @@ class MountPointDocumentHttp2Test extends AbstractOpenApiHttp2Test {
         assertEquals(HttpClient.Version.HTTP_2, response.version());
 
         final var resultDoc = response.body();
-        JSONAssert.assertEquals(fillPort(expectedJson, port), resultDoc, JSONCompareMode.NON_EXTENSIBLE);
+        JSONAssert.assertEquals(fillPort(expectedJson, port()), resultDoc, JSONCompareMode.NON_EXTENSIBLE);
     }
 
     private static Stream<Arguments> getMountDocByModuleTest() {

@@ -29,7 +29,7 @@ class ControllerDocumentTest extends AbstractOpenApiTest {
         assertEquals(HttpResponseStatus.OK, response.status());
 
         final var resultDoc = response.content().toString(StandardCharsets.UTF_8);
-        JSONAssert.assertEquals(fillPort(expectedJson, port), resultDoc, JSONCompareMode.NON_EXTENSIBLE);
+        JSONAssert.assertEquals(fillPort(expectedJson, port()), resultDoc, JSONCompareMode.NON_EXTENSIBLE);
     }
 
     /**
@@ -45,7 +45,7 @@ class ControllerDocumentTest extends AbstractOpenApiTest {
         assertEquals(HttpResponseStatus.OK, response.status());
 
         final var resultDoc = response.content().toString(StandardCharsets.UTF_8);
-        JSONAssert.assertEquals(fillPort(expectedJson, port), resultDoc, JSONCompareMode.NON_EXTENSIBLE);
+        JSONAssert.assertEquals(fillPort(expectedJson, port()), resultDoc, JSONCompareMode.NON_EXTENSIBLE);
     }
 
     private static Stream<Arguments> getDocByModuleTest() {
