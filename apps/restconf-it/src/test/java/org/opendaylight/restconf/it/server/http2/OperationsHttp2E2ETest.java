@@ -39,7 +39,7 @@ class OperationsHttp2E2ETest extends AbstractHttp2E2ETest {
     protected void beforeEach() throws Exception {
         super.beforeEach();
         final var cssService = new EOSClusterSingletonServiceProvider(new SimpleDOMEntityOwnershipService());
-        netconfKeystoreService = new DefaultNetconfKeystoreService(getDataBroker(), rpcProviderService,
+        netconfKeystoreService = new DefaultNetconfKeystoreService(getDataBroker(), rpcProviderService(),
             cssService, new NullAAAEncryptionService());
     }
 

@@ -82,7 +82,7 @@ class MountPointE2ETest extends AbstractE2ETest {
         final var encryptionService = new NullAAAEncryptionService();
         final var netconfClientConfBuilderFactory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService,
             id -> null, sslContextFactoryProvider());
-        final var netconfClientFactory = new NetconfClientFactoryImpl(netconfTimer, sshTransportStackFactory);
+        final var netconfClientFactory = new NetconfClientFactoryImpl(netconfTimer, sshTransportStackFactory());
         final var topologySchemaAssembler = new NetconfTopologySchemaAssembler(4);
         final var yangParserFactory = new DefaultYangParserFactory();
         final var schemaSourceMgr =
@@ -90,8 +90,8 @@ class MountPointE2ETest extends AbstractE2ETest {
         final var baseSchemaProvider = new DefaultBaseNetconfSchemaProvider(yangParserFactory);
 
         topologyService = new NetconfTopologyImpl(netconfClientFactory, netconfTimer, topologySchemaAssembler,
-            schemaSourceMgr, dataBroker, domMountPointService, encryptionService, netconfClientConfBuilderFactory,
-            rpcProviderService, baseSchemaProvider, new DeviceActionFactoryImpl());
+            schemaSourceMgr, dataBroker, domMountPointService(), encryptionService, netconfClientConfBuilderFactory,
+            rpcProviderService(), baseSchemaProvider, new DeviceActionFactoryImpl());
     }
 
     @AfterEach
@@ -104,12 +104,6 @@ class MountPointE2ETest extends AbstractE2ETest {
         if (topologyService != null) {
             topologyService.close();
             topologyService = null;
-        }
-        if (clientStreamService != null) {
-            clientStreamService = null;
-        }
-        if (streamControl != null) {
-            streamControl = null;
         }
         super.afterEach();
     }
@@ -244,7 +238,7 @@ class MountPointE2ETest extends AbstractE2ETest {
                 }""", eventListener.readNext(), JSONCompareMode.LENIENT);
 
             // terminate stream
-            streamControl.close();
+            streamControl().close();
             await().atMost(Duration.ofSeconds(1)).until(eventListener::ended);
 
         } finally {
@@ -397,7 +391,7 @@ class MountPointE2ETest extends AbstractE2ETest {
                    }
                }]
             }
-            """.formatted(localAddress, devicePort, DEVICE_USERNAME, DEVICE_PASSWORD);
+            """.formatted(localAddress(), devicePort, DEVICE_USERNAME, DEVICE_PASSWORD);
         final var response = invokeRequest(HttpMethod.POST, TOPOLOGY_URI, APPLICATION_JSON, input);
         assertEquals(HttpResponseStatus.CREATED, response.status());
         // wait till connected

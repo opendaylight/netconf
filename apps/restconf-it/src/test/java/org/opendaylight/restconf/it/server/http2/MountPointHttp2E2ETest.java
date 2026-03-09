@@ -80,7 +80,7 @@ class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
         final var encryptionService = new NullAAAEncryptionService();
         final var netconfClientConfBuilderFactory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService,
             id -> null, sslContextFactoryProvider());
-        final var netconfClientFactory = new NetconfClientFactoryImpl(netconfTimer, sshTransportStackFactory);
+        final var netconfClientFactory = new NetconfClientFactoryImpl(netconfTimer, sshTransportStackFactory());
         final var topologySchemaAssembler = new NetconfTopologySchemaAssembler(4);
         final var yangParserFactory = new DefaultYangParserFactory();
         final var schemaSourceMgr =
@@ -88,8 +88,8 @@ class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
         final var baseSchemaProvider = new DefaultBaseNetconfSchemaProvider(yangParserFactory);
 
         topologyService = new NetconfTopologyImpl(netconfClientFactory, netconfTimer, topologySchemaAssembler,
-            schemaSourceMgr, dataBroker, domMountPointService, encryptionService, netconfClientConfBuilderFactory,
-            rpcProviderService, baseSchemaProvider, new DeviceActionFactoryImpl());
+            schemaSourceMgr, dataBroker, domMountPointService(), encryptionService, netconfClientConfBuilderFactory,
+            rpcProviderService(), baseSchemaProvider, new DeviceActionFactoryImpl());
     }
 
     @AfterEach
@@ -102,12 +102,6 @@ class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
         if (topologyService != null) {
             topologyService.close();
             topologyService = null;
-        }
-        if (clientStreamService != null) {
-            clientStreamService = null;
-        }
-        if (streamControl != null) {
-            streamControl = null;
         }
         super.afterEach();
     }
@@ -367,7 +361,7 @@ class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
                    }
                }]
             }
-            """.formatted(localAddress, devicePort, DEVICE_USERNAME, DEVICE_PASSWORD);
+            """.formatted(localAddress(), devicePort, DEVICE_USERNAME, DEVICE_PASSWORD);
 
         final var response = http2Client.send(HttpRequest.newBuilder()
             .uri(createUri(TOPOLOGY_URI))
