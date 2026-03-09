@@ -25,17 +25,6 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class StreamsE2ETest extends AbstractE2ETest {
-    @Override
-    @AfterEach
-    protected void afterEach() throws Exception {
-        if (clientStreamService != null) {
-            clientStreamService = null;
-        }
-        if (streamControl != null) {
-            streamControl = null;
-        }
-        super.afterEach();
-    }
 
     // FIXME: NETCONF-1590, disable replay and enable the test
     @Disabled
@@ -166,7 +155,7 @@ class StreamsE2ETest extends AbstractE2ETest {
                 }""", eventListener.readNext(), JSONCompareMode.LENIENT);
 
             // terminate stream
-            streamControl.close();
+            streamControl().close();
             await().atMost(Duration.ofSeconds(1)).until(eventListener::ended);
 
         } finally {
