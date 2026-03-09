@@ -33,7 +33,7 @@ class UiHttp2Test extends AbstractOpenApiHttp2Test {
         final var location = response.headers().firstValue("location").orElseThrow();
 
         response = http2Client.send(HttpRequest.newBuilder()
-            .uri(new URI("http://" + host + location))
+            .uri(new URI("http://" + host() + location))
             .GET()
             .header("accept", TEXT_HTML)
             .build(), HttpResponse.BodyHandlers.ofString());
