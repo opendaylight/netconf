@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bfc38e0_14ebb7bb",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-03-09T07:43:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ac061745_b2cb5151",
+      "revId": "e81fb2efd882443c88b27484e0f3b8cd16680e5f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0dd1f1e5_a23d90ea",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-03-05T17:16:53Z",
       "side": 1,
       "message": "unrelated changes, why to use intValue?",
+      "revId": "e81fb2efd882443c88b27484e0f3b8cd16680e5f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2d2739e_348ed494",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-03-09T07:43:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0dd1f1e5_a23d90ea",
       "revId": "e81fb2efd882443c88b27484e0f3b8cd16680e5f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "02e6ddd9_f8e2fa37",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpoint.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-03-09T07:43:44Z",
+      "side": 1,
+      "message": "HTTP/3 startup is optional in this endpoint. We still want the Netty endpoint to serve HTTP/1.1 and HTTP/2 when H3 is disabled or cannot be initialized (e.g. TLS certificate or private key is not configured)",
+      "parentUuid": "1b02a3ca_d225c47c",
+      "revId": "e81fb2efd882443c88b27484e0f3b8cd16680e5f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a35dbb18_09a86d57",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "939554a1_f2f2bb73",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-03-09T07:43:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a35dbb18_09a86d57",
+      "revId": "e81fb2efd882443c88b27484e0f3b8cd16680e5f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "745a356a_dee86a73",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-03-05T17:16:53Z",
       "side": 1,
       "message": "do we have better location for this const?",
+      "revId": "e81fb2efd882443c88b27484e0f3b8cd16680e5f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e59e9c8e_02870c73",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-03-09T07:43:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "745a356a_dee86a73",
       "revId": "e81fb2efd882443c88b27484e0f3b8cd16680e5f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
