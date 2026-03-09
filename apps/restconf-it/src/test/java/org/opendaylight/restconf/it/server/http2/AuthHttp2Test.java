@@ -129,7 +129,7 @@ class AuthHttp2Test extends AbstractHttp2E2ETest {
     }
 
     private static String extractStreamNameJson(final String content) {
-        final var json = new JSONObject(content, JSON_PARSER_CONFIGURATION);
+        final var json = new JSONObject(content, jsonParserConfiguration());
         return json.getJSONObject("sal-remote:output").getString("stream-name");
     }
 
