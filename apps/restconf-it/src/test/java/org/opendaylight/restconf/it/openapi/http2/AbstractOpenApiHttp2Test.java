@@ -51,7 +51,7 @@ abstract class AbstractOpenApiHttp2Test extends AbstractOpenApiTest {
     protected void assertContentJson(final String getRequestUri, final String expectedContent) throws Exception {
         final var response = http2Client.send(HttpRequest.newBuilder()
             .GET()
-            .uri(new URI("http://" + host + getRequestUri))
+            .uri(new URI("http://" + host() + getRequestUri))
             .build(), HttpResponse.BodyHandlers.ofString());
 
         assertEquals(200, response.statusCode());
@@ -62,6 +62,6 @@ abstract class AbstractOpenApiHttp2Test extends AbstractOpenApiTest {
     }
 
     protected URI createApiUri(final String path) throws URISyntaxException {
-        return new URI("http://" + host + API_V3_PATH + path);
+        return new URI("http://" + host() + API_V3_PATH + path);
     }
 }
