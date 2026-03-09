@@ -76,7 +76,7 @@ public class NC1440Test extends AbstractOpenApiTest {
 
         final var headers = client.send(HttpRequest.newBuilder()
             .GET()
-            .uri(new URI("http://" + host + API_V3_PATH + "/mounts/1"))
+            .uri(new URI("http://" + host() + API_V3_PATH + "/mounts/1"))
             .timeout(Duration.ofSeconds(10))
             .build(), HttpResponse.BodyHandlers.discarding());
         assertEquals(200, headers.statusCode());
@@ -103,7 +103,7 @@ public class NC1440Test extends AbstractOpenApiTest {
         final var exception = client.send(HttpRequest.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .GET()
-                .uri(new URI("http://" + host + API_V3_PATH + "/mounts/1"))
+                .uri(new URI("http://" + host() + API_V3_PATH + "/mounts/1"))
                 .timeout(Duration.ofSeconds(10))
                 .build(), HttpResponse.BodyHandlers.ofString());
         assertEquals(HttpResponseStatus.INTERNAL_SERVER_ERROR.code(), exception.statusCode());
