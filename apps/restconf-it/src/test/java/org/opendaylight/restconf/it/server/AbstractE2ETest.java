@@ -53,7 +53,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.opendaylight.mdsal.binding.api.ActionProviderService;
 import org.opendaylight.mdsal.binding.api.ActionSpec;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.dom.adapter.BindingAdapterFactory;
@@ -142,25 +141,24 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String APPLICATION_XML = "application/xml";
 
-    protected static String localAddress;
-    protected static BootstrapFactory bootstrapFactory;
-    protected static SSHTransportStackFactory sshTransportStackFactory;
-    protected HttpClientStackGrouping invalidClientStackGrouping;
-    protected DOMMountPointService domMountPointService;
-    protected RpcProviderService rpcProviderService;
-    protected ActionProviderService actionProviderService;
-    protected String host;
+    private static String localAddress;
+    private static BootstrapFactory bootstrapFactory;
+    private static SSHTransportStackFactory sshTransportStackFactory;
 
-    protected int port;
-
-    protected volatile EventStreamService clientStreamService;
-    protected volatile EventStreamService.StreamControl streamControl;
-
+    private HttpClientStackGrouping invalidClientStackGrouping;
+    private DOMMountPointService domMountPointService;
+    private RpcProviderService rpcProviderService;
+    private String host;
     private HttpClientStackGrouping clientStackGrouping;
     private DOMRpcRouter domRpcRouter;
     private SimpleNettyEndpoint endpoint;
     private DOMNotificationRouter domNotificationRouter;
     private MdsalRestconfStreamRegistry streamRegistry;
+
+    private int port;
+
+    private volatile EventStreamService clientStreamService;
+    private volatile EventStreamService.StreamControl streamControl;
 
     @BeforeAll
     static void beforeAll() {
@@ -219,7 +217,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         domMountPointService = new DOMMountPointServiceImpl();
         final var adapterContext = new ConstantAdapterContext(new DefaultBindingDOMCodecServices(getRuntimeContext()));
         final var adapterFactory = new BindingAdapterFactory(adapterContext);
-        actionProviderService = adapterFactory.createActionProviderService(
+        final var actionProviderService = adapterFactory.createActionProviderService(
             new RouterDOMActionProviderService(domRpcRouter));
         // action implementations
         actionProviderService.registerImplementation(
@@ -255,12 +253,99 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         streamRegistry.close();
         domNotificationRouter.close();
         domRpcRouter.close();
+        if (clientStreamService() != null) {
+            clientStreamService = null;
+        }
+        if (streamControl() != null) {
+            streamControl = null;
+        }
     }
 
     @AfterAll
     static void afterAll() {
         bootstrapFactory.close();
         sshTransportStackFactory.close();
+    }
+
+    /**
+     * Return the localAddress.
+     *
+     * @return the localAddress
+     */
+    protected static String localAddress() {
+        return localAddress;
+    }
+
+    /**
+     * Return the sshTransportStackFactory.
+     *
+     * @return the sshTransportStackFactory
+     */
+    protected static SSHTransportStackFactory sshTransportStackFactory() {
+        return sshTransportStackFactory;
+    }
+
+    /**
+     * Return the invalidClientStackGrouping.
+     *
+     * @return the invalidClientStackGrouping
+     */
+    protected final HttpClientStackGrouping invalidClientStackGrouping() {
+        return invalidClientStackGrouping;
+    }
+
+    /**
+     * Return the domMountPointService.
+     *
+     * @return the domMountPointService
+     */
+    protected final DOMMountPointService domMountPointService() {
+        return domMountPointService;
+    }
+
+    /**
+     * Return the rpcProviderService.
+     *
+     * @return the rpcProviderService
+     */
+    protected final RpcProviderService rpcProviderService() {
+        return rpcProviderService;
+    }
+
+    /**
+     * Return the host.
+     *
+     * @return the host
+     */
+    protected final String host() {
+        return host;
+    }
+
+    /**
+     * Return the port.
+     *
+     * @return the port
+     */
+    protected final int port() {
+        return port;
+    }
+
+    /**
+     * Return the clientStreamService.
+     *
+     * @return the clientStreamService
+     */
+    protected final EventStreamService clientStreamService() {
+        return clientStreamService;
+    }
+
+    /**
+     * Return the streamControl.
+     *
+     * @return the streamControl
+     */
+    protected final EventStreamService.StreamControl streamControl() {
+        return streamControl;
     }
 
     /**
