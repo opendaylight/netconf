@@ -95,7 +95,7 @@ public abstract class AbstractHttp3E2ETest extends AbstractE2ETest {
         super.beforeEach();
 
         // Setup HTTP/3 client
-        client = new Http3NettyTestClient(localAddress, port, USERNAME, PASSWORD);
+        client = new Http3NettyTestClient(localAddress(), port(), USERNAME, PASSWORD);
     }
 
     @AfterEach
@@ -111,7 +111,7 @@ public abstract class AbstractHttp3E2ETest extends AbstractE2ETest {
 
     @Override
     protected Transport createTransport() {
-        return HTTPServerOverTls.of(localAddress, port, certificate, privateKey);
+        return HTTPServerOverTls.of(localAddress(), port(), certificate, privateKey);
     }
 
     @Override
@@ -120,13 +120,13 @@ public abstract class AbstractHttp3E2ETest extends AbstractE2ETest {
         return new NettyEndpointConfiguration(
             ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000), "rests",
             MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
-            WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, localAddress, port, certificate, privateKey,
+            WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, localAddress(), port(), certificate, privateKey,
             HTTP3_ALT_SVC_MAX_AGE_SECONDS, HTTP3_INITIAL_MAX_DATA, HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE,
             HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
     }
 
     protected URI createUri(final String path) throws URISyntaxException {
-        return new URI("https://" + host + path);
+        return new URI("https://" + host() + path);
     }
 
     protected static void assertErrorResponseJson(final Http3Response response, final ErrorType expectedErrorType,
