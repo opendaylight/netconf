@@ -20,7 +20,6 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -28,17 +27,6 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class StreamsHttp2E2ETest extends AbstractHttp2E2ETest {
-    @Override
-    @AfterEach
-    protected void afterEach() throws Exception {
-        if (clientStreamService != null) {
-            clientStreamService = null;
-        }
-        if (streamControl != null) {
-            streamControl = null;
-        }
-        super.afterEach();
-    }
 
     @Override
     @BeforeEach
@@ -160,7 +148,7 @@ class StreamsHttp2E2ETest extends AbstractHttp2E2ETest {
                 }""", eventListener.readNext(), JSONCompareMode.LENIENT);
 
             // terminate stream
-            streamControl.close();
+            streamControl().close();
             await().atMost(Duration.ofSeconds(1)).until(eventListener::ended);
 
         } finally {
@@ -241,7 +229,7 @@ class StreamsHttp2E2ETest extends AbstractHttp2E2ETest {
                 }""", eventListener2.readNext(), JSONCompareMode.LENIENT);
 
             // terminate stream
-            streamControl.close();
+            streamControl().close();
             await().atMost(Duration.ofSeconds(1)).until(eventListener1::ended);
             await().atMost(Duration.ofSeconds(1)).until(eventListener2::ended);
         } finally {
@@ -265,7 +253,7 @@ class StreamsHttp2E2ETest extends AbstractHttp2E2ETest {
             .build(), HttpResponse.BodyHandlers.ofString());
         assertEquals(HttpResponseStatus.OK.code(), response.statusCode());
 
-        final var json = new JSONObject(response.body(), JSON_PARSER_CONFIGURATION);
+        final var json = new JSONObject(response.body(), jsonParserConfiguration());
         final var streamName = json.getJSONObject("sal-remote:output").getString("stream-name");
         assertNotNull(streamName, "Stream name is undefined");
 
