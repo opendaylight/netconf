@@ -183,7 +183,7 @@ abstract class AbstractHttp2E2ETest extends AbstractE2ETest {
     }
 
     protected URI createUri(final String path) throws URISyntaxException {
-        return new URI("http://" + host + path);
+        return new URI("http://" + host() + path);
     }
 
     private static Map<String, List<String>> normalizeHeaders(final HttpResponse<String> response) {
