@@ -47,7 +47,7 @@ class AuthHttp3Test extends AbstractHttp3E2ETest {
     @MethodSource("targets")
     void unauthorized(final String uri) throws Exception {
         // Setup client without authorization
-        final var clientNoAuth = new Http3NettyTestClient(localAddress, port);
+        final var clientNoAuth = new Http3NettyTestClient(localAddress(), port());
 
         // Send request with incorrect credentials in authorization header
         final var request = HttpRequest.newBuilder()
@@ -79,7 +79,7 @@ class AuthHttp3Test extends AbstractHttp3E2ETest {
     @Test
     void testStreamUnauthorized() throws Exception {
         // Setup client without authorization
-        final var clientNoAuth = new Http3NettyTestClient(localAddress, port);
+        final var clientNoAuth = new Http3NettyTestClient(localAddress(), port());
 
         // Send request with incorrect credentials in authorization header
         final var request = HttpRequest.newBuilder()

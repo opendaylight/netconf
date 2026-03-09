@@ -42,7 +42,7 @@ class AuthTest extends AbstractE2ETest {
     @MethodSource("targets")
     void unauthorized(final String uri) throws Exception {
         final var request = buildRequest(HttpMethod.GET, uri, APPLICATION_JSON, null, null);
-        final var response = invokeRequest(request, invalidClientStackGrouping);
+        final var response = invokeRequest(request, invalidClientStackGrouping());
         assertResponse(response, HttpResponseStatus.UNAUTHORIZED);
     }
 
@@ -63,7 +63,7 @@ class AuthTest extends AbstractE2ETest {
         final var request = buildRequest(HttpMethod.GET,
             "/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream=" + stream,
             APPLICATION_JSON, null, null);
-        final var response = invokeRequest(request, invalidClientStackGrouping);
+        final var response = invokeRequest(request, invalidClientStackGrouping());
         assertResponse(response, HttpResponseStatus.UNAUTHORIZED);
     }
 
