@@ -136,15 +136,9 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
      */
     protected static final String TOASTER_OLD_REV = "2009-11-19";
 
-    protected static String localAddress;
-    protected static BootstrapFactory bootstrapFactory;
-    protected static SSHTransportStackFactory sshTransportStackFactory;
-
-    protected HttpClientStackGrouping clientStackGrouping;
-    protected DOMMountPointService domMountPointService;
-    protected RpcProviderService rpcProviderService;
-    protected String host;
-    protected int port;
+    private static String localAddress;
+    private static BootstrapFactory bootstrapFactory;
+    private static SSHTransportStackFactory sshTransportStackFactory;
 
     @TempDir
     private File tmpDir;
@@ -153,6 +147,11 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
     private DOMNotificationRouter domNotificationRouter;
     private MdsalRestconfStreamRegistry streamRegistry;
     private HttpServerListenStackGrouping serverStackGrouping;
+    private HttpClientStackGrouping clientStackGrouping;
+    private DOMMountPointService domMountPointService;
+    private RpcProviderService rpcProviderService;
+    private String host;
+    private int port;
 
     @BeforeAll
     static void beforeAll() {
@@ -250,6 +249,33 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
     static void afterAll() {
         bootstrapFactory.close();
         sshTransportStackFactory.close();
+    }
+
+    /**
+     * Return the localAddress.
+     *
+     * @return the localAddress
+     */
+    protected static String localAddress() {
+        return localAddress;
+    }
+
+    /**
+     * Return the host.
+     *
+     * @return the host
+     */
+    protected final String host() {
+        return host;
+    }
+
+    /**
+     * Return the port.
+     *
+     * @return the port
+     */
+    protected final int port() {
+        return port;
     }
 
     protected Transport createTransport() {
