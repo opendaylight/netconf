@@ -98,7 +98,7 @@ class MountPointDocumentHttp3Test extends AbstractOpenApiHttp3Test {
 
         assertEquals(HttpResponseStatus.OK, response.status());
         final var resultDoc = response.content();
-        JSONAssert.assertEquals(fillPort(expectedJson, port, "https"), resultDoc, JSONCompareMode.NON_EXTENSIBLE);
+        JSONAssert.assertEquals(fillPort(expectedJson, port(), "https"), resultDoc, JSONCompareMode.NON_EXTENSIBLE);
     }
 
     private static Stream<Arguments> getMountDocByModuleTest() {
