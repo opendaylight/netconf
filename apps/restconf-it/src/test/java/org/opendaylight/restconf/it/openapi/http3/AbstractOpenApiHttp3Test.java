@@ -83,7 +83,7 @@ public class AbstractOpenApiHttp3Test extends AbstractOpenApiTest {
         super.beforeEach();
 
         // Setup HTTP/3 client
-        client = new Http3NettyTestClient(localAddress, port, USERNAME, PASSWORD);
+        client = new Http3NettyTestClient(localAddress(), port(), USERNAME, PASSWORD);
     }
 
     @AfterEach
@@ -99,27 +99,27 @@ public class AbstractOpenApiHttp3Test extends AbstractOpenApiTest {
 
     @Override
     protected Transport createTransport() {
-        return HTTPServerOverTls.of(localAddress, port, certificate, privateKey);
+        return HTTPServerOverTls.of(localAddress(), port(), certificate, privateKey);
     }
 
     @Override
     protected NettyEndpointConfiguration createEndpointConfiguration() {
         return new NettyEndpointConfiguration(ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO,
             Uint32.valueOf(1000), RESTS, MessageEncoding.JSON, serverStackGrouping(), CHUNK_SIZE, FRAME_SIZE,
-            ALT_SVC_HEADER, localAddress, port, certificate, privateKey, HTTP3_ALT_SVC_MAX_AGE_SECONDS,
+            ALT_SVC_HEADER, localAddress(), port(), certificate, privateKey, HTTP3_ALT_SVC_MAX_AGE_SECONDS,
             HTTP3_INITIAL_MAX_DATA, HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE,
             HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
     }
 
     protected URI createApiUri(final String path) throws URISyntaxException {
-        return new URI("https://" + host + API_V3_PATH + path);
+        return new URI("https://" + host() + API_V3_PATH + path);
     }
 
     @Override
     protected void assertContentJson(final String getRequestUri, final String expectedContent) throws Exception {
         final var response = client.send(HttpRequest.newBuilder()
             .GET()
-            .uri(new URI("https://" + host + getRequestUri))
+            .uri(new URI("https://" + host() + getRequestUri))
             .build());
         assertEquals(HttpResponseStatus.OK, response.status());
         final var content = response.content();
@@ -151,9 +151,9 @@ public class AbstractOpenApiHttp3Test extends AbstractOpenApiTest {
                    }
                }]
             }
-            """.formatted(localAddress, devicePort, DEVICE_USERNAME, DEVICE_PASSWORD);
+            """.formatted(localAddress(), devicePort, DEVICE_USERNAME, DEVICE_PASSWORD);
         final var response = client.send(HttpRequest.newBuilder()
-            .uri(new URI("https://" + host + TOPOLOGY_URI))
+            .uri(new URI("https://" + host() + TOPOLOGY_URI))
             .POST(HttpRequest.BodyPublishers.ofString(input))
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
             .build());
@@ -165,7 +165,7 @@ public class AbstractOpenApiHttp3Test extends AbstractOpenApiTest {
 
     private boolean deviceConnectedJson() throws Exception {
         final var response = client.send(HttpRequest.newBuilder()
-            .uri(new URI("https://" + host + DEVICE_STATUS_URI))
+            .uri(new URI("https://" + host() + DEVICE_STATUS_URI))
             .GET()
             .build());
 
