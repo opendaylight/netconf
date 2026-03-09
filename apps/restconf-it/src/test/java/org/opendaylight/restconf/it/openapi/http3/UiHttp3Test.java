@@ -31,7 +31,7 @@ class UiHttp3Test extends AbstractOpenApiHttp3Test {
         final var location = Optional.ofNullable(response.headers().get("location")).orElseThrow();
 
         response = client().send(HttpRequest.newBuilder()
-            .uri(new URI("https://" + host + location))
+            .uri(new URI("https://" + host() + location))
             .GET()
             .header("accept", TEXT_HTML)
             .build());
