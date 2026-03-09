@@ -71,7 +71,7 @@ class BenchmarkOpenApiIT extends AbstractOpenApiTest {
         // Due to size of the response, we discard the body.
         final var headers = client.send(HttpRequest.newBuilder()
             .GET()
-            .uri(new URI("http://" + host + API_V3_PATH + "/mounts/1"))
+            .uri(new URI("http://" + host() + API_V3_PATH + "/mounts/1"))
             .timeout(Duration.ofMinutes(5))
             .build(), HttpResponse.BodyHandlers.discarding());
         assertEquals(200, headers.statusCode());
@@ -79,7 +79,7 @@ class BenchmarkOpenApiIT extends AbstractOpenApiTest {
 
         final var response = client.send(HttpRequest.newBuilder()
             .GET()
-            .uri(new URI("http://" + host + API_V3_PATH + "/mounts/1?depth=1&width=1"))
+            .uri(new URI("http://" + host() + API_V3_PATH + "/mounts/1?depth=1&width=1"))
             .build(), HttpResponse.BodyHandlers.ofString());
         assertEquals(200, response.statusCode());
         // The response is still too large for whole comparison, so just check some random rpc, to verify the data
