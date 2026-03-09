@@ -18,25 +18,12 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class StreamsE2ETest extends AbstractE2ETest {
-    @Override
-    @AfterEach
-    protected void afterEach() throws Exception {
-        if (clientStreamService != null) {
-            clientStreamService = null;
-        }
-        if (streamControl != null) {
-            streamControl = null;
-        }
-        super.afterEach();
-    }
-
     // FIXME: NETCONF-1590, disable replay and enable the test
     @Disabled
     @Test
@@ -166,7 +153,7 @@ class StreamsE2ETest extends AbstractE2ETest {
                 }""", eventListener.readNext(), JSONCompareMode.LENIENT);
 
             // terminate stream
-            streamControl.close();
+            streamControl().close();
             await().atMost(Duration.ofSeconds(1)).until(eventListener::ended);
 
         } finally {
