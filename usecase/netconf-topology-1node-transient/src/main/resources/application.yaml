@@ -12,3 +12,7 @@ inmemory-datastore:
     max-data-change-listener-queue-size: 1000
     max-data-store-executor-queue-size: 5000
     debug-transaction: false
+
+cluster-datastore-broker:
+  max-data-broker-future-callback-queue-size: 1000
+  max-data-broker-future-callback-pool-size: 20
