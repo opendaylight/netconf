@@ -11,6 +11,7 @@
 module org.opendaylight.netconf.dagger {
     exports org.opendaylight.netconf.dagger.springboot.config;
     exports org.opendaylight.netconf.dagger.mdsal;
+    exports org.opendaylight.netconf.dagger.controller;
 
     uses org.opendaylight.yangtools.binding.meta.YangModelBindingProvider;
 
@@ -18,6 +19,7 @@ module org.opendaylight.netconf.dagger {
 
     requires transitive org.opendaylight.odlparent.dagger;
     requires mdsal.dom.inmemory.datastore;
+    requires sal.distributed.datastore;
     requires spring.beans;
     requires spring.boot;
     requires spring.context;
