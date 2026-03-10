@@ -11,8 +11,11 @@ import jakarta.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
@@ -52,6 +55,23 @@ public final class SpringbootConfigLoader implements ConfigLoader {
         return new Binder(ConfigurationPropertySources.from(environment.getPropertySources()))
             .bind(prefix, expectedClass)
             .orElseThrow(() -> new IllegalStateException("Configuration property not found with prefix: " + prefix));
+    }
+
+    @Override
+    public Map<String, Object> getConfigPropertiesMap(final Path filePath) {
+        final var resource = resolveResource(filePath);
+        final var fileName = filePath.getFileName().toString().toLowerCase(Locale.ROOT);
+        final var propertiesMap = new HashMap<String, Object>();
+        try (var inputStream = resource.getInputStream()) {
+            final var props = new Properties();
+            props.load(inputStream);
+            for (final var key : props.stringPropertyNames()) {
+                propertiesMap.put(key, props.getProperty(key));
+            }
+        } catch (IOException ex) {
+            throw new IllegalStateException("Failed to load properties map configuration from " + fileName, ex);
+        }
+        return propertiesMap;
     }
 
     private static Resource resolveResource(final Path filePath) {
