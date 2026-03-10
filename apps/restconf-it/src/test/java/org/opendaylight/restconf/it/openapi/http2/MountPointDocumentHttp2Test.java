@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -65,11 +64,9 @@ class MountPointDocumentHttp2Test extends AbstractOpenApiHttp2Test {
         super.afterEach();
     }
 
-    // FIXME NETCONF-1566: Fails because of HTTPClient maximum content length limitation. Enable after fix.
     /**
      * Tests the swagger document that is result of the call to the '/mounts/1' endpoint.
      */
-    @Disabled
     @Test
     void getMountDocTest() throws Exception {
         final var expectedJson = getExpectedDoc("openapi-documents/device-all.json");
@@ -83,7 +80,7 @@ class MountPointDocumentHttp2Test extends AbstractOpenApiHttp2Test {
         assertEquals(HttpClient.Version.HTTP_2, response.version());
 
         final var resultDoc = response.body();
-        JSONAssert.assertEquals(expectedJson, resultDoc, JSONCompareMode.NON_EXTENSIBLE);
+        JSONAssert.assertEquals(fillPort(expectedJson, port()), resultDoc, JSONCompareMode.NON_EXTENSIBLE);
     }
 
     /**
