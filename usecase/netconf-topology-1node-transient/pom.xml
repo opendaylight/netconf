@@ -33,6 +33,11 @@
             <artifactId>error_prone_annotations</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <!-- Kept in compile scope to satisfy module-info.java 'requires' directive. Ignore test-only warning. -->
+        </dependency>
+        <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
             <scope>provided</scope>
@@ -46,6 +51,10 @@
         <dependency>
             <groupId>org.eclipse.jdt</groupId>
             <artifactId>org.eclipse.jdt.annotation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.controller</groupId>
+            <artifactId>sal-distributed-datastore</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
@@ -106,7 +115,6 @@
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-parser-api</artifactId>
-            <!-- This does not have test scope due to requirement from module-info -->
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
@@ -186,6 +194,11 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-common</artifactId>
+            <!-- Kept in compile scope to satisfy module-info.java 'requires' directive. Ignore test-only warning. -->
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-model-api</artifactId>
         </dependency>
         <dependency>
@@ -199,7 +212,7 @@
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-parser-spi</artifactId>
-            <!-- This does not have test scope due to requirement from module-info -->
+            <!-- Kept in compile scope to satisfy module-info.java 'requires' directive. Ignore test-only warning. -->
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
@@ -208,6 +221,7 @@
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-xpath-api</artifactId>
+            <!-- Kept in compile scope to satisfy module-info.java 'requires' directive. Ignore test-only warning. -->
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
@@ -235,6 +249,11 @@
             <optional>true</optional>
         </dependency>
 
+        <dependency>
+            <groupId>org.opendaylight.controller.samples</groupId>
+            <artifactId>sample-toaster</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc6241</artifactId>
