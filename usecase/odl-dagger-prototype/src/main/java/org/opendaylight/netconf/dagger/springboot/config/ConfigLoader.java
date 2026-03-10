@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.dagger.springboot.config;
 
 import java.nio.file.Path;
+import java.util.Map;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
@@ -29,4 +30,14 @@ public interface ConfigLoader {
      * @throws IllegalStateException if the configuration file cannot be found, read, or bound to the class
      */
     <T> T getConfig(Class<T> expectedClass, String prefix, Path filePath);
+
+    /**
+     * Loads configuration properties from an external file or classpath resource and maps them into a {@link Map}
+     * with String keys and Object values.
+     *
+     * @param filePath Path of the configuration file.
+     * @return {@link Map} populated with the loaded configuration properties.
+     * @throws IllegalStateException if the configuration file cannot be found, read, or parsed.
+     */
+    Map<String, Object> getConfigPropertiesMap(Path filePath);
 }
