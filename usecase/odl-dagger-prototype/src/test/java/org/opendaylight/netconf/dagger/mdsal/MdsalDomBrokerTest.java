@@ -44,6 +44,7 @@ class MdsalDomBrokerTest {
         assertNotNull(component.modelContext(), "Model context should be initialized");
         assertNotNull(component.clusterSingletonServiceProvider(), "Cluster provided should be initialized");
         assertNotNull(component.entityOwnershipService(), "Entity ownership should be initialized");
+        assertNotNull(component.dataBroker(), "Data broker should be initialized");
     }
 
     @Test
@@ -59,14 +60,16 @@ class MdsalDomBrokerTest {
         final var modelContext = component.modelContext();
         final var classPathModels = modelContext.getModules();
         assertThat(classPathModels)
-            .hasSize(4)
+            .hasSize(6)
             .extracting(ModuleLike::getSourceIdentifier)
             .extracting(SourceIdentifier::toYangFilename)
             .containsExactlyInAnyOrder(
                 "ietf-inet-types@2013-07-15.yang",
                 "ietf-netconf@2011-06-01.yang",
                 "odl-codegen-extensions@2024-06-27.yang",
-                "odl-general-entity@2015-09-30.yang"
+                "odl-general-entity@2015-09-30.yang",
+                "distributed-datastore-provider@2025-01-30.yang",
+                "odl-controller-cds-types@2025-01-31.yang"
             );
 
     }
