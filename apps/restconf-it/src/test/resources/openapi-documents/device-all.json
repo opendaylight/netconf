@@ -11,6 +11,493 @@
     }
   ],
   "paths": {
+    "/rests/operations/network-topology/topology=topology-netconf/node=device-sim/yang-ext:mount/ietf-netconf:get-config": {
+      "post": {
+        "description": "Retrieve all or part of a specified configuration.",
+        "summary": "POST - device-sim - ietf-netconf - get-config",
+        "requestBody": {
+          "description": "get-config_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/ietf-netconf_get-config_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/ietf-netconf_get-config_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RPC get-config success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ietf-netconf_get-config_output"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ietf-netconf_get-config_output"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "device-sim ietf-netconf"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/network-topology/topology=topology-netconf/node=device-sim/yang-ext:mount/ietf-netconf:edit-config": {
+      "post": {
+        "description": "The <edit-config> operation loads all or part of a specified\nconfiguration to the specified target configuration.",
+        "summary": "POST - device-sim - ietf-netconf - edit-config",
+        "requestBody": {
+          "description": "edit-config_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/ietf-netconf_edit-config_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/ietf-netconf_edit-config_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC edit-config success"
+          }
+        },
+        "tags": [
+          "device-sim ietf-netconf"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/network-topology/topology=topology-netconf/node=device-sim/yang-ext:mount/ietf-netconf:copy-config": {
+      "post": {
+        "description": "Create or replace an entire configuration datastore with the\ncontents of another complete configuration datastore.",
+        "summary": "POST - device-sim - ietf-netconf - copy-config",
+        "requestBody": {
+          "description": "copy-config_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/ietf-netconf_copy-config_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/ietf-netconf_copy-config_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC copy-config success"
+          }
+        },
+        "tags": [
+          "device-sim ietf-netconf"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/network-topology/topology=topology-netconf/node=device-sim/yang-ext:mount/ietf-netconf:delete-config": {
+      "post": {
+        "description": "Delete a configuration datastore.",
+        "summary": "POST - device-sim - ietf-netconf - delete-config",
+        "requestBody": {
+          "description": "delete-config_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/ietf-netconf_delete-config_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/ietf-netconf_delete-config_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC delete-config success"
+          }
+        },
+        "tags": [
+          "device-sim ietf-netconf"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/network-topology/topology=topology-netconf/node=device-sim/yang-ext:mount/ietf-netconf:lock": {
+      "post": {
+        "description": "The lock operation allows the client to lock the configuration\nsystem of a device.",
+        "summary": "POST - device-sim - ietf-netconf - lock",
+        "requestBody": {
+          "description": "lock_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/ietf-netconf_lock_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/ietf-netconf_lock_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC lock success"
+          }
+        },
+        "tags": [
+          "device-sim ietf-netconf"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/network-topology/topology=topology-netconf/node=device-sim/yang-ext:mount/ietf-netconf:unlock": {
+      "post": {
+        "description": "The unlock operation is used to release a configuration lock,\npreviously obtained with the 'lock' operation.",
+        "summary": "POST - device-sim - ietf-netconf - unlock",
+        "requestBody": {
+          "description": "unlock_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/ietf-netconf_unlock_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/ietf-netconf_unlock_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC unlock success"
+          }
+        },
+        "tags": [
+          "device-sim ietf-netconf"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/network-topology/topology=topology-netconf/node=device-sim/yang-ext:mount/ietf-netconf:get": {
+      "post": {
+        "description": "Retrieve running configuration and device state information.",
+        "summary": "POST - device-sim - ietf-netconf - get",
+        "requestBody": {
+          "description": "get_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/ietf-netconf_get_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/ietf-netconf_get_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RPC get success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ietf-netconf_get_output"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ietf-netconf_get_output"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "device-sim ietf-netconf"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/network-topology/topology=topology-netconf/node=device-sim/yang-ext:mount/ietf-netconf:close-session": {
+      "post": {
+        "description": "Request graceful termination of a NETCONF session.",
+        "summary": "POST - device-sim - ietf-netconf - close-session",
+        "requestBody": {
+          "description": "close-session_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "xml": {
+                  "name": "input",
+                  "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC close-session success"
+          }
+        },
+        "tags": [
+          "device-sim ietf-netconf"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/network-topology/topology=topology-netconf/node=device-sim/yang-ext:mount/ietf-netconf:kill-session": {
+      "post": {
+        "description": "Force the termination of a NETCONF session.",
+        "summary": "POST - device-sim - ietf-netconf - kill-session",
+        "requestBody": {
+          "description": "kill-session_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/ietf-netconf_kill-session_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/ietf-netconf_kill-session_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC kill-session success"
+          }
+        },
+        "tags": [
+          "device-sim ietf-netconf"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/network-topology/topology=topology-netconf/node=device-sim/yang-ext:mount/ietf-netconf:commit": {
+      "post": {
+        "description": "Commit the candidate configuration as the device's new\ncurrent configuration.",
+        "summary": "POST - device-sim - ietf-netconf - commit",
+        "requestBody": {
+          "description": "commit_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/ietf-netconf_commit_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/ietf-netconf_commit_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC commit success"
+          }
+        },
+        "tags": [
+          "device-sim ietf-netconf"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/network-topology/topology=topology-netconf/node=device-sim/yang-ext:mount/ietf-netconf:discard-changes": {
+      "post": {
+        "description": "Revert the candidate configuration to the current\nrunning configuration.",
+        "summary": "POST - device-sim - ietf-netconf - discard-changes",
+        "requestBody": {
+          "description": "discard-changes_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "xml": {
+                  "name": "input",
+                  "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC discard-changes success"
+          }
+        },
+        "tags": [
+          "device-sim ietf-netconf"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/network-topology/topology=topology-netconf/node=device-sim/yang-ext:mount/ietf-netconf:cancel-commit": {
+      "post": {
+        "description": "This operation is used to cancel an ongoing confirmed commit.\nIf the confirmed commit is persistent, the parameter\n'persist-id' must be given, and it must match the value of the\n'persist' parameter.",
+        "summary": "POST - device-sim - ietf-netconf - cancel-commit",
+        "requestBody": {
+          "description": "cancel-commit_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/ietf-netconf_cancel-commit_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/ietf-netconf_cancel-commit_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC cancel-commit success"
+          }
+        },
+        "tags": [
+          "device-sim ietf-netconf"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/network-topology/topology=topology-netconf/node=device-sim/yang-ext:mount/ietf-netconf:validate": {
+      "post": {
+        "description": "Validates the contents of the specified configuration.",
+        "summary": "POST - device-sim - ietf-netconf - validate",
+        "requestBody": {
+          "description": "validate_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/ietf-netconf_validate_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/ietf-netconf_validate_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC validate success"
+          }
+        },
+        "tags": [
+          "device-sim ietf-netconf"
+        ],
+        "parameters": []
+      }
+    },
     "/rests/operations/network-topology/topology=topology-netconf/node=device-sim/yang-ext:mount/ietf-netconf-monitoring:get-schema": {
       "post": {
         "description": "This operation is used to retrieve a schema from the\nNETCONF server.\n\nPositive Response:\nThe NETCONF server returns the requested schema.\n\nNegative Response:\nIf requested schema does not exist, the <error-tag> is\n'invalid-value'.\n\nIf more than one schema matches the requested parameters, the\n<error-tag> is 'operation-failed', and <error-app-tag> is\n'data-not-unique'.",
@@ -937,6 +1424,395 @@
   },
   "components": {
     "schemas": {
+      "ietf-netconf_get-config_input": {
+        "title": "ietf-netconf_get-config_input",
+        "type": "object",
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/ietf-netconf_source"
+          },
+          "filter": {
+            "description": "Subtree or XPath filter to use. (This is unknown data, need to be filled by user.)",
+            "example": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "source"
+        ],
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_source": {
+        "title": "ietf-netconf_source",
+        "type": "object",
+        "description": "Particular configuration to retrieve.",
+        "properties": {
+          "candidate": {
+            "description": "The candidate configuration is the config source.",
+            "type": "object"
+          }
+        },
+        "xml": {
+          "name": "source",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_get-config_output": {
+        "title": "ietf-netconf_get-config_output",
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Copy of the source datastore subset that matched\nthe filter criteria (if any).  An empty data container\nindicates that the request did not produce any results. (This is unknown data, need to be filled by user.)",
+            "example": {},
+            "type": "object"
+          }
+        },
+        "xml": {
+          "name": "output",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_edit-config_input": {
+        "title": "ietf-netconf_edit-config_input",
+        "type": "object",
+        "properties": {
+          "target": {
+            "$ref": "#/components/schemas/ietf-netconf_target"
+          },
+          "default-operation": {
+            "description": "The default operation to use.",
+            "type": "string",
+            "enum": [
+              "merge",
+              "replace",
+              "none"
+            ],
+            "default": "merge",
+            "example": "merge"
+          },
+          "test-option": {
+            "description": "The test option to use.",
+            "type": "string",
+            "enum": [
+              "test-then-set",
+              "set",
+              "test-only"
+            ],
+            "default": "test-then-set",
+            "example": "test-then-set"
+          },
+          "error-option": {
+            "description": "The error option to use.",
+            "type": "string",
+            "enum": [
+              "stop-on-error",
+              "continue-on-error",
+              "rollback-on-error"
+            ],
+            "default": "stop-on-error",
+            "example": "stop-on-error"
+          },
+          "config": {
+            "description": "Inline Config content. (This is unknown data, need to be filled by user.)",
+            "example": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "target"
+        ],
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_target": {
+        "title": "ietf-netconf_target",
+        "type": "object",
+        "description": "Particular configuration to edit.",
+        "properties": {
+          "candidate": {
+            "description": "The candidate configuration is the config target.",
+            "type": "object"
+          }
+        },
+        "xml": {
+          "name": "target",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_copy-config_input": {
+        "title": "ietf-netconf_copy-config_input",
+        "type": "object",
+        "properties": {
+          "target": {
+            "$ref": "#/components/schemas/ietf-netconf_target1"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ietf-netconf_source1"
+          }
+        },
+        "required": [
+          "target",
+          "source"
+        ],
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_target1": {
+        "title": "ietf-netconf_target",
+        "type": "object",
+        "description": "Particular configuration to copy to.",
+        "properties": {
+          "candidate": {
+            "description": "The candidate configuration is the config target.",
+            "type": "object"
+          }
+        },
+        "xml": {
+          "name": "target",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_source1": {
+        "title": "ietf-netconf_source",
+        "type": "object",
+        "description": "Particular configuration to copy from.",
+        "properties": {
+          "candidate": {
+            "description": "The candidate configuration is the config source.",
+            "type": "object"
+          }
+        },
+        "xml": {
+          "name": "source",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_delete-config_input": {
+        "title": "ietf-netconf_delete-config_input",
+        "type": "object",
+        "properties": {
+          "target": {
+            "$ref": "#/components/schemas/ietf-netconf_target2"
+          }
+        },
+        "required": [
+          "target"
+        ],
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_target2": {
+        "title": "ietf-netconf_target",
+        "type": "object",
+        "description": "Particular configuration to delete.",
+        "properties": {
+          "startup": {
+            "description": "The startup configuration is the config target.",
+            "type": "object"
+          }
+        },
+        "xml": {
+          "name": "target",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_lock_input": {
+        "title": "ietf-netconf_lock_input",
+        "type": "object",
+        "properties": {
+          "target": {
+            "$ref": "#/components/schemas/ietf-netconf_target3"
+          }
+        },
+        "required": [
+          "target"
+        ],
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_target3": {
+        "title": "ietf-netconf_target",
+        "type": "object",
+        "description": "Particular configuration to lock.",
+        "properties": {
+          "candidate": {
+            "description": "The candidate configuration is the config target.",
+            "type": "object"
+          }
+        },
+        "xml": {
+          "name": "target",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_unlock_input": {
+        "title": "ietf-netconf_unlock_input",
+        "type": "object",
+        "properties": {
+          "target": {
+            "$ref": "#/components/schemas/ietf-netconf_target4"
+          }
+        },
+        "required": [
+          "target"
+        ],
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_target4": {
+        "title": "ietf-netconf_target",
+        "type": "object",
+        "description": "Particular configuration to unlock.",
+        "properties": {
+          "candidate": {
+            "description": "The candidate configuration is the config target.",
+            "type": "object"
+          }
+        },
+        "xml": {
+          "name": "target",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_get_input": {
+        "title": "ietf-netconf_get_input",
+        "type": "object",
+        "properties": {
+          "filter": {
+            "description": "This parameter specifies the portion of the system\nconfiguration and state data to retrieve. (This is unknown data, need to be filled by user.)",
+            "example": {},
+            "type": "object"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_get_output": {
+        "title": "ietf-netconf_get_output",
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Copy of the running datastore subset and/or state\ndata that matched the filter criteria (if any).\nAn empty data container indicates that the request did not\nproduce any results. (This is unknown data, need to be filled by user.)",
+            "example": {},
+            "type": "object"
+          }
+        },
+        "xml": {
+          "name": "output",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_kill-session_input": {
+        "title": "ietf-netconf_kill-session_input",
+        "type": "object",
+        "properties": {
+          "session-id": {
+            "description": "Particular session to kill.",
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          }
+        },
+        "required": [
+          "session-id"
+        ],
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_commit_input": {
+        "title": "ietf-netconf_commit_input",
+        "type": "object",
+        "properties": {
+          "confirmed": {
+            "description": "Requests a confirmed commit.",
+            "type": "object"
+          },
+          "confirm-timeout": {
+            "description": "The timeout interval for a confirmed commit.",
+            "type": "integer",
+            "format": "int64",
+            "default": 600,
+            "example": 1
+          },
+          "persist": {
+            "description": "This parameter is used to make a confirmed commit\npersistent.  A persistent confirmed commit is not aborted\nif the NETCONF session terminates.  The only way to abort\na persistent confirmed commit is to let the timer expire,\nor to use the <cancel-commit> operation.\n\nThe value of this parameter is a token that must be given\nin the 'persist-id' parameter of <commit> or\n<cancel-commit> operations in order to confirm or cancel\nthe persistent confirmed commit.\n\nThe token should be a random string.",
+            "type": "string",
+            "example": "Some persist"
+          },
+          "persist-id": {
+            "description": "This parameter is given in order to commit a persistent\nconfirmed commit.  The value must be equal to the value\ngiven in the 'persist' parameter to the <commit> operation.\nIf it does not match, the operation fails with an\n'invalid-value' error.",
+            "type": "string",
+            "example": "Some persist-id"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_cancel-commit_input": {
+        "title": "ietf-netconf_cancel-commit_input",
+        "type": "object",
+        "properties": {
+          "persist-id": {
+            "description": "This parameter is given in order to cancel a persistent\nconfirmed commit.  The value must be equal to the value\ngiven in the 'persist' parameter to the <commit> operation.\nIf it does not match, the operation fails with an\n'invalid-value' error.",
+            "type": "string",
+            "example": "Some persist-id"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_validate_input": {
+        "title": "ietf-netconf_validate_input",
+        "type": "object",
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/ietf-netconf_source2"
+          }
+        },
+        "required": [
+          "source"
+        ],
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
+      "ietf-netconf_source2": {
+        "title": "ietf-netconf_source",
+        "type": "object",
+        "description": "Particular configuration to validate.",
+        "properties": {
+          "candidate": {
+            "description": "The candidate configuration is the config source.",
+            "type": "object"
+          }
+        },
+        "xml": {
+          "name": "source",
+          "namespace": "urn:ietf:params:xml:ns:netconf:base:1.0"
+        }
+      },
       "ietf-netconf-monitoring_get-schema_input": {
         "title": "ietf-netconf-monitoring_get-schema_input",
         "type": "object",
