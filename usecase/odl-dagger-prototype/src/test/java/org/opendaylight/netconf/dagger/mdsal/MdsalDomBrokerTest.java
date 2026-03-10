@@ -8,19 +8,32 @@
 package org.opendaylight.netconf.dagger.mdsal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.DisplayString;
+import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.Toaster;
+import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.Toaster.ToasterStatus;
+import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterBuilder;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.model.api.ModuleLike;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 
 class MdsalDomBrokerTest {
+    private static final DataObjectIdentifier<Toaster>
+        TOASTER_DOI = DataObjectIdentifier.builder(Toaster.class).build();
     private MdsalDomBrokerTestFactory component;
 
     @BeforeEach
@@ -44,6 +57,48 @@ class MdsalDomBrokerTest {
         assertNotNull(component.modelContext(), "Model context should be initialized");
         assertNotNull(component.clusterSingletonServiceProvider(), "Cluster provided should be initialized");
         assertNotNull(component.entityOwnershipService(), "Entity ownership should be initialized");
+        assertNotNull(component.dataBroker(), "Data broker should be initialized");
+    }
+
+    @Test
+    void testReadWriteOnDataBroker() throws Exception {
+        final var dataBroker = component.dataBroker();
+        final var toasterOperData = new ToasterBuilder()
+            .setToasterManufacturer(new DisplayString("testManu"))
+            .setToasterModelNumber(new DisplayString("TestModel"))
+            .setToasterStatus(ToasterStatus.Up)
+            .setDarknessFactor(Uint32.TEN)
+            .build();
+
+        // Write operational data.
+        final var operWriteTransaction = dataBroker.newWriteOnlyTransaction();
+        operWriteTransaction.put(LogicalDatastoreType.OPERATIONAL, TOASTER_DOI, toasterOperData);
+        operWriteTransaction.commit().get(2, TimeUnit.SECONDS);
+
+        // Verify the read data matches the written data.
+        try (var readTransaction = dataBroker.newReadOnlyTransaction()) {
+            final var toastOperational = readTransaction.read(LogicalDatastoreType.OPERATIONAL, TOASTER_DOI)
+                .get(2, TimeUnit.SECONDS)
+                .orElseThrow();
+            assertEquals(toasterOperData, toastOperational);
+        }
+
+        // Write configuration data.
+        final var toasterConfigData = new ToasterBuilder()
+            .setDarknessFactor(Uint32.ONE)
+            .build();
+
+        final var configWriteTransaction = dataBroker.newWriteOnlyTransaction();
+        configWriteTransaction.put(LogicalDatastoreType.CONFIGURATION, TOASTER_DOI, toasterConfigData);
+        configWriteTransaction.commit().get(2, TimeUnit.SECONDS);
+
+        // Verify the read data matches the written data.
+        try (var readTransaction = dataBroker.newReadOnlyTransaction()) {
+            final var toastConfig = readTransaction.read(LogicalDatastoreType.CONFIGURATION, TOASTER_DOI)
+                    .get(2, TimeUnit.SECONDS)
+                    .orElseThrow();
+            assertEquals(toasterConfigData, toastConfig);
+        }
     }
 
     @Test
@@ -59,14 +114,17 @@ class MdsalDomBrokerTest {
         final var modelContext = component.modelContext();
         final var classPathModels = modelContext.getModules();
         assertThat(classPathModels)
-            .hasSize(4)
+            .hasSize(7)
             .extracting(ModuleLike::getSourceIdentifier)
             .extracting(SourceIdentifier::toYangFilename)
             .containsExactlyInAnyOrder(
                 "ietf-inet-types@2013-07-15.yang",
                 "ietf-netconf@2011-06-01.yang",
                 "odl-codegen-extensions@2024-06-27.yang",
-                "odl-general-entity@2015-09-30.yang"
+                "odl-general-entity@2015-09-30.yang",
+                "distributed-datastore-provider@2025-01-30.yang",
+                "odl-controller-cds-types@2025-01-31.yang",
+                "toaster@2009-11-20.yang"
             );
 
     }
