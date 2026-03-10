@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.dagger.springboot.config;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.file.Path;
@@ -28,6 +29,7 @@ class SpringbootConfigLoaderTest {
     private static final Path YAML_CONFIG = Path.of("config.yaml");
     private static final Path ALFA_JP_CONFIG = Path.of("config/alfa.cfg");
     private static final Path BETA_JP_CONFIG = Path.of("resource.beta.cfg");
+    private static final Path DATASTORE_CONFIG = Path.of("datastore.cfg");
 
     private final ConfigLoader configLoader = new SpringbootConfigLoader();
 
@@ -57,6 +59,17 @@ class SpringbootConfigLoaderTest {
         assertEquals(HTTP2_MAX_FRAME_SIZE, betaConfig.http2MaxFrameSize);
         assertEquals(TLS_CERTIFICATE, betaConfig.tlsCertificate);
         assertEquals(TLS_PRIVATE_KEY, betaConfig.tlsPrivateKey);
+    }
+
+    @Test
+    void loadPropertiesMapTest() {
+        final var configPropertiesMap = configLoader.getConfigPropertiesMap(DATASTORE_CONFIG);
+        assertThat(configPropertiesMap)
+            .hasSize(4)
+            .containsEntry("shard-election-timeout-factor", "20")
+            .containsEntry("shard-leader-election-timeout-in-seconds", "30")
+            .containsEntry("operational.persistent", "false")
+            .containsEntry("shard-transaction-commit-timeout-in-seconds", "30");
     }
 
     @ConfigurationProperties("resource.alfa")
