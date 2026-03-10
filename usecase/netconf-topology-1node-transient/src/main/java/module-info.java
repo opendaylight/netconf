@@ -9,6 +9,7 @@
  * Dagger prototype for the RNC standalone transient applications, built from daggerized ODL components.
  */
 module org.opendaylight.netconf.dagger {
+    exports org.opendaylight.netconf.dagger.controller;
     exports org.opendaylight.netconf.dagger.mdsal;
     exports org.opendaylight.netconf.dagger.springboot.config;
 
@@ -45,6 +46,7 @@ module org.opendaylight.netconf.dagger {
     requires org.opendaylight.mdsal.eos.dom.api;
     requires org.opendaylight.mdsal.eos.dom.simple;
     requires org.opendaylight.mdsal.singleton.impl;
+    requires sal.distributed.datastore;
     requires spring.beans;
     requires spring.context;
     requires spring.core;
