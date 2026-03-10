@@ -11,15 +11,20 @@
 module org.opendaylight.netconf.dagger {
     exports org.opendaylight.netconf.dagger.springboot.config;
     exports org.opendaylight.netconf.dagger.mdsal;
+    exports org.opendaylight.netconf.dagger.controller;
 
+    uses org.opendaylight.raft.spi.RaftPolicy;
     uses org.opendaylight.yangtools.binding.meta.YangModelBindingProvider;
 
     opens org.opendaylight.netconf.dagger.springboot.config to spring.core, spring.beans;
 
     requires transitive org.opendaylight.odlparent.dagger;
+    requires sal.distributed.datastore;
     requires spring.beans;
     requires spring.boot;
     requires spring.core;
+    requires org.opendaylight.controller.cluster.commons;
+    requires org.opendaylight.controller.repackaged.pekko;
     requires org.opendaylight.mdsal.binding.dom.adapter;
     requires org.opendaylight.mdsal.dom.api;
     requires org.opendaylight.mdsal.dom.broker;
@@ -28,6 +33,7 @@ module org.opendaylight.netconf.dagger {
     requires org.opendaylight.mdsal.eos.dom.simple;
     requires org.opendaylight.mdsal.singleton.api;
     requires org.opendaylight.mdsal.singleton.impl;
+    requires org.opendaylight.raft.spi;
     requires org.opendaylight.yangtools.binding.generator;
     requires org.opendaylight.yangtools.binding.runtime.spi;
     requires org.opendaylight.yangtools.odlext.parser.support;
