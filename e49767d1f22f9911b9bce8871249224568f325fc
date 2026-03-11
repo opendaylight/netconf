@@ -33,6 +33,24 @@
       "message": "TimeUnit.SECONDS looks useless here, because execution reaches it only after several unbounded blocking waits have already completed. In particular, Http3.newRequestStream(...).sync().getNow() and streamChannel.closeFuture().sync() can block indefinitely, so the request can still get stuck forever before the timeout is ever applied",
       "revId": "e49767d1f22f9911b9bce8871249224568f325fc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e7c6812_ad3a2ab5",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-11T14:57:41Z",
+      "side": 1,
+      "message": "Http3.newRequestStream(...) now use .await with 2 second timeout to create stream \nand streamChannel.closeFuture().sync() was removed and now only with this timeout we wait for response to be finished\nonly writeAndFlush stays with sync(), for test that should be fine",
+      "parentUuid": "23d34c5f_70b795dc",
+      "revId": "e49767d1f22f9911b9bce8871249224568f325fc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
