@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "767af0bd_5ca64569",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-03-11T12:41:38Z",
+      "side": 1,
+      "message": "Extra empty line",
+      "revId": "2fe7a736d6f7248c7e4140f3c152ed4b7964098a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
