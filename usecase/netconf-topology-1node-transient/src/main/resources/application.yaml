@@ -1,0 +1,14 @@
+inmemory-datastore:
+  operational:
+    max-data-change-executor-queue-size: 1000
+    max-data-change-executor-pool-size: 20
+    max-data-change-listener-queue-size: 1000
+    max-data-store-executor-queue-size: 5000
+    debug-transaction: false
+
+  configuration:
+    max-data-change-executor-queue-size: 1000
+    max-data-change-executor-pool-size: 20
+    max-data-change-listener-queue-size: 1000
+    max-data-store-executor-queue-size: 5000
+    debug-transaction: false
