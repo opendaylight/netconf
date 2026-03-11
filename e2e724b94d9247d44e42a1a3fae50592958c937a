@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5006c7ca_4a45b58a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-11T09:52:10Z",
+      "side": 1,
+      "message": "good point, @matej create a follow up task for it.",
+      "parentUuid": "d50e32d7_78bad90a",
+      "revId": "e2e724b94d9247d44e42a1a3fae50592958c937a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "43aa9a34_ccf6bd7a",
         "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
         "patchSetId": 21
