@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1cbe5307_8c95ed09",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-11T10:48:01Z",
+      "side": 1,
+      "message": "https://lf-opendaylight.atlassian.net/browse/NETCONF-1597",
+      "parentUuid": "5006c7ca_4a45b58a",
+      "revId": "e2e724b94d9247d44e42a1a3fae50592958c937a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "43aa9a34_ccf6bd7a",
@@ -66,6 +84,24 @@
       "writtenOn": "2026-03-11T09:29:19Z",
       "side": 1,
       "message": "Repeated headers can overwrite earlier values:\n`Accept: application/json`\n`Accept: application/xml`",
+      "revId": "e2e724b94d9247d44e42a1a3fae50592958c937a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93c54b5d_e6661d18",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-11T10:48:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "43aa9a34_ccf6bd7a",
       "revId": "e2e724b94d9247d44e42a1a3fae50592958c937a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
