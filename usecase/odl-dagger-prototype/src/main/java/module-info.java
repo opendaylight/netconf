@@ -17,8 +17,10 @@ module org.opendaylight.netconf.dagger {
     opens org.opendaylight.netconf.dagger.springboot.config to spring.core, spring.beans;
 
     requires transitive org.opendaylight.odlparent.dagger;
+    requires mdsal.dom.inmemory.datastore;
     requires spring.beans;
     requires spring.boot;
+    requires spring.context;
     requires spring.core;
     requires org.opendaylight.mdsal.binding.dom.adapter;
     requires org.opendaylight.mdsal.dom.api;
