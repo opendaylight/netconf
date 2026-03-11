@@ -29,4 +29,13 @@ public final class MdsalQualifiers {
     @Retention(RUNTIME)
     public @interface ClassPathYangModules {
     }
+
+    @Qualifier
+    @Retention(RUNTIME)
+    public @interface ConfigDataStore {}
+
+    @Qualifier
+    @Retention(RUNTIME)
+    public @interface OperationalDataStore {}
+
 }
