@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c43f11e2_db1b35a3",
+        "filename": "usecase/odl-dagger-prototype/src/main/java/org/opendaylight/netconf/dagger/mdsal/InMemoryDataStoreModule.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-03-11T15:04:25Z",
+      "side": 1,
+      "message": "into Map\u003cLogicalDatastoreType, DOMStore\u003e",
+      "range": {
+        "startLine": 58,
+        "startChar": 4,
+        "endLine": 58,
+        "endChar": 13
+      },
+      "revId": "31ac1e4aa918703df5266ac1bfc9b93a1dae9687",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
