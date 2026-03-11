@@ -41,10 +41,12 @@ module org.opendaylight.netconf.dagger {
     requires transitive org.opendaylight.yangtools.yang.xpath.impl;
     requires transitive org.opendaylight.yangtools.yin.source.dom;
     requires transitive spring.boot;
+    requires mdsal.dom.inmemory.datastore;
     requires org.opendaylight.mdsal.eos.dom.api;
     requires org.opendaylight.mdsal.eos.dom.simple;
     requires org.opendaylight.mdsal.singleton.impl;
     requires spring.beans;
+    requires spring.context;
     requires spring.core;
 
     requires static transitive com.google.errorprone.annotations;
