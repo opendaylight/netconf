@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "e2e724b94d9247d44e42a1a3fae50592958c937a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d50e32d7_78bad90a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-03-11T09:29:19Z",
+      "side": 1,
+      "message": "Tests do not cover the Alt-Svc:\nAlt-Svc advertisement correctness\nupgrade/discovery behaviour from an HTTP/1.1 or HTTP/2 client path\nwhether the advertised port/header matches the real endpoint",
+      "revId": "e2e724b94d9247d44e42a1a3fae50592958c937a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43aa9a34_ccf6bd7a",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-03-11T09:29:19Z",
+      "side": 1,
+      "message": "Repeated headers can overwrite earlier values:\n`Accept: application/json`\n`Accept: application/xml`",
+      "revId": "e2e724b94d9247d44e42a1a3fae50592958c937a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
