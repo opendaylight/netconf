@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d54ff9c7_49acfbfa",
+        "filename": "usecase/odl-dagger-prototype/src/main/java/module-info.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-12T14:34:26Z",
+      "side": 1,
+      "message": "[WARNING] /home/odl/projects/opendaylight/netconf/usecase/odl-dagger-prototype/src/main/java/module-info.java:[16,20] requires directive for an automatic module\n[WARNING] /home/odl/projects/opendaylight/netconf/usecase/odl-dagger-prototype/src/main/java/module-info.java:[17,20] requires directive for an automatic module",
+      "revId": "f40e76182f69d0f577ff1a89c21cbba25eada95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "94c8515d_3666af3f",
         "filename": "usecase/pom.xml",
         "patchSetId": 10
