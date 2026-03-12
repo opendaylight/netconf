@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "61347dfd_983db6c5",
+        "filename": "usecase/odl-dagger-prototype/src/main/java/module-info.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-12T14:40:49Z",
+      "side": 1,
+      "message": "we probably do not need opens as we are not using spring configuration at runtime",
+      "revId": "f40e76182f69d0f577ff1a89c21cbba25eada95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d54ff9c7_49acfbfa",
         "filename": "usecase/odl-dagger-prototype/src/main/java/module-info.java",
         "patchSetId": 10
