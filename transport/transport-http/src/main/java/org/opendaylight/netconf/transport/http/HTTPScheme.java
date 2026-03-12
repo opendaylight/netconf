@@ -90,7 +90,7 @@ public enum HTTPScheme {
      */
     private static final class AlpnUpgradeHandler extends ApplicationProtocolNegotiationHandler {
         private static final Logger LOG = LoggerFactory.getLogger(AlpnUpgradeHandler.class);
-        private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.INFO, "Alpn2To1");
+        private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.DEBUG, "Alpn2To1");
 
         private final ChannelInitializer<Channel> childChannelInit;
         private final Uint32 frameSize;
