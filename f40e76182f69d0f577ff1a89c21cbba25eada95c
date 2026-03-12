@@ -69,6 +69,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4b5e27f_71f85e76",
+        "filename": "usecase/odl-dagger-prototype/src/main/java/module-info.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-12T15:24:59Z",
+      "side": 1,
+      "message": "Its OK, spring is using: `Automatic-Module-Name: spring.core`",
+      "parentUuid": "d54ff9c7_49acfbfa",
+      "revId": "f40e76182f69d0f577ff1a89c21cbba25eada95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "94c8515d_3666af3f",
