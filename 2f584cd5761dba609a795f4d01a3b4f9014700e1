@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a3ac573e_5d46c8c9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-12T08:27:25Z",
+      "side": 1,
+      "message": "I wonder why this patch appears after clarification that we do not need dynamic configuration: https://lf-opendaylight.atlassian.net/browse/NETCONF-1569?focusedCommentId\u003d52978",
+      "parentUuid": "50a25db3_42492218",
+      "revId": "2f584cd5761dba609a795f4d01a3b4f9014700e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0d908a2e_013b4720",
         "filename": "dagger/dagger-mdsal/src/main/java/module-info.java",
         "patchSetId": 4
