@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0b24ea86_9a501cc3",
+        "filename": "usecase/odl-dagger-prototype/src/main/java/module-info.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-12T14:33:35Z",
+      "side": 1,
+      "message": "[WARNING] /home/odl/projects/opendaylight/netconf/usecase/odl-dagger-prototype/target/generated-sources/annotations/org/opendaylight/netconf/dagger/springboot/config/SpringbootConfigLoaderModule_ConfigLoaderFactory.java:[12,2] class dagger.internal.DaggerGenerated in module dagger is not indirectly exported using \u0027requires transitive\u0027\n[WARNING] /home/odl/projects/opendaylight/netconf/usecase/odl-dagger-prototype/target/generated-sources/annotations/org/opendaylight/netconf/dagger/springboot/config/SpringbootConfigLoaderModule_ConfigLoaderFactory.java:[13,2] class javax.annotation.processing.Generated in module java.compiler is not indirectly exported using \u0027requires transitive\u0027\n[WARNING] /home/odl/projects/opendaylight/netconf/usecase/odl-dagger-prototype/target/generated-sources/annotations/org/opendaylight/netconf/dagger/springboot/config/SpringbootConfigLoaderModule_ConfigLoaderFactory.java:[26,80] interface dagger.internal.Factory in module dagger is not indirectly exported using \u0027requires transitive\u0027",
+      "revId": "f40e76182f69d0f577ff1a89c21cbba25eada95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "94c8515d_3666af3f",
         "filename": "usecase/pom.xml",
         "patchSetId": 10
