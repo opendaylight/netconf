@@ -84,6 +84,24 @@
       "message": "odl- is being reserved for odl karaf features",
       "revId": "f40e76182f69d0f577ff1a89c21cbba25eada95c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50f8b00a_30818496",
+        "filename": "usecase/pom.xml",
+        "patchSetId": 10
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-03-12T15:11:05Z",
+      "side": 1,
+      "message": "\u0027netconf-topology-1node-transient\u0027 is a much better name",
+      "parentUuid": "94c8515d_3666af3f",
+      "revId": "f40e76182f69d0f577ff1a89c21cbba25eada95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
