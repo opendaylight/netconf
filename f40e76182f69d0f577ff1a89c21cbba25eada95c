@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "41a62275_2b689ff8",
+        "filename": "usecase/odl-dagger-prototype/pom.xml",
+        "patchSetId": 10
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-12T14:32:04Z",
+      "side": 1,
+      "message": "[WARNING] Used undeclared dependencies found:\n[WARNING]    org.springframework:spring-core:jar:7.0.3:compile\n[WARNING] Unused declared dependencies found:\n[WARNING]    org.yaml:snakeyaml:jar:2.5:compile",
+      "revId": "f40e76182f69d0f577ff1a89c21cbba25eada95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "94c8515d_3666af3f",
         "filename": "usecase/pom.xml",
         "patchSetId": 10
