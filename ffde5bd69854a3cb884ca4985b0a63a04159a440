@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06e0814a_75e95735",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-12T09:35:46Z",
+      "side": 1,
+      "message": "Also clarify which setting are per-connection or per-stream configured.",
+      "revId": "ffde5bd69854a3cb884ca4985b0a63a04159a440",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b49de7cc_e77416f5",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/Http3ServerBootstrap.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-12T09:35:46Z",
+      "side": 1,
+      "message": "maxChunkSize()",
+      "revId": "ffde5bd69854a3cb884ca4985b0a63a04159a440",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2792ae1b_a5e83eb4",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/Http3ServerBootstrap.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-12T09:35:46Z",
+      "side": 1,
+      "message": "document this value and reason for it",
+      "revId": "ffde5bd69854a3cb884ca4985b0a63a04159a440",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
