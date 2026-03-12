@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e83fd94e_bdbd6167",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-12T16:05:06Z",
+      "side": 1,
+      "message": "try explain more about reasons for change and why what has been done",
+      "revId": "cff2ebee1b6b8e80fb7a24c831ccaf7779aea6b8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff232cf0_a97e9091",
+        "filename": "usecase/odl-dagger-prototype/pom.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-12T16:05:06Z",
+      "side": 1,
+      "message": "c is after b",
+      "revId": "cff2ebee1b6b8e80fb7a24c831ccaf7779aea6b8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4f77dbc_b9a22d19",
+        "filename": "usecase/odl-dagger-prototype/src/main/java/module-info.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-12T16:05:06Z",
+      "side": 1,
+      "message": "Module \u0027org.opendaylight.netconf.dagger\u0027 reads package \u0027org.opendaylight.odlparent.dagger\u0027 from both \u0027org.opendaylight.odlparent.dagger\u0027 and \u0027dagger\u0027",
+      "revId": "cff2ebee1b6b8e80fb7a24c831ccaf7779aea6b8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb011309_48b7a09c",
+        "filename": "usecase/odl-dagger-prototype/src/main/java/org/opendaylight/netconf/dagger/mdsal/MdsalBindingDomAdapterModule.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-12T16:05:06Z",
+      "side": 1,
+      "message": "@Singleton?",
+      "revId": "cff2ebee1b6b8e80fb7a24c831ccaf7779aea6b8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2049690f_a2ffd6a7",
+        "filename": "usecase/odl-dagger-prototype/src/main/java/org/opendaylight/netconf/dagger/mdsal/MdsalQualifiers.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-12T16:05:06Z",
+      "side": 1,
+      "message": "public @interface ClassPathYangModules {}",
+      "revId": "cff2ebee1b6b8e80fb7a24c831ccaf7779aea6b8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61ee753d_1c578eff",
+        "filename": "usecase/odl-dagger-prototype/src/test/java/org/opendaylight/netconf/dagger/mdsal/MdsalDomBrokerTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-12T16:05:06Z",
+      "side": 1,
+      "message": "not neede line",
+      "revId": "cff2ebee1b6b8e80fb7a24c831ccaf7779aea6b8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca605883_939827bd",
+        "filename": "usecase/odl-dagger-prototype/src/test/java/org/opendaylight/netconf/dagger/mdsal/MdsalDomBrokerTestFactory.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-12T16:05:06Z",
+      "side": 1,
+      "message": "what\u0027s behind changing these classes?",
+      "revId": "cff2ebee1b6b8e80fb7a24c831ccaf7779aea6b8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
