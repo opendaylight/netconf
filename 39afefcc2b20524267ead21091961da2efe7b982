@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "de6770a3_6d4472de",
+        "filename": ".pre-commit-config.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-13T12:00:33Z",
+      "side": 1,
+      "message": "it seems to be more \"prettier\" issue:\n\n2026-03-13T09:50:01.0868562Z      description \"\n2026-03-13T09:50:01.0868843Z -\t\tThis module contains the definitions of elements that creates network\n2026-03-13T09:50:01.0869299Z -\t\ttopology i.e. definition of network nodes and links. This module is\n2026-03-13T09:50:01.0869730Z -\t\tnot designed to be used solely for network representation. This module\n2026-03-13T09:50:01.0870155Z -\t\tSHOULD be used as base module in defining the network topology.\n2026-03-13T09:50:01.0870452Z -\t\";\n2026-03-13T09:50:01.0870723Z +        This module contains the definitions of elements that creates network\n2026-03-13T09:50:01.0871170Z +        topology i.e. definition of network nodes and links. This module is\n2026-03-13T09:50:01.0871841Z +        not designed to be used solely for network representation. This module\n2026-03-13T09:50:01.0872272Z +        SHOULD be used as base module in defining the network topology.\n2026-03-13T09:50:01.0872572Z +    \";",
+      "revId": "39afefcc2b20524267ead21091961da2efe7b982",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "a9d72926_d760d44d",
