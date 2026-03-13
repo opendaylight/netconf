@@ -33,6 +33,24 @@
       "message": "no new line at the and of file",
       "revId": "2860b034b582df6f61a0b3bfab5b8dddd9d0f74d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c21b8be5_de6ba04f",
+        "filename": "apps/restconf-nb/src/test/resources/foo-xml-test/yang/foo.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-13T13:38:08Z",
+      "side": 1,
+      "message": "y, that\u0027 what we (I) want 😄",
+      "parentUuid": "8eac73ef_0a025dc1",
+      "revId": "2860b034b582df6f61a0b3bfab5b8dddd9d0f74d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
