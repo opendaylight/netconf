@@ -46,7 +46,7 @@ repos:
     hooks:
       - id: prettier
         types_or: [yaml, markdown]
-        exclude: '^(.*\.template|.*\.patch|.*\.diff)$'
+        exclude: '^(.*\.template|.*\.patch|.*\.diff|.*\.yang|.*\.YANG)$'
 
   - repo: https://github.com/adrienverge/yamllint
     rev: 81e9f98ffd059efe8aa9c1b1a42e5cce61b640c6 # frozen: v1.35.1
