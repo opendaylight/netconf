@@ -14,9 +14,9 @@ repos:
     rev: cef0300fd0fc4d2a87a85fa2093c6b283ea36f4b # frozen: v5.0.0
     hooks:
       - id: trailing-whitespace
-        exclude: '^.*\.(bin|patch|diff|yang|YANG)$'
+        exclude: '^.*\.(bin|patch|diff|yang|YANG|js)$'
       - id: end-of-file-fixer
-        exclude: '^.*\.(bin|patch|diff|xml|XML|yang|YANG)$'
+        exclude: '^.*\.(bin|patch|diff|xml|XML|yang|YANG|js)$'
       - id: check-yaml
         args: [--allow-multiple-documents]
       - id: check-xml
