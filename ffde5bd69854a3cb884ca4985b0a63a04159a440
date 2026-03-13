@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfd0d092_fb82c65a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-03-13T13:13:55Z",
+      "side": 1,
+      "message": "maxUdpPayloadSize() is per connection, and we can calculate maxChunkSize once, and reuse it as an attribute for all streams within this connection",
+      "parentUuid": "06e0814a_75e95735",
+      "revId": "ffde5bd69854a3cb884ca4985b0a63a04159a440",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b49de7cc_e77416f5",
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "done in https://git.opendaylight.org/gerrit/c/netconf/+/121256/7..9/protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/Http3ServerBootstrap.java#123",
       "parentUuid": "2792ae1b_a5e83eb4",
+      "revId": "ffde5bd69854a3cb884ca4985b0a63a04159a440",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6746e361_1f54db3c",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/Http3ServerBootstrap.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-03-13T13:13:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02c8e8c6_74e02f64",
       "revId": "ffde5bd69854a3cb884ca4985b0a63a04159a440",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
