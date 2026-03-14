@@ -10,10 +10,7 @@ package org.opendaylight.netconf.transport.http;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.kohsuke.MetaInfServices;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.BasicAuth;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.IetfHttpClientData;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.TcpSupported;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.TlsSupported;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev260204.IetfHttpClientData;
 import org.opendaylight.yangtools.binding.YangFeature;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
@@ -30,6 +27,8 @@ public final class IetfHttpClientFeatureProvider implements YangFeatureProvider<
 
     @Override
     public Set<? extends YangFeature<?, IetfHttpClientData>> supportedFeatures() {
-        return Set.of(BasicAuth.VALUE, TcpSupported.VALUE, TlsSupported.VALUE);
+        // Note: explicitly not proxy-connect
+        // FIXME: version-discovery
+        return Set.of();
     }
 }
