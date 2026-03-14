@@ -9,13 +9,10 @@ package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
 
-import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
-import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.crypt.hash.rev140806.CryptHash;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.TrustAnchorCertCms;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.password.grouping.password.type.CleartextPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.http.client.identity.grouping.ClientIdentity;
@@ -23,8 +20,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.http.client.identity.grouping.client.identity.auth.type.basic.BasicBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.http.client.stack.grouping.Transport;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.http.client.stack.grouping.transport.tcp.tcp.TcpClientParametersBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.transport.HttpOverTcp;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.transport.HttpOverTls;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
@@ -43,49 +38,6 @@ import org.opendaylight.yangtools.yang.common.Uint16;
 public final class ConfigUtils {
     private ConfigUtils() {
         // utility class
-    }
-
-    /**
-     * Builds transport configuration for {@link HTTPServer} using TCP transport underlay with no authorization.
-     *
-     * @param host local address
-     * @param port local port
-     * @return transport configuration
-     */
-    @Deprecated(since = "10.0.3", forRemoval = true)
-    public static HttpOverTcp serverTransportTcp(final @NonNull String host, final int port) {
-        return HTTPServerOverTcp.of(host, port, null);
-    }
-
-    /**
-     * Builds transport configuration for {@link HTTPServer} using TCP transport underlay with Basic Authorization.
-     *
-     * @param host local address
-     * @param port local port
-     * @param userCryptHashMap user credentials map for Basic Authorization where key is username and value is a
-     *      {@link CryptHash} value for user password
-     * @return transport configuration
-     */
-    @Deprecated(since = "10.0.3", forRemoval = true)
-    public static HttpOverTcp serverTransportTcp(final @NonNull String host, final int port,
-            final @Nullable Map<String, String> userCryptHashMap) {
-        return HTTPServerOverTcp.of(host, port, userCryptHashMap);
-    }
-
-    /**
-     * Builds transport configuration for {@link HTTPServer} using TCP transport underlay.
-     *
-     * @param tcpParams TCP layer configuration
-     * @param httpParams HTTP layer configuration
-     * @return transport configuration
-     */
-    @Deprecated(since = "10.0.3", forRemoval = true)
-    public static HttpOverTcp serverTransportTcp(
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen
-                .stack.grouping.transport.http.over.tcp.http.over.tcp.@NonNull TcpServerParameters tcpParams,
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen
-                .stack.grouping.transport.http.over.tcp.http.over.tcp.@Nullable HttpServerParameters httpParams) {
-        return HTTPServerOverTcp.of(tcpParams, httpParams);
     }
 
     /**
@@ -139,58 +91,6 @@ public final class ConfigUtils {
             .setTcpClientParameters(tcpParams).setHttpClientParameters(httpParams).build();
         return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208
             .http.client.stack.grouping.transport.TcpBuilder().setTcp(tcp).build();
-    }
-
-    /**
-     * Builds transport configuration for {@link HTTPServer} using TLS transport underlay with no authorization.
-     *
-     * @param host local address
-     * @param port local port
-     * @param certificate server X509 certificate
-     * @param privateKey server private key
-     * @return transport configuration
-     */
-    @Deprecated(since = "10.0.3", forRemoval = true)
-    public static HttpOverTls serverTransportTls(final @NonNull String host, final int port,
-            final @NonNull Certificate certificate, final @NonNull PrivateKey privateKey) {
-        return HTTPServerOverTls.of(host, port, certificate, privateKey);
-    }
-
-    /**
-     * Builds transport configuration for {@link HTTPServer} using TLS transport underlay with Basic Authorization.
-     *
-     * @param host local address
-     * @param port local port
-     * @param certificate server X509 certificate
-     * @param privateKey server private key
-     * @param userCryptHashMap user credentials map for Basic Authorization where key is username and value is a
-     *      {@link CryptHash} value for user password
-     * @return transport configuration
-     */
-    @Deprecated(since = "10.0.3", forRemoval = true)
-    public static HttpOverTls serverTransportTls(final @NonNull String host, final int port,
-            final @NonNull Certificate certificate, final @NonNull PrivateKey privateKey,
-            final @Nullable Map<String, String> userCryptHashMap) {
-        return HTTPServerOverTls.of(host, port, certificate, privateKey, userCryptHashMap);
-    }
-
-    /**
-     * Builds transport configuration for {@link HTTPServer} using TLS transport underlay.
-     *
-     * @param tcpParams TCP layer configuration
-     * @param tlsParams TLS layer configuration
-     * @param httpParams HTTP layer configuration
-     * @return transport configuration
-     */
-    @Deprecated(since = "10.0.3", forRemoval = true)
-    public static HttpOverTls serverTransportTls(
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen
-                .stack.grouping.transport.http.over.tls.http.over.tls.@NonNull TcpServerParameters tcpParams,
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen
-                .stack.grouping.transport.http.over.tls.http.over.tls.@NonNull TlsServerParameters tlsParams,
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen
-                .stack.grouping.transport.http.over.tls.http.over.tls.@Nullable HttpServerParameters httpParams) {
-        return HTTPServerOverTls.of(tcpParams, tlsParams, httpParams);
     }
 
     /**
