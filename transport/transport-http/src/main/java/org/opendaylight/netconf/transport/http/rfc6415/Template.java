@@ -10,10 +10,12 @@ package org.opendaylight.netconf.transport.http.rfc6415;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 // FIXME: https://www.rfc-editor.org/rfc/rfc6415.html#section-3.1.1:
 //
 //              However, a "Link" element with a "template" ...
+@NonNullByDefault
 public record Template(URI rel, String template) implements Link {
     public Template {
         requireNonNull(rel);
