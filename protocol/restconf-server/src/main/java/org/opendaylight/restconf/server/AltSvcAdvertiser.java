@@ -7,27 +7,29 @@
  */
 package org.opendaylight.restconf.server;
 
+import static java.util.Objects.requireNonNull;
+
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.HttpResponse;
-import io.netty.util.AsciiString;
-import java.util.Objects;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * Adds Alt-Svc advertisement to outbound HTTP responses.
+ * Adds an {@value AltSvcAdvertiser#ALT_SVC} header to outbound {@link HttpResponse}s which do not already have this
+ * header.
  */
 @Sharable
-@NonNullByDefault
 final class AltSvcAdvertiser extends ChannelOutboundHandlerAdapter {
-    private static final AsciiString ALT_SVC = AsciiString.cached("Alt-Svc");
+    private static final @NonNull String ALT_SVC = "Alt-Svc";
 
-    private final CharSequence altSvcValue;
+    @NonNullByDefault
+    private final @NonNull CharSequence altSvcValue;
 
     AltSvcAdvertiser(final CharSequence altSvcValue) {
-        this.altSvcValue = Objects.requireNonNull(altSvcValue);
+        this.altSvcValue = requireNonNull(altSvcValue);
     }
 
     @Override
