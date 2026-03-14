@@ -11,7 +11,8 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.transport.http.ConfigUtils;
+import org.opendaylight.netconf.transport.http.HTTPServerOverTcp;
+import org.opendaylight.netconf.transport.http.HTTPServerOverTls;
 import org.opendaylight.netconf.transport.http.HttpServerStackConfiguration;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -278,9 +279,9 @@ public final class OSGiNorthbound {
             configuration.tls$_$private$_$key());
 
         final var transport = tlsCertKey != null
-            ? ConfigUtils.serverTransportTls(configuration.bind$_$address(), configuration.bind$_$port(),
+            ? HTTPServerOverTls.of(configuration.bind$_$address(), configuration.bind$_$port(),
                 tlsCertKey.certificate(), tlsCertKey.privateKey())
-            : ConfigUtils.serverTransportTcp(configuration.bind$_$address(), configuration.bind$_$port());
+            : HTTPServerOverTcp.of(configuration.bind$_$address(), configuration.bind$_$port());
 
         // advertise non-zero h3 support only when we have TLS (h3 requirement)
         final var altSvc = tlsCertKey != null
@@ -308,11 +309,11 @@ public final class OSGiNorthbound {
     private static @NonNull MessageEncoding parseDefaultEncoding(final String str) {
         if ("json".equalsIgnoreCase(str)) {
             return MessageEncoding.JSON;
-        } else if ("xml".equalsIgnoreCase(str)) {
-            return MessageEncoding.XML;
-        } else {
-            throw new IllegalArgumentException("Invalid default-encoding '" + str + "'");
         }
+        if ("xml".equalsIgnoreCase(str)) {
+            return MessageEncoding.XML;
+        }
+        throw new IllegalArgumentException("Invalid default-encoding '" + str + "'");
     }
 
     private static @NonNull String buildAltSvcHeader(final int bindPort, final long maxAgeSeconds) {

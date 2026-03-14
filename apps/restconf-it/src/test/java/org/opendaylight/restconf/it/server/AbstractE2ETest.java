@@ -75,6 +75,7 @@ import org.opendaylight.netconf.sal.remote.impl.CreateDataChangeEventSubscriptio
 import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.netconf.transport.http.EventStreamService;
 import org.opendaylight.netconf.transport.http.HTTPClient;
+import org.opendaylight.netconf.transport.http.HTTPServerOverTcp;
 import org.opendaylight.netconf.transport.http.HttpClientStackConfiguration;
 import org.opendaylight.netconf.transport.http.SseUtils;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
@@ -163,7 +164,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         // transport configuration
         final var port = randomBindablePort();
         host = localAddress + ":" + port;
-        final var serverTransport = ConfigUtils.serverTransportTcp(localAddress, port);
+        final var serverTransport = HTTPServerOverTcp.of(localAddress, port);
         final var serverStackGrouping = new HttpServerListenStackGrouping() {
             @Override
             public Class<HttpServerListenStackGrouping> implementedInterface() {

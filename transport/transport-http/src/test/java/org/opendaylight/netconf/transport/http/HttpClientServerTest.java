@@ -28,8 +28,6 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.transport.http.ConfigUtils.clientTransportTcp;
 import static org.opendaylight.netconf.transport.http.ConfigUtils.clientTransportTls;
-import static org.opendaylight.netconf.transport.http.ConfigUtils.serverTransportTcp;
-import static org.opendaylight.netconf.transport.http.ConfigUtils.serverTransportTls;
 import static org.opendaylight.netconf.transport.http.TestUtils.freePort;
 import static org.opendaylight.netconf.transport.http.TestUtils.generateX509CertData;
 import static org.opendaylight.netconf.transport.http.TestUtils.invoke;
@@ -205,7 +203,7 @@ class HttpClientServerTest {
     @ValueSource(booleans = {false, true})
     void noAuthTcp(final boolean http2) throws Exception {
         final var localPort = freePort();
-        doReturn(serverTransportTcp(localAddress, localPort)).when(serverConfig).getTransport();
+        doReturn(HTTPServerOverTcp.of(localAddress, localPort)).when(serverConfig).getTransport();
         doReturn(clientTransportTcp(localAddress, localPort)).when(clientConfig).getTransport();
         integrationTest(http2);
     }
@@ -214,7 +212,7 @@ class HttpClientServerTest {
     @ValueSource(booleans = {false, true})
     void basicAuthTcp(final boolean http2) throws Exception {
         final var localPort = freePort();
-        doReturn(serverTransportTcp(localAddress, localPort, USER_HASHES_MAP))
+        doReturn(HTTPServerOverTcp.of(localAddress, localPort, USER_HASHES_MAP))
             .when(serverConfig).getTransport();
         doReturn(clientTransportTcp(localAddress, localPort, USERNAME, PASSWORD))
             .when(clientConfig).getTransport();
@@ -225,7 +223,7 @@ class HttpClientServerTest {
     @ValueSource(booleans = {false, true})
     void customAuthTcp(final boolean http2) throws Exception {
         final var localPort = freePort();
-        doReturn(serverTransportTcp(localAddress, localPort)).when(serverConfig).getTransport();
+        doReturn(HTTPServerOverTcp.of(localAddress, localPort)).when(serverConfig).getTransport();
         doReturn(clientTransportTcp(localAddress, localPort, USERNAME, PASSWORD))
             .when(clientConfig).getTransport();
         integrationTest(http2, CUSTOM_AUTH_HANDLER_FACTORY);
@@ -236,7 +234,7 @@ class HttpClientServerTest {
     void noAuthTls(final boolean http2) throws Exception {
         final var certData = generateX509CertData("RSA");
         final var localPort = freePort();
-        doReturn(serverTransportTls(localAddress, localPort, certData.certificate(), certData.privateKey()))
+        doReturn(HTTPServerOverTls.of(localAddress, localPort, certData.certificate(), certData.privateKey()))
             .when(serverConfig).getTransport();
         doReturn(clientTransportTls(localAddress, localPort, certData.certificate())).when(clientConfig).getTransport();
         integrationTest(http2);
@@ -247,7 +245,7 @@ class HttpClientServerTest {
     void basicAuthTls(final boolean http2) throws Exception {
         final var certData = generateX509CertData("EC");
         final var localPort = freePort();
-        doReturn(serverTransportTls(localAddress, localPort, certData.certificate(), certData.privateKey(),
+        doReturn(HTTPServerOverTls.of(localAddress, localPort, certData.certificate(), certData.privateKey(),
             USER_HASHES_MAP)).when(serverConfig).getTransport();
         doReturn(clientTransportTls(localAddress, localPort, certData.certificate(), USERNAME, PASSWORD))
             .when(clientConfig).getTransport();
@@ -259,7 +257,7 @@ class HttpClientServerTest {
     void customAuthTls(final boolean http2) throws Exception {
         final var certData = generateX509CertData("RSA");
         final var localPort = freePort();
-        doReturn(serverTransportTls(localAddress, localPort, certData.certificate(), certData.privateKey()))
+        doReturn(HTTPServerOverTls.of(localAddress, localPort, certData.certificate(), certData.privateKey()))
             .when(serverConfig).getTransport();
         doReturn(clientTransportTls(localAddress, localPort, certData.certificate(), USERNAME, PASSWORD))
             .when(clientConfig).getTransport();
@@ -313,8 +311,8 @@ class HttpClientServerTest {
         // validate server cleartext protocol upgrade flow being compatible with java.net.HttpClient
         final var localPort = freePort();
         final var transport = withAuth
-            ? serverTransportTcp(localAddress, localPort, USER_HASHES_MAP)
-            : serverTransportTcp(localAddress, localPort);
+            ? HTTPServerOverTcp.of(localAddress, localPort, USER_HASHES_MAP)
+            : HTTPServerOverTcp.of(localAddress, localPort);
         doReturn(transport).when(serverConfig).getTransport();
 
         final var uri = nextValue("URI");
