@@ -6,12 +6,12 @@ module ietf-udp-client {
   import ietf-inet-types {
     prefix inet;
     reference
-      "RFC 6991: Common YANG Data Types";
+      "RFC 9911: Common YANG Data Types";
   }
 
   organization "IETF NETCONF (Network Configuration) Working Group";
   contact
-    "WG Web:   <http:/tools.ietf.org/wg/netconf/>
+    "WG Web:   <https://datatracker.ietf.org/group/netconf/>
      WG List:  <mailto:netconf@ietf.org>
 
      Authors:  Alex Huang Feng
@@ -31,14 +31,24 @@ module ietf-udp-client {
     4.c of the IETF Trust's Legal Provisions Relating to IETF Documents
     (https://trustee.ietf.org/license-info).
 
-    This version of this YANG module is part of RFC-to-be; see the RFC
-    itself for full legal notices.";
+    All revisions of IETF and IANA published modules can be found
+    at the YANG Parameters registry group
+    (https://www.iana.org/assignments/yang-parameters).
 
-  revision 2025-06-10 {
+    This version of this YANG module is part of RFC XXXX; see
+    the RFC itself for full legal notices.
+
+    The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL
+    NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'NOT RECOMMENDED',
+    'MAY', and 'OPTIONAL' in this document are to be interpreted as
+    described in BCP 14 (RFC 2119) (RFC 8174) when, and only when,
+    they appear in all capitals, as shown here.";
+
+  revision 2025-12-16 {
     description
       "Initial revision";
     reference
-      "RFC-to-be: YANG Groupings for UDP Clients and UDP Servers";
+      "RFC XXXX: YANG Groupings for UDP Clients and UDP Servers";
   }
 
   feature local-binding {
@@ -51,7 +61,7 @@ module ietf-udp-client {
   grouping udp-client {
     description
       "A reusable grouping for UDP clients.
-      
+
       Note that this grouping uses fairly typical descendant
       node names such that a stack of 'uses' statements will
       have name conflicts.  It is intended that the consuming
@@ -65,10 +75,7 @@ module ietf-udp-client {
       type inet:host;
       mandatory true;
       description
-        "The IP address or hostname of the remote UDP server.
-        If a domain name is configured, then the name resolution
-        should happen before each datagram is sent, unless a
-        previously resolved address is cached and still valid.";
+        "The IP address or hostname of the remote UDP server.";
     }
 
     leaf remote-port {
@@ -84,7 +91,12 @@ module ietf-udp-client {
         "The local IP address to bind to when sending UDP
         datagrams to the remote server. INADDR_ANY ('0.0.0.0') or
         INADDR6_ANY ('0:0:0:0:0:0:0:0' a.k.a. '::') may be used
-        so that the client can bind to any IPv4 or IPv6 address.";
+        so that the client can bind to any IPv4 or IPv6 address.
+        In normal operation, the local and configured
+        remote addresses SHOULD be from the same address family.
+        Differences between address families may occur in
+        abnormal or error conditions and are therefore allowed to
+        be reported.";
     }
 
     leaf local-port {
