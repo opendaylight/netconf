@@ -32,7 +32,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.grouping.client.authentication.users.User;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.grouping.client.authentication.users.user.auth.type.basic.basic.PasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.transport.HttpOverTcp;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.transport.HttpOverTcpBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.transport.HttpOverTls;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.transport.HttpOverTlsBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -63,8 +62,9 @@ public final class ConfigUtils {
      * @param port local port
      * @return transport configuration
      */
+    @Deprecated(since = "10.0.3", forRemoval = true)
     public static HttpOverTcp serverTransportTcp(final @NonNull String host, final int port) {
-        return serverTransportTcp(host, port, null);
+        return HTTPServerOverTcp.of(host, port, null);
     }
 
     /**
@@ -76,20 +76,10 @@ public final class ConfigUtils {
      *      {@link CryptHash} value for user password
      * @return transport configuration
      */
+    @Deprecated(since = "10.0.3", forRemoval = true)
     public static HttpOverTcp serverTransportTcp(final @NonNull String host, final int port,
             final @Nullable Map<String, String> userCryptHashMap) {
-
-        final var tcpParams = new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111
-                .http.server.listen.stack.grouping.transport.http.over.tcp.http.over.tcp.TcpServerParametersBuilder()
-            .setLocalBind(BindingMap.of(new LocalBindBuilder()
-                .setLocalAddress(IetfInetUtil.ipAddressFor(requireNonNull(host)))
-                .setLocalPort(new PortNumber(Uint16.valueOf(port)))
-                .build()))
-            .build();
-        final var httpParams = new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111
-                .http.server.listen.stack.grouping.transport.http.over.tcp.http.over.tcp.HttpServerParametersBuilder()
-            .setClientAuthentication(clientAuthentication(userCryptHashMap)).build();
-        return serverTransportTcp(tcpParams, httpParams);
+        return HTTPServerOverTcp.of(host, port, userCryptHashMap);
     }
 
     /**
@@ -99,16 +89,13 @@ public final class ConfigUtils {
      * @param httpParams HTTP layer configuration
      * @return transport configuration
      */
+    @Deprecated(since = "10.0.3", forRemoval = true)
     public static HttpOverTcp serverTransportTcp(
             final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen
                 .stack.grouping.transport.http.over.tcp.http.over.tcp.@NonNull TcpServerParameters tcpParams,
             final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen
                 .stack.grouping.transport.http.over.tcp.http.over.tcp.@Nullable HttpServerParameters httpParams) {
-        return new HttpOverTcpBuilder()
-                .setHttpOverTcp(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111
-                    .http.server.listen.stack.grouping.transport.http.over.tcp.HttpOverTcpBuilder()
-                    .setTcpServerParameters(tcpParams).setHttpServerParameters(httpParams).build())
-                .build();
+        return HTTPServerOverTcp.of(tcpParams, httpParams);
     }
 
     /**
@@ -303,8 +290,7 @@ public final class ConfigUtils {
             .http.client.stack.grouping.transport.TlsBuilder().setTls(tls).build();
     }
 
-    private static @Nullable ClientAuthentication clientAuthentication(
-            final @Nullable Map<String, String> userCryptHashMap) {
+    static @Nullable ClientAuthentication clientAuthentication(final @Nullable Map<String, String> userCryptHashMap) {
         if (userCryptHashMap == null || userCryptHashMap.isEmpty()) {
             return null;
         }
