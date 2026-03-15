@@ -137,7 +137,7 @@ public class NetconfMessageTransformer
         if (dataSchemaNode instanceof ActionNodeContainer actionContainer) {
             for (var actionDefinition : actionContainer.getActions()) {
                 path.addLast(actionDefinition.getQName());
-                builder.put(Absolute.of(path), actionDefinition);
+                builder.put(Absolute.of(List.copyOf(path)), actionDefinition);
                 path.removeLast();
             }
         }
