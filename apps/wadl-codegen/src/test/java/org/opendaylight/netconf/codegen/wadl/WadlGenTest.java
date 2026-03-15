@@ -9,7 +9,7 @@ package org.opendaylight.netconf.codegen.wadl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -20,7 +20,7 @@ class WadlGenTest {
         final var generator = new WadlGenerator();
         final var context = YangParserTestUtils.parseYangResourceDirectory("/wadl-gen");
         final var generatedWadlFiles = generator.generateFiles(context,
-            Set.copyOf(context.getModules()), (module, representation) -> Optional.empty());
+            Set.copyOf(context.getModules()), (module, representation) -> List.of());
         assertEquals(3, generatedWadlFiles.size());
         // TODO: more asserts
     }

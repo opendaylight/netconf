@@ -10,6 +10,7 @@ package org.opendaylight.netconf.api.subtree;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.xml.XmlEscapers;
+import java.io.IOException;
 import org.opendaylight.yangtools.concepts.PrettyTree;
 
 /**
@@ -25,61 +26,61 @@ final class SubtreeFilterPrettyTree extends PrettyTree {
     }
 
     @Override
-    public void appendTo(final StringBuilder sb, final int depth) {
-        appendIndent(sb, depth);
-        sb.append("<filter type=\"subtree\">");
-        appendIndent(sb.append('\n'), depth);
-        appendSiblingSet(sb, depth + 1, prefixes, filter);
-        appendIndent(sb, depth);
-        sb.append("</filter>");
+    public Appendable appendTo(final Appendable appendable, final int depth) throws IOException {
+        appendIndent(appendable, depth);
+        appendable.append("<filter type=\"subtree\">");
+        appendIndent(appendable.append('\n'), depth);
+        appendSiblingSet(appendable, depth + 1, prefixes, filter);
+        appendIndent(appendable, depth);
+        return appendable.append("</filter>");
     }
 
-    private static void appendContainment(final StringBuilder sb, final int depth, final Prefixes prefixes,
-            final ContainmentNode node) {
-        startSibling(sb, depth, prefixes, node);
-        sb.append(">\n");
-        appendSiblingSet(sb, depth + 1, prefixes, node);
-        endSibling(sb, depth, prefixes, node);
+    private static void appendContainment(final Appendable appendable, final int depth, final Prefixes prefixes,
+            final ContainmentNode node) throws IOException {
+        startSibling(appendable, depth, prefixes, node);
+        appendable.append(">\n");
+        appendSiblingSet(appendable, depth + 1, prefixes, node);
+        endSibling(appendable, depth, prefixes, node);
     }
 
-    private static void appendContentMatch(final StringBuilder sb, final int depth, final Prefixes prefixes,
-            final ContentMatchNode node) {
-        startSibling(sb, depth, prefixes, node);
-        appendIndent(sb.append(">\n"), depth + 1);
-        sb.append(XmlEscapers.xmlContentEscaper().escape(node.value())).append('\n');
-        endSibling(sb, depth, prefixes, node);
+    private static void appendContentMatch(final Appendable appendable, final int depth, final Prefixes prefixes,
+            final ContentMatchNode node) throws IOException {
+        startSibling(appendable, depth, prefixes, node);
+        appendIndent(appendable.append(">\n"), depth + 1);
+        appendable.append(XmlEscapers.xmlContentEscaper().escape(node.value())).append('\n');
+        endSibling(appendable, depth, prefixes, node);
     }
 
-    private static void appendSelection(final StringBuilder sb, final int depth, final Prefixes prefixes,
-            final SelectionNode node) {
-        startSibling(sb, depth, prefixes, node);
+    private static void appendSelection(final Appendable appendable, final int depth, final Prefixes prefixes,
+            final SelectionNode node) throws IOException {
+        startSibling(appendable, depth, prefixes, node);
 
         for (var am : node.attributeMatches()) {
             final var selection = am.selection();
-            appendPrefix(sb.append(' '), prefixes, selection.namespace());
-            appendAttributeData(sb.append(selection.name()).append('='), am.value());
+            appendPrefix(appendable.append(' '), prefixes, selection.namespace());
+            appendAttributeData(appendable.append(selection.name()).append('='), am.value());
         }
 
-        sb.append("/>\n");
+        appendable.append("/>\n");
     }
 
-    private static void appendSiblingSet(final StringBuilder sb, final int depth, final Prefixes prefixes,
-            final SiblingSet siblings) {
+    private static void appendSiblingSet(final Appendable appendable, final int depth, final Prefixes prefixes,
+            final SiblingSet siblings) throws IOException {
         for (var contentMatch : siblings.contentMatches()) {
-            appendContentMatch(sb, depth, prefixes, contentMatch);
+            appendContentMatch(appendable, depth, prefixes, contentMatch);
         }
         for (var selection : siblings.selections()) {
-            appendSelection(sb, depth, prefixes, selection);
+            appendSelection(appendable, depth, prefixes, selection);
         }
         for (var containment : siblings.containments()) {
-            appendContainment(sb, depth, prefixes, containment);
+            appendContainment(appendable, depth, prefixes, containment);
         }
     }
 
-    private static void startSibling(final StringBuilder sb, final int depth, final Prefixes prefixes,
-            final Sibling node) {
-        appendIndent(sb, depth);
-        appendNamespaceSelection(sb.append('<'), prefixes, node);
+    private static void startSibling(final Appendable appendable, final int depth, final Prefixes prefixes,
+            final Sibling node) throws IOException {
+        appendIndent(appendable, depth);
+        appendNamespaceSelection(appendable.append('<'), prefixes, node);
         // adding namespaces and prefixes at the top/first filter node
         if (depth == 1) {
             final var prefixesMap = prefixes.getNamespaceToPrefixMap();
@@ -88,40 +89,43 @@ final class SubtreeFilterPrettyTree extends PrettyTree {
                 // this never throws error because map not empty
                 var entry = prefixesIt.next();
                 // add first namespaces and prefix
-                appendAttributeData(sb.append(" xmlns:").append(entry.getValue()).append('='), entry.getKey());
+                appendAttributeData(appendable.append(" xmlns:").append(entry.getValue()).append('='), entry.getKey());
                 // add other namespaces if there are some with indentation
                 while (prefixesIt.hasNext()) {
                     entry = prefixesIt.next();
-                    appendIndent(sb.append('\n'), depth);
-                    appendAttributeData(sb.append(" xmlns:").append(entry.getValue()).append('='), entry.getKey());
+                    appendIndent(appendable.append('\n'), depth);
+                    appendAttributeData(appendable.append(" xmlns:").append(entry.getValue()).append('='),
+                        entry.getKey());
                 }
             }
         }
     }
 
-    private static void endSibling(final StringBuilder sb, final int depth, final Prefixes prefixes,
-            final Sibling node) {
-        appendIndent(sb, depth);
-        appendNamespaceSelection(sb.append("</"), prefixes, node);
-        sb.append(">\n");
+    private static void endSibling(final Appendable appendable, final int depth, final Prefixes prefixes,
+            final Sibling node) throws IOException {
+        appendIndent(appendable, depth);
+        appendNamespaceSelection(appendable.append("</"), prefixes, node);
+        appendable.append(">\n");
     }
 
-    private static void appendNamespaceSelection(final StringBuilder sb, final Prefixes prefixes, final Sibling node) {
+    private static void appendNamespaceSelection(final Appendable appendable, final Prefixes prefixes,
+            final Sibling node) throws IOException {
         switch (node.selection()) {
             case NamespaceSelection.Exact(var namespace, var name) -> {
-                appendPrefix(sb, prefixes, namespace);
-                sb.append(name);
+                appendPrefix(appendable, prefixes, namespace);
+                appendable.append(name);
             }
-            case NamespaceSelection.Wildcard(var name) -> sb.append(name);
+            case NamespaceSelection.Wildcard(var name) -> appendable.append(name);
         }
     }
 
-    private static void appendPrefix(final StringBuilder sb, final Prefixes prefixes, final String namespace) {
-        sb.append(prefixes.lookUpPrefix(namespace)).append(':');
+    private static void appendPrefix(final Appendable appendable, final Prefixes prefixes, final String namespace)
+            throws IOException {
+        appendable.append(prefixes.lookUpPrefix(namespace)).append(':');
     }
 
-    private static void appendAttributeData(final StringBuilder sb, final String str) {
+    private static void appendAttributeData(final Appendable appendable, final String str) throws IOException {
         // Escape special characters in string and append it
-        sb.append('"').append(XmlEscapers.xmlAttributeEscaper().escape(str)).append('"');
+        appendable.append('"').append(XmlEscapers.xmlAttributeEscaper().escape(str)).append('"');
     }
 }
