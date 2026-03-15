@@ -70,10 +70,10 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.binding.KeyStep;
 import org.opendaylight.yangtools.binding.impl.DataObjectIdentifierWithKey;
+import org.opendaylight.yangtools.dagger.yang.parser.DaggerDefaultYangParserComponent;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
 @ExtendWith(MockitoExtension.class)
 class AbstractNetconfTopologyTest {
@@ -162,7 +162,7 @@ class AbstractNetconfTopologyTest {
             schemaManager, dataBroker, mountPointService,
             new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
                 sslContextFactoryProvider), deviceActionFactory,
-            new DefaultBaseNetconfSchemaProvider(new DefaultYangParserFactory()));
+            new DefaultBaseNetconfSchemaProvider(DaggerDefaultYangParserComponent.create().parserFactory()));
 
         final var netconfNode = new NetconfNodeAugmentBuilder()
             .setNetconfNode(new NetconfNodeBuilder()
@@ -212,8 +212,8 @@ class AbstractNetconfTopologyTest {
 
         final var keyStep = new KeyStep<>(Node.class, new NodeKey(testNode.getNodeId()));
         doReturn(keyStep).when(dataObjectDeleted).coerceKeyStep(Node.class);
-        topology.onDataTreeChanged((List.of(
-            new CustomTreeModification(LogicalDatastoreType.OPERATIONAL, path, dataObjectDeleted))));
+        topology.onDataTreeChanged(List.of(
+            new CustomTreeModification(LogicalDatastoreType.OPERATIONAL, path, dataObjectDeleted)));
         verify(delegate).close();
     }
 

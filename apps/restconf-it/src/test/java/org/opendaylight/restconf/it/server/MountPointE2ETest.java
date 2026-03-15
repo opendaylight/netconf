@@ -40,21 +40,15 @@ import org.opendaylight.netconf.topology.impl.NetconfTopologyImpl;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactoryImpl;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.restconf.api.MediaTypes;
-import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
+import org.opendaylight.yang.gen.v1.test.device.simulator.rev240917.DeviceSimData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.NotificationsData;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class MountPointE2ETest extends AbstractE2ETest {
-    private static final YangModuleInfo DEVICE_YANG_MODEL =
-        org.opendaylight.yang.svc.v1.test.device.simulator.rev240917.YangModuleInfoImpl.getInstance();
-    private static final YangModuleInfo NOTIFICATION_MODEL = org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns
-        .netconf.notification._1._0.rev080714.YangModuleInfoImpl.getInstance();
-    // RFC 6241 base model: urn:ietf:params:xml:ns:netconf:base:1.0
-    private static final YangModuleInfo IETF_NETCONF = org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns
-        .netconf.base._1._0.rev110601.YangModuleInfoImpl.getInstance();
     private static final String DEVICE_USERNAME = "device-username";
     private static final String DEVICE_PASSWORD = "device-password";
     private static final String TOPOLOGY_URI =
@@ -84,10 +78,9 @@ class MountPointE2ETest extends AbstractE2ETest {
             id -> null, sslContextFactoryProvider());
         final var netconfClientFactory = new NetconfClientFactoryImpl(netconfTimer, sshTransportStackFactory);
         final var topologySchemaAssembler = new NetconfTopologySchemaAssembler(4);
-        final var yangParserFactory = new DefaultYangParserFactory();
         final var schemaSourceMgr =
-            new DefaultSchemaResourceManager(yangParserFactory, tmpDir.getAbsolutePath(), "schema");
-        final var baseSchemaProvider = new DefaultBaseNetconfSchemaProvider(yangParserFactory);
+            new DefaultSchemaResourceManager(PARSER_FACTORY, TEXT_TO_IR, tmpDir.getAbsolutePath(), "schema");
+        final var baseSchemaProvider = new DefaultBaseNetconfSchemaProvider(PARSER_FACTORY);
 
         topologyService = new NetconfTopologyImpl(netconfClientFactory, netconfTimer, topologySchemaAssembler,
             schemaSourceMgr, dataBroker, domMountPointService, encryptionService, netconfClientConfBuilderFactory,
@@ -362,10 +355,11 @@ class MountPointE2ETest extends AbstractE2ETest {
             .setAuthProvider((usr, pwd) -> DEVICE_USERNAME.equals(usr) && DEVICE_PASSWORD.equals(pwd))
             .setMdSal(mdsal);
         if (mdsal) {
-            configBuilder.setModels(Set.of(DEVICE_YANG_MODEL, IETF_NETCONF));
+            configBuilder.setModels(Set.of(DeviceSimData.META.moduleInfo(), IetfNetconfData.META.moduleInfo()));
         } else {
             configBuilder
-                .setModels(Set.of(DEVICE_YANG_MODEL, IETF_NETCONF, NOTIFICATION_MODEL))
+                .setModels(Set.of(DeviceSimData.META.moduleInfo(), IetfNetconfData.META.moduleInfo(),
+                    NotificationsData.META.moduleInfo()))
                 .setNotificationFile(Path.of(getClass().getResource("/device-sim-notifications.xml").toURI())
                     .toFile());
         }

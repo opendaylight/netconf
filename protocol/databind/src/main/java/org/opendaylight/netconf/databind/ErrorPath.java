@@ -17,14 +17,14 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#page-83">RFC8040 errors grouping</a>.
  *
  * @param databind the {@link DatabindContext} to which this path is bound
- * @param path the {@link YangInstanceIdentifier}, {@link YangInstanceIdentifier#empty()} denotes the data root
+ * @param path the {@link YangInstanceIdentifier}, {@link YangInstanceIdentifier#of()} denotes the data root
  */
 public record ErrorPath(DatabindContext databind, YangInstanceIdentifier path) {
     /**
      * Default constructor.
      *
      * @param databind the {@link DatabindContext} to which this path is bound
-     * @param path the {@link YangInstanceIdentifier}, {@link YangInstanceIdentifier#empty()} denotes the data root
+     * @param path the {@link YangInstanceIdentifier}, {@link YangInstanceIdentifier#of()} denotes the data root
      */
     public ErrorPath {
         requireNonNull(databind);

@@ -30,9 +30,9 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class MountPointDocumentTest extends AbstractOpenApiTest {
     private static final YangModuleInfo TOASTER_YANG_MODEL =
-        org.opendaylight.yang.svc.v1.http.netconfcentral.org.ns.toaster.rev091120.YangModuleInfoImpl.getInstance();
+        org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterData.META.moduleInfo();
     private static final YangModuleInfo TOASTER_OLD_YANG_MODEL =
-        org.opendaylight.yang.svc.v1.http.netconfcentral.org.ns.toaster.rev091119.YangModuleInfoImpl.getInstance();
+        org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091119.ToasterData.META.moduleInfo();
 
     private int devicePort;
     private NetconfDeviceSimulator deviceSimulator;

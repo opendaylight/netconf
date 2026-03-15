@@ -66,23 +66,24 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.NetconfNodeAugment;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.NetconfNodeAugmentBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.NetconfNodeTopologyData;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.TopologyTypes1;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.network.topology.topology.topology.types.TopologyNetconf;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyData;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.TopologyTypes;
-import org.opendaylight.yang.svc.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.YangModuleInfoImpl;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.binding.KeyStep;
 import org.opendaylight.yangtools.binding.Rpc;
 import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Uint16;
-import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
+import org.opendaylight.yangtools.yang.source.ir.dagger.YangIRSourceModule;
 
 @ExtendWith(MockitoExtension.class)
 class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
@@ -131,9 +132,7 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         AbstractDataBrokerTest dataBrokerTest = new AbstractDataBrokerTest() {
             @Override
             protected Set<YangModuleInfo> getModuleInfos() {
-                return Set.of(YangModuleInfoImpl.getInstance(),
-                    org.opendaylight.yang.svc.v1.urn.opendaylight.netconf.node.topology.rev251205
-                        .YangModuleInfoImpl.getInstance());
+                return Set.of(NetworkTopologyData.META.moduleInfo(), NetconfNodeTopologyData.META.moduleInfo());
             }
         };
 
@@ -156,7 +155,8 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
 
         netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, clusterSingletonServiceProvider,
                 timer, schemaAssembler, actorSystem, clientFactory, mountPointService, encryptionService,
-                rpcProviderService, actionFactory, new DefaultSchemaResourceManager(new DefaultYangParserFactory()),
+                rpcProviderService, actionFactory,
+                new DefaultSchemaResourceManager(PARSER_FACTORY, YangIRSourceModule.provideTextToIR()),
                 builderFactory, TOPOLOGY_ID, Uint16.ZERO) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,

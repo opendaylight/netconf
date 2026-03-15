@@ -68,11 +68,11 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.cr
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yangtools.dagger.yang.parser.DaggerDefaultYangParserComponent;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
 @ExtendWith(MockitoExtension.class)
 class NetconfNodeHandlerTest {
@@ -127,7 +127,7 @@ class NetconfNodeHandlerTest {
 
     @BeforeAll
     static void beforeClass() throws Exception {
-        BASE_SCHEMAS = new DefaultBaseNetconfSchemaProvider(new DefaultYangParserFactory());
+        BASE_SCHEMAS = new DefaultBaseNetconfSchemaProvider(DaggerDefaultYangParserComponent.create().parserFactory());
     }
 
     @AfterAll

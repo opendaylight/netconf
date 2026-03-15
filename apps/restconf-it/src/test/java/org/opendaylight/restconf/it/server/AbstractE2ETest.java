@@ -46,6 +46,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.eclipse.jdt.annotation.NonNull;
 import org.json.JSONObject;
 import org.json.JSONParserConfiguration;
 import org.junit.jupiter.api.AfterAll;
@@ -100,6 +101,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.transport.HttpOverTcp;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecServices;
+import org.opendaylight.yangtools.dagger.yang.parser.DaggerDefaultYangParserComponent;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -107,6 +109,9 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.common.Uint64;
+import org.opendaylight.yangtools.yang.model.spi.source.YangTextToIRSourceTransformer;
+import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
+import org.opendaylight.yangtools.yang.source.ir.dagger.YangIRSourceModule;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.slf4j.Logger;
@@ -124,6 +129,9 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     private static final Uint64 HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE = Uint64.valueOf(256L * 1024);
     private static final Uint32 HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL = Uint32.valueOf(100);
 
+    protected static final @NonNull YangParserFactory PARSER_FACTORY =
+        DaggerDefaultYangParserComponent.create().parserFactory();
+    protected static final @NonNull YangTextToIRSourceTransformer TEXT_TO_IR = YangIRSourceModule.provideTextToIR();
     protected static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
         new JSONParserConfiguration().withStrictMode();
     protected static final Map<String, String> NS_CONTEXT = Map.of("r", "urn:ietf:params:xml:ns:yang:ietf-restconf");
