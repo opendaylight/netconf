@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.IntStream;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.TransportConstants;
@@ -59,6 +60,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.ser
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
 import org.opendaylight.yangtools.binding.util.BindingMap;
+import org.opendaylight.yangtools.dagger.yang.parser.DaggerDefaultYangParserComponent;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -71,14 +73,20 @@ import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.fs.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceListener;
+import org.opendaylight.yangtools.yang.model.repo.spi.SharedSchemaRepository;
+import org.opendaylight.yangtools.yang.model.repo.spi.SourceInfoSchemaSourceTransformer;
 import org.opendaylight.yangtools.yang.model.spi.source.URLYangTextSource;
-import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
-import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
+import org.opendaylight.yangtools.yang.model.spi.source.YangTextToIRSourceTransformer;
+import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
+import org.opendaylight.yangtools.yang.source.ir.dagger.YangIRSourceModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NetconfDeviceSimulator implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceSimulator.class);
+    private static final @NonNull YangTextToIRSourceTransformer TEXT_TO_IR = YangIRSourceModule.provideTextToIR();
+    private static final @NonNull YangParserFactory PARSER_FACTORY =
+        DaggerDefaultYangParserComponent.create().parserFactory();
 
     private final DefaultNetconfTimer timer = new DefaultNetconfTimer();
     private final Configuration configuration;
@@ -165,7 +173,7 @@ public class NetconfDeviceSimulator implements Closeable {
         LOG.info("Starting {}, {} simulated devices starting on port {}",
             configuration.getDeviceCount(), proto, configuration.getStartingPort());
 
-        final var schemaRepo = new SharedSchemaRepository("netconf-simulator");
+        final var schemaRepo = new SharedSchemaRepository(PARSER_FACTORY, "netconf-simulator");
         final var capabilities = parseSchemasToModuleCapabilities(schemaRepo);
         final var transportInitializer = createTransportInitializer(capabilities,
             sourceIdentifier -> schemaRepo.getSchemaSource(sourceIdentifier, YangTextSource.class));
@@ -231,7 +239,8 @@ public class NetconfDeviceSimulator implements Closeable {
 
     private Set<Capability> parseSchemasToModuleCapabilities(final SharedSchemaRepository consumer) {
         final Set<SourceIdentifier> loadedSources = new HashSet<>();
-        consumer.registerSchemaSourceListener(TextToIRTransformer.create(consumer, consumer));
+        consumer.registerSchemaSourceListener(SourceInfoSchemaSourceTransformer.ofYang(
+                consumer, consumer, TEXT_TO_IR));
         consumer.registerSchemaSourceListener(new SchemaSourceListener() {
             @Override
             public void schemaSourceEncountered(final SourceRepresentation schemaSourceRepresentation) {

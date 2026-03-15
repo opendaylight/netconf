@@ -58,9 +58,9 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.TopologyTypesBuilder;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
+import org.opendaylight.yangtools.dagger.yang.parser.DaggerDefaultYangParserComponent;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
 @ExtendWith(MockitoExtension.class)
 class NetconfTopologyImplTest {
@@ -106,7 +106,7 @@ class NetconfTopologyImplTest {
             final var topology = new TestingNetconfTopologyImpl(TOPOLOGY_KEY.getTopologyId().getValue(),
                 mockedClientFactory, mockedTimer, schemaAssembler, mockedResourceManager, dataBroker, mountPointService,
                 encryptionService, builderFactory, rpcProviderService,
-                new DefaultBaseNetconfSchemaProvider(new DefaultYangParserFactory()));
+                new DefaultBaseNetconfSchemaProvider(DaggerDefaultYangParserComponent.create().parserFactory()));
             //verify initialization of topology
             verify(wtx).merge(LogicalDatastoreType.OPERATIONAL, TOPOLOGY_PATH,
                 new TopologyBuilder().withKey(TOPOLOGY_KEY)

@@ -27,7 +27,6 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.UnknownSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaTreeEffectiveStatement;
@@ -131,11 +130,6 @@ final class ProxyEffectiveModelContext implements EffectiveModelContext, Delegat
     @Override
     public Collection<? extends IdentitySchemaNode> getDerivedIdentities(final IdentitySchemaNode identity) {
         return delegate.getDerivedIdentities(identity);
-    }
-
-    @Override
-    public Collection<? extends UnknownSchemaNode> getUnknownSchemaNodes() {
-        return delegate.getUnknownSchemaNodes();
     }
 
     @Override

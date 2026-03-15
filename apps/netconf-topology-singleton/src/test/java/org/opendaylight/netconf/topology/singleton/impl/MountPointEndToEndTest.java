@@ -163,7 +163,7 @@ import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.spi.source.DelegatedYangTextSource;
-import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
+import org.opendaylight.yangtools.yang.source.ir.dagger.YangIRSourceModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -254,8 +254,8 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         schemaAssembler = new NetconfTopologySchemaAssembler(1);
 
-        resourceManager = new DefaultSchemaResourceManager(new DefaultYangParserFactory(), TEST_ROOT_DIRECTORY,
-            TEST_DEFAULT_SUBDIR);
+        resourceManager = new DefaultSchemaResourceManager(PARSER_FACTORY, YangIRSourceModule.provideTextToIR(),
+            TEST_ROOT_DIRECTORY, TEST_DEFAULT_SUBDIR);
 
         topModuleInfo = BindingRuntimeHelpers.getYangModuleInfo(Top.class);
 

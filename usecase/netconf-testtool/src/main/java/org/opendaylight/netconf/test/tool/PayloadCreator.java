@@ -13,6 +13,7 @@ import java.io.StringWriter;
 import java.util.List;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencrypted;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.NetconfNodeTopologyData;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -38,7 +39,7 @@ import org.slf4j.LoggerFactory;
 final class PayloadCreator {
     private static final Logger LOG = LoggerFactory.getLogger(PayloadCreator.class);
     private static final EffectiveModelContext NETWORK_TOPOLOGY_SCHEMA_CONTEXT =
-        BindingRuntimeHelpers.createEffectiveModel(List.of(YangModuleInfoImpl.getInstance()));
+        BindingRuntimeHelpers.createEffectiveModel(List.of(NetconfNodeTopologyData.META.moduleInfo()));
     private static final JSONCodecFactory NETWORK_TOPOLOGY_JSON_CODEC_FACTORY =
         JSONCodecFactorySupplier.RFC7951.getShared(NETWORK_TOPOLOGY_SCHEMA_CONTEXT);
 
@@ -106,7 +107,7 @@ final class PayloadCreator {
             nodeBuilder.withChild(ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(NodeIdentifierWithPredicates.of(Node.QNAME, NODE_ID_QNAME, device + "-sim-device"))
                 .withChild(ImmutableNodes.newContainerBuilder()
-                    .withNodeIdentifier((NETCONF_NODE_IDENTIFIER))
+                    .withNodeIdentifier(NETCONF_NODE_IDENTIFIER)
                     .withChild(ImmutableNodes.leafNode(PORT_NODE_IDENTIFIER, Uint16.valueOf(device)))
                     .withChild(ImmutableNodes.leafNode(HOST_NODE_IDENTIFIER, parameters.generateConfigsAddress))
                     .withChild(ImmutableNodes.newChoiceBuilder()

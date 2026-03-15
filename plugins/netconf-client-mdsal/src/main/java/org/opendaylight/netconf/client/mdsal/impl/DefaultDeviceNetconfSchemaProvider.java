@@ -28,7 +28,9 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfRpcService;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.ProvidedSources;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.NotificationsData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.IetfYangTypesData;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -41,8 +43,8 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactoryConfig
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource.Costs;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
+import org.opendaylight.yangtools.yang.model.repo.spi.SharedSchemaRepository;
 import org.opendaylight.yangtools.yang.model.spi.source.DelegatedYangTextSource;
-import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +55,7 @@ public final class DefaultDeviceNetconfSchemaProvider implements DeviceNetconfSc
     /**
      * The RFC6241-standard QName of {@code ietf-netconf-yang}.
      */
-    private static final @NonNull QName RFC6241_IETF_NETCONF = YangModuleInfoImpl.getInstance().getName();
+    private static final @NonNull QName RFC6241_IETF_NETCONF = IetfNetconfData.META.moduleInfo().getName();
     /**
      * The QName of {@code ietf-netconf.yang} as revision used by libnetconf2/sysrepon/IOS-XR and perhaps others.
      * The delta is just addition of NACM extension instantiations. The data semantics remains the same.
@@ -65,7 +67,7 @@ public final class DefaultDeviceNetconfSchemaProvider implements DeviceNetconfSc
     private static final @NonNull SourceIdentifier RFC6241_SOURCE_ID = SourceIdentifier.ofQName(RFC6241_IETF_NETCONF);
     private static final @NonNull ListenableFuture<@NonNull YangTextSource> RFC6241_SOURCE =
         Futures.immediateFuture(new DelegatedYangTextSource(RFC6241_SOURCE_ID,
-            YangModuleInfoImpl.getInstance().getYangTextCharSource()));
+            IetfNetconfData.META.moduleInfo().getYangTextCharSource()));
 
     private static final @NonNull ProvidedSources<?> RFC6241_PROVIDED_SOURCES =
         new ProvidedSources<>(YangTextSource.class, sourceId -> {
@@ -122,10 +124,8 @@ public final class DefaultDeviceNetconfSchemaProvider implements DeviceNetconfSc
         // If device supports notifications and does not contain necessary modules, add them automatically
         if (sessionPreferences.containsNonModuleCapability(CapabilityURN.NOTIFICATION)) {
             requiredSources = new HashSet<>(requiredSources);
-            requiredSources.add(org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                    .YangModuleInfoImpl.getInstance().getName());
-            requiredSources.add(org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
-                    .YangModuleInfoImpl.getInstance().getName());
+            requiredSources.add(NotificationsData.META.moduleInfo().getName());
+            requiredSources.add(IetfYangTypesData.META.moduleInfo().getName());
         }
 
         // Register all sources with repository and start resolution
