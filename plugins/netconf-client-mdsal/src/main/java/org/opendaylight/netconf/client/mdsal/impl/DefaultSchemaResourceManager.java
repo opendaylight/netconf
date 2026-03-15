@@ -21,11 +21,12 @@ import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.fs.FilesystemSchemaSourceCache;
+import org.opendaylight.yangtools.yang.model.repo.spi.SharedSchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.spi.SoftSchemaSourceCache;
+import org.opendaylight.yangtools.yang.model.repo.spi.SourceInfoSchemaSourceTransformer;
 import org.opendaylight.yangtools.yang.model.spi.source.YangIRSource;
+import org.opendaylight.yangtools.yang.model.spi.source.YangTextToIRSourceTransformer;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
-import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
-import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -47,19 +48,23 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
 
     private final @GuardedBy("this") HashMap<String, DeviceNetconfSchemaProvider> resources = new HashMap<>();
     private final @NonNull DeviceNetconfSchemaProvider defaultResources;
-    private final YangParserFactory parserFactory;
+    private final @NonNull YangTextToIRSourceTransformer textToIR;
+    private final @NonNull YangParserFactory parserFactory;
     private final String defaultSubdirectory;
     private final String rootDirectory;
 
     @Activate
     @Inject
-    public DefaultSchemaResourceManager(@Reference final YangParserFactory parserFactory) {
-        this(parserFactory, "cache", "schema");
+    public DefaultSchemaResourceManager(@Reference final YangParserFactory parserFactory,
+            @Reference final YangTextToIRSourceTransformer textToIR) {
+        this(parserFactory, textToIR, "cache", "schema");
     }
 
-    public DefaultSchemaResourceManager(final YangParserFactory parserFactory, final String rootDirectory,
+    public DefaultSchemaResourceManager(final YangParserFactory parserFactory,
+            final YangTextToIRSourceTransformer textToIR, final String rootDirectory,
             final String defaultSubdirectory) {
         this.parserFactory = requireNonNull(parserFactory);
+        this.textToIR = requireNonNull(textToIR);
         this.rootDirectory = requireNonNull(rootDirectory);
         this.defaultSubdirectory = requireNonNull(defaultSubdirectory);
         defaultResources = createResources(defaultSubdirectory);
@@ -100,10 +105,11 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
 
     private @NonNull DeviceNetconfSchemaProvider createResources(final String subdir) {
         // Setup the baseline empty registry
-        final var repository = new SharedSchemaRepository(subdir, parserFactory);
+        final var repository = new SharedSchemaRepository(parserFactory, subdir);
 
         // Teach the registry how to transform YANG text to IRSchemaSource internally
-        repository.registerSchemaSourceListener(TextToIRTransformer.create(repository, repository));
+        repository.registerSchemaSourceListener(SourceInfoSchemaSourceTransformer.ofYang(repository, repository,
+            textToIR));
 
         // Attach a soft cache of IRSchemaSource instances. This is important during convergence when we are fishing
         // for a consistent set of modules, as it skips the need to re-parse the text sources multiple times. It also
