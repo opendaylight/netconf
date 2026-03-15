@@ -129,9 +129,10 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
+import org.opendaylight.yangtools.yang.model.repo.spi.SharedSchemaRepository;
+import org.opendaylight.yangtools.yang.model.repo.spi.SourceInfoSchemaSourceTransformer;
 import org.opendaylight.yangtools.yang.model.spi.source.DelegatedYangTextSource;
-import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
-import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
+import org.opendaylight.yangtools.yang.source.ir.dagger.YangIRSourceModule;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 
@@ -141,15 +142,15 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     private static final Timeout TIMEOUT = Timeout.create(Duration.ofSeconds(5));
     private static final SourceIdentifier SOURCE_IDENTIFIER1 = new SourceIdentifier("yang1");
     private static final SourceIdentifier SOURCE_IDENTIFIER2 = new SourceIdentifier("yang2");
-    private static final ListenableFuture<DefaultDOMRpcResult> EMPTY_RPC = Futures.immediateFuture(
-        new DefaultDOMRpcResult());
+    private static final ListenableFuture<DefaultDOMRpcResult> EMPTY_RPC =
+        Futures.immediateFuture(new DefaultDOMRpcResult());
 
     private ActorSystem system = ActorSystem.create();
     private final TestKit testKit = new TestKit(system);
 
     private ActorRef masterRef;
     private RemoteDeviceId remoteDeviceId;
-    private final SharedSchemaRepository masterSchemaRepository = new SharedSchemaRepository("master");
+    private final SharedSchemaRepository masterSchemaRepository = new SharedSchemaRepository(PARSER_FACTORY, "master");
 
     @Mock
     private Rpcs.Normalized mockRpc;
@@ -191,8 +192,8 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         remoteDeviceId = new RemoteDeviceId("netconf-topology",
                 new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
 
-        masterSchemaRepository.registerSchemaSourceListener(
-                TextToIRTransformer.create(masterSchemaRepository, masterSchemaRepository));
+        masterSchemaRepository.registerSchemaSourceListener(SourceInfoSchemaSourceTransformer.ofYang(
+            masterSchemaRepository, masterSchemaRepository, YangIRSourceModule.provideTextToIR()));
 
         final NetconfTopologySetup setup = NetconfTopologySetup.builder()
             .setActorSystem(system)
@@ -425,7 +426,7 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     @Test
     void testMissingSchemaSourceOnMissingProvider() {
-        final var repository = new SharedSchemaRepository("test");
+        final var repository = new SharedSchemaRepository(PARSER_FACTORY, "test");
 
         final var deviceSchemaProvider2 = mock(DeviceNetconfSchemaProvider.class);
         doReturn(repository).when(deviceSchemaProvider2).repository();

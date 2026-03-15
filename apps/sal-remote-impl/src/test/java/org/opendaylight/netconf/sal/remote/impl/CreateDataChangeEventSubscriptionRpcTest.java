@@ -207,10 +207,10 @@ class CreateDataChangeEventSubscriptionRpcTest {
         final var inference = stack.toInference();
 
         final var builder = ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(rpcStmt.input().argument()));
+            .withNodeIdentifier(new NodeIdentifier(rpcStmt.inputStatement().argument()));
         if (leafName != null) {
             final var lfQName = QName.create(rpcStmt.argument(), leafName);
-            stack.enterDataTree(rpcStmt.input().argument());
+            stack.enterDataTree(rpcStmt.inputStatement().argument());
             stack.enterDataTree(lfQName);
             builder.withChild(ImmutableNodes.leafNode(lfQName, leafValue));
         }

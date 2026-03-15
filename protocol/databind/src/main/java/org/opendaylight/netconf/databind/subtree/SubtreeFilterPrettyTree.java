@@ -10,6 +10,7 @@ package org.opendaylight.netconf.databind.subtree;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.xml.XmlEscapers;
+import java.io.IOException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.concepts.PrettyTree;
 
@@ -23,102 +24,104 @@ final class SubtreeFilterPrettyTree extends PrettyTree {
 
     SubtreeFilterPrettyTree(final SubtreeFilter filter) {
         this.filter = requireNonNull(filter);
-        this.prefixes = Prefixes.of(filter);
+        prefixes = Prefixes.of(filter);
     }
 
     @Override
-    public void appendTo(final StringBuilder sb, final int depth) {
-        appendIndent(sb, depth);
-        sb.append("<filter type=\"subtree\">").append('\n');
-        appendSiblingSet(sb, depth + 1, prefixes, filter);
-        appendIndent(sb, depth);
-        sb.append("</filter>");
+    public Appendable appendTo(final Appendable appendable, final int depth) throws IOException {
+        appendIndent(appendable, depth);
+        appendable.append("<filter type=\"subtree\">").append('\n');
+        appendSiblingSet(appendable, depth + 1, prefixes, filter);
+        appendIndent(appendable, depth);
+        return appendable.append("</filter>");
     }
 
-    private static void appendSiblingSet(final StringBuilder sb, final int depth, final Prefixes prefixes,
-            final SiblingSet siblings) {
+    private static void appendSiblingSet(final Appendable appendable, final int depth, final Prefixes prefixes,
+            final SiblingSet siblings) throws IOException {
         for (var contentMatch : siblings.contentMatches()) {
-            appendContentMatch(sb, depth, prefixes, contentMatch);
+            appendContentMatch(appendable, depth, prefixes, contentMatch);
         }
         for (var selection : siblings.selections()) {
-            appendSelection(sb, depth, prefixes, selection);
+            appendSelection(appendable, depth, prefixes, selection);
         }
         for (var containment : siblings.containments()) {
-            appendContainment(sb, depth, prefixes, containment);
+            appendContainment(appendable, depth, prefixes, containment);
         }
     }
 
-    private static void appendContentMatch(final StringBuilder sb, final int depth, final Prefixes prefixes,
-            final ContentMatchNode node) {
-        startSibling(sb, depth, prefixes, node);
-        sb.append(">\n");
-        appendIndent(sb, depth + 1);
-        sb.append(node.qnameValueMap().values().stream().findFirst().orElseThrow()).append('\n');
-        endSibling(sb, depth, prefixes, node);
+    private static void appendContentMatch(final Appendable appendable, final int depth, final Prefixes prefixes,
+            final ContentMatchNode node) throws IOException {
+        startSibling(appendable, depth, prefixes, node);
+        appendable.append(">\n");
+        appendIndent(appendable, depth + 1);
+        appendable.append(node.qnameValueMap().values().stream().findFirst().orElseThrow().toString()).append('\n');
+        endSibling(appendable, depth, prefixes, node);
     }
 
-    private static void appendSelection(final StringBuilder sb, final int depth, final Prefixes prefixes,
-            final SelectionNode node) {
-        startSibling(sb, depth, prefixes, node);
+    private static void appendSelection(final Appendable appendable, final int depth, final Prefixes prefixes,
+            final SelectionNode node) throws IOException {
+        startSibling(appendable, depth, prefixes, node);
         for (var am : node.attributeMatches()) {
             final var sel = am.selection();
-            sb.append(" ");
-            appendPrefix(sb, prefixes, sel.qname().getNamespace().toString());
-            sb.append(sel.qname().getLocalName());
-            sb.append("=");
-            appendAttributeData(sb, String.valueOf(am.value()));
+            appendable.append(" ");
+            appendPrefix(appendable, prefixes, sel.qname().getNamespace().toString());
+            appendable.append(sel.qname().getLocalName());
+            appendable.append("=");
+            appendAttributeData(appendable, String.valueOf(am.value()));
         }
-        sb.append("/>\n");
+        appendable.append("/>\n");
     }
 
-    private static void appendContainment(final StringBuilder sb, final int depth, final Prefixes prefixes,
-            final ContainmentNode node) {
-        startSibling(sb, depth, prefixes, node);
-        sb.append(">\n");
-        appendSiblingSet(sb, depth + 1, prefixes, node);
-        endSibling(sb, depth, prefixes, node);
+    private static void appendContainment(final Appendable appendable, final int depth, final Prefixes prefixes,
+            final ContainmentNode node) throws IOException {
+        startSibling(appendable, depth, prefixes, node);
+        appendable.append(">\n");
+        appendSiblingSet(appendable, depth + 1, prefixes, node);
+        endSibling(appendable, depth, prefixes, node);
     }
 
-    private static void startSibling(final StringBuilder sb, final int depth, final Prefixes prefixes,
-            final Sibling node) {
-        appendIndent(sb, depth);
-        sb.append('<');
-        appendNamespaceSelection(sb, prefixes, node);
+    private static void startSibling(final Appendable appendable, final int depth, final Prefixes prefixes,
+            final Sibling node) throws IOException {
+        appendIndent(appendable, depth);
+        appendable.append('<');
+        appendNamespaceSelection(appendable, prefixes, node);
         // For the first sibling (depth == 1), add namespace declarations.
         if (depth == 1) {
             for (var entry : prefixes.getNamespaceToPrefixMap().entrySet()) {
-                sb.append(" xmlns:").append(entry.getValue()).append("=\"").append(entry.getKey()).append("\"");
+                appendable.append(" xmlns:").append(entry.getValue()).append("=\"").append(entry.getKey()).append("\"");
             }
         }
     }
 
-    private static void endSibling(final StringBuilder sb, final int depth, final Prefixes prefixes,
-            final Sibling node) {
-        appendIndent(sb, depth);
-        sb.append("</");
-        appendNamespaceSelection(sb, prefixes, node);
-        sb.append(">\n");
+    private static void endSibling(final Appendable appendable, final int depth, final Prefixes prefixes,
+            final Sibling node) throws IOException {
+        appendIndent(appendable, depth);
+        appendable.append("</");
+        appendNamespaceSelection(appendable, prefixes, node);
+        appendable.append(">\n");
     }
 
-    private static void appendNamespaceSelection(final StringBuilder sb, final Prefixes prefixes, final Sibling node) {
+    private static void appendNamespaceSelection(final Appendable appendable, final Prefixes prefixes,
+            final Sibling node) throws IOException {
         switch (node.selection()) {
             case NamespaceSelection.Exact exact -> {
                 String ns = exact.qname().getNamespace().toString();
-                appendPrefix(sb, prefixes, ns);
-                sb.append(exact.qname().getLocalName());
+                appendPrefix(appendable, prefixes, ns);
+                appendable.append(exact.qname().getLocalName());
             }
             case NamespaceSelection.Wildcard wildcard -> {
                 // For Wildcard, output only the unqualified local name.
-                sb.append(wildcard.name().getLocalName());
+                appendable.append(wildcard.name().getLocalName());
             }
         }
     }
 
-    private static void appendPrefix(final StringBuilder sb, final Prefixes prefixes, final String namespace) {
-        sb.append(prefixes.lookUpPrefix(namespace)).append(':');
+    private static void appendPrefix(final Appendable appendable, final Prefixes prefixes, final String namespace)
+            throws IOException {
+        appendable.append(prefixes.lookUpPrefix(namespace)).append(':');
     }
 
-    private static void appendAttributeData(final StringBuilder sb, final String str) {
-        sb.append('"').append(XmlEscapers.xmlAttributeEscaper().escape(str)).append('"');
+    private static void appendAttributeData(final Appendable appendable, final String str) throws IOException {
+        appendable.append('"').append(XmlEscapers.xmlAttributeEscaper().escape(str)).append('"');
     }
 }

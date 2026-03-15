@@ -86,9 +86,10 @@ import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SharedSchemaRepository;
+import org.opendaylight.yangtools.yang.model.repo.spi.SourceInfoSchemaSourceTransformer;
 import org.opendaylight.yangtools.yang.model.spi.source.DelegatedYangTextSource;
-import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
-import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
+import org.opendaylight.yangtools.yang.source.ir.dagger.YangIRSourceModule;
 
 /**
  * Unit tests for NetconfNodeManager.
@@ -137,9 +138,9 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         masterAddress = Cluster.get(masterSystem).selfAddress().toString();
 
-        SharedSchemaRepository masterSchemaRepository = new SharedSchemaRepository("master");
-        masterSchemaRepository.registerSchemaSourceListener(
-                TextToIRTransformer.create(masterSchemaRepository, masterSchemaRepository));
+        SharedSchemaRepository masterSchemaRepository = new SharedSchemaRepository(PARSER_FACTORY, "master");
+        masterSchemaRepository.registerSchemaSourceListener(SourceInfoSchemaSourceTransformer.ofYang(
+                masterSchemaRepository, masterSchemaRepository, YangIRSourceModule.provideTextToIR()));
 
         final String yangTemplate = """
             module ID {\
@@ -165,9 +166,9 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
                 DEVICE_ID, responseTimeout, mockMountPointService).withDispatcher(Dispatchers.DefaultDispatcherId()),
                 NetconfTopologyUtils.createMasterActorName(DEVICE_ID.name(), masterAddress));
 
-        SharedSchemaRepository slaveSchemaRepository = new SharedSchemaRepository("slave");
-        slaveSchemaRepository.registerSchemaSourceListener(
-                TextToIRTransformer.create(slaveSchemaRepository, slaveSchemaRepository));
+        SharedSchemaRepository slaveSchemaRepository = new SharedSchemaRepository(PARSER_FACTORY, "slave");
+        slaveSchemaRepository.registerSchemaSourceListener(SourceInfoSchemaSourceTransformer.ofYang(
+            slaveSchemaRepository, slaveSchemaRepository, YangIRSourceModule.provideTextToIR()));
 
         final var provider = createDeviceSchemaProvider(slaveSchemaRepository);
         doReturn(slaveSchemaRepository).when(provider).registry();

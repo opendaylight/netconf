@@ -40,7 +40,6 @@ import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.ElementCountConstraint;
 import org.opendaylight.yangtools.yang.model.api.ElementCountConstraintAware;
 import org.opendaylight.yangtools.yang.model.api.IdentitySchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
@@ -51,6 +50,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.TypedDataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.meta.ModelStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.MaxElementsArgument;
+import org.opendaylight.yangtools.yang.model.api.stmt.MinElementsArgument;
 import org.opendaylight.yangtools.yang.model.api.type.BinaryTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BooleanTypeDefinition;
@@ -239,16 +240,21 @@ public class PropertyEntity {
             generator.writeEndObject();
             generator.writeStringField(DESCRIPTION, schemaNode.getDescription().orElse(""));
 
-            if (listNode.getElementCountConstraint().isPresent()) {
-                final var minElements = listNode.getElementCountConstraint().orElseThrow().getMinElements();
-                final var maxElements = listNode.getElementCountConstraint().orElseThrow().getMaxElements();
-                if (minElements != null) {
-                    createExamples(listNode, minElements, stack);
-                    generator.writeNumberField("minItems", minElements);
+            final var stmt = listNode.asEffectiveStatement();
+            final var min = stmt.minElementsStatement();
+            if (min != null) {
+                final var minElements = min.argument();
+                final var lowerInt = minElements.lowerInt();
+                if (lowerInt < Integer.MAX_VALUE) {
+                    createExamples(listNode, lowerInt + 1, stack);
+                } else {
+                    LOG.debug("Skipping examples with more than {} elements", lowerInt);
                 }
-                if (maxElements != null) {
-                    generator.writeNumberField("maxItems", maxElements);
-                }
+                writeMinItems(minElements);
+            }
+            final var max = stmt.maxElementsStatement();
+            if (max != null) {
+                writeMaxItems(max.argument());
             }
         } else {
              /*
@@ -256,6 +262,19 @@ public class PropertyEntity {
                 allOf is not an option, because ServiceNow can't parse it.
               */
             generator.writeStringField("$ref", ref);
+        }
+    }
+
+    private void writeMinItems(final MinElementsArgument minElements) throws IOException {
+        generator.writeNumberField("minItems", minElements.lowerBig().add(BigInteger.ONE));
+    }
+
+    private void writeMaxItems(final MaxElementsArgument maxElements) throws IOException {
+        switch (maxElements) {
+            case MaxElementsArgument.Bounded bounded -> generator.writeNumberField("maxItems", bounded.asBigInteger());
+            case MaxElementsArgument.Unbounded unbounded -> {
+                // No-op
+            }
         }
     }
 
@@ -306,7 +325,7 @@ public class PropertyEntity {
             if (childNode instanceof TypedDataSchemaNode leafSchemaNode) {
                 final var def = new TypeDef();
                 stack.enterDataTree(childNode.getQName());
-                processTypeDef(leafSchemaNode.getType(), leafSchemaNode, stack, def);
+                processTypeDef(leafSchemaNode.typeDefinition(), leafSchemaNode, stack, def);
                 stack.exit();
                 if (def.hasExample()) {
                     firstExampleMap.put(leafSchemaNode.getQName().getLocalName(), def.getExample());
@@ -346,29 +365,34 @@ public class PropertyEntity {
             throws IOException {
         generator.writeStringField(TYPE, ARRAY_TYPE);
 
-        Integer minElements = null;
-        final var optConstraint = listNode.getElementCountConstraint();
-        if (optConstraint.isPresent()) {
-            minElements = optConstraint.orElseThrow().getMinElements();
-            if (minElements != null) {
-                generator.writeNumberField("minItems", minElements);
-            }
-            final var maxElements = optConstraint.orElseThrow().getMaxElements();
-            if (maxElements != null) {
-                generator.writeNumberField("maxItems", maxElements);
-            }
+        final var stmt = listNode.asEffectiveStatement();
+        final var min = stmt.minElementsStatement();
+        final Integer exampleCount;
+        if (min != null) {
+            final var minElements = min.argument();
+            writeMinItems(minElements);
+
+            final var lowerInt = minElements.lowerInt();
+            exampleCount = lowerInt < Integer.MAX_VALUE ? lowerInt + 1 : null;
+        } else {
+            exampleCount = null;
         }
+        final var max = stmt.maxElementsStatement();
+        if (max != null) {
+            writeMaxItems(max.argument());
+        }
+
         final var def = new TypeDef();
-        processTypeDef(listNode.getType(), listNode, stack, def);
+        processTypeDef(listNode.typeDefinition(), listNode, stack, def);
 
         generator.writeObjectFieldStart(ITEMS);
-        processTypeDef(listNode.getType(), listNode, stack);
+        processTypeDef(listNode.typeDefinition(), listNode, stack);
         generator.writeEndObject();
         generator.writeStringField(DESCRIPTION, listNode.getDescription().orElse(""));
 
-        if (def.hasExample() && minElements != null) {
+        if (def.hasExample() && exampleCount != null) {
             final var listOfExamples = new ArrayList<>();
-            for (int i = 0; i < minElements; i++) {
+            for (int i = 0; i < exampleCount; i++) {
                 listOfExamples.add(def.getExample());
             }
             generator.writeArrayFieldStart(EXAMPLE);
@@ -383,7 +407,7 @@ public class PropertyEntity {
             final SchemaInferenceStack stack, final XMLNamespace parentNamespace) throws IOException {
         final var leafDescription = leafNode.getDescription().orElse("");
         generator.writeStringField(DESCRIPTION, leafDescription);
-        processTypeDef(leafNode.getType(), leafNode, stack);
+        processTypeDef(leafNode.typeDefinition(), leafNode, stack);
         if (!leafNode.getQName().getNamespace().equals(parentNamespace)) {
             // If the parent is not from the same model, define the child XML namespace.
             buildXmlParameter(leafNode);
@@ -417,10 +441,11 @@ public class PropertyEntity {
             }
         }
         //  A list or leaf-list node with a "min-elements" statement with a value greater than zero.
-        return schemaNode instanceof ElementCountConstraintAware constraintAware
-            && constraintAware.getElementCountConstraint()
-            .map(ElementCountConstraint::getMinElements)
-            .orElse(0) > 0;
+        if (schemaNode instanceof ElementCountConstraintAware constraintAware) {
+            final var countMatcher = constraintAware.elementCountMatcher();
+            return countMatcher != null && !countMatcher.matchesAll();
+        }
+        return false;
     }
 
     private void processTypeDef(final TypeDefinition<?> leafTypeDef, final DataSchemaNode schemaNode,

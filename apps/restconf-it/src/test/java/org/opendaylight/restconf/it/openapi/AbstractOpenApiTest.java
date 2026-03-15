@@ -38,6 +38,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.eclipse.jdt.annotation.NonNull;
 import org.json.JSONObject;
 import org.json.JSONParserConfiguration;
 import org.junit.jupiter.api.AfterAll;
@@ -95,10 +96,13 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.HttpServerListenStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.transport.HttpOverTcp;
 import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecServices;
+import org.opendaylight.yangtools.dagger.yang.parser.DaggerDefaultYangParserComponent;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.common.Uint64;
-import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
+import org.opendaylight.yangtools.yang.model.spi.source.YangTextToIRSourceTransformer;
+import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
+import org.opendaylight.yangtools.yang.source.ir.dagger.YangIRSourceModule;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -106,6 +110,9 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 public class AbstractOpenApiTest extends AbstractDataBrokerTest {
     private static final JSONParserConfiguration JSON_PARSER_CONFIGURATION = new JSONParserConfiguration()
         .withStrictMode();
+    private static final @NonNull YangParserFactory PARSER_FACTORY =
+        DaggerDefaultYangParserComponent.create().parserFactory();
+    private static final @NonNull YangTextToIRSourceTransformer TEXT_TO_IR = YangIRSourceModule.provideTextToIR();
 
     private static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
     private static final String TOPOLOGY_URI =
@@ -368,10 +375,9 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
             id -> null, sslContextFactoryProvider());
         final var netconfClientFactory = new NetconfClientFactoryImpl(netconfTimer, sshTransportStackFactory);
         final var topologySchemaAssembler = new NetconfTopologySchemaAssembler(4);
-        final var yangParserFactory = new DefaultYangParserFactory();
         final var schemaSourceMgr =
-            new DefaultSchemaResourceManager(yangParserFactory, tmpDir.getAbsolutePath(), "schema");
-        final var baseSchemaProvider = new DefaultBaseNetconfSchemaProvider(yangParserFactory);
+            new DefaultSchemaResourceManager(PARSER_FACTORY, TEXT_TO_IR, tmpDir.getAbsolutePath(), "schema");
+        final var baseSchemaProvider = new DefaultBaseNetconfSchemaProvider(PARSER_FACTORY);
 
         return new NetconfTopologyImpl(netconfClientFactory, netconfTimer, topologySchemaAssembler,
             schemaSourceMgr, dataBroker, domMountPointService, encryptionService, netconfClientConfBuilderFactory,

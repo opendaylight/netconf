@@ -37,8 +37,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
 import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecFactory;
 import org.opendaylight.yangtools.binding.generator.impl.DefaultBindingRuntimeGenerator;
+import org.opendaylight.yangtools.dagger.yang.parser.DaggerDefaultYangParserComponent;
 import org.opendaylight.yangtools.yang.parser.api.YangParserException;
-import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
 @ExtendWith(MockitoExtension.class)
 class NetconfNotificationManagerTest {
@@ -224,7 +224,7 @@ class NetconfNotificationManagerTest {
     }
 
     private static NetconfNotificationManager createManager() throws YangParserException {
-        return new NetconfNotificationManager(new DefaultYangParserFactory(),
+        return new NetconfNotificationManager(DaggerDefaultYangParserComponent.create().parserFactory(),
             new DefaultBindingRuntimeGenerator(), new DefaultBindingDOMCodecFactory());
     }
 }
