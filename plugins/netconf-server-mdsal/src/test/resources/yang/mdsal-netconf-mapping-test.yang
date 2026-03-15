@@ -180,7 +180,7 @@ module config {
         }
     }
 
-    augment "/map:top/map:modules/" {
+    augment "/map:top/map:modules" {
         container augmented-container {
             leaf identifier {
                 type string;
@@ -188,7 +188,7 @@ module config {
         }
     }
 
-    augment "/map:top/map:modules/" {
+    augment "/map:top/map:modules" {
         leaf leaf-from-augment {
             type string;
         }
