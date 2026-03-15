@@ -94,8 +94,8 @@ class DefaultMapBodyOrderTest {
         doReturn(3).when(entry).size();
         doReturn(new PrettyTree() {
             @Override
-            public void appendTo(final StringBuilder sb, final int depth) {
-                sb.append("prettyTree");
+            public Appendable appendTo(final Appendable appendable, final int depth) throws IOException {
+                return appendable.append("prettyTree");
             }
         }).when(entry).prettyTree();
 
@@ -109,8 +109,8 @@ class DefaultMapBodyOrderTest {
         doReturn(2).when(entry).size();
         doReturn(new PrettyTree() {
             @Override
-            public void appendTo(final StringBuilder sb, final int depth) {
-                sb.append("prettyTree");
+            public Appendable appendTo(final Appendable appendable, final int depth) throws IOException {
+                return appendable.append("prettyTree");
             }
         }).when(entry).prettyTree();
 

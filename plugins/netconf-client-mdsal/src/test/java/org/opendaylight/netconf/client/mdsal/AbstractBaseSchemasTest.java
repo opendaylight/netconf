@@ -9,9 +9,9 @@ package org.opendaylight.netconf.client.mdsal;
 
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
-import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
+import org.opendaylight.yangtools.dagger.yang.parser.DaggerDefaultYangParserComponent;
 
 public abstract class AbstractBaseSchemasTest {
     protected static final BaseNetconfSchemaProvider BASE_SCHEMAS =
-        new DefaultBaseNetconfSchemaProvider(new DefaultYangParserFactory());
+        new DefaultBaseNetconfSchemaProvider(DaggerDefaultYangParserComponent.create().parserFactory());
 }
