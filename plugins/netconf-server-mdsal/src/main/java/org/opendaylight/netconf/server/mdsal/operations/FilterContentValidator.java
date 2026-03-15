@@ -197,7 +197,7 @@ public class FilterContentValidator {
                 if (listKey instanceof IdentityrefTypeDefinition) {
                     keys.put(qname, keyValue);
                 } else {
-                    final var keyType = listKey.getType();
+                    final var keyType = listKey.typeDefinition();
                     if (keyType instanceof IdentityrefTypeDefinition || keyType instanceof LeafrefTypeDefinition
                             || keyType instanceof InstanceIdentifierTypeDefinition) {
                         final var document = filterContent.getDomElement().getOwnerDocument();

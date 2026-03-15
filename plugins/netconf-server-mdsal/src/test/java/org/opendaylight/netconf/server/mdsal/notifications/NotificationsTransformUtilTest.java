@@ -25,9 +25,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yangtools.binding.EventInstantAware;
 import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecFactory;
 import org.opendaylight.yangtools.binding.generator.impl.DefaultBindingRuntimeGenerator;
+import org.opendaylight.yangtools.dagger.yang.parser.DaggerDefaultYangParserComponent;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.parser.api.YangParserException;
-import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
@@ -52,8 +52,8 @@ class NotificationsTransformUtilTest {
 
     @BeforeAll
     static void beforeAll() throws YangParserException {
-        UTIL = new NotificationsTransformUtil(new DefaultYangParserFactory(), new DefaultBindingRuntimeGenerator(),
-            new DefaultBindingDOMCodecFactory());
+        UTIL = new NotificationsTransformUtil(DaggerDefaultYangParserComponent.create().parserFactory(),
+            new DefaultBindingRuntimeGenerator(), new DefaultBindingDOMCodecFactory());
     }
 
     @Test
