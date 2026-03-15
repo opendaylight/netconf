@@ -258,7 +258,7 @@ final class WadlTemplate {
                 builder.append("<param required=\"true\" style=\"template\" name=\"");
                 builder.append(pathParam.getQName().getLocalName());
                 builder.append("\" type=\"");
-                builder.append(pathParam.getType().getQName().getLocalName());
+                builder.append(pathParam.typeDefinition().getQName().getLocalName());
                 builder.append("\"/>");
                 builder.newLineIfNotEmpty();
             }

@@ -77,12 +77,12 @@ public sealed interface DatabindPath {
 
         @Override
         public InputEffectiveStatement inputStatement() {
-            return statement.input();
+            return statement.inputStatement();
         }
 
         @Override
         public OutputEffectiveStatement outputStatement() {
-            return statement.output();
+            return statement.outputStatement();
         }
     }
 
@@ -92,7 +92,7 @@ public sealed interface DatabindPath {
      * @param databind the {@link DatabindContext} to which this path is bound
      * @param inference the {@link EffectiveStatementInference} made by this path
      * @param instance the {@link YangInstanceIdentifier} of the instance being referenced,
-     *                 {@link YangInstanceIdentifier#empty()} denotes the datastore
+     *                 {@link YangInstanceIdentifier#of()} denotes the datastore
      * @param schema the {@link DataSchemaContext} of the datastore instance
      */
     // FIXME: split into 'Datastore' and 'Data' with non-empty instance, so we can bind to correct
@@ -207,12 +207,12 @@ public sealed interface DatabindPath {
 
         @Override
         public InputEffectiveStatement inputStatement() {
-            return statement.input();
+            return statement.inputStatement();
         }
 
         @Override
         public OutputEffectiveStatement outputStatement() {
-            return statement.output();
+            return statement.outputStatement();
         }
     }
 
@@ -223,7 +223,7 @@ public sealed interface DatabindPath {
     sealed interface InstanceReference extends DatabindPath {
         /**
          * {@return the {@link YangInstanceIdentifier} of the instance being referenced,
-         *          {@link YangInstanceIdentifier#empty()} denotes the data root}
+         *          {@link YangInstanceIdentifier#of()} denotes the data root}
          */
         YangInstanceIdentifier instance();
 
