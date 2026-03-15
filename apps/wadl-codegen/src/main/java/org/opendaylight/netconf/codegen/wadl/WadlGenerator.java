@@ -25,10 +25,10 @@ final class WadlGenerator implements FileGenerator {
             final Set<Module> localModules, final ModuleResourceResolver moduleResourcePathResolver) {
         final var result = ImmutableTable.<GeneratedFileType, GeneratedFilePath, GeneratedFile>builder();
 
-        for (Module module : localModules) {
-            final CharSequence body = new WadlTemplate(context, module).body();
+        for (var module : localModules) {
+            final var body = new WadlTemplate(context, module).body();
             if (body != null) {
-                result.put(GeneratedFileType.RESOURCE, GeneratedFilePath.ofPath(module.getName() + ".wadl"),
+                result.put(GeneratedFileType.RESOURCE, new GeneratedFilePath(module.getName() + ".wadl"),
                     GeneratedFile.of(GeneratedFileLifecycle.TRANSIENT, body));
             }
         }

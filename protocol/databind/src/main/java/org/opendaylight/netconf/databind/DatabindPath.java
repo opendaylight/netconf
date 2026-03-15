@@ -77,12 +77,12 @@ public sealed interface DatabindPath {
 
         @Override
         public InputEffectiveStatement inputStatement() {
-            return statement.input();
+            return statement.inputStatement();
         }
 
         @Override
         public OutputEffectiveStatement outputStatement() {
-            return statement.output();
+            return statement.outputStatement();
         }
     }
 
@@ -207,12 +207,12 @@ public sealed interface DatabindPath {
 
         @Override
         public InputEffectiveStatement inputStatement() {
-            return statement.input();
+            return statement.inputStatement();
         }
 
         @Override
         public OutputEffectiveStatement outputStatement() {
-            return statement.output();
+            return statement.outputStatement();
         }
     }
 

@@ -202,7 +202,7 @@ public final class AsyncGetDataProcessor {
         }
 
         // FIXME: Document now this works with the likes of YangInstanceIdentifier. I bet it does not.
-        final var defaultVal = leafSchema.getType().getDefaultValue().orElse(null);
+        final var defaultVal = leafSchema.typeDefinition().getDefaultValue().orElse(null);
 
         // This is a combined check for when we need to emit the leaf.
         if (
@@ -311,9 +311,8 @@ public final class AsyncGetDataProcessor {
         // FIXME: this check is bogus, as it confuses yang.data.api (NormalizedNode) with yang.model.api (RpcDefinition)
         if (configDataNode instanceof RpcDefinition) {
             return prepareRpcData(configDataNode, stateDataNode);
-        } else {
-            return prepareData(configDataNode, stateDataNode);
         }
+        return prepareData(configDataNode, stateDataNode);
     }
 
     /**
