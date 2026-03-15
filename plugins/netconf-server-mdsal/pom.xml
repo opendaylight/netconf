@@ -206,7 +206,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-parser-impl</artifactId>
+            <artifactId>dagger-yang-parser</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -273,7 +273,7 @@ public final class PathsEntity extends OpenApiEntity {
     private static String getAllowedType(final ListSchemaNode list, final QName key) {
         // see: https://datatracker.ietf.org/doc/html/rfc7950#section-4.2.4
         // see: https://swagger.io/docs/specification/data-models/data-types/
-        return switch (((LeafSchemaNode) list.getDataChildByName(key)).getType()) {
+        return switch (((LeafSchemaNode) list.getDataChildByName(key)).typeDefinition()) {
             // TODO: Use unnamed patterns when we have Java 22+
             case Int8TypeDefinition def -> "integer";
             case Int16TypeDefinition def -> "integer";
