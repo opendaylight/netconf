@@ -14,6 +14,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
+import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
@@ -29,6 +30,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Validate$F;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.WritableRunning;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Xpath;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.NotificationsData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.IetfNetconfMonitoringData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.IetfNetconfNotificationsData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.IetfYangLibraryData;
 import org.opendaylight.yangtools.binding.YangFeature;
 import org.opendaylight.yangtools.binding.runtime.spi.ModuleInfoSnapshotBuilder;
 import org.opendaylight.yangtools.yang.parser.api.YangParserException;
@@ -62,13 +67,11 @@ public final class DefaultBaseNetconfSchemaProvider implements BaseNetconfSchema
     private final LoadingCache<Capabilities, DefaultBaseNetconfSchema> baseSchemas = CacheBuilder.newBuilder()
         .weakValues().build(new CacheLoader<>() {
             @Override
-            public DefaultBaseNetconfSchema load(final Capabilities key) throws YangParserException {
+            public DefaultBaseNetconfSchema load(final Capabilities key) throws IOException, YangParserException {
                 LOG.debug("Loading base schema for {}", key);
                 final var sw = Stopwatch.createStarted();
 
-                final var builder = new ModuleInfoSnapshotBuilder(parserFactory)
-                    .add(org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601
-                        .YangModuleInfoImpl.getInstance());
+                final var builder = new ModuleInfoSnapshotBuilder(parserFactory).add(IetfNetconfData.META);
 
                 final var netconfFeatures = ImmutableSet.<YangFeature<?, @NonNull IetfNetconfData>>builder();
                 if (key.writableRunning) {
@@ -98,19 +101,13 @@ public final class DefaultBaseNetconfSchemaProvider implements BaseNetconfSchema
                 builder.addModuleFeatures(IetfNetconfData.class, netconfFeatures.build());
 
                 if (key.library) {
-                    builder.add(org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104
-                        .YangModuleInfoImpl.getInstance());
+                    builder.add(IetfYangLibraryData.META);
                 }
                 if (key.monitoring) {
-                    builder.add(org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring
-                        .rev101004.YangModuleInfoImpl.getInstance());
+                    builder.add(IetfNetconfMonitoringData.META);
                 }
                 if (key.notifications) {
-                    builder
-                        .add(org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                            .YangModuleInfoImpl.getInstance())
-                        .add(org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications
-                            .rev120206.YangModuleInfoImpl.getInstance());
+                    builder.add(NotificationsData.META).add(IetfNetconfNotificationsData.META);
                 }
 
                 final var snapshot = builder.build();
