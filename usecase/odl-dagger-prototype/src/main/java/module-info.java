@@ -12,6 +12,7 @@ module org.opendaylight.netconf.dagger {
     exports org.opendaylight.netconf.dagger.springboot.config;
     exports org.opendaylight.netconf.dagger.mdsal;
     exports org.opendaylight.netconf.dagger.controller;
+    exports org.opendaylight.netconf.dagger.netconf;
 
     uses org.opendaylight.yangtools.binding.meta.YangModelBindingProvider;
 
@@ -35,6 +36,9 @@ module org.opendaylight.netconf.dagger {
     requires org.opendaylight.mdsal.eos.dom.simple;
     requires org.opendaylight.mdsal.singleton.api;
     requires org.opendaylight.mdsal.singleton.impl;
+    requires org.opendaylight.restconf.server.api;
+    requires org.opendaylight.restconf.server.mdsal;
+    requires org.opendaylight.restconf.server.spi;
     requires org.opendaylight.yangtools.binding.generator;
     requires org.opendaylight.yangtools.binding.runtime.spi;
     requires org.opendaylight.yangtools.odlext.parser.support;
@@ -50,6 +54,7 @@ module org.opendaylight.netconf.dagger {
     requires org.opendaylight.yangtools.yang.parser.api;
     requires org.opendaylight.yangtools.yang.parser.rfc7950;
     requires org.opendaylight.yangtools.yang.xpath.impl;
+    requires restconf.server.jaxrs;
     requires servlet.api;
     requires servlet.jersey2;
     requires web.api;
@@ -60,4 +65,5 @@ module org.opendaylight.netconf.dagger {
     requires static jakarta.inject;
     requires static java.compiler;
     requires static org.eclipse.jdt.annotation;
+    requires java.validation;
 }
