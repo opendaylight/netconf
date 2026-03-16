@@ -112,7 +112,7 @@ class MdsalDomBrokerTest {
         final var modelContext = component.modelContext();
         final var classPathModels = modelContext.getModules();
         assertThat(classPathModels)
-            .hasSize(6)
+            .hasSize(12)
             .extracting(ModuleLike::getSourceIdentifier)
             .extracting(SourceIdentifier::toYangFilename)
             .containsExactlyInAnyOrder(
@@ -121,7 +121,13 @@ class MdsalDomBrokerTest {
                 "odl-general-entity@2015-09-30.yang",
                 "distributed-datastore-provider@2025-01-30.yang",
                 "odl-controller-cds-types@2025-01-31.yang",
-                "toaster@2009-11-20.yang"
+                "toaster@2009-11-20.yang",
+                "aaa@2016-12-14.yang",
+                "aaa-app-config@2017-06-19.yang",
+                "aaa-cert@2015-11-26.yang",
+                "aaa-cert-mdsal@2016-03-21.yang",
+                "aaa-cert-rpc@2015-12-15.yang",
+                "aaa-password-service-config@2017-06-19.yang"
             );
     }
 
