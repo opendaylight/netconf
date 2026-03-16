@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0b78ddc_bd6e8a65",
+        "filename": "usecase/odl-dagger-prototype/src/main/resources/org.opendaylight.restconf.nb.rfc8040.cfg",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-03-16T17:00:12Z",
+      "side": 1,
+      "message": "I would presume this would be application.properties for a SpringBoot application",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 38
+      },
+      "revId": "95047e6cb7f333935c53fd082b47837849e35ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80f56d27_22e9d79f",
+        "filename": "usecase/odl-dagger-prototype/src/main/resources/org.opendaylight.restconf.nb.rfc8040.cfg",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-03-16T17:00:12Z",
+      "side": 1,
+      "message": "I would expect this documentation to be picked up from generated metadata.",
+      "range": {
+        "startLine": 13,
+        "startChar": 2,
+        "endLine": 13,
+        "endChar": 21
+      },
+      "revId": "95047e6cb7f333935c53fd082b47837849e35ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "885d7e47_0aa882c3",
+        "filename": "usecase/odl-dagger-prototype/src/main/resources/org.opendaylight.restconf.nb.rfc8040.cfg",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-03-16T17:00:12Z",
+      "side": 1,
+      "message": "this would be something like odl.netconf.prototype.restconf.port",
+      "range": {
+        "startLine": 14,
+        "startChar": 1,
+        "endLine": 14,
+        "endChar": 13
+      },
+      "revId": "95047e6cb7f333935c53fd082b47837849e35ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
