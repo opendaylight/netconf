@@ -12,6 +12,7 @@ module org.opendaylight.netconf.dagger {
     exports org.opendaylight.netconf.dagger.aaa;
     exports org.opendaylight.netconf.dagger.controller;
     exports org.opendaylight.netconf.dagger.mdsal;
+    exports org.opendaylight.netconf.dagger.netconf;
     exports org.opendaylight.netconf.dagger.springboot.config;
 
     uses org.opendaylight.yangtools.binding.meta.YangModelBindingProvider;
@@ -50,12 +51,18 @@ module org.opendaylight.netconf.dagger {
     requires aaa.password.service.impl;
     requires aaa.shiro;
     requires aaa.tokenauthrealm;
+    requires java.validation;
     requires javax.servlet.api;
     requires mdsal.dom.inmemory.datastore;
     requires org.opendaylight.mdsal.eos.dom.api;
     requires org.opendaylight.mdsal.eos.dom.simple;
     requires org.opendaylight.mdsal.singleton.impl;
+    requires org.opendaylight.netconf.transport.tcp;
+    requires org.opendaylight.restconf.server.api;
+    requires org.opendaylight.restconf.server.mdsal;
+    requires org.opendaylight.restconf.server.spi;
     requires repackaged.shiro;
+    requires restconf.server.jaxrs;
     requires sal.distributed.datastore;
     requires servlet.api;
     requires servlet.jersey2;
@@ -63,6 +70,12 @@ module org.opendaylight.netconf.dagger {
     requires spring.context;
     requires spring.core;
     requires web.api;
+    requires restconf.server;
+//  IDEA expect automatic name based on folder (requires transport.http), however Maven expect automatic module name
+//  from MANIFEST file.
+    requires org.opendaylight.netconf.transport.http;
+
+    requires java.net.http;
 
     requires static transitive com.google.errorprone.annotations;
     requires static jakarta.inject;
