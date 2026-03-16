@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c6ffc4d4_6b4a28f5",
+        "filename": "usecase/odl-dagger-prototype/src/main/java/org/opendaylight/netconf/dagger/netconf/RestconfModule.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-03-16T17:01:08Z",
+      "side": 1,
+      "message": "let\u0027s not do JAX-RS",
+      "range": {
+        "startLine": 116,
+        "startChar": 25,
+        "endLine": 116,
+        "endChar": 38
+      },
+      "revId": "95047e6cb7f333935c53fd082b47837849e35ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c0b78ddc_bd6e8a65",
         "filename": "usecase/odl-dagger-prototype/src/main/resources/org.opendaylight.restconf.nb.rfc8040.cfg",
         "patchSetId": 2
