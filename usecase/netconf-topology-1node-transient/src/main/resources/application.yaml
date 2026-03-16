@@ -16,3 +16,43 @@ inmemory-datastore:
 cluster-datastore-broker:
   max-data-broker-future-callback-queue-size: 1000
   max-data-broker-future-callback-pool-size: 20
+
+shiro-configuration:
+  main:
+    # Hardcode 'admin:admin' credentials directly into Shiro for testing, avoiding the need for an underlying
+    # AAA database.
+    "textRealm": org.apache.shiro.realm.text.TextConfigurationRealm
+    "textRealm.userDefinitions": "admin=admin,admin"
+    "securityManager.realms": $textRealm
+
+    "accountingListener": org.opendaylight.aaa.shiro.filters.AuthenticationListener
+    "securityManager.authenticator.authenticationListeners": $accountingListener
+    "dynamicAuthorization": org.opendaylight.aaa.shiro.realm.MDSALDynamicAuthorizationFilter
+    "invalidRequest.blockSemicolon": "false"
+    "invalidRequest.blockEncodedForwardSlash": "false"
+    "invalidRequest.blockEncodedPeriod": "false"
+  urls:
+    "/**/operations/cluster-admin**": "authcBasic, roles[admin]"
+    "/**/v1/**": "authcBasic, roles[admin]"
+    "/**/data/aaa*/**": "authcBasic, roles[admin]"
+    "/**": "authcBasic"
+
+aaa-cert-service-config:
+  use-config: true
+  use-mdsal: true
+  bundle-name: opendaylight
+  ctl-keystore:
+    name: ctl.jks
+    alias: controller
+    store-password: ""
+    dname: "CN=ODL, OU=Dev, O=LinuxFoundation, L=QC Montreal, C=CA"
+    validity: 365
+    key-alg: RSA
+    sign-alg: SHA1WithRSAEncryption
+    keysize: 1024
+    tls-protocols: []
+    cipher-suites:
+      - ""
+  trust-keystore:
+    name: truststore.jks
+    store-password: ""
