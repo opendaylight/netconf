@@ -1,0 +1,52 @@
+shiro-configuration:
+  main:
+      # Hardcode 'admin:admin' credentials directly into Shiro for testing, avoiding the need for an underlying
+      # AAA database.
+    - pair-key: textRealm
+      pair-value: org.apache.shiro.realm.text.TextConfigurationRealm
+    - pair-key: textRealm.userDefinitions
+      pair-value: "admin=admin,admin"
+    - pair-key: securityManager.realms
+      pair-value: $textRealm
+
+    - pair-key: accountingListener
+      pair-value: org.opendaylight.aaa.shiro.filters.AuthenticationListener
+    - pair-key: securityManager.authenticator.authenticationListeners
+      pair-value: $accountingListener
+    - pair-key: dynamicAuthorization
+      pair-value: org.opendaylight.aaa.shiro.realm.MDSALDynamicAuthorizationFilter
+    - pair-key: invalidRequest.blockSemicolon
+      pair-value: "false"
+    - pair-key: invalidRequest.blockEncodedForwardSlash
+      pair-value: "false"
+    - pair-key: invalidRequest.blockEncodedPeriod
+      pair-value: "false"
+  urls:
+    - pair-key: /**/operations/cluster-admin**
+      pair-value: authcBasic, roles[admin]
+    - pair-key: /**/v1/**
+      pair-value: authcBasic, roles[admin]
+    - pair-key: /**/data/aaa*/**
+      pair-value: authcBasic, roles[admin]
+    - pair-key: /**
+      pair-value: authcBasic
+
+aaa-cert-service-config:
+  use-config: true
+  use-mdsal: true
+  bundle-name: opendaylight
+  ctl-keystore:
+    name: ctl.jks
+    alias: controller
+    store-password: ""
+    dname: "CN=ODL, OU=Dev, O=LinuxFoundation, L=QC Montreal, C=CA"
+    validity: 365
+    key-alg: RSA
+    sign-alg: SHA1WithRSAEncryption
+    keysize: 1024
+    tls-protocols: []
+    cipher-suites:
+      - suite-name: ""
+  trust-keystore:
+    name: truststore.jks
+    store-password: ""
