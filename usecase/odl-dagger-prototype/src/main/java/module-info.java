@@ -18,6 +18,9 @@ module org.opendaylight.netconf.dagger {
     opens org.opendaylight.netconf.dagger.springboot.config to spring.core, spring.beans;
 
     requires transitive org.opendaylight.odlparent.dagger;
+    requires aaa.encrypt.service;
+    requires aaa.filterchain;
+    requires javax.servlet.api;
     requires mdsal.dom.inmemory.datastore;
     requires sal.distributed.datastore;
     requires spring.beans;
@@ -47,6 +50,10 @@ module org.opendaylight.netconf.dagger {
     requires org.opendaylight.yangtools.yang.parser.api;
     requires org.opendaylight.yangtools.yang.parser.rfc7950;
     requires org.opendaylight.yangtools.yang.xpath.impl;
+    requires servlet.api;
+    requires servlet.jersey2;
+    requires web.api;
+    requires web.jetty.impl;
 
     requires static transitive com.google.errorprone.annotations;
     requires static dagger;
