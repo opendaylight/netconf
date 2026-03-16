@@ -56,3 +56,31 @@ aaa-cert-service-config:
   trust-keystore:
     name: truststore.jks
     store-password: ""
+
+rfc8040-configuration:
+  # pretty-print: false
+  # data-missing-is-404: false
+  # maximum-fragment-length: 0
+  # heartbeat-interval: 10000
+  # restconf: rests
+  # ping-executor-name-prefix: ping-executor
+  # max-thread-count: 1
+
+  # Netty endpoint related settings
+  # bind-address: "0.0.0.0"
+  # bind-port: 8182
+  # api-root-path: restconf
+  # boss-threads: 0
+  # worker-threads: 0
+  # http-chunk-size: 262144
+  # default-encoding: json
+  # http2-max-frame-size: 16384
+  # http3-alt-svc-max-age: 0
+  # http3-initial-max-data: 4194304
+  # http3-initial-max-stream-data-bidirectional-remote: 262144
+  # http3-initial-max-streams-bidirectional: 100
+
+  # Netty Tls transport configuration.
+  tls-certificate: etc/tls/cert.pem
+  # Private key file in PEM format
+  tls-private-key: etc/tls/key.pem
