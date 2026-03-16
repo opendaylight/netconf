@@ -9,6 +9,7 @@
  * Dagger prototype for the RNC standalone transient applications, built from daggerized ODL components.
  */
 module org.opendaylight.netconf.dagger {
+    exports org.opendaylight.netconf.dagger.aaa;
     exports org.opendaylight.netconf.dagger.controller;
     exports org.opendaylight.netconf.dagger.mdsal;
     exports org.opendaylight.netconf.dagger.springboot.config;
@@ -42,14 +43,26 @@ module org.opendaylight.netconf.dagger {
     requires transitive org.opendaylight.yangtools.yang.xpath.impl;
     requires transitive org.opendaylight.yangtools.yin.source.dom;
     requires transitive spring.boot;
+    requires aaa.authn.api;
+    requires aaa.cert;
+    requires aaa.encrypt.service;
+    requires aaa.password.service.api;
+    requires aaa.password.service.impl;
+    requires aaa.shiro;
+    requires aaa.tokenauthrealm;
+    requires javax.servlet.api;
     requires mdsal.dom.inmemory.datastore;
     requires org.opendaylight.mdsal.eos.dom.api;
     requires org.opendaylight.mdsal.eos.dom.simple;
     requires org.opendaylight.mdsal.singleton.impl;
+    requires repackaged.shiro;
     requires sal.distributed.datastore;
+    requires servlet.api;
+    requires servlet.jersey2;
     requires spring.beans;
     requires spring.context;
     requires spring.core;
+    requires web.api;
 
     requires static transitive com.google.errorprone.annotations;
     requires static jakarta.inject;
