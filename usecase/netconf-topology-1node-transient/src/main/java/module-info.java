@@ -11,6 +11,7 @@
 module org.opendaylight.netconf.dagger {
     exports org.opendaylight.netconf.dagger.controller;
     exports org.opendaylight.netconf.dagger.mdsal;
+    exports org.opendaylight.netconf.dagger.netconf;
     exports org.opendaylight.netconf.dagger.springboot.config;
 
     uses org.opendaylight.yangtools.binding.meta.YangModelBindingProvider;
@@ -42,11 +43,16 @@ module org.opendaylight.netconf.dagger {
     requires transitive spring.boot;
     requires aaa.encrypt.service;
     requires aaa.filterchain;
+    requires java.validation;
     requires javax.servlet.api;
     requires mdsal.dom.inmemory.datastore;
     requires org.opendaylight.mdsal.eos.dom.api;
     requires org.opendaylight.mdsal.eos.dom.simple;
     requires org.opendaylight.mdsal.singleton.impl;
+    requires org.opendaylight.restconf.server.api;
+    requires org.opendaylight.restconf.server.mdsal;
+    requires org.opendaylight.restconf.server.spi;
+    requires restconf.server.jaxrs;
     requires sal.distributed.datastore;
     requires servlet.api;
     requires servlet.jersey2;
