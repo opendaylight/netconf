@@ -39,9 +39,12 @@ import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.MixinNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,7 +143,9 @@ abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     private static boolean containsOnlyNonVisibleData(final YangInstanceIdentifier path, final NormalizedNode data) {
         // There's only one such case:top level list (pathArguments == 1 && data is Mixin)
         // any other mixin nodes are contained by a "regular" node thus visible when serialized
-        return path.getPathArguments().size() == 1 && data instanceof MixinNode;
+        return path.getPathArguments().size() == 1 &&
+               (data instanceof ChoiceNode || data instanceof LeafSetNode ||
+                data instanceof MapNode || data instanceof UnkeyedListNode);
     }
 
     @Override
