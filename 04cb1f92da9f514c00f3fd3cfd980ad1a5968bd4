@@ -22,6 +22,30 @@
       },
       "revId": "04cb1f92da9f514c00f3fd3cfd980ad1a5968bd4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68a97e53_d4281e2c",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http2/AltSvcHttp2Test.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-17T10:50:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "24563b2b_7795e809",
+      "range": {
+        "startLine": 36,
+        "startChar": 78,
+        "endLine": 36,
+        "endChar": 89
+      },
+      "revId": "04cb1f92da9f514c00f3fd3cfd980ad1a5968bd4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
