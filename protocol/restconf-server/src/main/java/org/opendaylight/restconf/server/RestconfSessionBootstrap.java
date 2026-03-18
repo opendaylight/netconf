@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.WriteBufferWaterMark;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http2.Http2FrameCodec;
 import io.netty.handler.codec.http2.Http2MultiplexHandler;
@@ -28,19 +29,23 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
 
     private final EndpointRoot root;
     private final Uint32 chunkSize;
+    private final WriteBufferWaterMark writeBufferWaterMark;
     private final AltSvcAdvertiser altSvcAdvertiser;
 
     RestconfSessionBootstrap(final HTTPScheme scheme, final EndpointRoot root,
-            final Uint32 chunkSize, final Uint32 frameSize, final AltSvcAdvertiser altSvcAdvertiser) {
+            final Uint32 chunkSize, final Uint32 frameSize, final WriteBufferWaterMark writeBufferWaterMark,
+            final AltSvcAdvertiser altSvcAdvertiser) {
         super(scheme, frameSize);
         this.root = requireNonNull(root);
         this.chunkSize = requireNonNull(chunkSize);
+        this.writeBufferWaterMark = requireNonNull(writeBufferWaterMark);
         this.altSvcAdvertiser = requireNonNull(altSvcAdvertiser);
     }
 
     @Override
     protected PipelinedHTTPServerSession configureHttp1(final ChannelHandlerContext ctx) {
         final var ch = ctx.channel();
+        ch.config().setWriteBufferWaterMark(writeBufferWaterMark);
         ch.pipeline().addBefore(ctx.name(), null, altSvcAdvertiser);
         return new RestconfSession(scheme, ch.remoteAddress(), root, chunkSize);
     }
@@ -59,6 +64,7 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
     private ChannelInitializer<Channel> buildHttp2ChildInitializer(final ChannelHandlerContext ctx) {
         return new ChannelInitializer<>() {
             @Override protected void initChannel(final Channel ch) {
+                ch.config().setWriteBufferWaterMark(writeBufferWaterMark);
                 final var pipeline = ch.pipeline();
                 pipeline.addLast(new Http2StreamFrameToHttpObjectCodec(true));
                 pipeline.addLast(new HttpObjectAggregator(MAX_HTTP2_CONTENT_LENGTH));

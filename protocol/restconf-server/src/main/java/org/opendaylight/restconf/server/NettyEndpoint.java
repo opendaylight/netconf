@@ -8,6 +8,8 @@
 package org.opendaylight.restconf.server;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.WriteBufferWaterMark;
 import java.util.concurrent.ExecutionException;
 import javax.net.ssl.SSLException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -39,17 +41,22 @@ public abstract class NettyEndpoint {
             final RestconfStream.Registry streamRegistry, final BootstrapFactory bootstrapFactory,
             final NettyEndpointConfiguration configuration) {
         this.configuration = configuration;
+        final var writeBufferWaterMark = new WriteBufferWaterMark(
+            configuration.writeBufferLowWaterMark().intValue(),
+            configuration.writeBufferHighWaterMark().intValue());
         final var listener = new RestconfTransportChannelListener(server, streamRegistry, principalService,
-            configuration);
+            configuration, writeBufferWaterMark);
         try {
-            httpServer = HTTPServer.listen(listener, bootstrapFactory.newServerBootstrap(),
+            final var serverBootstrap = bootstrapFactory.newServerBootstrap()
+                .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, writeBufferWaterMark);
+            httpServer = HTTPServer.listen(listener, serverBootstrap,
                 configuration.transportConfiguration()).get();
         } catch (UnsupportedConfigurationException | ExecutionException | InterruptedException e) {
             throw new IllegalStateException("Could not start RESTCONF server", e);
         }
 
         root = listener.root();
-        http3ServerBootstrap = startHttp3(configuration, root);
+        http3ServerBootstrap = startHttp3(configuration, root, writeBufferWaterMark);
     }
 
     @NonNullByDefault
@@ -65,7 +72,7 @@ public abstract class NettyEndpoint {
     }
 
     private static @Nullable Http3ServerBootstrap startHttp3(final NettyEndpointConfiguration configuration,
-            final EndpointRoot root) {
+            final EndpointRoot root,  final WriteBufferWaterMark writeBufferWaterMark) {
         final var certificate = configuration.tlsCertificate();
         final var privateKey = configuration.tlsPrivateKey();
         if (certificate == null || privateKey == null) {
@@ -93,7 +100,7 @@ public abstract class NettyEndpoint {
 
         try {
             return Http3ServerBootstrap.start(bindAddress, udpPort, certificate, privateKey, root,
-                configuration.chunkSize(),
+                configuration.chunkSize(), writeBufferWaterMark,
                 configuration.http3InitialMaxData(), configuration.http3InitialMaxStreamDataBidirectionalRemote(),
                 configuration.http3InitialMaxStreamsBidirectional());
         } catch (SSLException e) {

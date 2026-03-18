@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.WriteBufferWaterMark;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http3.Http3;
 import io.netty.handler.codec.http3.Http3FrameToHttpObjectCodec;
@@ -53,7 +54,7 @@ final class Http3ServerBootstrap implements AutoCloseable {
 
     static Http3ServerBootstrap start(final String bindAddress, final int bindPort,
             final X509Certificate certificate, final PrivateKey privateKey, final EndpointRoot root,
-            final Uint32 chunkSize, final Uint64 initialMaxData,
+            final Uint32 chunkSize, final WriteBufferWaterMark writeBufferWaterMark, final Uint64 initialMaxData,
             final Uint64 initialMaxStreamDataBidirectionalRemote, final Uint32 initialMaxStreamsBidirectional)
             throws SSLException {
         final var sslContext = QuicSslContextBuilder.forServer(privateKey, null, certificate)
@@ -63,6 +64,7 @@ final class Http3ServerBootstrap implements AutoCloseable {
         final var streamInitializer = new ChannelInitializer<QuicStreamChannel>() {
             @Override
             protected void initChannel(final QuicStreamChannel stream) {
+                stream.config().setWriteBufferWaterMark(writeBufferWaterMark);
                 final var pipeline = stream.pipeline();
                 final var maxChunkSize = stream.parent().attr(MAX_CHUNK_SIZE).get();
                 pipeline.addLast("h3-stream-log", new LoggingHandler(LogLevel.DEBUG));
