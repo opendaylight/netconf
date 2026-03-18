@@ -148,6 +148,24 @@ public final class OSGiNorthbound {
         int http2$_$max$_$frame$_$size() default 16384; // 16 KiB
 
         @AttributeDefinition(
+            name = "HTTP write buffer low watermark (bytes)",
+            description = """
+                Netty channel write buffer low watermark used for outbound backpressure.
+                A channel becomes writable again when queued outbound bytes fall below this value.
+                """,
+            min = "0")
+        int http$_$write$_$buffer$_$low$_$watermark() default 32768; // 32 KiB
+
+        @AttributeDefinition(
+            name = "HTTP write buffer high watermark (bytes)",
+            description = """
+                Netty channel write buffer high watermark used for outbound backpressure.
+                A channel becomes unwritable when queued outbound bytes exceed this value.
+                """,
+            min = "0")
+        int http$_$write$_$buffer$_$high$_$watermark() default 65536; // 64 KiB
+
+        @AttributeDefinition(
             name = "HTTP/3 Alt-Svc max-age (seconds)",
             description = """
                 Max-Age (ma) value advertised in Alt-Svc header for HTTP/3 (h3).
@@ -296,6 +314,8 @@ public final class OSGiNorthbound {
             parseDefaultEncoding(configuration.default$_$encoding()), new HttpServerStackConfiguration(transport),
             Uint32.valueOf(configuration.http$_$chunk$_$size()),
             Uint32.valueOf(configuration.http2$_$max$_$frame$_$size()),
+            Uint32.valueOf(configuration.http$_$write$_$buffer$_$low$_$watermark()),
+            Uint32.valueOf(configuration.http$_$write$_$buffer$_$high$_$watermark()),
             altSvc, configuration.bind$_$address(), configuration.bind$_$port(),
             tlsCertKey != null ? tlsCertKey.certificate() : null,
             tlsCertKey != null ? tlsCertKey.privateKey() : null,
