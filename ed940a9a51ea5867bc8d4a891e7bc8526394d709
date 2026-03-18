@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c84f51d_cdc99b12",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/AbstractWriteTx.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2026-03-18T18:46:48Z",
+      "side": 1,
+      "message": "The comment still references MixinNode.",
+      "revId": "ed940a9a51ea5867bc8d4a891e7bc8526394d709",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
