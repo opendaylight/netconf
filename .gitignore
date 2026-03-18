@@ -41,3 +41,11 @@ docs/_build/
 node_modules/
 .cache/
 node_modules/
+
+# PyTest execution
+**/__pycache__/
+tests/allure-results/
+tests/build_tools/
+tests/opendaylight/
+tests/results/
+tests/tmp/
