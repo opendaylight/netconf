@@ -19,6 +19,8 @@ module org.opendaylight.netconf.dagger {
     requires transitive org.opendaylight.mdsal.binding.dom.adapter;
     requires transitive org.opendaylight.mdsal.dom.api;
     requires transitive org.opendaylight.mdsal.dom.broker;
+    requires transitive org.opendaylight.mdsal.eos.binding.dom.adapter;
+    requires transitive org.opendaylight.mdsal.singleton.api;
     requires transitive org.opendaylight.odlparent.dagger;
     requires transitive org.opendaylight.yangtools.binding.generator;
     requires transitive org.opendaylight.yangtools.binding.runtime.spi;
@@ -37,6 +39,9 @@ module org.opendaylight.netconf.dagger {
     requires transitive org.opendaylight.yangtools.yang.parser.rfc7950;
     requires transitive org.opendaylight.yangtools.yang.xpath.impl;
     requires transitive spring.boot;
+    requires org.opendaylight.mdsal.eos.dom.api;
+    requires org.opendaylight.mdsal.eos.dom.simple;
+    requires org.opendaylight.mdsal.singleton.impl;
     requires spring.beans;
     requires spring.core;
 
