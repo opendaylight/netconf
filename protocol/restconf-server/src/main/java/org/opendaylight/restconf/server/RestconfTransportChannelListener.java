@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.server;
 
+import io.netty.channel.WriteBufferWaterMark;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -32,9 +33,11 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     private final EndpointRoot root;
     private final Uint32 chunkSize;
     private final Uint32 frameSize;
+    private final WriteBufferWaterMark writeBufferWaterMark;
 
     RestconfTransportChannelListener(final RestconfServer server, final RestconfStream.Registry streamRegistry,
-            final PrincipalService principalService, final NettyEndpointConfiguration configuration) {
+            final PrincipalService principalService, final NettyEndpointConfiguration configuration,
+            final WriteBufferWaterMark writeBufferWaterMark) {
         // Reconstruct root API path in encoded form
         final var apiRootPath = configuration.apiRootPath();
         final var sb = new StringBuilder();
@@ -64,6 +67,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
         chunkSize = configuration.chunkSize();
         frameSize = configuration.frameSize();
+        this.writeBufferWaterMark = writeBufferWaterMark;
 
         LOG.info("Initialized with service {}", server.getClass());
         LOG.info("Initialized with base path: {}, default encoding: {}, default pretty print: {}", restconf,
@@ -77,7 +81,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     @Override
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
         channel.channel().pipeline().addLast(new RestconfSessionBootstrap(channel.scheme(), root, chunkSize,
-            frameSize));
+            frameSize, writeBufferWaterMark));
     }
 
     @Override

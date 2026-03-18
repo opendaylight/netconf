@@ -8,6 +8,8 @@
 package org.opendaylight.restconf.server;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.WriteBufferWaterMark;
 import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -32,10 +34,15 @@ public abstract class NettyEndpoint {
             final RestconfStream.Registry streamRegistry, final BootstrapFactory bootstrapFactory,
             final NettyEndpointConfiguration configuration) {
         this.configuration = configuration;
+        final var writeBufferWaterMark = new WriteBufferWaterMark(
+            configuration.writeBufferLowWaterMark().intValue(),
+            configuration.writeBufferHighWaterMark().intValue());
         final var listener = new RestconfTransportChannelListener(server, streamRegistry, principalService,
-            configuration);
+            configuration, writeBufferWaterMark);
         try {
-            httpServer = HTTPServer.listen(listener, bootstrapFactory.newServerBootstrap(),
+            final var serverBootstrap = bootstrapFactory.newServerBootstrap()
+                .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, writeBufferWaterMark);
+            httpServer = HTTPServer.listen(listener, serverBootstrap,
                 configuration.transportConfiguration()).get();
         } catch (UnsupportedConfigurationException | ExecutionException | InterruptedException e) {
             throw new IllegalStateException("Could not start RESTCONF server", e);

@@ -53,11 +53,14 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     private final @NonNull MessageEncoding defaultEncoding;
     private final @NonNull Uint32 chunkSize;
     private final @NonNull Uint32 frameSize;
+    private final @NonNull Uint32 writeBufferLowWaterMark;
+    private final @NonNull Uint32 writeBufferHighWaterMark;
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
             final List<String> apiRootPath, final MessageEncoding defaultEncoding,
-            final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize) {
+            final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
+            final Uint32 writeBufferLowWaterMark, final Uint32 writeBufferHighWaterMark) {
         super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
         this.transportConfiguration = requireNonNull(transportConfiguration);
         this.defaultEncoding = requireNonNull(defaultEncoding);
@@ -73,6 +76,22 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         }
         this.frameSize = frameSize;
 
+        final var lowWaterMark = requireNonNull(writeBufferLowWaterMark);
+        if (lowWaterMark.longValue() > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("HTTP write buffer low watermark must not exceed " + Integer.MAX_VALUE);
+        }
+        this.writeBufferLowWaterMark = lowWaterMark;
+
+        final var highWaterMark = requireNonNull(writeBufferHighWaterMark);
+        if (highWaterMark.longValue() > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("HTTP write buffer high watermark must not exceed " + Integer.MAX_VALUE);
+        }
+        if (lowWaterMark.longValue() > highWaterMark.longValue()) {
+            throw new IllegalArgumentException("HTTP write buffer high watermark must be greater than or equal to low "
+                + "watermark");
+        }
+        this.writeBufferHighWaterMark = highWaterMark;
+
         if (apiRootPath.isEmpty()) {
             throw new IllegalArgumentException("empty apiRootPath");
         }
@@ -85,15 +104,18 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
             final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration,
-            final Uint32 chunkSize, final Uint32 frameSize) {
+            final Uint32 chunkSize, final Uint32 frameSize, final Uint32 writeBufferLowWaterMark,
+            final Uint32 writeBufferHighWaterMark) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
-            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize);
+            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize,
+            writeBufferLowWaterMark, writeBufferHighWaterMark);
     }
 
     @Beta
     public NettyEndpointConfiguration(final HttpServerStackGrouping transportConfiguration) {
         this(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO, Uint32.valueOf(10_000), "restconf",
-            MessageEncoding.JSON, transportConfiguration, Uint32.valueOf(262144), Uint32.valueOf(16384));
+            MessageEncoding.JSON, transportConfiguration, Uint32.valueOf(262144), Uint32.valueOf(16384),
+            Uint32.valueOf(32768), Uint32.valueOf(65536));
     }
 
     /**
@@ -185,10 +207,24 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         return frameSize;
     }
 
+    /**
+     * {@return low watermark for queued outbound bytes}
+     */
+    public Uint32 writeBufferLowWaterMark() {
+        return writeBufferLowWaterMark;
+    }
+
+    /**
+     * {@return high watermark for queued outbound bytes}
+     */
+    public Uint32 writeBufferHighWaterMark() {
+        return writeBufferHighWaterMark;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(errorTagMapping(), prettyPrint(), sseMaximumFragmentLength(), sseHeartbeatIntervalMillis(),
-            apiRootPath, transportConfiguration, defaultEncoding);
+            apiRootPath, transportConfiguration, defaultEncoding, writeBufferLowWaterMark, writeBufferHighWaterMark);
     }
 
     @Override
@@ -198,7 +234,9 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             && sseMaximumFragmentLength().equals(other.sseMaximumFragmentLength())
             && sseHeartbeatIntervalMillis().equals(other.sseHeartbeatIntervalMillis())
             && apiRootPath.equals(other.apiRootPath) && transportConfiguration.equals(other.transportConfiguration)
-            && defaultEncoding.equals(other.defaultEncoding);
+            && defaultEncoding.equals(other.defaultEncoding)
+            && writeBufferLowWaterMark.equals(other.writeBufferLowWaterMark)
+            && writeBufferHighWaterMark.equals(other.writeBufferHighWaterMark);
     }
 
     @Override
@@ -208,6 +246,8 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
                 .map(segment -> URLEncoder.encode(segment, StandardCharsets.UTF_8))
                 .collect(Collectors.joining("/")))
             .add("defaultEncoding", defaultEncoding)
-            .add("transportConfiguration", transportConfiguration);
+            .add("transportConfiguration", transportConfiguration)
+            .add("writeBufferLowWaterMark", writeBufferLowWaterMark)
+            .add("writeBufferHighWaterMark", writeBufferHighWaterMark);
     }
 }
