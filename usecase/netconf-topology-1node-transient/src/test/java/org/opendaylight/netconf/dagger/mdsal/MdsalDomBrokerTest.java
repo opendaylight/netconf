@@ -42,6 +42,8 @@ class MdsalDomBrokerTest {
         assertNotNull(component.domRpcRouter(), "RPC Router should be initialized");
         assertNotNull(component.notificationPublishService(), "Notification publish should be initialized");
         assertNotNull(component.modelContext(), "Model context should be initialized");
+        assertNotNull(component.clusterSingletonServiceProvider(), "Cluster provided should be initialized");
+        assertNotNull(component.entityOwnershipService(), "Entity ownership should be initialized");
     }
 
     @Test
@@ -57,12 +59,13 @@ class MdsalDomBrokerTest {
         final var modelContext = component.modelContext();
         final var classPathModels = modelContext.getModules();
         assertThat(classPathModels)
-            .hasSize(2)
+            .hasSize(3)
             .extracting(ModuleLike::getSourceIdentifier)
             .extracting(SourceIdentifier::toYangFilename)
             .containsExactlyInAnyOrder(
                 "ietf-inet-types@2013-07-15.yang",
-                "ietf-netconf@2011-06-01.yang"
+                "ietf-netconf@2011-06-01.yang",
+                "odl-general-entity@2015-09-30.yang"
             );
 
     }
