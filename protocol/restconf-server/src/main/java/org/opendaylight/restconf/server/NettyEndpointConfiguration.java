@@ -13,6 +13,7 @@ import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.MoreObjects.ToStringHelper;
+import io.netty.channel.WriteBufferWaterMark;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -57,6 +58,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     private final @NonNull MessageEncoding defaultEncoding;
     private final @NonNull Uint32 chunkSize;
     private final @NonNull Uint32 frameSize;
+    private final @NonNull WriteBufferWaterMark writeBufferWaterMark;
     private final @NonNull String altSvcHeaderValue;
     private final @Nullable String bindAddress;
     private final @NonNull Uint32 http3AltSvcMaxAgeSeconds;
@@ -72,19 +74,21 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
             final List<String> apiRootPath, final MessageEncoding defaultEncoding,
             final HttpServerListenStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
-            final String altSvcHeaderValue, final Uint32 http3AltSvcMaxAgeSeconds, final Uint64 http3InitialMaxData,
+            final int writeBufferLowWaterMark, final int writeBufferHighWaterMark, final String altSvcHeaderValue,
+            final Uint32 http3AltSvcMaxAgeSeconds, final Uint64 http3InitialMaxData,
             final Uint64 http3InitialMaxStreamDataBidirectionalRemote,
             final Uint32 http3InitialMaxStreamsBidirectional) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis, apiRootPath,
-            defaultEncoding, transportConfiguration, chunkSize, frameSize, altSvcHeaderValue, null, 0, null, null,
-            http3AltSvcMaxAgeSeconds, http3InitialMaxData, http3InitialMaxStreamDataBidirectionalRemote,
-            http3InitialMaxStreamsBidirectional);
+            defaultEncoding, transportConfiguration, chunkSize, frameSize, writeBufferLowWaterMark,
+            writeBufferHighWaterMark, altSvcHeaderValue, null, 0, null, null, http3AltSvcMaxAgeSeconds,
+            http3InitialMaxData, http3InitialMaxStreamDataBidirectionalRemote, http3InitialMaxStreamsBidirectional);
     }
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
             final List<String> apiRootPath, final MessageEncoding defaultEncoding,
             final HttpServerListenStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
+            final int writeBufferLowWaterMark, final int writeBufferHighWaterMark,
             final String altSvcHeaderValue, final @Nullable String bindAddress, final int bindPort,
             final @Nullable X509Certificate tlsCertificate, final @Nullable PrivateKey tlsPrivateKey,
             final Uint32 http3AltSvcMaxAgeSeconds, final Uint64 http3InitialMaxData,
@@ -110,6 +114,18 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
                 "HTTP/2 frame size must be between 16384 bytes (16 KiB) and 16777215 bytes (16 MiB)");
         }
         this.frameSize = frameSize;
+
+        if (writeBufferLowWaterMark < 0) {
+            throw new IllegalArgumentException("HTTP write buffer low watermark must be greater than or equal to 0");
+        }
+        if (writeBufferHighWaterMark < 0) {
+            throw new IllegalArgumentException("HTTP write buffer high watermark must be greater than or equal to 0");
+        }
+        if (writeBufferLowWaterMark > writeBufferHighWaterMark) {
+            throw new IllegalArgumentException("HTTP write buffer high watermark must be greater than or equal to low "
+                + "watermark");
+        }
+        writeBufferWaterMark = new WriteBufferWaterMark(writeBufferLowWaterMark, writeBufferHighWaterMark);
 
         final var initialMaxData = requireNonNull(http3InitialMaxData);
         final var initMaxData = initialMaxData.longValue();
@@ -147,36 +163,39 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
             final MessageEncoding defaultEncoding, final HttpServerListenStackGrouping transportConfiguration,
-            final Uint32 chunkSize, final Uint32 frameSize, final String altSvcHeaderValue,
+            final Uint32 chunkSize, final Uint32 frameSize, final int writeBufferLowWaterMark,
+            final int writeBufferHighWaterMark, final String altSvcHeaderValue,
             final Uint32 http3AltSvcMaxAgeSeconds, final Uint64 http3InitialMaxData,
             final Uint64 http3InitialMaxStreamDataBidirectionalRemote,
             final Uint32 http3InitialMaxStreamsBidirectional) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
             parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize,
-            altSvcHeaderValue, http3AltSvcMaxAgeSeconds, http3InitialMaxData,
-            http3InitialMaxStreamDataBidirectionalRemote, http3InitialMaxStreamsBidirectional);
+            writeBufferLowWaterMark, writeBufferHighWaterMark, altSvcHeaderValue, http3AltSvcMaxAgeSeconds,
+            http3InitialMaxData, http3InitialMaxStreamDataBidirectionalRemote, http3InitialMaxStreamsBidirectional);
     }
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
             final MessageEncoding defaultEncoding, final HttpServerListenStackGrouping transportConfiguration,
-            final Uint32 chunkSize, final Uint32 frameSize, final String altSvcHeaderValue,
-            final @Nullable String bindAddress, final int bindPort, final @Nullable X509Certificate tlsCertificate,
-            final @Nullable PrivateKey tlsPrivateKey, final Uint32 http3AltSvcMaxAgeSeconds,
+            final Uint32 chunkSize, final Uint32 frameSize, final int writeBufferLowWaterMark,
+            final int writeBufferHighWaterMark, final String altSvcHeaderValue, final @Nullable String bindAddress,
+            final int bindPort, final @Nullable X509Certificate tlsCertificate, final @Nullable
+            PrivateKey tlsPrivateKey, final Uint32 http3AltSvcMaxAgeSeconds,
             final Uint64 http3InitialMaxData, final Uint64 http3InitialMaxStreamDataBidirectionalRemote,
             final Uint32 http3InitialMaxStreamsBidirectional) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
             parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize,
-            altSvcHeaderValue, bindAddress, bindPort, tlsCertificate, tlsPrivateKey, http3AltSvcMaxAgeSeconds,
-            http3InitialMaxData, http3InitialMaxStreamDataBidirectionalRemote, http3InitialMaxStreamsBidirectional);
+            writeBufferLowWaterMark, writeBufferHighWaterMark, altSvcHeaderValue, bindAddress, bindPort,
+            tlsCertificate, tlsPrivateKey, http3AltSvcMaxAgeSeconds, http3InitialMaxData,
+            http3InitialMaxStreamDataBidirectionalRemote, http3InitialMaxStreamsBidirectional);
     }
 
     @Beta
     public NettyEndpointConfiguration(final HttpServerListenStackGrouping transportConfiguration) {
         this(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO, Uint32.valueOf(10_000), "restconf",
             MessageEncoding.JSON, transportConfiguration, Uint32.valueOf(262144), Uint32.valueOf(16384),
-            "h3=\":8443\"; ma=3600", Uint32.valueOf(3600), Uint64.valueOf(4L * 1024 * 1024),
-            Uint64.valueOf(256L * 1024), Uint32.valueOf(100));
+            32768, 65536, "h3=\":8443\"; ma=3600", Uint32.valueOf(3600),
+            Uint64.valueOf(4L * 1024 * 1024), Uint64.valueOf(256L * 1024), Uint32.valueOf(100));
     }
 
     /**
@@ -267,6 +286,13 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     }
 
     /**
+     * {@return write buffer watermark configuration for Netty channels}
+     */
+    public WriteBufferWaterMark writeBufferWaterMark() {
+        return writeBufferWaterMark;
+    }
+
+    /**
      * {@return {@code Alt-Svc} header value, or {@code null} if Alt-Svc advertisement is disabled}
      */
     public @NonNull String altSvcHeaderValue() {
@@ -310,7 +336,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         return Objects.hash(errorTagMapping(), prettyPrint(), sseMaximumFragmentLength(), sseHeartbeatIntervalMillis(),
             apiRootPath, transportConfiguration, defaultEncoding, chunkSize, frameSize, altSvcHeaderValue,
             bindAddress, bindPort, http3AltSvcMaxAgeSeconds, tlsCertificate, tlsPrivateKey, http3InitialMaxData,
-            http3InitialMaxStreamDataBidirectionalRemote, http3InitialMaxStreamsBidirectional);
+            http3InitialMaxStreamDataBidirectionalRemote, http3InitialMaxStreamsBidirectional, writeBufferWaterMark);
     }
 
     @Override
@@ -329,7 +355,8 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             && Objects.equals(tlsCertificate, other.tlsCertificate)
             && http3InitialMaxData.equals(other.http3InitialMaxData)
             && http3InitialMaxStreamDataBidirectionalRemote.equals(other.http3InitialMaxStreamDataBidirectionalRemote)
-            && http3InitialMaxStreamsBidirectional.equals(other.http3InitialMaxStreamsBidirectional);
+            && http3InitialMaxStreamsBidirectional.equals(other.http3InitialMaxStreamsBidirectional)
+            && Objects.equals(writeBufferWaterMark, other.writeBufferWaterMark);
     }
 
     @Override
@@ -346,6 +373,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             .add("http3AltSvcMaxAgeSeconds", http3AltSvcMaxAgeSeconds)
             .add("http3InitialMaxData", http3InitialMaxData)
             .add("http3InitialMaxStreamDataBidirectionalRemote", http3InitialMaxStreamDataBidirectionalRemote)
-            .add("http3InitialMaxStreamsBidirectional", http3InitialMaxStreamsBidirectional);
+            .add("http3InitialMaxStreamsBidirectional", http3InitialMaxStreamsBidirectional)
+            .add("writeBufferWaterMark", writeBufferWaterMark);
     }
 }

@@ -14,6 +14,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import java.net.InetSocketAddress;
@@ -51,6 +52,8 @@ class RestconfSessionTest {
     @Mock
     private Channel channel;
     @Mock
+    private ChannelConfig channelConfig;
+    @Mock
     private ChannelPipeline pipeline;
     @Mock
     private Registration registration;
@@ -68,6 +71,7 @@ class RestconfSessionTest {
         doReturn(channel).when(transportChannel).channel();
         doReturn(HTTPScheme.HTTP).when(transportChannel).scheme();
         doReturn(channel).when(ctx).channel();
+        doReturn(channelConfig).when(channel).config();
         doReturn(pipeline).when(ctx).pipeline();
         doReturn(pipeline).when(channel).pipeline();
         doReturn(pipeline).when(pipeline).addBefore(any(), isNull(), any());
@@ -76,8 +80,9 @@ class RestconfSessionTest {
         // default config just for testing purposes
         final var configuration = new NettyEndpointConfiguration(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE,
             Uint16.ZERO, Uint32.valueOf(10_000), "restconf", MessageEncoding.JSON, httpServerStackGrouping,
-            Uint32.valueOf(256 * 1024), Uint32.valueOf(16 * 1024), "h3=\":8443\"; ma=3600", Uint32.valueOf(3600),
-            Uint64.valueOf(4L * 1024 * 1024), Uint64.valueOf(256L * 1024), Uint32.valueOf(100));
+            Uint32.valueOf(256 * 1024), Uint32.valueOf(16 * 1024), 32 * 1024, 64 * 1024,
+            "h3=\":8443\"; ma=3600", Uint32.valueOf(3600), Uint64.valueOf(4L * 1024 * 1024),
+            Uint64.valueOf(256L * 1024), Uint32.valueOf(100));
 
         final var listener = new RestconfTransportChannelListener(server, streamRegistry, principalService,
             configuration);

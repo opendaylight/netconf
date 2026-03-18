@@ -125,6 +125,9 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
     private static final Uint64 HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE = Uint64.valueOf(256L * 1024);
     private static final Uint32 HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL = Uint32.valueOf(100);
 
+    private static final int WRITE_BUFFER_LOW_WATER_MARK = 32 * 1024;
+    private static final int WRITE_BUFFER_HIGH_WATER_MARK = 64 * 1024;
+
     static final String MODIFY_SUBSCRIPTION_URI =
         "/restconf/operations/ietf-subscribed-notifications:modify-subscription";
     static final String ESTABLISH_SUBSCRIPTION_URI =
@@ -234,9 +237,9 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
             ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000), RESTCONF,
-            MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, ALT_SVC_HEADER,
-            HTTP3_ALT_SVC_MAX_AGE_SECONDS, HTTP3_INITIAL_MAX_DATA, HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE,
-            HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
+            MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
+            WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS, HTTP3_INITIAL_MAX_DATA,
+            HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE, HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory,
             configuration);
     }

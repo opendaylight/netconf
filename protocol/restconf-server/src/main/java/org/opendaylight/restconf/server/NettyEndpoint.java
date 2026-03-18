@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import io.netty.channel.ChannelOption;
 import java.util.concurrent.ExecutionException;
 import javax.net.ssl.SSLException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -42,7 +43,9 @@ public abstract class NettyEndpoint {
         final var listener = new RestconfTransportChannelListener(server, streamRegistry, principalService,
             configuration);
         try {
-            httpServer = HTTPServer.listen(listener, bootstrapFactory.newServerBootstrap(),
+            final var serverBootstrap = bootstrapFactory.newServerBootstrap();
+            serverBootstrap.childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, configuration.writeBufferWaterMark());
+            httpServer = HTTPServer.listen(listener, serverBootstrap,
                 configuration.transportConfiguration()).get();
         } catch (UnsupportedConfigurationException | ExecutionException | InterruptedException e) {
             throw new IllegalStateException("Could not start RESTCONF server", e);
@@ -93,7 +96,7 @@ public abstract class NettyEndpoint {
 
         try {
             return Http3ServerBootstrap.start(bindAddress, udpPort, certificate, privateKey, root,
-                configuration.chunkSize(),
+                configuration.chunkSize(), configuration.writeBufferWaterMark(),
                 configuration.http3InitialMaxData(), configuration.http3InitialMaxStreamDataBidirectionalRemote(),
                 configuration.http3InitialMaxStreamsBidirectional());
         } catch (SSLException e) {
