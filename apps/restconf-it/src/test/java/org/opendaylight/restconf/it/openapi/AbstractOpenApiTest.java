@@ -128,6 +128,9 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
     private static final Uint64 HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE = Uint64.valueOf(256L * 1024);
     private static final Uint32 HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL = Uint32.valueOf(100);
 
+    private static final Uint32 WRITE_BUFFER_LOW_WATER_MARK = Uint32.valueOf(32 * 1024);
+    private static final Uint32 WRITE_BUFFER_HIGH_WATER_MARK = Uint32.valueOf(64 * 1024);
+
     protected static final String DEVICE_USERNAME = "device-username";
     protected static final String DEVICE_PASSWORD = "device-password";
     protected static final String USERNAME = "username";
@@ -229,9 +232,9 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
             ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000),
-            RESTS, MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, ALT_SVC_HEADER,
-            HTTP3_ALT_SVC_MAX_AGE_SECONDS, HTTP3_INITIAL_MAX_DATA, HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE,
-            HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
+            RESTS, MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
+            WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS, HTTP3_INITIAL_MAX_DATA,
+            HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE, HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory,
             configuration);
 
