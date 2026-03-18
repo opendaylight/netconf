@@ -144,6 +144,78 @@ public final class OSGiNorthbound {
                 """,
             min = "16384", max = "16777215")
         int http2$_$max$_$frame$_$size() default 16384; // 16 KiB
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
+=======
+
+        @AttributeDefinition(
+            name = "HTTP write buffer low watermark (bytes)",
+            description = """
+                Netty channel write buffer low watermark used for outbound backpressure.
+                A channel becomes writable again when queued outbound bytes fall below this value.
+                """,
+            min = "0")
+        int http$_$write$_$buffer$_$low$_$watermark() default 32768; // 32 KiB
+
+        @AttributeDefinition(
+            name = "HTTP write buffer high watermark (bytes)",
+            description = """
+                Netty channel write buffer high watermark used for outbound backpressure.
+                A channel becomes unwritable when queued outbound bytes exceed this value.
+                """,
+            min = "0")
+        int http$_$write$_$buffer$_$high$_$watermark() default 65536; // 64 KiB
+
+        @AttributeDefinition(
+            name = "HTTP/3 Alt-Svc max-age (seconds)",
+            description = """
+                Max-Age (ma) value advertised in Alt-Svc header for HTTP/3 (h3).
+                Alt-Svc is defined by RFC7838(https://www.rfc-editor.org/rfc/rfc7838.html#section-3.1).
+                HTTP/3 identifies itself via the "h3" ALPN token defined
+                by RFC9114(https://www.rfc-editor.org/rfc/rfc9114.html#name-http-alternative-services).
+                The advertised alternative service always uses bind-port.
+                Set to 0 to disable Alt-Svc advertisement.
+                The configured upper bound is implementation-defined (Integer.MAX_VALUE).
+                """,
+            min = "0", max = "2147483647")
+        long http3$_$alt$_$svc$_$max$_$age() default 3600;
+
+        @AttributeDefinition(
+            name = "HTTP/3 initial max data (bytes)",
+            description = """
+                QUIC connection-level initial max data limit for HTTP/3.
+                This configures the QUIC initial_max_data transport parameter defined in
+                RFC9000(https://www.rfc-editor.org/rfc/rfc9000.html#section-18.2-4.14.1)
+                The maximum value follows the QUIC variable-length integer encoding defined in
+                RFC9000(https://www.rfc-editor.org/rfc/rfc9000.html#section-16), which allows values up to 2^62 - 1.
+                """,
+            min = "1", max = "4611686018427387903")
+        long http3$_$initial$_$max$_$data() default 4L * 1024 * 1024;
+
+        @AttributeDefinition(
+            name = "HTTP/3 initial max stream data bidirectional remote (bytes)",
+            description = """
+                QUIC initial max stream data limit for remotely-initiated bidirectional streams.
+                This configures the QUIC initial_max_stream_data_bidi_remote transport parameter defined in
+                RFC9000(https://www.rfc-editor.org/rfc/rfc9000.html#section-18.2-4.18.1).
+                The maximum value follows the QUIC variable-length integer encoding defined in
+                RFC9000(https://www.rfc-editor.org/rfc/rfc9000.html#section-16), which allows values up to 2^62 - 1.
+                Locally-initiated bidirectional stream limit is fixed to 262144 bytes.
+                """,
+            min = "0", max = "4611686018427387903")
+        long http3$_$initial$_$max$_$stream$_$data$_$bidirectional$_$remote() default 256L * 1024;
+
+        @AttributeDefinition(
+            name = "HTTP/3 initial max bidirectional streams",
+            description = """
+                QUIC initial max number of bidirectional streams.
+                This configures the QUIC initial_max_streams_bidi transport parameter defined in
+                RFC9000(https://www.rfc-editor.org/rfc/rfc9000.html#section-18.2-4.22.1),
+                The maximum value is constrained by
+                RFC9000(https://www.rfc-editor.org/rfc/rfc9000.html#section-4.6).
+                """,
+            min = "0", max = "1152921504606846976")
+        long http3$_$initial$_$max$_$streams$_$bidirectional() default 100;
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
@@ -257,7 +329,20 @@ public final class OSGiNorthbound {
             Uint32.valueOf(configuration.heartbeat$_$interval()), configuration.api$_$root$_$path(),
             parseDefaultEncoding(configuration.default$_$encoding()), new HttpServerStackConfiguration(transport),
             Uint32.valueOf(configuration.http$_$chunk$_$size()),
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
             Uint32.valueOf(configuration.http2$_$max$_$frame$_$size()))
+=======
+            Uint32.valueOf(configuration.http2$_$max$_$frame$_$size()),
+            Uint32.valueOf(configuration.http$_$write$_$buffer$_$low$_$watermark()),
+            Uint32.valueOf(configuration.http$_$write$_$buffer$_$high$_$watermark()),
+            altSvc, configuration.bind$_$address(), configuration.bind$_$port(),
+            tlsCertKey != null ? tlsCertKey.certificate() : null,
+            tlsCertKey != null ? tlsCertKey.privateKey() : null,
+            Uint32.valueOf(configuration.http3$_$alt$_$svc$_$max$_$age()),
+            Uint64.valueOf(configuration.http3$_$initial$_$max$_$data()),
+            Uint64.valueOf(configuration.http3$_$initial$_$max$_$stream$_$data$_$bidirectional$_$remote()),
+            Uint32.valueOf(configuration.http3$_$initial$_$max$_$streams$_$bidirectional()))
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
         );
     }
 

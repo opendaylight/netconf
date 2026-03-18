@@ -53,11 +53,50 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     private final @NonNull MessageEncoding defaultEncoding;
     private final @NonNull Uint32 chunkSize;
     private final @NonNull Uint32 frameSize;
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
+=======
+    private final @NonNull Uint32 writeBufferLowWaterMark;
+    private final @NonNull Uint32 writeBufferHighWaterMark;
+    private final @NonNull String altSvcHeaderValue;
+    private final @Nullable String bindAddress;
+    private final @NonNull Uint32 http3AltSvcMaxAgeSeconds;
+    private final @Nullable X509Certificate tlsCertificate;
+    private final @Nullable PrivateKey tlsPrivateKey;
+    private final @NonNull Uint64 http3InitialMaxData;
+    private final @NonNull Uint64 http3InitialMaxStreamDataBidirectionalRemote;
+    private final @NonNull Uint32 http3InitialMaxStreamsBidirectional;
+
+    private final int bindPort;
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
             final List<String> apiRootPath, final MessageEncoding defaultEncoding,
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
             final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize) {
+=======
+            final HttpServerListenStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
+            final Uint32 writeBufferLowWaterMark, final Uint32 writeBufferHighWaterMark,
+            final String altSvcHeaderValue, final Uint32 http3AltSvcMaxAgeSeconds, final Uint64 http3InitialMaxData,
+            final Uint64 http3InitialMaxStreamDataBidirectionalRemote,
+            final Uint32 http3InitialMaxStreamsBidirectional) {
+        this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis, apiRootPath,
+            defaultEncoding, transportConfiguration, chunkSize, frameSize, writeBufferLowWaterMark,
+            writeBufferHighWaterMark, altSvcHeaderValue, null, 0, null, null, http3AltSvcMaxAgeSeconds,
+            http3InitialMaxData, http3InitialMaxStreamDataBidirectionalRemote, http3InitialMaxStreamsBidirectional);
+    }
+
+    public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
+            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
+            final List<String> apiRootPath, final MessageEncoding defaultEncoding,
+            final HttpServerListenStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
+            final Uint32 writeBufferLowWaterMark, final Uint32 writeBufferHighWaterMark,
+            final String altSvcHeaderValue, final @Nullable String bindAddress, final int bindPort,
+            final @Nullable X509Certificate tlsCertificate, final @Nullable PrivateKey tlsPrivateKey,
+            final Uint32 http3AltSvcMaxAgeSeconds, final Uint64 http3InitialMaxData,
+            final Uint64 http3InitialMaxStreamDataBidirectionalRemote,
+            final Uint32 http3InitialMaxStreamsBidirectional) {
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
         super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
         this.transportConfiguration = requireNonNull(transportConfiguration);
         this.defaultEncoding = requireNonNull(defaultEncoding);
@@ -73,6 +112,49 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         }
         this.frameSize = frameSize;
 
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
+=======
+        final var lowWaterMark = requireNonNull(writeBufferLowWaterMark);
+        if (lowWaterMark.longValue() > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("HTTP write buffer low watermark must not exceed " + Integer.MAX_VALUE);
+        }
+        this.writeBufferLowWaterMark = lowWaterMark;
+
+        final var highWaterMark = requireNonNull(writeBufferHighWaterMark);
+        if (highWaterMark.longValue() > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("HTTP write buffer high watermark must not exceed " + Integer.MAX_VALUE);
+        }
+        if (lowWaterMark.longValue() > highWaterMark.longValue()) {
+            throw new IllegalArgumentException("HTTP write buffer high watermark must be greater than or equal to low "
+                + "watermark");
+        }
+        this.writeBufferHighWaterMark = highWaterMark;
+
+        final var initialMaxData = requireNonNull(http3InitialMaxData);
+        final var initMaxData = initialMaxData.longValue();
+        if (initMaxData < 0 || initMaxData > 4611686018427387903L) {
+            throw new IllegalArgumentException("HTTP/3 initial max data must not exceed 4611686018427387903");
+        }
+        this.http3InitialMaxData = initialMaxData;
+
+        final var initialMaxStreamDataBidirectionalRemote =
+            requireNonNull(http3InitialMaxStreamDataBidirectionalRemote);
+        final var remoteBidiMaxData = initialMaxStreamDataBidirectionalRemote.longValue();
+        if (remoteBidiMaxData < 0 || remoteBidiMaxData > 4611686018427387903L) {
+            throw new IllegalArgumentException(
+                "HTTP/3 initial max stream data (bidirectional remote) must not exceed 4611686018427387903");
+        }
+        this.http3InitialMaxStreamDataBidirectionalRemote = initialMaxStreamDataBidirectionalRemote;
+
+        final var initialMaxStreamsBidirectional = requireNonNull(http3InitialMaxStreamsBidirectional);
+        final var maxBidiStreams = initialMaxStreamsBidirectional.longValue();
+        if (maxBidiStreams < 0 || maxBidiStreams > 1152921504606846976L) {
+            throw new IllegalArgumentException("HTTP/3 initial max bidirectional streams must not exceed "
+                + "1152921504606846976");
+        }
+        this.http3InitialMaxStreamsBidirectional = initialMaxStreamsBidirectional;
+
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
         if (apiRootPath.isEmpty()) {
             throw new IllegalArgumentException("empty apiRootPath");
         }
@@ -84,16 +166,53 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
             final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration,
             final Uint32 chunkSize, final Uint32 frameSize) {
+=======
+            final MessageEncoding defaultEncoding, final HttpServerListenStackGrouping transportConfiguration,
+            final Uint32 chunkSize, final Uint32 frameSize, final Uint32 writeBufferLowWaterMark,
+            final Uint32 writeBufferHighWaterMark, final String altSvcHeaderValue,
+            final Uint32 http3AltSvcMaxAgeSeconds, final Uint64 http3InitialMaxData,
+            final Uint64 http3InitialMaxStreamDataBidirectionalRemote,
+            final Uint32 http3InitialMaxStreamsBidirectional) {
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
             parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize);
+=======
+            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize,
+            writeBufferLowWaterMark, writeBufferHighWaterMark, altSvcHeaderValue, http3AltSvcMaxAgeSeconds,
+            http3InitialMaxData, http3InitialMaxStreamDataBidirectionalRemote, http3InitialMaxStreamsBidirectional);
+    }
+
+    public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
+            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
+            final MessageEncoding defaultEncoding, final HttpServerListenStackGrouping transportConfiguration,
+            final Uint32 chunkSize, final Uint32 frameSize, final Uint32 writeBufferLowWaterMark,
+            final Uint32 writeBufferHighWaterMark, final String altSvcHeaderValue, final @Nullable String bindAddress,
+            final int bindPort, final @Nullable X509Certificate tlsCertificate,
+            final @Nullable PrivateKey tlsPrivateKey, final Uint32 http3AltSvcMaxAgeSeconds,
+            final Uint64 http3InitialMaxData, final Uint64 http3InitialMaxStreamDataBidirectionalRemote,
+            final Uint32 http3InitialMaxStreamsBidirectional) {
+        this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
+            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize,
+            writeBufferLowWaterMark, writeBufferHighWaterMark, altSvcHeaderValue, bindAddress, bindPort,
+            tlsCertificate, tlsPrivateKey, http3AltSvcMaxAgeSeconds, http3InitialMaxData,
+            http3InitialMaxStreamDataBidirectionalRemote, http3InitialMaxStreamsBidirectional);
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
     }
 
     @Beta
     public NettyEndpointConfiguration(final HttpServerStackGrouping transportConfiguration) {
         this(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO, Uint32.valueOf(10_000), "restconf",
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
             MessageEncoding.JSON, transportConfiguration, Uint32.valueOf(262144), Uint32.valueOf(16384));
+=======
+            MessageEncoding.JSON, transportConfiguration, Uint32.valueOf(262144), Uint32.valueOf(16384),
+            Uint32.valueOf(32768), Uint32.valueOf(65536), "h3=\":8443\"; ma=3600", Uint32.valueOf(3600),
+            Uint64.valueOf(4L * 1024 * 1024), Uint64.valueOf(256L * 1024), Uint32.valueOf(100));
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
     }
 
     /**
@@ -185,10 +304,73 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         return frameSize;
     }
 
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
+=======
+    /**
+     * {@return low watermark for queued outbound bytes}
+     */
+    public Uint32 writeBufferLowWaterMark() {
+        return writeBufferLowWaterMark;
+    }
+
+    /**
+     * {@return high watermark for queued outbound bytes}
+     */
+    public Uint32 writeBufferHighWaterMark() {
+        return writeBufferHighWaterMark;
+    }
+
+    /**
+     * {@return {@code Alt-Svc} header value, or {@code null} if Alt-Svc advertisement is disabled}
+     */
+    public @NonNull String altSvcHeaderValue() {
+        return altSvcHeaderValue;
+    }
+
+    public @Nullable String bindAddress() {
+        return bindAddress;
+    }
+
+    public int bindPort() {
+        return bindPort;
+    }
+
+    public Uint32 http3AltSvcMaxAgeSeconds() {
+        return http3AltSvcMaxAgeSeconds;
+    }
+
+    public @Nullable X509Certificate tlsCertificate() {
+        return tlsCertificate;
+    }
+
+    public @Nullable PrivateKey tlsPrivateKey() {
+        return tlsPrivateKey;
+    }
+
+    public Uint64 http3InitialMaxData() {
+        return http3InitialMaxData;
+    }
+
+    public Uint64 http3InitialMaxStreamDataBidirectionalRemote() {
+        return http3InitialMaxStreamDataBidirectionalRemote;
+    }
+
+    public Uint32 http3InitialMaxStreamsBidirectional() {
+        return http3InitialMaxStreamsBidirectional;
+    }
+
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
     @Override
     public int hashCode() {
         return Objects.hash(errorTagMapping(), prettyPrint(), sseMaximumFragmentLength(), sseHeartbeatIntervalMillis(),
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
             apiRootPath, transportConfiguration, defaultEncoding);
+=======
+            apiRootPath, transportConfiguration, defaultEncoding, chunkSize, frameSize, altSvcHeaderValue,
+            bindAddress, bindPort, http3AltSvcMaxAgeSeconds, tlsCertificate, tlsPrivateKey, http3InitialMaxData,
+            http3InitialMaxStreamDataBidirectionalRemote, http3InitialMaxStreamsBidirectional,
+            writeBufferLowWaterMark, writeBufferHighWaterMark);
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
     }
 
     @Override
@@ -198,7 +380,22 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             && sseMaximumFragmentLength().equals(other.sseMaximumFragmentLength())
             && sseHeartbeatIntervalMillis().equals(other.sseHeartbeatIntervalMillis())
             && apiRootPath.equals(other.apiRootPath) && transportConfiguration.equals(other.transportConfiguration)
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
             && defaultEncoding.equals(other.defaultEncoding);
+=======
+            && defaultEncoding.equals(other.defaultEncoding) && chunkSize.equals(other.chunkSize)
+            && frameSize.equals(other.frameSize)
+            && Objects.equals(altSvcHeaderValue, other.altSvcHeaderValue)
+            && Objects.equals(bindAddress, other.bindAddress) && bindPort == other.bindPort
+            && http3AltSvcMaxAgeSeconds.equals(other.http3AltSvcMaxAgeSeconds)
+            && Objects.equals(tlsPrivateKey, other.tlsPrivateKey)
+            && Objects.equals(tlsCertificate, other.tlsCertificate)
+            && http3InitialMaxData.equals(other.http3InitialMaxData)
+            && http3InitialMaxStreamDataBidirectionalRemote.equals(other.http3InitialMaxStreamDataBidirectionalRemote)
+            && http3InitialMaxStreamsBidirectional.equals(other.http3InitialMaxStreamsBidirectional)
+            && writeBufferLowWaterMark.equals(other.writeBufferLowWaterMark)
+            && writeBufferHighWaterMark.equals(other.writeBufferHighWaterMark);
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
     }
 
     @Override
@@ -208,6 +405,19 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
                 .map(segment -> URLEncoder.encode(segment, StandardCharsets.UTF_8))
                 .collect(Collectors.joining("/")))
             .add("defaultEncoding", defaultEncoding)
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
             .add("transportConfiguration", transportConfiguration);
+=======
+            .add("transportConfiguration", transportConfiguration)
+            .add("altSvcHeaderValue", altSvcHeaderValue)
+            .add("bindAddress", bindAddress)
+            .add("bindPort", bindPort)
+            .add("http3AltSvcMaxAgeSeconds", http3AltSvcMaxAgeSeconds)
+            .add("http3InitialMaxData", http3InitialMaxData)
+            .add("http3InitialMaxStreamDataBidirectionalRemote", http3InitialMaxStreamDataBidirectionalRemote)
+            .add("http3InitialMaxStreamsBidirectional", http3InitialMaxStreamsBidirectional)
+            .add("writeBufferLowWaterMark", writeBufferLowWaterMark)
+            .add("writeBufferHighWaterMark", writeBufferHighWaterMark);
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
     }
 }

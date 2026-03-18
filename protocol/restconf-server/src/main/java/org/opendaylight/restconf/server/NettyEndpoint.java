@@ -8,6 +8,8 @@
 package org.opendaylight.restconf.server;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.WriteBufferWaterMark;
 import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -32,16 +34,25 @@ public abstract class NettyEndpoint {
             final RestconfStream.Registry streamRegistry, final BootstrapFactory bootstrapFactory,
             final NettyEndpointConfiguration configuration) {
         this.configuration = configuration;
+        final var writeBufferWaterMark = new WriteBufferWaterMark(
+            configuration.writeBufferLowWaterMark().intValue(),
+            configuration.writeBufferHighWaterMark().intValue());
         final var listener = new RestconfTransportChannelListener(server, streamRegistry, principalService,
-            configuration);
+            configuration, writeBufferWaterMark);
         try {
-            httpServer = HTTPServer.listen(listener, bootstrapFactory.newServerBootstrap(),
+            final var serverBootstrap = bootstrapFactory.newServerBootstrap()
+                .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, writeBufferWaterMark);
+            httpServer = HTTPServer.listen(listener, serverBootstrap,
                 configuration.transportConfiguration()).get();
         } catch (UnsupportedConfigurationException | ExecutionException | InterruptedException e) {
             throw new IllegalStateException("Could not start RESTCONF server", e);
         }
 
         root = listener.root();
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
+=======
+        http3ServerBootstrap = startHttp3(configuration, root, writeBufferWaterMark);
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
     }
 
     @NonNullByDefault
@@ -52,4 +63,45 @@ public abstract class NettyEndpoint {
     protected final ListenableFuture<Empty> shutdown() {
         return httpServer.shutdown();
     }
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
+=======
+
+    private static @Nullable Http3ServerBootstrap startHttp3(final NettyEndpointConfiguration configuration,
+            final EndpointRoot root,  final WriteBufferWaterMark writeBufferWaterMark) {
+        final var certificate = configuration.tlsCertificate();
+        final var privateKey = configuration.tlsPrivateKey();
+        if (certificate == null || privateKey == null) {
+            LOG.info("HTTP/3 is disabled because TLS is not configured");
+            return null;
+        }
+
+        final var bindAddress = configuration.bindAddress();
+        if (bindAddress == null || bindAddress.isBlank()) {
+            LOG.warn("HTTP/3 is enabled but bind address is not configured");
+            return null;
+        }
+
+        final var udpPort = configuration.bindPort();
+        if (udpPort <= 0 || udpPort > 65535) {
+            LOG.warn("HTTP/3 is enabled but UDP port is invalid: {}", udpPort);
+            return null;
+        }
+
+        final var http3AltSvcMaxAgeSeconds = configuration.http3AltSvcMaxAgeSeconds();
+        if (http3AltSvcMaxAgeSeconds.longValue() == 0) {
+            LOG.info("HTTP/3 is disabled because Alt-Svc max-age is {}", http3AltSvcMaxAgeSeconds);
+            return null;
+        }
+
+        try {
+            return Http3ServerBootstrap.start(bindAddress, udpPort, certificate, privateKey, root,
+                configuration.chunkSize(), writeBufferWaterMark,
+                configuration.http3InitialMaxData(), configuration.http3InitialMaxStreamDataBidirectionalRemote(),
+                configuration.http3InitialMaxStreamsBidirectional());
+        } catch (SSLException e) {
+            LOG.warn("Failed to initialize HTTP/3 TLS context", e);
+            return null;
+        }
+    }
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
 }

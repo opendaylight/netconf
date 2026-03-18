@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.server;
 
+import io.netty.channel.WriteBufferWaterMark;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -32,9 +33,15 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     private final EndpointRoot root;
     private final Uint32 chunkSize;
     private final Uint32 frameSize;
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
+=======
+    private final WriteBufferWaterMark writeBufferWaterMark;
+    private final AltSvcAdvertiser altSvcAdvertiser;
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
 
     RestconfTransportChannelListener(final RestconfServer server, final RestconfStream.Registry streamRegistry,
-            final PrincipalService principalService, final NettyEndpointConfiguration configuration) {
+            final PrincipalService principalService, final NettyEndpointConfiguration configuration,
+            final WriteBufferWaterMark writeBufferWaterMark) {
         // Reconstruct root API path in encoded form
         final var apiRootPath = configuration.apiRootPath();
         final var sb = new StringBuilder();
@@ -64,6 +71,11 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
         chunkSize = configuration.chunkSize();
         frameSize = configuration.frameSize();
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
+=======
+        this.writeBufferWaterMark = writeBufferWaterMark;
+        altSvcAdvertiser = new AltSvcAdvertiser(configuration.altSvcHeaderValue());
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
 
         LOG.info("Initialized with service {}", server.getClass());
         LOG.info("Initialized with base path: {}, default encoding: {}, default pretty print: {}", restconf,
@@ -77,7 +89,11 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     @Override
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
         channel.channel().pipeline().addLast(new RestconfSessionBootstrap(channel.scheme(), root, chunkSize,
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
             frameSize));
+=======
+            frameSize, writeBufferWaterMark, altSvcAdvertiser));
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
     }
 
     @Override

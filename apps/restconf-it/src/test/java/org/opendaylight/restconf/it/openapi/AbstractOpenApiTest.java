@@ -112,6 +112,16 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
         DEVICE_NODE_URI + "/netconf-node-topology:netconf-node?fields=connection-status";
     private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
     private static final Uint32 FRAME_SIZE = Uint32.valueOf(16 * 1024);
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
+=======
+    private static final String ALT_SVC_HEADER = "h3=\":8443\"; ma=3600";
+    private static final Uint32 HTTP3_ALT_SVC_MAX_AGE_SECONDS = Uint32.valueOf(3600);
+    private static final Uint64 HTTP3_INITIAL_MAX_DATA = Uint64.valueOf(4L * 1024 * 1024);
+    private static final Uint64 HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE = Uint64.valueOf(256L * 1024);
+    private static final Uint32 HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL = Uint32.valueOf(100);
+    private static final Uint32 WRITE_BUFFER_LOW_WATER_MARK = Uint32.valueOf(32 * 1024);
+    private static final Uint32 WRITE_BUFFER_HIGH_WATER_MARK = Uint32.valueOf(64 * 1024);
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
 
     protected static final String DEVICE_USERNAME = "device-username";
     protected static final String DEVICE_PASSWORD = "device-password";
@@ -211,7 +221,13 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
         // Netty endpoint
         final var configuration = new NettyEndpointConfiguration(
             ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000),
+<<<<<<< HEAD   (bd3e0a Refactor pipeline setup)
             RESTS, MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE);
+=======
+            RESTS, MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
+            WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS, HTTP3_INITIAL_MAX_DATA,
+            HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE, HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
+>>>>>>> CHANGE (3b9215 Add HTTP write buffer watermarks to RFC8040 config)
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory,
             configuration);
 
