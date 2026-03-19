@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a3e1c915_41ea4a6e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-19T15:51:58Z",
+      "side": 1,
+      "message": "why those 4?",
+      "revId": "ed940a9a51ea5867bc8d4a891e7bc8526394d709",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7c84f51d_cdc99b12",
         "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/AbstractWriteTx.java",
         "patchSetId": 2
