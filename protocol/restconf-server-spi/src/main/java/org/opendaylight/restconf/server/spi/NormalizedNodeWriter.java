@@ -20,10 +20,10 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.query.DepthParam;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
+import org.opendaylight.yangtools.databind.RequestException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -285,30 +285,19 @@ public abstract class NormalizedNodeWriter implements Flushable, Closeable {
      * @throws IOException when thrown from the backing writer.
      */
     public final NormalizedNodeWriter write(final NormalizedNode node) throws IOException {
-        if (node instanceof ContainerNode n) {
-            writeContainer(n);
-        } else if (node instanceof MapNode n) {
-            writeMap(n);
-        } else if (node instanceof MapEntryNode n) {
-            writeMapEntry(n);
-        } else if (node instanceof LeafNode<?> n) {
-            writeLeaf(n);
-        } else if (node instanceof ChoiceNode n) {
-            writeChoice(n);
-        } else if (node instanceof UnkeyedListNode n) {
-            writeUnkeyedList(n);
-        } else if (node instanceof UnkeyedListEntryNode n) {
-            writeUnkeyedListEntry(n);
-        } else if (node instanceof LeafSetNode<?> n) {
-            writeLeafSet(n);
-        } else if (node instanceof LeafSetEntryNode<?> n) {
-            writeLeafSetEntry(n);
-        } else if (node instanceof AnydataNode<?> n) {
-            writeAnydata(n);
-        } else if (node instanceof AnyxmlNode<?> n) {
-            writeAnyxml(n);
-        } else {
-            throw new IOException("Unhandled contract " + node.contract().getSimpleName());
+        switch (node) {
+            case ContainerNode n -> writeContainer(n);
+            case MapNode n -> writeMap(n);
+            case MapEntryNode n -> writeMapEntry(n);
+            case LeafNode<?> n -> writeLeaf(n);
+            case ChoiceNode n -> writeChoice(n);
+            case UnkeyedListNode n -> writeUnkeyedList(n);
+            case UnkeyedListEntryNode n -> writeUnkeyedListEntry(n);
+            case LeafSetNode<?> n -> writeLeafSet(n);
+            case LeafSetEntryNode<?> n -> writeLeafSetEntry(n);
+            case AnydataNode<?> n -> writeAnydata(n);
+            case AnyxmlNode<?> n -> writeAnyxml(n);
+            default -> throw new IOException("Unhandled contract " + node.contract().getSimpleName());
         }
         return this;
     }

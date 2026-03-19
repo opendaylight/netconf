@@ -10,7 +10,7 @@ package org.opendaylight.restconf.server.api;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
-import org.opendaylight.netconf.databind.RequestError;
+import org.opendaylight.yangtools.databind.RequestError;
 
 public class PatchStatusEntity {
     private final String editId;
