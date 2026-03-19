@@ -10,8 +10,8 @@ package org.opendaylight.restconf.server.api;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
-import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
+import org.opendaylight.yangtools.databind.DatabindPath.Data;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 @Beta

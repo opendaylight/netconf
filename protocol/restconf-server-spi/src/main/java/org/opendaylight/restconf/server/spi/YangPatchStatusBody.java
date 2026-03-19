@@ -17,12 +17,13 @@ import java.util.List;
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.FormattableBodySupport;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.status.YangPatchStatus;
+import org.opendaylight.yangtools.databind.ErrorInfo;
+import org.opendaylight.yangtools.databind.RequestError;
 import org.opendaylight.yangtools.yang.data.codec.gson.DefaultJSONValueWriter;
 
 /**
@@ -139,9 +140,11 @@ public final class YangPatchStatusBody extends FormattableBody {
             if (errorMessage != null) {
                 writer.name("error-message").value(errorMessage.elementBody());
             }
-            final var errorInfo = error.info();
-            if (errorInfo != null) {
-                writer.name("error-info").value(errorInfo.elementBody());
+            switch (error.info()) {
+                case null -> {
+                    // no-op
+                }
+                case ErrorInfo.OfLiteral errorInfo -> writer.name("error-info").value(errorInfo.elementBody());
             }
 
             writer.endObject();
@@ -180,11 +183,15 @@ public final class YangPatchStatusBody extends FormattableBody {
             }
 
             // optional node
-            final var errorInfo = restconfError.info();
-            if (errorInfo != null) {
-                writer.writeStartElement("error-info");
-                writer.writeCharacters(errorInfo.elementBody());
-                writer.writeEndElement();
+            switch (restconfError.info()) {
+                case null -> {
+                    // no-op
+                }
+                case ErrorInfo.OfLiteral errorInfo -> {
+                    writer.writeStartElement("error-info");
+                    writer.writeCharacters(errorInfo.elementBody());
+                    writer.writeEndElement();
+                }
             }
         }
 

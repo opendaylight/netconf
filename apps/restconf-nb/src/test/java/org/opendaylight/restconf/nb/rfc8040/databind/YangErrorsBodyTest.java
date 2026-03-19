@@ -9,11 +9,11 @@ package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.netconf.databind.DatabindContext;
-import org.opendaylight.netconf.databind.ErrorInfo;
-import org.opendaylight.netconf.databind.ErrorMessage;
-import org.opendaylight.netconf.databind.ErrorPath;
-import org.opendaylight.netconf.databind.RequestError;
+import org.opendaylight.yangtools.databind.DatabindContext;
+import org.opendaylight.yangtools.databind.ErrorInfo;
+import org.opendaylight.yangtools.yang.common.ErrorMessage;
+import org.opendaylight.yangtools.databind.ErrorPath;
+import org.opendaylight.yangtools.databind.RequestError;
 import org.opendaylight.restconf.server.api.YangErrorsBody;
 import org.opendaylight.restconf.server.api.testlib.AbstractJukeboxTest;
 import org.opendaylight.yangtools.yang.common.ErrorTag;

@@ -26,9 +26,9 @@ import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.server.mdsal.TransactionProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yangtools.databind.DatabindProvider;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -75,7 +75,8 @@ public final class CopyConfig extends AbstractEdit {
         if (Datastore.running.toString().equals(target)) {
             throw new DocumentedException("edit-config on running datastore is not supported",
                 ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED, ErrorSeverity.ERROR);
-        } else if (Datastore.candidate.toString().equals(target)) {
+        }
+        if (Datastore.candidate.toString().equals(target)) {
             copyToCandidate(operationElement);
         } else if (URL_KEY.equals(target)) {
             copyToUrl(targetElement, operationElement);
@@ -171,7 +172,8 @@ public final class CopyConfig extends AbstractEdit {
     private DOMDataTreeReadWriteTransaction getTransaction(final Datastore datastore) throws DocumentedException {
         if (datastore == Datastore.candidate) {
             return transactionProvider.getOrCreateTransaction();
-        } else if (datastore == Datastore.running) {
+        }
+        if (datastore == Datastore.running) {
             return transactionProvider.createRunningTransaction();
         }
         throw new DocumentedException("Incorrect Datastore: ", ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT,

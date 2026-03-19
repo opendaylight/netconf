@@ -15,14 +15,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.google.common.collect.ImmutableMap;
 import java.text.ParseException;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.netconf.databind.DatabindContext;
-import org.opendaylight.netconf.databind.DatabindPath.Action;
-import org.opendaylight.netconf.databind.DatabindPath.Data;
-import org.opendaylight.netconf.databind.ErrorInfo;
-import org.opendaylight.netconf.databind.ErrorMessage;
-import org.opendaylight.netconf.databind.RequestError;
-import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.yangtools.databind.DatabindContext;
+import org.opendaylight.yangtools.databind.DatabindPath.Action;
+import org.opendaylight.yangtools.databind.DatabindPath.Data;
+import org.opendaylight.yangtools.databind.ErrorInfo;
+import org.opendaylight.yangtools.databind.RequestError;
+import org.opendaylight.yangtools.databind.RequestException;
+import org.opendaylight.yangtools.yang.common.ErrorMessage;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -302,7 +302,8 @@ class ApiPathNormalizerTest {
             error.message());
         assertEquals(ErrorType.PROTOCOL, error.type());
         assertEquals(ErrorTag.INVALID_VALUE, error.tag());
-        assertEquals(new ErrorInfo("Invalid value '' for boolean type. Allowed values are 'true' and 'false'"),
+        assertEquals(
+            new ErrorInfo.OfLiteral("Invalid value '' for boolean type. Allowed values are 'true' and 'false'"),
             error.info());
     }
 
