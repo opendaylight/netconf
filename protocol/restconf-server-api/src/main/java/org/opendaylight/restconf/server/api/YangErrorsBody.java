@@ -13,11 +13,12 @@ import java.io.OutputStream;
 import java.util.List;
 import javax.xml.stream.XMLStreamException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.errors.Error;
+import org.opendaylight.yangtools.databind.ErrorInfo;
+import org.opendaylight.yangtools.databind.RequestError;
 import org.opendaylight.yangtools.yang.data.codec.gson.DefaultJSONValueWriter;
 
 /**
@@ -71,9 +72,11 @@ public final class YangErrorsBody extends FormattableBody {
                 if (errorAppTag != null) {
                     writer.name(ERROR_APP_TAG).value(errorAppTag);
                 }
-                final var errorInfo = error.info();
-                if (errorInfo != null) {
-                    writer.name(ERROR_INFO).value(errorInfo.elementBody());
+                switch (error.info()) {
+                    case null -> {
+                        // No-op
+                    }
+                    case ErrorInfo.OfLiteral errorInfo -> writer.name(ERROR_INFO).value(errorInfo.elementBody());
                 }
                 final var errorMessage = error.message();
                 if (errorMessage != null) {
@@ -133,12 +136,16 @@ public final class YangErrorsBody extends FormattableBody {
                     writer.writeCharacters(appTag);
                     writer.writeEndElement();
                 }
-                final var info = error.info();
-                if (info != null) {
-                    // FIXME: defer to FormattableBody?
-                    writer.writeStartElement(ERROR_INFO);
-                    writer.writeCharacters(info.elementBody());
-                    writer.writeEndElement();
+                switch (error.info()) {
+                    case null -> {
+                        // no-op
+                    }
+                    case ErrorInfo.OfLiteral info -> {
+                        // FIXME: defer to FormattableBody?
+                        writer.writeStartElement(ERROR_INFO);
+                        writer.writeCharacters(info.elementBody());
+                        writer.writeEndElement();
+                    }
                 }
                 writer.writeEndElement();
             }

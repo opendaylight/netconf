@@ -9,7 +9,7 @@ package org.opendaylight.netconf.client.mdsal.api;
 
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.yangtools.databind.DatabindContext;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
