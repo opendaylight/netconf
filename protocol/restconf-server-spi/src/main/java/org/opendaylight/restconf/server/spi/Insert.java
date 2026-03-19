@@ -16,13 +16,13 @@ import java.text.ParseException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.databind.DatabindContext;
-import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.yangtools.concepts.Immutable;
+import org.opendaylight.yangtools.databind.DatabindContext;
+import org.opendaylight.yangtools.databind.RequestException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 
 /**
@@ -67,14 +67,9 @@ public final class Insert implements Immutable {
             final var paramValue = param.getValue();
 
             switch (paramName) {
-                case InsertParam.uriName:
-                    insert = mandatoryParam(InsertParam::forUriValue, paramName, paramValue);
-                    break;
-                case PointParam.uriName:
-                    point = mandatoryParam(PointParam::forUriValue, paramName, paramValue);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid parameter: " + paramName);
+                case InsertParam.uriName -> insert = mandatoryParam(InsertParam::forUriValue, paramName, paramValue);
+                case PointParam.uriName -> point = mandatoryParam(PointParam::forUriValue, paramName, paramValue);
+                default -> throw new IllegalArgumentException("Invalid parameter: " + paramName);
             }
         }
 

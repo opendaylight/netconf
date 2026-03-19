@@ -19,11 +19,11 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
-import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMDataBrokerFieldsExtension;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadTransaction;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadWriteTransaction;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsTransactionChain;
+import org.opendaylight.yangtools.databind.DatabindContext;
 
 public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBroker {
     private final NetconfDOMDataBrokerFieldsExtension fieldsExtension = new NetconfDOMDataBrokerFieldsExtensionImpl();

@@ -11,8 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.netconf.databind.ErrorMessage;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
+import org.opendaylight.yangtools.yang.common.ErrorMessage;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;

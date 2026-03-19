@@ -14,11 +14,11 @@ import com.google.common.util.concurrent.MoreExecutors;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
-import org.opendaylight.netconf.databind.DatabindPath.Action;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.ServerActionOperations;
 import org.opendaylight.restconf.server.spi.ServerRpcOperations;
+import org.opendaylight.yangtools.databind.DatabindPath.Action;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 
 /**

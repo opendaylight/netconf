@@ -13,10 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.netconf.databind.ErrorInfo;
-import org.opendaylight.netconf.databind.ErrorMessage;
-import org.opendaylight.netconf.databind.RequestError;
-import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.yangtools.databind.ErrorInfo;
+import org.opendaylight.yangtools.databind.RequestError;
+import org.opendaylight.yangtools.databind.RequestException;
+import org.opendaylight.yangtools.yang.common.ErrorMessage;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
@@ -66,7 +66,7 @@ class ServerExceptionTest {
         assertSame(cause, ex.getCause());
         assertServerError(
             new RequestError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, new ErrorMessage("some message"), null,
-                null, new ErrorInfo("cause message")),
+                null, new ErrorInfo.OfLiteral("cause message")),
             ex);
     }
 
@@ -78,7 +78,7 @@ class ServerExceptionTest {
         assertSame(cause, ex.getCause());
         assertServerError(
             new RequestError(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, new ErrorMessage("some message"), null,
-                null, new ErrorInfo("cause message")),
+                null, new ErrorInfo.OfLiteral("cause message")),
             ex);
     }
 
@@ -90,7 +90,7 @@ class ServerExceptionTest {
         assertSame(cause, ex.getCause());
         assertServerError(
             new RequestError(ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED, new ErrorMessage("some message"),
-                null, null, new ErrorInfo("cause message")),
+                null, null, new ErrorInfo.OfLiteral("cause message")),
             ex);
     }
 

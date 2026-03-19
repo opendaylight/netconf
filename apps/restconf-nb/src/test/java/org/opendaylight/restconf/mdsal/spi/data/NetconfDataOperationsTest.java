@@ -57,8 +57,6 @@ import org.opendaylight.netconf.client.mdsal.spi.DataOperationsService;
 import org.opendaylight.netconf.client.mdsal.spi.DataOperationsServiceImpl;
 import org.opendaylight.netconf.client.mdsal.spi.DataStoreService;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDataOperations;
-import org.opendaylight.netconf.databind.DatabindPath.Data;
-import org.opendaylight.netconf.databind.ErrorInfo;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
@@ -91,6 +89,8 @@ import org.opendaylight.restconf.server.spi.ServerDataOperations;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
+import org.opendaylight.yangtools.databind.DatabindPath.Data;
+import org.opendaylight.yangtools.databind.ErrorInfo;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -526,8 +526,9 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         final var serverError = globalErrors.getFirst();
         assertNotNull(serverError);
         assertEquals(ErrorTag.OPERATION_FAILED, serverError.tag());
-        assertEquals("RPC during tx failed. Requested resource already lockedUser callback failed. ",
-            serverError.info().elementBody());
+        assertEquals(
+            new ErrorInfo.OfLiteral("RPC during tx failed. Requested resource already lockedUser callback failed. "),
+            serverError.info());
     }
 
     @Override
@@ -604,8 +605,8 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         final var globalErrors = status.globalErrors();
         assertNotNull(globalErrors);
         assertEquals(1, globalErrors.size());
-        final var globalError = globalErrors.get(0);
-        assertEquals(new ErrorInfo("Data missing"), globalError.info());
+        final var globalError = globalErrors.getFirst();
+        assertEquals(new ErrorInfo.OfLiteral("Data missing"), globalError.info());
         assertEquals(ErrorType.RPC, globalError.type());
         assertEquals(ErrorTag.DATA_MISSING, globalError.tag());
     }
@@ -720,7 +721,7 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
     @Override
     NormalizedNode readData(final ContentParam content, final Data path, final ServerDataOperations strategy) {
         try {
-            return (dataOperationService)
+            return dataOperationService
                 .getData(path, new DataGetParams(content, DepthParam.max(), null, null))
                 .get(2, TimeUnit.SECONDS)
                 .orElse(null);
