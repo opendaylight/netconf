@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "00b6a700_08165f7c",
+        "filename": "usecase/odl-dagger-prototype/pom.xml",
+        "patchSetId": 10
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-19T06:12:04Z",
+      "side": 1,
+      "message": "spring-core -\u003e Done.\nsnakeyaml -\u003e False positive. Added a comment to this dependency. It is required by Spring Boot to parse YAML files.",
+      "parentUuid": "41a62275_2b689ff8",
+      "revId": "f40e76182f69d0f577ff1a89c21cbba25eada95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0b24ea86_9a501cc3",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e3f09ea_c1f1b95e",
+        "filename": "usecase/odl-dagger-prototype/src/main/java/module-info.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-19T06:12:04Z",
+      "side": 1,
+      "message": "Done by not exporting springboot.config in module-info file.",
+      "parentUuid": "0b24ea86_9a501cc3",
+      "revId": "f40e76182f69d0f577ff1a89c21cbba25eada95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "61347dfd_983db6c5",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-03-12T14:40:49Z",
       "side": 1,
       "message": "we probably do not need opens as we are not using spring configuration at runtime",
+      "revId": "f40e76182f69d0f577ff1a89c21cbba25eada95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1498acd_1616000d",
+        "filename": "usecase/odl-dagger-prototype/src/main/java/module-info.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-19T06:12:04Z",
+      "side": 1,
+      "message": "If I remove this:\n\n[INFO] Running org.opendaylight.netconf.dagger.springboot.config.SpringbootConfigLoaderTest\n[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.585 s \u003c\u003c\u003c FAILURE! -- in org.opendaylight.netconf.dagger.springboot.config.SpringbootConfigLoaderTest\n[ERROR] org.opendaylight.netconf.dagger.springboot.config.SpringbootConfigLoaderTest.loadJavaPropertiesFile -- Time elapsed: 0.449 s \u003c\u003c\u003c ERROR!\norg.springframework.boot.context.properties.bind.BindException: Failed to bind properties under \u0027resource.alfa\u0027 to org.opendaylight.netconf.dagger.springboot.config.SpringbootConfigLoaderTest$Alfa\n.........\n\nCaused by: java.lang.reflect.InaccessibleObjectException: Unable to make org.opendaylight.netconf.dagger.springboot.config.SpringbootConfigLoaderTest$Alfa(java.lang.String,int,java.lang.String,int,java.util.List) accessible: module org.opendaylight.netconf.dagger does not \"opens org.opendaylight.netconf.dagger.springboot.config\" to module spring.core",
+      "parentUuid": "61347dfd_983db6c5",
       "revId": "f40e76182f69d0f577ff1a89c21cbba25eada95c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -118,6 +172,24 @@
       "side": 1,
       "message": "\u0027netconf-topology-1node-transient\u0027 is a much better name",
       "parentUuid": "94c8515d_3666af3f",
+      "revId": "f40e76182f69d0f577ff1a89c21cbba25eada95c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f059262_5b81a673",
+        "filename": "usecase/pom.xml",
+        "patchSetId": 10
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-19T06:12:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "50f8b00a_30818496",
       "revId": "f40e76182f69d0f577ff1a89c21cbba25eada95c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
