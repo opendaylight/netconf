@@ -9,10 +9,10 @@ package org.opendaylight.restconf.server.spi;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.netconf.databind.RequestError;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.testlib.AbstractJukeboxTest;
+import org.opendaylight.yangtools.databind.RequestError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 

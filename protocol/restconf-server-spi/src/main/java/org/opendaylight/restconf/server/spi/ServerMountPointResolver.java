@@ -9,8 +9,8 @@ package org.opendaylight.restconf.server.spi;
 
 import com.google.common.annotations.Beta;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.databind.DatabindPath.Data;
-import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.yangtools.databind.DatabindPath.Data;
+import org.opendaylight.yangtools.databind.RequestException;
 
 /**
  * A resolver of {@code yang-ext:mount} references to {@link ServerStrategy}..

@@ -57,8 +57,6 @@ import org.opendaylight.mdsal.singleton.api.ClusterSingletonService;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.mdsal.singleton.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
-import org.opendaylight.netconf.databind.DatabindProvider;
-import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
 import org.opendaylight.restconf.mdsal.spi.NotificationSource;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
@@ -87,6 +85,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.databind.DatabindProvider;
+import org.opendaylight.yangtools.databind.RequestException;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -202,7 +202,8 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private final Registration sclReg;
     private final Registration tclReg;
     private final AtomicBoolean isLeader = new AtomicBoolean(false);
-    private DefaultNotificationSource notificationSource;
+    private final DefaultNotificationSource notificationSource;
+
     private DOMTransactionChain txChain;
 
     @Inject

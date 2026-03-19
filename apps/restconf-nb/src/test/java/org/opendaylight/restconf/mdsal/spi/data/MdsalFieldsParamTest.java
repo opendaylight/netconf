@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.yangtools.databind.RequestException;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.common.QName;

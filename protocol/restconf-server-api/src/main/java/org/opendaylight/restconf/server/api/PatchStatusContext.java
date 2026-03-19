@@ -12,7 +12,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.databind.RequestError;
+import org.opendaylight.yangtools.databind.RequestError;
 
 /**
  * Holder of patch status context.
