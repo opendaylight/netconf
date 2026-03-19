@@ -8,10 +8,10 @@
 package org.opendaylight.restconf.server.spi;
 
 import java.util.List;
-import org.opendaylight.netconf.databind.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.ChildBody.PrefixAndBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.yangtools.databind.DatabindPath.Data;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 

@@ -13,7 +13,7 @@ import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.yangtools.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;

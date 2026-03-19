@@ -22,9 +22,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
-import org.opendaylight.netconf.databind.DatabindContext;
-import org.opendaylight.netconf.databind.RequestError;
-import org.opendaylight.netconf.databind.RequestException;
+import org.opendaylight.yangtools.databind.DatabindContext;
+import org.opendaylight.yangtools.databind.RequestError;
+import org.opendaylight.yangtools.databind.RequestException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 

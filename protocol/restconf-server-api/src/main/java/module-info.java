@@ -12,8 +12,8 @@ module org.opendaylight.restconf.server.api {
     exports org.opendaylight.restconf.server.api;
 
     requires transitive com.google.common;
-    requires transitive org.opendaylight.netconf.databind;
     requires transitive org.opendaylight.restconf.api;
+    requires transitive org.opendaylight.yangtools.databind;
     requires transitive org.opendaylight.yangtools.yang.data.api;
     requires transitive org.opendaylight.yangtools.yang.data.codec.gson;
     requires transitive org.opendaylight.yangtools.yang.data.codec.xml;

@@ -9,21 +9,18 @@
  * Object models of NETCONF/RESTCONF constructs and their YANG-assisted data binding operations.
  */
 module org.opendaylight.netconf.databind {
-    exports org.opendaylight.netconf.databind;
     exports org.opendaylight.netconf.databind.subtree;
 
+    requires transitive org.opendaylight.yangtools.databind;
     requires transitive org.opendaylight.yangtools.yang.common;
-    requires transitive org.opendaylight.yangtools.yang.data.codec.gson;
     requires transitive org.opendaylight.yangtools.yang.data.codec.xml;
     requires transitive org.opendaylight.yangtools.yang.data.util;
     requires transitive org.opendaylight.yangtools.yang.model.api;
     requires org.opendaylight.yangtools.yang.data.impl;
-    requires org.opendaylight.yangtools.yang.data.spi;
     requires com.google.common;
     requires org.slf4j;
 
     // Annotation-only dependencies
     requires static transitive org.eclipse.jdt.annotation;
-    requires static com.github.spotbugs.annotations;
     requires static org.osgi.annotation.bundle;
 }
