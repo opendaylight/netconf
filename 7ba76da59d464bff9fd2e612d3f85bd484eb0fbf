@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8460c3b5_8bb399a1",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-03-19T08:20:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a01783c_769f6478",
+      "range": {
+        "startLine": 118,
+        "startChar": 12,
+        "endLine": 118,
+        "endChar": 35
+      },
+      "revId": "7ba76da59d464bff9fd2e612d3f85bd484eb0fbf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "509b99ed_edead380",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-03-18T16:07:56Z",
       "side": 1,
       "message": "err, no: this should project the configuration items directly",
+      "range": {
+        "startLine": 291,
+        "startChar": 32,
+        "endLine": 291,
+        "endChar": 52
+      },
+      "revId": "7ba76da59d464bff9fd2e612d3f85bd484eb0fbf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "879fe1ba_c7615a75",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-03-19T08:20:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "509b99ed_edead380",
       "range": {
         "startLine": 291,
         "startChar": 32,
