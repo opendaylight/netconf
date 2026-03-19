@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf8050c8_94ce4b1c",
+        "filename": "usecase/odl-dagger-prototype/src/main/java/org/opendaylight/netconf/dagger/mdsal/MdsalQualifiers.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-19T08:48:19Z",
+      "side": 1,
+      "message": "I added the qualifier for EffectiveModelContext just as a safety measure. I have also added more description to the commit message and the Javadoc to clarify this.",
+      "parentUuid": "af2598f8_6a1d2a5c",
+      "revId": "9b2c21b3608e97ba5023545f8185cbaefa602f86",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4641ceb6_a7971cd0",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-03-12T15:58:00Z",
       "side": 1,
       "message": "do we need runtime? for dagger?",
+      "revId": "9b2c21b3608e97ba5023545f8185cbaefa602f86",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d28ec31c_a457364f",
+        "filename": "usecase/odl-dagger-prototype/src/main/java/org/opendaylight/netconf/dagger/mdsal/MdsalQualifiers.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-19T08:48:19Z",
+      "side": 1,
+      "message": "I am using @Retention(RUNTIME) because it is the standard convention for custom Dagger qualifiers. Furthermore, the jakarta.inject.Qualifier specification expects qualifiers to be retained at runtime so the dependency injection framework can correctly identify and resolve the bindings. This approach aligns with the official Dagger documentation:\n\nhttps://dagger.dev/tutorial/11-withdraw-command\n\nhttps://medium.com/@jiteshdalsaniya/understanding-qualifiers-in-dagger-2-801dd8fbebd9",
+      "parentUuid": "4641ceb6_a7971cd0",
       "revId": "9b2c21b3608e97ba5023545f8185cbaefa602f86",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
