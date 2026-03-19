@@ -10,9 +10,9 @@ package org.opendaylight.restconf.server.spi;
 import com.google.common.annotations.Beta;
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.databind.DatabindPath.Rpc;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.yangtools.databind.DatabindPath.Rpc;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 
 /**

@@ -17,12 +17,12 @@ import java.util.List;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.databind.DatabindPath;
-import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.ServerDataOperations;
+import org.opendaylight.yangtools.databind.DatabindPath;
+import org.opendaylight.yangtools.databind.RequestException;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -44,8 +44,8 @@ public final class FieldsParamParser {
     private final EffectiveModelContext modelContext;
     private final DataSchemaContext startNode;
 
-    private FieldsParamParser(final EffectiveModelContext context, final DataSchemaContext startNode) {
-        this.modelContext = requireNonNull(context);
+    private FieldsParamParser(final EffectiveModelContext modelContext, final DataSchemaContext startNode) {
+        this.modelContext = requireNonNull(modelContext);
         this.startNode = requireNonNull(startNode);
     }
 

@@ -46,10 +46,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
-import org.opendaylight.netconf.databind.DatabindContext;
-import org.opendaylight.netconf.databind.DatabindPath.Data;
-import org.opendaylight.netconf.databind.ErrorMessage;
-import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
@@ -69,6 +65,10 @@ import org.opendaylight.restconf.server.spi.NotSupportedServerMountPointResolver
 import org.opendaylight.restconf.server.spi.NotSupportedServerRpcOperations;
 import org.opendaylight.restconf.server.spi.ServerDataOperations;
 import org.opendaylight.restconf.server.spi.ServerStrategy.StrategyAndPath;
+import org.opendaylight.yangtools.databind.DatabindContext;
+import org.opendaylight.yangtools.databind.DatabindPath.Data;
+import org.opendaylight.yangtools.databind.RequestException;
+import org.opendaylight.yangtools.yang.common.ErrorMessage;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -434,18 +434,17 @@ final class MdsalRestconfStrategyTest extends AbstractServerDataOperationsTest {
     }
 
     @Override
-    NormalizedNode readData(final ContentParam content, Data path,
+    NormalizedNode readData(final ContentParam content, final Data path,
             final ServerDataOperations dataOperations) {
-        if (dataOperations instanceof MdsalRestconfStrategy mdsalRestconfStrategy) {
-            try {
-                mdsalRestconfStrategy.readData(getServerRequest, content, path, null);
-                return getServerRequest.getResult().orElse(null);
-            } catch (TimeoutException | InterruptedException | RequestException e) {
-                throw new AssertionError(e);
-            }
-        } else {
+        if (!(dataOperations instanceof MdsalRestconfStrategy mdsalRestconfStrategy)) {
             fail("Wrong ServerDataOperations type" + dataOperations);
             return null;
+        }
+        try {
+            mdsalRestconfStrategy.readData(getServerRequest, content, path, null);
+            return getServerRequest.getResult().orElse(null);
+        } catch (TimeoutException | InterruptedException | RequestException e) {
+            throw new AssertionError(e);
         }
     }
 

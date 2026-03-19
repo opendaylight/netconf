@@ -40,19 +40,17 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
-import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfData;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
+import org.opendaylight.yangtools.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.w3c.dom.Node;
 
 @ExtendWith(MockitoExtension.class)
@@ -121,8 +119,7 @@ class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     }
 
     private static Node resolveNode(final DOMRpcResult result) {
-        DataContainerChild value = result.value()
-                .findChildByArg(NetconfMessageTransformUtil.NETCONF_DATA_NODEID).orElseThrow();
+        var value = result.value().findChildByArg(NetconfMessageTransformUtil.NETCONF_DATA_NODEID).orElseThrow();
         Node node = ((DOMSourceAnyxmlNode)value).body().getNode();
         assertNotNull(node);
         return node;
@@ -135,11 +132,11 @@ class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
         rpc.domRpcService().registerRpcListener(listener);
 
         verify(listener).onRpcAvailable(argument.capture());
-        final Collection<DOMRpcIdentifier> argValue = argument.getValue();
-        final Collection<? extends RpcDefinition> operations = SCHEMA_CONTEXT.getOperations();
+        final var argValue = argument.getValue();
+        final var operations = SCHEMA_CONTEXT.getOperations();
         assertEquals(argValue.size(), operations.size());
-        for (RpcDefinition operation : operations) {
-            final DOMRpcIdentifier domRpcIdentifier = DOMRpcIdentifier.create(operation.getQName());
+        for (var operation : operations) {
+            final var domRpcIdentifier = DOMRpcIdentifier.create(operation.getQName());
             assertTrue(argValue.contains(domRpcIdentifier));
         }
     }

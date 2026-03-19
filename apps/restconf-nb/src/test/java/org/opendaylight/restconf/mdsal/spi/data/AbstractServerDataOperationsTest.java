@@ -7,10 +7,10 @@
  */
 package org.opendaylight.restconf.mdsal.spi.data;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,10 +26,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opendaylight.netconf.databind.DatabindContext;
-import org.opendaylight.netconf.databind.DatabindPath.Data;
-import org.opendaylight.netconf.databind.ErrorPath;
-import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostResult;
@@ -43,6 +39,11 @@ import org.opendaylight.restconf.server.api.testlib.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.spi.ServerDataOperations;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
+import org.opendaylight.yangtools.databind.DatabindContext;
+import org.opendaylight.yangtools.databind.DatabindPath.Data;
+import org.opendaylight.yangtools.databind.ErrorInfo;
+import org.opendaylight.yangtools.databind.ErrorPath;
+import org.opendaylight.yangtools.databind.RequestException;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -287,7 +288,8 @@ abstract class AbstractServerDataOperationsTest extends AbstractJukeboxTest {
 
         final var errors = assertThrows(RequestException.class, dataPostRequest::getResult).errors();
         assertEquals(1, errors.size());
-        assertThat(errors.get(0).info().elementBody(), containsString(domException.getMessage()));
+        final var info = assertInstanceOf(ErrorInfo.OfLiteral.class, errors.getFirst().info());
+        assertThat(info.elementBody()).contains(domException.getMessage());
     }
 
     abstract @NonNull ServerDataOperations testPostDataFailStrategy(DOMException domException);

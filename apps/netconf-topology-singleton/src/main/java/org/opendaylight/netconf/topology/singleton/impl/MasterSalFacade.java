@@ -37,11 +37,11 @@ import org.opendaylight.netconf.client.mdsal.spi.DataStoreService;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDataOperations;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceDataBroker;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceMount;
-import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.spi.NetconfDeviceTopologyAdapter;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.Credentials;
+import org.opendaylight.yangtools.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.slf4j.Logger;
@@ -147,7 +147,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
     @Override
     public void onSshAlgorithmsNegotiated(final NegotiatedSshAlg negotiatedSshAlg) {
-        this.negotiatedSshKeys = negotiatedSshAlg;
+        negotiatedSshKeys = negotiatedSshAlg;
     }
 
     @Override

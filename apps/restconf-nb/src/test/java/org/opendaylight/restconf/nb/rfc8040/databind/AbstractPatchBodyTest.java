@@ -21,7 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.mdsal.spi.data.MdsalRestconfStrategy;
 import org.opendaylight.restconf.server.api.PatchBody;
@@ -35,6 +34,7 @@ import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerModulesOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerRpcOperations;
 import org.opendaylight.restconf.server.spi.ServerStrategy.StrategyAndPath;
+import org.opendaylight.yangtools.databind.RequestException;
 
 @ExtendWith(MockitoExtension.class)
 abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
