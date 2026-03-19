@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4df7b90_9077b984",
+        "filename": "usecase/odl-dagger-prototype/pom.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-19T08:49:10Z",
+      "side": 0,
+      "message": "This dependency is no longer used only in tests. I have removed the test scope and moved it to the correct place.",
+      "parentUuid": "1d009b78_ad91de61",
+      "revId": "9b2c21b3608e97ba5023545f8185cbaefa602f86",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "59a0391b_bc375046",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-03-12T16:05:06Z",
       "side": 0,
       "message": "why removed?",
+      "revId": "9b2c21b3608e97ba5023545f8185cbaefa602f86",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02fe7afd_cae13025",
+        "filename": "usecase/odl-dagger-prototype/src/test/java/org/opendaylight/netconf/dagger/mdsal/MdsalSchemaContextTestModule.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-19T08:49:10Z",
+      "side": 0,
+      "message": "There is no longer a need to mock the schema context for tests, as it is now loaded directly from the classpath. I have added more description to the commit message to clarify this.",
+      "parentUuid": "59a0391b_bc375046",
       "revId": "9b2c21b3608e97ba5023545f8185cbaefa602f86",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
