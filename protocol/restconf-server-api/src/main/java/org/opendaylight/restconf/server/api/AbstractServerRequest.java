@@ -14,10 +14,10 @@ import java.security.Principal;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.databind.AbstractRequest;
-import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.yangtools.databind.AbstractRequest;
+import org.opendaylight.yangtools.databind.RequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

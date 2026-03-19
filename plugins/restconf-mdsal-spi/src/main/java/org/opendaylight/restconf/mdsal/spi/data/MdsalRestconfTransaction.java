@@ -20,11 +20,11 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.netconf.databind.DatabindContext;
-import org.opendaylight.netconf.databind.ErrorPath;
-import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.mdsal.spi.data.ExistenceCheck.Conflict;
 import org.opendaylight.restconf.mdsal.spi.data.ExistenceCheck.Result;
+import org.opendaylight.yangtools.databind.DatabindContext;
+import org.opendaylight.yangtools.databind.ErrorPath;
+import org.opendaylight.yangtools.databind.RequestException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -56,13 +56,12 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
 
     @Override
     protected void deleteImpl(final YangInstanceIdentifier path) throws RequestException {
-        if (RestconfStrategy.syncAccess(verifyNotNull(rwTx).exists(CONFIGURATION, path), path)) {
-            rwTx.delete(CONFIGURATION, path);
-        } else {
+        if (!RestconfStrategy.syncAccess(verifyNotNull(rwTx).exists(CONFIGURATION, path), path)) {
             LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
             throw new RequestException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Data does not exist",
                 new ErrorPath(databind, path));
         }
+        rwTx.delete(CONFIGURATION, path);
     }
 
     @Override

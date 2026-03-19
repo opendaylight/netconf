@@ -10,7 +10,7 @@ package org.opendaylight.netconf.client.mdsal.spi;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Optional;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.netconf.databind.DatabindPath.Data;
+import org.opendaylight.yangtools.databind.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
