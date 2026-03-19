@@ -26,7 +26,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.api.SchemalessRpcService;
-import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.yangtools.databind.DatabindContext;
 import org.opendaylight.restconf.mdsal.spi.DOMServerActionOperations;
 import org.opendaylight.restconf.mdsal.spi.DOMServerRpcOperations;
 import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;

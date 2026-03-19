@@ -41,7 +41,6 @@ import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
@@ -68,6 +67,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.databind.RequestException;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -332,7 +332,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             if (state().canMoveTo(SubscriptionState.SUSPENDED)) {
                 Futures.addCallback(updateReceiversState(State.Suspended), new FutureCallback<>() {
                     @Override
-                    public void onSuccess(Void result) {
+                    public void onSuccess(final Void result) {
                         setState(SubscriptionState.SUSPENDED);
                         suspendReceivers(id(), reason);
                     }
@@ -357,7 +357,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             if (state().canMoveTo(SubscriptionState.ACTIVE)) {
                 Futures.addCallback(updateReceiversState(State.Active), new FutureCallback<>() {
                     @Override
-                    public void onSuccess(Void result) {
+                    public void onSuccess(final Void result) {
                         setState(SubscriptionState.ACTIVE);
                         resumeReceivers(id());
                     }
@@ -971,11 +971,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         filters.setRelease(ImmutableMap.copyOf(freshFilters));
         // Callback to update operational datastore with the list of filter names that compiled successfully
         Futures.addCallback(filtersOperationalViewUpdated(filters.getAcquire().keySet()), new FutureCallback<>() {
-            @Override public void onSuccess(@Nullable Void result) {
+            @Override
+            public void onSuccess(final Void result) {
                 LOG.debug("Filters operational view update completed");
             }
 
-            @Override public void onFailure(Throwable cause) {
+            @Override
+            public void onFailure(final Throwable cause) {
                 LOG.warn("Filters operational view update failed", cause);
             }
         }, MoreExecutors.directExecutor());

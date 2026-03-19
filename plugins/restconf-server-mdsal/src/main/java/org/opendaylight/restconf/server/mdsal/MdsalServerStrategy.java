@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.server.mdsal;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -21,6 +20,7 @@ import org.opendaylight.restconf.server.spi.ServerMountPointResolver;
 import org.opendaylight.restconf.server.spi.ServerRpcOperations;
 import org.opendaylight.restconf.server.spi.ServerStrategy;
 import org.opendaylight.restconf.server.spi.YangLibraryVersionResource;
+import org.opendaylight.yangtools.databind.DatabindContext;
 
 /**
  * A {@link ServerStrategy} associated with the root of a {@link RestconfServer}. It exposes

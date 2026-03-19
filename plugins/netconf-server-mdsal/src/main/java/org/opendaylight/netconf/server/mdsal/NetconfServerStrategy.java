@@ -11,8 +11,8 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableSet;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
+import org.opendaylight.yangtools.databind.DatabindContext;
 
 /**
  * Strategy for executing NETCONF server requests. It is bound to a {@link DatabindContext} and has capabilities derived

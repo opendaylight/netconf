@@ -19,7 +19,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps.ConfigNodeKey;
 import org.opendaylight.netconf.client.mdsal.util.NormalizedDataUtil;
-import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.yangtools.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;

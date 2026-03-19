@@ -10,7 +10,6 @@ package org.opendaylight.netconf.server.mdsal;
 import com.google.common.collect.ImmutableSet;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.server.api.operations.NetconfOperation;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 import org.opendaylight.netconf.server.mdsal.operations.Commit;
@@ -24,6 +23,7 @@ import org.opendaylight.netconf.server.mdsal.operations.RuntimeRpc;
 import org.opendaylight.netconf.server.mdsal.operations.Unlock;
 import org.opendaylight.netconf.server.mdsal.operations.Validate;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yangtools.databind.DatabindProvider;
 
 final class MdsalNetconfOperationService implements NetconfOperationService {
     private final ImmutableSet<NetconfOperation> operations;

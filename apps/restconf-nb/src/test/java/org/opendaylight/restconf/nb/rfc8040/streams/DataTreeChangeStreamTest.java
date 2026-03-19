@@ -37,7 +37,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
-import org.opendaylight.netconf.databind.DatabindProvider;
+import org.opendaylight.yangtools.databind.DatabindProvider;
 import org.opendaylight.netconf.sal.remote.impl.DataTreeChangeSource;
 import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;

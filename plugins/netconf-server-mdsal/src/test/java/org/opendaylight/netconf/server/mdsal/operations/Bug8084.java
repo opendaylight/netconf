@@ -13,7 +13,7 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.yangtools.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint16;
