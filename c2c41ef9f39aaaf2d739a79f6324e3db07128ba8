@@ -33,6 +33,24 @@
       "message": "really needed?",
       "revId": "c2c41ef9f39aaaf2d739a79f6324e3db07128ba8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d2c0153_eece8fe4",
+        "filename": "usecase/odl-dagger-prototype/src/main/java/module-info.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-19T08:49:23Z",
+      "side": 1,
+      "message": "[INFO] -------------------------------------------------------------\n[ERROR] COMPILATION ERROR : \n[INFO] -------------------------------------------------------------\n[ERROR] netconf/usecase/netconf-topology-1node-transient/src/main/java/org/opendaylight/netconf/dagger/mdsal/InMemoryDataStoreModule.java:[28,35] package org.springframework.context.annotation is not visible",
+      "parentUuid": "1ccb3fd3_84e97285",
+      "revId": "c2c41ef9f39aaaf2d739a79f6324e3db07128ba8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
