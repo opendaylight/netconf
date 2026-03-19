@@ -22,21 +22,20 @@ import static org.opendaylight.netconf.databind.subtree.SubtreeFilterTestUtils.U
 
 import java.util.List;
 import java.util.Map;
-import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
-import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.yangtools.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName;
 
 class SubtreeFilterPrettyTreeTest {
-
     @BeforeEach
     void setUp() {
+        // FIXME: migrate
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
     }
@@ -45,7 +44,7 @@ class SubtreeFilterPrettyTreeTest {
     @MethodSource
     void testExamples(final String expectedString, final SubtreeFilter filter) throws Exception {
         final var actual = filter.prettyTree().toString();
-        final Diff diff = XMLUnit.compareXML(expectedString, actual);
+        final var diff = XMLUnit.compareXML(expectedString, actual);
         assertTrue(diff.similar());
     }
 
