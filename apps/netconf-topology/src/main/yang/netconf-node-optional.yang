@@ -31,7 +31,7 @@ module netconf-node-optional {
         }
     }
 
-    augment "/nt:network-topology/nt:topology/nt:node/" {
+    augment "/nt:network-topology/nt:topology/nt:node" {
         when "../../nt:topology-types/topology-netconf";
         oce:augment-identifier "netconf-node-augmented-optional";
         uses netconf-node-augmented-optional-fields;
