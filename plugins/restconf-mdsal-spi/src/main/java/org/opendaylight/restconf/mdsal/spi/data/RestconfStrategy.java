@@ -27,11 +27,6 @@ import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
-import org.opendaylight.netconf.databind.DatabindContext;
-import org.opendaylight.netconf.databind.DatabindPath.Data;
-import org.opendaylight.netconf.databind.ErrorPath;
-import org.opendaylight.netconf.databind.RequestError;
-import org.opendaylight.netconf.databind.RequestException;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
@@ -47,6 +42,11 @@ import org.opendaylight.restconf.server.spi.AbstractServerDataOperations;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.Insert;
 import org.opendaylight.restconf.server.spi.ServerDataOperations;
+import org.opendaylight.yangtools.databind.DatabindContext;
+import org.opendaylight.yangtools.databind.DatabindPath.Data;
+import org.opendaylight.yangtools.databind.ErrorPath;
+import org.opendaylight.yangtools.databind.RequestError;
+import org.opendaylight.yangtools.databind.RequestException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -574,7 +574,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
 
         Futures.addCallback(getFuture, new FutureCallback<>() {
             @Override
-            public void onSuccess(Optional<NormalizedNode> result) {
+            public void onSuccess(final Optional<NormalizedNode> result) {
                 if (result.isPresent()) {
                     getRequest.completeWith(result);
                 } else {
@@ -584,7 +584,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
             }
 
             @Override
-            public void onFailure(Throwable cause) {
+            public void onFailure(final Throwable cause) {
                 getRequest.failWith(decodeException(cause, "GET", path));
             }
         }, MoreExecutors.directExecutor());

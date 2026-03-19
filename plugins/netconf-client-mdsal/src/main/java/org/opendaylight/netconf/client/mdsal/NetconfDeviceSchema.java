@@ -10,7 +10,7 @@ package org.opendaylight.netconf.client.mdsal;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.databind.DatabindContext;
+import org.opendaylight.yangtools.databind.DatabindContext;
 
 /**
  * {@link NetconfDeviceCapabilities} and {@link DatabindContext} pertaining to a {@link NetconfDevice}.
