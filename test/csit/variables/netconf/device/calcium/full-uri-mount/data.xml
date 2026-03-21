@@ -1,0 +1,11 @@
+<node xmlns="urn:TBD:params:xml:ns:yang:network-topology">
+  <node-id>$DEVICE_NAME</node-id>
+  <host xmlns="urn:opendaylight:netconf-node-topology">$DEVICE_IP</host>
+  <port xmlns="urn:opendaylight:netconf-node-topology">$DEVICE_PORT</port>
+  <login-password-unencrypted xmlns="urn:opendaylight:netconf-node-topology">
+    <username>$DEVICE_USER</username>
+    <password>$DEVICE_PASSWORD</password>
+  </login-password-unencrypted>
+  <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
+  <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">0</keepalive-delay>
+</node>

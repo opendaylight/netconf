@@ -1,0 +1,5 @@
+<cars xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:sal-clustering-it:car">
+  <car-entry>
+    <id>KEEP</id>
+  </car-entry>
+</cars>
