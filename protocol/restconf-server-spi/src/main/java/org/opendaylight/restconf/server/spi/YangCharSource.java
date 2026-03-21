@@ -29,11 +29,11 @@ final class YangCharSource extends CharSource {
     }
 
     YangCharSource(final ModuleEffectiveStatement module) {
-        this(FORMATTER.toYangTextSnippet(module, module.getDeclared()));
+        this(FORMATTER.toYangTextSnippet(module, module.requireDeclared()));
     }
 
     YangCharSource(final ModuleEffectiveStatement module, final SubmoduleEffectiveStatement submodule) {
-        this(FORMATTER.toYangTextSnippet(submodule, submodule.getDeclared()));
+        this(FORMATTER.toYangTextSnippet(submodule, submodule.requireDeclared()));
     }
 
     @Override
