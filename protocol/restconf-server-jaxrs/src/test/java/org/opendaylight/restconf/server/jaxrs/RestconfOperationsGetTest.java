@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.jaxrs;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +25,7 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
 import org.opendaylight.yang.gen.v1.module._1.rev140101.Module1Data;
 import org.opendaylight.yang.gen.v1.module._2.rev140102.Module2Data;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyData;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -52,7 +53,8 @@ class RestconfOperationsGetTest extends AbstractRestconfTest {
         </operations>""";
 
     private static final EffectiveModelContext MODEL_CONTEXT = BindingRuntimeHelpers.createRuntimeContext(
-        Module1Data.class, Module2Data.class, NetworkTopology.class).modelContext();
+        List.of(Module1Data.META.moduleInfo(), Module2Data.META.moduleInfo(), NetworkTopologyData.META.moduleInfo()))
+            .modelContext();
 
     @Override
     EffectiveModelContext modelContext() {
