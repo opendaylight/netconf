@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.ChildBody.PrefixAndBody;
@@ -125,8 +126,9 @@ public abstract class AbstractJukeboxTest {
         .build();
 
     protected static final @NonNull EffectiveModelContext JUKEBOX_SCHEMA = BindingRuntimeHelpers.createEffectiveModel(
-        ExampleJukeboxData.class, AugmentedJukeboxData.class, IetfInetTypesData.class, IetfYangTypesData.class,
-        IetfRestconfMonitoringData.class);
+        List.of(ExampleJukeboxData.META.moduleInfo(), AugmentedJukeboxData.META.moduleInfo(),
+            IetfInetTypesData.META.moduleInfo(), IetfYangTypesData.META.moduleInfo(),
+            IetfRestconfMonitoringData.META.moduleInfo()));
     protected static final @NonNull DatabindContext JUKEBOX_DATABIND = DatabindContext.ofModel(JUKEBOX_SCHEMA);
 
     protected static final @NonNull Data JUKEBOX_PATH = jukeboxPath(JUKEBOX_IID);
