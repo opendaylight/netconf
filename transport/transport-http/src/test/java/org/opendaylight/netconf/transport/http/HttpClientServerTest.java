@@ -44,6 +44,8 @@ import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http2.Http2FrameCodec;
+import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
 import java.io.IOException;
 import java.io.InputStream;
@@ -177,7 +179,23 @@ class HttpClientServerTest {
                 }
 
                 @Override
-                protected ChannelInitializer<Channel> buildHttp2ChildInitializer(final ChannelHandlerContext ctx) {
+                protected void configureHttp2(final ChannelHandlerContext ctx) {
+                    ensureHttp2Multiplexer(ctx);
+                    ctx.pipeline().remove(this);
+                }
+
+                @Override
+                protected void ensureHttp2Multiplexer(final ChannelHandlerContext ctx) {
+                    if (ctx.pipeline().context("h2-multiplexer") != null) {
+                        return;
+                    }
+                    final var frameCodecCtx = ctx.pipeline().context(Http2FrameCodec.class);
+                    assertNotNull(frameCodecCtx);
+                    ctx.pipeline().addAfter(frameCodecCtx.name(), "h2-multiplexer",
+                        new Http2MultiplexHandler(newHttp2ChildInitializer(), newHttp2ChildInitializer()));
+                }
+
+                private ChannelInitializer<Channel> newHttp2ChildInitializer() {
                     return new ChannelInitializer<>() {
                         @Override
                         protected void initChannel(final Channel ch) {
