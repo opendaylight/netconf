@@ -54,16 +54,24 @@ cp $CONFIG_PATH/ssh_host_rsa_key.pub /etc/ssh/ssh_host_rsa_key.pub
 # These variables will replace corresponding placeholders inside configuration templates
 SAVEIFS=$IFS
 IFS=
-export NP_PRIVKEY=`cat /etc/ssh/ssh_host_rsa_key | sed -u '1d; $d' | tr -d '\n'`
-export NP_PUBKEY=`openssl rsa -in /etc/ssh/ssh_host_rsa_key -pubout | sed -u '1d; $d' | tr -d '\n'`
+NP_PRIVKEY=`cat /etc/ssh/ssh_host_rsa_key | sed -u '1d; $d' | tr -d '\n'`
+export NP_PRIVKEY
+NP_PUBKEY=`openssl rsa -in /etc/ssh/ssh_host_rsa_key -pubout | sed -u '1d; $d' | tr -d '\n'`
+export NP_PUBKEY
 
 if [ -d "$CONFIG_PATH/certs" ]; then
-    export NP_CA_CERT=`sed -u '1d; $d' $CONFIG_PATH/certs/ca.pem | tr -d '\n'`
-    export NP_CLIENT_CERT=`sed -u '1d; $d' $CONFIG_PATH/certs/client.crt | tr -d '\n'`
-    export NP_SERVER_PRIVATE_KEY=`sed -u '1d; $d' $CONFIG_PATH/certs/server.key | tr -d '\n'`
-    export NP_SERVER_PUBLIC_KEY=`sed -u '1d; $d' $CONFIG_PATH/certs/server.pub | tr -d '\n'`
-    export NP_SERVER_CERTIFICATE=`sed -u '1d; $d' $CONFIG_PATH/certs/server.crt | tr -d '\n'`
-    export NP_CLIENT_CERT_FINGERPRINT=`openssl x509 -noout -fingerprint -in $CONFIG_PATH/certs/ca.pem -sha1 | cut -d'=' -f2- | tr -d '\n'`
+    NP_CA_CERT=`sed -u '1d; $d' $CONFIG_PATH/certs/ca.pem | tr -d '\n'`
+    export NP_CA_CERT
+    NP_CLIENT_CERT=`sed -u '1d; $d' $CONFIG_PATH/certs/client.crt | tr -d '\n'`
+    export NP_CLIENT_CERT
+    NP_SERVER_PRIVATE_KEY=`sed -u '1d; $d' $CONFIG_PATH/certs/server.key | tr -d '\n'`
+    export NP_SERVER_PRIVATE_KEY
+    NP_SERVER_PUBLIC_KEY=`sed -u '1d; $d' $CONFIG_PATH/certs/server.pub | tr -d '\n'`
+    export NP_SERVER_PUBLIC_KEY
+    NP_SERVER_CERTIFICATE=`sed -u '1d; $d' $CONFIG_PATH/certs/server.crt | tr -d '\n'`
+    export NP_SERVER_CERTIFICATE
+    NP_CLIENT_CERT_FINGERPRINT=`openssl x509 -noout -fingerprint -in $CONFIG_PATH/certs/ca.pem -sha1 | cut -d'=' -f2- | tr -d '\n'`
+    export NP_CLIENT_CERT_FINGERPRINT
 fi
 IFS=$SAVEIFS
 
