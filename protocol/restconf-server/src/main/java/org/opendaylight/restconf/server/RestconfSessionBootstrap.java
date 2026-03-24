@@ -13,6 +13,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http2.Http2FrameCodec;
+import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
@@ -40,7 +42,17 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
     }
 
     @Override
-    protected ChannelInitializer<Channel> buildHttp2ChildInitializer(final ChannelHandlerContext ctx) {
+    protected void configureHttp2(final ChannelHandlerContext ctx) {
+        if (ctx.pipeline().context("h2-multiplexer") != null) {
+            return;
+        }
+        final var frameCodecCtx = requireNonNull(ctx.pipeline().context(Http2FrameCodec.class));
+        ctx.pipeline().addAfter(frameCodecCtx.name(), "h2-multiplexer",
+            new Http2MultiplexHandler(buildHttp2ChildInitializer(ctx), buildHttp2ChildInitializer(ctx)));
+        ctx.pipeline().remove(this);
+    }
+
+    private ChannelInitializer<Channel> buildHttp2ChildInitializer(final ChannelHandlerContext ctx) {
         return new ChannelInitializer<>() {
             @Override protected void initChannel(final Channel ch) {
                 final var pipeline = ch.pipeline();
