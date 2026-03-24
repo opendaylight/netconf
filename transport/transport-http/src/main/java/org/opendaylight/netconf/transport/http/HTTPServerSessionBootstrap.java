@@ -9,12 +9,9 @@ package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelInitializer;
-import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -37,7 +34,7 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
 
     @Override
     public final void handlerAdded(final ChannelHandlerContext ctx) {
-        scheme.initializeServerPipeline(ctx, buildHttp2ChildInitializer(ctx), frameSize);
+        scheme.initializeServerPipeline(ctx, frameSize);
     }
 
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
@@ -47,7 +44,7 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
             LOG.debug("{} resolved to {} semantics", ctx.channel(), setup);
             switch (setup) {
                 case HTTP_11 -> ctx.pipeline().replace(this, null, configureHttp1(ctx));
-                case HTTP_2 -> ctx.pipeline().remove(this);
+                case HTTP_2 -> configureHttp2(ctx);
             }
         } else {
             super.userEventTriggered(ctx, event);
@@ -64,11 +61,15 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
     protected abstract PipelinedHTTPServerSession configureHttp1(ChannelHandlerContext ctx);
 
     /**
-     * Build the per-stream initializer the HTTP/2 pipeline should install into {@link Http2MultiplexHandler}.
+     * Finalize the parent channel pipeline for HTTP/2 once HTTP/2 semantics have been selected.
      *
-     * @param ctx the {@link ChannelHandlerContext} associated with the parent HTTP/2 connection
-     * @return channel initializer configuring stream channels
+     * <p>This method is invoked after protocol detection resolves the connection to HTTP/2 via ALPN,
+     * cleartext prior knowledge, or h2c upgrade. Implementations are expected to ensure the
+     * {@code Http2MultiplexHandler} is installed on the parent pipeline, perform any remaining
+     * connection-level HTTP/2 setup, and retire this bootstrap handler once configuration is finished.
+     *
+     * @param ctx the {@link ChannelHandlerContext} of this bootstrap on the parent connection channel
      */
     @NonNullByDefault
-    protected abstract ChannelInitializer<Channel> buildHttp2ChildInitializer(ChannelHandlerContext ctx);
+    protected abstract void configureHttp2(ChannelHandlerContext ctx);
 }
