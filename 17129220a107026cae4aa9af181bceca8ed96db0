@@ -16,6 +16,329 @@
       "message": "recheck",
       "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "863fc85c_1f7269de",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "too many side effects - cannot be grouping as parameter?",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "070c1a73_7ba45b36",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/AbstractOpenApiHttp3Test.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "keep \"\"\" on this line",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80855c8d_6bfb9843",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/BenchmarkOpenApiHttp3IT.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "can return port?",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8014d31f_06e1169d",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/ControllerDocumentHttp3Test.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "empty line before @Test",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1071a28f_b8ef643d",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/ControllerDocumentHttp3Test.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "please describe with better sentence",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "beb87401_8cc89582",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "username",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a05d31c_f6cb6751",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "password",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4397b3aa_46cd5e44",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "why we should discard body?",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47580d60_5e73678c",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "Do we really need this ArrayListMultimap?",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cff9d51b_abdbfadd",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "Try to one line your javadocs",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdcc0114_55586d38",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "headers 😊",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6e2229f_742bb1df",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/MountPointDocumentHttp3Test.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "duplicate code",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f87372fc_8c17e46b",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "can stay private please?",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5e0eed9_a4ff4a81",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "why port again?",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8085ff06_b85bed6f",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http2/AbstractHttp2E2ETest.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "private, so why you made non-private config in JSON_PARSER_CONFIGURATION when you declare it here again?",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d39bfbb1_b8a17045",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/AbstractHttp3E2ETest.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "private/removed",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03197dad_ba3dd583",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/DataHttp3E2ETest.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "keep \"\"\" on previous line",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef80b85a_86cee205",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/MountPointHttp3E2ETest.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "just throws Exception",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f516508_48c9816f",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/OperationsHttp3E2ETest.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:09:09Z",
+      "side": 1,
+      "message": "I hope this is just random key 😄",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
