@@ -20,6 +20,9 @@ import static org.xmlunit.matchers.CompareMatcher.isSimilarTo;
 import static org.xmlunit.matchers.EvaluateXPathMatcher.hasXPath;
 
 import com.google.common.base.Splitter;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.buffer.Unpooled;
@@ -38,6 +41,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.apache.shiro.authc.AuthenticationException;
@@ -71,6 +75,7 @@ import org.opendaylight.mdsal.dom.broker.RouterDOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.odl.device.notification.SubscribeDeviceNotificationRpc;
+import org.opendaylight.netconf.rfc8639.impl.IetfSubscriptionFeatureProvider;
 import org.opendaylight.netconf.sal.remote.impl.CreateDataChangeEventSubscriptionRpc;
 import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.netconf.transport.http.EventStreamService;
@@ -98,8 +103,14 @@ import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionO
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.HttpServerListenStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.Transport;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.IetfSubscribedNotificationsData;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecServices;
+import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
+import org.opendaylight.yangtools.binding.runtime.api.BindingRuntimeContext;
+import org.opendaylight.yangtools.binding.runtime.api.BindingRuntimeGenerator;
+import org.opendaylight.yangtools.binding.runtime.api.DefaultBindingRuntimeContext;
+import org.opendaylight.yangtools.binding.runtime.spi.ModuleInfoSnapshotBuilder;
 import org.opendaylight.yangtools.dagger.yang.parser.DaggerDefaultYangParserComponent;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -134,6 +145,22 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
 
     protected static final @NonNull YangParserFactory PARSER_FACTORY =
         DaggerDefaultYangParserComponent.create().parserFactory();
+
+    private static final BindingRuntimeGenerator GENERATOR = ServiceLoader.load(BindingRuntimeGenerator.class)
+        .findFirst().orElseThrow(() -> new ExceptionInInitializerError("No BindingRuntimeGenerator found"));
+    private static final LoadingCache<Set<YangModuleInfo>, BindingRuntimeContext> RUNTIME_CONTEXT_CACHE = CacheBuilder
+        .newBuilder().weakValues().build(new CacheLoader<>() {
+            public BindingRuntimeContext load(final Set<YangModuleInfo> key) throws Exception {
+                final var snapshot = new ModuleInfoSnapshotBuilder(PARSER_FACTORY)
+                    .add(key)
+                    .addModuleFeatures(IetfSubscribedNotificationsData.class,
+                        new IetfSubscriptionFeatureProvider().supportedFeatures())
+                    .build();
+                return new DefaultBindingRuntimeContext(GENERATOR.generateTypeMapping(snapshot.modelContext()),
+                    snapshot);
+            }
+        });
+
     protected static final @NonNull YangTextToIRSourceTransformer TEXT_TO_IR = YangIRSourceModule.provideTextToIR();
     protected static final Map<String, String> NS_CONTEXT = Map.of("r", "urn:ietf:params:xml:ns:yang:ietf-restconf");
     protected static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
@@ -209,9 +236,6 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         // MDSAL services
         setup();
         final var domDataBroker = getDomBroker();
-        // FIXME: NETCONF-1590, creating model context like this create context where ietf-subscribed-notifications has
-        //  the replay feature enabled, and replay-log-creation-time becomes mandatory field and stream fails to be
-        //  added to datastore
         final var schemaContext = getRuntimeContext().modelContext();
         final var schemaService = new FixedDOMSchemaService(schemaContext);
         final var dataBindProvider = new MdsalDatabindProvider(schemaService);
@@ -330,6 +354,11 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
      */
     protected static JSONParserConfiguration jsonParserConfiguration() {
         return JSON_PARSER_CONFIGURATION;
+    }
+
+    @Override
+    protected BindingRuntimeContext getRuntimeContext() {
+        return RUNTIME_CONTEXT_CACHE.getUnchecked(getModuleInfos());
     }
 
     /**
