@@ -16,7 +16,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import java.net.http.HttpRequest;
 import java.util.List;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -62,8 +61,6 @@ class AuthHttp3Test extends AbstractHttp3E2ETest {
         assertResponse(response, HttpResponseStatus.UNAUTHORIZED);
     }
 
-    // FIXME: NETCONF-1590, disable replay and enable the test
-    @Disabled
     @Test
     void testStreamAuthorized() throws Exception {
         final var response = client().send(HttpRequest.newBuilder()
@@ -74,8 +71,6 @@ class AuthHttp3Test extends AbstractHttp3E2ETest {
         assertResponse(response, HttpResponseStatus.OK);
     }
 
-    // FIXME: NETCONF-1590, disable replay and enable the test
-    @Disabled
     @Test
     void testStreamUnauthorized() throws Exception {
         // Setup client without authorization
