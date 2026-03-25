@@ -16,6 +16,24 @@
       "message": "why do we need EOS when we do not work in a cluster?",
       "revId": "bc3334ced6f12e3029684f685943b269e1dd3124",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42e52430_5bef38ca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-25T12:25:41Z",
+      "side": 1,
+      "message": "Netty endpoint requires \u0027ClusterSingletonServiceProvider\u0027\nhttps://git.opendaylight.org/gerrit/c/netconf/+/121609/11/usecase/netconf-topology-1node-transient/src/main/java/org/opendaylight/netconf/dagger/netconf/RestconfModule.java#99",
+      "parentUuid": "cc2b44bf_71508a43",
+      "revId": "bc3334ced6f12e3029684f685943b269e1dd3124",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
