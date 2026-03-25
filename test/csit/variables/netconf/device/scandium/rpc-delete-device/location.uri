@@ -1,0 +1,1 @@
+$RESTCONF_ROOT/operations/netconf-node-topology:delete-device

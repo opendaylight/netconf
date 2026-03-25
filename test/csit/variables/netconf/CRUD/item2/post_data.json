@@ -1,0 +1,9 @@
+{
+  "car:car-entry": {
+    "car:id":"TOYOTA",
+    "car:model":"Camry",
+    "car:manufacturer":"Toyota",
+    "car:year":"1982",
+    "car:category":"sedan"
+  }
+}

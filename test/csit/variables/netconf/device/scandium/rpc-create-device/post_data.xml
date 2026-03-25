@@ -1,0 +1,11 @@
+<input xmlns="urn:opendaylight:netconf-node-topology">
+   <node-id>$DEVICE_NAME</node-id>
+   <host>$DEVICE_IP</host>
+   <port>$DEVICE_PORT</port>
+   <login-password>
+     <username>$DEVICE_USER</username>
+     <password>$DEVICE_PASSWORD</password>
+   </login-password>
+   <tcp-only>false</tcp-only>
+   <keepalive-delay>0</keepalive-delay>
+ </input>

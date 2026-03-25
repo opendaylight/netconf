@@ -1,0 +1,7 @@
+<car-entry xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:sal-clustering-it:car">
+  <id>SMALL</id>
+  <model>Isetta</model>
+  <manufacturer>BMW</manufacturer>
+  <year>1953</year>
+  <category>microcar</category>
+</car-entry>
