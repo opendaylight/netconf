@@ -16,7 +16,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -48,7 +47,6 @@ class AuthTest extends AbstractE2ETest {
     }
 
     // FIXME: NETCONF-1590, disable replay and enable the test
-    @Disabled
     @Test
     void testStreamAuthorized() throws Exception {
         final var response = invokeRequest(HttpMethod.GET,
@@ -57,7 +55,6 @@ class AuthTest extends AbstractE2ETest {
     }
 
     // FIXME: NETCONF-1590, disable replay and enable the test
-    @Disabled
     @Test
     void testStreamUnauthorized() throws Exception {
         final var stream = createStream();

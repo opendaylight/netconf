@@ -24,7 +24,6 @@ import javax.net.ssl.SSLException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
@@ -175,7 +174,6 @@ class MountPointE2ETest extends AbstractE2ETest {
     }
 
     // FIXME: NETCONF-1590, disable replay and enable the test
-    @Disabled
     @Test
     void notificationStreamJsonTest() throws Exception {
         startDeviceSimulator(false);
