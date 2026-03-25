@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a469cdbe_bc0272d8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:54:36Z",
+      "side": 1,
+      "message": "maybe, needed for AAA if you decide to go with full implementation, but for RESTCONF - got with Netty enbdpoint",
+      "revId": "463d8ae71cfb0c9cd3a14294adbc10a669092f26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20d27c3d_2102dc56",
+        "filename": "usecase/netconf-topology-1node-transient/src/main/java/org/opendaylight/netconf/dagger/aaa/NoEncryptionServiceModule.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-25T14:54:36Z",
+      "side": 1,
+      "message": "for PoC, maybe we can have just no encryption service",
+      "revId": "463d8ae71cfb0c9cd3a14294adbc10a669092f26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
