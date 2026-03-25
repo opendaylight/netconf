@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d580c87_af296f42",
+        "filename": "usecase/netconf-topology-1node-transient/pom.xml",
+        "patchSetId": 18
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-25T17:00:53Z",
+      "side": 1,
+      "message": "Fixed by improving the comment.\nThis dependency shows a warning during the Maven build:\n[WARNING] Non-test scoped test only dependencies found:\n[WARNING]    com.google.guava:guava:jar:33.5.0-jre:compile\n[WARNING]    org.opendaylight.yangtools:yang-parser-spi:jar:15.0.1:compile\n[WARNING]    org.opendaylight.yangtools:yang-common:jar:15.0.1:compile\n[WARNING]    org.opendaylight.yangtools:yang-xpath-api:jar:15.0.1:compile\n\nHowever, adding the test scope here results in a compilation failure due to transitive requirements from module-info.",
+      "parentUuid": "89489521_1c92b7b6",
+      "revId": "4d4ce993e853098bb8ce34e42efbb30c3c144105",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3e9d6dcb_c89a975a",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0aeae75f_857bb2a7",
+        "filename": "usecase/netconf-topology-1node-transient/pom.xml",
+        "patchSetId": 18
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-25T17:00:53Z",
+      "side": 1,
+      "message": "Fixed by improving the comment.\nThis dependency shows a warning during the Maven build:\n[WARNING] Non-test scoped test only dependencies found:\n[WARNING]    com.google.guava:guava:jar:33.5.0-jre:compile\n[WARNING]    org.opendaylight.yangtools:yang-parser-spi:jar:15.0.1:compile\n[WARNING]    org.opendaylight.yangtools:yang-common:jar:15.0.1:compile\n[WARNING]    org.opendaylight.yangtools:yang-xpath-api:jar:15.0.1:compile\n\nHowever, adding the test scope here results in a compilation failure due to transitive requirements from module-info.",
+      "parentUuid": "3e9d6dcb_c89a975a",
+      "revId": "4d4ce993e853098bb8ce34e42efbb30c3c144105",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0073e93a_a6bae346",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-03-25T14:58:53Z",
       "side": 1,
       "message": "try to have declared type and name on the same line",
+      "revId": "4d4ce993e853098bb8ce34e42efbb30c3c144105",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb9b2956_166e028e",
+        "filename": "usecase/netconf-topology-1node-transient/src/test/java/org/opendaylight/netconf/dagger/mdsal/MdsalDomBrokerTest.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-25T17:00:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0073e93a_a6bae346",
       "revId": "4d4ce993e853098bb8ce34e42efbb30c3c144105",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
