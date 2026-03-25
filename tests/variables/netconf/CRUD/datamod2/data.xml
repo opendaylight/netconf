@@ -1,0 +1,3 @@
+<cont xmlns="urn:opendaylight:test:netconf:crud">
+<l>Another Modified Content</l>
+</cont>
