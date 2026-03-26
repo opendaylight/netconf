@@ -420,6 +420,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3197d612_837c580b",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/MountPointDocumentHttp3Test.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-26T08:08:17Z",
+      "side": 1,
+      "message": "if you mean implementation in benchmark test, that is using setSchemasDir() for models, this one is using setModels(),\nsetSchemasDir() is deprecated so it would be great to stop using that, but in that case this should be solved for http 1 and 2 tests too, in that case this should be moved to AbstractOpenApiTest and serve for all implementations of this tests. IMO it would be better to do it as another task",
+      "parentUuid": "f6e2229f_742bb1df",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f87372fc_8c17e46b",
@@ -433,6 +451,24 @@
       "writtenOn": "2026-03-25T14:09:09Z",
       "side": 1,
       "message": "can stay private please?",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f45fb618_825cf577",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-26T08:08:17Z",
+      "side": 1,
+      "message": "It wasn\u0027t private, but made it private now",
+      "parentUuid": "f87372fc_8c17e46b",
       "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -454,6 +490,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fee8298c_f9ac1638",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-26T08:08:17Z",
+      "side": 1,
+      "message": "port is needed for connection of http3Client",
+      "parentUuid": "c5e0eed9_a4ff4a81",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8085ff06_b85bed6f",
@@ -471,6 +525,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2e48e9a_820d3819",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http2/AbstractHttp2E2ETest.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-26T08:08:17Z",
+      "side": 1,
+      "message": "made it private",
+      "parentUuid": "8085ff06_b85bed6f",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d39bfbb1_b8a17045",
@@ -484,6 +556,24 @@
       "writtenOn": "2026-03-25T14:09:09Z",
       "side": 1,
       "message": "private/removed",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee494330_aea28582",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/AbstractHttp3E2ETest.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-26T08:08:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d39bfbb1_b8a17045",
       "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
