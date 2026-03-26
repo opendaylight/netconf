@@ -16,6 +16,24 @@
       "message": "What about some files which should go to .gitignore, do we have any?",
       "revId": "0e6959dea072bba5b128fc75246f0ea0220254d3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7351550a_235e1d9b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-03-26T08:21:32Z",
+      "side": 1,
+      "message": "OK, ATM, since there no tests yet.",
+      "parentUuid": "4a70060a_721c5bb8",
+      "revId": "0e6959dea072bba5b128fc75246f0ea0220254d3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
