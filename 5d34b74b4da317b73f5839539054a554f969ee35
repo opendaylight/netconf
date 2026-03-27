@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c263a721_1dcff59b",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-27T10:06:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "85affea6_fbab1970",
+      "revId": "5d34b74b4da317b73f5839539054a554f969ee35",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6e133f7e_fef6f5a5",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-03-27T09:00:31Z",
       "side": 1,
       "message": "bad formatting",
+      "revId": "5d34b74b4da317b73f5839539054a554f969ee35",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b794f0b0_1e1bfda3",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/AbstractOpenApiHttp3Test.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-27T10:06:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e133f7e_fef6f5a5",
       "revId": "5d34b74b4da317b73f5839539054a554f969ee35",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4139fd0_cdd85aab",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-27T10:06:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "64f8a639_d28ff8b2",
+      "revId": "5d34b74b4da317b73f5839539054a554f969ee35",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "83c17c00_5af19204",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-03-27T09:00:31Z",
       "side": 1,
       "message": "could it be record?",
+      "revId": "5d34b74b4da317b73f5839539054a554f969ee35",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e0ab532_cba96c7e",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-27T10:06:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "83c17c00_5af19204",
       "revId": "5d34b74b4da317b73f5839539054a554f969ee35",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "896eb0bf_0811be21",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-27T10:06:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4e566a6a_8abc0ba1",
+      "revId": "5d34b74b4da317b73f5839539054a554f969ee35",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c8994bef_14ae60d5",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-03-27T09:00:31Z",
       "side": 1,
       "message": "why public?",
+      "revId": "5d34b74b4da317b73f5839539054a554f969ee35",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9c3a886_239db4f4",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 517,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-27T10:06:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c8994bef_14ae60d5",
       "revId": "5d34b74b4da317b73f5839539054a554f969ee35",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -137,6 +245,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed0fa146_51bcf8ac",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/AuthHttp3Test.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-27T10:06:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8ce5ed0f_f8bb015b",
+      "revId": "5d34b74b4da317b73f5839539054a554f969ee35",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "be62bca6_5d2e64e6",
@@ -150,6 +276,24 @@
       "writtenOn": "2026-03-27T09:00:31Z",
       "side": 1,
       "message": "bad formatting",
+      "revId": "5d34b74b4da317b73f5839539054a554f969ee35",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2aa62c2f_67e04abf",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/MountPointHttp3E2ETest.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-27T10:06:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be62bca6_5d2e64e6",
       "revId": "5d34b74b4da317b73f5839539054a554f969ee35",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
