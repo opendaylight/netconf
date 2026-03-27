@@ -456,6 +456,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a58ae6b8_8c1876bd",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/MountPointDocumentHttp3Test.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-27T14:14:19Z",
+      "side": 1,
+      "message": "https://lf-opendaylight.atlassian.net/browse/NETCONF-1617",
+      "parentUuid": "6386801b_fe21ad4e",
+      "revId": "17129220a107026cae4aa9af181bceca8ed96db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f87372fc_8c17e46b",
