@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b053f4c4_1a3cd05c",
+        "filename": "usecase/odl-dagger-prototype/src/main/java/org/opendaylight/netconf/dagger/netconf/RestconfModule.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-27T18:17:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c6ffc4d4_6b4a28f5",
+      "range": {
+        "startLine": 116,
+        "startChar": 25,
+        "endLine": 116,
+        "endChar": 38
+      },
+      "revId": "95047e6cb7f333935c53fd082b47837849e35ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c0b78ddc_bd6e8a65",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "db882e48_3dbcbb85",
+        "filename": "usecase/odl-dagger-prototype/src/main/resources/org.opendaylight.restconf.nb.rfc8040.cfg",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-27T18:17:25Z",
+      "side": 1,
+      "message": "Yes, this is required for the correct functionality of IDEA validation.\n\nHowever, I used application.yaml instead. The main reason is due to how configurations are parsed into Java Map objects. Parsing from application.properties does not keep the element order, whereas the YAML parser (SnakeYAML) uses an ordered map.\n\nThis is necessary because shiro-configuration requires the loaded map elements to maintain their exact order.",
+      "parentUuid": "c0b78ddc_bd6e8a65",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 38
+      },
+      "revId": "95047e6cb7f333935c53fd082b47837849e35ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "80f56d27_22e9d79f",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-03-16T17:00:12Z",
       "side": 1,
       "message": "I would expect this documentation to be picked up from generated metadata.",
+      "range": {
+        "startLine": 13,
+        "startChar": 2,
+        "endLine": 13,
+        "endChar": 21
+      },
+      "revId": "95047e6cb7f333935c53fd082b47837849e35ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c172cf2_588b89e0",
+        "filename": "usecase/odl-dagger-prototype/src/main/resources/org.opendaylight.restconf.nb.rfc8040.cfg",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-03-27T18:17:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "80f56d27_22e9d79f",
       "range": {
         "startLine": 13,
         "startChar": 2,
