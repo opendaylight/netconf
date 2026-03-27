@@ -228,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e2d883a_ff602fc1",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/StreamsE2ETest.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-03-27T10:06:32Z",
+      "side": 1,
+      "message": "reworked in follow up task",
+      "parentUuid": "734e7eb2_7013fcd9",
+      "revId": "5d34b74b4da317b73f5839539054a554f969ee35",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ce5ed0f_f8bb015b",
