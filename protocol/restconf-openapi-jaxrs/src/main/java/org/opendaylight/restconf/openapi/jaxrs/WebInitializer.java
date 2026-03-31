@@ -14,7 +14,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
-import org.opendaylight.aaa.web.ResourceDetails;
 import org.opendaylight.aaa.web.ServletDetails;
 import org.opendaylight.aaa.web.WebContext;
 import org.opendaylight.aaa.web.WebContextSecurer;
@@ -48,6 +47,7 @@ public final class WebInitializer implements AutoCloseable {
             .contextPath("/openapi")
             .supportsSessions(true)
             .addServlet(ServletDetails.builder()
+                .name("OpenAPI API")
                 .servlet(servletSupport.createHttpServletBuilder(new Application() {
                     @Override
                     public Set<Object> getSingletons() {
@@ -57,7 +57,16 @@ public final class WebInitializer implements AutoCloseable {
                 }).build())
                 .addUrlPattern("/api/v3/*")
                 .build())
-            .addResource(ResourceDetails.builder().name("/explorer").build());
+            .addServlet(ServletDetails.builder()
+                .name("OpenAPI Explorer")
+                .servlet(servletSupport.createHttpServletBuilder(new Application() {
+                    @Override
+                    public Set<Object> getSingletons() {
+                        return Set.of(new JaxRsExplorer());
+                    }
+                }).build())
+                .addUrlPattern("/explorer/*")
+                .build());
 
         webContextSecurer.requireAuthentication(webContextBuilder, "/*");
 

@@ -38,11 +38,13 @@
         <module>netconf-test-util</module>
         <module>restconf-api</module>
         <module>restconf-client</module>
+        <module>restconf-openapi-common</module>
         <module>restconf-openapi</module>
         <module>restconf-server</module>
         <module>restconf-server-api</module>
         <module>restconf-server-api-testlib</module>
         <module>restconf-server-jaxrs</module>
+        <module>restconf-openapi-jaxrs</module>
         <module>restconf-server-spi</module>
     </modules>
 </project>
