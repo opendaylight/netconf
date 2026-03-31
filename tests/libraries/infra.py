@@ -225,3 +225,28 @@ def get_file_content(path: str):
         content = file.read()
 
     return content
+
+def copy_file(
+    src_dir: str,
+    src_file_name: str,
+    dst_dir: str,
+    target_file_name: str | None = None,
+):
+    """Copy file from one location to another.
+
+    By providing target_file_name parameter, file would be renamed.
+
+     Args:
+        src_dir (str): Source file directory in which it is located.
+        src_file_name (str): Name of the file to be copied.
+        dst_dir (str): Destination directory where the file should be copied.
+        target_file_name (str): Optional target file name, set if the copied
+            file needs to be stored under different name in the target directory.
+            By default it keeps the file name.
+
+    Returns:
+        None
+    """
+    if target_file_name is None:
+        target_file_name = src_file_name
+    shell(f"cp {src_dir}/{src_file_name} {dst_dir}/{target_file_name}")
