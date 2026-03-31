@@ -57,7 +57,7 @@ public final class WebInitializer implements AutoCloseable {
                 }).build())
                 .addUrlPattern("/api/v3/*")
                 .build())
-            .addResource(ResourceDetails.builder().name("/explorer").build());
+            .addResource(ResourceDetails.builder().name("explorer").build());
 
         webContextSecurer.requireAuthentication(webContextBuilder, "/*");
 
