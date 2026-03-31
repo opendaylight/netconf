@@ -27,7 +27,8 @@ ODL_FEATRUES = [
     "odl-netconf-mdsal",
     "odl-restconf-openapi",
     "odl-clustering-test-app",
-    "odl-netconf-topology"
+    "odl-netconf-topology",
+    "odl-netconf-callhome-ssh"
 ]
 
 log = logging.getLogger(__name__)
