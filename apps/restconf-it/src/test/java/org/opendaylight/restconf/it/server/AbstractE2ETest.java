@@ -39,6 +39,7 @@ import java.net.ServerSocket;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -173,6 +174,8 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     private static BootstrapFactory bootstrapFactory;
     private static SSHTransportStackFactory sshTransportStackFactory;
 
+    private final List<EventStreamService.StreamControl> streamControl = new ArrayList<>();
+
     private HttpClientStackGrouping invalidClientStackGrouping;
     private DOMMountPointService domMountPointService;
     private RpcProviderService rpcProviderService;
@@ -186,7 +189,6 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     private int port;
 
     private volatile EventStreamService clientStreamService;
-    private volatile EventStreamService.StreamControl streamControl;
 
     @Override
     protected BindingRuntimeContext getRuntimeContext() {
@@ -283,11 +285,9 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         streamRegistry.close();
         domNotificationRouter.close();
         domRpcRouter.close();
+        closeAllStreams();
         if (clientStreamService != null) {
             clientStreamService = null;
-        }
-        if (streamControl != null) {
-            streamControl = null;
         }
     }
 
@@ -344,13 +344,6 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
      */
     protected final int port() {
         return port;
-    }
-
-    /**
-     * {@return the streamControl}
-     */
-    protected final EventStreamService.StreamControl streamControl() {
-        return streamControl;
     }
 
     /**
@@ -592,11 +585,12 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
 
     protected TestEventStreamListener startStream(final String uri) {
         final var eventListener = new TestEventStreamListener();
+        final int initSize = streamControl.size();
         clientStreamService.startEventStream("localhost", uri, eventListener,
             new EventStreamService.StartCallback() {
                 @Override
                 public void onStreamStarted(final EventStreamService.StreamControl control) {
-                    streamControl = control;
+                    streamControl.add(control);
                 }
 
                 @Override
@@ -604,9 +598,13 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
                     LOG.error("Stream was not started", cause);
                 }
             });
-        await().atMost(Duration.ofSeconds(2)).until(eventListener::started);
-        assertNotNull(streamControl);
+        await().atMost(Duration.ofSeconds(2)).until(() -> eventListener.started() && streamControl.size() > initSize);
         return eventListener;
+    }
+
+    protected final void closeAllStreams() {
+        streamControl.forEach(EventStreamService.StreamControl::close);
+        streamControl.clear();
     }
 
     static final class ExampleActionImpl implements ExampleAction {
