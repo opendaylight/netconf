@@ -48,6 +48,7 @@ public final class WebInitializer implements AutoCloseable {
             .contextPath("/openapi")
             .supportsSessions(true)
             .addServlet(ServletDetails.builder()
+                .name("OpenAPI API")
                 .servlet(servletSupport.createHttpServletBuilder(new Application() {
                     @Override
                     public Set<Object> getSingletons() {
@@ -57,7 +58,7 @@ public final class WebInitializer implements AutoCloseable {
                 }).build())
                 .addUrlPattern("/api/v3/*")
                 .build())
-            .addResource(ResourceDetails.builder().name("/explorer").build());
+            .addResource(ResourceDetails.builder().name("explorer").build());
 
         webContextSecurer.requireAuthentication(webContextBuilder, "/*");
 
