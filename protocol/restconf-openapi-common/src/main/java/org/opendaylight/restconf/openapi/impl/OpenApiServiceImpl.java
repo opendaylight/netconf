@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import static java.util.Objects.requireNonNull;
+import static org.eclipse.jdt.annotation.Checks.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;

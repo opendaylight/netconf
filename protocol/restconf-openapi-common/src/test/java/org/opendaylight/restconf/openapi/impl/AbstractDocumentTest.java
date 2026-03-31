@@ -79,8 +79,7 @@ abstract class AbstractDocumentTest {
         if (revision != null) {
             uri = uri + "(" + revision + ")";
         }
-        return assertOpenApiEntity(openApiService.getDocByModule(moduleName, revision, new URI(uri), 0, 0,
-            RESTS));
+        return assertOpenApiEntity(openApiService.getDocByModule(moduleName, revision, new URI(uri), 0, 0, RESTS));
     }
 
     protected static String getMountDoc(final int width, final int depth, final int offset, final int limit)
