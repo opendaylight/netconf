@@ -9,6 +9,7 @@ package org.opendaylight.restconf.it.server.http2;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -20,6 +21,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
@@ -43,7 +45,12 @@ import org.opendaylight.restconf.it.server.NullAAAEncryptionService;
 import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+<<<<<<< HEAD   (3dd6dc Allow StreamsE2ETest to handle multiple streams)
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
+=======
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
+>>>>>>> CHANGE (146a89 Add missing HTTP/2 streaming test)
 
 class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
     private static final YangModuleInfo DEVICE_YANG_MODEL =
@@ -202,6 +209,83 @@ class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
 
         assertEquals(HttpClient.Version.HTTP_2, response.version());
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
+    }
+
+    @Test
+    void notificationStreamJsonTest() throws Exception {
+        startDeviceSimulator(false);
+        mountDeviceJson();
+
+        var response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri("""
+                /rests/operations/network-topology:network-topology/topology=topology-netconf/node=device-sim\
+                /yang-ext:mount/notifications:create-subscription"""))
+            .POST(HttpRequest.BodyPublishers.ofString("""
+                {
+                   "input": {
+                       "stream": "NETCONF"
+                   }
+                }"""))
+            .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_JSON)
+            .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
+            .build(), HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(HttpResponseStatus.NO_CONTENT.code(), response.statusCode());
+
+        // create notification stream
+        response = http2Client.send(HttpRequest.newBuilder()
+            .uri(createUri("/rests/operations/odl-device-notification:subscribe-device-notification"))
+            .POST(HttpRequest.BodyPublishers.ofString("""
+                {
+                    "input": {
+                        "path": "/network-topology:network-topology/topology[topology-id='topology-netconf']\
+                /node[node-id='device-sim']"
+                    }
+                }"""))
+            .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_JSON)
+            .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
+            .build(), HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(HttpResponseStatus.OK.code(), response.statusCode());
+        //  {
+        //      "odl-device-notification:output": {
+        //          "stream-name": "urn:uuid:01a56682-f2ab-419f-8a77-9cf995a52220"
+        //      }
+        //  }
+        final var json = new JSONObject(response.body(), jsonParserConfiguration());
+        final var streamName = json.getJSONObject("odl-device-notification:output").getString("stream-name");
+        assertNotNull(streamName, "Stream name is undefined");
+
+        // get stream URL from restconf-state
+        final var streamUrl = getStreamUrlJson(streamName);
+        assertNotNull(streamUrl, "Stream URL not found");
+
+        // start stream
+        final var streamClient = startStreamClient();
+        try {
+            final var eventListener = startStream(streamUrl.getPath());
+
+            // NB: testing single predefined event with 2 sec delay
+            // due to device simulator starts sending events immediately after subscription
+            // so restconf server may drop events occurred in interval between stream start
+            // via netconf and actual consumption via restconf.
+            // Also devise simulator does not respect defined events order.
+
+            JSONAssert.assertEquals("""
+                {
+                    "ietf-restconf:notification": {
+                        "device-sim:device-event": {
+                            "event-message": "Event message"
+                        }
+                    }
+                }""", eventListener.readNext(), JSONCompareMode.LENIENT);
+
+            // terminate stream
+            closeAllStreams();
+            await().atMost(Duration.ofSeconds(1)).until(eventListener::ended);
+        } finally {
+            streamClient.shutdown().get(2, TimeUnit.SECONDS);
+        }
     }
 
     @Test
