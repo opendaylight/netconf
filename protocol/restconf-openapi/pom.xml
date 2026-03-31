@@ -24,18 +24,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>dk.brics</groupId>
-      <artifactId>automaton</artifactId>
-      <version>1.12-4</version>
-    </dependency>
-
-    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
     </dependency>
     <dependency>
       <groupId>com.guicedee.services</groupId>
@@ -51,34 +41,8 @@
       <artifactId>netty-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>jakarta.annotation</groupId>
-      <artifactId>jakarta.annotation-api</artifactId>
-      <scope>provided</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>jakarta.ws.rs</groupId>
-      <artifactId>jakarta.ws.rs-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.eclipse.jdt</groupId>
       <artifactId>org.eclipse.jdt.annotation</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.aaa.web</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.aaa.web</groupId>
-      <artifactId>web-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.mdsal</groupId>
-      <artifactId>mdsal-dom-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
@@ -86,83 +50,15 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>restconf-server-jaxrs</artifactId>
+      <artifactId>restconf-openapi-common</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>transport-http</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>concepts</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>util</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-data-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-model-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-model-util</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.component.annotations</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.service.metatype.annotations</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.glassfish.jersey.core</groupId>
-      <artifactId>jersey-common</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish.jersey.core</groupId>
-      <artifactId>jersey-server</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.skyscreamer</groupId>
-      <artifactId>jsonassert</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-test-util</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <Bundle-Name>Restconf OpenAPI Generator</Bundle-Name>
-            <Embed-Dependency>automaton</Embed-Dependency>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
