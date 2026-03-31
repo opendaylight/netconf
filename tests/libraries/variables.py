@@ -20,6 +20,7 @@ class Variables(BaseSettings):
     ODL_IP: str = "127.0.0.1"
     TOOLS_IP: str = "127.0.1.0"
     KARAF_LOG_LEVEL: str = "INFO"
+    HEADERS = {"Content-Type": "application/json"}
 
     ODL_NETCONF_MDSAL_PORT: int = 2830
     ODL_NETCONF_PASSWORD: str = "admin"
