@@ -230,6 +230,48 @@ def verify_xmls_match(xml1, xml2, xml1_data_label1, xml2_data_label):
         raise AssertionError(f"XMLs do not match! Differences found:\n{diff_message}")
 
 
+def run_function_and_expect_error(function: Callable, *args, **kwargs):
+    """Run function and expect an exception to be raised
+
+    Args:
+        function (Callable): Function to be called.
+        *args: Function positional arguments.
+        **kwargs: Function keyword arguments.
+
+    Returns:
+        None
+    """
+    try:
+        function(*args, **kwargs)
+    except Exception as e:
+        log.info(f"Function {function.__name__}({args} {kwargs or ''}) failed as expected with: {e}")
+        return
+    else:
+        raise AssertionError(f"Expected function {function.__name__}({args} {kwargs or ''}) to fail, but passed.")
+
+def wait_until_function_pass(
+    retry_count: int, interval: int, function: Callable, *args, **kwargs
+) -> Any:
+    """Retry provided funtion with its argumetns repeatedly until it passes.
+
+    In order to pass provided function should not raise any exception.
+
+    Args:
+        retry_count (int): Maximum nuber of function calls retries.
+        interval (int): Number of seconds to wait until next try.
+        function (Callable): Function to be called, until it does not raise
+            exception.
+        *args: Function positional arguments.
+        **kwargs: Function keyword arguments.
+
+    Returns:
+        Any: Return value returend by last successful function call.
+    """
+    validator = lambda value: True
+    return wait_until_function_returns_value_with_custom_value_validator(
+        retry_count, interval, validator, function, *args, **kwargs
+    )
+
 def wait_until_function_returns_value_with_custom_value_validator(
     retry_count: int,
     interval: int,
@@ -247,7 +289,7 @@ def wait_until_function_returns_value_with_custom_value_validator(
         interval (int): Number of seconds to wait until next try.
         return_value_validator (Callable): Validator for evaluating
             returned value, if it is expected or not.
-        funtion (Callable): Function to be called, until it does not raise
+        function (Callable): Function to be called, until it does not raise
             exception and returns value passing validator call.
         *args: Function positional arguments.
         **kwargs: Function keyword arguments.
