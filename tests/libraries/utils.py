@@ -315,7 +315,7 @@ def wait_until_function_returns_value_with_custom_value_validator(
         except Exception as e:
             last_exception = e
             log.info(
-                f"{function.__name__}({args} {kwargs or ''}) failed with: {e} "
+                f"{function.__name__}({args} {kwargs or ''}) failed "
                 f"({retry_num}/{retry_count})"
             )
             log.debug(f"failed with: {e}")
@@ -323,6 +323,7 @@ def wait_until_function_returns_value_with_custom_value_validator(
     else:
         if logger_buffer:
             logger_buffer.flush_to_target(log)
+        log.error(last_exception)
         raise AssertionError(
             f"Failed to execute "
             f"{function.__name__}({','.join([str(arg) for arg in args])} "
