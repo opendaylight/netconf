@@ -57,70 +57,6 @@ def check_device_status(status: str, id: str = "netopeer2"):
     restconf_utils.check_for_elements_at_uri(DEVICE_STATUS, expected_values)
 
 
-def apply_ssh_based_call_home_configuration():
-    """Upload netopeer2 configuration files needed for SSH transport"""
-    infra.copy_file(
-        src_dir="variables/netconf/callhome/configuration-files/ssh/",
-        src_file_name="ietf-netconf-server.xml",
-        dst_dir="tmp/configuration-files/",
-    )
-    infra.copy_file(
-        src_dir="variables/netconf/callhome/configuration-files/ssh/",
-        src_file_name="ietf-keystore.xml",
-        dst_dir="tmp/configuration-files/",
-    )
-
-
-def apply_tls_based_call_home_configuration():
-    generate_certificates_for_tls_configuration()
-    """Upload netopeer2 configuration files needed for TLS transport"""
-    infra.copy_file(
-        src_dir="variables/netconf/callhome/configuration-files/tls",
-        src_file_name="ietf-keystore.xml",
-        dst_dir="tmp/configuration-files/",
-    )
-    infra.copy_file(
-        src_dir="variables/netconf/callhome/configuration-files/tls",
-        src_file_name="ietf-truststore.xml",
-        dst_dir="tmp/configuration-files/",
-    )
-    infra.copy_file(
-        src_dir="variables/netconf/callhome/configuration-files/tls",
-        src_file_name="ietf-netconf-server.xml",
-        dst_dir="tmp/configuration-files/",
-    )
-
-
-def generate_certificates_for_tls_configuration():
-    """Generates certificates for 2-way TLS authentication (ca, server, client)"""
-    infra.shell("rm -rf tmp/certs && mkdir tmp/certs")
-    infra.copy_file(
-        src_dir="variables/netconf/callhome/",
-        src_file_name="x509_v3.cfg",
-        dst_dir="tmp/",
-    )
-    infra.shell("openssl genrsa -out tmp/certs/ca.key 2048")
-    infra.shell(
-        'openssl req -x509 -new -extensions v3_ca -nodes -key tmp/certs/ca.key -sha256 -days 365 -subj "/C=US/ST=CA/L=Netopeer/O=netopeerCA/CN=netopeerCA" -out tmp/certs/ca.pem'
-    )
-    infra.shell("openssl genrsa -out tmp/certs/server.key 2048")
-    infra.shell(
-        'openssl req -new -sha256 -key tmp/certs/server.key -subj "/C=US/ST=CA/L=Netopeer/O=Netopeer2/CN=netopeer2-server" -out tmp/certs/server.csr'
-    )
-    infra.shell(
-        "openssl x509 -req -in tmp/certs/server.csr -CA tmp/certs/ca.pem -CAkey tmp/certs/ca.key -CAcreateserial -extfile tmp/x509_v3.cfg -out tmp/certs/server.crt -days 365 -sha256"
-    )
-    infra.shell("openssl rsa -in tmp/certs/server.key -pubout > tmp/certs/server.pub")
-    infra.shell("openssl genrsa -out tmp/certs/client.key 2048")
-    infra.shell(
-        'openssl req -new -sha256 -key tmp/certs/client.key -subj "/C=US/ST=CA/L=Netopeer/O=Netopeer2/CN=netopeer2-client" -out tmp/certs/client.csr'
-    )
-    infra.shell(
-        "openssl x509 -req -in tmp/certs/client.csr -CA tmp/certs/ca.pem -CAkey tmp/certs/ca.key -CAcreateserial -extfile tmp/x509_v3.cfg -out tmp/certs/client.crt -days 1024 -sha256"
-    )
-    infra.shell("cp -R tmp/certs tmp/configuration-files/")
-
-
 def get_certificate_file_content(file_name: str):
     """Get certificate or key file content
 
@@ -133,7 +69,7 @@ def get_certificate_file_content(file_name: str):
         str: Certificate or key file content.
     """
     rc, content = infra.shell(
-        f"sed -z 's!\\n!\\\\n!g' tmp/configuration-files/certs/{file_name}"
+        f"sed -z 's!\\n!\\\\n!g' /tmp/configuration-files/certs/{file_name}"
     )
 
     return content
@@ -141,8 +77,7 @@ def get_certificate_file_content(file_name: str):
 
 def register_keys_and_certificates_in_odl_cotroller():
     """Register pre-configured netopeer2 certificates and key in ODL-netconf keystore"""
-    # rc, pem_client_key = infra.shell("cat ./configuration-files/certs/client.key")
-    pem_client_key = infra.get_file_content("tmp/configuration-files/certs/client.key")
+    pem_client_key = infra.get_file_content("/tmp/configuration-files/certs/client.key")
     template = infra.get_file_content(ADD_KEYSTORE_ENTRY_REQ)
     body = template.replace("{pem-client-key}", pem_client_key)
     resp = templated_requests.post_to_uri(
