@@ -105,6 +105,11 @@ final class PublicKeyPolicy extends AlgorithmPolicy<
         builder.signatureFactories(factories);
     }
 
+    @Override
+    NamedFactory<Signature> parseFactory(@NonNull String alg) {
+        return BuiltinSignatures.resolveFactory(alg);
+    }
+
     private static Entry<
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm,
             SignatureFactory> entry(final SshPublicKeyAlgorithm alg, final SignatureFactory factory) {

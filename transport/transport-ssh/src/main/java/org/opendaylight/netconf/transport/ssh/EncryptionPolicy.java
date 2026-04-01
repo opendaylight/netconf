@@ -116,6 +116,11 @@ final class EncryptionPolicy extends AlgorithmPolicy<
         builder.cipherFactories(factories);
     }
 
+    @Override
+    NamedFactory<Cipher> parseFactory(final String alg) {
+        return BuiltinCiphers.resolveFactory(alg);
+    }
+
     private static Entry<
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshEncryptionAlgorithm,
             CipherFactory> entry(final SshEncryptionAlgorithm alg, final CipherFactory factory) {

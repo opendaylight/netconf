@@ -15,6 +15,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.common.BaseBuilder;
 import org.opendaylight.netconf.shaded.sshd.common.NamedFactory;
 import org.opendaylight.netconf.shaded.sshd.common.mac.BuiltinMacs;
+import org.opendaylight.netconf.shaded.sshd.common.mac.Mac;
 import org.opendaylight.netconf.shaded.sshd.common.mac.MacFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.mac.algs.rev241016.SshMacAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.TransportParamsGrouping;
@@ -69,9 +70,24 @@ final class MacPolicy extends AlgorithmPolicy<
     }
 
     @Override
+    org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm
+            algsOf(final String alg) {
+        if (alg.equals("aead")) {
+            return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf
+                .ssh.common.rev241010.SshMacAlgorithm(SshMacAlgorithm.None);
+        }
+        return super.algsOf(alg);
+    }
+
+    @Override
     void setFactories(final BaseBuilder<?, ?> builder,
             final List<NamedFactory<org.opendaylight.netconf.shaded.sshd.common.mac.Mac>> factories) {
         builder.macFactories(factories);
+    }
+
+    @Override
+    NamedFactory<Mac> parseFactory(final String alg) {
+        return BuiltinMacs.fromString(alg);
     }
 
     private static Entry<

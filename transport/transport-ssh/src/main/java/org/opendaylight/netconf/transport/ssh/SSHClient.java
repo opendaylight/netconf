@@ -30,10 +30,6 @@ import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.SshClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshEncryptionAlgorithm;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev241010.TcpClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
 import org.slf4j.Logger;
@@ -103,13 +99,13 @@ public final class SSHClient extends SSHTransportStack {
         final var sessionId = sessionId(clientSession);
         LOG.debug("Authenticating session {}", sessionId);
         clientSession.auth().addListener(future -> onAuthComplete(future, sessionId));
-        final var kex = new SshKeyExchangeAlgorithm(clientSession.getNegotiatedKexParameter(
+        final var kex = KeyExchangePolicy.CLIENT.algsOf(clientSession.getNegotiatedKexParameter(
             KexProposalOption.ALGORITHMS));
-        final var hostKey = new SshPublicKeyAlgorithm(clientSession.getNegotiatedKexParameter(
+        final var hostKey = PublicKeyPolicy.INSTANCE.algsOf(clientSession.getNegotiatedKexParameter(
             KexProposalOption.SERVERKEYS));
-        final var encryption = new SshEncryptionAlgorithm(clientSession.getNegotiatedKexParameter(
+        final var encryption = EncryptionPolicy.INSTANCE.algsOf(clientSession.getNegotiatedKexParameter(
             KexProposalOption.C2SENC));
-        final var mac = new SshMacAlgorithm(clientSession.getNegotiatedKexParameter(KexProposalOption.C2SMAC));
+        final var mac = MacPolicy.INSTANCE.algsOf(clientSession.getNegotiatedKexParameter(KexProposalOption.C2SMAC));
         algListener.onAlgorithmsNegotiated(kex, hostKey, encryption, mac);
     }
 

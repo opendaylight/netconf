@@ -294,6 +294,11 @@ final class KeyExchangePolicy extends AlgorithmPolicy<
         builder.keyExchangeFactories(factories);
     }
 
+    @Override
+    KeyExchangeFactory parseFactory(@NonNull String alg) {
+        return ClientBuilder.DH2KEX.apply(BuiltinDHFactories.resolveFactory(alg));
+    }
+
     private static Entry<
             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm,
             DHFactory> entry(final SshKeyExchangeAlgorithm alg, final DHFactory factory) {
