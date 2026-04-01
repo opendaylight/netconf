@@ -16,7 +16,8 @@ from libraries.variables import variables
 
 HEADERS = variables.HEADERS
 DEVICE_STATUS = (
-    "/rests/data/odl-netconf-callhome-server:netconf-callhome-server?content=nonconfig"
+    "/rests/data/odl-netconf-callhome-server:netconf-callhome-server/"
+    "allowed-devices?content=nonconfig"
 )
 WHITELIST = variables.CALLHOME_WHITELIST
 GLOBAL_CONFIG_URL = (
@@ -41,90 +42,11 @@ ADD_TRUSTED_CERTIFICATE = "variables/netconf/callhome/json/add_trusted_certifica
 log = logging.getLogger(__name__)
 
 
-def check_device_status(status: str, id: str = "netopeer2"):
-    """Checks the operational device status.
-
-    Args:
-        status (str): Expected device status.
-        id (str): Device id.
-
-    Returns:
-        str: Final truncated text.
-    """
-    expected_values = [f'"unique-id":"{id}"', f'"device-status":"{status}"']
-    if status in ("FAILED_NOT_ALLOWED", "FAILED_AUTH_FAILURE"):
-        expected_values.remove(f'"unique-id":"{id}"')
-    restconf_utils.check_for_elements_at_uri(DEVICE_STATUS, expected_values)
-
-
-def apply_ssh_based_call_home_configuration():
-    """Upload netopeer2 configuration files needed for SSH transport"""
-    infra.copy_file(
-        src_dir="variables/netconf/callhome/configuration-files/ssh/",
-        src_file_name="ietf-netconf-server.xml",
-        dst_dir="tmp/configuration-files/",
-    )
-    infra.copy_file(
-        src_dir="variables/netconf/callhome/configuration-files/ssh/",
-        src_file_name="ietf-keystore.xml",
-        dst_dir="tmp/configuration-files/",
-    )
-
-
-def apply_tls_based_call_home_configuration():
-    generate_certificates_for_tls_configuration()
-    """Upload netopeer2 configuration files needed for TLS transport"""
-    infra.copy_file(
-        src_dir="variables/netconf/callhome/configuration-files/tls",
-        src_file_name="ietf-keystore.xml",
-        dst_dir="tmp/configuration-files/",
-    )
-    infra.copy_file(
-        src_dir="variables/netconf/callhome/configuration-files/tls",
-        src_file_name="ietf-truststore.xml",
-        dst_dir="tmp/configuration-files/",
-    )
-    infra.copy_file(
-        src_dir="variables/netconf/callhome/configuration-files/tls",
-        src_file_name="ietf-netconf-server.xml",
-        dst_dir="tmp/configuration-files/",
-    )
-
-
-def generate_certificates_for_tls_configuration():
-    """Generates certificates for 2-way TLS authentication (ca, server, client)"""
-    infra.shell("rm -rf tmp/certs && mkdir tmp/certs")
-    infra.copy_file(
-        src_dir="variables/netconf/callhome/",
-        src_file_name="x509_v3.cfg",
-        dst_dir="tmp/",
-    )
-    infra.shell("openssl genrsa -out tmp/certs/ca.key 2048")
-    infra.shell(
-        'openssl req -x509 -new -extensions v3_ca -nodes -key tmp/certs/ca.key -sha256 -days 365 -subj "/C=US/ST=CA/L=Netopeer/O=netopeerCA/CN=netopeerCA" -out tmp/certs/ca.pem'
-    )
-    infra.shell("openssl genrsa -out tmp/certs/server.key 2048")
-    infra.shell(
-        'openssl req -new -sha256 -key tmp/certs/server.key -subj "/C=US/ST=CA/L=Netopeer/O=Netopeer2/CN=netopeer2-server" -out tmp/certs/server.csr'
-    )
-    infra.shell(
-        "openssl x509 -req -in tmp/certs/server.csr -CA tmp/certs/ca.pem -CAkey tmp/certs/ca.key -CAcreateserial -extfile tmp/x509_v3.cfg -out tmp/certs/server.crt -days 365 -sha256"
-    )
-    infra.shell("openssl rsa -in tmp/certs/server.key -pubout > tmp/certs/server.pub")
-    infra.shell("openssl genrsa -out tmp/certs/client.key 2048")
-    infra.shell(
-        'openssl req -new -sha256 -key tmp/certs/client.key -subj "/C=US/ST=CA/L=Netopeer/O=Netopeer2/CN=netopeer2-client" -out tmp/certs/client.csr'
-    )
-    infra.shell(
-        "openssl x509 -req -in tmp/certs/client.csr -CA tmp/certs/ca.pem -CAkey tmp/certs/ca.key -CAcreateserial -extfile tmp/x509_v3.cfg -out tmp/certs/client.crt -days 1024 -sha256"
-    )
-    infra.shell("cp -R tmp/certs tmp/configuration-files/")
-
-
 def get_certificate_file_content(file_name: str):
-    """Get certificate or key file content
+    """Get certificate or key file content with escaped newline characters.
 
-    This removes from the pem file headers and also new line characters.
+    This reads a PEM-formatted file and replaces actual line breaks with
+    literal '\\n' strings.
 
     Args:
         file_name (str): Name of the pem formated certificate or key file.
@@ -133,41 +55,48 @@ def get_certificate_file_content(file_name: str):
         str: Certificate or key file content.
     """
     rc, content = infra.shell(
-        f"sed -z 's!\\n!\\\\n!g' tmp/configuration-files/certs/{file_name}"
+        f"sed -z 's!\\n!\\\\n!g' /tmp/configuration-files/certs/{file_name}"
     )
 
     return content
 
 
 def register_keys_and_certificates_in_odl_cotroller():
-    """Register pre-configured netopeer2 certificates and key in ODL-netconf keystore"""
-    # rc, pem_client_key = infra.shell("cat ./configuration-files/certs/client.key")
-    pem_client_key = infra.get_file_content("tmp/configuration-files/certs/client.key")
+    """Register pre-configured netopeer2 certificates and key
+    in ODL-netconf keystore.
+    """
+
+    # Registere client key
+    pem_client_key = infra.get_file_content("/tmp/configuration-files/certs/client.key")
     template = infra.get_file_content(ADD_KEYSTORE_ENTRY_REQ)
     body = template.replace("{pem-client-key}", pem_client_key)
-    resp = templated_requests.post_to_uri(
+    templated_requests.post_to_uri(
         uri=f"{NETCONF_KEYSTORE_URL}:add-keystore-entry",
         data=body,
         headers=HEADERS,
         expected_code=templated_requests.ALLOWED_STATUS_CODES,
     )
+
+    # Pair client key with certificate chain
     client_key = get_certificate_file_content("client.key")
     certificat_chain = get_certificate_file_content("client.crt")
     template = infra.get_file_content(ADD_PRIVATE_KEY_REQ)
     body = template.replace("{client-key}", client_key)
     body = body.replace("{certificate-chain}", certificat_chain)
-    resp = templated_requests.post_to_uri(
+    templated_requests.post_to_uri(
         uri=f"{NETCONF_KEYSTORE_URL}:add-private-key",
         data=body,
         headers=HEADERS,
         expected_code=templated_requests.ALLOWED_STATUS_CODES,
     )
+
+    # Register device certificate
     ca_certificate = get_certificate_file_content("ca.pem")
     device_certificate = get_certificate_file_content("server.crt")
     template = infra.get_file_content(ADD_TRUSTED_CERTIFICATE)
     body = template.replace("{ca-certificate}", ca_certificate)
     body = body.replace("{device-certificate}", device_certificate)
-    resp = templated_requests.post_to_uri(
+    templated_requests.post_to_uri(
         uri=f"{NETCONF_KEYSTORE_URL}:add-trusted-certificate",
         data=body,
         headers=HEADERS,
@@ -176,7 +105,7 @@ def register_keys_and_certificates_in_odl_cotroller():
 
 
 def register_global_credentials_for_ssh_call_home_devices(username: str, password: str):
-    """Set global credentials for SSH call-home devices
+    """Set global credentials for SSH call-home devices.
 
     Args:
         username (str): Username used for global login.
@@ -188,7 +117,7 @@ def register_global_credentials_for_ssh_call_home_devices(username: str, passwor
     template = infra.get_file_content(CREATE_GLOBAL_CREDENTIALS_REQ)
     body = template.replace("{username}", username)
     body = body.replace("{password}", password)
-    resp = templated_requests.put_to_uri_request(
+    templated_requests.put_to_uri_request(
         uri=GLOBAL_CONFIG_URL,
         data=body,
         headers=HEADERS,
@@ -202,13 +131,13 @@ def register_ssh_call_home_device_in_odl_controller(
     username: str = "",
     password: str = "",
 ):
-    """Registration call-home device with SSH transport using latest models
+    """Registration call-home device with SSH transport using latest models.
 
     Args:
-        device_name(str): Call-home device name.
-        hostkey (str): Hostkey used for authentication.
-        username (str | None): Username used for authentication.
-        password (str | None): Password used for authentication.
+        device_name (str): Call-home device name.
+        hostkey (str): Hostkey used for host authentication.
+        username (str | None): Username used for client authentication.
+        password (str | None): Password used for client authentication.
 
     Returns:
         None
@@ -230,12 +159,28 @@ def register_ssh_call_home_device_in_odl_controller(
 
 
 def get_create_device_request_template():
+    """Returns json template for registering device including credentials.
+
+    Args:
+       None
+
+    Returns:
+        str: Json template
+    """
     template = infra.get_file_content(CREATE_SSH_DEVICE_REQ)
 
     return template
 
 
 def get_create_device_request_without_credentials_template():
+    """Returns json template for registering device without credentials.
+
+    Args:
+       None
+
+    Returns:
+        str: Json template
+    """
     template = infra.get_file_content(CREATE_SSH_DEVICE_REQ_HOST_KEY_ONLY)
 
     return template
@@ -244,12 +189,12 @@ def get_create_device_request_without_credentials_template():
 def register_tls_call_home_device_in_odl_controller(
     device_name: str, key_id: str, certificate_id: str
 ):
-    """Registration call-home device with TLS transport
+    """Registration call-home device with TLS transport.
 
     Args:
-        device_name(str): Call-home device name.
-        key_id (str): ID of the key used for authentication.
-        certificate_id (str): ID of the certificate used for authentication.
+        device_name (str): Call-home device name.
+        key_id (str): Id of the key used for authentication.
+        certificate_id (str): Id of the certificate used for authentication.
 
     Returns:
         None
@@ -258,9 +203,38 @@ def register_tls_call_home_device_in_odl_controller(
     body = template.replace("{device_name}", device_name)
     body = body.replace("{key_id}", key_id)
     body = body.replace("{certificate_id}", certificate_id)
-    resp = templated_requests.post_to_uri(
+    templated_requests.post_to_uri(
         uri=WHITELIST,
         data=body,
         headers=HEADERS,
         expected_code=templated_requests.ALLOWED_STATUS_CODES,
     )
+
+
+def check_device_status(device_id: str | None, status: str):
+    """Checks the operational device status.
+
+    Args:
+        device_id (str): Device uniqe-id.
+        status (str): Expected device status.
+
+    Returns:
+        None
+    """
+    if device_id is None:
+        restconf_utils.check_for_elements_at_uri(
+            DEVICE_STATUS, (f'"device-status":"{status}"',)
+        )
+    else:
+        resp = templated_requests.get_from_uri(uri=DEVICE_STATUS, expected_code=None)
+        devices = resp.json()["odl-netconf-callhome-server:allowed-devices"]["device"]
+        for device in devices:
+            if device["unique-id"] == device_id:
+                assert device["device-status"] == status, (
+                    f"Expected status: {status} does not match present status: "
+                    f'{device["device-status"]} for device id: {device_id}.'
+                )
+                return
+        raise AssertionError(
+            f"Did not find expected device {device_id} in the allowed-devices."
+        )
