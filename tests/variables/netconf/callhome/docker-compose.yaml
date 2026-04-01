@@ -11,5 +11,5 @@ services:
       - CALL_HOME_SSH_PORT=NETCONF_CH_SSH
       - CALL_HOME_TLS_PORT=NETCONF_CH_TLS
     volumes:
-      - ./tmp/configuration-files:/root/configuration-files
-      - ./tmp/init_configuration.sh:/root/init_configuration.sh
+      - /tmp/configuration-files:/root/configuration-files
+      - /tmp/init_configuration.sh:/root/init_configuration.sh

@@ -26,7 +26,7 @@ class Variables(BaseSettings):
     TOOLS_IP: str = "127.0.1.0"
     KARAF_LOG_LEVEL: str = "INFO"
     HEADERS: ClassVar[dict] = {"Content-Type": "application/json"}
-    MAX_HTTP_RESPONSE_BODY_LOG_SIZE: int = 500
+    MAX_HTTP_RESPONSE_BODY_LOG_SIZE: int = 5000
 
     ODL_NETCONF_MDSAL_PORT: int = 2830
     ODL_NETCONF_PASSWORD: str = "admin"
