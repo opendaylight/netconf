@@ -22,8 +22,9 @@ def check_for_elements_at_uri(uri: str, elements: List[str], pretty_print_json: 
     is verified to exist in the response
 
     Args:
-        uri (str): Uri location
-        elements (List[str]): List of elements are expected to be present in response.
+        uri (str): Uri location.
+        elements (List[str]): List of elements which are expected to be present
+            in response.
         pretty_print_json (bool): Log received message in pretty format.
 
     Returns:
@@ -36,4 +37,4 @@ def check_for_elements_at_uri(uri: str, elements: List[str], pretty_print_json: 
        log.info(resp.text)
     assert resp.status_code == 200
     for i in elements:
-        assert i in resp.text
+        assert i in resp.text, f"Expected element: {i} was not found in the response: {resp.text}"
