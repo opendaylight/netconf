@@ -53,6 +53,7 @@
             <artifactId>bcprov-jdk18on</artifactId>
         </dependency>
         <dependency>
+<<<<<<< HEAD   (8b0262 Enable mount point document test for HTTP/2/3)
             <groupId>${project.groupId}</groupId>
             <artifactId>netconf-netty-util</artifactId>
         </dependency>
@@ -96,6 +97,11 @@
         <dependency>
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>org.apache.karaf.features.core</artifactId>
+=======
+            <groupId>org.codehaus.janino</groupId>
+            <artifactId>janino</artifactId>
+            <version>3.1.12</version>
+>>>>>>> CHANGE (90995c Bump janino to 3.1.12)
         </dependency>
         <dependency>
             <groupId>org.opendaylight.ietf.model</groupId>
