@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a29dab88_916b1790",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-01T12:23:52Z",
+      "side": 1,
+      "message": "I prefer you do not use this (CopyOnWriteArrayList) without justification",
+      "revId": "1a8cbabf521ddf2642d9a4655ab9246b3805ea3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
