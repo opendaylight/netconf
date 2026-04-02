@@ -12,8 +12,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.net.URI;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -22,9 +20,6 @@ import org.opendaylight.restconf.openapi.model.DocumentEntity;
 import org.opendaylight.restconf.openapi.model.MetadataEntity;
 import org.opendaylight.restconf.openapi.model.MountPointsEntity;
 import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * This service generates swagger (See
@@ -32,32 +27,37 @@ import org.osgi.service.component.annotations.Reference;
  * >https://helloreverb.com/developers/swagger</a>) compliant documentation for
  * RESTCONF APIs. The output of this is used by embedded Swagger UI.
  */
-@Singleton
-@Component(service = OpenApiService.class)
-public final class OpenApiServiceImpl implements OpenApiService {
+public final class OpenApiServiceImpl implements OpenApiService, AutoCloseable {
+    private final MountPointOpenApiGeneratorRFC8040 mountPointOpenApiGeneratorRFC8040;
     private final MountPointOpenApi mountPointOpenApiRFC8040;
     private final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040;
+    private final String basePath;
 
-    @Inject
-    @Activate
-    public OpenApiServiceImpl(@Reference final DOMSchemaService schemaService,
-            @Reference final DOMMountPointService mountPointService) {
+    public OpenApiServiceImpl(final DOMSchemaService schemaService, final DOMMountPointService mountPointService,
+            final String basePath) {
         this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService),
-            new OpenApiGeneratorRFC8040(schemaService));
+            new OpenApiGeneratorRFC8040(schemaService), basePath);
     }
 
     // FIXME Public for end-to-end testing openapi over Netty. Constructor that uses NettyEndpoint should be used
     //  instead when we get one.
     @VisibleForTesting
     public OpenApiServiceImpl(final MountPointOpenApiGeneratorRFC8040 mountPointOpenApiGeneratorRFC8040,
-                       final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040) {
-        mountPointOpenApiRFC8040 = requireNonNull(mountPointOpenApiGeneratorRFC8040).getMountPointOpenApi();
+            final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040, final String basePath) {
+        this.mountPointOpenApiGeneratorRFC8040 = requireNonNull(mountPointOpenApiGeneratorRFC8040);
+        mountPointOpenApiRFC8040 = this.mountPointOpenApiGeneratorRFC8040.getMountPointOpenApi();
         this.openApiGeneratorRFC8040 = requireNonNull(openApiGeneratorRFC8040);
+        this.basePath = "/" + requireNonNull(basePath) + "/";
+    }
+
+    @Override
+    public void close() {
+        mountPointOpenApiGeneratorRFC8040.close();
     }
 
     @Override
     public DocumentEntity getAllModulesDoc(final URI uri, final @Nullable Integer width, final @Nullable Integer depth,
-            final @Nullable Integer offset, final @Nullable Integer limit, final String basePath) throws IOException {
+            final @Nullable Integer offset, final @Nullable Integer limit) throws IOException {
         return openApiGeneratorRFC8040.getControllerModulesDoc(uri, unboxOrZero(width), unboxOrZero(depth),
             unboxOrZero(offset), unboxOrZero(limit), basePath);
     }
@@ -73,7 +73,7 @@ public final class OpenApiServiceImpl implements OpenApiService {
      */
     @Override
     public DocumentEntity getDocByModule(final String module, final String revision, final URI uri,
-            final @Nullable Integer width, final @Nullable Integer depth, final String basePath) throws IOException {
+            final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
         return openApiGeneratorRFC8040.getApiDeclaration(module, revision, uri, unboxOrZero(width), unboxOrZero(depth),
             basePath);
     }
@@ -85,16 +85,15 @@ public final class OpenApiServiceImpl implements OpenApiService {
 
     @Override
     public DocumentEntity getMountDocByModule(final long instanceNum, final String module, final String revision,
-            final URI uri, final @Nullable Integer width, final @Nullable Integer depth, final String basePath)
-            throws IOException {
+            final URI uri, final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
         return mountPointOpenApiRFC8040.getMountPointApi(uri, instanceNum, module, revision, unboxOrZero(width),
             unboxOrZero(depth), basePath);
     }
 
     @Override
     public DocumentEntity getMountDoc(final long instanceNum, final URI uri, final @Nullable Integer width,
-            final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit,
-            final String basePath) throws IOException {
+            final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
+            throws IOException {
         return mountPointOpenApiRFC8040.getMountPointApi(uri, instanceNum, unboxOrZero(width), unboxOrZero(depth),
             unboxOrZero(offset), unboxOrZero(limit), basePath);
     }
