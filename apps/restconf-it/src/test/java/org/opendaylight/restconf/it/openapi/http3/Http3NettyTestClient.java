@@ -7,6 +7,9 @@
  */
 package org.opendaylight.restconf.it.openapi.http3;
 
+import static io.netty.handler.codec.http.HttpHeaderNames.ACCEPT;
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
+import static io.netty.handler.codec.http3.Http3Headers.PseudoHeaderName.STATUS;
 import static java.net.http.HttpRequest.BodyPublisher;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -34,6 +37,7 @@ import io.netty.util.ReferenceCountUtil;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.net.http.HttpRequest;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -45,6 +49,8 @@ import java.util.concurrent.Flow.Subscription;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.opendaylight.netconf.transport.http.EventStreamService.StreamControl;
+import org.opendaylight.restconf.it.server.TestEventStreamListener;
 
 /**
  * Simple HTTP/3 client built on Netty.
@@ -131,7 +137,7 @@ public final class Http3NettyTestClient implements AutoCloseable {
     public Http3Response send(final HttpRequest request, final boolean discardBody) throws Exception {
         final var uri =  request.uri();
         final var scheme = uri.getScheme();
-        final var host = uri.getHost() + ":" + uri.getPort();
+        final var host = uri.getAuthority();
         final var query = uri.getRawQuery();
         final var path = uri.getRawPath() + (query != null && !query.isEmpty() ? "?" + query : "");
         final var timeout = request.timeout().map(Duration::getSeconds).orElse(DEFAULT_TIMEOUT);
@@ -140,46 +146,45 @@ public final class Http3NettyTestClient implements AutoCloseable {
         final var status = new AtomicInteger();
         final var responseFuture = new CompletableFuture<Http3Response>();
 
-        final var streamChannelFuture = Http3.newRequestStream(quicChannel,
-            new Http3RequestStreamInboundHandler() {
-                @Override
-                protected void channelRead(final ChannelHandlerContext ctx, final Http3HeadersFrame frame) {
-                    frame.headers().forEach(header -> {
-                            final var name = header.getKey().toString();
-                            final var value = header.getValue().toString();
+        final var streamChannelFuture = Http3.newRequestStream(quicChannel, new Http3RequestStreamInboundHandler() {
+            @Override
+            protected void channelRead(final ChannelHandlerContext ctx, final Http3HeadersFrame frame) {
+                frame.headers().forEach(header -> {
+                        final var name = header.getKey().toString();
+                        final var value = header.getValue().toString();
 
-                            if (name.equals(":status")) {
-                                status.set(Integer.parseInt(value));
-                            } else {
-                                headers.put(name, value);
-                            }
+                        if (name.equals(":status")) {
+                            status.set(Integer.parseInt(value));
+                        } else {
+                            headers.put(name, value);
                         }
-                    );
-                    ReferenceCountUtil.release(frame);
-                }
-
-                @Override
-                protected void channelRead(final ChannelHandlerContext ctx, final Http3DataFrame frame) {
-                    if (!discardBody) {
-                        body.append(frame.content().toString(StandardCharsets.UTF_8));
                     }
-                    ReferenceCountUtil.release(frame);
-                }
+                );
+                ReferenceCountUtil.release(frame);
+            }
 
-                @Override
-                protected void channelInputClosed(final ChannelHandlerContext ctx) {
-                    responseFuture.complete(new Http3Response(
-                        HttpResponseStatus.valueOf(status.get()), headers, body.toString()));
-                    ctx.close();
+            @Override
+            protected void channelRead(final ChannelHandlerContext ctx, final Http3DataFrame frame) {
+                if (!discardBody) {
+                    body.append(frame.content().toString(StandardCharsets.UTF_8));
                 }
+                ReferenceCountUtil.release(frame);
+            }
 
-                @Override
-                public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-                    responseFuture.completeExceptionally(cause);
-                    ctx.close();
-                }
+            @Override
+            protected void channelInputClosed(final ChannelHandlerContext ctx) {
+                responseFuture.complete(new Http3Response(
+                    HttpResponseStatus.valueOf(status.get()), headers, body.toString()));
+                ctx.close();
+            }
 
-            });
+            @Override
+            public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+                responseFuture.completeExceptionally(cause);
+                ctx.close();
+            }
+
+        });
 
         if (!streamChannelFuture.await(2, TimeUnit.SECONDS)) {
             throw new TimeoutException("Stream creation timed out after 2 seconds");
@@ -222,6 +227,103 @@ public final class Http3NettyTestClient implements AutoCloseable {
 
     public Http3Response send(final HttpRequest request) throws Exception {
         return send(request, false);
+    }
+
+    /**
+     * Sends an HTTP/3 request and returns the received response.
+     *
+     * @param uri address to the stream
+     * @param listener dstream listener
+     * @return stream control to end streaming
+     * @throws Exception if establishing stream fails
+     */
+    public StreamControl listenToStream(final URI uri, final TestEventStreamListener listener) throws Exception {
+        final var pending = new StringBuilder();
+        final var eventData = new StringBuilder();
+
+        final var streamFuture = Http3.newRequestStream(quicChannel, new Http3RequestStreamInboundHandler() {
+            @Override
+            protected void channelRead(final ChannelHandlerContext ctx, final Http3HeadersFrame frame) {
+                final var headers = frame.headers();
+                if (headers.contains(STATUS.value(), "200") && headers.contains(CONTENT_TYPE, "text/event-stream")
+                        && !listener.started()) {
+                    listener.onStreamStart();
+                }
+                ReferenceCountUtil.release(frame);
+            }
+
+            @Override
+            protected void channelRead(final ChannelHandlerContext ctx, final Http3DataFrame frame) {
+                pending.append(frame.content().toString(StandardCharsets.UTF_8));
+                ReferenceCountUtil.release(frame);
+
+                int newLine;
+                while ((newLine = pending.indexOf("\n")) >= 0) {
+                    var line = pending.substring(0, newLine);
+                    pending.delete(0, newLine + 1);
+
+                    if (line.endsWith("\r")) {
+                        line = line.substring(0, line.length() - 1);
+                    }
+
+                    // check if end of notification was reached
+                    if (line.isEmpty()) {
+                        if (!eventData.isEmpty()) {
+                            listener.onEventField("data", eventData.toString());
+                            eventData.setLength(0);
+                        }
+                        continue;
+                    }
+
+                    final var colon = line.indexOf(':');
+                    if (colon > 0) {
+                        final var fieldName = line.substring(0, colon);
+
+                        if ("data".equals(fieldName)) {
+                            if (!eventData.isEmpty()) {
+                                eventData.append('\n');
+                            }
+                            eventData.append(line.substring(colon + 1));
+                        }
+                    }
+                }
+            }
+
+            @Override
+            protected void channelInputClosed(final ChannelHandlerContext ctx) {
+                listener.onStreamEnd();
+                ctx.close();
+            }
+
+            @Override
+            public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
+                listener.onStreamEnd();
+                ctx.close();
+            }
+        });
+
+        if (!streamFuture.await(2, TimeUnit.SECONDS)) {
+            throw new TimeoutException("Stream creation timed out after 2 seconds");
+        }
+
+        final var headersFrame = new DefaultHttp3HeadersFrame();
+        headersFrame.headers()
+            .method("GET")
+            .path(uri.getRawPath())
+            .authority(uri.getAuthority())
+            .scheme(uri.getScheme());
+        headersFrame.headers().add(ACCEPT, "text/event-stream");
+        if (username != null && password != null) {
+            headersFrame.headers().add(HttpHeaderNames.AUTHORIZATION,
+                "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes()));
+        }
+
+        final var streamChannel = streamFuture.getNow();
+        streamChannel.writeAndFlush(headersFrame).addListener(QuicStreamChannel.SHUTDOWN_OUTPUT).sync();
+        return () -> {
+            streamChannel.close();
+            listener.onStreamEnd();
+        };
     }
 
     private static byte[] getBody(final BodyPublisher publisher) throws Exception {
