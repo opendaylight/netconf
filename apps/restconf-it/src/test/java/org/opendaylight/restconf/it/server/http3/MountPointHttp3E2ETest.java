@@ -9,6 +9,7 @@ package org.opendaylight.restconf.it.server.http3;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -42,6 +43,8 @@ import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class MountPointHttp3E2ETest extends AbstractHttp3E2ETest {
     private static final YangModuleInfo DEVICE_YANG_MODEL =
@@ -195,6 +198,77 @@ class MountPointHttp3E2ETest extends AbstractHttp3E2ETest {
             .build());
 
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
+    }
+
+    @Test
+    void notificationStreamJsonTest() throws Exception {
+        startDeviceSimulator(false);
+        mountDeviceJson();
+
+        var response = client().send(HttpRequest.newBuilder()
+            .uri(createUri("""
+                /rests/operations/network-topology:network-topology/topology=topology-netconf/node=device-sim\
+                /yang-ext:mount/notifications:create-subscription"""))
+            .POST(HttpRequest.BodyPublishers.ofString("""
+                {
+                   "input": {
+                       "stream": "NETCONF"
+                   }
+                }"""))
+            .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_JSON)
+            .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
+            .build());
+
+        assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
+
+        // create notification stream
+        response = client().send(HttpRequest.newBuilder()
+            .uri(createUri("/rests/operations/odl-device-notification:subscribe-device-notification"))
+            .POST(HttpRequest.BodyPublishers.ofString("""
+                {
+                    "input": {
+                        "path": "/network-topology:network-topology/topology[topology-id='topology-netconf']\
+                /node[node-id='device-sim']"
+                    }
+                }"""))
+            .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_JSON)
+            .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
+            .build());
+
+        assertEquals(HttpResponseStatus.OK, response.status());
+        //  {
+        //      "odl-device-notification:output": {
+        //          "stream-name": "urn:uuid:01a56682-f2ab-419f-8a77-9cf995a52220"
+        //      }
+        //  }
+        final var json = new JSONObject(response.body(), jsonParserConfiguration());
+        final var streamName = json.getJSONObject("odl-device-notification:output").getString("stream-name");
+        assertNotNull(streamName, "Stream name is undefined");
+
+        // get stream URL from restconf-state
+        final var streamUrl = getStreamUrlJson(streamName);
+        assertNotNull(streamUrl, "Stream URL not found");
+
+        final var eventListener = startStream(streamUrl);
+
+        // NB: testing single predefined event with 2 sec delay
+        // due to device simulator starts sending events immediately after subscription
+        // so restconf server may drop events occurred in interval between stream start
+        // via netconf and actual consumption via restconf.
+        // Also devise simulator does not respect defined events order.
+
+        JSONAssert.assertEquals("""
+            {
+                "ietf-restconf:notification": {
+                    "device-sim:device-event": {
+                        "event-message": "Event message"
+                    }
+                }
+            }""", eventListener.readNext(), JSONCompareMode.LENIENT);
+
+        // terminate stream
+        closeAllStreams();
+        await().atMost(Duration.ofSeconds(1)).until(eventListener::ended);
     }
 
     @Test
