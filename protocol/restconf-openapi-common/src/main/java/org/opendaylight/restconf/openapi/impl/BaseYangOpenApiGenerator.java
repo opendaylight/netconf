@@ -45,7 +45,7 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public DocumentEntity getControllerModulesDoc(final URI uri, final int width, final int depth,
-            final int offset, final int limit, final String basePath) throws IOException {
+            final int offset, final int limit, final String basePath) {
         final var modelContext = modelContext();
         final var schema = createSchemaFromUri(uri);
         final var host = createHostFromUri(uri);

@@ -56,6 +56,10 @@
             <artifactId>web-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-dom-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-openapi-common</artifactId>
         </dependency>

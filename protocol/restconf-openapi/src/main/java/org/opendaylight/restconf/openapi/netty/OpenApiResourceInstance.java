@@ -56,12 +56,10 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
 
     private final OpenApiService service;
-    private final String basePath;
 
-    OpenApiResourceInstance(final String path, final OpenApiService service, final String basePath) {
+    OpenApiResourceInstance(final String path, final OpenApiService service) {
         super(path);
         this.service = requireNonNull(service);
-        this.basePath = "/" + requireNonNull(basePath) + "/";
     }
 
     @Override
@@ -134,7 +132,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
 
         final DocumentEntity entity;
         try {
-            entity = service.getDocByModule(module, revision, targetUri, width, depth, basePath);
+            entity = service.getDocByModule(module, revision, targetUri, width, depth);
         } catch (IOException e) {
             return new ExceptionRequestResponse(e);
         }
@@ -175,7 +173,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
 
         final DocumentEntity entity;
         try {
-            entity = service.getMountDoc(instance, targetUri, width, depth, offset, limit, basePath);
+            entity = service.getMountDoc(instance, targetUri, width, depth, offset, limit);
         } catch (IOException e) {
             return new ExceptionRequestResponse(e);
         }
@@ -225,7 +223,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
 
         final DocumentEntity entity;
         try {
-            entity = service.getMountDocByModule(instance, module, revision, targetUri, width, depth, basePath);
+            entity = service.getMountDocByModule(instance, module, revision, targetUri, width, depth);
         } catch (IOException e) {
             return new ExceptionRequestResponse(e);
         }
@@ -258,7 +256,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
 
         final DocumentEntity entity;
         try {
-            entity = service.getAllModulesDoc(targetUri, width, depth, offset, limit, basePath);
+            entity = service.getAllModulesDoc(targetUri, width, depth, offset, limit);
         } catch (IOException e) {
             return new ExceptionRequestResponse(e);
         }

@@ -80,9 +80,6 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.it.server.NullAAAEncryptionService;
 import org.opendaylight.restconf.it.server.TestRequestCallback;
 import org.opendaylight.restconf.it.server.TestTransportChannelListener;
-import org.opendaylight.restconf.openapi.impl.MountPointOpenApiGeneratorRFC8040;
-import org.opendaylight.restconf.openapi.impl.OpenApiGeneratorRFC8040;
-import org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl;
 import org.opendaylight.restconf.openapi.netty.OpenApiResourceProvider;
 import org.opendaylight.restconf.server.AAAShiroPrincipalService;
 import org.opendaylight.restconf.server.MessageEncoding;
@@ -237,12 +234,19 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
         final var openApiSchemaService = new FixedDOMSchemaService(openApiSchemaContext);
 
         // OpenApi
-        final var mountPointOpenApiGeneratorRFC8040 = new MountPointOpenApiGeneratorRFC8040(openApiSchemaService,
-            domMountPointService);
         // FIXME use constructor that has NettyEndpoint as parameter when we migrate to Netty in the future.
-        final var openApiService = new OpenApiServiceImpl(mountPointOpenApiGeneratorRFC8040,
-            new OpenApiGeneratorRFC8040(openApiSchemaService));
-        final var openApiResourceProvider = new OpenApiResourceProvider(openApiService);
+        final var openApiResourceProvider = new OpenApiResourceProvider(openApiSchemaService, domMountPointService,
+            new OpenApiResourceProvider.Configuration() {
+                @Override
+                public String api$_$root$_$path() {
+                    return RESTS;
+                }
+
+                @Override
+                public Class<OpenApiResourceProvider.Configuration> annotationType() {
+                    return OpenApiResourceProvider.Configuration.class;
+                }
+            });
         endpoint.registerWebResource(openApiResourceProvider);
     }
 
