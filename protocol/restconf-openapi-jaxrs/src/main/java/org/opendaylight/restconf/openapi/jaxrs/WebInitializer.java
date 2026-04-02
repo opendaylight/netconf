@@ -19,7 +19,9 @@ import org.opendaylight.aaa.web.WebContext;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
-import org.opendaylight.restconf.openapi.api.OpenApiService;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl;
 import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
@@ -35,13 +37,16 @@ import org.osgi.service.component.annotations.Reference;
 @Singleton
 @Component(service = { })
 public final class WebInitializer implements AutoCloseable {
+    private final OpenApiServiceImpl openApiService;
     private final Registration registration;
 
     @Inject
     @Activate
     public WebInitializer(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
-            @Reference final ServletSupport servletSupport, @Reference final OpenApiService openApiService,
-            @Reference final JaxRsEndpoint endpoint) throws ServletException {
+            @Reference final ServletSupport servletSupport, @Reference final DOMSchemaService schemaService,
+            @Reference final DOMMountPointService mountPointService, @Reference final JaxRsEndpoint endpoint)
+            throws ServletException {
+        openApiService = new OpenApiServiceImpl(schemaService, mountPointService, endpoint.configuration().restconf());
         final var webContextBuilder = WebContext.builder()
             .name("OpenAPI")
             .contextPath("/openapi")
@@ -51,7 +56,7 @@ public final class WebInitializer implements AutoCloseable {
                 .servlet(servletSupport.createHttpServletBuilder(new Application() {
                     @Override
                     public Set<Object> getSingletons() {
-                        return Set.of(new JaxRsOpenApi(openApiService, endpoint.configuration().restconf()),
+                        return Set.of(new JaxRsOpenApi(openApiService),
                             new OpenApiBodyWriter(new JsonFactoryBuilder().build()));
                     }
                 }).build())
@@ -78,5 +83,6 @@ public final class WebInitializer implements AutoCloseable {
     @PreDestroy
     public void close() {
         registration.close();
+        openApiService.close();
     }
 }
