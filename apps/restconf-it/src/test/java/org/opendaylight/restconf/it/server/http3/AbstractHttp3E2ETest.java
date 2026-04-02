@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.it.server.http3;
 
 import static java.util.stream.Collectors.toSet;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.equalTo;
@@ -44,6 +45,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.it.openapi.http3.Http3NettyTestClient;
 import org.opendaylight.restconf.it.server.AbstractE2ETest;
+import org.opendaylight.restconf.it.server.TestEventStreamListener;
 import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.HttpServerListenStackGrouping;
@@ -113,6 +115,17 @@ public abstract class AbstractHttp3E2ETest extends AbstractE2ETest {
             WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, localAddress(), port(), certificate, privateKey,
             HTTP3_ALT_SVC_MAX_AGE_SECONDS, HTTP3_INITIAL_MAX_DATA, HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE,
             HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
+    }
+
+    @Override
+    protected URI getStreamUrlJson(final String streamName) throws Exception {
+        // get stream URL from restconf-state
+        final var response = client.send(HttpRequest.newBuilder()
+            .uri(createUri("/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream=" + streamName))
+            .GET()
+            .build());
+        assertEquals(HttpResponseStatus.OK, response.status());
+        return extractStreamUrlJson(response.content());
     }
 
     protected URI createUri(final String path) throws URISyntaxException {
@@ -229,5 +242,14 @@ public abstract class AbstractHttp3E2ETest extends AbstractE2ETest {
             .collect(Collectors.toMap(Map.Entry::getKey,
                 e -> e.getValue().iterator().next()
             ));
+    }
+
+    protected TestEventStreamListener startStream(final URI uri) throws Exception {
+        final var listener = new TestEventStreamListener();
+        final var control = client.listenToStream(uri, listener);
+        await().atMost(Duration.ofSeconds(2)).until(listener::started);
+        addStreamControl(control);
+
+        return listener;
     }
 }
