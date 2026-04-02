@@ -174,7 +174,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     private static BootstrapFactory bootstrapFactory;
     private static SSHTransportStackFactory sshTransportStackFactory;
 
-    private final List<EventStreamService.StreamControl> streamControl = new ArrayList<>();
+    protected final List<EventStreamService.StreamControl> streamControl = new ArrayList<>();
 
     private HttpClientStackGrouping invalidClientStackGrouping;
     private DOMMountPointService domMountPointService;
@@ -547,7 +547,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         return extractStreamUrlJson(response.content().toString(StandardCharsets.UTF_8));
     }
 
-    private static URI extractStreamUrlJson(final String content) {
+    protected static URI extractStreamUrlJson(final String content) {
         // {
         //      "ietf-restconf-monitoring:stream": [{
         //              "name": "urn:uuid:6413c077-5dfe-464c-b17f-20c5bbb456f4",
