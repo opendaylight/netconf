@@ -169,6 +169,26 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>iana-ssh-encryption-algs</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>iana-ssh-key-exchange-algs</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>iana-ssh-mac-algs</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>iana-ssh-public-key-algs</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc9644-ietf-ssh-server</artifactId>
             <scope>test</scope>
         </dependency>
