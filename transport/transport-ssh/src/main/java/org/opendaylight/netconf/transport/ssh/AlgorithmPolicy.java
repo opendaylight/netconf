@@ -13,6 +13,7 @@ import com.google.common.annotations.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -29,10 +30,16 @@ abstract sealed class AlgorithmPolicy<T extends TypeObject, F extends NamedResou
         permits EncryptionPolicy, KeyExchangePolicy, MacPolicy, PublicKeyPolicy {
     private final @NonNull List<F> defaultFactories;
     private final @NonNull Map<T, F> typeToFactory;
+    private final @NonNull Map<String, T> factoryToType;
 
     AlgorithmPolicy(final Map<T, ? extends F> typeToFactory, final List<? extends F> defaultFactories) {
         this.typeToFactory = Map.copyOf(typeToFactory);
         this.defaultFactories = List.copyOf(defaultFactories);
+        factoryToType = typeToFactory.entrySet().stream()
+            .collect(Collectors.toUnmodifiableMap(
+                entry -> entry.getValue().getName(),
+                Map.Entry::getKey
+            ));
     }
 
     /**
@@ -60,6 +67,20 @@ abstract sealed class AlgorithmPolicy<T extends TypeObject, F extends NamedResou
             factories.add(factory);
         }
         return List.copyOf(factories);
+    }
+
+    /**
+     * Maps factory name to IANA representation of used algorithm.
+     *
+     * @param factoryName name of used factory
+     * @return IANA representation of used algorithm
+     */
+    T algOf(final String factoryName) {
+        final T type = factoryToType.get(factoryName);
+        if (type == null) {
+            throw new IllegalArgumentException("Unrecognized algorithm policy used: " + factoryName);
+        }
+        return type;
     }
 
     abstract @Nullable List<T> algsOf(@NonNull TransportParamsGrouping params);
