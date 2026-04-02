@@ -79,6 +79,7 @@ import org.opendaylight.netconf.rfc8639.impl.IetfSubscriptionFeatureProvider;
 import org.opendaylight.netconf.sal.remote.impl.CreateDataChangeEventSubscriptionRpc;
 import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.netconf.transport.http.EventStreamService;
+import org.opendaylight.netconf.transport.http.EventStreamService.StreamControl;
 import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.netconf.transport.http.HTTPServerOverTcp;
 import org.opendaylight.netconf.transport.http.HttpClientStackConfiguration;
@@ -174,7 +175,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     private static BootstrapFactory bootstrapFactory;
     private static SSHTransportStackFactory sshTransportStackFactory;
 
-    private final List<EventStreamService.StreamControl> streamControl = new ArrayList<>();
+    private final List<StreamControl> streamControl = new ArrayList<>();
 
     private HttpClientStackGrouping invalidClientStackGrouping;
     private DOMMountPointService domMountPointService;
@@ -543,7 +544,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         return extractStreamUrlJson(response.content().toString(StandardCharsets.UTF_8));
     }
 
-    private static URI extractStreamUrlJson(final String content) {
+    protected static URI extractStreamUrlJson(final String content) {
         // {
         //      "ietf-restconf-monitoring:stream": [{
         //              "name": "urn:uuid:6413c077-5dfe-464c-b17f-20c5bbb456f4",
@@ -585,7 +586,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         clientStreamService.startEventStream("localhost", uri, eventListener,
             new EventStreamService.StartCallback() {
                 @Override
-                public void onStreamStarted(final EventStreamService.StreamControl control) {
+                public void onStreamStarted(final StreamControl control) {
                     streamControl.add(control);
                 }
 
@@ -598,8 +599,12 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         return eventListener;
     }
 
+    protected final void addStreamControl(final StreamControl control) {
+        streamControl.add(control);
+    }
+
     protected final void closeAllStreams() {
-        streamControl.forEach(EventStreamService.StreamControl::close);
+        streamControl.forEach(StreamControl::close);
         streamControl.clear();
     }
 
