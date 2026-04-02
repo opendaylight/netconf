@@ -69,6 +69,21 @@ final class MacPolicy extends AlgorithmPolicy<
     }
 
     @Override
+    org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm
+            algOf(final String alg) {
+        // This value is returned by mina-sshd getNegotiatedKexParameter(KexProposalOption.C2SMAC)
+        // when Authenticated Encryption with Associated Data (AEAD) is used, used encryption algorithm also
+        // ensures integrity and authenticity so there is no need to negotiate separate mac algorithm.
+        // https://github.com/apache/mina-sshd/commit/e487c77983167985181d8eace868fa9482462b99
+        // Report SshMacAlgorithm.None as no mac algorithm is used.
+        if (alg.equals("aead")) {
+            return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf
+                .ssh.common.rev241010.SshMacAlgorithm(SshMacAlgorithm.None);
+        }
+        return super.algOf(alg);
+    }
+
+    @Override
     void setFactories(final BaseBuilder<?, ?> builder,
             final List<NamedFactory<org.opendaylight.netconf.shaded.sshd.common.mac.Mac>> factories) {
         builder.macFactories(factories);
