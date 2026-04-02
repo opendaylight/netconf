@@ -367,10 +367,14 @@ class NetconfClientFactoryImplTest {
                 .onTransportChannelEstablished(any(TransportChannel.class));
 
             // Verify listener was invoked with expected algorithms
-            final var kex = new SshKeyExchangeAlgorithm("sntrup761x25519-sha512");
-            final var hostKey = new SshPublicKeyAlgorithm("rsa-sha2-512");
-            final var encryption = new SshEncryptionAlgorithm("chacha20-poly1305@openssh.com");
-            final var mac = new SshMacAlgorithm("aead");
+            final var kex = new SshKeyExchangeAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.Sntrup761x25519Sha512);
+            final var hostKey = new SshPublicKeyAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh._public.key.algs.rev241016.SshPublicKeyAlgorithm.RsaSha2512);
+            final var encryption = new SshEncryptionAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.encryption.algs.rev241016.SshEncryptionAlgorithm.Chacha20Poly1305);
+            final var mac = new SshMacAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                .iana.ssh.mac.algs.rev241016.SshMacAlgorithm.None);
             verify(algListener, times(1)).onAlgorithmsNegotiated(kex, hostKey, encryption, mac);
         } finally {
             server.shutdown().get(1, TimeUnit.SECONDS);
