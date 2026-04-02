@@ -320,9 +320,9 @@ class MountPointE2ETest extends AbstractE2ETest {
                     {
                       "netconf-node-topology:netconf-node": {
                         "negotiated-ssh-transport-parameters": {
-                          "encryption-alg": "chacha20-poly1305@openssh.com",
+                          "encryption-alg": "chacha20-poly1305",
                           "host-key-alg": "rsa-sha2-512",
-                          "mac-alg": "aead",
+                          "mac-alg": "none",
                           "key-exchange-alg": "sntrup761x25519-sha512"
                         }
                       }
