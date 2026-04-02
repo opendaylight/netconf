@@ -61,7 +61,7 @@ public abstract class NettyEndpoint {
 
     @NonNullByDefault
     public final Registration registerWebResource(final WebHostResourceProvider provider) {
-        return root.registerProvider(provider, String.join("/", configuration.apiRootPath()));
+        return root.registerProvider(provider);
     }
 
     protected final ListenableFuture<Empty> shutdown() {
