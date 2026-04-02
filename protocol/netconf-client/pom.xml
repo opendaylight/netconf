@@ -62,6 +62,22 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+        <groupId>org.opendaylight.ietf.model</groupId>
+        <artifactId>iana-ssh-encryption-algs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>iana-ssh-key-exchange-algs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>iana-ssh-mac-algs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>iana-ssh-public-key-algs</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
             <artifactId>rfc6241</artifactId>
         </dependency>
@@ -195,6 +211,10 @@
                     <ignoredNonTestScopedDependencies>
                         <ignoredNonTestScopedDependency>org.opendaylight.mdsal.binding.model.ietf:rfc9640</ignoredNonTestScopedDependency>
                         <ignoredNonTestScopedDependency>org.opendaylight.mdsal.binding.model.ietf:rfc9642</ignoredNonTestScopedDependency>
+                        <ignoredNonTestScopedDependency>org.opendaylight.mdsal.binding.model:iana-ssh-encryption-algs</ignoredNonTestScopedDependency>
+                        <ignoredNonTestScopedDependency>org.opendaylight.mdsal.binding.model:iana-ssh-key-exchange-algs</ignoredNonTestScopedDependency>
+                        <ignoredNonTestScopedDependency>org.opendaylight.mdsal.binding.model:iana-ssh-mac-algs</ignoredNonTestScopedDependency>
+                        <ignoredNonTestScopedDependency>org.opendaylight.mdsal.binding.model:iana-ssh-public-key-algs</ignoredNonTestScopedDependency>
                     </ignoredNonTestScopedDependencies>
                 </configuration>
             </plugin>

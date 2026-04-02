@@ -1823,9 +1823,9 @@ negotiated-ssh-transport-parameters container:
             <netconf-node xmlns="urn:opendaylight:netconf-node-topology">
                 <port>17830</port>
                 <negotiated-ssh-transport-parameters>
-                    <encryption-alg>chacha20-poly1305@openssh.com</encryption-alg>
+                    <encryption-alg>chacha20-poly1305</encryption-alg>
                     <host-key-alg>rsa-sha2-512</host-key-alg>
-                    <mac-alg>aead</mac-alg>
+                    <mac-alg>none</mac-alg>
                     <key-exchange-alg>sntrup761x25519-sha512</key-exchange-alg>
                 </negotiated-ssh-transport-parameters>
                 <session-id>1</session-id>
@@ -1849,9 +1849,9 @@ negotiated-ssh-transport-parameters container:
                       "netconf-node-topology:netconf-node": {
                           "port": 17830,
                           "negotiated-ssh-transport-parameters": {
-                              "encryption-alg": "chacha20-poly1305@openssh.com",
+                              "encryption-alg": "chacha20-poly1305",
                               "host-key-alg": "rsa-sha2-512",
-                              "mac-alg": "aead",
+                              "mac-alg": "none",
                               "key-exchange-alg": "sntrup761x25519-sha512"
                           },
                           "session-id": 1,
@@ -1866,6 +1866,11 @@ negotiated-ssh-transport-parameters container:
               ]
           }
 
+.. note::
+
+    mac-alg can end up being none. This means Authenticated Encryption with Associated Data (AEAD) is used,
+    used encryption algorithm also ensures integrity and authenticity so there is no need to negotiate separate
+    mac algorithm.
 
 Northbound (NETCONF servers)
 ----------------------------
