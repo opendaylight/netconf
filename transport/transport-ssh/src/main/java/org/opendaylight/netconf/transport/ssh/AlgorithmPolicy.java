@@ -62,6 +62,21 @@ abstract sealed class AlgorithmPolicy<T extends TypeObject, F extends NamedResou
         return List.copyOf(factories);
     }
 
+    /**
+     * Maps factory name to IANA representation of used algorithm.
+     *
+     * @param factoryName name of used factory
+     * @return IANA representation of used algorithm
+     */
+    T algOf(final String factoryName) {
+        for (final var entry : typeToFactory.entrySet()) {
+            if (entry.getValue().getName().equals(factoryName)) {
+                return entry.getKey();
+            }
+        }
+        throw new IllegalArgumentException("Unrecognized algorithm policy used: " + factoryName);
+    }
+
     abstract @Nullable List<T> algsOf(@NonNull TransportParamsGrouping params);
 
     abstract void setFactories(@NonNull BaseBuilder<?, ?> builder, @NonNull List<F> factories);
