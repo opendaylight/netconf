@@ -69,6 +69,19 @@ final class MacPolicy extends AlgorithmPolicy<
     }
 
     @Override
+    org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm
+            algOf(final String alg) {
+        // This means Authenticated Encryption with Associated Data (AEAD) is used, used encryption algorithm also
+        // ensures integrity and authenticity so there is no need to negotiate separate mac algorithm.
+        // Report SshMacAlgorithm.None as no mac algorithm is used.
+        if (alg.equals("aead")) {
+            return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf
+                .ssh.common.rev241010.SshMacAlgorithm(SshMacAlgorithm.None);
+        }
+        return super.algOf(alg);
+    }
+
+    @Override
     void setFactories(final BaseBuilder<?, ?> builder,
             final List<NamedFactory<org.opendaylight.netconf.shaded.sshd.common.mac.Mac>> factories) {
         builder.macFactories(factories);
