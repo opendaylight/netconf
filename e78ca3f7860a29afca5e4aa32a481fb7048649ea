@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1447acb_f5b940c6",
+        "filename": "protocol/restconf-openapi-jaxrs/src/main/java/org/opendaylight/restconf/openapi/jaxrs/JaxRsExplorer.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-07T18:05:52Z",
+      "side": 1,
+      "message": "We need JaxRsExplorer because after moving the explorer frontend into\nrestconf-openapi-common, the JAX-RS module can no longer serve those files\nthrough bundle-local ResourceDetails registration alone. This class acts as a\nsmall bridge which exposes the shared static assets through JAX-RS and lets us\nkeep only one copy of the frontend.",
+      "revId": "e78ca3f7860a29afca5e4aa32a481fb7048649ea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
