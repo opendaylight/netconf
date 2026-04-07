@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8948beb7_e759f75a",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/AlgorithmPolicy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-04-07T11:41:47Z",
+      "side": 1,
+      "message": "multiple issues:\n- missing documentation\n- \u0027alg\u0027 is more like \u0027algName\u0027 -- and it is *not* type-safe",
+      "range": {
+        "startLine": 65,
+        "startChar": 4,
+        "endLine": 65,
+        "endChar": 31
+      },
+      "revId": "b2d1623bac84f0870cd8a6c90f9a1c188870f221",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d777c553_2f09a940",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/AlgorithmPolicy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-04-07T11:41:47Z",
+      "side": 1,
+      "message": "so ... we are excruciatingly slow, O(N), by default: is this the best we can do?",
+      "range": {
+        "startLine": 66,
+        "startChar": 31,
+        "endLine": 66,
+        "endChar": 53
+      },
+      "revId": "b2d1623bac84f0870cd8a6c90f9a1c188870f221",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55733a8e_d5556460",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/MacPolicy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-04-07T11:41:47Z",
+      "side": 1,
+      "message": "magic string: where does it come from?",
+      "range": {
+        "startLine": 77,
+        "startChar": 24,
+        "endLine": 77,
+        "endChar": 28
+      },
+      "revId": "b2d1623bac84f0870cd8a6c90f9a1c188870f221",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
