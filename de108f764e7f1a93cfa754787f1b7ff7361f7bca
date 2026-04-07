@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c18e5c8f_ddc99bd7",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-07T07:42:37Z",
+      "side": 1,
+      "message": "Replaced by explicit definition",
+      "parentUuid": "ad30b5ba_bea16eb5",
+      "revId": "de108f764e7f1a93cfa754787f1b7ff7361f7bca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f8ea870e_97a7174d",
@@ -136,6 +154,24 @@
       "writtenOn": "2026-04-01T12:21:43Z",
       "side": 1,
       "message": "do we have to use service loader?",
+      "revId": "de108f764e7f1a93cfa754787f1b7ff7361f7bca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a39df788_46d16096",
+        "filename": "apps/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/streams/DataTreeChangeStreamTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-07T07:42:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4ec1b4ce_f864b360",
       "revId": "de108f764e7f1a93cfa754787f1b7ff7361f7bca",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
