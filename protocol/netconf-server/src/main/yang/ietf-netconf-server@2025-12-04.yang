@@ -57,7 +57,7 @@ module ietf-netconf-server {
     "This module contains a collection of YANG definitions
      for configuring NETCONF servers.
 
-     Copyright (c) 2024 IETF Trust and the persons identified
+     Copyright (c) 2025 IETF Trust and the persons identified
      as authors of the code. All rights reserved.
 
      Redistribution and use in source and binary forms, with
@@ -78,11 +78,11 @@ module ietf-netconf-server {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2024-08-14 {
+  revision 2025-12-04 {
     description
       "Initial version";
     reference
-      "RFC HHHH: NETCONF Client and Server Models";
+      "RFC HHHH: A YANG Data Model for NETCONF Clients and Server";
   }
 
   // Features
@@ -142,7 +142,7 @@ module ietf-netconf-server {
 
   grouping netconf-server-grouping {
     description
-      "A reusable grouping for configuring a NETCONF server
+      "A grouping for configuring a NETCONF server
        without any consideration for how underlying transport
        sessions are established.
 
@@ -184,7 +184,7 @@ module ietf-netconf-server {
              when the 'cert-to-name' mapping is independent of
              fingerprint matching.  A 'cert-to-name' having no
              fingerprint value will match any client certificate
-             and therefore should only be present at the end of
+             and therefore SHOULD only be present at the end of
              the user-ordered 'cert-to-name' list.";
         }
       }
@@ -193,7 +193,7 @@ module ietf-netconf-server {
 
   grouping netconf-server-listen-stack-grouping {
     description
-      "A reusable grouping for configuring a NETCONF server
+      "A grouping for configuring a NETCONF server
        'listen' protocol stack for listening on a single port.";
     choice transport {
       mandatory true;
@@ -315,7 +315,7 @@ module ietf-netconf-server {
 
   grouping netconf-server-callhome-stack-grouping {
     description
-      "A reusable grouping for configuring a NETCONF server
+      "A grouping for configuring a NETCONF server
        'call-home' protocol stack, for a single outbound
        connection.";
     choice transport {
@@ -438,7 +438,7 @@ module ietf-netconf-server {
 
   grouping netconf-server-app-grouping {
     description
-      "A reusable grouping for configuring a NETCONF server
+      "A grouping for configuring a NETCONF server
        application that supports both 'listen' and 'call-home'
        protocol stacks for a multiplicity of connections.";
     container listen {
@@ -625,26 +625,26 @@ module ietf-netconf-server {
             type enumeration {
               enum first-listed {
                 description
-                  "Indicates that reconnections should start with
+                  "Indicates that reconnections SHOULD start with
                    the first endpoint listed.";
               }
               enum last-connected {
                 description
-                  "Indicates that reconnections should start with
+                  "Indicates that reconnections SHOULD start with
                    the endpoint last connected to, if known.  If
                    no previous connection is known, then the
                    first endpoint configured is used.";
               }
               enum random-selection {
                 description
-                  "Indicates that reconnections should start with
+                  "Indicates that reconnections SHOULD start with
                    a random endpoint.";
               }
             }
             default "first-listed";
             description
               "Specifies which of the NETCONF client's endpoints
-               the NETCONF server should start with when trying
+               the NETCONF server SHOULD start with when trying
                to connect to the NETCONF client.";
           }
           leaf max-wait {
