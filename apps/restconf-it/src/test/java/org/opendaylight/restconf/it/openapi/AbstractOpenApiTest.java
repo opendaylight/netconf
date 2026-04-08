@@ -80,6 +80,9 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.it.server.NullAAAEncryptionService;
 import org.opendaylight.restconf.it.server.TestRequestCallback;
 import org.opendaylight.restconf.it.server.TestTransportChannelListener;
+import org.opendaylight.restconf.openapi.impl.MountPointOpenApiGeneratorRFC8040;
+import org.opendaylight.restconf.openapi.impl.OpenApiGeneratorRFC8040;
+import org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl;
 import org.opendaylight.restconf.openapi.netty.OpenApiResourceProvider;
 import org.opendaylight.restconf.server.AAAShiroPrincipalService;
 import org.opendaylight.restconf.server.MessageEncoding;
@@ -90,8 +93,8 @@ import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.HttpServerListenStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.listen.stack.grouping.Transport;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260402.HttpServerListenStackGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260402.http.server.listen.stack.grouping.Transport;
 import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecServices;
 import org.opendaylight.yangtools.dagger.yang.parser.DaggerDefaultYangParserComponent;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -234,19 +237,12 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
         final var openApiSchemaService = new FixedDOMSchemaService(openApiSchemaContext);
 
         // OpenApi
+        final var mountPointOpenApiGeneratorRFC8040 = new MountPointOpenApiGeneratorRFC8040(openApiSchemaService,
+            domMountPointService);
         // FIXME use constructor that has NettyEndpoint as parameter when we migrate to Netty in the future.
-        final var openApiResourceProvider = new OpenApiResourceProvider(openApiSchemaService, domMountPointService,
-            new OpenApiResourceProvider.Configuration() {
-                @Override
-                public String api$_$root$_$path() {
-                    return RESTS;
-                }
-
-                @Override
-                public Class<OpenApiResourceProvider.Configuration> annotationType() {
-                    return OpenApiResourceProvider.Configuration.class;
-                }
-            });
+        final var openApiService = new OpenApiServiceImpl(mountPointOpenApiGeneratorRFC8040,
+            new OpenApiGeneratorRFC8040(openApiSchemaService));
+        final var openApiResourceProvider = new OpenApiResourceProvider(openApiService);
         endpoint.registerWebResource(openApiResourceProvider);
     }
 

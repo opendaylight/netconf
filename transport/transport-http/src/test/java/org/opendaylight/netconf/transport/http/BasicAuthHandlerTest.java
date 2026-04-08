@@ -27,14 +27,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.crypt.hash.rev140806.CryptHash;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.HttpServerGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.grouping.ClientAuthentication;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.grouping.ClientAuthenticationBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.grouping.ProtocolVersions;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.grouping.SupportedVersions;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.grouping.client.authentication.users.UserBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.grouping.client.authentication.users.user.auth.type.basic.BasicBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.grouping.client.authentication.users.user.auth.type.basic.basic.PasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260402.HttpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260402.http.server.grouping.ClientAuthentication;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260402.http.server.grouping.ClientAuthenticationBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260402.http.server.grouping.ProtocolVersions;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260402.http.server.grouping.SupportedVersions;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260402.http.server.grouping.client.authentication.users.UserBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260402.http.server.grouping.client.authentication.users.user.auth.type.basic.BasicBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260402.http.server.grouping.client.authentication.users.user.auth.type.basic.basic.PasswordBuilder;
 import org.opendaylight.yangtools.binding.util.BindingMap;
 
 class BasicAuthHandlerTest {
@@ -63,7 +63,7 @@ class BasicAuthHandlerTest {
             public ClientAuthentication getClientAuthentication() {
                 final var user1 = new UserBuilder()
                     .setUserId(USERNAME1)
-                    .setAuthType(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204
+                    .setAuthType(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260402
                             .http.server.grouping.client.authentication.users.user.auth.type.BasicBuilder()
                         .setBasic(new BasicBuilder()
                             .setUsername(USERNAME1)
@@ -75,7 +75,7 @@ class BasicAuthHandlerTest {
                     .build();
                 final var user2 = new UserBuilder()
                     .setUserId(USERNAME2)
-                    .setAuthType(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204
+                    .setAuthType(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260402
                             .http.server.grouping.client.authentication.users.user.auth.type.BasicBuilder()
                         .setBasic(new BasicBuilder()
                             .setUsername(USERNAME2)
@@ -87,7 +87,7 @@ class BasicAuthHandlerTest {
                     .build();
 
                 return new ClientAuthenticationBuilder()
-                    .setUsers(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204
+                    .setUsers(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260402
                         .http.server.grouping.client.authentication.UsersBuilder()
                         .setUser(BindingMap.of(user1, user2)).build()).build();
             }
