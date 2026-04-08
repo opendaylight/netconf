@@ -50,6 +50,7 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
 import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.client.auth.password.PasswordIdentityProvider;
+import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.netconf.transport.api.TransportChannel;
@@ -301,11 +302,14 @@ class NetconfClientFactoryImplTest {
 
     @Test
     void sshClientWithConfigurator() throws Exception {
-        final ServerFactoryManagerConfigurator serverConfigurator = factoryManager -> {
-            factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
-            factoryManager.setPasswordAuthenticator(
-                (usr, psw, session) -> USERNAME.equals(usr) && PASSWORD.equals(psw));
-            factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
+        final var serverConfigurator = new ServerFactoryManagerConfigurator() {
+            @Override
+            protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
+                factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+                factoryManager.setPasswordAuthenticator(
+                    (usr, psw, session) -> USERNAME.equals(usr) && PASSWORD.equals(psw));
+                factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
+            }
         };
         final var clientConfigurator = new ClientFactoryManagerConfigurator() {
             @Override

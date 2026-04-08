@@ -47,6 +47,7 @@ import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyPairProvider;
+import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.PasswordAuthenticator;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.PublickeyAuthenticator;
@@ -54,6 +55,7 @@ import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.UserAuthPublicKey
 import org.opendaylight.netconf.topology.callhome.CallHomeSshAuthSettings.DefaultAuthSettings;
 import org.opendaylight.netconf.transport.ssh.SSHServer;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
+import org.opendaylight.netconf.transport.ssh.ServerFactoryManagerConfigurator;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
@@ -161,32 +163,41 @@ class CallHomeSshServerTest {
 
         try {
             // client 1: rejected due to public key is not identified
-            client1 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams,
-                null, factoryMgr -> {
-                    factoryMgr.setKeyPairProvider(KeyPairProvider.wrap(client1Keys));
-                    factoryMgr.setPasswordAuthenticator(passwordAuthenticator);
-                    factoryMgr.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+            client1 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams, null,
+                new ServerFactoryManagerConfigurator() {
+                    @Override
+                    protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
+                        factoryManager.setKeyPairProvider(KeyPairProvider.wrap(client1Keys));
+                        factoryManager.setPasswordAuthenticator(passwordAuthenticator);
+                        factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+                    }
                 }).get(TIMEOUT, TimeUnit.MILLISECONDS);
             // verify unknown key reported
             verify(statusRecorder, timeout(TIMEOUT).times(1))
                 .reportUnknown(any(InetSocketAddress.class), eq(client1Keys.getPublic()));
 
             // client 2: rejected due to auth failure (wrong password)
-            client2 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams,
-                null, factoryMgr -> {
-                    factoryMgr.setKeyPairProvider(KeyPairProvider.wrap(client2Keys));
-                    factoryMgr.setPasswordAuthenticator(passwordAuthenticator);
-                    factoryMgr.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+            client2 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams, null,
+                new ServerFactoryManagerConfigurator() {
+                    @Override
+                    protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
+                        factoryManager.setKeyPairProvider(KeyPairProvider.wrap(client2Keys));
+                        factoryManager.setPasswordAuthenticator(passwordAuthenticator);
+                        factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+                    }
                 }).get(TIMEOUT, TimeUnit.MILLISECONDS);
             // verify auth failure reported for known key
             verify(statusRecorder, timeout(TIMEOUT).times(1)).reportFailedAuth("client2-id");
 
             // client 3: success with password auth
-            client3 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams,
-                null, factoryMgr -> {
-                    factoryMgr.setKeyPairProvider(KeyPairProvider.wrap(client3Keys));
-                    factoryMgr.setPasswordAuthenticator(passwordAuthenticator);
-                    factoryMgr.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+            client3 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams, null,
+                new ServerFactoryManagerConfigurator() {
+                    @Override
+                    protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
+                        factoryManager.setKeyPairProvider(KeyPairProvider.wrap(client3Keys));
+                        factoryManager.setPasswordAuthenticator(passwordAuthenticator);
+                        factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+                    }
                 }).get(TIMEOUT, TimeUnit.MILLISECONDS);
             // verify netconf sessions established
             verify(clientSessionListener, timeout(TIMEOUT).times(1)).onSessionUp(any(NetconfClientSession.class));
@@ -194,13 +205,16 @@ class CallHomeSshServerTest {
             verify(statusRecorder, times(1)).reportSuccess("client3-id");
 
             // client 4: success with public key auth
-            client4 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams,
-                null, factoryMgr -> {
-                    factoryMgr.setKeyPairProvider(KeyPairProvider.wrap(client4Keys));
-                    final var pkFactory = new UserAuthPublicKeyFactory();
-                    pkFactory.setSignatureFactories(factoryMgr.getSignatureFactories());
-                    factoryMgr.setPublickeyAuthenticator(publicKeyAuthenticator);
-                    factoryMgr.setUserAuthFactories(List.of(pkFactory));
+            client4 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams, null,
+                new ServerFactoryManagerConfigurator() {
+                    @Override
+                    protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
+                        factoryManager.setKeyPairProvider(KeyPairProvider.wrap(client4Keys));
+                        final var pkFactory = new UserAuthPublicKeyFactory();
+                        pkFactory.setSignatureFactories(factoryManager.getSignatureFactories());
+                        factoryManager.setPublickeyAuthenticator(publicKeyAuthenticator);
+                        factoryManager.setUserAuthFactories(List.of(pkFactory));
+                    }
                 }).get(TIMEOUT, TimeUnit.MILLISECONDS);
             // verify netconf sessions established
             verify(clientSessionListener, timeout(TIMEOUT).times(2)).onSessionUp(any(NetconfClientSession.class));

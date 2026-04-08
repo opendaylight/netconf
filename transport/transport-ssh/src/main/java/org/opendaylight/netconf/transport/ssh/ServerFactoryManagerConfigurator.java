@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 
@@ -15,14 +15,14 @@ import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
  * Extension interface allowing one to customize {@link ServerFactoryManager} before it is used to create the
  * {@link SSHServer} instance.
  */
-@FunctionalInterface
-public interface ServerFactoryManagerConfigurator {
+@NonNullByDefault
+public abstract class ServerFactoryManagerConfigurator {
     /**
      * Apply custom configuration.
      *
      * @param factoryManager server factory manager instance
      * @throws UnsupportedConfigurationException if the configuration is not acceptable
      */
-    void configureServerFactoryManager(@NonNull ServerFactoryManager factoryManager)
+    protected abstract void configureServerFactoryManager(ServerFactoryManager factoryManager)
         throws UnsupportedConfigurationException;
 }

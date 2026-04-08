@@ -38,6 +38,7 @@ import org.opendaylight.netconf.server.api.monitoring.YangModuleCapability;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
+import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.server.auth.UserAuthFactory;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.UserAuthPublicKeyFactory;
@@ -221,19 +222,22 @@ public class NetconfDeviceSimulator implements Closeable {
             final Configuration configuration) {
         final var authProvider = configuration.getAuthProvider();
         final var publicKeyAuthenticator = configuration.getPublickeyAuthenticator();
-        return factoryManager -> {
-            final var authFactoriesListBuilder = ImmutableList.<UserAuthFactory>builder();
-            authFactoriesListBuilder.add(new UserAuthPasswordFactory());
-            factoryManager.setPasswordAuthenticator(
-                (usr, pass, session) -> authProvider.authenticated(usr, pass));
-            if (publicKeyAuthenticator != null) {
-                final var factory = new UserAuthPublicKeyFactory();
-                factory.setSignatureFactories(factoryManager.getSignatureFactories());
-                authFactoriesListBuilder.add(factory);
-                factoryManager.setPublickeyAuthenticator(publicKeyAuthenticator);
+        return new ServerFactoryManagerConfigurator() {
+            @Override
+            protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
+                final var authFactoriesListBuilder = ImmutableList.<UserAuthFactory>builder();
+                authFactoriesListBuilder.add(new UserAuthPasswordFactory());
+                factoryManager.setPasswordAuthenticator(
+                    (usr, pass, session) -> authProvider.authenticated(usr, pass));
+                if (publicKeyAuthenticator != null) {
+                    final var factory = new UserAuthPublicKeyFactory();
+                    factory.setSignatureFactories(factoryManager.getSignatureFactories());
+                    authFactoriesListBuilder.add(factory);
+                    factoryManager.setPublickeyAuthenticator(publicKeyAuthenticator);
+                }
+                factoryManager.setUserAuthFactories(authFactoriesListBuilder.build());
+                factoryManager.setKeyPairProvider(new VirtualKeyPairProvider());
             }
-            factoryManager.setUserAuthFactories(authFactoriesListBuilder.build());
-            factoryManager.setKeyPairProvider(new VirtualKeyPairProvider());
         };
     }
 
