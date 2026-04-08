@@ -1,0 +1,52 @@
+module odl-http-server {
+  yang-version 1.1;
+  namespace "urn:opendaylight:yang:http:server";
+  prefix "ohs";
+
+  description
+    "OpenDaylight configuration model for HTTP servers.
+
+     Copyright (c) 2026 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+
+     This program and the accompanying materials are made available under the
+     terms of the Eclipse Public License v1.0 which accompanies this distribution,
+     and is available at http://www.eclipse.org/legal/epl-v10.html";
+
+  revision "2026-04-15" {
+    description "Initial revision";
+  }
+
+  import ietf-http-server {
+    prefix https;
+  }
+
+  import odl-codegen-extensions {
+    prefix oce;
+  }
+
+  import odl-quic-common {
+    prefix oqc;
+  }
+
+  grouping http3-server-grouping {
+    uses https:http-server-listen-stack-grouping {
+      augment transport/http-over-quic {
+        if-feature https:quic-supported;
+
+        oce:augment-identifier quic-under-http;
+
+        // FIXME: should be in ietf-http-server in some shape or form
+        // must 'tls-versions/min and tls-versions/min != tlscmn:tls12' {
+        //   error-message
+        //    "QUIC requires that TLS 1.3 (or later) is used.";
+        //}
+
+        container quic-server-parameters {
+          description
+            "QUIC-level server parameters.";
+          uses oqc:transport-params-grouping;
+        }
+      }
+    }
+  }
+}
