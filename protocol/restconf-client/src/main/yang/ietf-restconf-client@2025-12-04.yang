@@ -33,7 +33,7 @@ module ietf-restconf-client {
     "This module contains a collection of YANG definitions
      for configuring RESTCONF clients.
 
-     Copyright (c) 2024 IETF Trust and the persons identified
+     Copyright (c) 2025 IETF Trust and the persons identified
      as authors of the code. All rights reserved.
 
      Redistribution and use in source and binary forms, with
@@ -54,43 +54,39 @@ module ietf-restconf-client {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2024-08-14 {
+  revision 2025-12-04 {
     description
       "Initial version";
     reference
-      "RFC IIII: RESTCONF Client and Server Models";
+      "RFC IIII: A YANG Data Model for RESTCONF Clients and Server";
   }
 
   // Features
 
-  feature https-initiate {
+  feature initiate {
     description
-      "The 'https-initiate' feature indicates that the RESTCONF
-       client supports initiating HTTPS connections to RESTCONF
-       servers. This feature exists as HTTPS might not be a
-       mandatory to implement transport in the future.";
+      "The 'initiate' feature indicates that the RESTCONF
+       client supports initiating connections to RESTCONF
+       servers.";
     reference
       "RFC 8040: RESTCONF Protocol";
   }
 
-  feature http-listen {
+  feature listen {
     description
-      "The 'http-listen' feature indicates that the RESTCONF client
-       supports opening a port to listen for incoming RESTCONF
-       server call-home connections using HTTP.  This feature
-       exists as not all RESTCONF clients may support RESTCONF
-       call home.";
+      "The 'listen' feature indicates that the RESTCONF client
+       supports listening for incoming RESTCONF server call-home
+       connections.";
     reference
       "RFC 8071: NETCONF Call Home and RESTCONF Call Home";
   }
 
-  feature https-listen {
+  feature tcp-listen {
+    if-feature listen;
     description
-      "The 'https-listen' feature indicates that the RESTCONF client
-       supports opening a port to listen for incoming RESTCONF
-       server call-home connections using HTTPS.  This feature
-       exists as not all RESTCONF clients may support RESTCONF
-       call home.";
+      "The 'tcp-listen' feature indicates that the RESTCONF client
+       supports listening for incoming RESTCONF server call-home
+       connections over TCP (e.g., HTTP/1 or HTTP/2).";
     reference
       "RFC 8071: NETCONF Call Home and RESTCONF Call Home";
   }
@@ -107,47 +103,91 @@ module ietf-restconf-client {
        the top-level 'restconf-client' node.";
   }
 
+  feature foo {
+    description
+      "This is an internal feature used only to create a
+       logical fallacy to remove unwanted nodes from the
+       'ietf-http-client' grouping.";
+  }
+
   // Groupings
+
+  grouping restconf-client-grouping {
+    description
+      "A grouping for configuring a RESTCONF client without any
+       consideration for how underlying transport sessions are
+       established.
+
+       As no RESTCONF-specific client configuration needs to be
+       set, this node is empty, but retained for clarity and for
+       consistency with other 'client-server' models.";
+  }
+
 
   grouping restconf-client-initiate-stack-grouping {
     description
-      "A reusable grouping for configuring a RESTCONF client
+      "A grouping for configuring a RESTCONF client
        'initiate' protocol stack for a single outbound connection.";
     container http-client-parameters {
       description
-        "HTTP-level client parameters to listen
-         for RESTCONF over HTTPS connections.";
-      uses httpc:http-client-grouping;
+        "HTTP-level client parameters.";
+      uses httpc:http-client-grouping {
+        refine "uri/scheme" {
+          must '. = "https"';
+          description
+            "RFC 8040 requires the 'https' scheme.";
+        }
+        refine 'uri/path' {
+          if-feature "foo and not foo"; // logically impossible
+          description
+            "The 'path' component of the URI does not make
+             sense to configure for a RESTCONF client.";
+        }
+        refine 'uri/query' {
+          if-feature "foo and not foo"; // logically impossible
+          description
+            "The 'query' component of the URI does not make
+             sense to configure for a RESTCONF client.";
+        }
+        refine 'uri/fragment' {
+          if-feature "foo and not foo"; // logically impossible
+          description
+            "The 'fragment' component of the URI does not make
+             sense to configure for a RESTCONF client.";
+        }
+      }
     }
+    container restconf-client-parameters {
+      description
+        "RESTCONF-level client parameters to initiate
+         a RESTCONF over HTTP connection.";
+      uses rcc:restconf-client-grouping;
+    }
+
   } // restconf-client-initiate-stack-grouping
+
 
   grouping restconf-client-listen-stack-grouping {
     description
-      "A reusable grouping for configuring a RESTCONF client
-       'listen' protocol stack for listening on a single port.  The
-       'listen' stack supports call home connections, as
-       described in RFC 8071";
+      "A grouping for configuring a RESTCONF client to listen
+       to a port for call home connections, as described in
+       RFC 8071.";
     reference
       "RFC 8071: NETCONF Call Home and RESTCONF Call Home";
     choice transport {
       mandatory true;
       description
         "Selects between available transports.";
-      case http {
-        if-feature "http-listen";
-        container http {
+      case tcp {
+        if-feature "tcp-listen";
+        container tcp {
           description
-            "TCP, HTTP, and RESTCONF configuration to
-             listen for RESTCONF over HTTPS connections.
-
-             This transport option is made available to support
-             deployments where the TLS connections are terminated
-             by another system (e.g., a load balancer) fronting
-             the client.";
+            "Configures the client to open a TCP port to listen for
+             TCP-client connections, i.e., RESTCONF-server call home
+             connections.";
           container tcp-server-parameters {
             description
-              "TCP-level server parameters to listen for
-               RESTCONF over HTTP connections.";
+              "TCP-level server parameters.";
             uses tcps:tcp-server-grouping {
               refine "local-bind/local-port" {
                 default "4336";
@@ -160,50 +200,58 @@ module ietf-restconf-client {
           }
           container http-client-parameters {
             description
-              "HTTP-level client parameters to listen for
-               RESTCONF over HTTP connections.";
-            uses httpc:http-client-grouping;
-          }
-        }
-      }
-      case https {
-        if-feature "https-listen";
-        container https {
-          description
-            "TCP, TLS, HTTP, and RESTCONF configuration to
-             listen for RESTCONF over HTTPS connections.";
-          container tcp-server-parameters {
-            description
-              "TCP-level server parameters to listen
-               for RESTCONF over HTTPS connections.";
-            uses tcps:tcp-server-grouping {
-              refine "local-bind/local-port" {
-                default "4336";
+              "HTTP-level client parameters.";
+            uses httpc:http-client-grouping {
+              refine "uri/scheme" {
+                must '. = "https"';
                 description
-                  "The RESTCONF client will listen on the IANA-
-                   assigned well-known port for 'restconf-ch-tls'
-                   (4336) if no value is specified.";
+                  "RFC 8040 requires the 'https' scheme.";
+              }
+              refine 'uri/authority/port' {
+                if-feature "foo and not foo"; // logically impossible
+                description
+                  "The authority's 'port' component of the URI does
+                   not make sense to configure for a RESTCONF client
+                   listening for a call home connections.";
+              }
+              refine 'uri/path' {
+                if-feature "foo and not foo"; // logically impossible
+                description
+                  "The 'path' component of the URI does not make
+                   sense to configure for a RESTCONF client.";
+              }
+              refine 'uri/query' {
+                if-feature "foo and not foo"; // logically impossible
+                description
+                  "The 'query' component of the URI does not make
+                   sense to configure for a RESTCONF client.";
+              }
+              refine 'uri/fragment' {
+                if-feature "foo and not foo"; // logically impossible
+                description
+                  "The 'fragment' component of the URI does not make
+                   sense to configure for a RESTCONF client.";
               }
             }
           }
-          container http-client-parameters {
+          container restconf-client-parameters {
             description
-              "HTTP-level client parameters to listen
-               for RESTCONF over HTTPS connections.";
-            uses httpc:http-client-grouping;
+              "RESTCONF-level client parameters.";
+            uses rcc:restconf-client-grouping;
           }
         }
       }
     }
   } // restconf-client-listen-stack-grouping
 
+
   grouping restconf-client-app-grouping {
     description
-      "A reusable grouping for configuring a RESTCONF client
+      "A grouping for configuring a RESTCONF client
        application that supports both 'initiate' and 'listen'
        protocol stacks for a multiplicity of connections.";
     container initiate {
-      if-feature "https-initiate";
+      if-feature "initiate";
       presence
         "Indicates that client-initiated connections have been
          configured.  This statement is present so the mandatory
@@ -312,7 +360,7 @@ module ietf-restconf-client {
                      multiple interval from the anchor time.
 
                      If an 'anchor-time' is not provided, then the
-                     server may implicitly set it to the time when
+                     server MAY implicitly set it to the time when
                      this configuraton is applied (e.g., on boot).
 
                      For example, for an anchor time is 15 minutes
@@ -334,9 +382,9 @@ module ietf-restconf-client {
                      because it is idle.";
                 }
               }
-            } // periodic-connection
-          } // connection-type
-        } // connection-type
+            }
+          }
+        }
         container reconnect-strategy {
           description
             "The reconnection strategy directs how a RESTCONF
@@ -351,26 +399,26 @@ module ietf-restconf-client {
             type enumeration {
               enum first-listed {
                 description
-                  "Indicates that reconnections should start
+                  "Indicates that reconnections SHOULD start
                    with the first endpoint listed.";
               }
               enum last-connected {
                 description
-                  "Indicates that reconnections should start with
+                  "Indicates that reconnections SHOULD start with
                    the endpoint last connected to, if known.  If
                    no previous connection is known, then the
                    first endpoint configured is used.";
               }
               enum random-selection {
                 description
-                  "Indicates that reconnections should start with
+                  "Indicates that reconnections SHOULD start with
                    a random endpoint.";
               }
             }
             default "first-listed";
             description
               "Specifies which of the RESTCONF server's
-               endpoints the RESTCONF client should start
+               endpoints the RESTCONF client SHOULD start
                with when trying to connect to the RESTCONF
                server.";
           }
@@ -401,7 +449,7 @@ module ietf-restconf-client {
     } // initiate
 
     container listen {
-      if-feature "http-listen or https-listen";
+      if-feature listen;
       presence
         "Indicates that client-listening ports have been configured.
          This statement is present so the mandatory descendant nodes
@@ -411,7 +459,7 @@ module ietf-restconf-client {
       leaf idle-timeout {
         type uint16;
         units "seconds";
-        default "180"; // three minutes
+        default "180";
         description
           "Specifies the maximum number of seconds that an
            underlying TCP session may remain idle. A TCP session
@@ -439,6 +487,7 @@ module ietf-restconf-client {
     } // listen
   } // restconf-client-app-grouping
 
+
   // Protocol accessible node for servers that implement this module.
   container restconf-client {
     if-feature central-restconf-client-supported;
@@ -446,4 +495,5 @@ module ietf-restconf-client {
     description
       "Top-level container for RESTCONF client configuration.";
   }
+
 }
