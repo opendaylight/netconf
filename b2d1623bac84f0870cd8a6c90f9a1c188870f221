@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d575aa1e_a4695e1d",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/AlgorithmPolicy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-04-08T08:08:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8948beb7_e759f75a",
+      "range": {
+        "startLine": 65,
+        "startChar": 4,
+        "endLine": 65,
+        "endChar": 31
+      },
+      "revId": "b2d1623bac84f0870cd8a6c90f9a1c188870f221",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d777c553_2f09a940",
@@ -49,6 +73,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "10e77fb3_29fa7b2e",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/AlgorithmPolicy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-04-08T08:08:36Z",
+      "side": 1,
+      "message": "true, but the maps are not really big and have fixed size.\n\nAlternative could be using bimap, that would require some refactor, but shouldn\u0027t be a problem.",
+      "parentUuid": "d777c553_2f09a940",
+      "range": {
+        "startLine": 66,
+        "startChar": 31,
+        "endLine": 66,
+        "endChar": 53
+      },
+      "revId": "b2d1623bac84f0870cd8a6c90f9a1c188870f221",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "55733a8e_d5556460",
         "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/MacPolicy.java",
         "patchSetId": 6
@@ -60,6 +108,30 @@
       "writtenOn": "2026-04-07T11:41:47Z",
       "side": 1,
       "message": "magic string: where does it come from?",
+      "range": {
+        "startLine": 77,
+        "startChar": 24,
+        "endLine": 77,
+        "endChar": 28
+      },
+      "revId": "b2d1623bac84f0870cd8a6c90f9a1c188870f221",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa027e75_6981a170",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/MacPolicy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-04-08T08:08:36Z",
+      "side": 1,
+      "message": "Added better explanation",
+      "parentUuid": "55733a8e_d5556460",
       "range": {
         "startLine": 77,
         "startChar": 24,
