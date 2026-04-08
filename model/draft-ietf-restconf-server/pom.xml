@@ -59,5 +59,9 @@
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>transport-http</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>transport-udp</artifactId>
+        </dependency>
     </dependencies>
 </project>
