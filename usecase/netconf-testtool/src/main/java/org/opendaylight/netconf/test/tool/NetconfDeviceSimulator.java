@@ -226,7 +226,7 @@ public class NetconfDeviceSimulator implements Closeable {
             @Override
             protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
                 final var authFactoriesListBuilder = ImmutableList.<UserAuthFactory>builder();
-                authFactoriesListBuilder.add(new UserAuthPasswordFactory());
+                authFactoriesListBuilder.add(UserAuthPasswordFactory.INSTANCE);
                 factoryManager.setPasswordAuthenticator(
                     (usr, pass, session) -> authProvider.authenticated(usr, pass));
                 if (publicKeyAuthenticator != null) {

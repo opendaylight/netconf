@@ -169,7 +169,7 @@ class CallHomeSshServerTest {
                     protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
                         factoryManager.setKeyPairProvider(KeyPairProvider.wrap(client1Keys));
                         factoryManager.setPasswordAuthenticator(passwordAuthenticator);
-                        factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+                        factoryManager.setUserAuthFactories(List.of(UserAuthPasswordFactory.INSTANCE));
                     }
                 }).get(TIMEOUT, TimeUnit.MILLISECONDS);
             // verify unknown key reported
@@ -183,7 +183,7 @@ class CallHomeSshServerTest {
                     protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
                         factoryManager.setKeyPairProvider(KeyPairProvider.wrap(client2Keys));
                         factoryManager.setPasswordAuthenticator(passwordAuthenticator);
-                        factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+                        factoryManager.setUserAuthFactories(List.of(UserAuthPasswordFactory.INSTANCE));
                     }
                 }).get(TIMEOUT, TimeUnit.MILLISECONDS);
             // verify auth failure reported for known key
@@ -196,7 +196,7 @@ class CallHomeSshServerTest {
                     protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
                         factoryManager.setKeyPairProvider(KeyPairProvider.wrap(client3Keys));
                         factoryManager.setPasswordAuthenticator(passwordAuthenticator);
-                        factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+                        factoryManager.setUserAuthFactories(List.of(UserAuthPasswordFactory.INSTANCE));
                     }
                 }).get(TIMEOUT, TimeUnit.MILLISECONDS);
             // verify netconf sessions established

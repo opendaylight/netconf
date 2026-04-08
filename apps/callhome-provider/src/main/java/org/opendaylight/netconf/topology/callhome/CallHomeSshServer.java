@@ -98,7 +98,7 @@ public final class CallHomeSshServer implements AutoCloseable {
                 factoryManager.addSessionListener(createSessionListener());
                 // supported auth factories
                 factoryManager.setUserAuthFactories(List.of(
-                    new UserAuthPasswordFactory(),
+                    UserAuthPasswordFactory.INSTANCE,
                     new UserAuthPublicKeyFactory()));
             }
         };

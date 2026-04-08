@@ -270,7 +270,7 @@ class SshClientServerTest extends AbstractClientServerTest {
             @Override
             protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
                 // authenticate user by credentials and generate host key
-                factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+                factoryManager.setUserAuthFactories(List.of(UserAuthPasswordFactory.INSTANCE));
                 factoryManager.setPasswordAuthenticator(
                     (usr, psw, session) -> username.equals(usr) && PASSWORD.equals(psw));
                 factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());

@@ -305,7 +305,7 @@ class NetconfClientFactoryImplTest {
         final var serverConfigurator = new ServerFactoryManagerConfigurator() {
             @Override
             protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
-                factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+                factoryManager.setUserAuthFactories(List.of(UserAuthPasswordFactory.INSTANCE));
                 factoryManager.setPasswordAuthenticator(
                     (usr, psw, session) -> USERNAME.equals(usr) && PASSWORD.equals(psw));
                 factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
