@@ -22,6 +22,30 @@
       },
       "revId": "82c6623e74fd9ccc484981618ee97b11d6413865",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e510577_46e13be2",
+        "filename": "protocol/netconf-client/pom.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-04-08T11:54:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbc8de62_74fed2b4",
+      "range": {
+        "startLine": 188,
+        "startChar": 19,
+        "endLine": 188,
+        "endChar": 27
+      },
+      "revId": "82c6623e74fd9ccc484981618ee97b11d6413865",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
