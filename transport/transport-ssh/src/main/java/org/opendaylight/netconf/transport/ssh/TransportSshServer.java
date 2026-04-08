@@ -240,7 +240,7 @@ final class TransportSshServer extends SshServer {
                 final var authFactoriesBuilder = ImmutableList.<UserAuthFactory>builder();
                 final var passwordMap = passwordMapBuilder.build();
                 if (!passwordMap.isEmpty()) {
-                    authFactoriesBuilder.add(new UserAuthPasswordFactory());
+                    authFactoriesBuilder.add(UserAuthPasswordFactory.INSTANCE);
                     server.setPasswordAuthenticator(new CryptHashPasswordAuthenticator(passwordMap));
                 }
                 final var hostBasedMap = hostBasedMapBuilder.build();

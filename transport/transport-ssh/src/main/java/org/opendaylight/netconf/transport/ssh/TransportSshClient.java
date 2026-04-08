@@ -204,7 +204,7 @@ final class TransportSshClient extends SshClient {
                 if (password.getPasswordType() instanceof CleartextPassword clearTextPassword) {
                     client.setPasswordIdentityProvider(
                             PasswordIdentityProvider.wrapPasswords(clearTextPassword.requireCleartextPassword()));
-                    authFactoriesListBuilder.add(new UserAuthPasswordFactory());
+                    authFactoriesListBuilder.add(UserAuthPasswordFactory.INSTANCE);
                 }
                 // TODO support encrypted password -- requires augmentation of default schema
             }
