@@ -50,6 +50,7 @@ import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.client.auth.password.PasswordIdentityProvider;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
+import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.netconf.shaded.sshd.server.session.ServerSession;
@@ -265,12 +266,15 @@ class SshClientServerTest extends AbstractClientServerTest {
     }
 
     private static ServerFactoryManagerConfigurator serverConfigurator(final String username) {
-        return factoryManager -> {
-            // authenticate user by credentials and generate host key
-            factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
-            factoryManager.setPasswordAuthenticator(
-                (usr, psw, session) -> username.equals(usr) && PASSWORD.equals(psw));
-            factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
+        return new ServerFactoryManagerConfigurator() {
+            @Override
+            protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
+                // authenticate user by credentials and generate host key
+                factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+                factoryManager.setPasswordAuthenticator(
+                    (usr, psw, session) -> username.equals(usr) && PASSWORD.equals(psw));
+                factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
+            }
         };
     }
 
