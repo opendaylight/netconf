@@ -13,10 +13,12 @@ import java.util.concurrent.ExecutionException;
 import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.server.ServerTransportInitializer;
+import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.SSHServer;
+import org.opendaylight.netconf.transport.ssh.ServerFactoryManagerConfigurator;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.server.rev240814.netconf.server.listen.stack.grouping.transport.ssh.ssh.TcpServerParametersBuilder;
@@ -70,11 +72,14 @@ public final class SshServerTransport implements AutoCloseable {
             final AuthProvider authProvider, final TcpServerGrouping listenParams) {
         try {
             sshServer = factoryHolder.factory().listenServer(TransportConstants.SSH_SUBSYSTEM, initializer,
-                listenParams, null, factoryMgr -> {
-                    factoryMgr.setUserAuthFactories(List.of(UserAuthPasswordFactory.INSTANCE));
-                    factoryMgr.setPasswordAuthenticator(
-                        (username, password, session) -> authProvider.authenticated(username, password));
-                    factoryMgr.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
+                listenParams, null, new ServerFactoryManagerConfigurator() {
+                    @Override
+                    protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
+                        factoryManager.setUserAuthFactories(List.of(UserAuthPasswordFactory.INSTANCE));
+                        factoryManager.setPasswordAuthenticator(
+                            (username, password, session) -> authProvider.authenticated(username, password));
+                        factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
+                    }
                 })
                 .get();
         } catch (UnsupportedConfigurationException | ExecutionException | InterruptedException e) {
