@@ -85,6 +85,13 @@ module ietf-http-server {
       "RFC GGGG: YANG Groupings for HTTP Clients and HTTP Servers";
   }
 
+  revision 2026-04-02 {
+    description
+      "Added QUIC server parameters for HTTP/3 transport limits";
+    reference
+      "RFC GGGG: YANG Groupings for HTTP Clients and HTTP Servers";
+  }
+
   // Features
 
   feature client-auth-supported {
@@ -141,6 +148,21 @@ module ietf-http-server {
     description
       "Indicates that the server implements the discovery for
        which HTTP versions are supported for HTTP servers.";
+  }
+
+  typedef quic-varint {
+    type uint64 {
+      range "0..4611686018427387903";
+    }
+    description
+      "A QUIC transport parameter value encoded as a variable-
+      length integer.
+
+      The largest value allowed by QUIC variable-length integer
+      encoding is 2^62 - 1.";
+    reference
+      "RFC 9000: QUIC: A UDP-Based Multiplexed and
+      Secure Transport, Section 16";
   }
 
   // Groupings
@@ -352,9 +374,51 @@ module ietf-http-server {
               "HTTP-level server parameters.";
             uses http-server-grouping;
           }
+          container quic-server-parameters {
+            description
+              "QUIC-level server parameters used by HTTP/3.";
+            uses quic-server-grouping;
+          }
         }
       }
     }
   } // http-server-listen-stack-grouping
 
+  grouping quic-server-grouping {
+    description
+      "A grouping for QUIC-level server parameters used by HTTP/3.";
+    leaf initial-max-data {
+      type quic-varint;
+      default "4194304";
+      description
+        "The QUIC initial_max_data transport parameter used
+        by HTTP/3 to limit connection-level flow control.";
+      reference
+        "RFC 9000: QUIC: A UDP-Based Multiplexed and Secure
+        Transport, Section 18.2";
+    }
+    leaf initial-max-stream-data-bidi-remote {
+      type quic-varint;
+      default "262144";
+      description
+        "The QUIC initial_max_stream_data_bidi_remote
+        transport parameter used by HTTP/3 to limit flow
+        control for remotely initiated bidirectional
+        streams.";
+      reference
+        "RFC 9000: QUIC: A UDP-Based Multiplexed and Secure
+        Transport, Section 18.2";
+    }
+    leaf initial-max-streams-bidi {
+      type uint32;
+      default "100";
+      description
+        "The QUIC initial_max_streams_bidi transport
+        parameter used by HTTP/3 to limit the number of
+        bidirectional streams.";
+      reference
+        "RFC 9000: QUIC: A UDP-Based Multiplexed and Secure
+        Transport, Sections 4.6 and 18.2";
+    }
+  }
 }
