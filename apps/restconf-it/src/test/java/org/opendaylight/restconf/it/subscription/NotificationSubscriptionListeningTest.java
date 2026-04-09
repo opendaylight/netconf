@@ -50,7 +50,7 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
     private static TestEventStreamListener eventListener;
 
     @BeforeEach
-    void beforeEach() throws Exception {
+    protected void beforeEach() throws Exception {
         super.beforeEach();
         streamClient = startStreamClient();
 
