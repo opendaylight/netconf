@@ -55,9 +55,17 @@ module org.opendaylight.netconf.dagger {
     requires java.validation;
     requires javax.servlet.api;
     requires mdsal.dom.inmemory.datastore;
+    requires netconf.client;
+    requires netconf.client.mdsal;
+    requires netconf.topology;
+    requires netconf.topology.impl;
     requires org.opendaylight.mdsal.eos.dom.api;
     requires org.opendaylight.mdsal.eos.dom.simple;
     requires org.opendaylight.mdsal.singleton.impl;
+    requires org.opendaylight.netconf.common;
+    //  IDEA expect automatic name based on folder (requires keystore.legacy), however Maven expect automatic module
+    //  name from MANIFEST file.
+    requires org.opendaylight.netconf.keystore.legacy;
     //  IDEA expect automatic name based on folder (requires transport.http), however Maven expect automatic module name
     //  from MANIFEST file.
     requires org.opendaylight.netconf.transport.http;
