@@ -235,7 +235,7 @@ class MountPointE2ETest extends AbstractE2ETest {
                 }""", eventListener.readNext(), JSONCompareMode.LENIENT);
 
             // terminate stream
-            streamControl().close();
+            closeAllStreams();
             await().atMost(Duration.ofSeconds(1)).until(eventListener::ended);
 
         } finally {
