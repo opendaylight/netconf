@@ -106,9 +106,6 @@ class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
         if (clientStreamService != null) {
             clientStreamService = null;
         }
-        if (streamControl != null) {
-            streamControl = null;
-        }
         super.afterEach();
     }
 
