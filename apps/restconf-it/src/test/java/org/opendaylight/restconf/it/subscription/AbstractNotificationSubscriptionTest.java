@@ -150,6 +150,8 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
     private DOMRpcRouter domRpcRouter;
     private MdsalRestconfStreamRegistry streamRegistry;
 
+    private int port;
+
     @Override
     protected BindingRuntimeContext getRuntimeContext() {
         return RUNTIME_CONTEXT_CACHE.getUnchecked(getModuleInfos());
@@ -167,9 +169,9 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
     }
 
     @BeforeEach
-    void beforeEach() throws Exception {
+    protected void beforeEach() throws Exception {
         // transport configuration
-        final var port = randomBindablePort();
+        port = randomBindablePort();
         host = localAddress + ":" + port;
         final var serverTransport = HTTPServerOverTcp.of(localAddress, port);
         final var serverStackGrouping = new HttpServerListenStackGrouping() {
@@ -234,11 +236,7 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
             rpcImplementations);
 
         // Netty endpoint
-        final var configuration = new NettyEndpointConfiguration(
-            ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000), RESTCONF,
-            MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
-            WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS, HTTP3_INITIAL_MAX_DATA,
-            HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE, HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
+        final var configuration = createEndpointConfiguration(serverStackGrouping);
         endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory,
             configuration);
     }
@@ -264,6 +262,27 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
     static void afterAll() {
         bootstrapFactory.close();
         sshTransportStackFactory.close();
+    }
+
+    /**
+     * {@return the localAddress}
+     */
+    protected static String localAddress() {
+        return localAddress;
+    }
+
+    /**
+     * {@return the host}
+     */
+    protected final String host() {
+        return host;
+    }
+
+    /**
+     * {@return the port}
+     */
+    protected final int port() {
+        return port;
     }
 
     /**
@@ -368,6 +387,15 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
         } catch (IOException e) {
             throw new AssertionError(e);
         }
+    }
+
+    protected NettyEndpointConfiguration createEndpointConfiguration(
+            final HttpServerListenStackGrouping serverStackGrouping) {
+        return new NettyEndpointConfiguration(
+            ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000), RESTCONF,
+            MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
+            WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS, HTTP3_INITIAL_MAX_DATA,
+            HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE, HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
     }
 
     protected FullHttpResponse invokeRequestKeepClient(final HTTPClient streamHttpClient, final HttpMethod method,
