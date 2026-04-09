@@ -7,8 +7,10 @@
  */
 package org.opendaylight.netconf.dagger.restconf;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -37,6 +39,7 @@ class RestconfNettyEndpointTest {
     @Test
     void testCorrectlyInitializedServices() {
         assertNotNull(component.nettyEndpoint());
+        assertNotNull(component.netconfTopologyImpl());
     }
 
     @Test
@@ -57,6 +60,80 @@ class RestconfNettyEndpointTest {
             // Verify the server is correctly responding.
             final var status = response.statusCode();
             assertEquals(200, status, "Expected 200 from Netty, but got HTTP " + status);
+        }
+    }
+
+    @Test
+    void testNetconfDeviceMountAndTopologyIntegration() throws Exception {
+        // Initialize Dagger components.
+        assertNotNull(component.nettyEndpoint(), "NettyEndpoint should be initialized");
+        assertNotNull(component.netconfTopologyImpl(), "Netconf topology should be initialized");
+
+        // Create Java HTTP Client
+        try (var client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(3)).build()) {
+            // Send PUT request to create device.
+            final var jsonConfig = """
+                {
+                    "node": [
+                        {
+                            "node-id": "test-device",
+                            "netconf-node": {
+                                "netconf-node-topology:port": 17830,
+                                "netconf-node-topology:reconnect-on-changed-schema": false,
+                                "netconf-node-topology:connection-timeout-millis": 20000,
+                                "netconf-node-topology:tcp-only": false,
+                                "netconf-node-topology:max-connection-attempts": 3,
+                                "netconf-node-topology:login-password-unencrypted": {
+                                    "netconf-node-topology:username": "netconf",
+                                    "netconf-node-topology:password": "netconf"
+                                },
+                                "netconf-node-topology:host": "127.0.0.1",
+                                "netconf-node-topology:min-backoff-millis": 2000,
+                                "netconf-node-topology:max-backoff-millis": 1800000,
+                                "netconf-node-topology:backoff-multiplier": 1.5,
+                                "netconf-node-topology:keepalive-delay": 120
+                            }
+                        }
+                    ]
+                }
+                """;
+            final var configUri = URI.create("http://localhost:8182/restconf/data/network-topology:network-topology"
+                + "/topology=topology-netconf/node=test-device");
+            final var putRequest = HttpRequest.newBuilder()
+                .uri(configUri)
+                .header("Authorization", "Basic YWRtaW46YWRtaW4=")
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(jsonConfig))
+                .build();
+            final var putResponse = client.send(putRequest, HttpResponse.BodyHandlers.ofString());
+
+            // Verify the device configuration was successfully accepted.
+            final var putStatus = putResponse.statusCode();
+            assertEquals(201, putStatus, "Failed to configure device. Expected HTTP 201, got " + putStatus
+                + ". Body: " + putResponse.body());
+
+            // Get operational data.
+            final var operUri = URI.create("http://localhost:8182/restconf/data/network-topology:network-topology"
+                    + "/topology=topology-netconf/node=test-device?content=nonconfig");
+            final var getRequest = HttpRequest.newBuilder()
+                .uri(operUri)
+                .header("Authorization", "Basic YWRtaW46YWRtaW4=")
+                .header("Accept", "application/json")
+                .GET()
+                .build();
+
+            // Verify attempting to connect device.
+            await()
+                .atMost(Duration.ofSeconds(10))
+                .pollInterval(Duration.ofSeconds(1))
+                .untilAsserted(() -> {
+                    final var response = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
+
+                    assertEquals(200, response.statusCode(), "Waiting for operational state to appear...");
+                    assertTrue(response.body().contains("\"connection-status\":\"connecting\""),
+                        "Operational state found, but missing connection status");
+                });
         }
     }
 }

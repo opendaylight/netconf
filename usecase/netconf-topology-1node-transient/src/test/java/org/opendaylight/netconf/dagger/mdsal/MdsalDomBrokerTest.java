@@ -112,7 +112,7 @@ class MdsalDomBrokerTest {
         final var modelContext = component.modelContext();
         final var classPathModels = modelContext.getModules();
         assertThat(classPathModels)
-            .hasSize(44)
+            .hasSize(63)
             .extracting(ModuleLike::getSourceIdentifier)
             .extracting(SourceIdentifier::toYangFilename)
             .containsExactlyInAnyOrder(
@@ -159,7 +159,26 @@ class MdsalDomBrokerTest {
                 "ietf-truststore@2024-10-10.yang",
                 "ietf-udp-client@2025-12-16.yang",
                 "ietf-udp-server@2025-12-16.yang",
-                "ietf-x509-cert-to-name@2014-12-10.yang"
+                "ietf-x509-cert-to-name@2014-12-10.yang",
+                "iana-ssh-encryption-algs@2024-10-16.yang",
+                "iana-ssh-key-exchange-algs@2024-10-16.yang",
+                "iana-ssh-mac-algs@2024-10-16.yang",
+                "iana-ssh-public-key-algs@2024-10-16.yang",
+                "ietf-netconf-client@2025-12-04.yang",
+                "ietf-netconf-monitoring@2010-10-04.yang",
+                "ietf-netconf-notifications@2012-02-06.yang",
+                "ietf-ssh-client@2024-10-10.yang",
+                "ietf-ssh-common@2024-10-10.yang",
+                "ietf-ssh-server@2024-10-10.yang",
+                "nc-notifications@2008-07-14.yang",
+                "netconf-keystore@2024-07-08.yang",
+                "netconf-node-optional@2022-12-25.yang",
+                "netconf-node-topology@2025-12-05.yang",
+                "network-topology@2013-10-21.yang",
+                "notifications@2008-07-14.yang",
+                "odl-codegen-extensions@2024-06-27.yang",
+                "odl-netconf-device@2025-12-05.yang",
+                "yang-ext@2013-07-09.yang"
             );
     }
 
