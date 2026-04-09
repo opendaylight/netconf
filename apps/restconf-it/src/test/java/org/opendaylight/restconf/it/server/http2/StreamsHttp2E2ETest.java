@@ -65,8 +65,6 @@ class StreamsHttp2E2ETest extends AbstractHttp2E2ETest {
         assertTrue(status == HttpResponseStatus.OK.code() || status == HttpResponseStatus.CREATED.code());
     }
 
-    // FIXME: NETCONF-1590, disable replay and enable the test
-    @Disabled
     @Test
     void dataChangeEventStreamJsonTest() throws Exception {
         // Create data change notification stream
@@ -171,7 +169,7 @@ class StreamsHttp2E2ETest extends AbstractHttp2E2ETest {
     /**
      * Tests listening on multiple streams at same time with one client.
      */
-    // FIXME: NETCONF-1590, disable replay and enable the test
+    // FIXME: NETCONF-1590, fix and enable the test
     @Disabled
     @Test
     void listenMultipleStreams() throws Exception {
