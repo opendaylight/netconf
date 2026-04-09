@@ -12,6 +12,9 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.Uninterruptibles;
 import java.io.IOException;
 import java.net.URI;
@@ -19,12 +22,13 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -36,6 +40,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.netconf.databind.DatabindContext;
 import org.opendaylight.netconf.databind.DatabindProvider;
 import org.opendaylight.netconf.sal.remote.impl.DataTreeChangeSource;
 import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
@@ -43,7 +48,6 @@ import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
 import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.SkipNotificationDataParam;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
-import org.opendaylight.restconf.server.api.testlib.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -59,19 +63,28 @@ import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.P
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1Builder;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1Key;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$F;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$F;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.IetfSubscribedNotificationsData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subtree;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
+import org.opendaylight.yangtools.binding.generator.impl.DefaultBindingRuntimeGenerator;
+import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
+import org.opendaylight.yangtools.binding.runtime.api.BindingRuntimeContext;
+import org.opendaylight.yangtools.binding.runtime.api.BindingRuntimeGenerator;
+import org.opendaylight.yangtools.binding.runtime.api.DefaultBindingRuntimeContext;
+import org.opendaylight.yangtools.binding.runtime.spi.ModuleInfoSnapshotBuilder;
 import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
+import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlunit.assertj.XmlAssert;
 
-// FIXME: NETCONF-1590, disable replay
-@Ignore
 // TODO: Migrate this test to JUnit5 after migrating the mdsal tests.
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
@@ -210,6 +223,22 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
             .nodeWithKey(MyList1.QNAME, QName.create(PatchCont.QNAME.getModule(), "name"), "Althea")
             .build();
 
+    private static final YangParserFactory PARSER_FACTORY = ServiceLoader.load(YangParserFactory.class)
+        .findFirst().orElseThrow(() -> new ExceptionInInitializerError("No YangParserFactory found"));
+    private static final BindingRuntimeGenerator GENERATOR = new DefaultBindingRuntimeGenerator();
+    private static final LoadingCache<Set<YangModuleInfo>, BindingRuntimeContext> RUNTIME_CONTEXT_CACHE = CacheBuilder
+        .newBuilder().weakValues().build(new CacheLoader<>() {
+            public BindingRuntimeContext load(final Set<YangModuleInfo> key) throws Exception {
+                final var snapshot = new ModuleInfoSnapshotBuilder(PARSER_FACTORY)
+                    .add(key)
+                    .addModuleFeatures(IetfSubscribedNotificationsData.class,
+                        Set.of(EncodeJson$F.VALUE, EncodeXml$F.VALUE, Subtree.VALUE))
+                    .build();
+                return new DefaultBindingRuntimeContext(GENERATOR.generateTypeMapping(snapshot.modelContext()),
+                    snapshot);
+            }
+        });
+
     private final CompletingServerRequest<RestconfStream<List<DataTreeCandidate>>> request =
         new CompletingServerRequest<>();
 
@@ -221,13 +250,19 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
     private DatabindProvider databindProvider;
     private RestconfStream.Registry streamRegistry;
 
+    @Override
+    protected BindingRuntimeContext getRuntimeContext() {
+        return RUNTIME_CONTEXT_CACHE.getUnchecked(getModuleInfos());
+    }
+
     @Before
     public void setUp() throws Exception {
         dataBroker = getDataBroker();
         domDataBroker = getDomBroker();
-        databindProvider = () -> AbstractInstanceIdentifierTest.IID_DATABIND;
+        final var modelContext = getRuntimeContext().modelContext();
+        databindProvider = () -> DatabindContext.ofModel(modelContext);
         streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker, notificationService,
-            new FixedDOMSchemaService(AbstractInstanceIdentifierTest.IID_SCHEMA), x -> x, databindProvider);
+            new FixedDOMSchemaService(modelContext), x -> x, databindProvider);
     }
 
     TestHandler createHandler(final YangInstanceIdentifier path, final String streamName,

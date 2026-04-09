@@ -17,7 +17,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -67,8 +66,6 @@ class AuthHttp2Test extends AbstractHttp2E2ETest {
         assertEquals(HttpClient.Version.HTTP_2, response.version());
     }
 
-    // FIXME: NETCONF-1590, disable replay and enable the test
-    @Disabled
     @Test
     void testStreamAuthorized() throws Exception {
         var response = http2Client.send(HttpRequest.newBuilder()
@@ -82,8 +79,6 @@ class AuthHttp2Test extends AbstractHttp2E2ETest {
         assertEquals(HttpClient.Version.HTTP_2, response.version());
     }
 
-    // FIXME: NETCONF-1590, disable replay and enable the test
-    @Disabled
     @Test
     void testStreamUnauthorized() throws Exception {
         // Setup client without authorization
