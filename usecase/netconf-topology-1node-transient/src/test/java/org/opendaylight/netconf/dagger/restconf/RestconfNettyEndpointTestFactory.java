@@ -18,8 +18,10 @@ import org.opendaylight.netconf.dagger.mdsal.MdsalDomBrokerModule;
 import org.opendaylight.netconf.dagger.mdsal.MdsalEosBindingAdapterModule;
 import org.opendaylight.netconf.dagger.mdsal.MdsalEosDomSimpleModule;
 import org.opendaylight.netconf.dagger.mdsal.MdsalSingletonImplModule;
+import org.opendaylight.netconf.dagger.netconf.NetconfTopologyModule;
 import org.opendaylight.netconf.dagger.netconf.RestconfNettyEndpointModule;
 import org.opendaylight.netconf.dagger.springboot.config.SpringbootConfigLoaderModule;
+import org.opendaylight.netconf.topology.impl.NetconfTopologyImpl;
 import org.opendaylight.odlparent.dagger.AutoCloseableComponent;
 import org.opendaylight.odlparent.dagger.ResourceSupportModule;
 import org.opendaylight.restconf.server.NettyEndpoint;
@@ -36,10 +38,13 @@ import org.opendaylight.restconf.server.NettyEndpoint;
     InMemoryDataStoreModule.class,
     InsecureAAAModule.class,
     RestconfNettyEndpointModule.class,
+    NetconfTopologyModule.class,
     SpringbootConfigLoaderModule.class,
     ResourceSupportModule.class
 })
 public interface RestconfNettyEndpointTestFactory extends AutoCloseableComponent {
 
     NettyEndpoint nettyEndpoint();
+
+    NetconfTopologyImpl netconfTopologyImpl();
 }
