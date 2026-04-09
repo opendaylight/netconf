@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad0d1bbb_2979d713",
+        "filename": "protocol/netconf-client/src/test/java/org/opendaylight/netconf/client/NetconfClientFactoryImplTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-09T10:52:04Z",
+      "side": 1,
+      "message": "Please use static imports where possible.",
+      "revId": "1d0fc79f88a0fc4373624c2c15b0a47598c2b2a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d4e021e_047fac68",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1594Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-09T10:52:04Z",
+      "side": 1,
+      "message": "Please use static imports where possible.\nimport static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh.key.exchange.algs.rev241016.SshKeyExchangeAlgorithm.Sntrup761x25519Sha512;",
+      "revId": "1d0fc79f88a0fc4373624c2c15b0a47598c2b2a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9420e5fc_c90eff33",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1594Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-09T10:52:04Z",
+      "side": 1,
+      "message": "Unrequired \"throws Exception\"",
+      "revId": "1d0fc79f88a0fc4373624c2c15b0a47598c2b2a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

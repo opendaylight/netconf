@@ -97,6 +97,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2ca04992_c659294d",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/AlgorithmPolicy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-09T10:52:04Z",
+      "side": 1,
+      "message": "Would it be better to refactor this method as follows:\n```\n    T algOf(final String factoryName) {\n        T type \u003d factoryToType.get(factoryName);\n        if (type \u003d\u003d null) {\n            throw new IllegalArgumentException(\"Unrecognized algorithm policy used: \" + factoryName);\n        }\n        return type;\n    }\n```\n\nAnd prepare this map in the constructor?\n```\n        this.factoryToType \u003d typeToFactory.entrySet().stream()\n            .collect(Collectors.toUnmodifiableMap(\n                entry -\u003e entry.getValue().getName(),\n                Map.Entry::getKey\n            ));\n```",
+      "parentUuid": "10e77fb3_29fa7b2e",
+      "range": {
+        "startLine": 66,
+        "startChar": 31,
+        "endLine": 66,
+        "endChar": 53
+      },
+      "revId": "b2d1623bac84f0870cd8a6c90f9a1c188870f221",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "55733a8e_d5556460",
         "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/MacPolicy.java",
         "patchSetId": 6
