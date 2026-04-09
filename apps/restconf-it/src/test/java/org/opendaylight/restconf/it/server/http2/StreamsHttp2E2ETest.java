@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -33,9 +32,6 @@ class StreamsHttp2E2ETest extends AbstractHttp2E2ETest {
     protected void afterEach() throws Exception {
         if (clientStreamService != null) {
             clientStreamService = null;
-        }
-        if (streamControl != null) {
-            streamControl = null;
         }
         super.afterEach();
     }
@@ -158,7 +154,7 @@ class StreamsHttp2E2ETest extends AbstractHttp2E2ETest {
                 }""", eventListener.readNext(), JSONCompareMode.LENIENT);
 
             // terminate stream
-            streamControl.close();
+            closeAllStreams();
             await().atMost(Duration.ofSeconds(1)).until(eventListener::ended);
 
         } finally {
@@ -169,8 +165,6 @@ class StreamsHttp2E2ETest extends AbstractHttp2E2ETest {
     /**
      * Tests listening on multiple streams at same time with one client.
      */
-    // FIXME: NETCONF-1590, fix and enable the test
-    @Disabled
     @Test
     void listenMultipleStreams() throws Exception {
         // Create first stream
@@ -239,7 +233,7 @@ class StreamsHttp2E2ETest extends AbstractHttp2E2ETest {
                 }""", eventListener2.readNext(), JSONCompareMode.LENIENT);
 
             // terminate stream
-            streamControl.close();
+            closeAllStreams();
             await().atMost(Duration.ofSeconds(1)).until(eventListener1::ended);
             await().atMost(Duration.ofSeconds(1)).until(eventListener2::ended);
         } finally {
