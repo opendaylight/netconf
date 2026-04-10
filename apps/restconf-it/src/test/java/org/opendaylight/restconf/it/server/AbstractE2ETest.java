@@ -102,7 +102,7 @@ import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionO
 import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.HttpServerListenStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.Transport;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev251111.http.server.listen.stack.grouping.transport.HttpOverTcp;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.IetfSubscribedNotificationsData;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
 import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecServices;
@@ -207,7 +207,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         // transport configuration
         port = randomBindablePort();
         host = localAddress + ":" + port;
-        final var serverTransport = createTransport();
+        final var serverTransport = HTTPServerOverTcp.of(localAddress, port);
         final var serverStackGrouping = new HttpServerListenStackGrouping() {
             @Override
             public Class<HttpServerListenStackGrouping> implementedInterface() {
@@ -215,7 +215,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
             }
 
             @Override
-            public Transport getTransport() {
+            public HttpOverTcp getTransport() {
                 return serverTransport;
             }
         };
@@ -364,10 +364,6 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-    }
-
-    protected Transport createTransport() {
-        return HTTPServerOverTcp.of(localAddress, port);
     }
 
     protected NettyEndpointConfiguration createEndpointConfiguration(
