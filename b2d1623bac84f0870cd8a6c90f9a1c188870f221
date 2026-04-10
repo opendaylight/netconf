@@ -121,6 +121,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5168e3c4_ba8b7a91",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/AlgorithmPolicy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-04-10T15:47:48Z",
+      "side": 1,
+      "message": "from my look in to this, BiMap does something similar internally, will check how much refactoring would be using bimap and I will provide a patch for that",
+      "parentUuid": "2ca04992_c659294d",
+      "range": {
+        "startLine": 66,
+        "startChar": 31,
+        "endLine": 66,
+        "endChar": 53
+      },
+      "revId": "b2d1623bac84f0870cd8a6c90f9a1c188870f221",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "55733a8e_d5556460",
         "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/MacPolicy.java",
         "patchSetId": 6
