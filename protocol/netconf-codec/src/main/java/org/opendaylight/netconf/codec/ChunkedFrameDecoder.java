@@ -74,8 +74,31 @@ public final class ChunkedFrameDecoder extends FrameDecoder {
     }
 
     @Override
+    protected void handlerRemoved0(final ChannelHandlerContext ctx) {
+        releaseChunkBuffer();
+    }
+
+    @Override
     protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out)
             throws IllegalStateException {
+        try {
+            tryDecode(in, out);
+        } catch (final IllegalStateException e) {
+            // FIXME: NETCONF-1694: https://www.rfc-editor.org/info/rfc6242/#section-4.2
+            //        If the chunk-size and the chunk-size value respectively are invalid
+            //        or if an error occurs during the decoding process, the peer MUST
+            //        terminate the NETCONF session by closing the corresponding SSH channel.
+            resetDecoder();
+            throw e;
+        }
+    }
+
+    /**
+     * Decode the chunked frames in the input and add each complete message to {@code out}.
+     *
+     * @throws IllegalStateException if the input does not match RFC 6242 chunked framing.
+     */
+    private void tryDecode(final ByteBuf in, final List<Object> out) throws IllegalStateException {
         while (in.isReadable()) {
             switch (state) {
                 case HEADER_ONE -> {
@@ -152,6 +175,25 @@ public final class ChunkedFrameDecoder extends FrameDecoder {
         }
 
         in.discardReadBytes();
+    }
+
+    /**
+     * After a framing error, start again from the header of a new message.
+     *
+     * <p>Without this reset the next input continues in the old state with no chunk buffer,
+     * which fails with a NullPointerException and leaks the buffer read in the DATA state.
+     */
+    private void resetDecoder() {
+        releaseChunkBuffer();
+        state = State.HEADER_ONE;
+        chunkSize = 0;
+    }
+
+    private void releaseChunkBuffer() {
+        if (chunk != null) {
+            chunk.release();
+            chunk = null;
+        }
     }
 
     private void extractNewChunkOrMessageEnd(final byte byteToCheck) {
