@@ -41,14 +41,12 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.opendaylight.netconf.transport.http.HTTPServerOverTls;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.it.openapi.http3.Http3NettyTestClient;
 import org.opendaylight.restconf.it.server.AbstractE2ETest;
 import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.HttpServerListenStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.listen.stack.grouping.Transport;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -104,11 +102,6 @@ public abstract class AbstractHttp3E2ETest extends AbstractE2ETest {
 
     protected Http3NettyTestClient client() {
         return client;
-    }
-
-    @Override
-    protected Transport createTransport() {
-        return HTTPServerOverTls.of(localAddress(), port(), certificate, privateKey);
     }
 
     @Override
