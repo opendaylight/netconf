@@ -10,12 +10,14 @@ package org.opendaylight.netconf.codec;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.handler.codec.DecoderException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -121,6 +123,87 @@ class ChunkedFrameDecoderTest {
             // The channel is still open, so only the removal can have released the chunk.
             assertTrue(channel.isOpen());
             assertEquals(0, activeBuffers(), "chunk must be released when the decoder is removed");
+        } finally {
+            channel.close();
+        }
+    }
+
+    /**
+     * Two-step write: first complete the DATA section (which allocates 'chunk'), then send a malformed footer byte that
+     * causes decode() to throw IllegalStateException.
+     *
+     * <p>We check the allocated buffers after the exception but BEFORE channel.close() to prove that the try-catch
+     * releases 'chunk' immediately, not merely deferring to teardown.
+     */
+    @Test
+    void testMalformedFooterReleasesChunkImmediately() {
+        final var channel = new EmbeddedChannel(decoder);
+        try {
+            // Step 1: header + complete data, state lands at FOOTER_ONE, chunk holds the DATA section.
+            channel.writeInbound(incompleteChunk());
+            assertEquals(1, activeBuffers(), "chunk must hold the DATA section before the malformed byte");
+
+            // Step 2: '\n' advances FOOTER_ONE to FOOTER_TWO; 'X' fails checkHash and throws.
+            final var ex = assertThrows(DecoderException.class,
+                () -> channel.writeInbound(Unpooled.copiedBuffer("\nX".getBytes(StandardCharsets.UTF_8))));
+            assertInstanceOf(IllegalStateException.class, ex.getCause());
+
+            // Assert BEFORE channel.close(). If we closed first, ChunkedFrameDecoder.handlerRemoved0() would release
+            // chunk regardless of whether the try-catch is present, hiding the bug.
+            assertEquals(0, activeBuffers(), "chunk must be released immediately when decode() throws");
+        } finally {
+            channel.close();
+        }
+    }
+
+    /**
+     * Two-step write: first complete the DATA section (which allocates 'chunk'), then send the header of a next chunk
+     * whose size exceeds the maximum of 4096.
+     *
+     * <p>We check the allocated buffers after the exception but BEFORE channel.close() to prove that the try-catch
+     * releases 'chunk' immediately, not merely deferring to teardown.
+     */
+    @Test
+    void testOversizedNextChunkReleasesChunk() {
+        final var channel = new EmbeddedChannel(decoder);
+        try {
+            // Step 1: header + complete data, state lands at FOOTER_ONE, chunk holds the DATA section.
+            channel.writeInbound(incompleteChunk());
+            assertEquals(1, activeBuffers(), "chunk must hold the DATA section before the oversized chunk header");
+
+            // Step 2: "\n#5" starts the next chunk. Each '0' grows the size, and at 5000 checkChunkSize() throws.
+            final var ex = assertThrows(DecoderException.class,
+                () -> channel.writeInbound(Unpooled.copiedBuffer("\n#5000\n".getBytes(StandardCharsets.UTF_8))));
+            final var cause = assertInstanceOf(IllegalStateException.class, ex.getCause());
+            assertEquals("Chunk size 5000 exceeds maximum 4096", cause.getMessage());
+
+            // Assert BEFORE channel.close(). If we closed first, ChunkedFrameDecoder.handlerRemoved0() would release
+            // chunk regardless of whether the try-catch is present, hiding the bug.
+            assertEquals(0, activeBuffers(), "chunk must be released when the chunk size is too large");
+        } finally {
+            channel.close();
+        }
+    }
+
+    /**
+     * After a framing error the decoder must start again from a clean state, so the next valid message decodes
+     * correctly instead of failing on the released chunk buffer.
+     */
+    @Test
+    void testMalformedFooterThenValidMessage() {
+        final var channel = new EmbeddedChannel(decoder);
+        try {
+            // Step 1: header + complete data, state lands at FOOTER_ONE.
+            channel.writeInbound(Unpooled.copiedBuffer(INCOMPLETE_CHUNK.getBytes(StandardCharsets.UTF_8)));
+
+            // Step 2: 'X' is not a valid footer byte. decode() releases the chunk and resets its state.
+            final var ex = assertThrows(DecoderException.class,
+                () -> channel.writeInbound(Unpooled.copiedBuffer("\nX".getBytes(StandardCharsets.UTF_8))));
+            assertInstanceOf(IllegalStateException.class, ex.getCause());
+
+            // Step 3: a complete valid message is decoded as a whole.
+            channel.writeInbound(Unpooled.copiedBuffer(CHUNKED_MESSAGE_ONE.getBytes(StandardCharsets.UTF_8)));
+            assertChunk(new ArrayList<>(channel.inboundMessages()));
         } finally {
             channel.close();
         }
