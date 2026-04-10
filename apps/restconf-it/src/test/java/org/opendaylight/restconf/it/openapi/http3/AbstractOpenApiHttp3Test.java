@@ -30,14 +30,12 @@ import org.json.JSONObject;
 import org.json.JSONParserConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.opendaylight.netconf.transport.http.HTTPServerOverTls;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.it.openapi.AbstractOpenApiTest;
 import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.HttpServerListenStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.listen.stack.grouping.Transport;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.common.Uint64;
@@ -97,11 +95,6 @@ public class AbstractOpenApiHttp3Test extends AbstractOpenApiTest {
 
     protected Http3NettyTestClient client() {
         return client;
-    }
-
-    @Override
-    protected Transport createTransport() {
-        return HTTPServerOverTls.of(localAddress(), port(), certificate, privateKey);
     }
 
     @Override

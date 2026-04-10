@@ -94,7 +94,7 @@ import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.HttpServerListenStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.listen.stack.grouping.Transport;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.listen.stack.grouping.transport.HttpOverTcp;
 import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecServices;
 import org.opendaylight.yangtools.dagger.yang.parser.DaggerDefaultYangParserComponent;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -174,7 +174,7 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
         // transport configuration
         port = randomBindablePort();
         host = localAddress + ":" + port;
-        final var serverTransport = createTransport();
+        final var serverTransport = HTTPServerOverTcp.of(localAddress, port);
         final var serverStackGrouping = new HttpServerListenStackGrouping() {
             @Override
             public Class<HttpServerListenStackGrouping> implementedInterface() {
@@ -182,7 +182,7 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
             }
 
             @Override
-            public Transport getTransport() {
+            public HttpOverTcp getTransport() {
                 return serverTransport;
             }
         };
@@ -285,10 +285,6 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
      */
     protected final int port() {
         return port;
-    }
-
-    protected Transport createTransport() {
-        return HTTPServerOverTcp.of(localAddress, port);
     }
 
     protected NettyEndpointConfiguration createEndpointConfiguration(
