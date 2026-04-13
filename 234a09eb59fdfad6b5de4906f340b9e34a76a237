@@ -16,6 +16,24 @@
       "message": "why?",
       "revId": "234a09eb59fdfad6b5de4906f340b9e34a76a237",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bec4ba1d_96dd797a",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 602,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-13T13:14:49Z",
+      "side": 1,
+      "message": "To add stream control from AbstractHttp3E2ETest without lowering visibility level of private streamControl or duplicating it in that class",
+      "parentUuid": "82456f1f_e1235598",
+      "revId": "234a09eb59fdfad6b5de4906f340b9e34a76a237",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
