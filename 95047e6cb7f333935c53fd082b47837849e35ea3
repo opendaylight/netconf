@@ -163,6 +163,30 @@
       },
       "revId": "95047e6cb7f333935c53fd082b47837849e35ea3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0efbb64a_ccbb062a",
+        "filename": "usecase/odl-dagger-prototype/src/main/resources/org.opendaylight.restconf.nb.rfc8040.cfg",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-13T10:52:18Z",
+      "side": 1,
+      "message": "Fixed by adding the prefix \u0027odl.netconf.prototype\u0027 to the configuration.",
+      "parentUuid": "885d7e47_0aa882c3",
+      "range": {
+        "startLine": 14,
+        "startChar": 1,
+        "endLine": 14,
+        "endChar": 13
+      },
+      "revId": "95047e6cb7f333935c53fd082b47837849e35ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
