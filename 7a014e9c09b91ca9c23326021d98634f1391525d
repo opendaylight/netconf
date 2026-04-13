@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f7b1748_811d08f4",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/http3/AbstractNotificationSubscriptionHttp3Test.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-13T13:18:52Z",
+      "side": 1,
+      "message": "removed",
+      "parentUuid": "ffeb151f_5ec7df05",
+      "revId": "7a014e9c09b91ca9c23326021d98634f1391525d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1df006f4_b5309a44",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-04-13T08:06:36Z",
       "side": 1,
       "message": "why protected?",
+      "revId": "7a014e9c09b91ca9c23326021d98634f1391525d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a43dcc8_5d0d10cd",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/http3/AbstractNotificationSubscriptionHttp3Test.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-13T13:18:52Z",
+      "side": 1,
+      "message": "increased to private",
+      "parentUuid": "1df006f4_b5309a44",
       "revId": "7a014e9c09b91ca9c23326021d98634f1391525d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "47ddb79d_4e993eb2",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/http3/AbstractNotificationSubscriptionHttp3Test.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-13T13:18:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3625320e_ef05f84e",
+      "revId": "7a014e9c09b91ca9c23326021d98634f1391525d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b8657372_cec477c5",
@@ -82,6 +136,24 @@
       "writtenOn": "2026-04-13T08:06:36Z",
       "side": 1,
       "message": "can be static?",
+      "revId": "7a014e9c09b91ca9c23326021d98634f1391525d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3787329b_3aebe120",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/http3/NotificationSubscriptionListeningHttp3Test.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-13T13:18:52Z",
+      "side": 1,
+      "message": "No, it use non static startStreamClient() and invokeRequestKeepClient()",
+      "parentUuid": "b8657372_cec477c5",
       "revId": "7a014e9c09b91ca9c23326021d98634f1391525d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
