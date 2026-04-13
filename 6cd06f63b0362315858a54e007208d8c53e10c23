@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "433fb7ce_6b3b386d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-13T07:51:19Z",
+      "side": 1,
+      "message": "IMO restconf-openapi (netty) can get rid of netty in its package name",
+      "revId": "6cd06f63b0362315858a54e007208d8c53e10c23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab42e436_a27cd746",
+        "filename": "protocol/pom.xml",
+        "patchSetId": 12
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-13T07:51:19Z",
+      "side": 1,
+      "message": "should be grouped together",
+      "revId": "6cd06f63b0362315858a54e007208d8c53e10c23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2a1c084_12e55c29",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiStaticResources.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-13T07:51:19Z",
+      "side": 1,
+      "message": "seems to be used from netty and common, do we need this?",
+      "revId": "6cd06f63b0362315858a54e007208d8c53e10c23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c09eaa9e_fade4fcd",
+        "filename": "protocol/restconf-openapi-jaxrs/src/main/java/org/opendaylight/restconf/openapi/jaxrs/WebInitializer.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-13T07:51:19Z",
+      "side": 1,
+      "message": "really needed change?",
+      "revId": "6cd06f63b0362315858a54e007208d8c53e10c23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
