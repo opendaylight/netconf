@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51642a4c_1b59c22c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-13T14:11:19Z",
+      "side": 1,
+      "message": "so, why? what the reason, when its used, when not?",
+      "revId": "d45d630f1ff74438db1ee2587bcf943dbdfa45a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
