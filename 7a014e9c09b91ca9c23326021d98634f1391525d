@@ -16,6 +16,74 @@
       "message": "recheck",
       "revId": "7a014e9c09b91ca9c23326021d98634f1391525d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ffeb151f_5ec7df05",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/http3/AbstractNotificationSubscriptionHttp3Test.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-13T08:06:36Z",
+      "side": 1,
+      "message": "why public?",
+      "revId": "7a014e9c09b91ca9c23326021d98634f1391525d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1df006f4_b5309a44",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/http3/AbstractNotificationSubscriptionHttp3Test.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-13T08:06:36Z",
+      "side": 1,
+      "message": "why protected?",
+      "revId": "7a014e9c09b91ca9c23326021d98634f1391525d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3625320e_ef05f84e",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/http3/AbstractNotificationSubscriptionHttp3Test.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-13T08:06:36Z",
+      "side": 1,
+      "message": "not needed line",
+      "revId": "7a014e9c09b91ca9c23326021d98634f1391525d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8657372_cec477c5",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/http3/NotificationSubscriptionListeningHttp3Test.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-13T08:06:36Z",
+      "side": 1,
+      "message": "can be static?",
+      "revId": "7a014e9c09b91ca9c23326021d98634f1391525d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
