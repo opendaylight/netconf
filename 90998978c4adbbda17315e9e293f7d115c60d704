@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5c2ba03_4005f884",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/impl/OpenApiServiceImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-13T07:55:00Z",
+      "side": 1,
+      "message": "IMO do what you need with parameter, the assign value to entity field, eliminating this. usage",
+      "revId": "90998978c4adbbda17315e9e293f7d115c60d704",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b834a390_b0b4dc0d",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/impl/OpenApiServiceImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-13T07:55:00Z",
+      "side": 1,
+      "message": "can you clarify why its a good idea to club mountpoint generator here?",
+      "revId": "90998978c4adbbda17315e9e293f7d115c60d704",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fbdf053_eb9395a5",
+        "filename": "protocol/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/OpenApiResourceProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-13T07:55:00Z",
+      "side": 1,
+      "message": "can we avoid to reference one configuration from two classes?",
+      "revId": "90998978c4adbbda17315e9e293f7d115c60d704",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
