@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "099da62d_1bff66e2",
+        "filename": "protocol/netconf-client/src/test/java/org/opendaylight/netconf/client/NetconfClientFactoryImplTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-04-13T08:08:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e6d75249_358d799f",
+      "revId": "1d0fc79f88a0fc4373624c2c15b0a47598c2b2a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0d4e021e_047fac68",
@@ -71,6 +89,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b7df939_1e06aaa8",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1594Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-04-13T08:08:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "477a16d8_92a1c2d0",
+      "revId": "1d0fc79f88a0fc4373624c2c15b0a47598c2b2a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9420e5fc_c90eff33",
@@ -84,6 +120,24 @@
       "writtenOn": "2026-04-09T10:52:04Z",
       "side": 1,
       "message": "Unrequired \"throws Exception\"",
+      "revId": "1d0fc79f88a0fc4373624c2c15b0a47598c2b2a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "96289538_00a08ea2",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1594Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-04-13T08:08:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9420e5fc_c90eff33",
       "revId": "1d0fc79f88a0fc4373624c2c15b0a47598c2b2a7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
