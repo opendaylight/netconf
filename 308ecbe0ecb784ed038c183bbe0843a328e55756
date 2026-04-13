@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "199158c4_f3bea0df",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-13T13:12:21Z",
+      "side": 1,
+      "message": "Yes, for H3 tests \"https\" is used\nBut setting transport to TLS here caused that we can just use H3\nWhen returned as it was before, all version of protocols can be used even H3 via TLS, like in runtime.\nTo establish subscription for rfc8639 streams we need Http1 request",
+      "parentUuid": "0c4d0f31_f16c65aa",
+      "revId": "308ecbe0ecb784ed038c183bbe0843a328e55756",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1147bcc1_b13bc6fc",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-13T08:04:00Z",
       "side": 1,
       "message": "what other transport?",
+      "revId": "308ecbe0ecb784ed038c183bbe0843a328e55756",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "447cb3f2_77e59aec",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-13T13:12:21Z",
+      "side": 1,
+      "message": "It should have been protocols,(HTTP1/2) updated the commit message.",
+      "parentUuid": "1147bcc1_b13bc6fc",
       "revId": "308ecbe0ecb784ed038c183bbe0843a328e55756",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
