@@ -5,8 +5,9 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.openapi.netty;
+package org.opendaylight.restconf.openapi;
 
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -19,9 +20,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.metatype.annotations.AttributeDefinition;
-import org.osgi.service.metatype.annotations.Designate;
-import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 /**
  * {@link WebHostResourceProvider} of OpenApi.
@@ -30,25 +28,17 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 @NonNullByDefault
 @Component(immediate = true, service = WebHostResourceProvider.class,
     configurationPid = "org.opendaylight.restconf.nb.rfc8040")
-@Designate(ocd = OpenApiResourceProvider.Configuration.class)
 public final class OpenApiResourceProvider implements WebHostResourceProvider, AutoCloseable {
-    @ObjectClassDefinition
-    public @interface Configuration {
-        @AttributeDefinition(min = "1", description = """
-            The URI path of the RESTCONF API root resource. This value will be used as the result of {+restconf} URI
-            Template.
-            """)
-        String api$_$root$_$path() default "restconf";
-    }
+    private static final String API_ROOT_PATH_PROP = "api-root-path";
+    private static final String DEFAULT_API_ROOT_PATH = "restconf";
 
     private final OpenApiServiceImpl service;
 
     @Inject
     @Activate
     public OpenApiResourceProvider(@Reference final DOMSchemaService schemaService,
-            @Reference final DOMMountPointService mountPointService, final Configuration configuration) {
-        service = new OpenApiServiceImpl(schemaService, mountPointService,
-            configuration.api$_$root$_$path());
+            @Reference final DOMMountPointService mountPointService, final Map<String, ?> properties) {
+        service = new OpenApiServiceImpl(schemaService, mountPointService, apiRootPath(properties));
     }
 
     @Override
@@ -65,5 +55,10 @@ public final class OpenApiResourceProvider implements WebHostResourceProvider, A
     @Deactivate
     public void close() {
         service.close();
+    }
+
+    private static String apiRootPath(final Map<String, ?> properties) {
+        final var value = properties.get(API_ROOT_PATH_PROP);
+        return value instanceof String str ? str : DEFAULT_API_ROOT_PATH;
     }
 }

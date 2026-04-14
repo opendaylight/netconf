@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.openapi.netty;
+package org.opendaylight.restconf.openapi;
 
 import static java.util.Objects.requireNonNull;
 
@@ -30,7 +30,6 @@ import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceInstance;
 import org.opendaylight.netconf.transport.http.rfc6415.XRD;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
-import org.opendaylight.restconf.openapi.api.OpenApiStaticResources;
 import org.opendaylight.restconf.openapi.model.DocumentEntity;
 import org.opendaylight.restconf.openapi.model.MetadataEntity;
 import org.slf4j.Logger;
@@ -286,7 +285,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         }
 
         final var resourceName = "/explorer" + requested;
-        final var resource = OpenApiStaticResources.getResource(resourceName);
+        final var resource = OpenApiService.class.getResource(resourceName);
         if (resource == null) {
             LOG.debug("Resource '{}' not found", resourceName);
             return EmptyResponse.NOT_FOUND;
