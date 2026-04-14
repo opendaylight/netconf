@@ -18,6 +18,41 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "af6d9058_8d82bc74",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-14T23:12:18Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/122380",
+      "revId": "6cd06f63b0362315858a54e007208d8c53e10c23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c90bb3cd_97c94a38",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-14T23:12:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "433fb7ce_6b3b386d",
+      "revId": "6cd06f63b0362315858a54e007208d8c53e10c23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ab42e436_a27cd746",
@@ -31,6 +66,24 @@
       "writtenOn": "2026-04-13T07:51:19Z",
       "side": 1,
       "message": "should be grouped together",
+      "revId": "6cd06f63b0362315858a54e007208d8c53e10c23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ef84026_9b0f4f45",
+        "filename": "protocol/pom.xml",
+        "patchSetId": 12
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-14T23:12:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab42e436_a27cd746",
       "revId": "6cd06f63b0362315858a54e007208d8c53e10c23",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9ae13f5_93ff382b",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiStaticResources.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-14T23:12:18Z",
+      "side": 1,
+      "message": "We can use any class from openapi-common bundle, it can be removed",
+      "parentUuid": "b2a1c084_12e55c29",
+      "revId": "6cd06f63b0362315858a54e007208d8c53e10c23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c09eaa9e_fade4fcd",
@@ -65,6 +136,24 @@
       "writtenOn": "2026-04-13T07:51:19Z",
       "side": 1,
       "message": "really needed change?",
+      "revId": "6cd06f63b0362315858a54e007208d8c53e10c23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09fed21f_b7cc7811",
+        "filename": "protocol/restconf-openapi-jaxrs/src/main/java/org/opendaylight/restconf/openapi/jaxrs/WebInitializer.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-14T23:12:18Z",
+      "side": 1,
+      "message": "looks like we can use also /explorer",
+      "parentUuid": "c09eaa9e_fade4fcd",
       "revId": "6cd06f63b0362315858a54e007208d8c53e10c23",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
