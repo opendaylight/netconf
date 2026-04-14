@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.dagger.restconf;
+package org.opendaylight.netconf.dagger;
 
 import dagger.Component;
 import jakarta.inject.Singleton;
@@ -42,7 +42,7 @@ import org.opendaylight.restconf.server.NettyEndpoint;
     SpringbootConfigLoaderModule.class,
     ResourceSupportModule.class
 })
-public interface RestconfNettyEndpointTestFactory extends AutoCloseableComponent {
+public interface RestconfNetconfFactory extends AutoCloseableComponent {
 
     NettyEndpoint nettyEndpoint();
 
