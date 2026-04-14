@@ -47,8 +47,7 @@ public final class OpenApiResourceProvider implements WebHostResourceProvider, A
     @Activate
     public OpenApiResourceProvider(@Reference final DOMSchemaService schemaService,
             @Reference final DOMMountPointService mountPointService, final Configuration configuration) {
-        service = new OpenApiServiceImpl(schemaService, mountPointService,
-            configuration.api$_$root$_$path());
+        service = new OpenApiServiceImpl(schemaService, mountPointService, configuration.api$_$root$_$path());
     }
 
     @Override
