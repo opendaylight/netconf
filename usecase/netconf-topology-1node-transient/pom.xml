@@ -21,12 +21,23 @@
         <spring-boot-version>4.0.2</spring-boot-version>
         <!-- Keep this version synchronized with spring-boot version -->
         <springframework-version>7.0.3</springframework-version>
+        <!-- Dagger-generated code triggers a SpotBugs warning (URF_UNREAD_FIELD in DaggerRestconfNetconfFactory.java).
+             Excludes the generated Dagger inner implementation class from analysis.-->
+        <spotbugs.onlyAnalyze>
+            !org.opendaylight.netconf.dagger.DaggerRestconfNetconfFactory$RestconfNetconfFactoryImpl
+        </spotbugs.onlyAnalyze>
     </properties>
 
     <dependencies>
         <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>com.google.dagger</groupId>
             <artifactId>dagger</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.google.errorprone</groupId>
@@ -38,6 +49,12 @@
             <!-- Kept in compile scope to satisfy module-info.java 'requires' directive. Ignore test-only warning. -->
         </dependency>
         <dependency>
+            <groupId>com.guicedee.services</groupId>
+            <artifactId>javax.inject</artifactId>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
             <scope>provided</scope>
@@ -46,6 +63,7 @@
         <dependency>
             <groupId>jakarta.inject</groupId>
             <artifactId>jakarta.inject-api</artifactId>
+            <scope>compile</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -350,6 +368,11 @@
             <artifactId>spring-boot</artifactId>
             <version>${spring-boot-version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
         <!-- Required by Spring binder to parse YAML files -->
         <dependency>
             <groupId>org.yaml</groupId>
@@ -389,6 +412,55 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-config-to-target</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <includes>
+                                        <include>application.yaml</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>org.opendaylight.netconf.dagger.Main</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptors>
+                                <descriptor>src/assembly/executable.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
