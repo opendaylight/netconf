@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cbfb4c8f_2f8858bd",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-14T23:12:10Z",
+      "side": 1,
+      "message": "We cannot just add NettyEndpoint as a parameter of the constructor, because that introduces a circular dependency: NettyEndpoint depends on WebHostResourceProvider, and OpenApiResourceProvider would then depend back on NettyEndpoint.\n\nBut looks like we can remove it",
+      "parentUuid": "f8a3ce62_6665c5d1",
+      "revId": "90998978c4adbbda17315e9e293f7d115c60d704",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a5c2ba03_4005f884",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-13T07:55:00Z",
       "side": 1,
       "message": "IMO do what you need with parameter, the assign value to entity field, eliminating this. usage",
+      "revId": "90998978c4adbbda17315e9e293f7d115c60d704",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15589a02_0a263040",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/impl/OpenApiServiceImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-14T23:12:10Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/122380",
+      "parentUuid": "a5c2ba03_4005f884",
       "revId": "90998978c4adbbda17315e9e293f7d115c60d704",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7411e1a_1023ad6b",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/impl/OpenApiServiceImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-14T23:12:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b834a390_b0b4dc0d",
+      "revId": "90998978c4adbbda17315e9e293f7d115c60d704",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5fbdf053_eb9395a5",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-04-13T07:55:00Z",
       "side": 1,
       "message": "can we avoid to reference one configuration from two classes?",
+      "revId": "90998978c4adbbda17315e9e293f7d115c60d704",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4f7c01b_ccdf6416",
+        "filename": "protocol/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/OpenApiResourceProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-14T23:12:10Z",
+      "side": 1,
+      "message": "We should keep both components bound to the same PID if both consume org.opendaylight.restconf.nb.rfc8040. What we can avoid is defining the same configuration metadata twice.\n\nOpenApiResourceProvider does not need its own @Designate/Configuration; it can read api-root-path from activation properties instead, leaving OSGiNorthbound.Configuration is the one place defining the config schema for that PID.\n\nAnd we cannot just add NettyEndpoint as a parameter of the constructor, because that introduces a circular dependency: NettyEndpoint depends on WebHostResourceProvider, and OpenApiResourceProvider would then depend back on NettyEndpoint.",
+      "parentUuid": "5fbdf053_eb9395a5",
       "revId": "90998978c4adbbda17315e9e293f7d115c60d704",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
