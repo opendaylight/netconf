@@ -30,6 +30,7 @@ import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLException;
 import org.apache.shiro.authc.AuthenticationException;
@@ -234,19 +235,8 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
         final var openApiSchemaService = new FixedDOMSchemaService(openApiSchemaContext);
 
         // OpenApi
-        // FIXME use constructor that has NettyEndpoint as parameter when we migrate to Netty in the future.
         final var openApiResourceProvider = new OpenApiResourceProvider(openApiSchemaService, domMountPointService,
-            new OpenApiResourceProvider.Configuration() {
-                @Override
-                public String api$_$root$_$path() {
-                    return RESTS;
-                }
-
-                @Override
-                public Class<OpenApiResourceProvider.Configuration> annotationType() {
-                    return OpenApiResourceProvider.Configuration.class;
-                }
-            });
+            Map.of("api-root-path", RESTS));
         endpoint.registerWebResource(openApiResourceProvider);
     }
 
