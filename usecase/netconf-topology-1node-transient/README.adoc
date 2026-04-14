@@ -1,0 +1,17 @@
+# Dagger prototype for the RNC standalone transient applications
+
+This project is a Dagger-based prototype of standalone, transient application designed to run a single-node
+Netconf topology environment. It compiles into a runnable JAR that executes specific Netconf operations.
+
+## How to use as standalone application
+* Compile the project.
+* Navigate to the "target" directory containing the built artifacts.
+* Start the application using Java with preview features enabled:
+----
+java --enable-preview -jar netconf-topology-1node-transient-[PROJECT_VERSION]-executable.jar
+----
+
+## Configuration
+* The application loads its configuration from an `application.yaml` file. To change the default configuration,
+ simply edit the `application.yaml` file located in the exact same directory (next to) the runnable JAR file before
+ starting the application.
