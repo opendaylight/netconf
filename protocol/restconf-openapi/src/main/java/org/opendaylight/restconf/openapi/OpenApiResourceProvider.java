@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi;
 
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -46,7 +47,7 @@ public final class OpenApiResourceProvider implements WebHostResourceProvider, A
     @Inject
     @Activate
     public OpenApiResourceProvider(@Reference final DOMSchemaService schemaService,
-            @Reference final DOMMountPointService mountPointService, final Configuration configuration) {
+        @Reference final DOMMountPointService mountPointService, final Configuration configuration) {
         service = new OpenApiServiceImpl(schemaService, mountPointService,
             configuration.api$_$root$_$path());
     }
