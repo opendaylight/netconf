@@ -16,6 +16,24 @@
       "message": "so, why? what the reason, when its used, when not?",
       "revId": "d45d630f1ff74438db1ee2587bcf943dbdfa45a7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a80096b_52174d8e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-14T14:30:49Z",
+      "side": 1,
+      "message": "it is not used for HTTP/3, it should have not been changed in previous patches, it is configuration for HTTP1/2 and setting it like this just disable those protocols.\nto start HTTP/3 by Netty endpoint we just need to set correct HTTP/3 parameters - certificate, privateKey.....\nIt didn\u0027t break anything because it is just for HTTP/3 tests where it is not used, only now it became issue when I need HTTP/1 request to establish subscription.\nAdapted commit message to better reflect the reason for this.",
+      "parentUuid": "51642a4c_1b59c22c",
+      "revId": "d45d630f1ff74438db1ee2587bcf943dbdfa45a7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
