@@ -20,6 +20,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1291cfd6_f98a1592",
+        "filename": "transport/transport-http/src/main/yang/ietf-http-server@2026-04-02.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-04-14T11:21:39Z",
+      "side": 1,
+      "message": "incorrect rebase?",
+      "range": {
+        "startLine": 88,
+        "startChar": 2,
+        "endLine": 88,
+        "endChar": 21
+      },
+      "revId": "ea7adf8da3d6c62e25a5ab6e074a446a214ae40a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a2ff54e0_4bc84ad4",
         "filename": "transport/transport-http/src/main/yang/ietf-http-server@2026-04-02.yang",
         "patchSetId": 2
