@@ -20,13 +20,15 @@ import java.time.Duration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opendaylight.netconf.dagger.DaggerRestconfNetconfFactory;
+import org.opendaylight.netconf.dagger.RestconfNetconfFactory;
 
 class RestconfNettyEndpointTest {
-    private RestconfNettyEndpointTestFactory component;
+    private RestconfNetconfFactory component;
 
     @BeforeEach
     void setUp() {
-        component = DaggerRestconfNettyEndpointTestFactory.create();
+        component = DaggerRestconfNetconfFactory.create();
     }
 
     @AfterEach
