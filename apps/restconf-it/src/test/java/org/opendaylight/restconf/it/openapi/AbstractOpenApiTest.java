@@ -235,7 +235,6 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
         final var openApiSchemaService = new FixedDOMSchemaService(openApiSchemaContext);
 
         // OpenApi
-        // FIXME use constructor that has NettyEndpoint as parameter when we migrate to Netty in the future.
         final var openApiResourceProvider = new OpenApiResourceProvider(openApiSchemaService, domMountPointService,
             new OpenApiResourceProvider.Configuration() {
                 @Override
