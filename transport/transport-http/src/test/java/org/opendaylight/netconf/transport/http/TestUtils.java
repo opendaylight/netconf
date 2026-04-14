@@ -14,6 +14,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -42,6 +44,7 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.opendaylight.netconf.transport.api.TransportChannel;
 
 final class TestUtils {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
@@ -79,29 +82,31 @@ final class TestUtils {
         return request;
     }
 
-    static ListenableFuture<FullHttpResponse> invoke(final HTTPClient client, final FullHttpRequest request) {
+    static ListenableFuture<FullHttpResponse> invoke(final TransportChannel clientChannel, final FullHttpRequest request) {
         final var future = SettableFuture.<FullHttpResponse>create();
-        client.invoke(request, new FutureCallback<>() {
+
+        // Add a one-time handler to the pipeline to catch the next response
+        clientChannel.channel().pipeline().addLast(new SimpleChannelInboundHandler<FullHttpResponse>() {
             @Override
-            public void onSuccess(final FullHttpResponse response) {
-                // To simplify the test code we use future on top of callback.
-                // Due to content of response object is released (cleared) on exit from this method
-                // we need to ensure the content is copied channel independent byte buffer.
-                // Using response.copy() is not suitable because it uses same byte buf allocator
-                // as the original message, this may result ResourceLeakDetector exception
-                // if copied content buffer is not released (read) in a moment when
-                // byte buf allocator's garbage collector is called.
+            protected void channelRead0(ChannelHandlerContext ctx, FullHttpResponse response) {
+                // Copy the response as you did before
                 final var content = Unpooled.wrappedBuffer(ByteBufUtil.getBytes(response.content()));
                 final var copy = new DefaultFullHttpResponse(response.protocolVersion(), response.status(), content);
                 copy.headers().set(response.headers());
+
+                // Remove ourselves from the pipeline and complete the future
+                ctx.pipeline().remove(this);
                 future.set(copy);
             }
 
             @Override
-            public void onFailure(final Throwable cause) {
+            public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
                 future.setException(cause);
             }
         });
+
+        // Send the request
+        clientChannel.channel().writeAndFlush(request);
         return future;
     }
 

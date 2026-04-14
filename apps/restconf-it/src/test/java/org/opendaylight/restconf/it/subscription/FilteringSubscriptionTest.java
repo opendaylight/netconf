@@ -101,7 +101,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                <id>%s</id>
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
              </input>""", id);
-        final var modifyResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
+        final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
@@ -174,7 +174,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
         assertEquals(HttpResponseStatus.CREATED, postFilterResponse.status());
 
         // Establish subscription with filter reference
-        final var establishResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+        final var establishResponse = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {

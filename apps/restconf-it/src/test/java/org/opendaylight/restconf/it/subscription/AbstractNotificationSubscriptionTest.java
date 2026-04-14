@@ -62,6 +62,7 @@ import org.opendaylight.netconf.rfc8639.impl.IetfSubscriptionFeatureProvider;
 import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.netconf.transport.http.EventStreamService;
 import org.opendaylight.netconf.transport.http.HTTPClient;
+import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.netconf.transport.http.HTTPServerOverTcp;
 import org.opendaylight.netconf.transport.http.HttpClientStackConfiguration;
 import org.opendaylight.netconf.transport.http.SseUtils;
@@ -69,6 +70,9 @@ import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.client.ClientHttp1Session;
+import org.opendaylight.restconf.client.ClientHttp2Session;
+import org.opendaylight.restconf.client.ClientSession;
 import org.opendaylight.restconf.it.server.TestEventStreamListener;
 import org.opendaylight.restconf.it.server.TestRequestCallback;
 import org.opendaylight.restconf.it.server.TestTransportChannelListener;
@@ -149,6 +153,7 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
     private DOMNotificationPublishService notificationPublishService;
     private DOMRpcRouter domRpcRouter;
     private MdsalRestconfStreamRegistry streamRegistry;
+    private ClientSession streamSession;
 
     @Override
     protected BindingRuntimeContext getRuntimeContext() {
@@ -299,15 +304,17 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
     }
 
     private FullHttpResponse invokeRequest(final FullHttpRequest request) throws Exception {
-        final var channelListener = new TestTransportChannelListener(ignored -> {
-            // no-op
+
+        final var clientSession = new ClientHttp1Session();
+        final var channelListener = new TestTransportChannelListener(transportChannel -> {
+            transportChannel.channel().pipeline().addLast("restconf-session", clientSession);
         });
         final var client = HTTPClient.connect(channelListener, bootstrapFactory.newBootstrap(),
             clientStackGrouping, false).get(2, TimeUnit.SECONDS);
         // await for connection
         await().atMost(Duration.ofSeconds(2)).until(channelListener::initialized);
         final var callback = new TestRequestCallback();
-        client.invoke(request, callback);
+        clientSession.invoke(request, callback);
         // await for response
         await().atMost(Duration.ofSeconds(2)).until(callback::completed);
         client.shutdown().get(2, TimeUnit.SECONDS);
@@ -318,22 +325,22 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
 
     FullHttpResponse invokeTwoRequests(final FullHttpRequest request1, final FullHttpRequest request2)
             throws Exception {
-        final var channelListener = new TestTransportChannelListener(ignored -> {
-            // no-op
+        final var clientSession = new ClientHttp1Session();
+        final var channelListener = new TestTransportChannelListener(transportChannel -> {
+            transportChannel.channel().pipeline().addLast("restconf-session", clientSession);
         });
         final var client = HTTPClient.connect(channelListener, bootstrapFactory.newBootstrap(),
             clientStackGrouping, false).get(2, TimeUnit.SECONDS);
         // await for connection
         await().atMost(Duration.ofSeconds(2)).until(channelListener::initialized);
         final var callback = new TestRequestCallback();
-        client.invoke(request1, callback);
+        clientSession.invoke(request1, callback);
         // await for response
         await().atMost(Duration.ofSeconds(2)).until(callback::completed);
         final var response1 = callback.response();
         assertNotNull(response1);
         assertEquals(HttpResponseStatus.OK, response1.status());
-
-        client.invoke(request2, callback);
+        clientSession.invoke(request2, callback);
         // await for response
         await().atMost(Duration.ofSeconds(2)).until(callback::completed);
         final var response2 = callback.response();
@@ -370,11 +377,10 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
         }
     }
 
-    protected FullHttpResponse invokeRequestKeepClient(final HTTPClient streamHttpClient, final HttpMethod method,
-            final String uri, final String contentType, final String content, final String acceptType) {
+    protected FullHttpResponse invokeRequestKeepClient(final HttpMethod method, final String uri,
+            final String contentType, final String content, final String acceptType) {
         final var callback = new TestRequestCallback();
-        streamHttpClient.invoke(buildRequest(method, uri, contentType, content, acceptType), callback);
-        // await for response
+        streamSession.invoke(buildRequest(method, uri, contentType, content, acceptType), callback);
         await().atMost(Duration.ofSeconds(2)).until(callback::completed);
         final var response = callback.response();
         assertNotNull(response);
@@ -382,12 +388,19 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
     }
 
     protected HTTPClient startStreamClient(final boolean http2) throws Exception {
-        final var transportListener = new TestTransportChannelListener(channel ->
-            clientStreamService = SseUtils.enableClientSse(channel));
+        final var session = http2 ? new ClientHttp2Session(HTTPScheme.HTTP)
+            : new ClientHttp1Session();
+        final var transportListener = new TestTransportChannelListener(channel -> {
+            // 2. Inject the session into the pipeline
+            channel.channel().pipeline().addLast("restconf-session", session);
+            clientStreamService = SseUtils.enableClientSse(channel);
+        });
         final var streamClient = HTTPClient.connect(transportListener, bootstrapFactory.newBootstrap(),
             clientStackGrouping, http2).get(2, TimeUnit.SECONDS);
+
         await().atMost(Duration.ofSeconds(2)).until(transportListener::initialized);
         assertNotNull(clientStreamService);
+        streamSession = session;
         return streamClient;
     }
 
@@ -401,7 +414,7 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
 
     protected TestEventStreamListener startSubscriptionStream(final String subscriptionId, final boolean http2)
             throws Exception {
-        subscriptionStreamClient = startStreamClient(http2);
+        startStreamClient(http2);
         return startSubscriptionStreamOnExistingClient(subscriptionId);
     }
 
@@ -442,7 +455,7 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
              </establish-subscription>
              """, filter);
 
-        return invokeRequestKeepClient(streamHttpClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+        return invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, input, MediaTypes.APPLICATION_YANG_DATA_JSON);
     }
 

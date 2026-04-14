@@ -33,13 +33,19 @@ import static org.opendaylight.netconf.transport.http.TestUtils.generateX509Cert
 import static org.opendaylight.netconf.transport.http.TestUtils.invoke;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
@@ -61,6 +67,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -285,8 +292,16 @@ class HttpClientServerTest {
         final var server = HTTPServer.listen(serverTransportListener, bootstrapFactory.newServerBootstrap(),
             serverConfig).get(2, TimeUnit.SECONDS);
         try {
+            final var clientTransportChannel = new AtomicReference<TransportChannel>();
+            doAnswer(inv -> {
+                clientTransportChannel.set(inv.getArgument(0));
+                return null;
+            }).when(clientTransportListener).onTransportChannelEstablished(any());
+
             final var client = HTTPClient.connect(clientTransportListener, bootstrapFactory.newBootstrap(),
-                    clientConfig, http2).get(2, TimeUnit.SECONDS);
+                clientConfig, http2).get(2, TimeUnit.SECONDS);
+            final var transportChannel = clientTransportChannel.get();
+            assertNotNull(transportChannel);
             try {
                 verify(clientTransportListener, timeout(2000)).onTransportChannelEstablished(any());
                 verify(serverTransportListener, timeout(2000)).onTransportChannelEstablished(any());
@@ -303,7 +318,7 @@ class HttpClientServerTest {
                         // allow multiple requests on same connections
                         .set(CONNECTION, KEEP_ALIVE);
 
-                    final var response = invoke(client, request).get(2, TimeUnit.SECONDS);
+                    final var response = invoke(transportChannel, request).get(2, TimeUnit.SECONDS);
                     assertNotNull(response);
                     assertEquals(OK, response.status());
                     assertEquals("Method: " + method + " URI: " + uri + " Payload: " + payload,
@@ -363,5 +378,30 @@ class HttpClientServerTest {
 
     private static String nextValue(final String prefix) {
         return prefix + COUNTER.incrementAndGet();
+    }
+
+    private ListenableFuture<FullHttpResponse> invoke(final TransportChannel transportChannel,
+        final FullHttpRequest request) {
+        final var future = SettableFuture.<FullHttpResponse>create();
+
+        transportChannel.channel().pipeline().addLast(new SimpleChannelInboundHandler<FullHttpResponse>() {
+            @Override
+            protected void channelRead0(ChannelHandlerContext ctx, FullHttpResponse msg) {
+                final var content = wrappedBuffer(ByteBufUtil.getBytes(msg.content()));
+                final var copy = new DefaultFullHttpResponse(msg.protocolVersion(), msg.status(), content);
+                copy.headers().set(msg.headers());
+
+                ctx.pipeline().remove(this);
+                future.set(copy);
+            }
+
+            @Override
+            public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+                future.setException(cause);
+            }
+        });
+
+        transportChannel.channel().writeAndFlush(request);
+        return future;
     }
 }

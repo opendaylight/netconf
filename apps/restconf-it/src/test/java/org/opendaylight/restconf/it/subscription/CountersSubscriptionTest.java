@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.client.RestconfClientSession;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterOutOfBread;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterRestocked;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -55,7 +56,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
     @Test
     void counterNotificationTest() throws Exception {
         // Establish subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+        final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {
@@ -116,7 +117,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
                <id>%s</id>
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
              </input>""", id);
-        final var modifyResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
+        final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
@@ -158,7 +159,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
                <id>%s</id>
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
              </input>""", id);
-        final var modifyResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
+        final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
