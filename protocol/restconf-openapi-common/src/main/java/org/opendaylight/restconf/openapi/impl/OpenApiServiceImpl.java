@@ -28,7 +28,6 @@ import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
  * RESTCONF APIs. The output of this is used by embedded Swagger UI.
  */
 public final class OpenApiServiceImpl implements OpenApiService, AutoCloseable {
-    private final MountPointOpenApiGeneratorRFC8040 mountPointOpenApiGeneratorRFC8040;
     private final MountPointOpenApi mountPointOpenApiRFC8040;
     private final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040;
     private final String basePath;
@@ -39,20 +38,17 @@ public final class OpenApiServiceImpl implements OpenApiService, AutoCloseable {
             new OpenApiGeneratorRFC8040(schemaService), basePath);
     }
 
-    // FIXME Public for end-to-end testing openapi over Netty. Constructor that uses NettyEndpoint should be used
-    //  instead when we get one.
     @VisibleForTesting
     public OpenApiServiceImpl(final MountPointOpenApiGeneratorRFC8040 mountPointOpenApiGeneratorRFC8040,
             final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040, final String basePath) {
-        this.mountPointOpenApiGeneratorRFC8040 = requireNonNull(mountPointOpenApiGeneratorRFC8040);
-        mountPointOpenApiRFC8040 = this.mountPointOpenApiGeneratorRFC8040.getMountPointOpenApi();
+        mountPointOpenApiRFC8040 = requireNonNull(mountPointOpenApiGeneratorRFC8040).getMountPointOpenApi();
         this.openApiGeneratorRFC8040 = requireNonNull(openApiGeneratorRFC8040);
         this.basePath = "/" + requireNonNull(basePath) + "/";
     }
 
     @Override
     public void close() {
-        mountPointOpenApiGeneratorRFC8040.close();
+        mountPointOpenApiRFC8040.close();
     }
 
     @Override
