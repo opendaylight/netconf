@@ -23,11 +23,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
-import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterRestocked;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.InsufficientResources;
@@ -51,27 +48,10 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
     private static final String FORMATTED_EVENT_TIME = EVENT_TIME.atZone(ZoneId.systemDefault())
         .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
-    private HTTPClient streamClient;
-
-    @BeforeEach
-    void beforeEach() throws Exception {
-        super.beforeEach();
-        streamClient = startStreamClient();
-    }
-
-    @AfterEach
-    @Override
-    protected void afterEach() throws Exception {
-        if (streamClient != null) {
-            streamClient.shutdown().get(2, TimeUnit.SECONDS);
-        }
-        super.afterEach();
-    }
-
     @Test
     void testSubscriptionSuspension() throws Exception {
         // Establish subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+        final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON, """
                 {
                   "input": {
@@ -124,7 +104,7 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
               <id>%s</id>
               <stream-subtree-filter><toasterRestocked xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
             </input>""", subscriptionId);
-        final var modifyResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
+        final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
@@ -158,7 +138,7 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
     @Test
     void testSuspendSuspendedSubscription() throws Exception {
         // Establish subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+        final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON, """
                 {
                   "input": {
