@@ -81,7 +81,7 @@ class NotificationSubscriptionListeningHttp2Test extends AbstractNotificationSub
         final var eventListener = startSubscriptionStream(subscriptionId, true);
 
         // Delete the subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST,
+        final var response = invokeRequestKeepClient(HttpMethod.POST,
             "/restconf/operations/ietf-subscribed-notifications:delete-subscription",
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
@@ -153,7 +153,7 @@ class NotificationSubscriptionListeningHttp2Test extends AbstractNotificationSub
             streamClient = startStreamClient();
         }
         final var uri = "/restconf/operations/ietf-subscribed-notifications:establish-subscription";
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, uri,
+        final var response = invokeRequestKeepClient(HttpMethod.POST, uri,
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {
