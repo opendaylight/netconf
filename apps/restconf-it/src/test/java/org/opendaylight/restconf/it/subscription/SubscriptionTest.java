@@ -68,7 +68,7 @@ public class SubscriptionTest extends AbstractNotificationSubscriptionTest {
     void testToOperationalOutput() throws Exception {
         final var stopTime = Instant.now().plus(Duration.ofDays(2));
         // Establish subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+        final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON, String.format("""
             {
               "input": {

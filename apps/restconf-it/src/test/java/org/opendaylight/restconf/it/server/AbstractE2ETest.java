@@ -26,6 +26,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -44,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.IntSupplier;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -80,12 +82,15 @@ import org.opendaylight.netconf.sal.remote.impl.CreateDataChangeEventSubscriptio
 import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.netconf.transport.http.EventStreamService;
 import org.opendaylight.netconf.transport.http.HTTPClient;
+import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.netconf.transport.http.HTTPServerOverTcp;
 import org.opendaylight.netconf.transport.http.HttpClientStackConfiguration;
 import org.opendaylight.netconf.transport.http.SseUtils;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.client.ClientHttp1Session;
+import org.opendaylight.restconf.client.ClientHttp2Session;
 import org.opendaylight.restconf.server.AAAShiroPrincipalService;
 import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
@@ -404,15 +409,16 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
 
     protected FullHttpResponse invokeRequest(final FullHttpRequest request, final HttpClientStackGrouping clientConf)
             throws Exception {
-        final var channelListener = new TestTransportChannelListener(ignored -> {
-            // no-op
+        final var clientSession = new ClientHttp1Session();
+        final var channelListener = new TestTransportChannelListener(transportChannel -> {
+            transportChannel.channel().pipeline().addLast("restconf-session", clientSession);
         });
         final var client = HTTPClient.connect(channelListener, bootstrapFactory.newBootstrap(),
             clientConf, false).get(2, TimeUnit.SECONDS);
         // await for connection
         await().atMost(Duration.ofSeconds(2)).until(channelListener::initialized);
         final var callback = new TestRequestCallback();
-        client.invoke(request, callback);
+        clientSession.invoke(request, callback);
         // await for response
         await().atMost(Duration.ofSeconds(2)).until(callback::completed);
         client.shutdown().get(2, TimeUnit.SECONDS);
@@ -574,8 +580,23 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
     }
 
     protected HTTPClient startStreamClient(final boolean http2) throws Exception {
-        final var transportListener = new TestTransportChannelListener(channel ->
-            clientStreamService = SseUtils.enableClientSse(channel));
+        final var transportListener = new TestTransportChannelListener(channel -> {
+
+            IntSupplier streamIdSupplier = null;
+            final ChannelHandler session;
+
+            if (http2) {
+                final var h2Session = new ClientHttp2Session(HTTPScheme.HTTP);
+                session = h2Session;
+                streamIdSupplier = h2Session::nextStreamId;
+            } else {
+                session = new ClientHttp1Session();
+            }
+
+            channel.channel().pipeline().addLast("restconf-session", session);
+            clientStreamService = SseUtils.enableClientSse(channel, streamIdSupplier);
+        });
+
         final var streamClient = HTTPClient.connect(transportListener, bootstrapFactory.newBootstrap(),
             clientStackGrouping, http2).get(2, TimeUnit.SECONDS);
         await().atMost(Duration.ofSeconds(2)).until(transportListener::initialized);
