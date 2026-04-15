@@ -20,13 +20,9 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.TimeUnit;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
-import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterOutOfBread;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterRestocked;
@@ -54,30 +50,13 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
         .withChild(ImmutableNodes.leafNode(BREAD_NODEID, 1))
         .build();
 
-    private static HTTPClient streamClient;
-
-    @BeforeEach
-    void beforeEach() throws Exception {
-        super.beforeEach();
-        streamClient = startStreamClient();
-    }
-
-    @AfterEach
-    @Override
-    protected void afterEach() throws Exception {
-        if (streamClient != null) {
-            streamClient.shutdown().get(2, TimeUnit.SECONDS);
-        }
-        super.afterEach();
-    }
-
     @Test
     void filterNotificationReceivedTest() throws Exception {
         final var response = establishFilteredSubscription("""
             <toasterRestocked xmlns="http://netconfcentral.org/ns/toaster">
               <amountOfBread/>
             </toasterRestocked>
-            """, streamClient);
+            """);
 
         assertEquals(HttpResponseStatus.OK, response.status());
         final var id = extractSubscriptionId(response);
@@ -101,7 +80,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                <id>%s</id>
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
              </input>""", id);
-        final var modifyResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
+        final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
@@ -121,7 +100,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
     @Test
     void filterNotificationNotReceivedTest() throws Exception {
         final var response = establishFilteredSubscription(
-            "<toasterOutOfBread xmlns=\"http://netconfcentral.org/ns/toaster\"/>", streamClient);
+            "<toasterOutOfBread xmlns=\"http://netconfcentral.org/ns/toaster\"/>");
         verifyToasterOutOfBreadFilter(response);
     }
 
@@ -133,7 +112,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                 <id/>
               </entry>
             </example-notification>
-            """, streamClient);
+            """);
 
         assertEquals(HttpResponseStatus.OK, response.status());
         final var id = extractSubscriptionId(response);
@@ -174,7 +153,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
         assertEquals(HttpResponseStatus.CREATED, postFilterResponse.status());
 
         // Establish subscription with filter reference
-        final var establishResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+        final var establishResponse = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {

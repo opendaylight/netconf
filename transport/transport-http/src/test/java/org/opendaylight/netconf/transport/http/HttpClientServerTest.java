@@ -47,6 +47,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http2.Http2FrameCodec;
 import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
+import io.netty.handler.codec.http2.HttpConversionUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Authenticator;
@@ -61,6 +62,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -282,6 +284,13 @@ class HttpClientServerTest {
     }
 
     private void integrationTest(final boolean http2, final AuthHandlerFactory authHandlerFactory) throws Exception {
+        // capture the channel
+        final var clientChannelRef = new AtomicReference<TransportChannel>();
+        doAnswer(inv -> {
+            clientChannelRef.set(inv.getArgument(0));
+            return null;
+        }).when(clientTransportListener).onTransportChannelEstablished(any());
+
         final var server = HTTPServer.listen(serverTransportListener, bootstrapFactory.newServerBootstrap(),
             serverConfig).get(2, TimeUnit.SECONDS);
         try {
@@ -291,19 +300,25 @@ class HttpClientServerTest {
                 verify(clientTransportListener, timeout(2000)).onTransportChannelEstablished(any());
                 verify(serverTransportListener, timeout(2000)).onTransportChannelEstablished(any());
 
+                final var transportChannel = clientChannelRef.get();
+                assertNotNull(transportChannel);
+                final var httpChannel = (HTTPTransportChannel) transportChannel;
+                final var scheme = httpChannel.scheme().name().toLowerCase();
+
                 for (var method : METHODS) {
                     final var uri = nextValue("/URI");
                     final var payload = nextValue("PAYLOAD");
                     final var request = new DefaultFullHttpRequest(HTTP_1_1, HttpMethod.valueOf(method),
                         uri, wrappedBuffer(payload.getBytes(StandardCharsets.UTF_8)));
                     request.headers()
+                        .set(HttpConversionUtil.ExtensionHeaderNames.SCHEME.text(), scheme)
                         .set(HOST, "example.com")
                         .set(CONTENT_TYPE, TEXT_PLAIN)
                         .setInt(CONTENT_LENGTH, request.content().readableBytes())
                         // allow multiple requests on same connections
                         .set(CONNECTION, KEEP_ALIVE);
 
-                    final var response = invoke(client, request).get(2, TimeUnit.SECONDS);
+                    final var response = invoke(transportChannel, request).get(2, TimeUnit.SECONDS);
                     assertNotNull(response);
                     assertEquals(OK, response.status());
                     assertEquals("Method: " + method + " URI: " + uri + " Payload: " + payload,

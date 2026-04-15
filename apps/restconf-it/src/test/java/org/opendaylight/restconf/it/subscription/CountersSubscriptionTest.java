@@ -16,13 +16,9 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
-import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterOutOfBread;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterRestocked;
@@ -34,28 +30,10 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
     private static final NodeIdentifier BREAD_NODEID =
         NodeIdentifier.create(QName.create(ToasterRestocked.QNAME, "amountOfBread").intern());
 
-    private static HTTPClient streamClient;
-
-    @Override
-    @BeforeEach
-    void beforeEach() throws Exception {
-        super.beforeEach();
-        streamClient = startStreamClient();
-    }
-
-    @AfterEach
-    @Override
-    protected void afterEach() throws Exception {
-        if (streamClient != null) {
-            streamClient.shutdown().get(2, TimeUnit.SECONDS);
-        }
-        super.afterEach();
-    }
-
     @Test
     void counterNotificationTest() throws Exception {
         // Establish subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+        final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {
@@ -97,7 +75,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
             <toasterRestocked xmlns="http://netconfcentral.org/ns/toaster">
               <amountOfBread/>
             </toasterRestocked>
-            """, streamClient);
+            """);
 
         assertEquals(HttpResponseStatus.OK, response.status());
         final var id = extractSubscriptionId(response);
@@ -116,7 +94,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
                <id>%s</id>
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
              </input>""", id);
-        final var modifyResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
+        final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
@@ -133,7 +111,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
     @Test
     void excludedCounterNotificationTest() throws Exception {
         final var response = establishFilteredSubscription(
-            "<toasterOutOfBread xmlns=\"http://netconfcentral.org/ns/toaster\"/>", streamClient);
+            "<toasterOutOfBread xmlns=\"http://netconfcentral.org/ns/toaster\"/>");
 
         assertEquals(HttpResponseStatus.OK, response.status());
         final var id = extractSubscriptionId(response);
@@ -158,7 +136,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
                <id>%s</id>
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
              </input>""", id);
-        final var modifyResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
+        final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
