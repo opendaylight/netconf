@@ -58,6 +58,7 @@
         <module>odl-restconf-api</module>
         <module>odl-restconf-common</module>
         <module>odl-restconf-nb</module>
+        <module>odl-restconf-nb-jaxrs</module>
         <module>odl-restconf-openapi</module>
         <module>odl-restconf-server-api</module>
         <module>odl-yanglib-mdsal-writer</module>
