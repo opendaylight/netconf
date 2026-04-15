@@ -54,7 +54,6 @@
         <module>odl-netconf-transport</module>
         <module>odl-netconf-transport-api</module>
         <module>odl-netconf-truststore</module>
-        <module>odl-restconf</module>
         <module>odl-restconf-all</module>
         <module>odl-restconf-api</module>
         <module>odl-restconf-common</module>
