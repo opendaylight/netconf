@@ -21,12 +21,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.opendaylight.aaa</groupId>
-            <artifactId>odl-aaa-shiro</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.ietf</groupId>
             <artifactId>odl-ietf-model-rfc7317-iana-crypt-hash</artifactId>
             <type>xml</type>
@@ -59,6 +53,12 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>odl-netconf-transport</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-restconf-common</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
@@ -104,10 +104,6 @@
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-server-jaxrs</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>

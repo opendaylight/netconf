@@ -38,6 +38,7 @@
         <!-- northbound applications -->
         <module>netconf-nb</module>
         <module>restconf-nb</module>
+        <module>restconf-nb-jaxrs</module>
 
         <!-- NETCONF console -->
         <module>netconf-console</module>
