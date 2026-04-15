@@ -14,13 +14,10 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.concurrent.TimeUnit;
 import org.awaitility.core.ConditionTimeoutException;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
-import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.it.subscription.AbstractNotificationSubscriptionTest;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterRestocked;
@@ -31,17 +28,6 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class NotificationSubscriptionListeningHttp2Test extends AbstractNotificationSubscriptionTest {
-    private static HTTPClient streamClient;
-
-    @AfterEach
-    @Override
-    protected void afterEach() throws Exception {
-        if (streamClient != null) {
-            streamClient.shutdown().get(2, TimeUnit.SECONDS);
-            streamClient = null;
-        }
-        super.afterEach();
-    }
 
     /**
      * Tests sending and receiving custom notification.
@@ -81,7 +67,7 @@ class NotificationSubscriptionListeningHttp2Test extends AbstractNotificationSub
         final var eventListener = startSubscriptionStream(subscriptionId, true);
 
         // Delete the subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST,
+        final var response = invokeRequestKeepClient(HttpMethod.POST,
             "/restconf/operations/ietf-subscribed-notifications:delete-subscription",
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
@@ -148,12 +134,9 @@ class NotificationSubscriptionListeningHttp2Test extends AbstractNotificationSub
             }""", eventListener2.readNext(), JSONCompareMode.LENIENT);
     }
 
-    private String startSubscription() throws Exception {
-        if (streamClient == null) {
-            streamClient = startStreamClient();
-        }
+    private String startSubscription() {
         final var uri = "/restconf/operations/ietf-subscribed-notifications:establish-subscription";
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, uri,
+        final var response = invokeRequestKeepClient(HttpMethod.POST, uri,
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {
