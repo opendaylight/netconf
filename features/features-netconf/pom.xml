@@ -138,6 +138,12 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-restconf-openapi-jaxrs</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>odl-restconf-nb</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
