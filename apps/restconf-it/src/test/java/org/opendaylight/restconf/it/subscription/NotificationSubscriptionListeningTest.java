@@ -17,15 +17,12 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.concurrent.TimeUnit;
 import org.awaitility.core.ConditionTimeoutException;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
-import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.it.server.TestEventStreamListener;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterRestocked;
@@ -46,16 +43,14 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
           }
         }""";
 
-    private static HTTPClient streamClient;
     private static TestEventStreamListener eventListener;
 
     @BeforeEach
     void beforeEach() throws Exception {
         super.beforeEach();
-        streamClient = startStreamClient();
 
         // Establish subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+        final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {
@@ -73,15 +68,6 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
 
         // Start listening on notifications
         eventListener = startSubscriptionStream(String.valueOf(subscriptionId));
-    }
-
-    @AfterEach
-    @Override
-    protected void afterEach() throws Exception {
-        if (streamClient != null) {
-            streamClient.shutdown().get(2, TimeUnit.SECONDS);
-        }
-        super.afterEach();
     }
 
     /**
@@ -115,7 +101,7 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
     @Test
     void testListenModifiedNotification() throws Exception {
         // Modify the subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST,
+        final var response = invokeRequestKeepClient(HttpMethod.POST,
             "/restconf/operations/ietf-subscribed-notifications:modify-subscription",
             MediaTypes.APPLICATION_YANG_DATA_XML, """
              <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
@@ -145,7 +131,7 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
     @Test
     void testListenDeleteNotification() throws Exception {
         // Delete the subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST,
+        final var response = invokeRequestKeepClient(HttpMethod.POST,
             "/restconf/operations/ietf-subscribed-notifications:delete-subscription",
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
@@ -172,7 +158,7 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
     @Test
     void testListenKillNotification() throws Exception {
         // Kill the subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST,
+        final var response = invokeRequestKeepClient(HttpMethod.POST,
             "/restconf/operations/ietf-subscribed-notifications:kill-subscription",
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
