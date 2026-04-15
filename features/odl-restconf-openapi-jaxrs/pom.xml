@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright © 2017 Red Hat, Inc. and others.
+ Copyright (c) 2026 PANTHEON.tech, s.r.o. and others.  All rights reserved.
 
  This program and the accompanying materials are made available under the
  terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -15,20 +15,14 @@
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>odl-restconf-all</artifactId>
+    <artifactId>odl-restconf-openapi-jaxrs</artifactId>
     <packaging>feature</packaging>
-    <name>OpenDaylight :: Restconf :: All</name>
+    <name>OpenDaylight :: RESTCONF :: OPENAPI JAX-RS</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-restconf-nb</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-restconf-openapi</artifactId>
+            <groupId>org.opendaylight.odlparent</groupId>
+            <artifactId>odl-jackson-2</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
@@ -38,11 +32,14 @@
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
+
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-restconf-openapi-jaxrs</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
+            <artifactId>restconf-openapi-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-openapi-jaxrs</artifactId>
         </dependency>
     </dependencies>
 </project>
