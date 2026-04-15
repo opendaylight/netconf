@@ -20,31 +20,12 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 public class StopTimeTest extends AbstractNotificationSubscriptionTest {
-    private static HTTPClient streamClient;
-
-    @BeforeEach
-    protected void beforeEach() throws Exception {
-        super.beforeEach();
-        streamClient = startStreamClient();
-    }
-
-    @AfterEach
-    @Override
-    protected void afterEach() throws Exception {
-        if (streamClient != null) {
-            streamClient.shutdown().get(2, TimeUnit.SECONDS);
-        }
-        super.afterEach();
-    }
 
     /**
      * Test establishing subscription with stop-time in the past.
@@ -53,7 +34,7 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
     void invalidStopTimeTest() {
         final var stopTime = Instant.now().minus(Duration.ofDays(1));
         // Establish subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+        final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             String.format("""
                 {
@@ -131,7 +112,7 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
                <stop-time>%s</stop-time>
              </input>""", subscriptionId1, newStopTime);
-        final var modifyResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
+        final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
 
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
@@ -202,7 +183,7 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
                <id>%s</id>
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
              </input>""", subscriptionId);
-        final var modifyResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
+        final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
 
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
@@ -237,7 +218,7 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
     }
 
     private String establishSubscription(final Instant stopTime) {
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+        final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             String.format("""
             {
