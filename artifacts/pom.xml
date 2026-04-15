@@ -517,6 +517,11 @@
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>restconf-nb-jaxrs</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>restconf-server</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -599,6 +604,13 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-restconf-nb</artifactId>
+                <version>${project.version}</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>odl-restconf-nb-jaxrs</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
                 <classifier>features</classifier>
