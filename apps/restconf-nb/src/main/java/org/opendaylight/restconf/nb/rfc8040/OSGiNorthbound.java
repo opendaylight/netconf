@@ -20,8 +20,6 @@ import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.NettyEndpoint;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
 import org.opendaylight.restconf.server.OSGiNettyEndpoint;
-import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
-import org.opendaylight.restconf.server.jaxrs.JaxRsEndpointConfiguration;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -77,14 +75,6 @@ public final class OSGiNorthbound {
         @AttributeDefinition(name = "{+restconf}", description = """
             The value of RFC8040 {+restconf} URI template, pointing to the root resource. Must not end with '/'.""")
         String restconf() default "rests";
-
-        @AttributeDefinition(min = "1")
-        String ping$_$executor$_$name$_$prefix() default JaxRsEndpointConfiguration.DEFAULT_NAME_PREFIX;
-
-        // FIXME: this is a misnomer: it specifies the core pool size, i.e. minimum thread count, the maximum is set to
-        //        Integer.MAX_VALUE, which is not what we want
-        @AttributeDefinition(min = "0")
-        int max$_$thread$_$count() default JaxRsEndpointConfiguration.DEFAULT_CORE_POOL_SIZE;
 
         // Note: below (+restconf above) are used in NettyEndpointConfiguration
 
@@ -219,28 +209,19 @@ public final class OSGiNorthbound {
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
 
-    private final ComponentFactory<JaxRsEndpoint> jaxrsFactory;
     private final ComponentFactory<NettyEndpoint> nettyEndpointFactory;
 
-    private ComponentInstance<JaxRsEndpoint> jaxrs;
     private ComponentInstance<NettyEndpoint> nettyEndpoint;
     private RestconfBootstrapFactory bootstrapFactory;
-    private Map<String, ?> jaxrsProps;
     private Map<String, ?> nettyEndpointProps;
     private RestconfBootstrapFactory.Configuration bootstrapFactoryConfig;
 
     @Activate
     public OSGiNorthbound(
-            @Reference(target = "(component.factory=" + JaxRsEndpoint.FACTORY_NAME + ")")
-            final ComponentFactory<JaxRsEndpoint> jaxrsFactory,
             @Reference(target = "(component.factory=" + OSGiNettyEndpoint.FACTORY_NAME + ")")
             final ComponentFactory<NettyEndpoint> nettyEndpointFactory,
             final Configuration configuration) {
-        this.jaxrsFactory = requireNonNull(jaxrsFactory);
         this.nettyEndpointFactory = requireNonNull(nettyEndpointFactory);
-
-        jaxrsProps = newJaxrsProps(configuration);
-        jaxrs = jaxrsFactory.newInstance(FrameworkUtil.asDictionary(jaxrsProps));
 
         bootstrapFactoryConfig = newBootstrapConfiguration(configuration);
         bootstrapFactory = new RestconfBootstrapFactory(bootstrapFactoryConfig);
@@ -253,14 +234,6 @@ public final class OSGiNorthbound {
 
     @Modified
     void modified(final Configuration configuration) {
-        final var newJaxRsProps = newJaxrsProps(configuration);
-        if (!newJaxRsProps.equals(jaxrsProps)) {
-            jaxrs.dispose();
-            jaxrsProps = newJaxRsProps;
-            jaxrs = jaxrsFactory.newInstance(FrameworkUtil.asDictionary(jaxrsProps));
-            LOG.debug("JAX-RS northbound restarted with {}", jaxrsProps);
-        }
-
         // allocate new bootstrap factory if needed
         final var newBoostrapFactoryConfig = newBootstrapConfiguration(configuration);
         final var bootstrap = newBoostrapFactoryConfig.equals(bootstrapFactoryConfig) ? bootstrapFactory
@@ -286,8 +259,6 @@ public final class OSGiNorthbound {
 
     @Deactivate
     void deactivate() {
-        jaxrs.dispose();
-        jaxrs = null;
         nettyEndpoint.dispose();
         nettyEndpoint = null;
         bootstrapFactory.close();
@@ -298,15 +269,6 @@ public final class OSGiNorthbound {
     private static RestconfBootstrapFactory.Configuration newBootstrapConfiguration(final Configuration configuration) {
         return new RestconfBootstrapFactory.Configuration(configuration.boss$_$threads(),
             configuration.worker$_$threads());
-    }
-
-    private static Map<String, ?> newJaxrsProps(final Configuration configuration) {
-        return JaxRsEndpoint.props(new JaxRsEndpointConfiguration(
-            configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
-            PrettyPrintParam.of(configuration.pretty$_$print()),
-            Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
-            Uint32.valueOf(configuration.heartbeat$_$interval()), configuration.restconf(),
-            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count()));
     }
 
     private static Map<String, ?> newNettyEndpointProps(final BootstrapFactory bootstrapFactory,

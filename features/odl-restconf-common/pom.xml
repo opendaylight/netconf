@@ -57,12 +57,6 @@
             <classifier>features</classifier>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.odlparent</groupId>
-            <artifactId>odl-karaf-feat-jetty</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>odl-yangtools-export</artifactId>
             <type>xml</type>
