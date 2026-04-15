@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright © 2017 Red Hat, Inc. and others.
+ Copyright (c) 2026 PANTHEON.tech, s.r.o. and others.  All rights reserved.
 
  This program and the accompanying materials are made available under the
  terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -15,40 +15,53 @@
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>odl-restconf-openapi</artifactId>
+    <artifactId>odl-restconf-nb-jaxrs</artifactId>
     <packaging>feature</packaging>
-    <name>OpenDaylight :: RESTCONF :: OPENAPI</name>
+    <name>OpenDaylight :: RESTCONF :: Northbound JAX-RS</name>
 
     <dependencies>
         <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-netconf-mdsal-common</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-restconf-common</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-restconf-server-api</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-yanglib-mdsal-writer</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.odlparent</groupId>
-            <artifactId>odl-jackson-2</artifactId>
+            <artifactId>odl-karaf-feat-jetty</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
+
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-restconf-nb</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
+            <artifactId>restconf-nb-jaxrs</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-restconf-nb-jaxrs</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
+            <artifactId>restconf-server-jaxrs</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-openapi-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-openapi-jaxrs</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-openapi</artifactId>
+            <artifactId>restconf-server-mdsal</artifactId>
         </dependency>
     </dependencies>
 </project>
