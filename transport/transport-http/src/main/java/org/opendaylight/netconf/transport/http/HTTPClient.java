@@ -9,12 +9,9 @@ package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http2.DefaultHttp2Connection;
@@ -23,7 +20,6 @@ import io.netty.handler.codec.http2.Http2ConnectionHandler;
 import io.netty.handler.codec.http2.Http2FrameLogger;
 import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandlerBuilder;
 import io.netty.handler.logging.LogLevel;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
@@ -43,7 +39,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.
 public abstract sealed class HTTPClient extends HTTPTransportStack permits PlainHTTPClient, TlsHTTPClient {
     private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.INFO, "Client");
 
-    private final ClientRequestDispatcher dispatcher;
     private final ClientAuthProvider authProvider;
     private final boolean http2;
 
@@ -52,18 +47,6 @@ public abstract sealed class HTTPClient extends HTTPTransportStack permits Plain
         super(listener, scheme);
         this.authProvider = authProvider;
         this.http2 = http2;
-        dispatcher = http2 ? new ClientHttp2RequestDispatcher(scheme) : new ClientHttp1RequestDispatcher();
-    }
-
-    /**
-     * Invokes the HTTP request over established connection.
-     *
-     * @param request the full http request object
-     * @param callback invoked when the request completes
-     */
-    public void invoke(final @NonNull FullHttpRequest request,
-            final @NonNull FutureCallback<@NonNull FullHttpResponse> callback) {
-        dispatcher.dispatch(request, callback);
     }
 
     /**
@@ -140,7 +123,6 @@ public abstract sealed class HTTPClient extends HTTPTransportStack permits Plain
         if (authProvider != null) {
             pipeline.addLast(authProvider);
         }
-        pipeline.addLast(dispatcher);
 
         // signal client transport is ready to send requests
         // NB. while server signals readiness on exit from initChannel(),

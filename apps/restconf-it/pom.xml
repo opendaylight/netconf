@@ -286,6 +286,11 @@
             <artifactId>xmlunit-legacy</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-client</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

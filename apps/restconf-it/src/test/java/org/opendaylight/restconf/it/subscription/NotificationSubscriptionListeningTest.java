@@ -55,7 +55,7 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
         streamClient = startStreamClient();
 
         // Establish subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+        final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {
@@ -115,7 +115,7 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
     @Test
     void testListenModifiedNotification() throws Exception {
         // Modify the subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST,
+        final var response = invokeRequestKeepClient(HttpMethod.POST,
             "/restconf/operations/ietf-subscribed-notifications:modify-subscription",
             MediaTypes.APPLICATION_YANG_DATA_XML, """
              <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
@@ -145,7 +145,7 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
     @Test
     void testListenDeleteNotification() throws Exception {
         // Delete the subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST,
+        final var response = invokeRequestKeepClient(HttpMethod.POST,
             "/restconf/operations/ietf-subscribed-notifications:delete-subscription",
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
@@ -172,7 +172,7 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
     @Test
     void testListenKillNotification() throws Exception {
         // Kill the subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST,
+        final var response = invokeRequestKeepClient(HttpMethod.POST,
             "/restconf/operations/ietf-subscribed-notifications:kill-subscription",
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """

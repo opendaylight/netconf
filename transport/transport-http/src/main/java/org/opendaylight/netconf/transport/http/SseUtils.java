@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.IntSupplier;
 import java.util.stream.Stream;
 
 /*
@@ -39,15 +40,15 @@ public final class SseUtils {
      * @param channel client-side {@link HTTPTransportChannel}
      * @return an instance of {@link EventStreamService} to be used to request SSE stream using current connection.
      */
-    public static EventStreamService enableClientSse(final HTTPTransportChannel channel) {
+    public static EventStreamService enableClientSse(final HTTPTransportChannel channel,
+            final IntSupplier nextStreamId) {
         final var nettyChannel = channel.channel();
         final var pipeline = nettyChannel.pipeline();
 
-        final var http2Dispatcher = pipeline.get(ClientHttp2RequestDispatcher.class);
         final var http2AdapterContext = pipeline.context(HttpToHttp2ConnectionHandler.class);
-        if (http2Dispatcher != null && http2AdapterContext != null) {
+        if (http2AdapterContext != null && nextStreamId != null) {
             // http 2
-            final var sseService = new ClientHttp2SseService(channel, http2Dispatcher::nextStreamId);
+            final var sseService = new ClientHttp2SseService(channel, nextStreamId);
             pipeline.addAfter(http2AdapterContext.name(), SSE_SERVICE_HANDLER_NAME, sseService);
             return sseService;
         }
