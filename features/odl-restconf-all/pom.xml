@@ -22,7 +22,7 @@
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-restconf</artifactId>
+            <artifactId>odl-restconf-nb</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
