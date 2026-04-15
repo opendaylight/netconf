@@ -77,6 +77,7 @@ import org.opendaylight.netconf.transport.http.HttpClientStackConfiguration;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.client.ClientHttp1Session;
 import org.opendaylight.restconf.it.server.NullAAAEncryptionService;
 import org.opendaylight.restconf.it.server.TestRequestCallback;
 import org.opendaylight.restconf.it.server.TestTransportChannelListener;
@@ -320,15 +321,16 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
 
     protected FullHttpResponse invokeRequest(final FullHttpRequest request, final HttpClientStackGrouping clientConf)
             throws Exception {
-        final var channelListener = new TestTransportChannelListener(ignored -> {
-            // no-op
+        final var clientSession = new ClientHttp1Session();
+        final var channelListener = new TestTransportChannelListener(transportChannel -> {
+            transportChannel.channel().pipeline().addLast("restconf-session", clientSession);
         });
         final var client = HTTPClient.connect(channelListener, bootstrapFactory.newBootstrap(),
             clientConf, false).get(2, TimeUnit.SECONDS);
         // await for connection
         await().atMost(Duration.ofSeconds(2)).until(channelListener::initialized);
         final var callback = new TestRequestCallback();
-        client.invoke(request, callback);
+        clientSession.invoke(request, callback);
         // await for response
         await().atMost(Duration.ofSeconds(2)).until(callback::completed);
         client.shutdown().get(2, TimeUnit.SECONDS);
