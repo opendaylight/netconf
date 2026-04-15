@@ -71,7 +71,7 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
     @Test
     void testSubscriptionSuspension() throws Exception {
         // Establish subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+        final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON, """
                 {
                   "input": {
@@ -124,7 +124,7 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
               <id>%s</id>
               <stream-subtree-filter><toasterRestocked xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
             </input>""", subscriptionId);
-        final var modifyResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
+        final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
@@ -158,7 +158,7 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
     @Test
     void testSuspendSuspendedSubscription() throws Exception {
         // Establish subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+        final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON, """
                 {
                   "input": {

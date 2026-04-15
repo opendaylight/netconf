@@ -9,14 +9,15 @@ package org.opendaylight.netconf.transport.http;
 
 import static org.opendaylight.netconf.transport.http.AbstractBasicAuthHandler.BASIC_AUTH_PREFIX;
 
-import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpRequest;
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
@@ -42,6 +43,7 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.opendaylight.netconf.transport.api.TransportChannel;
 
 final class TestUtils {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
@@ -79,11 +81,12 @@ final class TestUtils {
         return request;
     }
 
-    static ListenableFuture<FullHttpResponse> invoke(final HTTPClient client, final FullHttpRequest request) {
+    static ListenableFuture<FullHttpResponse> invoke(final TransportChannel clientChannel,
+            final DefaultFullHttpRequest request) {
         final var future = SettableFuture.<FullHttpResponse>create();
-        client.invoke(request, new FutureCallback<>() {
+        clientChannel.channel().pipeline().addLast(new SimpleChannelInboundHandler<FullHttpResponse>() {
             @Override
-            public void onSuccess(final FullHttpResponse response) {
+            protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpResponse response) {
                 // To simplify the test code we use future on top of callback.
                 // Due to content of response object is released (cleared) on exit from this method
                 // we need to ensure the content is copied channel independent byte buffer.
@@ -94,14 +97,22 @@ final class TestUtils {
                 final var content = Unpooled.wrappedBuffer(ByteBufUtil.getBytes(response.content()));
                 final var copy = new DefaultFullHttpResponse(response.protocolVersion(), response.status(), content);
                 copy.headers().set(response.headers());
+                ctx.pipeline().remove(this);
                 future.set(copy);
             }
 
             @Override
-            public void onFailure(final Throwable cause) {
+            public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
                 future.setException(cause);
             }
         });
+
+        clientChannel.channel().writeAndFlush(request).addListener(f -> {
+            if (!f.isSuccess()) {
+                future.setException(f.cause());
+            }
+        });
+
         return future;
     }
 
