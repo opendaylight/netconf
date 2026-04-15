@@ -1,0 +1,260 @@
+module iana-quic-transport {
+  yang-version 1.1;
+  namespace "urn:ietf:params:xml:ns:yang:iana-quic-transport";
+  prefix iana-quic-transport;
+
+  organization
+    "Internet Assigned Numbers Authority (IANA)";
+
+  contact
+    "Internet Assigned Numbers Authority
+
+     ICANN
+     12025 Waterfront Drive, Suite 300
+     Los Angeles, CA 90094
+
+     Tel: +1 424 254 5300
+
+     <mailto:iana@iana.org>";
+
+  description
+    "This YANG module translates IANA registry 'QUIC Transport
+     Parameters' to YANG derived types.
+
+     Copyright (c) 2025 IETF Trust and the persons identified as
+     authors of the code. All rights reserved.
+
+     Redistribution and use in source and binary forms, with or
+     without modification, is permitted pursuant to, and subject to
+     the license terms contained in, the Revised BSD License set
+     forth in Section 4.c of the IETF Trust's Legal Provisions
+     Relating to IETF Documents
+     (https://trustee.ietf.org/license-info).
+
+     This version of this YANG module was generated from the
+     corresponding IANA registry using an XSLT stylesheet from the
+     'iana-yang' project (https://github.com/llhotka/iana-yang).";
+
+  reference
+    "QUIC (https://www.iana.org/assignments/quic/)";
+
+  revision 2025-09-23 {
+    description
+      "Current revision as of the revision date specified in the XML
+       representation of the registry page.";
+    reference
+      "https://www.iana.org/assignments/quic/quic.xml";
+  }
+
+  /* Typedefs */
+
+  typedef quic-transport-parameter {
+    type enumeration {
+      enum original_destination_connection_id {
+        description
+          "0x00 (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum max_idle_timeout {
+        description
+          "0x01 (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum stateless_reset_token {
+        description
+          "0x02 (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum max_udp_payload_size {
+        description
+          "0x03 (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum initial_max_data {
+        description
+          "0x04 (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum initial_max_stream_data_bidi_local {
+        description
+          "0x05 (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum initial_max_stream_data_bidi_remote {
+        description
+          "0x06 (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum initial_max_stream_data_uni {
+        description
+          "0x07 (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum initial_max_streams_bidi {
+        description
+          "0x08 (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum initial_max_streams_uni {
+        description
+          "0x09 (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum ack_delay_exponent {
+        description
+          "0x0a (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum max_ack_delay {
+        description
+          "0x0b (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum disable_active_migration {
+        description
+          "0x0c (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum preferred_address {
+        description
+          "0x0d (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum active_connection_id_limit {
+        description
+          "0x0e (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum initial_source_connection_id {
+        description
+          "0x0f (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum retry_source_connection_id {
+        description
+          "0x10 (permanent)";
+        reference
+          "RFC 9000";
+      }
+      enum version_information {
+        description
+          "0x11 (permanent)";
+        reference
+          "RFC 9368";
+      }
+      enum max_datagram_frame_size {
+        description
+          "0x20 (permanent)";
+        reference
+          "RFC 9221";
+      }
+      enum discard {
+        description
+          "0x173e (provisional) Receiver silently discards.";
+        reference
+          "https://github.com/quicwg/base-drafts/wiki
+           /Quantum-Readiness-test";
+      }
+      enum google_handshake_message {
+        description
+          "0x26ab (provisional) Used to carry Google internal
+           handshake message";
+      }
+      enum grease_quic_bit {
+        description
+          "0x2ab2 (permanent)";
+        reference
+          "RFC 9287";
+      }
+      enum initial_rtt {
+        description
+          "0x3127 (provisional) Initial RTT in microseconds";
+      }
+      enum google_connection_options {
+        description
+          "0x3128 (provisional) Google connection options for
+           experimentation";
+      }
+      enum user_agent {
+        status deprecated;
+        description
+          "0x3129 (provisional) User agent string (deprecated)";
+      }
+      enum google_version {
+        description
+          "0x4752 (provisional) Google QUIC version downgrade
+           prevention";
+      }
+      enum version_information_draft {
+        status deprecated;
+        description
+          "0xff73db (provisional) Deprecated; use version_information
+           instead";
+        reference
+          "draft-ietf-quic-version-negotiation-13";
+      }
+      enum google_debug_1 {
+        description
+          "0x219bbcd0 (provisional)";
+      }
+      enum min_ack_delay {
+        description
+          "0xff04de1b (provisional)";
+        reference
+          "draft-ietf-quic-ack-frequency-07";
+      }
+      enum enable_multipath {
+        description
+          "0x0f739bbc1b666d05 (provisional)";
+        reference
+          "draft-ietf-quic-multipath-05";
+      }
+      enum enable_multipath-06 {
+        description
+          "0x0f739bbc1b666d06 (provisional)";
+        reference
+          "draft-ietf-quic-multipath-06";
+      }
+      enum initial_max_path_id {
+        description
+          "0x0f739bbc1b666d0d (provisional)";
+        reference
+          "draft-ietf-quic-multipath-15";
+      }
+      enum bdp_frame {
+        description
+          "0x4143414213370002 (provisional)";
+        reference
+          "draft-misell-quic-bdp-token-02";
+      }
+    }
+    description
+      "This enumeration type defines QUIC transport parameters.";
+    reference
+      "RFC 9000: QUIC: A UDP-Based Multiplexed and Secure
+       Transport";
+  }
+
+  typedef transport-parameter {
+    type quic-transport-parameter;
+    description
+      "This type allows reference to a QUIC transport parameters
+       using the assigned value.";
+  }
+}
