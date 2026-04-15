@@ -16,12 +16,9 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
-import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterRestocked;
@@ -42,22 +39,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 public class SubscriptionTest extends AbstractNotificationSubscriptionTest {
-    private static HTTPClient streamClient;
-
-    @BeforeEach
-    protected void beforeEach() throws Exception {
-        super.beforeEach();
-        streamClient = startStreamClient();
-    }
-
-    @AfterEach
-    @Override
-    protected void afterEach() throws Exception {
-        if (streamClient != null) {
-            streamClient.shutdown().get(2, TimeUnit.SECONDS);
-        }
-        super.afterEach();
-    }
 
     /**
      * Tests the toOperational() method output.
@@ -68,7 +49,7 @@ public class SubscriptionTest extends AbstractNotificationSubscriptionTest {
     void testToOperationalOutput() throws Exception {
         final var stopTime = Instant.now().plus(Duration.ofDays(2));
         // Establish subscription
-        final var response = invokeRequestKeepClient(streamClient, HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
+        final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON, String.format("""
             {
               "input": {
