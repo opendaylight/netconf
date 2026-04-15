@@ -23,7 +23,7 @@ TOOLS_IP = variables.TOOLS_IP
 KARAF_LOG_LEVEL = variables.KARAF_LOG_LEVEL
 ODL_FEATRUES = [
     "odl-infrautils-ready",
-    "odl-restconf",
+    "odl-restconf-nb",
     "odl-netconf-mdsal",
     "odl-restconf-openapi",
     "odl-clustering-test-app",
