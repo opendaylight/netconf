@@ -16,6 +16,24 @@
       "message": "where it was changed?",
       "revId": "2d758d9cd23cc5bceb66807312689ce029502ef3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "384176b9_02e73cec",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-15T08:12:55Z",
+      "side": 1,
+      "message": "in 1540: https://git.opendaylight.org/gerrit/c/netconf/+/121112",
+      "parentUuid": "46e74665_b5c111cd",
+      "revId": "2d758d9cd23cc5bceb66807312689ce029502ef3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
