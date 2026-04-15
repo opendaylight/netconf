@@ -139,6 +139,24 @@
       "parentUuid": "5fbdf053_eb9395a5",
       "revId": "90998978c4adbbda17315e9e293f7d115c60d704",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b09ba33_23ff2327",
+        "filename": "protocol/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/netty/OpenApiResourceProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-15T06:58:47Z",
+      "side": 1,
+      "message": "IIRC, I was thinking that when we have designated endpoints we should be able to pass it somehow:\n```\nIn option #1 we remove @Component instantiation from OpenApiServiceImpl which can be leaved as simple implementation in common with instantiation in jaxrs and netty protocols with appropriate jaxrs or Netty endpoint and its configuration thus eliminating NETCONF-1560: Netty based OpenAPI operates with JAXRS configuration\nResolved\n bill of introducing restconf base path into transport related WebHostResourceProvider.\n```\n\nIDK Try to check, please.",
+      "parentUuid": "d4f7c01b_ccdf6416",
+      "revId": "90998978c4adbbda17315e9e293f7d115c60d704",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ],
   "submitRequirementResults": [
