@@ -143,6 +143,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7e19b74_304bc5a3",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/AlgorithmPolicy.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-04-16T08:02:48Z",
+      "side": 1,
+      "message": "I end up using Peter\u0027s proposed solution due to KeyExchangePolicy causing problems for the BiMap approach. KeyExchangeFactory uses default equals() implementation, which doesn\u0027t work when we only have factoryName and have to create new KeyExchangeFactory to match.",
+      "parentUuid": "5168e3c4_ba8b7a91",
+      "range": {
+        "startLine": 66,
+        "startChar": 31,
+        "endLine": 66,
+        "endChar": 53
+      },
+      "revId": "b2d1623bac84f0870cd8a6c90f9a1c188870f221",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "55733a8e_d5556460",
