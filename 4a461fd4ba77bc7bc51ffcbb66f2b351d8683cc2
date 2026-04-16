@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a0fb6e8_120ee57e",
+        "filename": "artifacts/pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 513,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-16T08:13:36Z",
+      "side": 1,
+      "message": "after -nb",
+      "revId": "4a461fd4ba77bc7bc51ffcbb66f2b351d8683cc2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2c1d065_6082e193",
+        "filename": "features/odl-restconf-nb-jaxrs/pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-16T08:13:36Z",
+      "side": 1,
+      "message": "can we format this header?",
+      "revId": "4a461fd4ba77bc7bc51ffcbb66f2b351d8683cc2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29bd5eed_73ed64f0",
+        "filename": "features/odl-restconf-nb/src/main/feature/feature.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-16T08:13:36Z",
+      "side": 1,
+      "message": "the last one",
+      "revId": "4a461fd4ba77bc7bc51ffcbb66f2b351d8683cc2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7cd5ea36_dc43baea",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyLocationProvider.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-16T08:13:36Z",
+      "side": 1,
+      "message": "if original is for jaxrs, mark it as deprecated",
+      "revId": "4a461fd4ba77bc7bc51ffcbb66f2b351d8683cc2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
