@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed1188e8_7b2d820a",
+        "filename": "features/odl-restconf-openapi-jaxrs/src/main/feature/feature.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-16T08:16:20Z",
+      "side": 1,
+      "message": "(c)",
+      "revId": "cf9ee11dd65b576b6b30dcdc187066b3114d762c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
