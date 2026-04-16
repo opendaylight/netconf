@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2ce43a8_906ac189",
+        "filename": "artifacts/pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 513,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-16T09:10:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a0fb6e8_120ee57e",
+      "revId": "4a461fd4ba77bc7bc51ffcbb66f2b351d8683cc2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d2c1d065_6082e193",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-16T08:13:36Z",
       "side": 1,
       "message": "can we format this header?",
+      "revId": "4a461fd4ba77bc7bc51ffcbb66f2b351d8683cc2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08e8ee42_259081c8",
+        "filename": "features/odl-restconf-nb-jaxrs/pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-16T09:10:27Z",
+      "side": 1,
+      "message": "It follows the convention of all others pom.xml formatting https://git.opendaylight.org/gerrit/c/netconf/+/122394/3/apps/restconf-nb/pom.xml#9",
+      "parentUuid": "d2c1d065_6082e193",
       "revId": "4a461fd4ba77bc7bc51ffcbb66f2b351d8683cc2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce164745_2bac2d2f",
+        "filename": "features/odl-restconf-nb/src/main/feature/feature.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-16T09:10:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "29bd5eed_73ed64f0",
+      "revId": "4a461fd4ba77bc7bc51ffcbb66f2b351d8683cc2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7cd5ea36_dc43baea",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-04-16T08:13:36Z",
       "side": 1,
       "message": "if original is for jaxrs, mark it as deprecated",
+      "revId": "4a461fd4ba77bc7bc51ffcbb66f2b351d8683cc2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28f08766_99d833d4",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyLocationProvider.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-16T09:10:27Z",
+      "side": 1,
+      "message": "Isn\u0027t it covered by deprecating the whole JAX-RS bundle?",
+      "parentUuid": "7cd5ea36_dc43baea",
       "revId": "4a461fd4ba77bc7bc51ffcbb66f2b351d8683cc2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
