@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cef2dd4d_a0af71cf",
+        "filename": "usecase/netconf-topology-1node-transient/src/main/java/org/opendaylight/netconf/dagger/Main.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-16T08:26:59Z",
+      "side": 1,
+      "message": "can we try JEP 445: Unnamed Classes and Instance Main Methods?",
+      "revId": "d2f54f7d4460912398e6352585e9c5118863e964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
