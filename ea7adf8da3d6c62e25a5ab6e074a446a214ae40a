@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2f8dfb8_63e4bbfe",
+        "filename": "transport/transport-http/src/main/yang/ietf-http-server@2026-04-02.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-04-16T11:04:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1291cfd6_f98a1592",
+      "range": {
+        "startLine": 88,
+        "startChar": 2,
+        "endLine": 88,
+        "endChar": 21
+      },
+      "revId": "ea7adf8da3d6c62e25a5ab6e074a446a214ae40a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2ff54e0_4bc84ad4",
@@ -78,6 +102,30 @@
       "side": 1,
       "message": "https://datatracker.ietf.org/doc/html/draft-ietf-netconf-quic-client-server-04#name-the-ietf-quic-server-module\n \nadds the quic things",
       "parentUuid": "a2ff54e0_4bc84ad4",
+      "range": {
+        "startLine": 377,
+        "startChar": 10,
+        "endLine": 377,
+        "endChar": 42
+      },
+      "revId": "ea7adf8da3d6c62e25a5ab6e074a446a214ae40a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d8cbda7_f79224cf",
+        "filename": "transport/transport-http/src/main/yang/ietf-http-server@2026-04-02.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-04-16T11:04:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0682d9d6_3bb51323",
       "range": {
         "startLine": 377,
         "startChar": 10,
