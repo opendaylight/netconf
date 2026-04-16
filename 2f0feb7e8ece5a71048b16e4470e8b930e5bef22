@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "2f0feb7e8ece5a71048b16e4470e8b930e5bef22",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "304f5e6f_7ca8e7c1",
+        "filename": "features/features-netconf/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-16T08:08:55Z",
+      "side": 1,
+      "message": "IMO it should be before openapi",
+      "revId": "2f0feb7e8ece5a71048b16e4470e8b930e5bef22",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
