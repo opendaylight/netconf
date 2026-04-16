@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "530ad56b_b38184c9",
+        "filename": "usecase/netconf-topology-1node-transient/pom.xml",
+        "patchSetId": 24
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-16T08:39:14Z",
+      "side": 0,
+      "message": "why removed?",
+      "revId": "67be4e9724090c4f0c3c39b42a47db98ae6db1f7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
