@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be1a6869_9822f03e",
+        "filename": "usecase/netconf-topology-1node-transient/pom.xml",
+        "patchSetId": 20
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-16T08:42:29Z",
+      "side": 1,
+      "message": "IDK maybe version is usually before scope",
+      "revId": "d97a71b76ec514b8bf3cab5f0c4435ffda065aee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
