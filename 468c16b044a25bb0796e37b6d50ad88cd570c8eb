@@ -16,6 +16,24 @@
       "message": "please describe the test setup in place, what when we are using h1 or h3 to establish subscription, test streaming",
       "revId": "468c16b044a25bb0796e37b6d50ad88cd570c8eb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33738f46_c70e5cb9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-17T07:22:29Z",
+      "side": 1,
+      "message": "added doc to NotificationSubscriptionListeningHttp3Test in last patch",
+      "parentUuid": "03a40a8f_454a83b7",
+      "revId": "468c16b044a25bb0796e37b6d50ad88cd570c8eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
