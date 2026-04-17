@@ -38,7 +38,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
 
     @Override
     @BeforeEach
-    void beforeEach() throws Exception {
+    protected void beforeEach() throws Exception {
         super.beforeEach();
         streamClient = startStreamClient();
     }
