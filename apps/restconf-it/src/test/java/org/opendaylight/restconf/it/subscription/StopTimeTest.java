@@ -32,7 +32,7 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
     private static HTTPClient streamClient;
 
     @BeforeEach
-    void beforeEach() throws Exception {
+    protected void beforeEach() throws Exception {
         super.beforeEach();
         streamClient = startStreamClient();
     }
