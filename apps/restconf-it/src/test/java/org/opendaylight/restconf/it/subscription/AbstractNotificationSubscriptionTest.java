@@ -167,7 +167,7 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
     }
 
     @BeforeEach
-    void beforeEach() throws Exception {
+    protected void beforeEach() throws Exception {
         // transport configuration
         final var port = randomBindablePort();
         host = localAddress + ":" + port;
