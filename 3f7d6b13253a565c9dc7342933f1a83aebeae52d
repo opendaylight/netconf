@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d429a767_4c77f91e",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-20T20:24:11Z",
+      "side": 1,
+      "message": "Let\u0027s bind them together in one chain",
+      "revId": "3f7d6b13253a565c9dc7342933f1a83aebeae52d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
