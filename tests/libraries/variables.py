@@ -36,5 +36,10 @@ class Variables(BaseSettings):
     CALLHOME_WHITELIST: str = "rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices"
     NETCONF_KEYSTORE_DATA_URL: str = "rests/data/netconf-keystore:keystore"
 
+    XML_MESSAGE_HEADERS: dict = {
+    "Content-Type": "application/xml",
+    "Accept": "application/xml",
+}
+
 
 variables = Variables()
