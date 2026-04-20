@@ -40,5 +40,10 @@ class Variables(BaseSettings):
 
     MODULES_API: str = "/rests/data/ietf-yang-library:modules-state?content=nonconfig"
 
+    XML_MESSAGE_HEADERS: dict = {
+    "Content-Type": "application/xml",
+    "Accept": "application/xml",
+}
+
 
 variables = Variables()

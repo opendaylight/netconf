@@ -1,3 +1,5 @@
+aiohttp==3.13.5
+aiohttp_sse_client==0.2.1
 allure-pytest==2.14.3
 Jinja2==3.1.6
 jmespath==1.0.1
