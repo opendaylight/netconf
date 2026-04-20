@@ -71,6 +71,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2dd3f892_374dd5f7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-20T08:18:36Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/122380/1/protocol/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/OpenApiResourceInstance.java#8",
+      "parentUuid": "61ca8e88_da4a61ae",
+      "revId": "6cd06f63b0362315858a54e007208d8c53e10c23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ab42e436_a27cd746",
