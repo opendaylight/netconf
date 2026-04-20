@@ -153,6 +153,25 @@ def preconditions():
 
 
 @pytest.fixture(scope="class")
+def teardown_kill_all_running_ssereceiver_processes():
+    """Fixture to stop ssereceiver instaces at the end of test class execution
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    yield
+    infra.shell(
+        (
+            r"pkill -f '^(.*/)?python3?\s+.*ssereceiver.py' || "
+            r"echo 'No running instance of play.py script.'"
+        )
+    )
+
+
+@pytest.fixture(scope="class")
 def log_test_suite_start_end_to_karaf(request: pytest.FixtureRequest):
     """Fixture to log in karaf test suite start and end markers
 
