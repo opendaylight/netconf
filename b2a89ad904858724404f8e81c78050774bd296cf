@@ -16,6 +16,24 @@
       "message": "https://git.opendaylight.org/gerrit/c/netconf/+/122098/comments/433fb7ce_6b3b386d",
       "revId": "b2a89ad904858724404f8e81c78050774bd296cf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b61ade72_11b0b61c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-20T08:26:04Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/122380/1/protocol/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/OpenApiResourceInstance.java#8",
+      "parentUuid": "f4c1bc07_74ced053",
+      "revId": "b2a89ad904858724404f8e81c78050774bd296cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
