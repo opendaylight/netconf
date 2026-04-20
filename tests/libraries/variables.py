@@ -51,5 +51,10 @@ class Variables(BaseSettings):
 
     USE_NETCONF_CONNECTOR: bool = False
 
+    XML_MESSAGE_HEADERS: ClassVar[dict] = {
+    "Content-Type": "application/xml",
+    "Accept": "application/xml",
+}
+
 
 variables = Variables()
