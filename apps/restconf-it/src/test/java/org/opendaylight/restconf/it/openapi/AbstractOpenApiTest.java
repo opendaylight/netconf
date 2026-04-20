@@ -80,7 +80,7 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.it.server.NullAAAEncryptionService;
 import org.opendaylight.restconf.it.server.TestRequestCallback;
 import org.opendaylight.restconf.it.server.TestTransportChannelListener;
-import org.opendaylight.restconf.openapi.netty.OpenApiResourceProvider;
+import org.opendaylight.restconf.openapi.OpenApiResourceProvider;
 import org.opendaylight.restconf.server.AAAShiroPrincipalService;
 import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
