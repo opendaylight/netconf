@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f7875fe3_a7bac389",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-20T20:39:05Z",
+      "side": 1,
+      "message": "this logic does not match the existing behavior in SseUtils#parseChunks. Here eventData.append(line.substring(colon + 1)) keeps the optional space after : in lines like `data: hello`, so HTTP/3 tests will see `\" hello\"` while the existing shared SSE parser strips that space and yields `\"hello\"`. It would be better to mirror SseUtils.",
+      "revId": "3f7d6b13253a565c9dc7342933f1a83aebeae52d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d429a767_4c77f91e",
         "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
         "patchSetId": 9
