@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7b4ed9a_7a3b41fd",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/StreamsHttp3E2ETest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2026-04-21T10:12:18Z",
+      "side": 1,
+      "message": "Just create a String with value \"/rests/data/example-jukebox:jukebox\" and use it across this test class to simplify this.",
+      "revId": "00ac743f6a4397f61ead2e3556521be8913e9dec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6741dc83_1c71be76",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/StreamsHttp3E2ETest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2026-04-21T10:12:18Z",
+      "side": 1,
+      "message": "Here as well",
+      "revId": "00ac743f6a4397f61ead2e3556521be8913e9dec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12451a20_8f4756ff",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/StreamsHttp3E2ETest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2026-04-21T10:12:18Z",
+      "side": 1,
+      "message": "Here as well",
+      "revId": "00ac743f6a4397f61ead2e3556521be8913e9dec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4bcbb7ac_13cf5c2f",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/StreamsHttp3E2ETest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2026-04-21T10:12:18Z",
+      "side": 1,
+      "message": "Here as well",
+      "revId": "00ac743f6a4397f61ead2e3556521be8913e9dec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45fc29b1_8968248d",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/StreamsHttp3E2ETest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2026-04-21T10:12:18Z",
+      "side": 1,
+      "message": "Here as well",
+      "revId": "00ac743f6a4397f61ead2e3556521be8913e9dec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
