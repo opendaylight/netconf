@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75fe6c58_9b689fc3",
+        "filename": "usecase/netconf-topology-1node-transient/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-04-21T11:06:09Z",
+      "side": 1,
+      "message": "spotbugs.onlyAnalyze, see documentation",
+      "range": {
+        "startLine": 26,
+        "startChar": 9,
+        "endLine": 26,
+        "endChar": 62
+      },
+      "revId": "3ed5d7ac96cd7cc0487aec1e74241271d6680029",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
