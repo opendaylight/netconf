@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff2596d3_a1b262c7",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/AlgorithmPolicy.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-21T12:47:50Z",
+      "side": 1,
+      "message": "can be var",
+      "range": {
+        "startLine": 82,
+        "startChar": 14,
+        "endLine": 82,
+        "endChar": 15
+      },
+      "revId": "86a873242dc5840ace51d0ef9bb78d00f25aece2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01cae54c_4592b96e",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/MacPolicy.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-21T12:47:50Z",
+      "side": 1,
+      "message": "consider \"aead\".equals(alg)\n(no null check needed)",
+      "range": {
+        "startLine": 79,
+        "startChar": 12,
+        "endLine": 79,
+        "endChar": 45
+      },
+      "revId": "86a873242dc5840ace51d0ef9bb78d00f25aece2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47a77d84_7256f2a1",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1594Test.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-21T12:47:50Z",
+      "side": 1,
+      "message": "double space (in all lambdas below)",
+      "range": {
+        "startLine": 104,
+        "startChar": 58,
+        "endLine": 104,
+        "endChar": 60
+      },
+      "revId": "86a873242dc5840ace51d0ef9bb78d00f25aece2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
