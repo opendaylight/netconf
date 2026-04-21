@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "31723430_54c3617b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-21T09:38:50Z",
+      "side": 1,
+      "message": "Currently, there is no ClientHttp3RequestDispatcher. scope of this is to resolve existing code issues.\nIf we need HTTP/3 client capabilities, we should do that in separate task.",
+      "parentUuid": "eac90e78_42ef3af9",
+      "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd27d312_65a55b6f",
