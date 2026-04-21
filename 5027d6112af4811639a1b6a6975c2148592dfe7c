@@ -3,6 +3,57 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cd0fea74_384e62f5",
+        "filename": "apps/restconf-it/pom.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-21T14:19:46Z",
+      "side": 1,
+      "message": "Test scope dependency should be at the end.",
+      "revId": "5027d6112af4811639a1b6a6975c2148592dfe7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8f4889e_806e22bb",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-21T14:19:46Z",
+      "side": 1,
+      "message": "Is the client initialization still necessary? It is replaced by clientSession in the multiple tests here.",
+      "revId": "5027d6112af4811639a1b6a6975c2148592dfe7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53d00ab3_1c122e30",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-21T14:19:46Z",
+      "side": 1,
+      "message": "Hmm I do not think we can reuse callback. Could you plese fix this here and prepare new one?",
+      "revId": "5027d6112af4811639a1b6a6975c2148592dfe7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "faa5a9ec_9ef930a7",
         "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseUtils.java",
         "patchSetId": 7
