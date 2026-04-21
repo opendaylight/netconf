@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b710de03_18adab39",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientHttp1Session.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-21T09:30:15Z",
+      "side": 1,
+      "message": "I am not sure it is safe.\nwe are not accessing it just from netty loop. It is modified in .invoke() from application thread, so it can be accessed from 2 threads. Invoke is used only in tests. \nIt was same for dispatcher logic, it just went trough HTTPClient.invoke() -\u003e dispatch()\nIt could be left like it is or potentially improved by wrapping invoke() logic to channel.eventLoop().execute(). IMO that should be addressed separately.",
+      "parentUuid": "dd27d312_65a55b6f",
+      "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2bb3dbc6_7abd5458",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-04-20T19:08:14Z",
       "side": 1,
       "message": "And this one also",
+      "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "50e013f7_af8940fe",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientHttp2Session.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-21T09:30:15Z",
+      "side": 1,
+      "message": "see first one",
+      "parentUuid": "2bb3dbc6_7abd5458",
       "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
