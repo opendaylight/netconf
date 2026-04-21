@@ -38,6 +38,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9b509009_bf1dfd44",
+        "filename": "protocol/restconf-client/pom.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-21T13:52:39Z",
+      "side": 1,
+      "message": "Should be below netty-common. ABC order.",
+      "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe7c72d9_9d8be7bf",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientHttp1Session.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-21T13:52:39Z",
+      "side": 1,
+      "message": "Maybe this class should be in impl folder?",
+      "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dd27d312_65a55b6f",
         "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientHttp1Session.java",
         "patchSetId": 7
@@ -73,6 +107,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "953f8fb5_f8645dbd",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientHttp1Session.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-21T13:52:39Z",
+      "side": 1,
+      "message": "If this can be accessed from multiple threads, why not make local.writeAndFlush thread-safe as well? In this situation, the queue could contain requests in a different order than they are actually written to the channel.\n\nCan we use something like this?\n```\n        local.eventLoop().execute(() -\u003e {\n            queue.add(req);\n            local.writeAndFlush(request).addListener(sent -\u003e {\n                final var cause \u003d sent.cause();\n                if (cause !\u003d null \u0026\u0026 queue.remove(req)) {\n                    callback.onFailure(cause);\n                }\n            });\n        });\n```",
+      "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a6b6b4b_4a83bccc",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientHttp2Session.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-21T13:52:39Z",
+      "side": 1,
+      "message": "Maybe this class should be in impl folder?",
+      "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2bb3dbc6_7abd5458",
         "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientHttp2Session.java",
         "patchSetId": 7
@@ -102,6 +170,63 @@
       "side": 1,
       "message": "see first one",
       "parentUuid": "2bb3dbc6_7abd5458",
+      "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ecafbe7c_a74aa5c6",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientHttp2Session.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-21T13:52:39Z",
+      "side": 1,
+      "message": "If this can be accessed from multiple threads, why not make local.writeAndFlush thread-safe as well? In this situation, the `queue` could contain requests in a different order than they are actually written to the channel.",
+      "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "feff5d5b_8c15b846",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-21T13:52:39Z",
+      "side": 1,
+      "message": "Add empty space between params and description.",
+      "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "348af74e_662afeb1",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-21T13:52:39Z",
+      "side": 1,
+      "message": "Overriding method parameters are not annotated.",
+      "range": {
+        "startLine": 22,
+        "startChar": 32,
+        "endLine": 22,
+        "endChar": 40
+      },
       "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
