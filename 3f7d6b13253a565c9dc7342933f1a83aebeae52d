@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14bea2fa_ff358580",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-21T06:36:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7875fe3_a7bac389",
+      "revId": "3f7d6b13253a565c9dc7342933f1a83aebeae52d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d429a767_4c77f91e",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-20T20:24:11Z",
       "side": 1,
       "message": "Let\u0027s bind them together in one chain",
+      "revId": "3f7d6b13253a565c9dc7342933f1a83aebeae52d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23c342f8_0a108d3a",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-21T06:36:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d429a767_4c77f91e",
       "revId": "3f7d6b13253a565c9dc7342933f1a83aebeae52d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
