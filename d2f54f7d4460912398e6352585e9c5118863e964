@@ -16,6 +16,24 @@
       "message": "can we try JEP 445: Unnamed Classes and Instance Main Methods?",
       "revId": "d2f54f7d4460912398e6352585e9c5118863e964",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a9057d6_344478bc",
+        "filename": "usecase/netconf-topology-1node-transient/src/main/java/org/opendaylight/netconf/dagger/Main.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-21T08:07:40Z",
+      "side": 1,
+      "message": "This is preview language feature, disabled by default:\nhttps://openjdk.org/jeps/445#This-is-preview-language-feature-disabled-by-default\n\nTo use it, we would be required to start the application with the preview flag:\njava --enable-preview -jar netconf-topology-1node-transient-11.0.0-SNAPSHOT-executable.jar",
+      "parentUuid": "cef2dd4d_a0af71cf",
+      "revId": "d2f54f7d4460912398e6352585e9c5118863e964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
