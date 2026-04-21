@@ -16,6 +16,9 @@ odl:
           max-data-store-executor-queue-size: 5000
           debug-transaction: false
 
+      mdsal-notification:
+        notification-queue-depth: 65536
+
       cluster-datastore-broker:
         max-data-broker-future-callback-queue-size: 1000
         max-data-broker-future-callback-pool-size: 20
