@@ -20,6 +20,7 @@ import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceProvider;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.RestconfStream;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.listen.stack.grouping.transport.HttpOverQuic;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.slf4j.Logger;
@@ -34,13 +35,11 @@ public abstract class NettyEndpoint {
 
     private final HTTPServer httpServer;
     private final EndpointRoot root;
-    private final NettyEndpointConfiguration configuration;
     private final @Nullable Http3ServerBootstrap http3ServerBootstrap;
 
     protected NettyEndpoint(final RestconfServer server, final PrincipalService principalService,
             final RestconfStream.Registry streamRegistry, final BootstrapFactory bootstrapFactory,
             final NettyEndpointConfiguration configuration) {
-        this.configuration = configuration;
         final var writeBufferWaterMark = new WriteBufferWaterMark(
             configuration.writeBufferLowWaterMark().intValue(),
             configuration.writeBufferHighWaterMark().intValue());
@@ -72,23 +71,10 @@ public abstract class NettyEndpoint {
     }
 
     private static @Nullable Http3ServerBootstrap startHttp3(final NettyEndpointConfiguration configuration,
-            final EndpointRoot root,  final WriteBufferWaterMark writeBufferWaterMark) {
-        final var certificate = configuration.tlsCertificate();
-        final var privateKey = configuration.tlsPrivateKey();
-        if (certificate == null || privateKey == null) {
-            LOG.info("HTTP/3 is disabled because TLS is not configured");
-            return null;
-        }
-
-        final var bindAddress = configuration.bindAddress();
-        if (bindAddress == null || bindAddress.isBlank()) {
-            LOG.warn("HTTP/3 is enabled but bind address is not configured");
-            return null;
-        }
-
-        final var udpPort = configuration.bindPort();
-        if (udpPort <= 0 || udpPort > 65535) {
-            LOG.warn("HTTP/3 is enabled but UDP port is invalid: {}", udpPort);
+            final EndpointRoot root, final WriteBufferWaterMark writeBufferWaterMark) {
+        final var http3TransportConfiguration = configuration.http3TransportConfiguration();
+        if (http3TransportConfiguration == null) {
+            LOG.info("HTTP/3 is disabled because transport is not configured");
             return null;
         }
 
@@ -98,13 +84,17 @@ public abstract class NettyEndpoint {
             return null;
         }
 
+        final var transport = http3TransportConfiguration.getTransport();
+        if (!(transport instanceof HttpOverQuic httpOverQuicTransport)) {
+            LOG.warn("HTTP/3 transport must be http-over-quic, got {}", transport);
+            return null;
+        }
+
         try {
-            return Http3ServerBootstrap.start(bindAddress, udpPort, certificate, privateKey, root,
-                configuration.chunkSize(), writeBufferWaterMark,
-                configuration.http3InitialMaxData(), configuration.http3InitialMaxStreamDataBidirectionalRemote(),
-                configuration.http3InitialMaxStreamsBidirectional());
-        } catch (SSLException e) {
-            LOG.warn("Failed to initialize HTTP/3 TLS context", e);
+            return Http3ServerBootstrap.start(httpOverQuicTransport, root, configuration.chunkSize(),
+                writeBufferWaterMark);
+        } catch (UnsupportedConfigurationException | SSLException e) {
+            LOG.warn("Failed to initialize HTTP/3 listener", e);
             return null;
         }
     }
