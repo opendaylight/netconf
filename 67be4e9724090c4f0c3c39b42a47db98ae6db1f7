@@ -16,6 +16,24 @@
       "message": "why removed?",
       "revId": "67be4e9724090c4f0c3c39b42a47db98ae6db1f7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4fdfabcd_f626af4e",
+        "filename": "usecase/netconf-topology-1node-transient/pom.xml",
+        "patchSetId": 24
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-21T08:02:05Z",
+      "side": 0,
+      "message": "I removed it because it stopped showing up in the maven build warnings. Since the plugin is no longer complaining about it, the inline doc was outdated. Here is the current output:\n\n[INFO] --- dependency:3.10.0:analyze-only (analyze-declarations) @ netconf-topology-1node-transient ---\n[WARNING] Unused declared dependencies found:\n[WARNING]    org.yaml:snakeyaml:jar:2.5:compile\n[WARNING] Non-test scoped test only dependencies found:\n[WARNING]    com.google.guava:guava:jar:33.5.0-jre:compile\n[WARNING]    org.opendaylight.yangtools:yang-common:jar:15.0.2:compile\n[WARNING]    org.opendaylight.yangtools:yang-parser-spi:jar:15.0.2:compile\n[WARNING]    org.opendaylight.yangtools:yang-xpath-api:jar:15.0.2:compile",
+      "parentUuid": "530ad56b_b38184c9",
+      "revId": "67be4e9724090c4f0c3c39b42a47db98ae6db1f7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
