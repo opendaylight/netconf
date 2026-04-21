@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.openapi.model.security.Http;
+import org.opendaylight.restconf.openapi.model.security.Oauth2;
 import org.opendaylight.restconf.openapi.model.security.SecuritySchemeObject;
 
 public final class SecuritySchemesEntity extends OpenApiEntity {
@@ -38,8 +39,17 @@ public final class SecuritySchemesEntity extends OpenApiEntity {
                     generator.writeStringField("bearerFormat", http.bearerFormat());
                 }
             }
-            generator.writeEndObject();
+            if (entry.getValue() instanceof Oauth2 oauth2) {
+                generator.writeStringField("type", oauth2.type().toString());
+                generator.writeObjectFieldStart("flows");
+                generator.writeObjectFieldStart(oauth2.flow());
+                generator.writeStringField("authorizationUrl", oauth2.authorizationUrl());
+                generator.writeNullField("scopes");
+                generator.writeEndObject();
+                generator.writeEndObject();
+            }
             generator.writeEndObject();
         }
+        generator.writeEndObject();
     }
 }
