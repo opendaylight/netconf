@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "133674d0_5df64e00",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/http3/Http3NettyTestClient.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2026-04-21T10:13:00Z",
+      "side": 0,
+      "message": "Pls reformat this back.",
+      "revId": "468c16b044a25bb0796e37b6d50ad88cd570c8eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
