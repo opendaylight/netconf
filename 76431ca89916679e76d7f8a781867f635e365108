@@ -16,6 +16,24 @@
       "message": "Should we close this client in AfterEach?",
       "revId": "76431ca89916679e76d7f8a781867f635e365108",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57474a5d_0ecda304",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/http3/AbstractNotificationSubscriptionHttp3Test.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-21T06:37:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c3c54ca_72d5d86d",
+      "revId": "76431ca89916679e76d7f8a781867f635e365108",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
