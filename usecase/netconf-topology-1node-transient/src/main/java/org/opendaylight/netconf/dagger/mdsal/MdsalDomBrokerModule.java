@@ -60,7 +60,7 @@ public interface MdsalDomBrokerModule {
     static DOMNotificationRouter domNotificationRouter(final ResourceSupport resourceSupport,
             final ConfigLoader configLoader) {
         final var config = configLoader.getConfig(DOMNotificationRouterConfig.class,
-            "", Path.of("org.opendaylight.mdsal.dom.notification.cfg"));
+            "odl.netconf.prototype.mdsal-notification", Path.of("application.yaml"));
         final var domNotificationRouter = new DOMNotificationRouter(config);
         resourceSupport.register(domNotificationRouter);
         return domNotificationRouter;
@@ -120,7 +120,7 @@ public interface MdsalDomBrokerModule {
      * Implementation of OSGi DOMNotificationRouter configuration used for components that are not initialized
      * or managed by the OSGi.
      */
-    @ConfigurationProperties
+    @ConfigurationProperties(prefix = "odl.netconf.prototype.mdsal-notification")
     class DOMNotificationRouterConfig implements DOMNotificationRouter.Config {
         private int queueDepth = 65536;
 
