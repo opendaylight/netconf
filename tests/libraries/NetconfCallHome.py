@@ -16,14 +16,14 @@ from libraries.variables import variables
 
 HEADERS = variables.HEADERS
 DEVICE_STATUS = (
-    "/rests/data/odl-netconf-callhome-server:netconf-callhome-server/"
+    "/restconf/data/odl-netconf-callhome-server:netconf-callhome-server/"
     "allowed-devices?content=nonconfig"
 )
 WHITELIST = variables.CALLHOME_WHITELIST
 GLOBAL_CONFIG_URL = (
-    "/rests/data/odl-netconf-callhome-server:netconf-callhome-server/global/credentials"
+    "/restconf/data/odl-netconf-callhome-server:netconf-callhome-server/global/credentials"
 )
-NETCONF_KEYSTORE_URL = "/rests/operations/netconf-keystore"
+NETCONF_KEYSTORE_URL = "/restconf/operations/netconf-keystore"
 NETCONF_KEYSTORE_DATA_URL = variables.NETCONF_KEYSTORE_DATA_URL
 
 CREATE_GLOBAL_CREDENTIALS_REQ = (

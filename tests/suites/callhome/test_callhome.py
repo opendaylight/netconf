@@ -20,7 +20,7 @@ from libraries import utils
 from libraries.variables import variables
 
 MOUNT_POINT_URL = (
-    "/rests/data/network-topology:network-topology/"
+    "/restconf/data/network-topology:network-topology/"
     "topology=topology-netconf?content=nonconfig"
 )
 NETCONF_MOUNT_EXPECTED_VALUE = (
