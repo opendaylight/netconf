@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf017670_33fded52",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/AlgorithmPolicy.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-04-21T16:36:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff2596d3_a1b262c7",
+      "range": {
+        "startLine": 82,
+        "startChar": 14,
+        "endLine": 82,
+        "endChar": 15
+      },
+      "revId": "86a873242dc5840ace51d0ef9bb78d00f25aece2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "01cae54c_4592b96e",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2175e433_375d3920",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/MacPolicy.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-04-21T16:36:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "01cae54c_4592b96e",
+      "range": {
+        "startLine": 79,
+        "startChar": 12,
+        "endLine": 79,
+        "endChar": 45
+      },
+      "revId": "86a873242dc5840ace51d0ef9bb78d00f25aece2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "47a77d84_7256f2a1",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-04-21T12:47:50Z",
       "side": 1,
       "message": "double space (in all lambdas below)",
+      "range": {
+        "startLine": 104,
+        "startChar": 58,
+        "endLine": 104,
+        "endChar": 60
+      },
+      "revId": "86a873242dc5840ace51d0ef9bb78d00f25aece2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cb5bfe6_90a10a14",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1594Test.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-04-21T16:36:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "47a77d84_7256f2a1",
       "range": {
         "startLine": 104,
         "startChar": 58,
