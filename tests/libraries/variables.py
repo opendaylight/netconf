@@ -21,8 +21,8 @@ class Variables(BaseSettings):
     ODL_IP: str = "127.0.0.1"
     ODL_USER: str = "admin"
     ODL_PASSWORD: str = "admin"
-    RESTCONF_PORT: int = 8181
-    RESTCONF_ROOT: str = "rests"
+    RESTCONF_PORT: int = 8182
+    RESTCONF_ROOT: str = "restconf"
     TOOLS_IP: str = "127.0.1.0"
     KARAF_LOG_LEVEL: str = "INFO"
     HEADERS: ClassVar[dict] = {"Content-Type": "application/json"}
@@ -33,8 +33,8 @@ class Variables(BaseSettings):
     ODL_NETCONF_PROMPT: str = "]]>]]>"
     ODL_NETCONF_USER: str = "admin"
 
-    CALLHOME_WHITELIST: str = "rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices"
-    NETCONF_KEYSTORE_DATA_URL: str = "rests/data/netconf-keystore:keystore"
+    CALLHOME_WHITELIST: str = "restconf/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices"
+    NETCONF_KEYSTORE_DATA_URL: str = "restconf/data/netconf-keystore:keystore"
 
     SEND_ACCEPT_XML_HEADERS: dict = {
     "Content-Type": "application/xml",
