@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.transport.http.HTTPServerOverQuic;
 import org.opendaylight.netconf.transport.http.HTTPServerOverTcp;
 import org.opendaylight.netconf.transport.http.HTTPServerOverTls;
 import org.opendaylight.netconf.transport.http.HttpServerStackConfiguration;
@@ -282,6 +283,14 @@ public final class OSGiNorthbound {
             ? HTTPServerOverTls.of(configuration.bind$_$address(), configuration.bind$_$port(),
                 tlsCertKey.certificate(), tlsCertKey.privateKey())
             : HTTPServerOverTcp.of(configuration.bind$_$address(), configuration.bind$_$port());
+        final var http3Transport = tlsCertKey != null
+            ? new HttpServerStackConfiguration(HTTPServerOverQuic.of(
+                configuration.bind$_$address(), configuration.bind$_$port(),
+                tlsCertKey.certificate(), tlsCertKey.privateKey(),
+                Uint64.valueOf(configuration.http3$_$initial$_$max$_$data()),
+                Uint64.valueOf(configuration.http3$_$initial$_$max$_$stream$_$data$_$bidirectional$_$remote()),
+                Uint32.valueOf(configuration.http3$_$initial$_$max$_$streams$_$bidirectional())))
+            : null;
 
         // advertise non-zero h3 support only when we have TLS (h3 requirement)
         final var altSvc = tlsCertKey != null
@@ -298,13 +307,7 @@ public final class OSGiNorthbound {
             Uint32.valueOf(configuration.http2$_$max$_$frame$_$size()),
             Uint32.valueOf(configuration.http$_$write$_$buffer$_$low$_$watermark()),
             Uint32.valueOf(configuration.http$_$write$_$buffer$_$high$_$watermark()),
-            altSvc, configuration.bind$_$address(), configuration.bind$_$port(),
-            tlsCertKey != null ? tlsCertKey.certificate() : null,
-            tlsCertKey != null ? tlsCertKey.privateKey() : null,
-            Uint32.valueOf(configuration.http3$_$alt$_$svc$_$max$_$age()),
-            Uint64.valueOf(configuration.http3$_$initial$_$max$_$data()),
-            Uint64.valueOf(configuration.http3$_$initial$_$max$_$stream$_$data$_$bidirectional$_$remote()),
-            Uint32.valueOf(configuration.http3$_$initial$_$max$_$streams$_$bidirectional()))
+            altSvc, http3Transport, Uint32.valueOf(configuration.http3$_$alt$_$svc$_$max$_$age()))
         );
     }
 

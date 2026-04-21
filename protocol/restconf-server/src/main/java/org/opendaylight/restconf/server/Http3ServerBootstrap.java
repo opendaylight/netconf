@@ -27,13 +27,23 @@ import io.netty.util.AttributeKey;
 import java.net.InetSocketAddress;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import javax.net.ssl.SSLException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.crypto.CMSCertificateParser;
+import org.opendaylight.netconf.transport.crypto.KeyPairParser;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.netconf.transport.spi.NettyTransportSupport;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.listen.stack.grouping.transport.HttpOverQuic;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.Inline;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev241010.TlsServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev241010.tls.server.grouping.server.identity.auth.type.Certificate;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.udp.server.rev251216.udp.server.LocalBind;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260415.http3.server.grouping.QuicUnderHttp;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260415.http3.server.grouping.quic.under.http.QuicServerParameters;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.common.Uint64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,12 +62,21 @@ final class Http3ServerBootstrap implements AutoCloseable {
         this.quicGroup = requireNonNull(quicGroup);
     }
 
-    static Http3ServerBootstrap start(final String bindAddress, final int bindPort,
-            final X509Certificate certificate, final PrivateKey privateKey, final EndpointRoot root,
-            final Uint32 chunkSize, final WriteBufferWaterMark writeBufferWaterMark, final Uint64 initialMaxData,
-            final Uint64 initialMaxStreamDataBidirectionalRemote, final Uint32 initialMaxStreamsBidirectional)
-            throws SSLException {
-        final var sslContext = QuicSslContextBuilder.forServer(privateKey, null, certificate)
+    static Http3ServerBootstrap start(final HttpOverQuic transport, final EndpointRoot root, final Uint32 chunkSize,
+            final WriteBufferWaterMark writeBufferWaterMark) throws SSLException, UnsupportedConfigurationException {
+        final var httpOverQuic = transport.getHttpOverQuic();
+        if (httpOverQuic == null) {
+            throw new UnsupportedConfigurationException("Missing http-over-quic parameters");
+        }
+
+        final var bind = firstLocalBind(httpOverQuic.nonnullUdpServerParameters().nonnullLocalBind().values());
+        if (bind == null) {
+            throw new UnsupportedConfigurationException("Missing UDP bind point");
+        }
+
+        final var certificateKey = readCertificateKey(httpOverQuic.nonnullTlsServerParameters());
+        final var sslContext = QuicSslContextBuilder.forServer(certificateKey.privateKey(), null,
+                certificateKey.certificate())
             .applicationProtocols(Http3.supportedApplicationProtocols())
             .build();
 
@@ -75,11 +94,13 @@ final class Http3ServerBootstrap implements AutoCloseable {
             }
         };
 
+        final var quicServerParameters = requireQuicServerParameters(transport);
         final var codec = Http3.newQuicServerCodecBuilder()
             .sslContext(sslContext)
-            .initialMaxData(initialMaxData.longValue())
-            .initialMaxStreamDataBidirectionalRemote(initialMaxStreamDataBidirectionalRemote.longValue())
-            .initialMaxStreamsBidirectional(initialMaxStreamsBidirectional.longValue())
+            .initialMaxData(quicServerParameters.requireInitialMaxData().getValue().longValue())
+            .initialMaxStreamDataBidirectionalRemote(
+                quicServerParameters.requireInitialMaxStreamDataBidiRemote().getValue().longValue())
+            .initialMaxStreamsBidirectional(quicServerParameters.requireInitialMaxStreamsBidi().longValue())
             .handler(new ChannelInitializer<QuicChannel>() {
                 @Override
                 protected void initChannel(final QuicChannel ch) {
@@ -106,6 +127,9 @@ final class Http3ServerBootstrap implements AutoCloseable {
                 }
             });
 
+        final var bindAddress = bind.requireLocalAddress().stringValue();
+        final var bindPort = bind.requireLocalPort().getValue().toJava();
+
         final var channel = bootstrap
             .bind(new InetSocketAddress(bindAddress, bindPort))
             .syncUninterruptibly()
@@ -119,6 +143,59 @@ final class Http3ServerBootstrap implements AutoCloseable {
     public void close() {
         quicGroup.shutdownGracefully();
         channel.close().syncUninterruptibly();
+    }
+
+    private static @Nullable LocalBind firstLocalBind(final Collection<LocalBind> localBinds) {
+        if (localBinds.isEmpty()) {
+            return null;
+        }
+        final var first = localBinds.iterator().next();
+        final var size = localBinds.size();
+        if (size > 1) {
+            LOG.warn("HTTP/3 transport has {} UDP bind points, using {}", size, first);
+        }
+        return first;
+    }
+
+    private static CertificateKey readCertificateKey(final TlsServerGrouping tlsServerParameters)
+            throws UnsupportedConfigurationException {
+        final var authType = tlsServerParameters.nonnullServerIdentity().getAuthType();
+        if (!(authType instanceof Certificate certificateAuth)) {
+            throw new UnsupportedConfigurationException("Unsupported TLS server identity " + authType);
+        }
+
+        final var inlineOrKeystore = certificateAuth.nonnullCertificate().getInlineOrKeystore();
+        if (!(inlineOrKeystore instanceof Inline inline)) {
+            throw new UnsupportedConfigurationException("Unsupported TLS key storage " + inlineOrKeystore);
+        }
+
+        final var inlineDefinition = inline.getInlineDefinition();
+        if (inlineDefinition == null) {
+            throw new UnsupportedConfigurationException("Missing inline TLS definition");
+        }
+
+        final var keyPair = KeyPairParser.parseKeyPair(inlineDefinition);
+        final var certificate = (X509Certificate) CMSCertificateParser.parseCertificate(inlineDefinition
+            .requireCertData());
+        if (!keyPair.getPublic().equals(certificate.getPublicKey())) {
+            throw new UnsupportedConfigurationException("TLS private key mismatches certificate public key");
+        }
+        return new CertificateKey(certificate, keyPair.getPrivate());
+    }
+
+    private static QuicServerParameters requireQuicServerParameters(final HttpOverQuic transport)
+            throws UnsupportedConfigurationException {
+        final var quic = transport.augmentation(QuicUnderHttp.class);
+        if (quic == null || quic.getQuicServerParameters() == null) {
+            throw new UnsupportedConfigurationException("Missing quic-server-parameters augmentation");
+        }
+
+        final var parameters = quic.getQuicServerParameters();
+        if (parameters.getInitialMaxData() == null || parameters.getInitialMaxStreamDataBidiRemote() == null
+            || parameters.getInitialMaxStreamsBidi() == null) {
+            throw new UnsupportedConfigurationException("Incomplete quic-server-parameters augmentation");
+        }
+        return parameters;
     }
 
     /**
@@ -142,5 +219,8 @@ final class Http3ServerBootstrap implements AutoCloseable {
         final var peerMaxUdp = parameters != null ? parameters.maxUdpPayloadSize() : Long.MAX_VALUE;
         final var peerBound = peerMaxUdp == Long.MAX_VALUE ? Long.MAX_VALUE : Math.max(256L, peerMaxUdp - overhead);
         return Uint32.valueOf(Math.min(chunkSize.longValue(), peerBound));
+    }
+
+    private record CertificateKey(X509Certificate certificate, PrivateKey privateKey) {
     }
 }

@@ -36,7 +36,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.common.Uint64;
 
 @ExtendWith(MockitoExtension.class)
 class RestconfSessionTest {
@@ -82,9 +81,7 @@ class RestconfSessionTest {
         final var configuration = new NettyEndpointConfiguration(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE,
             Uint16.ZERO, Uint32.valueOf(10_000), "restconf", MessageEncoding.JSON, httpServerStackGrouping,
             Uint32.valueOf(256 * 1024), Uint32.valueOf(16 * 1024), Uint32.valueOf(32 * 1024),
-            Uint32.valueOf(64 * 1024), "h3=\":8443\"; ma=3600", Uint32.valueOf(3600),
-            Uint64.valueOf(4L * 1024 * 1024),
-            Uint64.valueOf(256L * 1024), Uint32.valueOf(100));
+            Uint32.valueOf(64 * 1024), "h3=\":8443\"; ma=3600", null, Uint32.valueOf(3600));
 
         final var listener = new RestconfTransportChannelListener(server, streamRegistry, principalService,
             configuration, new WriteBufferWaterMark(32 * 1024, 64 * 1024));
