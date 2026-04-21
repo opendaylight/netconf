@@ -22,6 +22,29 @@
       },
       "revId": "3ed5d7ac96cd7cc0487aec1e74241271d6680029",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc9ebf9b_d86e526d",
+        "filename": "usecase/netconf-topology-1node-transient/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-04-21T11:07:39Z",
+      "side": 1,
+      "message": "use maven-assembly-plugin instead",
+      "range": {
+        "startLine": 446,
+        "startChar": 28,
+        "endLine": 446,
+        "endChar": 46
+      },
+      "revId": "3ed5d7ac96cd7cc0487aec1e74241271d6680029",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
