@@ -97,20 +97,20 @@ FLOWFILTERS_UPDATE = "flowfilterentries"
 
 
 # Common APIs
-OPERATIONAL_TOPO_API = "/rests/data/network-topology:network-topology"
-CONFIG_TOPO_API = "/rests/data/network-topology:network-topology"
-CONFIG_API = "/rests/data"
-OPERATIONAL_API = "/rests/data"
-MODULES_API = "/rests/data/ietf-yang-library:modules-state?content=nonconfig"
+OPERATIONAL_TOPO_API = "/restconf/data/network-topology:network-topology"
+CONFIG_TOPO_API = "/restconf/data/network-topology:network-topology"
+CONFIG_API = "/restconf/data"
+OPERATIONAL_API = "/restconf/data"
+MODULES_API = "/restconf/data/ietf-yang-library:modules-state?content=nonconfig"
 
 # TOKEN
 AUTH_TOKEN_API = "/oauth2/token"
 REVOKE_TOKEN_API = "/oauth2/revoke"
 
 # LISP Flow Mapping variables
-LFM_RPC_API = "/rests/operations/odl-mappingservice"
-LFM_RPC_API_LI = "/rests/operations/lfm-mapping-database"
-LFM_SB_RPC_API = "/rests/operations/odl-lisp-sb"
+LFM_RPC_API = "/restconf/operations/odl-mappingservice"
+LFM_RPC_API_LI = "/restconf/operations/lfm-mapping-database"
+LFM_SB_RPC_API = "/restconf/operations/odl-lisp-sb"
 
 
 # Other global variables
