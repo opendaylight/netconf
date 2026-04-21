@@ -30,6 +30,8 @@ import org.json.JSONObject;
 import org.json.JSONParserConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.opendaylight.netconf.transport.http.HTTPServerOverQuic;
+import org.opendaylight.netconf.transport.http.HttpServerStackConfiguration;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.it.openapi.AbstractOpenApiTest;
 import org.opendaylight.restconf.server.MessageEncoding;
@@ -103,9 +105,10 @@ public class AbstractOpenApiHttp3Test extends AbstractOpenApiTest {
         return new NettyEndpointConfiguration(
             ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000), RESTS,
             MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
-            WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, localAddress(), port(), certificate, privateKey,
-            HTTP3_ALT_SVC_MAX_AGE_SECONDS, HTTP3_INITIAL_MAX_DATA, HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE,
-            HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL);
+            WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS,
+            new HttpServerStackConfiguration(HTTPServerOverQuic.of(
+                localAddress(), port(), certificate, privateKey, HTTP3_INITIAL_MAX_DATA,
+                HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE, HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL)));
     }
 
     protected URI createApiUri(final String path) throws URISyntaxException {
