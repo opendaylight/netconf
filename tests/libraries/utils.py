@@ -118,12 +118,13 @@ def report_known_bug_on_failure(bug_id: str):
         yield
     except AssertionError as e:
         url = (
-            f"https://jira.opendaylight.org/browse/{bug_id}"
-            if "-" in bug_id
-            else f"https://bugs.opendaylight.org/show_bug.cgi?id={bug_id_str}"
+            f"https://lf-opendaylight.atlassian.net/issues?jql=%22External%20issue%20ID%5BShort%20text%5D%22%20~%20%22{bug_id}%22"
         )
         allure.dynamic.link(url, name=f"Related Bug {bug_id}")
-        error_msg = f"\nThis test failed due to a previously reported bug: {url}\nOriginal error: {str(e)}"
+        error_msg = (
+            f"\nThis test failed due to a previously reported bug: {url}\n"
+            f"Original error: {str(e)}"
+        )
 
         raise AssertionError(error_msg) from e
 
