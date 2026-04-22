@@ -50,6 +50,42 @@
       "message": "what\u0027s behind?",
       "revId": "56b418833675ceb6b270cfc81436d0ba360af4c4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bd0a796_cd1a0f08",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-22T13:04:45Z",
+      "side": 1,
+      "message": "This was an attempt to avoid reusing the same configuration from two different classes. But it\u0027s not the best approach. The alternative would be to instantiate OpenApiResourceProvider manually in OSGiNorthbound, but that looks even worse, because it would move the wiring there and make the lifecycle/configuration handling less clean.",
+      "parentUuid": "d3aea7f7_284375ff",
+      "revId": "56b418833675ceb6b270cfc81436d0ba360af4c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3867ba69_579af0dc",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-22T13:04:45Z",
+      "side": 1,
+      "message": "Removed",
+      "parentUuid": "d3aea7f7_284375ff",
+      "revId": "56b418833675ceb6b270cfc81436d0ba360af4c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
