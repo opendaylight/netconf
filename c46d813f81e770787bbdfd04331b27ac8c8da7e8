@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c170925c_1f7fc45e",
+        "filename": "tests/libraries/restconf.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-04-22T11:27:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e39b7896_fa852715",
+      "revId": "c46d813f81e770787bbdfd04331b27ac8c8da7e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ab67d6c_a4d19c22",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "239e5886_c9d1aeec",
+        "filename": "tests/libraries/restconf.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-04-22T11:27:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2ab67d6c_a4d19c22",
+      "revId": "c46d813f81e770787bbdfd04331b27ac8c8da7e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5da327e_46411903",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-04-22T07:30:27Z",
       "side": 1,
       "message": "what is this for? separate commit?",
+      "revId": "c46d813f81e770787bbdfd04331b27ac8c8da7e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c515d42_fe1e116c",
+        "filename": "tests/libraries/utils.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-04-22T11:27:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b5da327e_46411903",
       "revId": "c46d813f81e770787bbdfd04331b27ac8c8da7e8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -71,6 +125,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "439e5275_a1961619",
+        "filename": "tests/libraries/variables.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-04-22T11:27:42Z",
+      "side": 1,
+      "message": "renamed to XML_MESSAGE_HEADERS",
+      "parentUuid": "c98fc44e_edf71602",
+      "revId": "c46d813f81e770787bbdfd04331b27ac8c8da7e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "84ab7372_6e7da747",
         "filename": "tests/suites/notifications/test_notifications.py",
         "patchSetId": 5
@@ -82,6 +154,24 @@
       "writtenOn": "2026-04-22T07:30:27Z",
       "side": 1,
       "message": "LFN ticket to migrate code?",
+      "revId": "c46d813f81e770787bbdfd04331b27ac8c8da7e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80453491_6f05393a",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-04-22T11:27:42Z",
+      "side": 1,
+      "message": "It was originally copied from https://github.com/opendaylight/integration-test/blob/master/csit/suites/netconf/notifications/notifications_basic.robot#L4 But since the Copyright header is already in tests, it is not necessary to be here.",
+      "parentUuid": "84ab7372_6e7da747",
       "revId": "c46d813f81e770787bbdfd04331b27ac8c8da7e8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
