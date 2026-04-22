@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "11679dfd_bb9a77c7",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/AbstractHttp3E2ETest.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-22T10:24:35Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/122506",
+      "parentUuid": "337d03c5_6d9abb72",
+      "revId": "536d09207a16e997bce92d07956b0e67553b9c61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d1af8289_5b71e83c",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bbf1005_f2440d79",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/AbstractHttp3E2ETest.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-22T10:24:35Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/122506",
+      "parentUuid": "d1af8289_5b71e83c",
+      "revId": "536d09207a16e997bce92d07956b0e67553b9c61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "19402b28_053adb61",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-04-22T07:05:33Z",
       "side": 1,
       "message": "3 spaces?",
+      "revId": "536d09207a16e997bce92d07956b0e67553b9c61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba8c2f75_b837d6ac",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/MountPointHttp3E2ETest.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-22T10:24:35Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/122506",
+      "parentUuid": "19402b28_053adb61",
       "revId": "536d09207a16e997bce92d07956b0e67553b9c61",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
