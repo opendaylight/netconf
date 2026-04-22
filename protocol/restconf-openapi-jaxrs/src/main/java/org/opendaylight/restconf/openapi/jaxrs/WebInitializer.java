@@ -23,12 +23,15 @@ import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl;
+import org.opendaylight.restconf.openapi.model.OpenApiOauth2Configuration;
 import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 /**
  * Initializes the wep app.
@@ -36,8 +39,31 @@ import org.osgi.service.component.annotations.Reference;
  * @author Thomas Pantelis
  */
 @Singleton
-@Component(service = { })
+@Component(service = { }, configurationPid = "org.opendaylight.restconf.nb.rfc8040")
 public final class WebInitializer implements AutoCloseable {
+    @ObjectClassDefinition
+    public @interface Configuration {
+        @AttributeDefinition(description = """
+            Authorization endpoint URL of the OAuth2/OIDC identity provider (e.g. Keycloak or Entra ID).
+            Used in the OpenAPI security scheme for the authorization-code-with-PKCE flow.
+            Leave empty to disable the OAuth2 security scheme in the generated OpenAPI document.
+            """)
+        String oauth2$_$authorization$_$url() default "";
+
+        @AttributeDefinition(description = """
+            Token endpoint URL of the OAuth2/OIDC identity provider.
+            Used in the OpenAPI security scheme for the authorization-code-with-PKCE flow.
+            Leave empty to disable the OAuth2 security scheme in the generated OpenAPI document.
+            """)
+        String oauth2$_$token$_$url() default "";
+
+        @AttributeDefinition(description = """
+            Refresh endpoint URL of the OAuth2/OIDC identity provider.
+            Used in the OpenAPI The URL to be used for obtaining refresh tokens.
+            Leave empty to disable the OAuth2 security scheme in the generated OpenAPI document.
+            """)
+        String oauth2$_$refresh$_$url() default "";
+    }
     private final OpenApiServiceImpl openApiService;
     private final Registration registration;
 
@@ -45,9 +71,15 @@ public final class WebInitializer implements AutoCloseable {
     @Activate
     public WebInitializer(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
             @Reference final ServletSupport servletSupport, @Reference final DOMSchemaService schemaService,
-            @Reference final DOMMountPointService mountPointService, @Reference final JaxRsEndpoint endpoint)
+            @Reference final DOMMountPointService mountPointService, @Reference final JaxRsEndpoint endpoint,
+            final Configuration configuration)
             throws ServletException {
-        openApiService = new OpenApiServiceImpl(schemaService, mountPointService, endpoint.configuration().restconf());
+        final var authUrl = configuration.oauth2$_$authorization$_$url();
+        final var tokenUrl = configuration.oauth2$_$token$_$url();
+        final var oauth2Config = authUrl.isBlank() || tokenUrl.isBlank()
+            ? null : new OpenApiOauth2Configuration(authUrl, tokenUrl, configuration.oauth2$_$refresh$_$url());
+        openApiService = new OpenApiServiceImpl(schemaService, mountPointService,
+            endpoint.configuration().restconf(), oauth2Config);
         final var webContextBuilder = WebContext.builder()
             .name("OpenAPI")
             .contextPath("/openapi")

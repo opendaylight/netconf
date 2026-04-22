@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
@@ -28,12 +29,13 @@ public final class DocumentEntity extends OpenApiEntity {
     public DocumentEntity(final EffectiveModelContext modelContext, final String title, final String url,
             final List<Map<String, List<String>>> security, final String deviceName, final String urlPrefix,
             final boolean isForSingleModule, final boolean includeDataStore, final Collection<? extends Module> modules,
-            final String basePath, final int width, final int depth) {
+            final String basePath, final int width, final int depth,
+            final @Nullable OpenApiOauth2Configuration oauth2Config) {
         info = new InfoEntity(title);
         servers = new ServersEntity(List.of(new ServerEntity(url)));
         paths = new PathsEntity(modelContext, deviceName, urlPrefix, isForSingleModule, includeDataStore, modules,
             basePath, width, depth);
-        components = new ComponentsEntity(modelContext, modules, isForSingleModule, width, depth);
+        components = new ComponentsEntity(modelContext, modules, isForSingleModule, width, depth, oauth2Config);
         this.security = new SecurityEntity(security);
     }
 

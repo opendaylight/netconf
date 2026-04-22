@@ -239,6 +239,21 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
                 }
 
                 @Override
+                public String oauth2$_$authorization$_$url() {
+                    return "";
+                }
+
+                @Override
+                public String oauth2$_$token$_$url() {
+                    return "";
+                }
+
+                @Override
+                public String oauth2$_$refresh$_$url() {
+                    return "";
+                }
+
+                @Override
                 public Class<OpenApiResourceProvider.Configuration> annotationType() {
                     return OpenApiResourceProvider.Configuration.class;
                 }
