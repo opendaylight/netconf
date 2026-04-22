@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24157ced_3b5a9bf9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-22T10:26:01Z",
+      "side": 1,
+      "message": "This patch address comments from \nhttps://git.opendaylight.org/gerrit/c/netconf/+/122160",
+      "revId": "7faee7995e68d2ddfd80aa70bbe72e041b0dfb7e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
