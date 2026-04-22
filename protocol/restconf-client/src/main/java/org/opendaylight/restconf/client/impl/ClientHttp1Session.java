@@ -15,8 +15,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.client.ClientSession;
@@ -50,8 +50,7 @@ public final class ClientHttp1Session extends ClientSession {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientHttp1Session.class);
 
-    // TODO: we access the queue only from Netty callbacks: can we use a plain ArrayDeque?
-    private final Queue<Req> queue = new ConcurrentLinkedQueue<>();
+    private final Queue<Req> queue = new ArrayDeque<>();
     private Channel channel;
 
     @Override
@@ -68,12 +67,14 @@ public final class ClientHttp1Session extends ClientSession {
         }
         // Queue has to be populated first, simply because a response may arrive sooner than the successful callback
         final var req = new Req(callback);
-        queue.add(req);
-        local.writeAndFlush(request).addListener(sent -> {
-            final var cause = sent.cause();
-            if (cause != null && queue.remove(req)) {
-                callback.onFailure(cause);
-            }
+        local.eventLoop().execute(() -> {
+            queue.add(req);
+            local.writeAndFlush(request).addListener(sent -> {
+                final var cause = sent.cause();
+                if (cause != null && queue.remove(req)) {
+                    callback.onFailure(cause);
+                }
+            });
         });
     }
 
