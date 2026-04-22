@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "580ef00c_84352dfa",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/Http3ServerBootstrap.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-22T12:47:54Z",
+      "side": 1,
+      "message": "Local variables should be declared as close to their usage as possible.",
+      "revId": "2890ad77013fe27fff278ce6558956a1769df9d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8334b58e_17e8be96",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/Http3ServerBootstrap.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-22T12:47:54Z",
+      "side": 1,
+      "message": "Missing an indent here.",
+      "revId": "2890ad77013fe27fff278ce6558956a1769df9d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d069302_3aeb2419",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/Http3ServerBootstrap.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-22T12:47:54Z",
+      "side": 1,
+      "message": "Remove",
+      "revId": "2890ad77013fe27fff278ce6558956a1769df9d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
