@@ -14,6 +14,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.ClientAuthSupported;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.IetfHttpServerData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.LocalUsersSupported;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.QuicSupported;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.TcpSupported;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.TlsSupported;
 import org.opendaylight.yangtools.binding.YangFeature;
@@ -32,8 +33,7 @@ public final class IetfHttpServerFeatureProvider implements YangFeatureProvider<
 
     @Override
     public Set<? extends YangFeature<?, IetfHttpServerData>> supportedFeatures() {
-        // FIXME: NETCONF-1520: quic-supported
-        return Set.of(TcpSupported.VALUE, TlsSupported.VALUE,
+        return Set.of(TcpSupported.VALUE, TlsSupported.VALUE, QuicSupported.VALUE,
             // FIXME: version-discovery
             BasicAuth.VALUE, ClientAuthSupported.VALUE, LocalUsersSupported.VALUE);
     }

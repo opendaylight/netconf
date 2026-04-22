@@ -12,6 +12,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.kohsuke.MetaInfServices;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.server.rev251204.IetfRestconfServerData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.server.rev251204.Listen;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.server.rev251204.QuicListen;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.server.rev251204.TcpListen;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.server.rev251204.TlsListen;
 import org.opendaylight.yangtools.binding.YangFeature;
@@ -31,7 +32,6 @@ public final class IetfRestconfServerFeatureProvider implements YangFeatureProvi
     @Override
     public Set<? extends YangFeature<?, IetfRestconfServerData>> supportedFeatures() {
         // FIXME: add CallHome.VALUE and TlsCallhome.VALUE when server refactoring is complete
-        // FIXME: QuicListen.VALUE once we have integrated HTTP/3 configuration
-        return Set.of(Listen.VALUE, TcpListen.VALUE, TlsListen.VALUE);
+        return Set.of(Listen.VALUE, TcpListen.VALUE, TlsListen.VALUE, QuicListen.VALUE);
     }
 }
