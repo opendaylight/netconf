@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "337d03c5_6d9abb72",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/AbstractHttp3E2ETest.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-22T07:05:33Z",
+      "side": 1,
+      "message": "protected against what?",
+      "revId": "536d09207a16e997bce92d07956b0e67553b9c61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1af8289_5b71e83c",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/AbstractHttp3E2ETest.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-22T07:05:33Z",
+      "side": 1,
+      "message": "unnecessary line",
+      "revId": "536d09207a16e997bce92d07956b0e67553b9c61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19402b28_053adb61",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/MountPointHttp3E2ETest.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-22T07:05:33Z",
+      "side": 1,
+      "message": "3 spaces?",
+      "revId": "536d09207a16e997bce92d07956b0e67553b9c61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
