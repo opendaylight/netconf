@@ -8,8 +8,10 @@
 package org.opendaylight.restconf.openapi.impl;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.openapi.model.OpenApiOauth2Configuration;
 import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
 
 /**
@@ -22,7 +24,13 @@ public class MountPointOpenApiGeneratorRFC8040 extends BaseYangOpenApiGenerator 
 
     public MountPointOpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService,
             final @NonNull DOMMountPointService mountService) {
-        super(schemaService);
+        this(schemaService, mountService, null);
+    }
+
+    public MountPointOpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService,
+            final @NonNull DOMMountPointService mountService,
+            final @Nullable OpenApiOauth2Configuration oauth2Config) {
+        super(schemaService, oauth2Config);
         mountPointOpenApi = new MountPointOpenApi(schemaService, mountService, this);
         mountPointOpenApi.init();
     }

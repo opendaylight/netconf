@@ -47,7 +47,9 @@ public final class WebInitializer implements AutoCloseable {
             @Reference final ServletSupport servletSupport, @Reference final DOMSchemaService schemaService,
             @Reference final DOMMountPointService mountPointService, @Reference final JaxRsEndpoint endpoint)
             throws ServletException {
-        openApiService = new OpenApiServiceImpl(schemaService, mountPointService, endpoint.configuration().restconf());
+        // OAuth2 config is not yet wired for the JAX-RS endpoint; pass null to omit the oauth2 security scheme.
+        openApiService = new OpenApiServiceImpl(schemaService, mountPointService,
+            endpoint.configuration().restconf(), null);
         final var webContextBuilder = WebContext.builder()
             .name("OpenAPI")
             .contextPath("/openapi")

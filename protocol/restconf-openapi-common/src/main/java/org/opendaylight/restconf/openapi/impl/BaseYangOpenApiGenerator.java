@@ -21,9 +21,11 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.model.DocumentEntity;
 import org.opendaylight.restconf.openapi.model.MetadataEntity;
+import org.opendaylight.restconf.openapi.model.OpenApiOauth2Configuration;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -32,12 +34,34 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 
 public abstract class BaseYangOpenApiGenerator {
     private static final String CONTROLLER_RESOURCE_NAME = "Controller";
-    public static final List<Map<String, List<String>>> SECURITY = List.of(Map.of("basicAuth", List.of()));
 
     private final DOMSchemaService schemaService;
+    private final @Nullable OpenApiOauth2Configuration oauth2Config;
 
     protected BaseYangOpenApiGenerator(final @NonNull DOMSchemaService schemaService) {
+        this(schemaService, null);
+    }
+
+    protected BaseYangOpenApiGenerator(final @NonNull DOMSchemaService schemaService,
+            final @Nullable OpenApiOauth2Configuration oauth2Config) {
         this.schemaService = requireNonNull(schemaService);
+        this.oauth2Config = oauth2Config;
+    }
+
+    public @Nullable OpenApiOauth2Configuration oauth2Config() {
+        return oauth2Config;
+    }
+
+    /**
+     * Returns the security requirements list for use in the OpenAPI document {@code security} section.
+     * Each entry in the outer list is an alternative (OR); all entries within a single map are conjunctions (AND).
+     * When OAuth2 is not configured only HTTP Basic is advertised.
+     */
+    public List<Map<String, List<String>>> securityRequirements() {
+        if (oauth2Config == null) {
+            return List.of(Map.of("basicAuth", List.of()));
+        }
+        return List.of(Map.of("basicAuth", List.of()), Map.of("oauth2", List.of()));
     }
 
     private @NonNull EffectiveModelContext modelContext() {
@@ -53,8 +77,8 @@ public abstract class BaseYangOpenApiGenerator {
         final var url = schema + "://" + host + "/";
         final var modulesWithoutDuplications = getModulesWithoutDuplications(modelContext);
         final var portionOfModels = getModelsSublist(modulesWithoutDuplications, offset, limit);
-        return new DocumentEntity(modelContext, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "", false, true,
-            portionOfModels, basePath, width, depth);
+        return new DocumentEntity(modelContext, title, url, securityRequirements(), CONTROLLER_RESOURCE_NAME, "",
+            false, true, portionOfModels, basePath, width, depth, oauth2Config);
     }
 
     public MetadataEntity getControllerModulesMeta(final int offset, final int limit) throws IOException {
@@ -88,8 +112,8 @@ public abstract class BaseYangOpenApiGenerator {
         final var title = module.getName();
         final var url = schema + "://" + host + "/";
         final var modules = List.of(module);
-        return new DocumentEntity(modelContext, title, url, SECURITY, deviceName, urlPrefix, true, false,
-            modules, basePath, width, depth);
+        return new DocumentEntity(modelContext, title, url, securityRequirements(), deviceName, urlPrefix, true,
+            false, modules, basePath, width, depth, oauth2Config);
     }
 
     public String createHostFromUri(final URI uri) {
