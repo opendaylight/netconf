@@ -52,10 +52,12 @@ public final class EventStreamResponse implements Response {
             .context(CHANNEL_SENDER_CONTEXT_NAME);
 
         final var response = new DefaultHttpResponse(version, HttpResponseStatus.OK);
-        response.headers()
-            .set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_EVENT_STREAM)
-            .set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE)
-            .set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED);
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_EVENT_STREAM);
+        if (HttpVersion.HTTP_1_1.equals(version)) {
+            response.headers()
+                .set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE)
+                .set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED);
+        }
         copyStreamId(streamId, response);
 
         if (sseHeartbeatIntervalMillis > 0) {
