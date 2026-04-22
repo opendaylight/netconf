@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.quic.QuicChannel;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -34,7 +35,12 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
 
     @Override
     public final void handlerAdded(final ChannelHandlerContext ctx) {
-        scheme.initializeServerPipeline(ctx, frameSize);
+        if (ctx.channel() instanceof QuicChannel) {
+            LOG.debug("{} resolved to HTTP/3 semantics", ctx.channel());
+            configureHttp3(ctx);
+        } else {
+            scheme.initializeServerPipeline(ctx, frameSize);
+        }
     }
 
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
@@ -72,4 +78,12 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
      */
     @NonNullByDefault
     protected abstract void configureHttp2(ChannelHandlerContext ctx);
+
+    /**
+     * Finalize the parent channel pipeline for HTTP/3 once HTTP/3 semantics have been selected.
+     *
+     * @param ctx the {@link ChannelHandlerContext} of this bootstrap on the parent QUIC channel
+     */
+    @NonNullByDefault
+    protected abstract void configureHttp3(ChannelHandlerContext ctx);
 }
