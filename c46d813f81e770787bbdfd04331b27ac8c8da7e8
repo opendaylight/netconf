@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e39b7896_fa852715",
+        "filename": "tests/libraries/restconf.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-22T07:30:27Z",
+      "side": 1,
+      "message": "2026 - or shouldn\u0027t you use LFN ticket to move code?",
+      "revId": "c46d813f81e770787bbdfd04331b27ac8c8da7e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ab67d6c_a4d19c22",
+        "filename": "tests/libraries/restconf.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-22T07:30:27Z",
+      "side": 1,
+      "message": "not needed line",
+      "revId": "c46d813f81e770787bbdfd04331b27ac8c8da7e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5da327e_46411903",
+        "filename": "tests/libraries/utils.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-22T07:30:27Z",
+      "side": 1,
+      "message": "what is this for? separate commit?",
+      "revId": "c46d813f81e770787bbdfd04331b27ac8c8da7e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c98fc44e_edf71602",
+        "filename": "tests/libraries/variables.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-22T07:30:27Z",
+      "side": 1,
+      "message": "can we split accept and content type? or rename this to be XML message",
+      "revId": "c46d813f81e770787bbdfd04331b27ac8c8da7e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84ab7372_6e7da747",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-22T07:30:27Z",
+      "side": 1,
+      "message": "LFN ticket to migrate code?",
+      "revId": "c46d813f81e770787bbdfd04331b27ac8c8da7e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
