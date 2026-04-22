@@ -117,6 +117,9 @@ window.onload = function () {
     layout: 'StandaloneLayout'
   });
 
+  ui.initOAuth({
+    usePkceWithAuthorizationCodeGrant: true
+  })
   window.ui = ui;
 
   function getQueryParams(params) {

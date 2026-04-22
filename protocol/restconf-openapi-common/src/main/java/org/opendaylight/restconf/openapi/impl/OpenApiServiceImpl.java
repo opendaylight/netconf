@@ -19,6 +19,7 @@ import org.opendaylight.restconf.openapi.api.OpenApiService;
 import org.opendaylight.restconf.openapi.model.DocumentEntity;
 import org.opendaylight.restconf.openapi.model.MetadataEntity;
 import org.opendaylight.restconf.openapi.model.MountPointsEntity;
+import org.opendaylight.restconf.openapi.model.OpenApiOauth2Configuration;
 import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
 
 /**
@@ -34,8 +35,13 @@ public final class OpenApiServiceImpl implements OpenApiService, AutoCloseable {
 
     public OpenApiServiceImpl(final DOMSchemaService schemaService, final DOMMountPointService mountPointService,
             final String basePath) {
-        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService),
-            new OpenApiGeneratorRFC8040(schemaService), basePath);
+        this(schemaService, mountPointService, basePath, null);
+    }
+
+    public OpenApiServiceImpl(final DOMSchemaService schemaService, final DOMMountPointService mountPointService,
+            final String basePath, final @Nullable OpenApiOauth2Configuration oauth2Config) {
+        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService, oauth2Config),
+            new OpenApiGeneratorRFC8040(schemaService, oauth2Config), basePath);
     }
 
     @VisibleForTesting
