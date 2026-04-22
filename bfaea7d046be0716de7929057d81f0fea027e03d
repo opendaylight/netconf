@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16cc82bc_141dc331",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 1854,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-22T08:16:28Z",
+      "side": 1,
+      "message": "thanks @samuel https://git.opendaylight.org/gerrit/c/netconf/+/120298/comment/2252597c_3ba3b24f/",
+      "revId": "bfaea7d046be0716de7929057d81f0fea027e03d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c467cfe_eac992a0",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1594Test.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-22T08:16:28Z",
+      "side": 1,
+      "message": "use enum types, do not hardcode strings\n```\ndoReturn(SshEd25519.getName()).when(transportClientSession)\n```",
+      "revId": "bfaea7d046be0716de7929057d81f0fea027e03d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2464f7d7_5cf25b8d",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1594Test.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-22T08:16:28Z",
+      "side": 1,
+      "message": "add javadocs",
+      "revId": "bfaea7d046be0716de7929057d81f0fea027e03d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
