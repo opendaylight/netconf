@@ -244,12 +244,11 @@ abstract class AbstractHttp3E2ETest extends AbstractE2ETest {
             ));
     }
 
-    protected TestEventStreamListener startStream(final URI uri) throws Exception {
+    TestEventStreamListener startStream(final URI uri) throws Exception {
         final var listener = new TestEventStreamListener();
         final var control = client.listenToStream(uri, listener);
         await().atMost(Duration.ofSeconds(2)).until(listener::started);
         addStreamControl(control);
-
         return listener;
     }
 }

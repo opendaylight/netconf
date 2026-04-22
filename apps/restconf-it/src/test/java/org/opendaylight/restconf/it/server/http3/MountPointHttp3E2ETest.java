@@ -211,9 +211,9 @@ class MountPointHttp3E2ETest extends AbstractHttp3E2ETest {
                 /yang-ext:mount/notifications:create-subscription"""))
             .POST(HttpRequest.BodyPublishers.ofString("""
                 {
-                   "input": {
-                       "stream": "NETCONF"
-                   }
+                    "input": {
+                        "stream": "NETCONF"
+                    }
                 }"""))
             .header(HttpHeaderNames.ACCEPT.toString(), APPLICATION_JSON)
             .header(HttpHeaderNames.CONTENT_TYPE.toString(), APPLICATION_JSON)
