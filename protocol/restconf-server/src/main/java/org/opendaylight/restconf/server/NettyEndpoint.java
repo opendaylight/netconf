@@ -11,7 +11,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.WriteBufferWaterMark;
 import java.util.concurrent.ExecutionException;
-import javax.net.ssl.SSLException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -35,7 +34,7 @@ public abstract class NettyEndpoint {
 
     private final HTTPServer httpServer;
     private final EndpointRoot root;
-    private final @Nullable Http3ServerBootstrap http3ServerBootstrap;
+    private final @Nullable HTTPServer http3Server;
 
     protected NettyEndpoint(final RestconfServer server, final PrincipalService principalService,
             final RestconfStream.Registry streamRegistry, final BootstrapFactory bootstrapFactory,
@@ -55,7 +54,7 @@ public abstract class NettyEndpoint {
         }
 
         root = listener.root();
-        http3ServerBootstrap = startHttp3(configuration, root, writeBufferWaterMark);
+        http3Server = startHttp3(listener, configuration);
     }
 
     @NonNullByDefault
@@ -64,14 +63,14 @@ public abstract class NettyEndpoint {
     }
 
     protected final ListenableFuture<Empty> shutdown() {
-        if (http3ServerBootstrap != null) {
-            http3ServerBootstrap.close();
+        if (http3Server != null) {
+            http3Server.shutdown();
         }
         return httpServer.shutdown();
     }
 
-    private static @Nullable Http3ServerBootstrap startHttp3(final NettyEndpointConfiguration configuration,
-            final EndpointRoot root, final WriteBufferWaterMark writeBufferWaterMark) {
+    private static @Nullable HTTPServer startHttp3(final RestconfTransportChannelListener listener,
+            final NettyEndpointConfiguration configuration) {
         final var http3TransportConfiguration = configuration.http3TransportConfiguration();
         if (http3TransportConfiguration == null) {
             LOG.info("HTTP/3 is disabled because transport is not configured");
@@ -91,10 +90,13 @@ public abstract class NettyEndpoint {
         }
 
         try {
-            return Http3ServerBootstrap.start(httpOverQuicTransport, root, configuration.chunkSize(),
-                writeBufferWaterMark);
-        } catch (UnsupportedConfigurationException | SSLException e) {
+            return HTTPServer.listen(listener, httpOverQuicTransport).get();
+        } catch (UnsupportedConfigurationException | ExecutionException e) {
             LOG.warn("Failed to initialize HTTP/3 listener", e);
+            return null;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LOG.warn("Interrupted while initializing HTTP/3 listener", e);
             return null;
         }
     }

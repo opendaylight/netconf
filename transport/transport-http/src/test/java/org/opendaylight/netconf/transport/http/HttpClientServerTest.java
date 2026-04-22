@@ -209,6 +209,11 @@ class HttpClientServerTest {
                         }
                     };
                 }
+
+                @Override
+                protected void configureHttp3(final ChannelHandlerContext ctx) {
+                    throw new UnsupportedOperationException("HTTP/3 is not covered by this test");
+                }
             });
             return null;
         }).when(serverTransportListener).onTransportChannelEstablished(any());
