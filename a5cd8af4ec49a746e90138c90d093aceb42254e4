@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "039e71ce_3d2e069a",
+        "filename": "features/odl-restconf-all/pom.xml",
+        "patchSetId": 10
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-22T11:23:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f894f4cb_171da75d",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 21
+      },
+      "revId": "a5cd8af4ec49a746e90138c90d093aceb42254e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f4490801_6f098209",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-04-22T10:52:14Z",
       "side": 1,
       "message": "order",
+      "range": {
+        "startLine": 30,
+        "startChar": 21,
+        "endLine": 30,
+        "endChar": 45
+      },
+      "revId": "a5cd8af4ec49a746e90138c90d093aceb42254e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "104e4482_7f8d470c",
+        "filename": "features/odl-restconf-openapi-jaxrs/pom.xml",
+        "patchSetId": 10
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-22T11:23:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4490801_6f098209",
       "range": {
         "startLine": 30,
         "startChar": 21,
