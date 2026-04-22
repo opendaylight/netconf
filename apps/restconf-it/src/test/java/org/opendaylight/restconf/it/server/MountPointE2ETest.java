@@ -177,9 +177,9 @@ class MountPointE2ETest extends AbstractE2ETest {
             /yang-ext:mount/notifications:create-subscription""",
             APPLICATION_JSON, """
                 {
-                   "input": {
-                       "stream": "NETCONF"
-                   }
+                    "input": {
+                        "stream": "NETCONF"
+                    }
                 }""");
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
 
