@@ -115,7 +115,7 @@ def report_known_bug_on_failure(bug_id: str):
         url = (
             f"https://jira.opendaylight.org/browse/{bug_id}"
             if "-" in bug_id
-            else f"https://bugs.opendaylight.org/show_bug.cgi?id={bug_id_str}"
+            else f"https://bugs.opendaylight.org/show_bug.cgi?id={bug_id}"
         )
         allure.dynamic.link(url, name=f"Related Bug {bug_id}")
         error_msg = f"\nThis test failed due to a previously reported bug: {url}\nOriginal error: {str(e)}"
