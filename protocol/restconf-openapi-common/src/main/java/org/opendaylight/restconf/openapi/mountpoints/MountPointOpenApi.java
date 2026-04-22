@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.openapi.mountpoints;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.SECURITY;
 
 import java.io.IOException;
 import java.net.URI;
@@ -170,8 +169,9 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var host = openApiGenerator.createHostFromUri(uri);
         final var title = deviceName + " modules of RESTCONF";
         final var url = schema + "://" + host + "/";
-        return new DocumentEntity(modelContext, title, url, SECURITY, deviceName, urlPrefix, false, includeDataStore,
-            portionOfModules, basePath, width, depth);
+        return new DocumentEntity(modelContext, title, url, openApiGenerator.securityRequirements(), deviceName,
+            urlPrefix, false, includeDataStore, portionOfModules, basePath, width, depth,
+            openApiGenerator.oauth2Config());
     }
 
     public MetadataEntity getMountPointApiMeta(final long id, final int offset, final int limit) throws IOException {
@@ -200,8 +200,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var host = openApiGenerator.createHostFromUri(uri);
         final var url = schema + "://" + host + "/";
         final var modules = BaseYangOpenApiGenerator.getModulesWithoutDuplications(modelContext);
-        return new DocumentEntity(modelContext, urlPrefix, url, SECURITY, deviceName, urlPrefix, true, false,
-            modules, basePath, width, depth);
+        return new DocumentEntity(modelContext, urlPrefix, url, openApiGenerator.securityRequirements(), deviceName,
+            urlPrefix, true, false, modules, basePath, width, depth, openApiGenerator.oauth2Config());
     }
 
     @Override
