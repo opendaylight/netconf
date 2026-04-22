@@ -15,6 +15,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceInstance;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceProvider;
 import org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl;
+import org.opendaylight.restconf.openapi.model.security.OpenApiOauth2Configuration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -39,6 +40,27 @@ public final class OpenApiResourceProvider implements WebHostResourceProvider, A
             Template.
             """)
         String api$_$root$_$path() default "restconf";
+
+        @AttributeDefinition(description = """
+            Authorization endpoint URL of the OAuth2/OIDC identity provider (e.g. Keycloak or Entra ID).
+            Used in the OpenAPI security scheme for the authorization-code-with-PKCE flow.
+            Leave empty to disable the OAuth2 security scheme in the generated OpenAPI document.
+            """)
+        String oauth2$_$authorization$_$url() default "";
+
+        @AttributeDefinition(description = """
+            Token endpoint URL of the OAuth2/OIDC identity provider.
+            Used in the OpenAPI security scheme for the authorization-code-with-PKCE flow.
+            Leave empty to disable the OAuth2 security scheme in the generated OpenAPI document.
+            """)
+        String oauth2$_$token$_$url() default "";
+
+        @AttributeDefinition(description = """
+            Refresh endpoint URL of the OAuth2/OIDC identity provider.
+            Used in the OpenAPI The URL to be used for obtaining refresh tokens.
+            Leave empty to disable the OAuth2 security scheme in the generated OpenAPI document.
+            """)
+        String oauth2$_$refresh$_$url() default "";
     }
 
     private final OpenApiServiceImpl service;
@@ -47,7 +69,12 @@ public final class OpenApiResourceProvider implements WebHostResourceProvider, A
     @Activate
     public OpenApiResourceProvider(@Reference final DOMSchemaService schemaService,
             @Reference final DOMMountPointService mountPointService, final Configuration configuration) {
-        service = new OpenApiServiceImpl(schemaService, mountPointService, configuration.api$_$root$_$path());
+        final var authUrl = configuration.oauth2$_$authorization$_$url();
+        final var tokenUrl = configuration.oauth2$_$token$_$url();
+        final var oauth2Config = authUrl.isBlank() || tokenUrl.isBlank()
+            ? null : new OpenApiOauth2Configuration(authUrl, tokenUrl, configuration.oauth2$_$refresh$_$url());
+        service = new OpenApiServiceImpl(schemaService, mountPointService,
+            configuration.api$_$root$_$path(), oauth2Config);
     }
 
     @Override

@@ -8,7 +8,9 @@
 package org.opendaylight.restconf.openapi.impl;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.openapi.model.security.OpenApiOauth2Configuration;
 
 /**
  * This class gathers all YANG-defined {@link org.opendaylight.yangtools.yang.model.api.Module}s and
@@ -19,5 +21,10 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 public class OpenApiGeneratorRFC8040 extends BaseYangOpenApiGenerator {
     public OpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService) {
         super(schemaService);
+    }
+
+    public OpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService,
+            final @Nullable OpenApiOauth2Configuration oauth2Config) {
+        super(schemaService, oauth2Config);
     }
 }

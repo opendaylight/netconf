@@ -75,6 +75,10 @@
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.service.component.annotations</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.metatype.annotations</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -93,6 +97,28 @@
                             <includeArtifactIds>restconf-openapi-common</includeArtifactIds>
                             <includes>explorer/**</includes>
                             <outputDirectory>${project.build.directory}/generated-resources/openapi-common</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-artifacts</id>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>${project.build.directory}/classes/restconf8040.oauth2.cfg</file>
+                                    <type>cfg</type>
+                                    <classifier>config</classifier>
+                                </artifact>
+                            </artifacts>
                         </configuration>
                     </execution>
                 </executions>
