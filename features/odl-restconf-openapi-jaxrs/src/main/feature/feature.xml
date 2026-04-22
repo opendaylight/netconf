@@ -9,5 +9,8 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-${project.version}">
     <feature name="odl-restconf-openapi-jaxrs" version="${project.version}">
         <feature version="[14,15)">odl-jackson-2</feature>
+        <configfile finalname="etc/org.opendaylight.restconf.nb.rfc8040.oauth2.cfg">
+            mvn:org.opendaylight.netconf/restconf-openapi-jaxrs/${project.version}/cfg/config
+        </configfile>
     </feature>
 </features>
