@@ -19,6 +19,7 @@ public interface SecuritySchemeObject {
      * <p>We are only using the "http" which might change in the future, so we will extend the Type enum.
      */
     enum Type {
-        http
+        http,
+        oauth2
     }
 }

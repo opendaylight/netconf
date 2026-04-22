@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import org.opendaylight.restconf.openapi.model.security.Http;
+import org.opendaylight.restconf.openapi.model.security.Oauth2;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
@@ -19,6 +20,9 @@ public final class ComponentsEntity extends OpenApiEntity {
     // FIXME: duplicate of BaseYangOpenApiGenerator.SECURITY?
     private static final String BASIC_AUTH_NAME = "basicAuth";
     private static final Http OPEN_API_BASIC_AUTH = new Http("basic", null, null);
+    private static final String OAUTH2_NAME = "oauth2";
+    private static final Oauth2 OPEN_API_OAUTH2 = new Oauth2("OAuth2", "implicit",
+        "http://keycloak.local:8080/realms/odl-realm/account");
 
     private final SchemasEntity schemas;
     private final SecuritySchemesEntity securitySchemes;
@@ -26,7 +30,8 @@ public final class ComponentsEntity extends OpenApiEntity {
     public ComponentsEntity(final EffectiveModelContext modelContext, final Collection<? extends Module> modules,
             final boolean isForSingleModule, final int width, final int depth) {
         schemas = new SchemasEntity(modelContext, modules, isForSingleModule, width, depth);
-        securitySchemes = new SecuritySchemesEntity(Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
+        securitySchemes = new SecuritySchemesEntity(Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH,
+            OAUTH2_NAME, OPEN_API_OAUTH2));
     }
 
     @Override

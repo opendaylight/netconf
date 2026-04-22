@@ -32,7 +32,8 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 
 public abstract class BaseYangOpenApiGenerator {
     private static final String CONTROLLER_RESOURCE_NAME = "Controller";
-    public static final List<Map<String, List<String>>> SECURITY = List.of(Map.of("basicAuth", List.of()));
+    public static final List<Map<String, List<String>>> SECURITY = List.of(Map.of("basicAuth", List.of(),
+        "oauth2", List.of()));
 
     private final DOMSchemaService schemaService;
 
