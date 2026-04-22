@@ -563,6 +563,13 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>restconf-openapi-jaxrs</artifactId>
+                <type>cfg</type>
+                <classifier>config</classifier>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>restconf-openapi</artifactId>
                 <version>${project.version}</version>
             </dependency>
