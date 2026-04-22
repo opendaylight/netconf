@@ -344,18 +344,19 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
             clientStackGrouping, false).get(2, TimeUnit.SECONDS);
         // await for connection
         await().atMost(Duration.ofSeconds(2)).until(channelListener::initialized);
-        final var callback = new TestRequestCallback();
-        client.invoke(request1, callback);
+        final var callback1 = new TestRequestCallback();
+        client.invoke(request1, callback1);
         // await for response
-        await().atMost(Duration.ofSeconds(2)).until(callback::completed);
-        final var response1 = callback.response();
+        await().atMost(Duration.ofSeconds(2)).until(callback1::completed);
+        final var response1 = callback1.response();
         assertNotNull(response1);
         assertEquals(HttpResponseStatus.OK, response1.status());
 
-        client.invoke(request2, callback);
+        final var callback2 = new TestRequestCallback();
+        client.invoke(request2, callback2);
         // await for response
-        await().atMost(Duration.ofSeconds(2)).until(callback::completed);
-        final var response2 = callback.response();
+        await().atMost(Duration.ofSeconds(2)).until(callback2::completed);
+        final var response2 = callback2.response();
         assertNotNull(response2);
         client.shutdown().get(2, TimeUnit.SECONDS);
         return response2;
