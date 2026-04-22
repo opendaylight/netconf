@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "46daa14e_df9a28f3",
+        "filename": "protocol/restconf-client/pom.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-22T05:20:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b509009_bf1dfd44",
+      "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fe7c72d9_9d8be7bf",
@@ -66,6 +84,24 @@
       "writtenOn": "2026-04-21T13:52:39Z",
       "side": 1,
       "message": "Maybe this class should be in impl folder?",
+      "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "681797cc_5c3aaa48",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientHttp1Session.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-22T05:20:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe7c72d9_9d8be7bf",
       "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -139,6 +175,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b83d888_a497d47b",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientHttp2Session.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-22T05:20:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a6b6b4b_4a83bccc",
+      "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2bb3dbc6_7abd5458",
@@ -208,6 +262,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c2538c5_ef00c257",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-22T05:20:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "feff5d5b_8c15b846",
+      "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "348af74e_662afeb1",
@@ -221,6 +293,30 @@
       "writtenOn": "2026-04-21T13:52:39Z",
       "side": 1,
       "message": "Overriding method parameters are not annotated.",
+      "range": {
+        "startLine": 22,
+        "startChar": 32,
+        "endLine": 22,
+        "endChar": 40
+      },
+      "revId": "52561c16227aa18a2c30dd72ef32f9e39f8f7370",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcec6fb0_964e25b7",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-22T05:20:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "348af74e_662afeb1",
       "range": {
         "startLine": 22,
         "startChar": 32,
