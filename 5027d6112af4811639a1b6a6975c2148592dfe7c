@@ -88,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1150ab9_6bc91469",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-04-22T12:27:55Z",
+      "side": 1,
+      "message": "separated task, it causes test failures",
+      "parentUuid": "53d00ab3_1c122e30",
+      "revId": "5027d6112af4811639a1b6a6975c2148592dfe7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "faa5a9ec_9ef930a7",
