@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a69d0b6a_93988211",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-23T07:21:30Z",
+      "side": 1,
+      "message": "AbstractNotificationSubscriptionTest.java:\nRoute through invokeRequestKeepClient()or a shared utility\n\ninvokeRequest() duplicates AbstractE2ETest and opens a TCP connection per call",
+      "revId": "3ccb627b7cf5752269c0fdf869fed225d5ec0fe8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "486517df_a5723973",
         "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
         "patchSetId": 6
