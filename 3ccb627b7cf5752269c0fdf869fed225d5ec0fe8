@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0262f7c7_749bdfa3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-23T07:19:57Z",
+      "side": 1,
+      "message": "AbstractNotificationSubscriptionTest.java:\n```\nUse a fresh new TestRequestCallback()for request2.\n\nTestRequestCallback reuse bug in invokeTwoRequests — completed is never reset,second await() returns immediately \n```",
+      "revId": "3ccb627b7cf5752269c0fdf869fed225d5ec0fe8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "486517df_a5723973",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-23T07:19:57Z",
+      "side": 1,
+      "message": "Override channelInactive(), drain the queue, and call onFailure() with a ClosedChannelException on each pending entry",
+      "revId": "3ccb627b7cf5752269c0fdf869fed225d5ec0fe8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63e1943c_eb02f947",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-23T07:19:57Z",
+      "side": 1,
+      "message": "volatile\n\n```\nchannel is written on the Netty event loop (handlerAdded) and read from an arbitrary thread (invoke null-check)\n```",
+      "revId": "3ccb627b7cf5752269c0fdf869fed225d5ec0fe8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a515c881_39a751e3",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-23T07:19:57Z",
+      "side": 1,
+      "message": "Override channelInactive(), drain the queue, and call onFailure() with a ClosedChannelException on each pending entry",
+      "revId": "3ccb627b7cf5752269c0fdf869fed225d5ec0fe8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c3598ea_be4cd328",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-23T07:19:57Z",
+      "side": 1,
+      "message": "volatile",
+      "revId": "3ccb627b7cf5752269c0fdf869fed225d5ec0fe8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
