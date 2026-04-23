@@ -16,6 +16,24 @@
       "message": "Remove unused config properties.",
       "revId": "f9177c77320248f1fcc1d76174b48a209c77ac98",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85d12319_bd3ecd26",
+        "filename": "usecase/netconf-topology-1node-transient/src/main/resources/application.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-04-23T07:32:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a067933_b9866dc9",
+      "revId": "f9177c77320248f1fcc1d76174b48a209c77ac98",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
