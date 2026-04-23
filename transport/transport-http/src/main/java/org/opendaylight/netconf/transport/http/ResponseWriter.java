@@ -103,7 +103,9 @@ public final class ResponseWriter extends ChannelInboundHandlerAdapter {
             final HttpVersion version) {
         final var response = new DefaultHttpResponse(version, status);
         headers.forEach(entry -> response.headers().add(entry.getKey(), entry.getValue()));
-        response.headers().set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED);
+        if (HttpVersion.HTTP_1_1.equals(version)) {
+            response.headers().set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED);
+        }
         switch (state) {
             case Inactive ignored -> {
                 LOG.debug("Rejecting sendResponseStart");
