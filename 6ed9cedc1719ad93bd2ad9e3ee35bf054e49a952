@@ -16,6 +16,24 @@
       "message": "why? illegal argument instead? is that on purpose?",
       "revId": "6ed9cedc1719ad93bd2ad9e3ee35bf054e49a952",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71b54383_9f410900",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/Http3ServerBootstrap.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-24T08:07:15Z",
+      "side": 1,
+      "message": "I have found out about this type in https://github.com/opendaylight/netconf/blob/852757ccf1b23a3384def65749c32983754e1cbe/transport/transport-tcp/src/main/java/org/opendaylight/netconf/transport/tcp/TCPServer.java#L69\nwhich uses a Yang-backed configuration as well",
+      "parentUuid": "ff1e7111_605d4063",
+      "revId": "6ed9cedc1719ad93bd2ad9e3ee35bf054e49a952",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
