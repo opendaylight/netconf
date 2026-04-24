@@ -70,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75539b57_b0e4dabb",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-24T12:25:24Z",
+      "side": 1,
+      "message": "@NonNull on the return type is fine and consistent with the rest of HTTPServer",
+      "parentUuid": "2c18e19b_7c84df92",
+      "revId": "70d75ba31562efbae90574eabe30aff073cb0ac5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c8665c4d_6a1a51b6",
