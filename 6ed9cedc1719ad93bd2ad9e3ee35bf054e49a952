@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff1e7111_605d4063",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/Http3ServerBootstrap.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-24T05:54:41Z",
+      "side": 1,
+      "message": "why? illegal argument instead? is that on purpose?",
+      "revId": "6ed9cedc1719ad93bd2ad9e3ee35bf054e49a952",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
