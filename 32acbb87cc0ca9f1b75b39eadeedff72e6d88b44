@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95f18421_31f38037",
+        "filename": "usecase/netconf-topology-1node-transient/src/main/java/org/opendaylight/netconf/dagger/RestconfNetconfFactory.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-24T06:06:59Z",
+      "side": 1,
+      "message": "unrelated change -separate commit",
+      "revId": "32acbb87cc0ca9f1b75b39eadeedff72e6d88b44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
