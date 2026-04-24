@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d349e54_e557a18e",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-24T08:27:40Z",
+      "side": 1,
+      "message": "Uses too many non-static class fields",
+      "parentUuid": "4725ab59_e21dd5d9",
+      "revId": "70d75ba31562efbae90574eabe30aff073cb0ac5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2c18e19b_7c84df92",
@@ -69,6 +87,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c188e6e4_91af8d2f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-24T08:27:40Z",
+      "side": 1,
+      "message": "Follow the convention based on the TCPServer and TLSServer.",
+      "parentUuid": "c8665c4d_6a1a51b6",
+      "revId": "70d75ba31562efbae90574eabe30aff073cb0ac5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "854b713d_1c701db3",
@@ -82,6 +118,24 @@
       "writtenOn": "2026-04-24T05:49:08Z",
       "side": 1,
       "message": "its non null by default",
+      "revId": "70d75ba31562efbae90574eabe30aff073cb0ac5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68ecd1d5_aca1d045",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/QuicTransportChannel.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-04-24T08:27:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "854b713d_1c701db3",
       "revId": "70d75ba31562efbae90574eabe30aff073cb0ac5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
