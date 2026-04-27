@@ -113,19 +113,18 @@ public final class OSGiNorthbound {
         String api$_$root$_$path() default "restconf";
 
         @AttributeDefinition(
-            name = "HTTP outbound data object (chunk) size (bytes)",
+            name = "HTTP/1.1 outbound data object (chunk) size (bytes)",
             description = """
-                Maximum size of a data chunk emitted during response streaming. Must be >= 1.
+                Maximum size of an HTTP/1.1 chunk emitted during response streaming. Must be >= 1.
 
-                This parameter is used in all HTTP implementations we provide including HTTP/1.1, HTTP/2 and HTTP/3.
-                It represents the size of HTTP object we are pushing forward to Netty pipeline. This object is then
-                formatted by appropriate Netty's H1.1, H2 or H3 codec to proper HttpObject(s)
-                or Http2Frame(s)/Http3Frame(s).
+                This parameter controls the size of HTTP objects pushed to Netty for HTTP/1.1 responses. HTTP/2
+                response object sizing follows the peer-advertised SETTINGS_MAX_FRAME_SIZE, while HTTP/3 uses the
+                peer QUIC transport parameters.
 
                 Its main purpose is to avoid out-of-memory issues when sending large response.
                 """,
                 min = "1")
-        int http$_$chunk$_$size() default 262144; // 256 KiB
+        int http1$_$chunk$_$size() default 262144; // 256 KiB
 
         @AttributeDefinition(
             name = "HTTP/2 max frame size (bytes)",
@@ -294,7 +293,7 @@ public final class OSGiNorthbound {
             Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
             Uint32.valueOf(configuration.heartbeat$_$interval()), configuration.api$_$root$_$path(),
             parseDefaultEncoding(configuration.default$_$encoding()), new HttpServerStackConfiguration(transport),
-            Uint32.valueOf(configuration.http$_$chunk$_$size()),
+            Uint32.valueOf(configuration.http1$_$chunk$_$size()),
             Uint32.valueOf(configuration.http2$_$max$_$frame$_$size()),
             Uint32.valueOf(configuration.http$_$write$_$buffer$_$low$_$watermark()),
             Uint32.valueOf(configuration.http$_$write$_$buffer$_$high$_$watermark()),
