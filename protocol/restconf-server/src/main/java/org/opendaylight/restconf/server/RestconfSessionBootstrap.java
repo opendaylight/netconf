@@ -66,8 +66,11 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
             return;
         }
         final var frameCodecCtx = requireNonNull(ctx.pipeline().context(Http2FrameCodec.class));
+        final var handler = (Http2FrameCodec) frameCodecCtx.handler();
+        final var maxFrameSize = Uint32.valueOf(handler.encoder().configuration().frameSizePolicy().maxFrameSize());
         ctx.pipeline().addAfter(frameCodecCtx.name(), "h2-multiplexer",
-            new Http2MultiplexHandler(buildHttp2ChildInitializer(ctx), buildHttp2ChildInitializer(ctx)));
+            new Http2MultiplexHandler(buildHttp2ChildInitializer(ctx, maxFrameSize),
+                buildHttp2ChildInitializer(ctx, maxFrameSize)));
         ctx.pipeline().remove(this);
     }
 
@@ -82,7 +85,8 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
         ctx.pipeline().remove(this);
     }
 
-    private ChannelInitializer<Channel> buildHttp2ChildInitializer(final ChannelHandlerContext ctx) {
+    private ChannelInitializer<Channel> buildHttp2ChildInitializer(final ChannelHandlerContext ctx,
+            final Uint32 maxFrameSize) {
         return new ChannelInitializer<>() {
             @Override protected void initChannel(final Channel ch) {
                 ch.config().setWriteBufferWaterMark(writeBufferWaterMark);
@@ -91,7 +95,7 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
                 pipeline.addLast(new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));
                 pipeline.addLast(altSvcAdvertiser);
                 pipeline.addLast("restconf-session", new ConcurrentRestconfSession(scheme,
-                    ctx.channel().remoteAddress(), root, chunkSize));
+                    ctx.channel().remoteAddress(), root, maxFrameSize));
             }
         };
     }
