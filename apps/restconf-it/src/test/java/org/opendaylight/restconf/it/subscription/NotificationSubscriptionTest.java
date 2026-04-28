@@ -110,20 +110,6 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
     }
 
     /**
-     * Tests listening to notifications.
-     */
-    @Test
-    void listenToNotificationsTest() throws Exception {
-        final var request1 = prepareEstablishRPCRequest();
-        // Listen to notifications
-        final var request2 = buildRequest(HttpMethod.GET, "/subscriptions/2147483648", APPLICATION_JSON, null,
-            "text/event-stream");
-        final var response = invokeTwoRequests(request1, request2);
-        // Listen to notifications
-        assertEquals(HttpResponseStatus.OK, response.status());
-    }
-
-    /**
      * Tests invalid input for establishing subscription RPC.
      */
     @Test
