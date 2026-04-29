@@ -15,6 +15,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import java.nio.channels.ClosedChannelException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.eclipse.jdt.annotation.NonNull;
@@ -52,7 +53,8 @@ public final class ClientHttp1Session extends ClientSession {
 
     // TODO: we access the queue only from Netty callbacks: can we use a plain ArrayDeque?
     private final Queue<Req> queue = new ConcurrentLinkedQueue<>();
-    private Channel channel;
+
+    private volatile Channel channel;
 
     @Override
     public void handlerAdded(final ChannelHandlerContext ctx) {
@@ -85,5 +87,14 @@ public final class ClientHttp1Session extends ClientSession {
         } else {
             LOG.warn("Unexpected response while no future associated -- Dropping response object {}", response);
         }
+    }
+
+    @Override
+    public void channelInactive(final ChannelHandlerContext ctx) {
+        for (final var req : queue) {
+            req.callback.onFailure(new ClosedChannelException());
+        }
+        queue.clear();
+        ctx.fireChannelInactive();
     }
 }
