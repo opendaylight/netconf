@@ -15,6 +15,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
+import java.nio.channels.ClosedChannelException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,30 +34,20 @@ import org.slf4j.LoggerFactory;
 public final class ClientHttp2Session extends ClientSession {
     private static final Logger LOG = LoggerFactory.getLogger(ClientHttp2Session.class);
 
-    // TODO: we access the queue only from Netty callbacks: can we use a plain HashMap?
+    // Concurrent because application threads add callbacks, and the Netty thread reads them.
     private final Map<Integer, FutureCallback<FullHttpResponse>> map = new ConcurrentHashMap<>();
     // identifier for streams initiated from client require to be odd-numbered, 1 is reserved
     // see https://datatracker.ietf.org/doc/html/rfc7540#section-5.1.1
     private final AtomicInteger streamIdCounter = new AtomicInteger(3);
     private final HTTPScheme scheme;
-    private Channel channel;
 
     public ClientHttp2Session(final HTTPScheme scheme) {
         this.scheme = requireNonNull(scheme);
     }
 
     @Override
-    public void handlerAdded(final ChannelHandlerContext ctx) {
-        this.channel = ctx.channel();
-    }
-
-    @Override
-    public void invoke(final @NonNull FullHttpRequest request,
+    protected void invoke(final Channel channel, final @NonNull FullHttpRequest request,
             final @NonNull FutureCallback<FullHttpResponse> callback) {
-        final var local = channel;
-        if (local == null) {
-            throw new IllegalStateException("Connection is not established yet");
-        }
         final var streamId = nextStreamId();
         request.headers()
             .setInt(ExtensionHeaderNames.STREAM_ID.text(), streamId)
@@ -64,7 +55,7 @@ public final class ClientHttp2Session extends ClientSession {
 
         // Map has to be populated first, simply because a response may arrive sooner than the successful callback
         map.put(streamId, callback);
-        local.writeAndFlush(request).addListener(sent -> {
+        channel.writeAndFlush(request).addListener(sent -> {
             final var cause = sent.cause();
             if (cause != null && map.remove(streamId, callback)) {
                 callback.onFailure(cause);
@@ -90,5 +81,16 @@ public final class ClientHttp2Session extends ClientSession {
             LOG.warn("Unexpected response with unknown or expired stream ID {} -- Dropping response object {}",
                 streamId, response);
         }
+    }
+
+    @Override
+    public void channelInactive(final ChannelHandlerContext ctx) {
+        clearChannel();
+        final var cause = new ClosedChannelException();
+        for (final var callback : map.values()) {
+            callback.onFailure(cause);
+        }
+        map.clear();
+        ctx.fireChannelInactive();
     }
 }
