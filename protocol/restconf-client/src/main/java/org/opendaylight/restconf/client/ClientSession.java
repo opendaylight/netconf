@@ -8,17 +8,48 @@
 package org.opendaylight.restconf.client;
 
 import com.google.common.util.concurrent.FutureCallback;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import org.eclipse.jdt.annotation.NonNull;
 
 public abstract class ClientSession extends SimpleChannelInboundHandler<FullHttpResponse> {
+    private volatile Channel channel;
+
+    @Override
+    public void handlerAdded(final ChannelHandlerContext ctx) {
+        this.channel = ctx.channel();
+    }
+
+    protected final void clearChannel() {
+        this.channel = null;
+    }
+
     /**
      * Invokes the HTTP request over the established connection.
      *
      * @param request A request to be sent.
      * @param callback A callback for accepting the results.
      */
-    public abstract void invoke(@NonNull FullHttpRequest request, @NonNull FutureCallback<FullHttpResponse> callback);
+    public final void invoke(final @NonNull FullHttpRequest request,
+            final @NonNull FutureCallback<FullHttpResponse> callback) {
+        final var local = channel;
+        if (local != null) {
+            executeRequest(local, request, callback);
+        } else {
+            throw new IllegalStateException("Connection is not established");
+        }
+    }
+
+    /**
+     * Executes the protocol-specific logic to send the request over the channel.
+     *
+     * @param channel  The active Netty channel.
+     * @param request  The HTTP request to send.
+     * @param callback The callback to be notified of the response or failure.
+     */
+    protected abstract void executeRequest(@NonNull Channel channel, @NonNull FullHttpRequest request,
+        @NonNull FutureCallback<FullHttpResponse> callback);
 }
