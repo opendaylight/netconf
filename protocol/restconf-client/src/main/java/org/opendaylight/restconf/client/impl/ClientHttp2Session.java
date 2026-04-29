@@ -15,6 +15,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
+import java.nio.channels.ClosedChannelException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,7 +40,8 @@ public final class ClientHttp2Session extends ClientSession {
     // see https://datatracker.ietf.org/doc/html/rfc7540#section-5.1.1
     private final AtomicInteger streamIdCounter = new AtomicInteger(3);
     private final HTTPScheme scheme;
-    private Channel channel;
+
+    private volatile Channel channel;
 
     public ClientHttp2Session(final HTTPScheme scheme) {
         this.scheme = requireNonNull(scheme);
@@ -55,7 +57,7 @@ public final class ClientHttp2Session extends ClientSession {
             final @NonNull FutureCallback<FullHttpResponse> callback) {
         final var local = channel;
         if (local == null) {
-            throw new IllegalStateException("Connection is not established yet");
+            throw new IllegalStateException("Connection is not established");
         }
         final var streamId = nextStreamId();
         request.headers()
@@ -90,5 +92,16 @@ public final class ClientHttp2Session extends ClientSession {
             LOG.warn("Unexpected response with unknown or expired stream ID {} -- Dropping response object {}",
                 streamId, response);
         }
+    }
+
+    @Override
+    public void channelInactive(final ChannelHandlerContext ctx) {
+        channel = null;
+        final var cause = new ClosedChannelException();
+        for (final var callback : map.values()) {
+            callback.onFailure(cause);
+        }
+        map.clear();
+        ctx.fireChannelInactive();
     }
 }
