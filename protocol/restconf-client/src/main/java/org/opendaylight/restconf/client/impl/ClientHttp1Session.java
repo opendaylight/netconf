@@ -15,8 +15,9 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import java.nio.channels.ClosedChannelException;
+import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.client.ClientSession;
@@ -50,29 +51,32 @@ public final class ClientHttp1Session extends ClientSession {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientHttp1Session.class);
 
-    // TODO: we access the queue only from Netty callbacks: can we use a plain ArrayDeque?
-    private final Queue<Req> queue = new ConcurrentLinkedQueue<>();
-    private Channel channel;
+    private final Queue<Req> queue = new ArrayDeque<>();
 
     @Override
-    public void handlerAdded(final ChannelHandlerContext ctx) {
-        this.channel = ctx.channel();
+    protected void executeRequest(final @NonNull Channel channel, final @NonNull FullHttpRequest request,
+            final @NonNull FutureCallback<FullHttpResponse> callback) {
+        final var req = new Req(callback);
+        if (channel.eventLoop().inEventLoop()) {
+            addAndWrite(channel, request, req);
+        } else {
+            channel.eventLoop().execute(() -> {
+                // Ensure the channel didn't die while this task was waiting in the EventLoop queue.
+                if (!channel.isActive()) {
+                    callback.onFailure(new ClosedChannelException());
+                    return;
+                }
+                addAndWrite(channel, request, req);
+            });
+        }
     }
 
-    @Override
-    public void invoke(final @NonNull FullHttpRequest request,
-            final @NonNull FutureCallback<FullHttpResponse> callback) {
-        final var local = channel;
-        if (local == null) {
-            throw new IllegalStateException("Connection is not established yet");
-        }
-        // Queue has to be populated first, simply because a response may arrive sooner than the successful callback
-        final var req = new Req(callback);
+    private void addAndWrite(final Channel channel, final FullHttpRequest request, final Req req) {
         queue.add(req);
-        local.writeAndFlush(request).addListener(sent -> {
+        channel.writeAndFlush(request).addListener(sent -> {
             final var cause = sent.cause();
             if (cause != null && queue.remove(req)) {
-                callback.onFailure(cause);
+                req.callback.onFailure(cause);
             }
         });
     }
@@ -85,5 +89,16 @@ public final class ClientHttp1Session extends ClientSession {
         } else {
             LOG.warn("Unexpected response while no future associated -- Dropping response object {}", response);
         }
+    }
+
+    @Override
+    public void channelInactive(final ChannelHandlerContext ctx) {
+        clearChannel();
+        final var cause = new ClosedChannelException();
+        Req req;
+        while ((req = queue.poll()) != null) {
+            req.callback.onFailure(cause);
+        }
+        ctx.fireChannelInactive();
     }
 }
