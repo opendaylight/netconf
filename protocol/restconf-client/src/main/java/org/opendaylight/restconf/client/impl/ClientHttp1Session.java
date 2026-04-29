@@ -15,6 +15,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import java.nio.channels.ClosedChannelException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.eclipse.jdt.annotation.NonNull;
@@ -50,26 +51,15 @@ public final class ClientHttp1Session extends ClientSession {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientHttp1Session.class);
 
-    // TODO: we access the queue only from Netty callbacks: can we use a plain ArrayDeque?
+    // Concurrent because application threads add callbacks, and the Netty thread reads them.
     private final Queue<Req> queue = new ConcurrentLinkedQueue<>();
-    private Channel channel;
 
     @Override
-    public void handlerAdded(final ChannelHandlerContext ctx) {
-        this.channel = ctx.channel();
-    }
-
-    @Override
-    public void invoke(final @NonNull FullHttpRequest request,
+    protected void invoke(@NonNull final Channel channel, final @NonNull FullHttpRequest request,
             final @NonNull FutureCallback<FullHttpResponse> callback) {
-        final var local = channel;
-        if (local == null) {
-            throw new IllegalStateException("Connection is not established yet");
-        }
-        // Queue has to be populated first, simply because a response may arrive sooner than the successful callback
         final var req = new Req(callback);
         queue.add(req);
-        local.writeAndFlush(request).addListener(sent -> {
+        channel.writeAndFlush(request).addListener(sent -> {
             final var cause = sent.cause();
             if (cause != null && queue.remove(req)) {
                 callback.onFailure(cause);
@@ -85,5 +75,16 @@ public final class ClientHttp1Session extends ClientSession {
         } else {
             LOG.warn("Unexpected response while no future associated -- Dropping response object {}", response);
         }
+    }
+
+    @Override
+    public void channelInactive(final ChannelHandlerContext ctx) {
+        clearChannel();
+        final var cause = new ClosedChannelException();
+        Req req;
+        while ((req = queue.poll()) != null) {
+            req.callback.onFailure(cause);
+        }
+        ctx.fireChannelInactive();
     }
 }
