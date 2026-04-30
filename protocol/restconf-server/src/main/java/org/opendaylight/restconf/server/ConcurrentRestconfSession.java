@@ -15,6 +15,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http2.Http2Exception;
 import java.net.SocketAddress;
 import java.net.URI;
+import java.util.function.IntSupplier;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.ConcurrentHTTPServerSession;
@@ -37,6 +38,14 @@ final class ConcurrentRestconfSession extends ConcurrentHTTPServerSession {
     @NonNullByDefault
     ConcurrentRestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root,
             final Uint32 chunkSize) {
+        super(scheme, chunkSize);
+        this.root = requireNonNull(root);
+        transportSession = new DefaultTransportSession(new HttpDescription(scheme, remoteAddress));
+    }
+
+    @NonNullByDefault
+    ConcurrentRestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root,
+            final IntSupplier chunkSize) {
         super(scheme, chunkSize);
         this.root = requireNonNull(root);
         transportSession = new DefaultTransportSession(new HttpDescription(scheme, remoteAddress));

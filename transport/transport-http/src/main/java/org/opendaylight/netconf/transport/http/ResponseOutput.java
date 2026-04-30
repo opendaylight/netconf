@@ -16,9 +16,9 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.ReadOnlyHttpHeaders;
 import io.netty.util.AsciiString;
+import java.util.function.IntSupplier;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.yangtools.yang.common.Uint32;
 
 /**
  * Streaming interface for emitting the contents of a {@link FiniteResponse} to the session. It supports only a single
@@ -31,10 +31,10 @@ public final class ResponseOutput {
     private final ChannelHandlerContext ctx;
     private final HttpVersion version;
     private final @Nullable Integer streamId;
-    private final Uint32 chunkSize;
+    private final IntSupplier chunkSize;
 
     ResponseOutput(final ChannelHandlerContext ctx, final HttpVersion version, final @Nullable Integer streamId,
-            final Uint32 chunkSize) {
+            final IntSupplier chunkSize) {
         this.ctx = requireNonNull(ctx);
         this.version = requireNonNull(version);
         this.streamId = streamId;

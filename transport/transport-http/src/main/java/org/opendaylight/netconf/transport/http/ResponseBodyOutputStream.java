@@ -28,10 +28,10 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Objects;
+import java.util.function.IntSupplier;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,20 +137,25 @@ public final class ResponseBodyOutputStream extends OutputStream {
     private abstract static sealed class Open extends State {
         final HTTPServerSession session;
         final ByteBufAllocator alloc;
-        final int maxChunkSize;
+        final IntSupplier maxChunkSize;
 
-        Open(final HTTPServerSession session, final ByteBufAllocator alloc, final int maxChunkSize) {
+        Open(final HTTPServerSession session, final ByteBufAllocator alloc, final IntSupplier maxChunkSize) {
             this.session = requireNonNull(session);
             this.alloc = requireNonNull(alloc);
-            if (maxChunkSize < 1) {
+            this.maxChunkSize = requireNonNull(maxChunkSize);
+        }
+
+        final int currentChunkSize() {
+            final var chunkSize = maxChunkSize.getAsInt();
+            if (chunkSize < 1) {
                 throw new IllegalArgumentException("Chunks have to have at least one byte");
             }
-            this.maxChunkSize = maxChunkSize;
+            return chunkSize;
         }
 
         @Override
         ToStringHelper addToStringAttributes(final ToStringHelper helper) {
-            return helper.add("maxChunkSize", maxChunkSize);
+            return helper.add("maxChunkSize", maxChunkSize.getAsInt());
         }
     }
 
@@ -166,9 +171,9 @@ public final class ResponseBodyOutputStream extends OutputStream {
         private final HttpVersion version;
         private final @Nullable Integer streamId;
 
-        PendingBody(final HTTPServerSession session, final int maxChunkSize, final HttpResponseStatus status,
-                final ReadOnlyHttpHeaders headers, final ChannelHandlerContext ctx, final HttpVersion version,
-                final @Nullable Integer streamId) {
+        PendingBody(final HTTPServerSession session, final IntSupplier maxChunkSize,
+                final HttpResponseStatus status, final ReadOnlyHttpHeaders headers, final ChannelHandlerContext ctx,
+                final HttpVersion version, final @Nullable Integer streamId) {
             super(session, ctx.alloc(), maxChunkSize);
             this.status = requireNonNull(status);
             this.headers = requireNonNull(headers);
@@ -231,7 +236,7 @@ public final class ResponseBodyOutputStream extends OutputStream {
     private abstract static sealed class WithBody extends Open permits FirstChunk, FollowingChunk {
         final ByteBuf buffer;
 
-        WithBody(final HTTPServerSession session, final ByteBufAllocator alloc, final int maxChunkSize,
+        WithBody(final HTTPServerSession session, final ByteBufAllocator alloc, final IntSupplier maxChunkSize,
                 final ByteBuf buffer) {
             super(session, alloc, maxChunkSize);
             this.buffer = requireNonNull(buffer);
@@ -253,6 +258,18 @@ public final class ResponseBodyOutputStream extends OutputStream {
          * @throws IOException if an I/O error occurs
          */
         abstract WithBody doWriteBytes(byte[] bytes, int offset, int length) throws IOException;
+
+        final void sendResponseParts(final ByteBuf source) throws IOException {
+            try {
+                while (source.isReadable()) {
+                    final var size = currentChunkSize();
+                    final var length = Math.min(source.readableBytes(), size);
+                    sendResponsePart(session, source.readRetainedSlice(length).asReadOnly());
+                }
+            } finally {
+                source.release();
+            }
+        }
 
         @Override
         ToStringHelper addToStringAttributes(final ToStringHelper helper) {
@@ -278,7 +295,7 @@ public final class ResponseBodyOutputStream extends OutputStream {
         private final HttpVersion version;
         private final @Nullable Integer streamId;
 
-        FirstChunk(final HTTPServerSession session, final ByteBufAllocator alloc, final int maxChunkSize,
+        FirstChunk(final HTTPServerSession session, final ByteBufAllocator alloc, final IntSupplier maxChunkSize,
                 final ByteBuf buffer, final HttpResponseStatus status, final ReadOnlyHttpHeaders headers,
                 final ChannelHandlerContext ctx, final HttpVersion version, final @Nullable Integer streamId) {
             super(session, alloc, maxChunkSize, buffer);
@@ -291,20 +308,30 @@ public final class ResponseBodyOutputStream extends OutputStream {
 
         @Override
         State writeByte(final int value) throws IOException {
-            if (buffer.readableBytes() < maxChunkSize) {
+            final var size = currentChunkSize();
+            if (buffer.readableBytes() < size) {
                 buffer.writeByte(value);
                 return this;
             }
 
-            LOG.debug("After writing a byte, response body exceeded {} bytes, sending first chunk", maxChunkSize);
+            LOG.debug("After writing a byte, response body exceeded {} bytes, sending first chunk", size);
             sendResponseStart(session, status, headers, version);
-            sendResponsePart(session, buffer.asReadOnly());
+            sendResponseParts(buffer);
             return new FollowingChunk(session, alloc, maxChunkSize, ctx).writeByte(value);
         }
 
         @Override
         WithBody doWriteBytes(final byte[] bytes, final int offset, final int length) throws IOException {
-            final var accept = Math.min(length, maxChunkSize - buffer.readableBytes());
+            final var maxChunkSize = currentChunkSize();
+            final var available = maxChunkSize - buffer.readableBytes();
+            if (available <= 0) {
+                LOG.debug("Response body exceeded {} bytes, sending first chunk", maxChunkSize);
+                sendResponseStart(session, status, headers, version);
+                sendResponseParts(buffer);
+                return followingChunk().writeBytes(bytes, offset, length);
+            }
+
+            final var accept = Math.min(length, available);
             buffer.writeBytes(bytes, offset, accept);
             final var remaining = length - accept;
             if (remaining == 0) {
@@ -314,7 +341,7 @@ public final class ResponseBodyOutputStream extends OutputStream {
             LOG.debug("After writing {} bytes, response body exceeded {} bytes, sending first chunk",
                 length, maxChunkSize);
             sendResponseStart(session, status, headers, version);
-            sendResponsePart(session, buffer.asReadOnly());
+            sendResponseParts(buffer);
             return followingChunk().writeBytes(bytes, offset + accept, remaining);
         }
 
@@ -322,7 +349,7 @@ public final class ResponseBodyOutputStream extends OutputStream {
         FollowingChunk flush() throws IOException {
             LOG.debug("Forcing chunked response on flush");
             sendResponseStart(session, status, headers, version);
-            sendResponsePart(session, buffer.asReadOnly());
+            sendResponseParts(buffer);
             return followingChunk();
         }
 
@@ -359,7 +386,7 @@ public final class ResponseBodyOutputStream extends OutputStream {
     private static final class FollowingChunk extends WithBody {
         private final ChannelHandlerContext ctx;
 
-        FollowingChunk(final HTTPServerSession session, final ByteBufAllocator alloc, final int maxChunkSize,
+        FollowingChunk(final HTTPServerSession session, final ByteBufAllocator alloc, final IntSupplier maxChunkSize,
                 final ChannelHandlerContext ctx) {
             super(session, alloc, maxChunkSize, alloc.buffer());
             this.ctx = ctx;
@@ -368,25 +395,34 @@ public final class ResponseBodyOutputStream extends OutputStream {
         @Override
         FollowingChunk writeByte(final int value) throws IOException {
             buffer.writeByte(value);
-            if (buffer.readableBytes() < maxChunkSize) {
+            final var size = currentChunkSize();
+            if (buffer.readableBytes() < size) {
                 return this;
             }
 
-            LOG.debug("After writing a byte, response chunk reached {} bytes, sending it", maxChunkSize);
-            sendResponsePart(session, buffer.asReadOnly());
+            LOG.debug("After writing a byte, response chunk reached {} bytes, sending it", size);
+            sendResponseParts(buffer);
             return new FollowingChunk(session, alloc, maxChunkSize, ctx);
         }
 
         @Override
         WithBody doWriteBytes(final byte[] bytes, final int offset, final int length) throws IOException {
-            final var accept = Math.min(length, maxChunkSize - buffer.readableBytes());
+            final var size = currentChunkSize();
+            final var available = size - buffer.readableBytes();
+            if (available <= 0) {
+                LOG.debug("Response chunk reached {} bytes, sending it", size);
+                sendResponseParts(buffer);
+                return new FollowingChunk(session, alloc, maxChunkSize, ctx).writeBytes(bytes, offset, length);
+            }
+
+            final var accept = Math.min(length, available);
             buffer.writeBytes(bytes, offset, accept);
-            if (buffer.readableBytes() < maxChunkSize) {
+            if (buffer.readableBytes() < size) {
                 return this;
             }
             LOG.debug("After writing {} bytes, response chunk reached {} bytes, sending it",
-                length, maxChunkSize);
-            sendResponsePart(session, buffer.asReadOnly());
+                length, size);
+            sendResponseParts(buffer);
             return new FollowingChunk(session, alloc, maxChunkSize, ctx)
                 .writeBytes(bytes, offset + accept, length - accept);
         }
@@ -399,13 +435,13 @@ public final class ResponseBodyOutputStream extends OutputStream {
             }
 
             LOG.debug("Flushing {}-byte chunk", size);
-            sendResponsePart(session, buffer.asReadOnly());
+            sendResponseParts(buffer);
             return new FollowingChunk(session, alloc, maxChunkSize, ctx);
         }
 
         @Override
         Closed close(final ReadOnlyHttpHeaders trailers) throws IOException {
-            sendResponsePart(session, buffer.asReadOnly());
+            sendResponseParts(buffer);
             sendResponseEnd(session, trailers);
             session.notifyRequestFinished(ctx);
             return Closed.INSTANCE;
@@ -425,8 +461,8 @@ public final class ResponseBodyOutputStream extends OutputStream {
     @NonNullByDefault
     ResponseBodyOutputStream(final ChannelHandlerContext ctx, final HttpResponseStatus status,
             final ReadOnlyHttpHeaders headers, final HttpVersion version, final @Nullable Integer streamId,
-            final Uint32 maxChunkSize) {
-        state = new PendingBody(ctx.pipeline().get(HTTPServerSession.class), maxChunkSize.intValue(), status,
+            final IntSupplier maxChunkSize) {
+        state = new PendingBody(ctx.pipeline().get(HTTPServerSession.class), maxChunkSize, status,
             headers, ctx, version, streamId);
     }
 
@@ -488,6 +524,7 @@ public final class ResponseBodyOutputStream extends OutputStream {
     private static void sendResponsePart(final HTTPServerSession session, final ByteBuf chunk) throws IOException {
         final var responseWriter = getResponseWriter(session);
         if (!responseWriter.sendResponsePart(chunk)) {
+            chunk.release();
             throw new IOException("Failed to send response part, writer inactive");
         }
     }

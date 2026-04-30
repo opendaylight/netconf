@@ -17,6 +17,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http2.Http2FrameCodec;
 import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
+import java.util.function.IntSupplier;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.netconf.transport.http.HTTPServerSessionBootstrap;
@@ -28,7 +29,7 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
     private static final int MAX_HTTP2_CONTENT_LENGTH = 16 * 1024;
 
     private final EndpointRoot root;
-    private final Uint32 chunkSize;
+    private final Uint32 http1ChunkSize;
     private final WriteBufferWaterMark writeBufferWaterMark;
     private final AltSvcAdvertiser altSvcAdvertiser;
 
@@ -37,7 +38,7 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
             final AltSvcAdvertiser altSvcAdvertiser) {
         super(scheme, frameSize);
         this.root = requireNonNull(root);
-        this.chunkSize = requireNonNull(chunkSize);
+        http1ChunkSize = requireNonNull(chunkSize);
         this.writeBufferWaterMark = requireNonNull(writeBufferWaterMark);
         this.altSvcAdvertiser = requireNonNull(altSvcAdvertiser);
     }
@@ -47,7 +48,7 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
         final var ch = ctx.channel();
         ch.config().setWriteBufferWaterMark(writeBufferWaterMark);
         ch.pipeline().addBefore(ctx.name(), null, altSvcAdvertiser);
-        return new RestconfSession(scheme, ch.remoteAddress(), root, chunkSize);
+        return new RestconfSession(scheme, ch.remoteAddress(), root, http1ChunkSize);
     }
 
     @Override
@@ -56,16 +57,20 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
             return;
         }
         final var frameCodecCtx = requireNonNull(ctx.pipeline().context(Http2FrameCodec.class));
-        final var handler = (Http2FrameCodec)frameCodecCtx.handler();
-        final var maxFrameSize = Uint32.valueOf(handler.encoder().configuration().frameSizePolicy().maxFrameSize());
+        final var frameCodec = (Http2FrameCodec) frameCodecCtx.handler();
+        final IntSupplier sizeSupplier = () -> peerHttp2MaxFrameSize(frameCodec);
         ctx.pipeline().addAfter(frameCodecCtx.name(), "h2-multiplexer",
-            new Http2MultiplexHandler(buildHttp2ChildInitializer(ctx, maxFrameSize),
-                buildHttp2ChildInitializer(ctx, maxFrameSize)));
+                new Http2MultiplexHandler(buildHttp2ChildInitializer(ctx, sizeSupplier),
+                    buildHttp2ChildInitializer(ctx, sizeSupplier)));
         ctx.pipeline().remove(this);
     }
 
+    private static int peerHttp2MaxFrameSize(final Http2FrameCodec frameCodec) {
+        return frameCodec.encoder().configuration().frameSizePolicy().maxFrameSize();
+    }
+
     private ChannelInitializer<Channel> buildHttp2ChildInitializer(final ChannelHandlerContext ctx,
-            final Uint32 maxFrameSize) {
+            final IntSupplier maxFrameSize) {
         return new ChannelInitializer<>() {
             @Override protected void initChannel(final Channel ch) {
                 ch.config().setWriteBufferWaterMark(writeBufferWaterMark);
