@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "d3732ecfa42a3dd30f2a21c5dab2fbd76312fc25",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08eec308_0f1b525d",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-30T07:34:40Z",
+      "side": 1,
+      "message": "I would expect ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS, null and maybe additional constructor with missing H3 settings?",
+      "revId": "d3732ecfa42a3dd30f2a21c5dab2fbd76312fc25",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
