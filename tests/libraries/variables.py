@@ -41,5 +41,6 @@ class Variables(BaseSettings):
     "Accept": "application/xml",
 }
 
+    MODULES_API: str = "/rests/data/ietf-yang-library:modules-state?content=nonconfig"
 
 variables = Variables()

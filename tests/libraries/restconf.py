@@ -16,7 +16,7 @@ RESTCONF_ROOT = variables.RESTCONF_ROOT
 
 
 def generate_uri(
-    identifier, datastore_flag: str = "config", node_value_list: list = ()
+    identifier, datastore_flag: str = "config", *node_value_list
 ):
     """Returns the proper URI to use.
 
@@ -34,13 +34,13 @@ def generate_uri(
     Returns:
         str: The fully constructed RESTCONF URI.
     """
-    uri = generate_rfc8040_uri(identifier, datastore_flag, node_value_list)
+    uri = generate_rfc8040_uri(identifier, datastore_flag, *node_value_list)
 
     return uri
 
 
 def generate_rfc8040_uri(
-    identifier, datastore_flag: str = "config", node_value_list: list = ()
+    identifier, datastore_flag: str = "config", *node_value_list
 ):
     """Generates an RFC 8040 compliant RESTCONF URI.
 
