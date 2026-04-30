@@ -32,6 +32,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -77,7 +78,6 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
     //     - we need to track which streams are alive and support terminating pruning requests when client resets
     //       a stream
     //     - SSE is nothing special
-    //     - we have Http2Settings, which has framesize -- which we should use when streaming responses
     //  We support HTTP/1.1 -> HTTP/2 upgrade for the first request only -- hence we know before processing the first
     //  result which mode of operation is effective. We probably need to have two subclasses of this thing, with
     //  HTTP/1.1 and HTTP/2 specializations.
@@ -86,13 +86,17 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
     //        reconsider the design
 
     private final HTTPScheme scheme;
-    private final Uint32 chunkSize;
+    private final IntSupplier chunkSize;
 
     // Only valid when the session is attached to a Channel
     private ServerRequestExecutor executor;
     private ResponseWriter responseWriter;
 
     protected HTTPServerSession(final HTTPScheme scheme, final Uint32 chunkSize) {
+        this(scheme, requireNonNull(chunkSize)::intValue);
+    }
+
+    protected HTTPServerSession(final HTTPScheme scheme, final IntSupplier chunkSize) {
         super(FullHttpRequest.class, false);
         this.scheme = requireNonNull(scheme);
         this.chunkSize = requireNonNull(chunkSize);

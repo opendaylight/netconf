@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.transport.http;
 
+import java.util.function.IntSupplier;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
 /**
@@ -14,6 +15,10 @@ import org.opendaylight.yangtools.yang.common.Uint32;
  */
 public abstract non-sealed class ConcurrentHTTPServerSession extends HTTPServerSession {
     protected ConcurrentHTTPServerSession(final HTTPScheme scheme, final Uint32 chunkSize) {
+        super(scheme, chunkSize);
+    }
+
+    protected ConcurrentHTTPServerSession(final HTTPScheme scheme, final IntSupplier chunkSize) {
         super(scheme, chunkSize);
     }
 }
