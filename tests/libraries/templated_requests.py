@@ -29,16 +29,22 @@ log = logging.getLogger(__name__)
 
 
 def get_from_uri(
-    uri: str, headers: dict | None = None, expected_code: int | List[int] | None = None
+    uri: str,
+    headers: dict | None = None,
+    expected_code: int | List[int] | None = None,
+    http_timeout: float | tuple[float, float] | None = None,
 ) -> requests.Response:
     """Sends HTTP GET request to ODL.
 
     Args:
-        url (str): URL address.
+        uri (str): URL address.
         expected_code (int | List[int] | None): Expected response code(s)
             returned by ODL. It could be either single numeric value or
             list of numbers. If not provided requests standard logic for
             evaluating failure response code is used.
+        http_timeout (float | tuple[float, float] | None): How many seconds to wait for
+            the server to send data before giving up. Can be a single float or a
+            (connect timeout, read timeout) tuple.
 
     Returns:
         requests.Response: Response returned by ODL for GET call.
@@ -48,7 +54,10 @@ def get_from_uri(
     if not headers:
         headers = {}
     response = requests.get(
-        url, headers=headers, auth=requests.auth.HTTPBasicAuth("admin", "admin")
+        url,
+        headers=headers,
+        auth=requests.auth.HTTPBasicAuth("admin", "admin"),
+        timeout=http_timeout,
     )
 
     try:
@@ -69,7 +78,9 @@ def get_from_uri(
         log.error(f"Response headers: {response.headers}")
         raise AssertionError("Unexpected failure in GET response.") from e
     else:
-        response_text = utils.truncate_long_text(response.text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE)
+        response_text = utils.truncate_long_text(
+            response.text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
+        )
         log.debug(f"Response: {response_text}")
         log.info(f"Response code: {response.status_code}")
         log.debug(f"Response headers: {response.headers}")
@@ -82,16 +93,21 @@ def put_to_uri_request(
     headers: dict,
     data: dict | str,
     expected_code: int | List[int] | None = None,
+    http_timeout: float | tuple[float, float] | None = None,
 ) -> requests.Response:
     """Sends HTTP PUT request to ODL using provided data.
 
     Args:
         uri (str): URI identifier.
+        headers (dict): HTTP headers to include in the request.
+        data (dict | str): Payload to be sent within the PUT request to ODL.
         expected_code (int | List[int] | None): Expected response code(s)
             returned by ODL. It could be either single numeric value or
             list of numbers. If not provided requests standard logic for
             evaluating failure response code is used.
-        data (dict | str): payload to be sent within the PUT request to ODL
+        http_timeout (float | tuple[float, float] | None): How many seconds to wait for
+            the server to send data before giving up. Can be a single float or a
+            (connect timeout, read timeout) tuple.
 
     Returns:
         requests.Response: Response returned by ODL for PUT call.
@@ -103,6 +119,7 @@ def put_to_uri_request(
         data=data,
         headers=headers,
         auth=requests.auth.HTTPBasicAuth("admin", "admin"),
+        timeout=http_timeout,
     )
 
     try:
@@ -123,7 +140,9 @@ def put_to_uri_request(
         log.error(f"Response headers: {response.headers}")
         raise AssertionError("Unexpected failure in PUT response.") from e
     else:
-        response_text = utils.truncate_long_text(response.text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE)
+        response_text = utils.truncate_long_text(
+            response.text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
+        )
         log.debug(f"Response: {response_text}")
         log.info(f"Response code: {response.status_code}")
         log.debug(f"Response headers: {response.headers}")
@@ -136,19 +155,24 @@ def post_to_uri(
     headers: dict,
     data: dict | str,
     expected_code: int | List[int] | None = None,
+    http_timeout: float | tuple[float, float] | None = None,
 ) -> requests.Response:
     """Send HTTP POST request to ODL.
 
     Args:
         uri (str): URI identifier.
-        data (dict | str): payload to be sent within the POST request to ODL.
+        headers (dict): HTTP headers to include in the request.
+        data (dict | str): Payload to be sent within the POST request to ODL.
         expected_code (int | List[int] | None): Expected response code(s)
             returned by ODL. It could be either single numeric value or
             list of numbers. If not provided requests standard logic for
             evaluating failure response code is used.
+        http_timeout (float | tuple[float, float] | None): How many seconds to wait for
+            the server to send data before giving up. Can be a single float or a
+            (connect timeout, read timeout) tuple.
 
     Returns:
-        requests.Response: Response returned by ODL for PUT call.
+        requests.Response: Response returned by ODL for POST call.
     """
     url = f"{BASE_URL}/{uri}"
     log.info(f"Sending to {url} this data: {data}")
@@ -157,6 +181,7 @@ def post_to_uri(
         data=data,
         headers=headers,
         auth=requests.auth.HTTPBasicAuth("admin", "admin"),
+        timeout=http_timeout,
     )
 
     try:
@@ -177,7 +202,9 @@ def post_to_uri(
         log.error(f"Response headers: {response.headers}")
         raise AssertionError("Unexpected failure in POST response.") from e
     else:
-        response_text = utils.truncate_long_text(response.text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE)
+        response_text = utils.truncate_long_text(
+            response.text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
+        )
         log.debug(f"Response: {response_text}")
         log.info(f"Response code: {response.status_code}")
         log.debug(f"Response headers: {response.headers}")
@@ -186,16 +213,21 @@ def post_to_uri(
 
 
 def delete_from_uri_request(
-    uri: str, expected_code: int | List[int] | None = None
+    uri: str,
+    expected_code: int | List[int] | None = None,
+    http_timeout: float | tuple[float, float] | None = None,
 ) -> requests.Response:
     """Sends HTTP DELETE request to ODL.
 
     Args:
-        url (str): URL address.
+        uri (str): URL address.
         expected_code (int | List[int] | None): Expected response code(s)
             returned by ODL. It could be either single numeric value or
             list of numbers. If not provided requests standard logic for
             evaluating failure response code is used.
+        http_timeout (float | tuple[float, float] | None): How many seconds to wait for
+            the server to send data before giving up. Can be a single float or a
+            (connect timeout, read timeout) tuple.
 
     Returns:
         requests.Response: Response returned by ODL for GET call.
@@ -203,7 +235,9 @@ def delete_from_uri_request(
     url = f"{BASE_URL}/{uri}"
     log.info(f"Sending DELETE request to {url}")
     response = requests.delete(
-        url=url, auth=requests.auth.HTTPBasicAuth("admin", "admin")
+        url=url,
+        auth=requests.auth.HTTPBasicAuth("admin", "admin"),
+        timeout=http_timeout,
     )
 
     try:
@@ -224,7 +258,9 @@ def delete_from_uri_request(
         log.error(f"Response headers: {response.headers}")
         raise AssertionError("Unexpected failure in DELETE response.") from e
     else:
-        response_text = utils.truncate_long_text(response.text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE)
+        response_text = utils.truncate_long_text(
+            response.text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
+        )
         log.debug(f"Response: {response_text}")
         log.info(f"Response code: {response.status_code}")
         log.debug(f"Response headers: {response.headers}")
@@ -256,6 +292,7 @@ def get_templated_request(
     json: bool = True,
     verify: bool = False,
     expected_code: int | List[int] | None = None,
+    http_timeout: float | tuple[float, float] | None = None,
 ) -> requests.Response:
     """Evaluates and sends GET request using template file.
 
@@ -274,6 +311,9 @@ def get_templated_request(
             returned by ODL. It could be either single numeric value or
             list of numbers. If not provided requests standard logic for
             evaluating failure response code is used.
+        http_timeout (float | tuple[float, float] | None): How many seconds to wait for
+            the server to send data before giving up. Can be a single float or a
+            (connect timeout, read timeout) tuple.
 
     Returns:
         requests.Response: Response returned by ODL for GET call.
@@ -288,7 +328,9 @@ def get_templated_request(
     if verify:
         file_name_suffix = "json" if json else "xml"
         expected_response = resolve_templated_text(
-            temlate_dir + "/data." + file_name_suffix, mapping
+            uri=temlate_dir + "/data." + file_name_suffix,
+            mapping=mapping,
+            http_timeout=http_timeout,
         )
         volatiles_list = resolve_volatiles_path(temlate_dir)
         try:
@@ -313,6 +355,7 @@ def put_templated_request(
     json: bool = True,
     verify: bool = False,
     expected_code: int | List[int] | None = None,
+    http_timeout: float | tuple[float, float] | None = None,
 ) -> requests.Response:
     """Evaluates and sends PUT request using template file.
 
@@ -331,6 +374,9 @@ def put_templated_request(
             returned by ODL. It could be either single numeric value or
             list of numbers. If not provided requests standard logic for
             evaluating failure response code is used.
+        http_timeout (float | tuple[float, float] | None): How many seconds to wait for
+            the server to send data before giving up. Can be a single float or a
+            (connect timeout, read timeout) tuple.
 
     Returns:
         requests.Response: Response returned by ODL for PUT call.
@@ -344,10 +390,11 @@ def put_templated_request(
     uri = resolve_templated_text(temlate_dir + "/location.uri", mapping)
     data = resolve_templated_text(temlate_dir + "/" + data_file_name, mapping)
     response = put_to_uri_request(
-        uri,
-        headers,
-        data,
+        uri=uri,
+        headers=headers,
+        data=data,
         expected_code=expected_code,
+        http_timeout=http_timeout,
     )
 
     if verify:
@@ -379,6 +426,7 @@ def post_templated_request(
     verify: bool = False,
     expected_code: int | List[int] | None = None,
     accept=None,
+    http_timeout: float | tuple[float, float] | None = None,
 ) -> requests.Response:
     """Evaluates and sends POST request using template file.
 
@@ -397,6 +445,9 @@ def post_templated_request(
             returned by ODL. It could be either single numeric value or
             list of numbers. If not provided requests standard logic for
             evaluating failure response code is used.
+        http_timeout (float | tuple[float, float] | None): How many seconds to wait for
+            the server to send data before giving up. Can be a single float or a
+            (connect timeout, read timeout) tuple.
 
 
     Returns:
@@ -413,10 +464,11 @@ def post_templated_request(
     uri = resolve_templated_text(temlate_dir + "/location.uri", mapping)
     data = resolve_templated_text(temlate_dir + "/" + data_file_name, mapping)
     response = post_to_uri(
-        uri,
-        headers,
-        data,
+        uri=uri,
+        headers=headers,
+        data=data,
         expected_code=expected_code,
+        http_timeout=http_timeout,
     )
 
     if verify:
@@ -442,7 +494,10 @@ def post_templated_request(
 
 
 def delete_templated_request(
-    temlate_dir: str, mapping: dict, expected_code: int | List[int] | None = None
+    temlate_dir: str,
+    mapping: dict,
+    expected_code: int | List[int] | None = None,
+    http_timeout: float | tuple[float, float] | None = None,
 ) -> requests.Response:
     """Evaluates and sends DELETE request using template file.
 
@@ -457,12 +512,17 @@ def delete_templated_request(
             returned by ODL. It could be either single numeric value or
             list of numbers. If not provided requests standard logic for
             evaluating failure response code is used.
+        http_timeout (float | tuple[float, float] | None): How many seconds to wait for
+            the server to send data before giving up. Can be a single float or a
+            (connect timeout, read timeout) tuple.
 
     Returns:
         requests.Response: Response returned by ODL for DELETE call.
     """
     uri = resolve_templated_text(temlate_dir + "/location.uri", mapping)
-    response = delete_from_uri_request(uri, expected_code=expected_code)
+    response = delete_from_uri_request(
+        uri=uri, expected_code=expected_code, http_timeout=http_timeout
+    )
 
     return response
 
@@ -489,6 +549,7 @@ def resolve_volatiles_path(template_dir) -> List[str]:
 
     return volatiles_list
 
+
 def get_jinja_templated_request(
     temlate_dir: str,
     mapping: dict,
@@ -496,6 +557,7 @@ def get_jinja_templated_request(
     json: bool = True,
     verify: bool = False,
     expected_code: int | List[int] | None = None,
+    http_timeout: float | tuple[float, float] | None = None,
 ) -> requests.Response:
     """Sends GET request and verifies response using jinja template file.
 
@@ -511,6 +573,9 @@ def get_jinja_templated_request(
             returned by ODL. It could be either single numeric value or
             list of numbers. If not provided requests standard logic for
             evaluating failure response code is used.
+        http_timeout (float | tuple[float, float] | None): How many seconds to wait for
+            the server to send data before giving up. Can be a single float or a
+            (connect timeout, read timeout) tuple.
 
     Returns:
         requests.Response: Response returned by ODL for GET call.
@@ -520,13 +585,13 @@ def get_jinja_templated_request(
     else:
         headers = {"Accept": "application/yang-data+xml"}
     uri = resolve_templated_text(temlate_dir + "/location.uri", mapping)
-    response = get_from_uri(uri, headers=headers, expected_code=expected_code)
+    response = get_from_uri(
+        uri=uri, headers=headers, expected_code=expected_code, http_timeout=http_timeout
+    )
 
     if verify:
         expected_response = utils.render_jinja_template(
-            template_path=f"{temlate_dir}/data.j2",
-            mapping=mapping,
-            filters=filters
+            template_path=f"{temlate_dir}/data.j2", mapping=mapping, filters=filters
         )
         volatiles_list = resolve_volatiles_path(temlate_dir)
         try:
