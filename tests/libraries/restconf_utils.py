@@ -38,3 +38,10 @@ def check_for_elements_at_uri(uri: str, elements: List[str], pretty_print_json: 
     assert resp.status_code == 200
     for i in elements:
         assert i in resp.text, f"Expected element: {i} was not found in the response: {resp.text}"
+
+def no_content_from_uri(uri, headers=None):
+    """
+    Issue a requests.get and return on error 404 (No content) or will fail and log the content.
+    Issues a requests.get for ${uri} using headers from ${headers}.
+    """
+    templated_requests.get_from_uri(uri=uri,headers=headers, expected_code=(404, 409))
