@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0600a044_66e36e34",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-30T07:43:19Z",
+      "side": 1,
+      "message": "static?",
+      "revId": "48fea460a63b700f7ae5075d629f3498a149f3d3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "597e1991_684a5f11",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-30T07:43:19Z",
+      "side": 1,
+      "message": "nice future? future for what? 😄",
+      "revId": "48fea460a63b700f7ae5075d629f3498a149f3d3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bc9f7bd_fba532f6",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-30T07:43:19Z",
+      "side": 1,
+      "message": "can we collocate related methods?",
+      "revId": "48fea460a63b700f7ae5075d629f3498a149f3d3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ffb110e3_ab763f10",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-30T07:43:19Z",
+      "side": 1,
+      "message": "are we sure all succeed during shutdown? can we hang?",
+      "revId": "48fea460a63b700f7ae5075d629f3498a149f3d3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
