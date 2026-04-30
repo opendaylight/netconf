@@ -36,5 +36,6 @@ class Variables(BaseSettings):
     CALLHOME_WHITELIST: str = "rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices"
     NETCONF_KEYSTORE_DATA_URL: str = "rests/data/netconf-keystore:keystore"
 
+    MODULES_API: str = "/rests/data/ietf-yang-library:modules-state?content=nonconfig"
 
 variables = Variables()
