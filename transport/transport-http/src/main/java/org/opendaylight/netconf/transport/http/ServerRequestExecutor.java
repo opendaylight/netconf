@@ -24,10 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.function.IntSupplier;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,9 +56,10 @@ final class ServerRequestExecutor implements PendingRequestListener {
     private final ExecutorService reqExecutor;
     private final ExecutorService respExecutor;
     private final @NonNull HTTPServerSession session;
-    private final @NonNull Uint32 chunkSize;
+    private final @NonNull IntSupplier chunkSize;
 
-    ServerRequestExecutor(final String threadNamePrefix, final HTTPServerSession session, final Uint32 chunkSize) {
+    ServerRequestExecutor(final String threadNamePrefix, final HTTPServerSession session,
+            final IntSupplier chunkSize) {
         this.session = requireNonNull(session);
         this.chunkSize = requireNonNull(chunkSize);
         reqExecutor = Executors.newThreadPerTaskExecutor(Thread.ofVirtual()
