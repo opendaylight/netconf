@@ -33,6 +33,57 @@
       "message": "I would expect ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS, null and maybe additional constructor with missing H3 settings?",
       "revId": "d3732ecfa42a3dd30f2a21c5dab2fbd76312fc25",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "872826b4_74830973",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/http3/AbstractNotificationSubscriptionHttp3Test.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-30T07:38:51Z",
+      "side": 1,
+      "message": "unrelate change",
+      "revId": "d3732ecfa42a3dd30f2a21c5dab2fbd76312fc25",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eaf6e760_2c987c40",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/Http3ServerBootstrap.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-30T07:38:51Z",
+      "side": 1,
+      "message": "is this a standard name?",
+      "revId": "d3732ecfa42a3dd30f2a21c5dab2fbd76312fc25",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ff09c17_5894b337",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerOverQuic.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-04-30T07:38:51Z",
+      "side": 1,
+      "message": "@NonNullByDefault",
+      "revId": "d3732ecfa42a3dd30f2a21c5dab2fbd76312fc25",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
