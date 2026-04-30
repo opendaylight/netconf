@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 
 def check_for_elements_at_uri(uri: str, elements: List[str], pretty_print_json: bool = False):
     """
-    A GET is made at the supplied {URI} and every item in the list of {elements}
+    A GET is made at the supplied ${uri} and every item in the list of ${elements}
     is verified to exist in the response
 
     Args:
@@ -38,3 +38,15 @@ def check_for_elements_at_uri(uri: str, elements: List[str], pretty_print_json: 
     assert resp.status_code == 200
     for i in elements:
         assert i in resp.text, f"Expected element: {i} was not found in the response: {resp.text}"
+
+def no_content_from_uri(uri, headers=None):
+    """
+    Invoke a requests.get and return on error 404 (No content) or will fail and log
+    the content. Invokes a requests.get for ${uri} using headers from ${headers}.
+
+    Note: Both 404 and 409 are accepted because the expected HTTP status code
+    depends on the 'data-missing-is-404' RESTCONF northbound configuration flag.
+    By default (false), ODL returns 409 Conflict for missing data. If the flag
+    is set to true, it returns 404 Not Found.
+    """
+    templated_requests.get_from_uri(uri=uri,headers=headers, expected_code=(404, 409))
