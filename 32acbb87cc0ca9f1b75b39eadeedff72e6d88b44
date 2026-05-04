@@ -16,6 +16,24 @@
       "message": "unrelated change -separate commit",
       "revId": "32acbb87cc0ca9f1b75b39eadeedff72e6d88b44",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1455b13_89a73090",
+        "filename": "usecase/netconf-topology-1node-transient/src/main/java/org/opendaylight/netconf/dagger/RestconfNetconfFactory.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-04T11:34:53Z",
+      "side": 1,
+      "message": "This is not an unrelated change.\nMaybe it looks like I have moved this class here, but this is not the intention.\nWhat I have done was that I needed RestconfNetconfFactory.java for my main application. Then I have removed and replaced it in the test as it was a duplication.",
+      "parentUuid": "95f18421_31f38037",
+      "revId": "32acbb87cc0ca9f1b75b39eadeedff72e6d88b44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
