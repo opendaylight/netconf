@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5c86dc4_9261355f",
+        "filename": "usecase/netconf-topology-1node-transient/pom.xml",
+        "patchSetId": 23
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-04T11:29:37Z",
+      "side": 1,
+      "message": "No. Without version it will fail.\n\n```\n[ERROR]   The project org.opendaylight.netconf:netconf-topology-1node-transient:12.0.0-SNAPSHOT (/home/peto/Projects/ODL/netconf/usecase/netconf-topology-1node-transient/pom.xml) has 1 error\n[ERROR]     \u0027dependencies.dependency.version\u0027 for jakarta.validation:jakarta.validation-api:jar is missing. @ line 51, column 21\n```",
+      "parentUuid": "efecfdb8_8195aa93",
+      "revId": "5d7145df61aceb44678bf79720ef8e1fecf9eca3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e4e51953_6b668ab9",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd3a60e8_9eb03b5c",
+        "filename": "usecase/netconf-topology-1node-transient/src/main/java/module-info.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-04T11:29:37Z",
+      "side": 1,
+      "message": "Because the JaxRsLocationProvider was the only implementation for LocationProvider.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/122394/12/protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyLocationProvider.java\n\nSwitched to NettyLocationProvider.",
+      "parentUuid": "e4e51953_6b668ab9",
+      "revId": "5d7145df61aceb44678bf79720ef8e1fecf9eca3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5421b33_732a17cc",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-04-24T06:00:48Z",
       "side": 1,
       "message": "IMO we do not align \"columns\" in ODL",
+      "revId": "5d7145df61aceb44678bf79720ef8e1fecf9eca3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02f23bf2_b7b3d5a4",
+        "filename": "usecase/netconf-topology-1node-transient/src/main/java/org/opendaylight/netconf/dagger/netconf/RestconfNettyEndpointModule.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-04T11:29:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5421b33_732a17cc",
       "revId": "5d7145df61aceb44678bf79720ef8e1fecf9eca3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
