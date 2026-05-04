@@ -16,8 +16,8 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import java.nio.channels.ClosedChannelException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
@@ -34,11 +34,10 @@ import org.slf4j.LoggerFactory;
 public final class ClientHttp2Session extends ClientSession {
     private static final Logger LOG = LoggerFactory.getLogger(ClientHttp2Session.class);
 
-    // TODO: we access the queue only from Netty callbacks: can we use a plain HashMap?
-    private final Map<Integer, FutureCallback<FullHttpResponse>> map = new ConcurrentHashMap<>();
+    private final Map<Integer, FutureCallback<FullHttpResponse>> map = new HashMap<>();
     // identifier for streams initiated from client require to be odd-numbered, 1 is reserved
     // see https://datatracker.ietf.org/doc/html/rfc7540#section-5.1.1
-    private final AtomicInteger streamIdCounter = new AtomicInteger(3);
+    private int streamIdCounter = 3;
     private final HTTPScheme scheme;
 
     private volatile Channel channel;
@@ -59,23 +58,27 @@ public final class ClientHttp2Session extends ClientSession {
         if (local == null) {
             throw new IllegalStateException("Connection is not established");
         }
-        final var streamId = nextStreamId();
-        request.headers()
-            .setInt(ExtensionHeaderNames.STREAM_ID.text(), streamId)
-            .set(ExtensionHeaderNames.SCHEME.text(), scheme);
+        local.eventLoop().execute(() -> {
+            final var streamId = nextStreamId();
+            request.headers()
+                .setInt(ExtensionHeaderNames.STREAM_ID.text(), streamId)
+                .set(ExtensionHeaderNames.SCHEME.text(), scheme);
 
-        // Map has to be populated first, simply because a response may arrive sooner than the successful callback
-        map.put(streamId, callback);
-        local.writeAndFlush(request).addListener(sent -> {
-            final var cause = sent.cause();
-            if (cause != null && map.remove(streamId, callback)) {
-                callback.onFailure(cause);
-            }
+            // Map has to be populated first, simply because a response may arrive sooner than the successful callback
+            map.put(streamId, callback);
+            local.writeAndFlush(request).addListener(sent -> {
+                final var cause = sent.cause();
+                if (cause != null && map.remove(streamId, callback)) {
+                    callback.onFailure(cause);
+                }
+            });
         });
     }
 
     public int nextStreamId() {
-        return streamIdCounter.getAndAdd(2);
+        final int currentId = streamIdCounter;
+        streamIdCounter += 2;
+        return currentId;
     }
 
     @Override
