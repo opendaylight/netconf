@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "29bb3f75_7323b671",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-04T12:25:25Z",
+      "side": 1,
+      "message": "Cannot be static, as it uses non-static class fields",
+      "parentUuid": "0600a044_66e36e34",
+      "revId": "48fea460a63b700f7ae5075d629f3498a149f3d3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "597e1991_684a5f11",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-04-30T07:43:19Z",
       "side": 1,
       "message": "nice future? future for what? 😄",
+      "revId": "48fea460a63b700f7ae5075d629f3498a149f3d3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc40b2ac_49d9513e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-04T12:25:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "597e1991_684a5f11",
       "revId": "48fea460a63b700f7ae5075d629f3498a149f3d3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "121f80c2_f95bd014",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-04T12:25:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0bc9f7bd_fba532f6",
+      "revId": "48fea460a63b700f7ae5075d629f3498a149f3d3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ffb110e3_ab763f10",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-04-30T07:43:19Z",
       "side": 1,
       "message": "are we sure all succeed during shutdown? can we hang?",
+      "revId": "48fea460a63b700f7ae5075d629f3498a149f3d3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd6e7826_be163ef2",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-04T12:25:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ffb110e3_ab763f10",
       "revId": "48fea460a63b700f7ae5075d629f3498a149f3d3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
