@@ -13,7 +13,6 @@ import textwrap
 import allure
 import pytest
 
-from libraries import infra
 from libraries import netconf
 from libraries import templated_requests
 from libraries import utils
@@ -27,7 +26,6 @@ NETOPEER_PORT = 830
 NETOPEER_USERNAME = "netconf"
 NETOPEER_PASSWORD = "wrong"
 NETOPEER_KEY = "device-key"
-NETOPEER_IMAGE = "sysrepo/sysrepo-netopeer2:latest"
 USE_NETCONF_CONNECTOR = False
 MODULES_API = variables.MODULES_API
 RESTCONF_ROOT = variables.RESTCONF_ROOT
@@ -40,24 +38,6 @@ log = logging.getLogger(__name__)
 @pytest.mark.usefixtures("log_test_case_start_end_to_karaf")
 @pytest.mark.run(order=4)
 class TestKeyAuth:
-
-    def run_netopeer_docker_container(self):
-        """Start a new docker container for netopeer server."""
-        infra.copy_file("variables/netconf/KeyAuth", "sb-rsa-key.pub", "tmp")
-        host_key_path = os.path.abspath("tmp/sb-rsa-key.pub")
-        infra.shell(
-            f"docker run  --name netconf-netopeer -dt -p {NETOPEER_PORT}:830 -v {host_key_path}:/home/{NETOPEER_USERNAME}/.ssh/authorized_keys {NETOPEER_IMAGE} netopeer2-server -d -v 2",
-            run_in_background=True,
-        )
-        rc, otuput = infra.shell("docker ps -a")
-        log.info(f"{otuput=}")
-
-    def stop_netopeer_docker_container(self):
-        """Stop docker container for netopeer server."""
-        infra.shell("docker stop netconf-netopeer")
-        infra.shell("docker rm netconf-netopeer")
-        rc, otuput = infra.shell("docker ps -a")
-        log.info(f"{otuput=}")
 
     def add_netconf_key(self):
         """Add Netconf Southbound key containing details about device
@@ -77,18 +57,26 @@ class TestKeyAuth:
     @pytest.fixture(scope="class", autouse=True)
     def suite_setup(self):
         """Get the suite ready for keyauth test cases."""
-        self.device_type_passw = (
-            "default" if USE_NETCONF_CONNECTOR else DEVICE_TYPE_PASSWD
-        )
-        self.run_netopeer_docker_container()
         self.add_netconf_key()
         yield
-        self.stop_netopeer_docker_container()
 
     @allure.description(
         textwrap.dedent(
             """
             **Test suite to verify the device mount using public key based auth.**
+
+            It is expected that the netopeer simulator is started and managed \
+            externally. It needs to listen on port 830 and use the key located at \
+            *tests/variables/netconf/KeyAuth/sb-rsa-key.pub* for hostkey validation.
+
+            This key needs to be mounted in netopeer under the \
+            */home/netconf/.ssh/authorized_keys* directory using a Docker bind mount \
+            option.
+
+            Example setup command:
+                `docker run  --name netconf-netopeer -dt -p {NETOPEER_PORT}:830 \
+                -v {host_key_path}:/home/{NETOPEER_USERNAME}/.ssh/authorized_keys \
+                {NETOPEER_IMAGE} netopeer2-server -d -v 2`
             """
         )
     )
