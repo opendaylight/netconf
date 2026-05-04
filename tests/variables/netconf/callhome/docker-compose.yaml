@@ -13,3 +13,4 @@ services:
     volumes:
       - /tmp/configuration-files:/root/configuration-files
       - /tmp/init_configuration.sh:/root/init_configuration.sh
+      - /tmp/keyauth/sb-rsa-key.pub:/home/netconf/.ssh/authorized_keys
