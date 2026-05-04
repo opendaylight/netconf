@@ -12,7 +12,6 @@ import textwrap
 import allure
 import pytest
 
-from libraries import infra
 from libraries import netconf
 from libraries import templated_requests
 from libraries import utils
@@ -26,7 +25,6 @@ NETOPEER_PORT = 830
 NETOPEER_USERNAME = "netconf"
 NETOPEER_PASSWORD = "wrong"
 NETOPEER_KEY = "device-key"
-NETOPEER_IMAGE = "sysrepo/sysrepo-netopeer2:latest"
 USE_NETCONF_CONNECTOR = False
 MODULES_API = variables.MODULES_API
 RESTCONF_ROOT = variables.RESTCONF_ROOT
@@ -60,12 +58,24 @@ class TestKeyAuth:
         """Get the suite ready for keyauth test cases."""
         self.add_netconf_key()
         yield
-        self.stop_netopeer_docker_container()
 
     @allure.description(
         textwrap.dedent(
             """
             **Test suite to verify the device mount using public key based auth.**
+
+            It is expected that the netopeer simulator is started and managed \
+            externally. It needs to listen on port 830 and use the key located at \
+            *tests/variables/netconf/KeyAuth/sb-rsa-key.pub* for hostkey validation.
+
+            This key needs to be mounted in netopeer under the \
+            */home/netconf/.ssh/authorized_keys* directory using a Docker bind mount \
+            option.
+
+            Example setup command:
+                `docker run  --name netconf-netopeer -dt -p {NETOPEER_PORT}:830 \
+                -v {host_key_path}:/home/{NETOPEER_USERNAME}/.ssh/authorized_keys \
+                {NETOPEER_IMAGE} netopeer2-server -d -v 2`
             """
         )
     )
