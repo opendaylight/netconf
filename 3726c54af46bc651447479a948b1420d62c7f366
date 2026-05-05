@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "287a661e_1fec1ceb",
+        "filename": "apps/restconf-nb/src/main/resources/restconf8040.cfg",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-05T08:27:59Z",
+      "side": 1,
+      "message": "Should we not mention here that this is now used to set the chunk size for HTTP/2",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 32
+      },
+      "revId": "3726c54af46bc651447479a948b1420d62c7f366",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
