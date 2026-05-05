@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62b8b04f_91475edc",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-05T14:20:19Z",
+      "side": 1,
+      "message": "I think here should be {device_name}",
+      "revId": "85187be9e3faf1e5872bee38e36fd11f184c4b6e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9dd37214_6960c764",
+        "filename": "tests/libraries/templated_requests.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-05T14:20:19Z",
+      "side": 1,
+      "message": "Is this intentional change? Seems like autoformat change. If yes fix other.",
+      "revId": "85187be9e3faf1e5872bee38e36fd11f184c4b6e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "137ea603_c27cc727",
+        "filename": "tests/libraries/templated_requests.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-05T14:20:19Z",
+      "side": 1,
+      "message": "Seems like there is one additional parameter. Is this correct?\n\n    Args:\n        template_location (str): Path to template text file.\n        mapping (dict): Dictionary with all value mapping between\n            placeholder values specified in template and expected value.",
+      "revId": "85187be9e3faf1e5872bee38e36fd11f184c4b6e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b1feabd_4676a956",
+        "filename": "tests/libraries/templated_requests.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 552,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-05T14:20:19Z",
+      "side": 1,
+      "message": "Please remove this empty line.",
+      "revId": "85187be9e3faf1e5872bee38e36fd11f184c4b6e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
