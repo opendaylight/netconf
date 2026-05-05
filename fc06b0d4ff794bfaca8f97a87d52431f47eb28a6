@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93e6ee00_0895aca8",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-05T12:04:12Z",
+      "side": 1,
+      "message": "Should we not remove channel here too?",
+      "revId": "fc06b0d4ff794bfaca8f97a87d52431f47eb28a6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ab90ca4_757f8158",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-05T12:04:12Z",
+      "side": 1,
+      "message": "Creating new exception for each element is not efficient.\n\n```\n      final var cause \u003d new ClosedChannelException();\n      for (final var req : queue) {                                                                      \n          req.callback.onFailure(cause);\n      }   \n```",
+      "revId": "fc06b0d4ff794bfaca8f97a87d52431f47eb28a6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
