@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e003df1f_51c89f28",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-05-05T13:38:05Z",
+      "side": 1,
+      "message": "this may no longer be valid by the time the lambda fires, if we are not in eventloop.\n\nthe point of the above TODO is to *prove* that the queue is only accessed from eventloop -- or documenting when that is not the case.",
+      "range": {
+        "startLine": 74,
+        "startChar": 12,
+        "endLine": 74,
+        "endChar": 17
+      },
+      "revId": "26903eb3d9c2dde2eb67178d49e9bdb8aa034d98",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
