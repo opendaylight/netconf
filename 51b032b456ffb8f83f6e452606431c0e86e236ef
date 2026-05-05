@@ -16,6 +16,24 @@
       "message": "I think that AtomicInteger is also not needed now.",
       "revId": "51b032b456ffb8f83f6e452606431c0e86e236ef",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c53dcaec_1b02f08a",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-05T12:35:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b8ad290_4cc3b538",
+      "revId": "51b032b456ffb8f83f6e452606431c0e86e236ef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
