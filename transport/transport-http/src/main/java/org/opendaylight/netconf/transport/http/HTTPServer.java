@@ -257,10 +257,6 @@ public final class HTTPServer extends HTTPTransportStack {
 
     private static ChannelHandler buildQuicCodec(final HTTPServer server, final TlsIdentity tlsIdentity,
             final QuicServerParameters quicServerParameters) {
-        // FIXME: QuicSslContextBuilder.build() declares throws SSLException (checked).  Verify whether the imported
-        //        Netty QUIC version wraps it as a RuntimeException; if not, catch SSLException here and rethrow as
-        //        UnsupportedConfigurationException to match how SSL errors are handled in the rest of the transport
-        //        layer (see HttpSslHandlerFactory).
         final var sslContext = QuicSslContextBuilder.forServer(tlsIdentity.privateKey(), null,
                 tlsIdentity.certificate())
             .applicationProtocols(Http3.supportedApplicationProtocols())
