@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f06e4cc5_2bcf0dad",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T20:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0c6e56ed_f160f9b7",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "51b3a4a5_88ab1a65",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-06T09:00:52Z",
       "side": 1,
       "message": "Similarly?",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e28a180b_cdf2d467",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T20:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51b3a4a5_88ab1a65",
       "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "65352fe1_55ffff31",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T20:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2c79bc4a_3faf5fd3",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2942f4a3_d11657fc",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-05-06T08:58:43Z",
       "side": 1,
       "message": "Use math.ceil(timeout / period) or document the truncation.",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4946ec7a_e01208a9",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T20:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2942f4a3_d11657fc",
       "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c4a33ca_55ac49d8",
+        "filename": "tests/libraries/restconf_utils.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T20:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99b431b9_839d224d",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "12c2a458_0dec8320",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-05-06T08:58:43Z",
       "side": 1,
       "message": "DELETE call? or just call?",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bf5d8eb_b1d8964a",
+        "filename": "tests/libraries/templated_requests.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T20:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "12c2a458_0dec8320",
       "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b70d5ad_0bc73cc1",
+        "filename": "tests/suites/KeyAuth/test_keyauth.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T20:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7d7b9d7a_8048e4b8",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "664549e6_90ee5c8a",
@@ -133,6 +259,24 @@
       "writtenOn": "2026-05-06T08:58:43Z",
       "side": 1,
       "message": "unused?",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c15a06c7_9da82ebc",
+        "filename": "tests/suites/KeyAuth/test_keyauth.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T20:32:44Z",
+      "side": 1,
+      "message": "it is used in `step_configure_device_on_netconf`",
+      "parentUuid": "664549e6_90ee5c8a",
       "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -154,6 +298,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d18b8d11_c5cb71b8",
+        "filename": "tests/suites/KeyAuth/test_keyauth.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T20:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "11ac7e03_756db618",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "16766b20_7faf1f4d",
@@ -167,6 +329,24 @@
       "writtenOn": "2026-05-06T08:58:43Z",
       "side": 1,
       "message": "netconf 😊",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "646e33c3_7cbf383e",
+        "filename": "tests/suites/KeyAuth/test_keyauth.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T20:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "16766b20_7faf1f4d",
       "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -188,6 +368,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f09e974a_fd69ef79",
+        "filename": "tests/suites/KeyAuth/test_keyauth.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T20:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "73853a80_7d999763",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5cf1fc7e_6cba3a64",
@@ -201,6 +399,24 @@
       "writtenOn": "2026-05-06T08:58:43Z",
       "side": 1,
       "message": "double n please",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e7e8b4e_b5dfca7a",
+        "filename": "tests/suites/KeyAuth/test_keyauth.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T20:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cf1fc7e_6cba3a64",
       "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
