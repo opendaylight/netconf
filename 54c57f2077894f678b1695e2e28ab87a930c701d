@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c90c0874_ae54dc9b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-06T09:00:13Z",
+      "side": 1,
+      "message": "can you document in test description that external device run is expected?\n\nBut test local has passed even without netopeer running where do we have device?",
+      "revId": "54c57f2077894f678b1695e2e28ab87a930c701d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf3c781a_b4c80416",
+        "filename": "tests/variables/netconf/callhome/docker-compose.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-06T09:00:13Z",
+      "side": 1,
+      "message": "how is this related?",
+      "revId": "54c57f2077894f678b1695e2e28ab87a930c701d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
