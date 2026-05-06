@@ -15,9 +15,7 @@ log = logging.getLogger(__name__)
 RESTCONF_ROOT = variables.RESTCONF_ROOT
 
 
-def generate_uri(
-    identifier, datastore_flag: str = "config", *node_value_list
-):
+def generate_uri(identifier, datastore_flag: str = "config", *node_value_list):
     """Returns the proper URI to use.
 
     Variable input error checking is done to ensure the ${datastore_flag} variable
@@ -39,9 +37,7 @@ def generate_uri(
     return uri
 
 
-def generate_rfc8040_uri(
-    identifier, datastore_flag: str = "config", *node_value_list
-):
+def generate_rfc8040_uri(identifier, datastore_flag: str = "config", *node_value_list):
     """Generates an RFC 8040 compliant RESTCONF URI.
 
     Constructs a URI path and query parameters according to RFC 8040 specifications,

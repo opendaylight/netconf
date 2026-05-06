@@ -1,6 +1,6 @@
 """
-   Utility library for configuring NETCONF topology node to connect to network elements. This operates
-   on the legacy network-topology model, with topology-id="topology-netconf".
+Utility library for configuring NETCONF topology node to connect to network elements. This operates
+on the legacy network-topology model, with topology-id="topology-netconf".
 """
 
 from logging import debug, info
