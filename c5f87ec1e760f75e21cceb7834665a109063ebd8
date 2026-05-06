@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3265ee51_9f3786b3",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-06T08:21:32Z",
+      "side": 1,
+      "message": "The \u0027f\u0027 here is typo?",
+      "range": {
+        "startLine": 79,
+        "startChar": 8,
+        "endLine": 79,
+        "endChar": 9
+      },
+      "revId": "c5f87ec1e760f75e21cceb7834665a109063ebd8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
