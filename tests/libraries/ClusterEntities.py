@@ -1,5 +1,5 @@
 """
-    Utility library for retrieving entity related data from ODL.
+Utility library for retrieving entity related data from ODL.
 """
 
 from logging import info
