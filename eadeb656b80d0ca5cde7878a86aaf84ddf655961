@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "51b3a4a5_88ab1a65",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-06T09:00:52Z",
+      "side": 1,
+      "message": "Similarly?",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2c79bc4a_3faf5fd3",
         "filename": "tests/libraries/netconf.py",
         "patchSetId": 6
