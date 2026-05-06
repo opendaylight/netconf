@@ -252,12 +252,12 @@ def run_function_and_expect_error(function: Callable, *args, **kwargs):
 def wait_until_function_pass(
     retry_count: int, interval: int, function: Callable, *args, **kwargs
 ) -> Any:
-    """Retry provided funtion with its argumetns repeatedly until it passes.
+    """Retry provided function with its arguments repeatedly until it passes.
 
     In order to pass provided function should not raise any exception.
 
     Args:
-        retry_count (int): Maximum nuber of function calls retries.
+        retry_count (int): Maximum number of function calls retries.
         interval (int): Number of seconds to wait until next try.
         function (Callable): Function to be called, until it does not raise
             exception.
@@ -265,7 +265,7 @@ def wait_until_function_pass(
         **kwargs: Function keyword arguments.
 
     Returns:
-        Any: Return value returend by last successful function call.
+        Any: Return value returned by last successful function call.
     """
     validator = lambda value: True
     return wait_until_function_returns_value_with_custom_value_validator(
@@ -280,12 +280,12 @@ def wait_until_function_returns_value_with_custom_value_validator(
     *args,
     **kwargs,
 ) -> Any:
-    """Retry provided funtion repeatedly until returns value passing validator.
+    """Retry provided function repeatedly until returns value passing validator.
 
     In order to pass provided function should not raise any exception.
 
     Args:
-        retry_count (int): Maximum nuber of function calls retries.
+        retry_count (int): Maximum number of function calls retries.
         interval (int): Number of seconds to wait until next try.
         return_value_validator (Callable): Validator for evaluating
             returned value, if it is expected or not.
@@ -295,7 +295,7 @@ def wait_until_function_returns_value_with_custom_value_validator(
         **kwargs: Function keyword arguments.
 
     Returns:
-        Any: Return value returend by last successful function call.
+        Any: Return value returned by last successful function call.
     """
     last_exception = None
     logger_buffer = None
