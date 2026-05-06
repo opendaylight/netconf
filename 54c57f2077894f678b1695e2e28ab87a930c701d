@@ -51,6 +51,24 @@
       "message": "how is this related?",
       "revId": "54c57f2077894f678b1695e2e28ab87a930c701d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddff3d3e_ae950424",
+        "filename": "tests/variables/netconf/callhome/docker-compose.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T20:35:15Z",
+      "side": 1,
+      "message": "To have one single docker compose file to run the netopeer server by external instance for both cases callhome and keyauth. But probably it could be just removed this file from netconf repository and stored somewhere else since it would be used by jenkins or GHA and not directly by pytest",
+      "parentUuid": "cf3c781a_b4c80416",
+      "revId": "54c57f2077894f678b1695e2e28ab87a930c701d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
