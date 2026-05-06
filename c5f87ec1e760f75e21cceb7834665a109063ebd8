@@ -46,6 +46,30 @@
       },
       "revId": "c5f87ec1e760f75e21cceb7834665a109063ebd8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03597db7_c3bbf435",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T08:28:40Z",
+      "side": 1,
+      "message": "This is for resolving/interpolating the string by using f-string (formatted string)\nhttps://realpython.com/python-f-strings/#doing-string-interpolation-with-f-strings-in-python",
+      "parentUuid": "3a831015_7ab1e81c",
+      "range": {
+        "startLine": 79,
+        "startChar": 8,
+        "endLine": 79,
+        "endChar": 9
+      },
+      "revId": "c5f87ec1e760f75e21cceb7834665a109063ebd8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
