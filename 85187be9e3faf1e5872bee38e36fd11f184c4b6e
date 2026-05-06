@@ -139,6 +139,24 @@
       "parentUuid": "8b1feabd_4676a956",
       "revId": "85187be9e3faf1e5872bee38e36fd11f184c4b6e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0bbba3e_536b5dc8",
+        "filename": "tests/libraries/templated_requests.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 552,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-06T07:51:33Z",
+      "side": 1,
+      "message": "Yes, Python methods are separated by two empty lines as shown on other places in this file 😄",
+      "parentUuid": "c5296213_94269926",
+      "revId": "85187be9e3faf1e5872bee38e36fd11f184c4b6e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
