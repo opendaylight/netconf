@@ -26,6 +26,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.AttributeKey;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.netconf.transport.http.HTTPServerSessionBootstrap;
 import org.opendaylight.netconf.transport.http.PipelinedHTTPServerSession;
@@ -124,10 +125,10 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
      * increase flush pressure.
      *
      * @param parameters peer QUIC transport parameters, or {@code null} if unavailable
-     * @param chunkSize  configured response chunk size (application payload bytes)
+     * @param chunkSize configured response chunk size (application payload bytes)
      * @return effective maximum chunk size for this connection
      */
-    private static Uint32 maxChunkSize(final QuicTransportParameters parameters, final Uint32 chunkSize) {
+    private static Uint32 maxChunkSize(final @Nullable QuicTransportParameters parameters, final Uint32 chunkSize) {
         final var peerMaxUdp = parameters != null ? parameters.maxUdpPayloadSize() : Long.MAX_VALUE;
         final var peerBound = peerMaxUdp == Long.MAX_VALUE ? Long.MAX_VALUE : Math.max(256L, peerMaxUdp - 64);
         return Uint32.valueOf(Math.min(chunkSize.longValue(), peerBound));
