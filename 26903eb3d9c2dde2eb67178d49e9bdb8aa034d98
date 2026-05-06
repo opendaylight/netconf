@@ -22,6 +22,30 @@
       },
       "revId": "26903eb3d9c2dde2eb67178d49e9bdb8aa034d98",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7679f656_35ae7f35",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-06T09:54:16Z",
+      "side": 1,
+      "message": "replaced TODOs with explanation in previous patch",
+      "parentUuid": "e003df1f_51c89f28",
+      "range": {
+        "startLine": 74,
+        "startChar": 12,
+        "endLine": 74,
+        "endChar": 17
+      },
+      "revId": "26903eb3d9c2dde2eb67178d49e9bdb8aa034d98",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
