@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fb112158_2ff9d8db",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T09:51:58Z",
+      "side": 1,
+      "message": "IDK why it could be passing for you, but if I do not start the netopeer it is failing for me on the `step_wait_for_device_to_become_connected`",
+      "parentUuid": "c90c0874_ae54dc9b",
+      "revId": "54c57f2077894f678b1695e2e28ab87a930c701d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cf3c781a_b4c80416",
         "filename": "tests/variables/netconf/callhome/docker-compose.yaml",
         "patchSetId": 5
