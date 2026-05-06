@@ -7,7 +7,9 @@
  */
 package org.opendaylight.restconf.server;
 
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.WriteBufferWaterMark;
 import java.util.concurrent.ExecutionException;
@@ -29,6 +31,7 @@ import org.slf4j.LoggerFactory;
  * Abstract base class. Subclasess should interact with {@link #shutdown()}. See {@link OSGiNettyEndpoint} for a dynamic
  * example.
  */
+@NonNullByDefault
 public abstract class NettyEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(NettyEndpoint.class);
 
@@ -59,16 +62,25 @@ public abstract class NettyEndpoint {
         http3Server = startHttp3(listener, configuration);
     }
 
-    @NonNullByDefault
     public final Registration registerWebResource(final WebHostResourceProvider provider) {
         return root.registerProvider(provider, String.join("/", configuration.apiRootPath()));
     }
 
-    protected final ListenableFuture<Empty> shutdown() {
-        if (http3Server != null) {
-            http3Server.shutdown();
+    protected final ListenableFuture<@Nullable Empty> shutdown() {
+        if (http3Server == null) {
+            return httpServer.shutdown();
         }
-        return httpServer.shutdown();
+        final var http3Shutdown = http3Server.shutdown();
+        final var httpShutdown = httpServer.shutdown();
+        return Futures.whenAllComplete(http3Shutdown, httpShutdown)
+            .call(() -> {
+                try {
+                    Futures.getDone(http3Shutdown);
+                } catch (ExecutionException e) {
+                    LOG.warn("HTTP/3 server shutdown failed", e.getCause());
+                }
+                return Futures.getDone(httpShutdown);
+            }, MoreExecutors.directExecutor());
     }
 
     private static @Nullable HTTPServer startHttp3(final RestconfTransportChannelListener listener,
