@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fa6a25c_a3ee09d1",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-06T15:09:38Z",
+      "side": 1,
+      "message": "Remove this extra space.",
+      "revId": "62a2331cd800ee601c043f52a1fb04f1adf9e671",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7dd34a0_f1a66bec",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-06T15:09:38Z",
+      "side": 1,
+      "message": "Missing @NonNull",
+      "revId": "62a2331cd800ee601c043f52a1fb04f1adf9e671",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f07f479_c6d24eee",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-06T15:09:38Z",
+      "side": 1,
+      "message": "Channel could be now annotated with @NonNull.",
+      "revId": "62a2331cd800ee601c043f52a1fb04f1adf9e671",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
