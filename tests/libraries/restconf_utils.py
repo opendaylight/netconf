@@ -16,7 +16,9 @@ from libraries import templated_requests
 log = logging.getLogger(__name__)
 
 
-def check_for_elements_at_uri(uri: str, elements: List[str], pretty_print_json: bool = False):
+def check_for_elements_at_uri(
+    uri: str, elements: List[str], pretty_print_json: bool = False
+):
     """
     A GET is made at the supplied ${uri} and every item in the list of ${elements}
     is verified to exist in the response
@@ -30,14 +32,17 @@ def check_for_elements_at_uri(uri: str, elements: List[str], pretty_print_json: 
     Returns:
         None
     """
-    resp = templated_requests.get_from_uri(uri=uri,expected_code=None)
+    resp = templated_requests.get_from_uri(uri=uri, expected_code=None)
     if pretty_print_json:
         log.info(json.dumps(resp.json()))
     else:
-       log.info(resp.text)
+        log.info(resp.text)
     assert resp.status_code == 200
     for i in elements:
-        assert i in resp.text, f"Expected element: {i} was not found in the response: {resp.text}"
+        assert (
+            i in resp.text
+        ), f"Expected element: {i} was not found in the response: {resp.text}"
+
 
 def no_content_from_uri(uri, headers=None):
     """
@@ -49,4 +54,4 @@ def no_content_from_uri(uri, headers=None):
     By default (false), ODL returns 409 Conflict for missing data. If the flag
     is set to true, it returns 404 Not Found.
     """
-    templated_requests.get_from_uri(uri=uri,headers=headers, expected_code=(404, 409))
+    templated_requests.get_from_uri(uri=uri, headers=headers, expected_code=(404, 409))
