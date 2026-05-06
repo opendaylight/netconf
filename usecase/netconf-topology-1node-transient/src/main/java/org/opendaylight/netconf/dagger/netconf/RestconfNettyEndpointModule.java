@@ -47,7 +47,6 @@ import org.opendaylight.restconf.server.spi.RestconfStream.Registry;
 import org.opendaylight.yangtools.databind.DatabindProvider;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.common.Uint64;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
@@ -119,10 +118,7 @@ public interface RestconfNettyEndpointModule {
             Uint32.valueOf(config.heartbeatInterval), config.apiRootPath, parseDefaultEncoding(config.defaultEncoding),
             new HttpServerStackConfiguration(httpOverTcp), Uint32.valueOf(config.httpChunkSize),
             Uint32.valueOf(config.http2MaxFrameSize), Uint32.valueOf(config.httpWriteBufferLowWatermark),
-            Uint32.valueOf(config.httpWriteBufferHighWatermark), svcHeader, Uint32.valueOf(config.http3AltSvcMaxAge()),
-            Uint64.valueOf(config.http3InitialMaxData()),
-            Uint64.valueOf(config.http3InitialMaxStreamDataBidirectionalRemote()),
-            Uint32.valueOf(config.http3InitialMaxStreamsBidirectional()));
+            Uint32.valueOf(config.httpWriteBufferHighWatermark), svcHeader, Uint32.valueOf(config.http3AltSvcMaxAge()));
     }
 
     @Provides
