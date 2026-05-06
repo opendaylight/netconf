@@ -101,6 +101,23 @@
       "message": "Channel could be now annotated with @NonNull.",
       "revId": "62a2331cd800ee601c043f52a1fb04f1adf9e671",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a7f68a6_6078d9df",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-06T15:34:43Z",
+      "side": 1,
+      "message": "`channelInactive()` iterates pending callbacks and then calls `clear()`. Since `invoke()` can run concurrently from an application thread, a request can be added after the iterator has already finished but before `clear()` drains the queue/map. In that case the callback is removed without `onFailure()`. Later, the write listener sees `queue.remove(req)` / `map.remove(...)` return false and also skips `onFailure()`.\n\nSo this narrows the leak window, but does not fully guarantee that all pending callbacks are failed on channel close.\n\nProbably we should avoid `for-each + clear()` here. For HTTP/1, drain with `poll()` and fail each removed request. For HTTP/2, remove entries individually, or add a per-request completion guard so the write listener and channelInactive path can race safely without losing or double-firing callbacks.",
+      "revId": "62a2331cd800ee601c043f52a1fb04f1adf9e671",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
