@@ -70,7 +70,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
         this.transportConfiguration = requireNonNull(transportConfiguration);
         this.defaultEncoding = requireNonNull(defaultEncoding);
-        this.altSvcHeaderValue = altSvcHeaderValue;
+        this.altSvcHeaderValue = requireNonNull(altSvcHeaderValue);
         this.http3TransportConfiguration = http3TransportConfiguration;
         this.http3AltSvcMaxAgeSeconds = requireNonNull(http3AltSvcMaxAgeSeconds);
 
