@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0c6e56ed_f160f9b7",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-06T08:58:43Z",
+      "side": 1,
+      "message": "just one _ is good 😊",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2c79bc4a_3faf5fd3",
         "filename": "tests/libraries/netconf.py",
         "patchSetId": 6
@@ -14,6 +31,142 @@
       "writtenOn": "2026-05-06T08:28:35Z",
       "side": 1,
       "message": "why scandium?",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2942f4a3_d11657fc",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-06T08:58:43Z",
+      "side": 1,
+      "message": "Use math.ceil(timeout / period) or document the truncation.",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12c2a458_0dec8320",
+        "filename": "tests/libraries/templated_requests.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-06T08:58:43Z",
+      "side": 1,
+      "message": "DELETE call? or just call?",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d7b9d7a_8048e4b8",
+        "filename": "tests/suites/KeyAuth/test_keyauth.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-06T08:58:43Z",
+      "side": 1,
+      "message": "unused?",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "664549e6_90ee5c8a",
+        "filename": "tests/suites/KeyAuth/test_keyauth.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-06T08:58:43Z",
+      "side": 1,
+      "message": "unused?",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11ac7e03_756db618",
+        "filename": "tests/suites/KeyAuth/test_keyauth.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-06T08:58:43Z",
+      "side": 1,
+      "message": "output 😊",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16766b20_7faf1f4d",
+        "filename": "tests/suites/KeyAuth/test_keyauth.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-06T08:58:43Z",
+      "side": 1,
+      "message": "netconf 😊",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73853a80_7d999763",
+        "filename": "tests/suites/KeyAuth/test_keyauth.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-06T08:58:43Z",
+      "side": 1,
+      "message": "..._TEMPLATE 😊",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cf1fc7e_6cba3a64",
+        "filename": "tests/suites/KeyAuth/test_keyauth.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-06T08:58:43Z",
+      "side": 1,
+      "message": "double n please",
       "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
