@@ -31,7 +31,7 @@ def shell(
     """Runs single or multiple shell commands.
 
     Multiple shell command are concatenated together by using joiner.
-    It provides mutliple options on how to run the command.
+    It provides multiple options on how to run the command.
 
     Args:
         command (str | list | tuple): Shell command(s) to be run.
