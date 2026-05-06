@@ -16,6 +16,23 @@
       "message": "NETCONF-1600",
       "revId": "508229e70467411023229c41cf64f4998deee529",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a07b590_31652a25",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-06T07:42:03Z",
+      "side": 1,
+      "message": "this is handled by Varint logic itself",
+      "revId": "508229e70467411023229c41cf64f4998deee529",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
