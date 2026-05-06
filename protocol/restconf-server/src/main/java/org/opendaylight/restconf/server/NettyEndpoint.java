@@ -7,7 +7,9 @@
  */
 package org.opendaylight.restconf.server;
 
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.WriteBufferWaterMark;
 import java.util.concurrent.ExecutionException;
@@ -63,10 +65,10 @@ public abstract class NettyEndpoint {
     }
 
     protected final ListenableFuture<Empty> shutdown() {
-        if (http3Server != null) {
-            http3Server.shutdown();
-        }
-        return httpServer.shutdown();
+        return http3Server != null
+            ? Futures.whenAllSucceed(http3Server.shutdown(), httpServer.shutdown())
+                .call(Empty::value, MoreExecutors.directExecutor())
+            : httpServer.shutdown();
     }
 
     private static @Nullable HTTPServer startHttp3(final RestconfTransportChannelListener listener,
