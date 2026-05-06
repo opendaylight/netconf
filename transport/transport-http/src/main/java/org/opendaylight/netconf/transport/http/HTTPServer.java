@@ -45,6 +45,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.udp.server.rev251216.udp.server.LocalBind;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260415.http3.server.grouping.QuicUnderHttp;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260415.http3.server.grouping.quic.under.http.QuicServerParameters;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.quic.common.rev260415.Varint;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -220,7 +221,18 @@ public final class HTTPServer extends HTTPTransportStack {
                 || parameters.getInitialMaxStreamsBidi() == null) {
             throw new UnsupportedConfigurationException("Incomplete quic-server-parameters augmentation");
         }
+        checkVarintBound(parameters.requireInitialMaxData(), "initialMaxData");
+        checkVarintBound(parameters.requireInitialMaxStreamDataBidiRemote(), "initialMaxStreamDataBidiRemote");
         return parameters;
+    }
+
+    private static void checkVarintBound(final Varint varint, final String name)
+            throws UnsupportedConfigurationException {
+        final var value = varint.getValue().longValue();
+        if (value < 0 || value > 4611686018427387903L) {
+            throw new UnsupportedConfigurationException(
+                name + " must be in range [0, 4611686018427387903], got " + value);
+        }
     }
 
     private static ChannelHandler buildQuicCodec(final HTTPServer server, final TlsIdentity tlsIdentity,
