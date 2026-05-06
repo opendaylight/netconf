@@ -12,8 +12,10 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -165,8 +167,26 @@ public final class HTTPServer extends HTTPTransportStack {
         final var group = NettyTransportSupport.newEventLoopGroup(0,
             Thread.ofPlatform().name("transport-http3-", 0).factory());
         final var codec = buildQuicCodec(server, certificateKey, quicServerParameters);
-        final var channel = createChannel(group, codec, bindAddress, bindPort);
-        return transformUnderlay(server, Futures.immediateFuture(new QuicUnderlay(channel, group)));
+        final var underlayFuture = SettableFuture.<QuicUnderlay>create();
+        NettyTransportSupport.newDatagramBootstrap()
+            .group(group)
+            .handler(new ChannelInitializer<>() {
+                @Override
+                protected void initChannel(final Channel ch) {
+                    ch.pipeline().addLast(codec);
+                }
+            })
+            .bind(new InetSocketAddress(bindAddress, bindPort))
+            .addListener((ChannelFutureListener) future -> {
+                final var cause = future.cause();
+                if (cause == null) {
+                    underlayFuture.set(new QuicUnderlay(future.channel(), group));
+                } else {
+                    group.shutdownGracefully();
+                    underlayFuture.setException(cause);
+                }
+            });
+        return transformUnderlay(server, underlayFuture);
     }
 
     private static @Nullable LocalBind firstLocalBind(final Collection<LocalBind> localBinds) {
@@ -215,6 +235,9 @@ public final class HTTPServer extends HTTPTransportStack {
             throw new UnsupportedConfigurationException("Missing quic-server-parameters augmentation");
         }
 
+        // FIXME: range validation for the three Varint parameters was present in the old NettyEndpointConfiguration
+        //        (e.g. initialMaxData ≤ 4611686018427387903L).  Those bounds are no longer enforced anywhere —
+        //        add them here before passing values to the Netty QUIC codec builder.
         final var parameters = quic.getQuicServerParameters();
         if (parameters.getInitialMaxData() == null || parameters.getInitialMaxStreamDataBidiRemote() == null
                 || parameters.getInitialMaxStreamsBidi() == null) {
@@ -225,6 +248,10 @@ public final class HTTPServer extends HTTPTransportStack {
 
     private static ChannelHandler buildQuicCodec(final HTTPServer server, final TlsIdentity tlsIdentity,
             final QuicServerParameters quicServerParameters) {
+        // FIXME: QuicSslContextBuilder.build() declares throws SSLException (checked).  Verify whether the imported
+        //        Netty QUIC version wraps it as a RuntimeException; if not, catch SSLException here and rethrow as
+        //        UnsupportedConfigurationException to match how SSL errors are handled in the rest of the transport
+        //        layer (see HttpSslHandlerFactory).
         final var sslContext = QuicSslContextBuilder.forServer(tlsIdentity.privateKey(), null,
                 tlsIdentity.certificate())
             .applicationProtocols(Http3.supportedApplicationProtocols())
@@ -242,21 +269,6 @@ public final class HTTPServer extends HTTPTransportStack {
                 }
             })
             .build();
-    }
-
-    private static Channel createChannel(final EventLoopGroup group, final ChannelHandler codec,
-            final String bindAddress, final int bindPort) {
-        return NettyTransportSupport.newDatagramBootstrap()
-            .group(group)
-            .handler(new ChannelInitializer<>() {
-                @Override
-                protected void initChannel(final Channel ch) {
-                    ch.pipeline().addLast(codec);
-                }
-            })
-            .bind(new InetSocketAddress(bindAddress, bindPort))
-            .syncUninterruptibly()
-            .channel();
     }
 
     private record TlsIdentity(X509Certificate certificate, PrivateKey privateKey) {
