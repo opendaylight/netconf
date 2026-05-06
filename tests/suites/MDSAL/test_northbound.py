@@ -472,7 +472,7 @@ class TestNorthbound:
             "step_get_config_running_to_confirm_no_edit_before_commit"
         ):
             """Make sure the running configuration is still unchanged as the change
-            was not commited yet."""
+            was not committed yet."""
             self.check_test_object_not_present_in_config(
                 "get-config-no-edit-before-commit"
             )
@@ -570,27 +570,27 @@ class TestNorthbound:
             self.check_test_object_not_present_in_config("get-config-candidate-discard")
 
         with allure_step_with_separate_logging(
-            "step_edit_config_mutliple_batch_merge_create"
+            "step_edit_config_multiple_batch_merge_create"
         ):
             """Use a create request with the third batch to create
             the infrastructure."""
             self.perform_test("merge-multiple-create")
 
         with allure_step_with_separate_logging(
-            "step_edit_config_mutliple_batch_merge_third"
+            "step_edit_config_multiple_batch_merge_third"
         ):
             """Use a create request with the third batch to create
             the infrastructure."""
             self.perform_test("merge-multiple-1")
 
         with allure_step_with_separate_logging(
-            "step_edit_config_mutliple_batch_merge_fourth"
+            "step_edit_config_multiple_batch_merge_fourth"
         ):
             """Use a merge request with the third batch to create the infrastructure."""
             self.perform_test("merge-multiple-2")
 
         with allure_step_with_separate_logging(
-            "step_edit_config_mutliple_batch_merge_fifth"
+            "step_edit_config_multiple_batch_merge_fifth"
         ):
             """Add a "name4" subelement to the element and check the reply."""
             self.perform_test("merge-multiple-3")
@@ -634,13 +634,13 @@ class TestNorthbound:
             self.perform_test("merge-multiple-edit")
 
         with allure_step_with_separate_logging(
-            "step_commit_mutltiple_modules_merge_edit"
+            "step_commit_multiple_modules_merge_edit"
         ):
             """Commit the addition of the "test" subelement and check the reply."""
             self.perform_test("merge-multiple-edit-commit")
 
         with allure_step_with_separate_logging(
-            "step_check_mutltiple_modules_merge_edit"
+            "step_check_multiple_modules_merge_edit"
         ):
             """Check that the "test" subelement exists and has correct value for
             "port" subelement."""
