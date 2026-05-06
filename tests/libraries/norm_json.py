@@ -1,4 +1,5 @@
 """This module contains single a function for normalizing JSON strings."""
+
 # Copyright (c) 2015 Cisco Systems, Inc. and others.  All rights reserved.
 #
 # This program and the accompanying materials are made available under the

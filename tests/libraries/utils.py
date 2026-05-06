@@ -244,10 +244,15 @@ def run_function_and_expect_error(function: Callable, *args, **kwargs):
     try:
         function(*args, **kwargs)
     except Exception as e:
-        log.info(f"Function {function.__name__}({args} {kwargs or ''}) failed as expected with: {e}")
+        log.info(
+            f"Function {function.__name__}({args} {kwargs or ''}) failed as expected with: {e}"
+        )
         return
     else:
-        raise AssertionError(f"Expected function {function.__name__}({args} {kwargs or ''}) to fail, but passed.")
+        raise AssertionError(
+            f"Expected function {function.__name__}({args} {kwargs or ''}) to fail, but passed."
+        )
+
 
 def wait_until_function_pass(
     retry_count: int, interval: int, function: Callable, *args, **kwargs
@@ -271,6 +276,7 @@ def wait_until_function_pass(
     return wait_until_function_returns_value_with_custom_value_validator(
         retry_count, interval, validator, function, *args, **kwargs
     )
+
 
 def wait_until_function_returns_value_with_custom_value_validator(
     retry_count: int,
