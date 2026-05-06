@@ -71,6 +71,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "99b431b9_839d224d",
+        "filename": "tests/libraries/restconf_utils.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-06T09:10:04Z",
+      "side": 1,
+      "message": "Invoke? Also document that both codes are accepted and they depends on RESTCONF configuration",
+      "revId": "eadeb656b80d0ca5cde7878a86aaf84ddf655961",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "12c2a458_0dec8320",
         "filename": "tests/libraries/templated_requests.py",
         "patchSetId": 6
