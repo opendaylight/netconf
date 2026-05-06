@@ -57,18 +57,18 @@ def allure_step_with_separate_logging(
     """Provide context manager for Allure steps which separates logging
 
     This fixture extends standart allure_step context manger with functionality
-    to store logs for each step seperately.
+    to store logs for each step separately.
 
     Args:
         request (FixtureRequest): Request fixture for accessing test context.
 
     Returns:
-        Callable: context manager for allure step with seperate logging.
+        Callable: context manager for allure step with separate logging.
     """
 
     @contextmanager
     def _log_step(title: str) -> Generator[any, None, None]:
-        """Exectue allure step with seperate logging
+        """Execute allure step with separate logging
 
         Args:
             title (str): Step title.
