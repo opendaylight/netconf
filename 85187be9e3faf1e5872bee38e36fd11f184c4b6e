@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "296938ad_69cfebd8",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T07:34:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62b8b04f_91475edc",
+      "revId": "85187be9e3faf1e5872bee38e36fd11f184c4b6e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9dd37214_6960c764",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-05T14:20:19Z",
       "side": 1,
       "message": "Is this intentional change? Seems like autoformat change. If yes fix other.",
+      "revId": "85187be9e3faf1e5872bee38e36fd11f184c4b6e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7e9a3a1_623db989",
+        "filename": "tests/libraries/templated_requests.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T07:34:16Z",
+      "side": 1,
+      "message": "It was autocorrected by code formatter (black). Created another commit for reformatting other tests files, which I previously missed.",
+      "parentUuid": "9dd37214_6960c764",
       "revId": "85187be9e3faf1e5872bee38e36fd11f184c4b6e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "06b27155_72e46c8d",
+        "filename": "tests/libraries/templated_requests.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T07:34:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "137ea603_c27cc727",
+      "revId": "85187be9e3faf1e5872bee38e36fd11f184c4b6e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b1feabd_4676a956",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-05-05T14:20:19Z",
       "side": 1,
       "message": "Please remove this empty line.",
+      "revId": "85187be9e3faf1e5872bee38e36fd11f184c4b6e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5296213_94269926",
+        "filename": "tests/libraries/templated_requests.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 552,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-06T07:34:16Z",
+      "side": 1,
+      "message": "It was autocorrected by code formatter (black) \n`Surround top-level function and class definitions with two blank lines.`\nhttps://peps.python.org/pep-0008/#blank-lines",
+      "parentUuid": "8b1feabd_4676a956",
       "revId": "85187be9e3faf1e5872bee38e36fd11f184c4b6e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
