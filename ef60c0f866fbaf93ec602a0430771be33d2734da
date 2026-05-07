@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa56573e_9b3542de",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-07T08:06:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e70af719_5859708c",
+      "revId": "ef60c0f866fbaf93ec602a0430771be33d2734da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fc6ec309_eb66ae37",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-05-07T07:27:44Z",
       "side": 1,
       "message": "missing space between cast and operand",
+      "revId": "ef60c0f866fbaf93ec602a0430771be33d2734da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "39370ef2_d4e2440d",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-07T08:06:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc6ec309_eb66ae37",
       "revId": "ef60c0f866fbaf93ec602a0430771be33d2734da",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
