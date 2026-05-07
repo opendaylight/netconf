@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37d6be63_b0f8102a",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/RestconfSessionBootstrapTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-07T09:50:19Z",
+      "side": 1,
+      "message": "This feature should rarely be required for regular clean code! Leave it for legacy code. Mocking a mock to return a mock, to return a mock, (...), to return something meaningful hints at violation of Law of Demeter or mocking a value object (a well known anti-pattern).",
+      "range": {
+        "startLine": 75,
+        "startChar": 58,
+        "endLine": 75,
+        "endChar": 76
+      },
+      "revId": "8bb36f8cb7488c3e0185f14178b0abd6db4e9d2b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
