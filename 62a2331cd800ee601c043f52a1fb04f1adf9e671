@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5dbfeb19_d4c5429e",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-07T05:55:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fa6a25c_a3ee09d1",
+      "revId": "62a2331cd800ee601c043f52a1fb04f1adf9e671",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7dd34a0_f1a66bec",
@@ -69,6 +87,60 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc159132_24a125f4",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-07T05:55:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7dd34a0_f1a66bec",
+      "revId": "62a2331cd800ee601c043f52a1fb04f1adf9e671",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ad47283_0de78299",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-07T05:55:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a590a790_6728ae89",
+      "revId": "62a2331cd800ee601c043f52a1fb04f1adf9e671",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8949290a_923d96ad",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-07T05:55:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "04b3f420_8ac0443b",
+      "revId": "62a2331cd800ee601c043f52a1fb04f1adf9e671",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4272d421_9caceda5",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-05-06T15:24:28Z",
       "side": 1,
       "message": "extra empty line",
+      "revId": "62a2331cd800ee601c043f52a1fb04f1adf9e671",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa3f6192_01f94d93",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-07T05:55:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4272d421_9caceda5",
       "revId": "62a2331cd800ee601c043f52a1fb04f1adf9e671",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -103,6 +193,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14071816_c793b8d5",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-07T05:55:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f07f479_c6d24eee",
+      "revId": "62a2331cd800ee601c043f52a1fb04f1adf9e671",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5a7f68a6_6078d9df",
@@ -116,6 +224,24 @@
       "writtenOn": "2026-05-06T15:34:43Z",
       "side": 1,
       "message": "`channelInactive()` iterates pending callbacks and then calls `clear()`. Since `invoke()` can run concurrently from an application thread, a request can be added after the iterator has already finished but before `clear()` drains the queue/map. In that case the callback is removed without `onFailure()`. Later, the write listener sees `queue.remove(req)` / `map.remove(...)` return false and also skips `onFailure()`.\n\nSo this narrows the leak window, but does not fully guarantee that all pending callbacks are failed on channel close.\n\nProbably we should avoid `for-each + clear()` here. For HTTP/1, drain with `poll()` and fail each removed request. For HTTP/2, remove entries individually, or add a per-request completion guard so the write listener and channelInactive path can race safely without losing or double-firing callbacks.",
+      "revId": "62a2331cd800ee601c043f52a1fb04f1adf9e671",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f26685a_0d9e9199",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-07T05:55:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a7f68a6_6078d9df",
       "revId": "62a2331cd800ee601c043f52a1fb04f1adf9e671",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
