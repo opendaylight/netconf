@@ -16,6 +16,9 @@ import allure
 import difflib
 import xml.dom.minidom
 
+from libraries.variables import variables
+
+MAX_VISUAL_DIFF_LOG_SIZE = variables.MAX_VISUAL_DIFF_LOG_SIZE
 
 log = logging.getLogger(__name__)
 
@@ -166,8 +169,7 @@ def verify_jsons_match(
             )
         )
         # TODO: show in the output part which is different
-        if len(visual_diff) > 2000:
-            visual_diff = visual_diff[:2000] + " ... (truncated long output)"
+        visual_diff = truncate_long_text(visual_diff, MAX_VISUAL_DIFF_LOG_SIZE)
         raise AssertionError(f": \n{visual_diff}")
 
 
