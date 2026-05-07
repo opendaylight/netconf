@@ -67,11 +67,8 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
             return;
         }
         final var frameCodecCtx = requireNonNull(ctx.pipeline().context(Http2FrameCodec.class));
-        final var handler = (Http2FrameCodec) frameCodecCtx.handler();
-        final var maxFrameSize = Uint32.valueOf(handler.encoder().configuration().frameSizePolicy().maxFrameSize());
         ctx.pipeline().addAfter(frameCodecCtx.name(), "h2-multiplexer",
-            new Http2MultiplexHandler(buildHttp2ChildInitializer(ctx, maxFrameSize),
-                buildHttp2ChildInitializer(ctx, maxFrameSize)));
+            new Http2MultiplexHandler(buildHttp2ChildInitializer(ctx), buildHttp2ChildInitializer(ctx)));
         ctx.pipeline().remove(this);
     }
 
@@ -86,8 +83,7 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
         ctx.pipeline().remove(this);
     }
 
-    private ChannelInitializer<Channel> buildHttp2ChildInitializer(final ChannelHandlerContext ctx,
-            final Uint32 maxFrameSize) {
+    private ChannelInitializer<Channel> buildHttp2ChildInitializer(final ChannelHandlerContext ctx) {
         return new ChannelInitializer<>() {
             @Override protected void initChannel(final Channel ch) {
                 ch.config().setWriteBufferWaterMark(writeBufferWaterMark);
@@ -95,8 +91,11 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
                 pipeline.addLast(new Http2StreamFrameToHttpObjectCodec(true));
                 pipeline.addLast(new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));
                 pipeline.addLast(altSvcAdvertiser);
+                // SETTINGS exchange is complete by stream creation time; read the peer-negotiated value now
+                final var codec = ctx.pipeline().get(Http2FrameCodec.class);
+                final var frameSize = Uint32.valueOf(codec.encoder().configuration().frameSizePolicy().maxFrameSize());
                 pipeline.addLast("restconf-session", new ConcurrentRestconfSession(scheme,
-                    ctx.channel().remoteAddress(), root, maxFrameSize));
+                    ctx.channel().remoteAddress(), root, frameSize));
             }
         };
     }
