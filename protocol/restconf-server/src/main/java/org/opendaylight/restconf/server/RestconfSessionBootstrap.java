@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
@@ -83,7 +84,8 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
         ctx.pipeline().remove(this);
     }
 
-    private ChannelInitializer<Channel> buildHttp2ChildInitializer(final ChannelHandlerContext ctx) {
+    @VisibleForTesting
+    ChannelInitializer<Channel> buildHttp2ChildInitializer(final ChannelHandlerContext ctx) {
         return new ChannelInitializer<>() {
             @Override protected void initChannel(final Channel ch) {
                 ch.config().setWriteBufferWaterMark(writeBufferWaterMark);
