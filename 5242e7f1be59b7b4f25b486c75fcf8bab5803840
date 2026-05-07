@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7543ab75_5211235a",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-07T11:00:12Z",
+      "side": 1,
+      "message": "bad formatting 😞",
+      "revId": "5242e7f1be59b7b4f25b486c75fcf8bab5803840",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1214c709_4ebfb751",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-07T11:00:12Z",
+      "side": 1,
+      "message": "javadoc? is this confusing to use the same method with diferent access?",
+      "revId": "5242e7f1be59b7b4f25b486c75fcf8bab5803840",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
