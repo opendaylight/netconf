@@ -49,7 +49,7 @@ public interface EventStreamService {
          *
          * @param cause cause of the failure to start
          */
-        void onStartFailure(Exception cause);
+        void onStartFailure(Throwable cause);
     }
 
     /**

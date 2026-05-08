@@ -12,14 +12,17 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.util.concurrent.FutureCallback;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http2.Http2StreamChannel;
+import io.netty.handler.codec.http2.Http2StreamChannelBootstrap;
+import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import java.nio.channels.ClosedChannelException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.restconf.client.ClientSession;
 import org.slf4j.Logger;
@@ -29,70 +32,95 @@ import org.slf4j.LoggerFactory;
  * Client side {@link ClientSession} implementation for HTTP 2.
  *
  * <p>Serves as gateway to Netty {@link Channel}, performs sending requests to server, returns server responses
- * associated. Uses request to response mapping by stream identifier.
+ * associated. Uses Netty's Http2MultiplexHandler to create a child channel per request.
  */
 public final class ClientHttp2Session extends ClientSession {
     private static final Logger LOG = LoggerFactory.getLogger(ClientHttp2Session.class);
 
-    // Concurrent because application threads add callbacks, and the Netty thread reads them.
-    private final Map<Integer, FutureCallback<FullHttpResponse>> map = new ConcurrentHashMap<>();
-    // identifier for streams initiated from client require to be odd-numbered, 1 is reserved
-    // see https://datatracker.ietf.org/doc/html/rfc7540#section-5.1.1
-    private final AtomicInteger streamIdCounter = new AtomicInteger(3);
     private final HTTPScheme scheme;
+    private Http2StreamChannelBootstrap bootstrap;
 
     public ClientHttp2Session(final HTTPScheme scheme) {
         this.scheme = requireNonNull(scheme);
     }
 
     @Override
-    protected void executeRequest(final @NonNull Channel channel, final @NonNull FullHttpRequest request,
-            final @NonNull FutureCallback<FullHttpResponse> callback) {
-        synchronized (map) {
-            final var streamId = nextStreamId();
-            request.headers()
-                .setInt(ExtensionHeaderNames.STREAM_ID.text(), streamId)
-                .set(ExtensionHeaderNames.SCHEME.text(), scheme);
-            // Map has to be populated first, simply because a response may arrive sooner than the successful callback
-            map.put(streamId, callback);
-            channel.writeAndFlush(request).addListener(sent -> {
-                final var cause = sent.cause();
-                if (cause != null && map.remove(streamId, callback)) {
-                    callback.onFailure(cause);
-                }
-            });
-        }
+    public void handlerAdded(final ChannelHandlerContext ctx) {
+        super.handlerAdded(ctx);
+        this.bootstrap = new Http2StreamChannelBootstrap(ctx.channel());
     }
 
-    public int nextStreamId() {
-        return streamIdCounter.getAndAdd(2);
+    @Override
+    protected void executeRequest(final @NonNull Channel channel, final @NonNull FullHttpRequest request,
+        final @NonNull FutureCallback<FullHttpResponse> callback) {
+
+        final var authFactory = channel.attr(HTTPClient.AUTH_PROVIDER_FACTORY).get();
+
+        bootstrap.open().addListener(future -> {
+            if (!future.isSuccess()) {
+                callback.onFailure(future.cause());
+                return;
+            }
+            final Http2StreamChannel streamChannel = (Http2StreamChannel) future.getNow();
+
+            request.headers().set(ExtensionHeaderNames.SCHEME.text(), scheme.name().toLowerCase());
+
+            streamChannel.pipeline().addLast(new Http2StreamFrameToHttpObjectCodec(false));
+
+            if (authFactory != null) {
+                final var authProvider = authFactory.get();
+                if (authProvider != null) {
+                    streamChannel.pipeline().addLast(authProvider);
+                }
+            }
+
+            streamChannel.pipeline().addLast(new SimpleChannelInboundHandler<FullHttpResponse>() {
+                private boolean completed = false;
+
+                @Override
+                protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpResponse response) {
+                    if (!completed) {
+                        completed = true;
+                        callback.onSuccess(response);
+                    }
+                }
+
+                @Override
+                public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
+                    if (!completed) {
+                        completed = true;
+                        callback.onFailure(cause);
+                    }
+                    ctx.close();
+                }
+
+                @Override
+                public void channelInactive(final ChannelHandlerContext ctx) {
+                    if (!completed) {
+                        completed = true;
+                        callback.onFailure(new ClosedChannelException());
+                    }
+                    ctx.fireChannelInactive();
+                }
+            });
+
+            streamChannel.writeAndFlush(request).addListener(writeFuture -> {
+                if (!writeFuture.isSuccess()) {
+                    streamChannel.pipeline().fireExceptionCaught(writeFuture.cause());
+                }
+            });
+        });
     }
 
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpResponse response) {
-        final var streamId = response.headers().getInt(ExtensionHeaderNames.STREAM_ID.text());
-        if (streamId == null) {
-            LOG.warn("Unexpected response with no stream ID -- Dropping response object {}", response);
-            return;
-        }
-        final var callback = map.remove(streamId);
-        if (callback != null) {
-            callback.onSuccess(response);
-        } else {
-            LOG.warn("Unexpected response with unknown or expired stream ID {} -- Dropping response object {}",
-                streamId, response);
-        }
+
+
     }
 
     @Override
     public void channelInactive(final ChannelHandlerContext ctx) {
         clearChannel();
-        final var cause = new ClosedChannelException();
-        for (final var entry : map.entrySet()) {
-            if (map.remove(entry.getKey(), entry.getValue())) {
-                entry.getValue().onFailure(cause);
-            }
-        }
         ctx.fireChannelInactive();
     }
 }
