@@ -23,6 +23,9 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http2.Http2StreamChannel;
+import io.netty.handler.codec.http2.Http2StreamChannelBootstrap;
+import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.ServerSocket;
@@ -84,7 +87,37 @@ final class TestUtils {
     static ListenableFuture<FullHttpResponse> invoke(final TransportChannel clientChannel,
             final DefaultFullHttpRequest request) {
         final var future = SettableFuture.<FullHttpResponse>create();
-        clientChannel.channel().pipeline().addLast(new SimpleChannelInboundHandler<FullHttpResponse>() {
+        final var channel = clientChannel.channel();
+        if (channel.pipeline().get("h2-multiplexer") != null) {
+            final var bootstrap = new Http2StreamChannelBootstrap(channel);
+            bootstrap.open().addListener(streamFuture -> {
+                if (!streamFuture.isSuccess()) {
+                    request.release();
+                    future.setException(streamFuture.cause());
+                    return;
+                }
+
+                final var streamChannel = (Http2StreamChannel) streamFuture.getNow();
+                streamChannel.pipeline().addLast(new Http2StreamFrameToHttpObjectCodec(false));
+                streamChannel.pipeline().addLast(new io.netty.handler.codec.http.HttpObjectAggregator(8192));
+                addResponseHandler(streamChannel, future);
+                streamChannel.writeAndFlush(request);
+            });
+        } else {
+            addResponseHandler(channel, future);
+            channel.writeAndFlush(request).addListener(requestFuture -> {
+                if (!requestFuture.isSuccess()) {
+                    future.setException(requestFuture.cause());
+                }
+            });
+        }
+        return future;
+    }
+
+    // Helper to keep the code clean
+    private static void addResponseHandler(final io.netty.channel.Channel channel,
+        final SettableFuture<FullHttpResponse> future) {
+        channel.pipeline().addLast(new SimpleChannelInboundHandler<FullHttpResponse>() {
             @Override
             protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpResponse response) {
                 // To simplify the test code we use future on top of callback.
@@ -106,14 +139,6 @@ final class TestUtils {
                 future.setException(cause);
             }
         });
-
-        clientChannel.channel().writeAndFlush(request).addListener(requestFuture -> {
-            if (!requestFuture.isSuccess()) {
-                future.setException(requestFuture.cause());
-            }
-        });
-
-        return future;
     }
 
     static X509CertData generateX509CertData(final String algorithm) throws Exception {
