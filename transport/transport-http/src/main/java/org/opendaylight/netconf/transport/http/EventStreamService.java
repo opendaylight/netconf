@@ -23,8 +23,8 @@ public interface EventStreamService {
      * a {@link Registration} instance, to be used for stream termination. Stream event to be applied on
      * {@link EventStreamListener} instance provided.
      *
-     * <p>If request is declined then {@link StartCallback#onStartFailure(Exception)} method invoked with
-     * {@link Exception} describing the decline reason.
+     * <p>If request is declined then {@link StartCallback#onStartFailure(Throwable)} method invoked with
+     * {@link Throwable} describing the decline reason.
      *
      * @param host host to be used in headers of stream request
      * @param requestUri stream request URI
@@ -49,7 +49,7 @@ public interface EventStreamService {
          *
          * @param cause cause of the failure to start
          */
-        void onStartFailure(Exception cause);
+        void onStartFailure(Throwable cause);
     }
 
     /**
