@@ -195,10 +195,9 @@ public interface RestconfNettyEndpointModule {
      *     <li>"foo/", which results in the RESTCONF data resource being located at /foo/data, where "foo/" is a single
      *        segment, i.e. must be correctly percent-encoded by clients attempting to access it..</li>
      *     </ul>
-     * @param httpChunkSize Maximum size of a data chunk emitted during response streaming. Must be >= 1. This parameter
-     *     is used in all HTTP implementations we provide including HTTP/1.1, HTTP/2 and HTTP/3. It represents the size
-     *     of HTTP object we are pushing forward to Netty pipeline. This object is then formatted by appropriate Netty's
-     *     H1.1, H2 or H3 codec to proper HttpObject(s) or Http2Frame(s)/Http3Frame(s). Its main purpose is to avoid
+     * @param httpChunkSize Maximum size of a data chunk emitted during HTTP/1.1 response streaming. Must be >= 1.
+     *     HTTP/2 response chunk size follows the peer's SETTINGS_MAX_FRAME_SIZE. For HTTP/3 this value is used as
+     *     the configured upper bound when deriving the effective response chunk size. Its main purpose is to avoid
      *     out-of-memory issues when sending large response.
      * @param http2MaxFrameSize Maximum HTTP/2 DATA frame payload size (SETTINGS_MAX_FRAME_SIZE) this server is willing
      *     to accept from clients. If not overridden, the RFC7540 default 16384 is used. Valid range 16384–16777215.
