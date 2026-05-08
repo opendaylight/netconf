@@ -15,7 +15,7 @@ import org.opendaylight.netconf.transport.api.TransportChannelListener;
 
 public abstract sealed class HTTPTransportStack extends AbstractOverlayTransportStack<HTTPTransportChannel>
         permits HTTPClient, HTTPServer {
-    static final int MAX_HTTP_CONTENT_LENGTH = 16 * 1024;
+    public static final int MAX_HTTP_CONTENT_LENGTH = 16 * 1024;
 
     private final @NonNull HTTPScheme scheme;
 
