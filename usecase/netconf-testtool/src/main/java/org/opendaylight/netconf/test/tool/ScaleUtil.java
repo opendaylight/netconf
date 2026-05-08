@@ -43,7 +43,7 @@ public final class ScaleUtil {
     private static final ScheduledExecutorService EXECUTOR = new LoggingWrapperExecutor(4);
     private static final Semaphore SEMAPHORE = new Semaphore(0);
     private static final Stopwatch STOPWATCH = Stopwatch.createUnstarted();
-    private static final String RESTCONF_URL = "http://%s:%d/rests/data/"
+    private static final String RESTCONF_URL = "http://%s:%d/restconf/data/"
             + "network-topology:network-topology?content=nonconfig";
 
     private static final long TIMEOUT = 20L;

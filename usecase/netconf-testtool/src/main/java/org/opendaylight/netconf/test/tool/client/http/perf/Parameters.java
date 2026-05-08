@@ -70,13 +70,13 @@ public class Parameters {
 
         parser.addArgument("--port")
                 .type(Integer.class)
-                .setDefault(8181)
+                .setDefault(8182)
                 .help("Restconf server port")
                 .dest("port");
 
         parser.addArgument("--destination")
                 .type(String.class)
-                .setDefault("/rests/data/network-topology:network-topology/topology=topology-netconf/node="
+                .setDefault("/restconf/data/network-topology:network-topology/topology=topology-netconf/node="
                         + "{DEVICE_PORT}-sim-device/yang-ext:mount/cisco-vpp:vpp/bridge-domains=bridge-domain/a")
                 .help("Destination to send the requests to after the ip:port part of the uri. "
                         + "Use {DEVICE_PORT} tag to use the device-port-range-start argument")
