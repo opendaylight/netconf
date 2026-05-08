@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb04c595_a9eb817b",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/model/security/SecuritySchemeObject.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-08T10:49:42Z",
+      "side": 1,
+      "message": "no more correct",
+      "revId": "71c897ff006c7fa4a5ce32c1970fce3fe9219381",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "348ccdcf_e5e8f317",
+        "filename": "protocol/restconf-openapi-common/src/main/resources/explorer/oauth2-redirect.html",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-08T10:49:42Z",
+      "side": 1,
+      "message": "this should not be moved",
+      "revId": "71c897ff006c7fa4a5ce32c1970fce3fe9219381",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
