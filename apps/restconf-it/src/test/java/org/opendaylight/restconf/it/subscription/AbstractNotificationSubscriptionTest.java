@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.IntSupplier;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -436,18 +435,14 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
 
     protected HTTPClient startStreamClient(final boolean http2) throws Exception {
         final var transportListener = new TestTransportChannelListener(channel -> {
-            final IntSupplier streamIdSupplier;
             final ChannelHandler session;
             if (http2) {
-                final var h2Session = new ClientHttp2Session(HTTPScheme.HTTP);
-                session = h2Session;
-                streamIdSupplier = h2Session::nextStreamId;
+                session = new ClientHttp2Session(HTTPScheme.HTTP);
             } else {
                 session = new ClientHttp1Session();
-                streamIdSupplier = null;
             }
             channel.channel().pipeline().addLast("restconf-session", session);
-            clientStreamService = SseUtils.enableClientSse(channel, streamIdSupplier);
+            clientStreamService = SseUtils.enableClientSse(channel);
         });
         final var streamClient = HTTPClient.connect(transportListener, bootstrapFactory.newBootstrap(),
             clientStackGrouping, http2).get(2, TimeUnit.SECONDS);
@@ -478,7 +473,7 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
                 }
 
                 @Override
-                public void onStartFailure(final Exception cause) {
+                public void onStartFailure(final Throwable cause) {
                     LOG.error("Stream was not started", cause);
                 }
             });
