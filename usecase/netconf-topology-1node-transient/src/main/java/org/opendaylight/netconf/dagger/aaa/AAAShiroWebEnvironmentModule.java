@@ -147,7 +147,7 @@ public interface AAAShiroWebEnvironmentModule {
             final RealmAuthProvider realmAuthProvider, final PasswordHashService passwordHashService,
             final ServletSupport servletSupport) {
         return new AAAWebEnvironment(shiroConfiguration, dataBroker, certificateManager, authenticationService,
-            realmAuthProvider, passwordHashService, servletSupport);
+            realmAuthProvider, passwordHashService, servletSupport, null);
     }
 
     /**
