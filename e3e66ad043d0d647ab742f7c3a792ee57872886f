@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "127d2fe8_3d45b95b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-08T12:52:48Z",
+      "side": 1,
+      "message": "Does not add oauth to security schemes not even when configured 😞",
+      "revId": "e3e66ad043d0d647ab742f7c3a792ee57872886f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
