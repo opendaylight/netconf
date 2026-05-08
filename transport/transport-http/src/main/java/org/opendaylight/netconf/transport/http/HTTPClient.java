@@ -11,15 +11,19 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http2.DefaultHttp2Connection;
-import io.netty.handler.codec.http2.DelegatingDecompressorFrameListener;
 import io.netty.handler.codec.http2.Http2ConnectionHandler;
+import io.netty.handler.codec.http2.Http2FrameCodecBuilder;
 import io.netty.handler.codec.http2.Http2FrameLogger;
-import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandlerBuilder;
+import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import io.netty.handler.logging.LogLevel;
+import io.netty.util.AttributeKey;
+import java.util.function.Supplier;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
@@ -38,6 +42,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.
  */
 public abstract sealed class HTTPClient extends HTTPTransportStack permits PlainHTTPClient, TlsHTTPClient {
     private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.INFO, "Client");
+    private static final AttributeKey<Supplier<ChannelHandler>> AUTH_PROVIDER_FACTORY
+        = AttributeKey.valueOf("authProviderFactory");
 
     private final ClientAuthProvider authProvider;
     private final boolean http2;
@@ -83,6 +89,7 @@ public abstract sealed class HTTPClient extends HTTPTransportStack permits Plain
             default -> throw new UnsupportedConfigurationException("Unsupported transport: " + transport);
         }
 
+        bootstrap.attr(AUTH_PROVIDER_FACTORY, () -> ClientAuthProvider.ofNullable(httpParams));
         final HTTPClient client;
         final ListenableFuture<? extends TransportStack> underlay;
         if (tlsParams != null) {
@@ -96,22 +103,31 @@ public abstract sealed class HTTPClient extends HTTPTransportStack permits Plain
         return transformUnderlay(client, underlay);
     }
 
+    /**
+     * Retrieves the authentication provider factory associated with the given channel.
+     *
+     * <p>In a multiplexed HTTP/2 environment, child streams share a single parent channel.
+     * Each concurrent child stream must generate its own isolated instance. This factory,
+     * stored in the parent channel's attributes, allows child channels to safely manufacture
+     * their own authentication handlers without interfering with other concurrent requests.
+     *
+     * @param channel the parent Netty {@link Channel} containing the authentication factory attribute
+     * @return a {@link Supplier} capable of generating new {@link ClientAuthProvider} instances,
+     *         or {@code null} if authentication is not configured for this connection
+     */
+    public static Supplier<ChannelHandler> getAuthFactory(final Channel channel) {
+        return channel.attr(AUTH_PROVIDER_FACTORY).get();
+    }
+
     @Override
     protected void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
         final var pipeline = underlayChannel.channel().pipeline();
         if (http2) {
-            // External HTTP 2 to internal HTTP 1.1 adapter handler
-            final var connection = new DefaultHttp2Connection(false);
-
-            initializePipeline(underlayChannel, pipeline, new HttpToHttp2ConnectionHandlerBuilder()
-                .frameListener(new DelegatingDecompressorFrameListener(connection,
-                    Http2ToHttpAdapter.builder(connection).maxContentLength(MAX_HTTP_CONTENT_LENGTH).build(),
-                    // FIXME: allow for maxAllocation control to prevent OutOfMemoryError
-                    0))
-                .connection(connection)
+            final var frameCodec = Http2FrameCodecBuilder.forClient()
                 .frameLogger(FRAME_LOGGER)
                 .gracefulShutdownTimeoutMillis(0L)
-                .build());
+                .build();
+            initializePipeline(underlayChannel, pipeline, frameCodec);
         } else {
             // HTTP 1.1
             pipeline.addLast(new HttpClientCodec(), new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));
@@ -120,8 +136,12 @@ public abstract sealed class HTTPClient extends HTTPTransportStack permits Plain
     }
 
     final void configureEndOfPipeline(final TransportChannel underlayChannel, final ChannelPipeline pipeline) {
-        if (authProvider != null) {
-            pipeline.addLast(authProvider);
+        if (http2) {
+            pipeline.addLast("h2-multiplexer", new Http2MultiplexHandler(new ChannelInboundHandlerAdapter()));
+        } else {
+            if (authProvider != null) {
+                pipeline.addLast(authProvider);
+            }
         }
 
         // signal client transport is ready to send requests
