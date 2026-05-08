@@ -172,12 +172,12 @@ Testtool help
       --controller-ip CONTROLLER-IP
                              Ip of controller if  available  it  will  be  used  for  spawning netconf connectors via
                              topology   configuration   as   a    part   of   URI(http://<controller-ip>:<controller-
-                             port>/rests/data/...) otherwise it  will  just  start  simulated  devices  and  skip the
+                             port>/restconf/data/...) otherwise it  will  just  start  simulated  devices  and  skip the
                              execution of PATCH requests
       --controller-port CONTROLLER-PORT
                              Port of controller if available  it  will  be  used  for spawning netconf connectors via
                              topology   configuration   as   a    part   of   URI(http://<controller-ip>:<controller-
-                             port>/rests/data/...) otherwise it  will  just  start  simulated  devices  and  skip the
+                             port>/restconf/data/...) otherwise it  will  just  start  simulated  devices  and  skip the
                              execution of PATCH requests
       --device-count DEVICES-COUNT
                              Number of simulated netconf devices to  spin.  This  is  the number of actual ports open
@@ -328,7 +328,7 @@ netconf-topology with the device connector configuration.
 
 ::
 
-    java -jar netconf-testtool-[VERSION]-executable.jar --device-count 10 --controller-ip 127.0.0.1 --controller-port 8181 --debug true
+    java -jar netconf-testtool-[VERSION]-executable.jar --device-count 10 --controller-ip 127.0.0.1 --controller-port 8182 --debug true
 
 
 Running testtool and OpenDaylight on different machines
@@ -382,13 +382,13 @@ Editing data for simulated device
 
    ::
 
-       java -jar netconf-testtool-[VERSION]-executable.jar --controller-ip 127.0.0.1 --controller-port 8181 --debug true --schemas-dir ~/test-schemas/
+       java -jar netconf-testtool-[VERSION]-executable.jar --controller-ip 127.0.0.1 --controller-port 8182 --debug true --schemas-dir ~/test-schemas/
 
 -  Check that you can see config data for simulated device by executing GET request to:
 
    ::
 
-       http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device/yang-ext:mount?content=config
+       http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device/yang-ext:mount?content=config
 
 -  The data should be just and empty data container
 
@@ -396,7 +396,7 @@ Editing data for simulated device
 
    ::
 
-       http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device/yang-ext:mount
+       http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device/yang-ext:mount
 
    with headers:
 
@@ -419,14 +419,14 @@ Editing data for simulated device
 
    ::
 
-       http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device/yang-ext:mount?content=config
+       http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device/yang-ext:mount?content=config
 
 -  Check that you can see the same modified data in operational for
    simulated device by executing GET request to
 
    ::
 
-       http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device/yang-ext:mount?content=nonconfig
+       http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device/yang-ext:mount?content=nonconfig
 
 .. warning::
 
@@ -502,7 +502,7 @@ Start the device with following command:
 
 ::
 
-    java -jar netconf-testtool-[VERSION]-executable.jar --controller-ip 127.0.0.1 --controller-port 8181 --schemas-dir ~/test-schemas/ --rpc-config ~/tmp/customrpc.xml --debug=true
+    java -jar netconf-testtool-[VERSION]-executable.jar --controller-ip 127.0.0.1 --controller-port 8182 --schemas-dir ~/test-schemas/ --rpc-config ~/tmp/customrpc.xml --debug=true
 
 
 
@@ -510,7 +510,7 @@ Example of use:
 
 ::
 
-    POST http://localhost:8181/rests/operations/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device/yang-ext:mount/example-ops:reboot
+    POST http://localhost:8182/restconf/operations/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device/yang-ext:mount/example-ops:reboot
 
 With body:
 
