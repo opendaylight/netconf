@@ -11,6 +11,7 @@ import com.google.errorprone.annotations.DoNotMock;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
+import java.lang.annotation.Annotation;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import org.opendaylight.aaa.cert.api.ICertificateManager;
 import org.opendaylight.aaa.cert.impl.CertificateManagerService;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.aaa.impl.password.service.DefaultPasswordHashService;
+import org.opendaylight.aaa.shiro.filters.Oauth2ProxyHeaderFilterConfigImpl;
 import org.opendaylight.aaa.shiro.realm.EmptyRealmAuthProvider;
 import org.opendaylight.aaa.shiro.realm.RealmAuthProvider;
 import org.opendaylight.aaa.shiro.web.env.AAAShiroWebEnvironment;
@@ -147,7 +149,38 @@ public interface AAAShiroWebEnvironmentModule {
             final RealmAuthProvider realmAuthProvider, final PasswordHashService passwordHashService,
             final ServletSupport servletSupport) {
         return new AAAWebEnvironment(shiroConfiguration, dataBroker, certificateManager, authenticationService,
-            realmAuthProvider, passwordHashService, servletSupport);
+            realmAuthProvider, passwordHashService, servletSupport, new Oauth2ProxyHeaderFilterConfigImpl(new Oauth2ProxyHeaderFilterConfigImpl.Configuration() {
+
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return null;
+            }
+
+            @Override
+            public int max$_$header$_$length() {
+                return 0;
+            }
+
+            @Override
+            public int max$_$role$_$length() {
+                return 0;
+            }
+
+            @Override
+            public int max$_$user$_$length() {
+                return 0;
+            }
+
+            @Override
+            public int max$_$roles$_$per$_$user() {
+                return 0;
+            }
+
+            @Override
+            public String allowed$_$chars() {
+                return "";
+            }
+        }), null);
     }
 
     /**
