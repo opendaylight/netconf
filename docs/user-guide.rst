@@ -3223,3 +3223,75 @@ OpenAPI URLs in that case would look like this:
 
     The URL links for OpenAPI are made for device with name *17830-sim-device* and model toaster
     with *2009-11-20* revision and need to be changed accordingly to connected device.
+
+
+Enabling OAuth2/OIDC Authorization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The OpenAPI Explorer supports the OAuth2 ``authorizationCode`` flow with PKCE (Proof Key for Code
+Exchange). When configured, an **Authorize** button appears in the Swagger UI, allowing users to
+obtain an access token directly from the identity provider (IdP) and have it injected automatically
+into every **Try it out** request. The examples below use `Keycloak <https://www.keycloak.org/>`_
+as the IdP.
+
+Prerequisites
+^^^^^^^^^^^^^
+
+- A running Keycloak instance (or any other OIDC-compliant identity provider).
+- The OpenAPI feature installed (``odl-restconf-openapi-jaxrs``).
+- Currently OAuth2 works with legacy JAXRS RESTCONF endpoint only.
+
+Configuring ODL
+^^^^^^^^^^^^^^^
+
+Set the two OAuth2 URL properties in the OSGi configuration PID
+``org.opendaylight.restconf.nb.rfc8040.oauth2``. The simplest way is to create (or edit) the
+corresponding ``.cfg`` file in Karaf's ``etc/`` directory::
+
+    # etc/org.opendaylight.restconf.nb.rfc8040.oauth2.cfg
+    oauth2-authorization-url = https://<keycloak-host>/realms/<realm>/protocol/openid-connect/auth
+    oauth2-token-url         = https://<keycloak-host>/realms/<realm>/protocol/openid-connect/token
+    oauth2-refresh-url       = https://<keycloak-host>/realms/<realm>/protocol/openid-connect/token
+
+.. note::
+
+    When authorization or token URL property is left empty (the default), the OAuth2 security scheme is omitted from
+    the generated OpenAPI document and only HTTP Basic authentication is offered.
+    Refresh token URL is not mandatory.
+
+After the configuration is applied, restart or reload the ``odl-restconf-openapi-jaxrs`` feature for the
+change to take effect.
+
+Using the Authorize Button
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Open the OpenAPI Explorer:
+   ``http://<odl-host>:8181/openapi/explorer/index.html``
+
+2. Click the **Authorize** button at the top of the page.
+
+3. In the dialog, expand the **oauth2** scheme and click **Authorize**. The browser will redirect
+   to the Keycloak login page.
+
+4. Log in with your Keycloak credentials. After a successful login, Keycloak redirects back to
+   the Swagger UI via the registered redirect URI.
+
+5. The access token is now stored in the browser session. All subsequent **Try it out** requests
+   will include an ``Authorization: Bearer <token>`` header automatically.
+
+Note on oauth2-proxy
+^^^^^^^^^^^^^^^^^^^^
+
+When the ODL instance is placed behind `oauth2-proxy <https://oauth2-proxy.github.io/oauth2-proxy/>`_,
+the proxy handles token acquisition and transparent refresh on behalf of all downstream requests.
+In that deployment model the **Authorize** button is not required — the proxy injects the token
+before the request reaches ODL. The OAuth2 security scheme in the generated OpenAPI document
+remains useful as machine-readable documentation of the expected authorization mechanism.
+
+If a user leaves the Swagger UI open for more than Token Expiration Time and the JWT expires, **Try it out**
+requests will begin returning ``401 Unauthorized``. Without the integrated OAuth2 flow described
+above, the only recovery is to manually reload the entire browser page, which causes oauth2-proxy
+to redirect back to Keycloak and issue a new session. While functional, this provides a poor user
+experience because the user loses their place in the documentation. Enabling the OAuth2 scheme in
+the OpenAPI Explorer allows the user to re-authorize in place by clicking the **Authorize** button
+again, without a full page reload.
