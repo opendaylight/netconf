@@ -2102,12 +2102,24 @@ Restconf-nb configuration works through OSGi Configuration Admin interface, in t
 
 Netty endpoint related settings are also configurable:
 
-* ``host-name``, which defaults to ``localhost``
 * ``bind-address``, which defaults to ``0.0.0.0``
 * ``bind-port``, which defaults to ``8182``
-* ``group-name``, which defaults to ``restconf-server``
+* ``api-root-path``, which defaults to ``restconf``
+* ``boss-threads``, which defaults to ``0``
+* ``worker-threads``, which defaults to ``0``
+* ``http-chunk-size``, which defaults to ``262144``
 * ``group-threads``, which defaults to ``0``
 * ``default-encoding``, which defaults to ``json``
+
+HTTP/2 and HTTP/3 related settings are also configurable:
+
+* ``http2-max-frame-size``, which defaults to ``16384``
+* ``http-write-buffer-low-watermark``, which defaults to ``32768``
+* ``http-write-buffer-high-watermark``, which defaults to ``65536``
+* ``http3-alt-svc-max-age``, which defaults to ``0`` without TLS and ``3600`` with TLS
+* ``http3-initial-max-data``, which defaults to ``4194304``
+* ``http3-initial-max-stream-data-bidirectional-remote``, which defaults to ``262144``
+* ``http3-initial-max-streams-bidirectional``, which defaults to ``100``
 
 Netty Tls transport configuration. Both certificate and private key are required in order to enable.
 
@@ -2131,17 +2143,40 @@ When this is set to true, the server will violate RFC8040 and report "404" inste
 
 *max-thread-count* — Number of threads Ping Executor will be run with.
 
-*host-name* — The hostname to be used for URLs constructed on server side.
-
 *bind-address* — The address to bind to.
 
 *bind-port* — The port to bind to.
 
-*group-name* — Thread name prefix to be used by Netty's thread executor.
+*api-root-path* — RESTCONF API root path as an RFC3986 path-rootless string.
+
+*boss-threads* — Number of Netty boss threads. 0 means the Netty default.
+
+*worker-threads* — Number of Netty worker threads. 0 means the Netty default.
+
+*http-chunk-size* — Maximum number of response bytes buffered before switching to chunk streaming.
 
 *group-threads* — Netty's thread limit. 0 means no limits.
 
 *default-encoding* — Default encoding for outgoing messages. Expected values are 'xml' or 'json' (without quotes).
+
+*http2-max-frame-size* — Maximum HTTP/2 frame payload size in bytes this server is willing to accept from the client.
+Valid values are 16384-16777215.
+
+*http-write-buffer-low-watermark* — Netty channel write buffer low watermark in bytes.
+
+*http-write-buffer-high-watermark* — Netty channel write buffer high watermark in bytes. Setting this value too high
+defeats the backpressure mechanism and risks exhausting server RAM.
+
+*http3-alt-svc-max-age* — HTTP/3 Alt-Svc max-age in seconds. The effective default is 0 when TLS is
+not configured. As soon as TLS is configured, the default is 3600. Set to 0 to disable Alt-Svc
+advertisement.
+
+*http3-initial-max-data* — Initial HTTP/3 QUIC connection data limit in bytes.
+
+*http3-initial-max-stream-data-bidirectional-remote* — Initial HTTP/3 QUIC stream data limit in bytes for
+remotely-initiated bidirectional streams.
+
+*http3-initial-max-streams-bidirectional* — Initial HTTP/3 maximum number of bidirectional streams.
 
 *tls-certificate* — Path to the X509 certificate file in PEM format.
 
@@ -2159,12 +2194,21 @@ file, ``org.opendaylight.restconf.nb.rfc8040.cfg``, for example:
     restconf=rests
     ping-executor-name-prefix=ping-executor
     max-thread-count=1
-    host-name=localhost
     bind-address=0.0.0.0
     bind-port=8182
-    group-name=restconf-server
+    api-root-path=restconf
+    boss-threads=0
+    worker-threads=0
+    http-chunk-size=262144
     group-threads=0
     default-encoding=json
+    http2-max-frame-size=16384
+    http-write-buffer-low-watermark=32768
+    http-write-buffer-high-watermark=65536
+    http3-alt-svc-max-age=0
+    http3-initial-max-data=4194304
+    http3-initial-max-stream-data-bidirectional-remote=262144
+    http3-initial-max-streams-bidirectional=100
     tls-certificate=etc/tls/cert.pem
     tls-private-key=etc/tls/key.pem
 
@@ -2173,17 +2217,28 @@ Or use Karaf CLI:
 ::
 
     opendaylight-user@root>config:edit org.opendaylight.restconf.nb.rfc8040
-    opendaylight-user@root>config:property-set maximum-fragment_length 0
+    opendaylight-user@root>config:property-set pretty-print false
+    opendaylight-user@root>config:property-set data-missing-is-404 false
+    opendaylight-user@root>config:property-set maximum-fragment-length 0
     opendaylight-user@root>config:property-set heartbeat-interval 10000
+    opendaylight-user@root>config:property-set restconf "rests"
     opendaylight-user@root>config:property-set ping-executor-name-prefix "ping-executor"
     opendaylight-user@root>config:property-set max-thread-count 1
-    opendaylight-user@root>config:property-set restconf "rests"
-    opendaylight-user@root>config:property-set host-name "localhost"
     opendaylight-user@root>config:property-set bind-address "0.0.0.0"
     opendaylight-user@root>config:property-set bind-port 8182
-    opendaylight-user@root>config:property-set group-name "restconf-server"
+    opendaylight-user@root>config:property-set api-root-path "restconf"
+    opendaylight-user@root>config:property-set boss-threads 0
+    opendaylight-user@root>config:property-set worker-threads 0
+    opendaylight-user@root>config:property-set http-chunk-size 262144
     opendaylight-user@root>config:property-set group-threads 0
     opendaylight-user@root>config:property-set default-encoding "json"
+    opendaylight-user@root>config:property-set http2-max-frame-size 16384
+    opendaylight-user@root>config:property-set http-write-buffer-low-watermark 32768
+    opendaylight-user@root>config:property-set http-write-buffer-high-watermark 65536
+    opendaylight-user@root>config:property-set http3-alt-svc-max-age 0
+    opendaylight-user@root>config:property-set http3-initial-max-data 4194304
+    opendaylight-user@root>config:property-set http3-initial-max-stream-data-bidirectional-remote 262144
+    opendaylight-user@root>config:property-set http3-initial-max-streams-bidirectional 100
     opendaylight-user@root>config:property-set tls-certificate "etc/tls/cert.pem"
     opendaylight-user@root>config:property-set tls-private-key "etc/tls/key.pem"
     opendaylight-user@root>config:update
