@@ -16,6 +16,24 @@
       "message": "getFirst() instead of get(0)",
       "revId": "aff44e37316070ad0a253bf7ade66cfb61799c60",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3bdab573_d411f333",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/RestconfSessionBootstrapTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-13T10:34:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a6a29b4_19ccb83d",
+      "revId": "aff44e37316070ad0a253bf7ade66cfb61799c60",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
