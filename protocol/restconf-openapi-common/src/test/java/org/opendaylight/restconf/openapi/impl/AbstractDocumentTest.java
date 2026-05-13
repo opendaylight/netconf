@@ -22,6 +22,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
 import org.opendaylight.restconf.openapi.model.DocumentEntity;
+import org.opendaylight.restconf.openapi.model.security.OpenApiOauth2Configuration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -46,6 +47,10 @@ abstract class AbstractDocumentTest {
     private static OpenApiService openApiService;
 
     protected static void initializeClass(final String yangPath) {
+        initializeClass(yangPath, null);
+    }
+
+    protected static void initializeClass(final String yangPath, final OpenApiOauth2Configuration oauth2Config) {
         final var schemaService = mock(DOMSchemaService.class);
         final var context = YangParserTestUtils.parseYangResourceDirectory(yangPath);
         when(schemaService.getGlobalContext()).thenReturn(context);
@@ -57,8 +62,8 @@ abstract class AbstractDocumentTest {
         final var service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
 
-        final var mountPointRFC8040 = new MountPointOpenApiGeneratorRFC8040(schemaService, service);
-        final var openApiGeneratorRFC8040 = new OpenApiGeneratorRFC8040(schemaService);
+        final var mountPointRFC8040 = new MountPointOpenApiGeneratorRFC8040(schemaService, service, oauth2Config);
+        final var openApiGeneratorRFC8040 = new OpenApiGeneratorRFC8040(schemaService, oauth2Config);
         mountPointRFC8040.getMountPointOpenApi().onMountPointCreated(mountPoint);
         openApiService = new OpenApiServiceImpl(mountPointRFC8040, openApiGeneratorRFC8040, RESTS);
     }
