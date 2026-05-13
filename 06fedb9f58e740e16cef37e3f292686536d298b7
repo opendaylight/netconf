@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2aa9257_912fa2a8",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServer.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-13T08:50:08Z",
+      "side": 1,
+      "message": "with the imported Netty QUIC API QuicSslContextBuilder#build() does not declare checked SSLException; SSL setup failures are not exposed as checked exceptions here. Therefore catching SSLException is not applicable for this dependency version",
+      "revId": "06fedb9f58e740e16cef37e3f292686536d298b7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
