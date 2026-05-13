@@ -7,6 +7,7 @@
 #
 
 import logging
+import signal
 import subprocess
 
 import psutil
@@ -96,7 +97,9 @@ def shell(
         return None, None
 
 
-def retry_shell_command(retry_count: int, interval: int, *args, **kwargs):
+def retry_shell_command(
+    retry_count: int, interval: int, *args, **kwargs
+) -> tuple[int, str]:
     """Repeatedly runs a shell command until the return code is 0.
 
     Args:
@@ -114,6 +117,25 @@ def retry_shell_command(retry_count: int, interval: int, *args, **kwargs):
         retry_count, interval, validator, shell, *args, **kwargs
     )
     return rc, output
+
+
+def count_port_occurrences(port: int, state: str, name: str) -> int:
+    """Counts number of occurrences of specific port types.
+
+    Args:
+        port (str): Port number.
+        state (str): Port state.
+        name (str): Name of the program using the port.
+
+    Returns:
+        int: Number of port occurrences.
+    """
+    rc, stdout = shell(
+        f'ss -punta 2> /dev/null | grep -E "{state} .+:{port} .+{name}" | wc -l'
+    )
+    log.warn(f"{stdout=}")
+    assert rc == 0, f"Failed to check number of occurrences for {port=} {state=} {name=}"
+    return int(stdout)
 
 
 def start_odl_with_features(features: tuple[str], timeout: int = 60):
@@ -212,7 +234,7 @@ def is_process_still_running(pid: int):
     return process.is_running() and process.status() != psutil.STATUS_ZOMBIE
 
 
-def get_file_content(path: str):
+def get_file_content(path: str) -> str:
     """Returns text file content.
 
     Args:
@@ -251,3 +273,52 @@ def copy_file(
     if target_file_name is None:
         target_file_name = src_file_name
     shell(f"cp {src_dir}/{src_file_name} {dst_dir}/{target_file_name}")
+
+
+def copy_dir(
+    src_dir: str,
+    dst_dir: str,
+):
+    """Copy directory from one location to another.
+
+     Args:
+        src_dir (str): Source directory to be copied.
+        dst_dir (str): Destination directory where the directory should be copied.
+
+    Returns:
+        None
+    """
+    shell(f"cp -r {src_dir} {dst_dir}")
+
+
+def stop_process_by_pid(pid: int, gracefully: bool = True, timeout: int | None = 5):
+    """Stops process by sending signal and veirfies it is not running.
+
+    Args:
+        pid (int): The operating system PID of the target process.
+        gracefully (bool): Determines which signal should be sent,
+            for gracefully it sends SIGTERM, otherwise SIGKILL
+        timeout (int | None): Seconds to wait for termination. None skips verification.
+
+    Returns:
+        None
+    """
+    log.info(f"Stopping process with PID {pid}")
+    signal_to_be_sent = signal.SIGTERM if gracefully else signal.SIGKILL
+    log.info(f"Sending signal {signal_to_be_sent} to process with PID {pid}")
+    process = psutil.Process(pid)
+    process.send_signal(signal_to_be_sent)
+
+    if timeout is not None:
+        # check if it is still running
+        try:
+            utils.wait_until_function_returns_value(
+                timeout, 1, False, is_process_still_running, process.pid
+            )
+        except AssertionError as e:
+            raise AssertionError(
+                (
+                    f"Was not able to stop process with PID {process.pid}, "
+                    f"it is still running."
+                )
+            ) from e
