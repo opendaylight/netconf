@@ -139,6 +139,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "58c3bf68_fa3bbb46",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3108,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-13T13:25:04Z",
+      "side": 1,
+      "message": "without proxy it works correctly:\n401, then 409 (success) or 403 for not privileged user\n\nwith proxy, IMO we have configuration issue with proxy ATM returning 403 regardless of auth state and not redirecting to ODL at all",
+      "parentUuid": "aadc140b_62730e5d",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3017dfff_749dd2db",
         "filename": "docs/user-guide.rst",
         "patchSetId": 3
