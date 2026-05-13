@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6efb5cdf_efa42062",
+        "filename": "protocol/restconf-openapi-common/src/main/resources/explorer/oauth2-redirect.html",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-13T07:21:00Z",
+      "side": 1,
+      "message": "why?",
+      "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
