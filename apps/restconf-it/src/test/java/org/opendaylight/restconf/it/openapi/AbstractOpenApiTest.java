@@ -232,32 +232,7 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
 
         // OpenApi
         final var openApiResourceProvider = new OpenApiResourceProvider(openApiSchemaService, domMountPointService,
-            new OpenApiResourceProvider.Configuration() {
-                @Override
-                public String api$_$root$_$path() {
-                    return RESTS;
-                }
-
-                @Override
-                public String oauth2$_$authorization$_$url() {
-                    return "";
-                }
-
-                @Override
-                public String oauth2$_$token$_$url() {
-                    return "";
-                }
-
-                @Override
-                public String oauth2$_$refresh$_$url() {
-                    return "";
-                }
-
-                @Override
-                public Class<OpenApiResourceProvider.Configuration> annotationType() {
-                    return OpenApiResourceProvider.Configuration.class;
-                }
-            });
+            createOpenApiConfiguration());
         endpoint.registerWebResource(openApiResourceProvider);
     }
 
@@ -474,5 +449,34 @@ public class AbstractOpenApiTest extends AbstractDataBrokerTest {
 
     protected static String fillPort(final String jsonString, final int port) throws JsonProcessingException {
         return fillPort(jsonString, port, "http");
+    }
+
+    protected OpenApiResourceProvider.Configuration createOpenApiConfiguration() {
+        return new OpenApiResourceProvider.Configuration() {
+            @Override
+            public String api$_$root$_$path() {
+                return RESTS;
+            }
+
+            @Override
+            public String oauth2$_$authorization$_$url() {
+                return "";
+            }
+
+            @Override
+            public String oauth2$_$token$_$url() {
+                return "";
+            }
+
+            @Override
+            public String oauth2$_$refresh$_$url() {
+                return "";
+            }
+
+            @Override
+            public Class<OpenApiResourceProvider.Configuration> annotationType() {
+                return OpenApiResourceProvider.Configuration.class;
+            }
+        };
     }
 }
