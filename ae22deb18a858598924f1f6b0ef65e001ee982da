@@ -3,6 +3,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f9b32c16_d8edbda7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-13T07:35:14Z",
+      "side": 1,
+      "message": "authorizationUrl + tokenUrl - not up to date",
+      "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf50abbd_10f846a2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-13T07:35:14Z",
+      "side": 1,
+      "message": "no more only two, maybe, remove enumerating statement?",
+      "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "599d10d7_49f1619a",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 6
@@ -14,6 +48,40 @@
       "writtenOn": "2026-05-13T07:24:24Z",
       "side": 1,
       "message": "missing E2E test case",
+      "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa5d349f_6c3b540f",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/model/ComponentsEntity.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-13T07:35:14Z",
+      "side": 1,
+      "message": "final var",
+      "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7564165_3f7d17b8",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/model/security/Oauth2.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-13T07:35:14Z",
+      "side": 1,
+      "message": "less rown please..",
       "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
