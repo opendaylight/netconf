@@ -101,6 +101,23 @@
       "message": "why?",
       "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4691b3bf_89641d03",
+        "filename": "protocol/restconf-openapi-jaxrs/src/main/java/org/opendaylight/restconf/openapi/jaxrs/WebInitializer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-13T10:24:28Z",
+      "side": 1,
+      "message": "feature:install odl-netconf-topology odl-restconf-nb-jaxrs odl-restconf-openapi-jaxrs is not enough to make config effective",
+      "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
