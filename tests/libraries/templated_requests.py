@@ -20,6 +20,7 @@ from libraries.variables import variables
 ODL_IP = variables.ODL_IP
 RESTCONF_PORT = variables.RESTCONF_PORT
 MAX_HTTP_RESPONSE_BODY_LOG_SIZE = variables.MAX_HTTP_RESPONSE_BODY_LOG_SIZE
+HEADERS_YANG_RFC8040_JSON = variables.HEADERS_YANG_RFC8040_JSON
 BASE_URL = f"http://{ODL_IP}:{RESTCONF_PORT}"
 
 ALLOWED_STATUS_CODES = {200, 201, 204}
@@ -355,11 +356,11 @@ def get_templated_request(
     values.
 
     Args:
-        temlate_dir (str): Path to directory containing template text file(s).
+        template_dir (str): Path to directory containing template text file(s).
         mapping (dict): Dictionary with all value mapping between placeholder
             values specified in template and expected value.
         json (bool): If true, use json template (file name with .json suffix),
-            otherwise use xml tempale (file anem with .xml suffix).
+            otherwise use xml template (file name with .xml suffix).
         verify (bool): If true, verify returned response with stored
             template file.
         expected_code (int | List[int] | None): Expected response code(s)
@@ -377,7 +378,7 @@ def get_templated_request(
         accept = {"Accept": "application/yang-data+json"}
     else:
         accept = {"Accept": "application/yang-data+xml"}
-    uri = resolve_templated_text(temlate_dir + "/location.uri", mapping)
+    uri = resolve_templated_text(template_dir+ "/location.uri", mapping)
     headers = accept
     jmes_expression = resolve_jmes_path(temlate_dir)
     response = get_from_uri(
@@ -392,7 +393,7 @@ def get_templated_request(
     if verify:
         file_name_suffix = "json" if json else "xml"
         expected_response = resolve_templated_text(
-            uri=temlate_dir + "/data." + file_name_suffix,
+            uri=template_dir+ "/data." + file_name_suffix,
             mapping=mapping,
         )
         volatiles_list = resolve_volatiles_path(temlate_dir)
@@ -413,7 +414,7 @@ def get_templated_request(
 
 
 def put_templated_request(
-    temlate_dir: str,
+    template_dir: str,
     mapping: dict,
     json: bool = True,
     verify: bool = False,
@@ -426,11 +427,11 @@ def put_templated_request(
     values.
 
     Args:
-        temlate_dir (str): Path to directory containing template text file(s).
+        template_dir (str): Path to directory containing template text file(s).
         mapping (dict): Dictionary with all value mapping between placeholder
             values specified in template and expected value.
         json (bool): If true, use json template (file name with .json suffix),
-            otherwise use xml tempale (file anem with .xml suffix).
+            otherwise use xml template (file name with .xml suffix).
         verify (bool): If true, verify returned response with stored
             template file.
         expected_code (int | List[int] | None): Expected response code(s)
@@ -452,10 +453,9 @@ def put_templated_request(
         data_file_name = "data.xml"
         content_type = {"Content-Type": "application/xml"}
         accept = {"Accept": "application/xml"}
-        # headers = {"Accept": "application/xml", "Content-Type": "application/xml"}
-    uri = resolve_templated_text(temlate_dir + "/location.uri", mapping)
+    uri = resolve_templated_text(template_dir+ "/location.uri", mapping)
     headers = content_type | accept
-    data = resolve_templated_text(temlate_dir + "/" + data_file_name, mapping)
+    data = resolve_templated_text(template_dir+ "/" + data_file_name, mapping)
     jmes_expression = resolve_jmes_path(temlate_dir)
     response = put_to_uri_request(
         uri=uri,
@@ -470,7 +470,7 @@ def put_templated_request(
     if verify:
         file_name_suffix = "json" if json else "xml"
         expected_response = resolve_templated_text(
-            temlate_dir + "/data." + file_name_suffix, mapping
+            template_dir+ "/data." + file_name_suffix, mapping
         )
         volatiles_list = resolve_volatiles_path(temlate_dir)
         try:
@@ -503,11 +503,11 @@ def post_templated_request(
     values.
 
     Args:
-        temlate_dir (str): Path to directory containing template text file(s).
+        template_dir (str): Path to directory containing template text file(s).
         mapping (dict): Dictionary with all value mapping between placeholder
             values specified in template and expected value.
         json (bool): If true, use json template (file name with .json suffix),
-            otherwise use xml tempale (file anem with .xml suffix).
+            otherwise use xml template (file name with .xml suffix).
         verify (bool): If true, verify returned response with stored
             template file.
         expected_code (int | List[int] | None): Expected response code(s)
@@ -530,9 +530,9 @@ def post_templated_request(
         data_file_name = "post_data.xml"
         content_type = {"Content-Type": "application/xml"}
         accept = {"Accept": "application/xml"}
-    uri = resolve_templated_text(temlate_dir + "/location.uri", mapping)
+    uri = resolve_templated_text(template_dir+ "/location.uri", mapping)
     headers = content_type | accept
-    data = resolve_templated_text(temlate_dir + "/" + data_file_name, mapping)
+    data = resolve_templated_text(template_dir+ "/" + data_file_name, mapping)
     jmes_expression = resolve_jmes_path(temlate_dir)
     response = post_to_uri(
         uri=uri,
@@ -547,9 +547,81 @@ def post_templated_request(
     if verify:
         file_name_suffix = "json" if json else "xml"
         expected_response = resolve_templated_text(
-            temlate_dir + "/data." + file_name_suffix, mapping
+            template_dir+ "/data." + file_name_suffix, mapping
         )
         volatiles_list = resolve_volatiles_path(temlate_dir)
+        try:
+            utils.verify_jsons_match(
+                response.text,
+                expected_response,
+                "received response",
+                "expected response",
+                volatiles_list,
+            )
+        except AssertionError as e:
+            raise AssertionError(
+                "Received response does not match expected response:"
+            ) from e
+
+    return response
+
+
+def post_as_json_rfc8040_templated(
+    template_dir: str,
+    mapping: dict,
+    json=True,
+    verify: bool = False,
+    expected_code: int | List[int] | None = None,
+    http_timeout: float | tuple[float, float] | None = None,
+) -> requests.Response:
+    """Evaluates and sends POST request using template file.
+
+    It uses provided data mapping between placeholder marks and expected
+    values.
+
+    Args:
+        template_dir (str): Path to directory containing template text file(s).
+        mapping (dict): Dictionary with all value mapping between placeholder
+            values specified in template and expected value.
+        json (bool): If true, use json template (file name with .json suffix),
+            otherwise use xml template (file name with .xml suffix).
+        verify (bool): If true, verify returned response with stored
+            template file.
+        expected_code (int | List[int] | None): Expected response code(s)
+            returned by ODL. It could be either single numeric value or
+            list of numbers. If not provided requests standard logic for
+            evaluating failure response code is used.
+        http_timeout (float | tuple[float, float] | None): How many seconds to wait for
+            the server to send data before giving up. Can be a single float or a
+            (connect timeout, read timeout) tuple.
+
+
+    Returns:
+        requests.Response: Response returned by ODL for POST call.
+    """
+    data_file_name = "post_data.json"
+    content_type = HEADERS_YANG_RFC8040_JSON
+    accept = {}
+    uri = resolve_templated_text(template_dir + "/location.uri", mapping)
+    headers = content_type | accept
+    data = resolve_templated_text(template_dir + "/" + data_file_name, mapping)
+    jmes_expression = resolve_jmes_path(template_dir)
+    response = post_to_uri(
+        uri=uri,
+        headers=headers,
+        data=data,
+        expected_code=expected_code,
+        jmes_path=jmes_expression,
+        normalize_json=json,
+        http_timeout=http_timeout,
+    )
+
+    if verify:
+        file_name_suffix = "json" if json else "xml"
+        expected_response = resolve_templated_text(
+            template_dir + "/data." + file_name_suffix, mapping
+        )
+        volatiles_list = resolve_volatiles_path(template_dir)
         try:
             utils.verify_jsons_match(
                 response.text,
@@ -578,7 +650,7 @@ def delete_templated_request(
     values.
 
     Args:
-        temlate_dir (str): Path to directory containing template text file(s).
+        template_dir (str): Path to directory containing template text file(s).
         mapping (dict): Dictionary with all value mapping between placeholder
             values specified in template and expected value.
         expected_code (int | List[int] | None): Expected response code(s)
@@ -592,7 +664,7 @@ def delete_templated_request(
     Returns:
         requests.Response: Response returned by ODL for DELETE call.
     """
-    uri = resolve_templated_text(temlate_dir + "/location.uri", mapping)
+    uri = resolve_templated_text(template_dir+ "/location.uri", mapping)
     response = delete_from_uri_request(
         uri=uri, expected_code=expected_code, http_timeout=http_timeout
     )
@@ -607,7 +679,7 @@ def resolve_volatiles_path(template_dir) -> List[str]:
     exists and returns the Volatiles List. Empty string is returned otherwise.
 
     Args:
-        temlate_dir (str): Path to directory containing volatiles list.
+        template_dir (str): Path to directory containing volatiles list.
 
     Returns:
         List[str]: List of volatiles values.
@@ -635,7 +707,7 @@ def get_jinja_templated_request(
     """Sends GET request and verifies response using jinja template file.
 
     Args:
-        temlate_dir (str): Path to directory containing jinja template.
+        template_dir (str): Path to directory containing jinja template.
         mapping (dict): Dictionary with all value mapping between placeholder
             values specified in template and expected value.
         filters (dict): Filters for modifying variables within jinja templates.
@@ -657,7 +729,7 @@ def get_jinja_templated_request(
         headers = {"Accept": "application/yang-data+json"}
     else:
         headers = {"Accept": "application/yang-data+xml"}
-    uri = resolve_templated_text(temlate_dir + "/location.uri", mapping)
+    uri = resolve_templated_text(template_dir+ "/location.uri", mapping)
     response = get_from_uri(
         uri=uri, headers=headers, expected_code=expected_code, http_timeout=http_timeout
     )
