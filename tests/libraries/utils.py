@@ -9,6 +9,7 @@
 from contextlib import contextmanager
 from collections.abc import Callable
 import logging
+import os
 import time
 from typing import Any, Generator, List, Tuple
 
@@ -257,6 +258,42 @@ def run_function_and_expect_error(function: Callable, *args, **kwargs):
         )
 
 
+def get_current_suite_name():
+    """Retrieves the name of the currently executing pytest test suite.
+
+    Returns:
+        str: The extracted name of the current test suite.
+    """
+    current_test = os.environ.get("PYTEST_CURRENT_TEST")
+    test_info = current_test.split(" ")[0]
+    test_suite_name = test_info.split("::")[1]
+
+    return test_suite_name
+
+
+def get_log_file_name(testtool: str, testcase: str | None = None):
+    """Generates a unique, sanitized log file name for a testing tool.
+
+    Get the name of the suite sanitized to be usable as a part of filename.
+    These names are used to constructs names of the log files produced
+    by the testing tools so two suites using a tool wont overwrite the
+    log files if they happen to run in one job.
+
+    Args:
+        testtool (str): The name of the test tool producing the log.
+        testcase (str | None): The name of the specific test case.
+
+    Returns:
+        str: The uniquely constructed and sanitized log file name.
+    """
+    current_suite_name = get_current_suite_name()
+    name = current_suite_name.replace(" ", "-").replace("/", "-").replace(".", "-")
+    suffix = f"--{testcase}" if testcase else ""
+    timestamp = str(int(time.time()))
+
+    return f"{testtool}--{name}{suffix}.{timestamp}.log"
+
+
 def wait_until_function_pass(
     retry_count: int, interval: int, function: Callable, *args, **kwargs
 ) -> Any:
@@ -276,6 +313,37 @@ def wait_until_function_pass(
         Any: Return value returned by last successful function call.
     """
     validator = lambda value: True
+    return wait_until_function_returns_value_with_custom_value_validator(
+        retry_count, interval, validator, function, *args, **kwargs
+    )
+
+
+def wait_until_function_returns_value(
+    retry_count: int,
+    interval: int,
+    expected_value: Any,
+    function: Callable,
+    *args,
+    **kwargs,
+) -> Any:
+    """Retry provided function repeatedly until it returns concrete value.
+
+    In order to pass provided function should not raise any exception.
+
+    Args:
+        retry_count (int): Maximum nuber of function calls retries.
+        interval (int): Number of seconds to wait until next try.
+        expected_value (Any): Value which is expected to be returned
+            by the function call.
+        function (Callable): Function to be called, until it does not raise
+            exception and returns expected value.
+        *args: Function positional arguments.
+        **kwargs: Function keyword arguments.
+
+    Returns:
+        Any: Return value returend by last successful function call.
+    """
+    validator = lambda value: value == expected_value
     return wait_until_function_returns_value_with_custom_value_validator(
         retry_count, interval, validator, function, *args, **kwargs
     )
@@ -324,7 +392,7 @@ def wait_until_function_returns_value_with_custom_value_validator(
         except Exception as e:
             last_exception = e
             log.info(
-                f"{function.__name__}({args} {kwargs or ''}) failed "
+                f"{function.__name__}({args} {kwargs or ''}) failed with: {e} "
                 f"({retry_num}/{retry_count})"
             )
             log.debug(f"failed with: {e}")
@@ -332,7 +400,6 @@ def wait_until_function_returns_value_with_custom_value_validator(
     else:
         if logger_buffer:
             logger_buffer.flush_to_target(log)
-        log.error(last_exception)
         raise AssertionError(
             f"Failed to execute "
             f"{function.__name__}({','.join([str(arg) for arg in args])} "
