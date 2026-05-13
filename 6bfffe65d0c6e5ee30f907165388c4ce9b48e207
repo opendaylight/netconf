@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95d76e33_1adfc7e3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-13T07:50:21Z",
+      "side": 1,
+      "message": "we have much more config options",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "528dbd1c_5ece3dbe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-13T07:50:21Z",
+      "side": 1,
+      "message": "coauthored also by:\nCo-authored-by: Gemini \u003cgemini@google.com\u003e",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3688ef53_d4bc36ca",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3061,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-13T07:50:21Z",
+      "side": 1,
+      "message": "odl-restconf-openapi-jaxrs and add a note that oauth2 does not works with Netty endpoint ATM",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9be8395_c6e278a2",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3063,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-13T07:50:21Z",
+      "side": 1,
+      "message": "we do not need to guide user to setup IdP - the user should know the settings from his provider",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a2ae71f_f30dff6a",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3085,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-13T07:50:21Z",
+      "side": 1,
+      "message": "yes, this is what we need",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c4e2ba2_da0b310d",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3088,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-13T07:50:21Z",
+      "side": 1,
+      "message": "two? try to avoid exact numbers..",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8616906a_80eaf131",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3098,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-13T07:50:21Z",
+      "side": 1,
+      "message": "do I need really to provide all options? including scope?",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aadc140b_62730e5d",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3108,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-13T07:50:21Z",
+      "side": 1,
+      "message": "do we need proxy?\n\ntest: 1) with proxy 2) without proxy with keycloak only",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3017dfff_749dd2db",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3130,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-13T07:50:21Z",
+      "side": 1,
+      "message": "can be different than 30 minutes, just some session timeout/reload",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
