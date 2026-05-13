@@ -23,21 +23,28 @@ class Variables(BaseSettings):
     ODL_PASSWORD: str = "admin"
     RESTCONF_PORT: int = 8182
     RESTCONF_ROOT: str = "restconf"
+    REST_API: str = f"{RESTCONF_ROOT}/data"
     TOOLS_IP: str = "127.0.1.0"
     KARAF_LOG_LEVEL: str = "INFO"
     HEADERS: ClassVar[dict] = {"Content-Type": "application/json"}
     MAX_HTTP_RESPONSE_BODY_LOG_SIZE: int = 2000
     MAX_VISUAL_DIFF_LOG_SIZE: int = 2000
+    ENABLE_GLOBAL_TEST_DEADLINES: bool = True
 
     ODL_NETCONF_MDSAL_PORT: int = 2830
     ODL_NETCONF_PASSWORD: str = "admin"
     ODL_NETCONF_PROMPT: str = "]]>]]>"
     ODL_NETCONF_USER: str = "admin"
+    ODL_NETCONF_NAMESPACE: str = "urn:ietf:params:xml:ns:netconf:base:1.0"
 
-    CALLHOME_WHITELIST: str = "restconf/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices"
+    CALLHOME_WHITELIST: str = (
+        "restconf/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices"
+    )
     NETCONF_KEYSTORE_DATA_URL: str = "restconf/data/netconf-keystore:keystore"
 
-    MODULES_API: str = "/restconf/data/ietf-yang-library:modules-state?content=nonconfig"
+    MODULES_API: str = (
+        "/restconf/data/ietf-yang-library:modules-state?content=nonconfig"
+    )
 
 
 variables = Variables()

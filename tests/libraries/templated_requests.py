@@ -494,6 +494,73 @@ def post_templated_request(
     return response
 
 
+def post_as_json_rfc8040_templated(
+    temlate_dir: str,
+    mapping: dict,
+    json=True,
+    verify: bool = False,
+    expected_code: int | List[int] | None = None,
+    http_timeout: float | tuple[float, float] | None = None,
+) -> requests.Response:
+    """Evaluates and sends POST request using template file.
+
+    It uses provided data mapping between placeholder marks and expected
+    values.
+
+    Args:
+        temlate_dir (str): Path to directory containing template text file(s).
+        mapping (dict): Dictionary with all value mapping between placeholder
+            values specified in template and expected value.
+        json (bool): If true, use json template (file name with .json suffix),
+            otherwise use xml tempale (file anem with .xml suffix).
+        verify (bool): If true, verify returned response with stored
+            template file.
+        expected_code (int | List[int] | None): Expected response code(s)
+            returned by ODL. It could be either single numeric value or
+            list of numbers. If not provided requests standard logic for
+            evaluating failure response code is used.
+        http_timeout (float | tuple[float, float] | None): How many seconds to wait for
+            the server to send data before giving up. Can be a single float or a
+            (connect timeout, read timeout) tuple.
+
+
+    Returns:
+        requests.Response: Response returned by ODL for POST call.
+    """
+    data_file_name = "post_data.json"
+    headers = {"Content-Type": "application/yang-data+json"}
+    uri = resolve_templated_text(temlate_dir + "/location.uri", mapping)
+    data = resolve_templated_text(temlate_dir + "/" + data_file_name, mapping)
+    response = post_to_uri(
+        uri=uri,
+        headers=headers,
+        data=data,
+        expected_code=expected_code,
+        http_timeout=http_timeout,
+    )
+
+    if verify:
+        file_name_suffix = "json" if json else "xml"
+        expected_response = resolve_templated_text(
+            temlate_dir + "/data." + file_name_suffix, mapping
+        )
+        volatiles_list = resolve_volatiles_path(temlate_dir)
+        try:
+            utils.verify_jsons_match(
+                response.text,
+                expected_response,
+                "received response",
+                "expected response",
+                volatiles_list,
+            )
+        except AssertionError as e:
+            raise AssertionError(
+                "Received response does not match expected response:"
+            ) from e
+
+    return response
+
+
 def delete_templated_request(
     temlate_dir: str,
     mapping: dict,

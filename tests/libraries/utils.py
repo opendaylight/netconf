@@ -9,6 +9,7 @@
 from contextlib import contextmanager
 from collections.abc import Callable
 import logging
+import os
 import time
 from typing import Any, Generator, List, Tuple
 
@@ -257,6 +258,29 @@ def run_function_and_expect_error(function: Callable, *args, **kwargs):
         )
 
 
+def get_current_suite_name():
+    current_test = os.environ.get("PYTEST_CURRENT_TEST")
+    test_info = current_test.split(" ")[0]
+    test_suite_name = test_info.split("::")[1]
+
+    return test_suite_name
+
+
+def get_log_file_name(testtool, testcase=None):
+    """
+    Get the name of the suite sanitized to be usable as a part of filename.
+    These names are used to constructs names of the log files produced
+    by the testing tools so two suites using a tool wont overwrite the
+    log files if they happen to run in one job.
+    """
+    current_suite_name = get_current_suite_name()
+    name = current_suite_name.replace(" ", "-").replace("/", "-").replace(".", "-")
+    suffix = f"--{testcase}" if testcase else ""
+    timestamp = str(int(time.time()))
+
+    return f"{testtool}--{name}{suffix}.{timestamp}.log"
+
+
 def wait_until_function_pass(
     retry_count: int, interval: int, function: Callable, *args, **kwargs
 ) -> Any:
@@ -279,6 +303,95 @@ def wait_until_function_pass(
     return wait_until_function_returns_value_with_custom_value_validator(
         retry_count, interval, validator, function, *args, **kwargs
     )
+
+
+def wait_until_function_returns_value(
+    retry_count: int,
+    interval: int,
+    expected_value: Any,
+    function: Callable,
+    *args,
+    **kwargs,
+) -> Any:
+    """Retry provided funtion repeatedly until it returns concrete value.
+
+    In order to pass provided function should not raise any exception.
+
+    Args:
+        retry_count (int): Maximum nuber of function calls retries.
+        interval (int): Number of seconds to wait until next try.
+        expected_value (Any): Value which is expected to be returned
+            by the function call.
+        funtion (Callable): Function to be called, until it does not raise
+            exception and returns expected value.
+        *args: Function positional arguments.
+        **kwargs: Function keyword arguments.
+
+    Returns:
+        Any: Return value returend by last successful function call.
+    """
+    validator = lambda value: value == expected_value
+    return wait_until_function_returns_value_with_custom_value_validator(
+        retry_count, interval, validator, function, *args, **kwargs
+    )
+
+
+def wait_until_function_returns_value_with_custom_value_validator(
+    retry_count: int,
+    interval: int,
+    return_value_validator: Callable,
+    function: Callable,
+    *args,
+    **kwargs,
+) -> Any:
+    """Retry provided funtion repeatedly until returns value passing validator.
+
+    In order to pass provided function should not raise any exception.
+
+    Args:
+        retry_count (int): Maximum nuber of function calls retries.
+        interval (int): Number of seconds to wait until next try.
+        return_value_validator (Callable): Validator for evaluating
+            returned value, if it is expected or not.
+        funtion (Callable): Function to be called, until it does not raise
+            exception and returns value passing validator call.
+        *args: Function positional arguments.
+        **kwargs: Function keyword arguments.
+
+    Returns:
+        Any: Return value returend by last successful function call.
+    """
+    last_exception = None
+    logger_buffer = None
+
+    for retry_num in range(retry_count):
+        try:
+            with deferred_logging() as logger_buffer:
+                result = function(*args, **kwargs)
+            if return_value_validator(result):
+                logger_buffer.flush_to_target(log)
+                return result
+            else:
+                raise AssertionError(
+                    f"{function.__name__}({args} {kwargs or ''}) did not return "
+                    f"expected value, but: {result}"
+                )
+        except Exception as e:
+            last_exception = e
+            log.info(
+                f"{function.__name__}({args} {kwargs or ''}) failed with: {e} "
+                f"({retry_num}/{retry_count})"
+            )
+            log.debug(f"failed with: {e}")
+        time.sleep(interval)
+    else:
+        if logger_buffer:
+            logger_buffer.flush_to_target(log)
+        raise AssertionError(
+            f"Failed to execute "
+            f"{function.__name__}({','.join([str(arg) for arg in args])} "
+            f"{kwargs or ''}) after {retry_count} attempts."
+        ) from last_exception
 
 
 def wait_until_function_returns_value_with_custom_value_validator(
