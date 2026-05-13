@@ -45,13 +45,19 @@ def check_for_elements_at_uri(
 
 
 def no_content_from_uri(uri, headers=None):
-    """
-    Invoke a requests.get and return on error 404 (No content) or will fail and log
+    """Invoke a requests.get and return on error 404 (No content) or will fail and log
     the content. Invokes a requests.get for ${uri} using headers from ${headers}.
 
     Note: Both 404 and 409 are accepted because the expected HTTP status code
     depends on the 'data-missing-is-404' RESTCONF northbound configuration flag.
     By default (false), ODL returns 409 Conflict for missing data. If the flag
     is set to true, it returns 404 Not Found.
+
+    Args:
+        uri (str): Uri location.
+        headers (dict): HTTP headers to use for the GET request.
+
+    Returns:
+        None
     """
     templated_requests.get_from_uri(uri=uri, headers=headers, expected_code=(404, 409))
