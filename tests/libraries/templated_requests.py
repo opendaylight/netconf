@@ -13,6 +13,7 @@ from typing import List
 
 import requests
 
+from libraries import norm_json
 from libraries import utils
 from libraries.variables import variables
 
@@ -32,6 +33,9 @@ def get_from_uri(
     uri: str,
     headers: dict | None = None,
     expected_code: int | List[int] | None = None,
+    normalize_json=False,
+    jmes_path=None,
+    keys_with_volatiles=(),
     http_timeout: float | tuple[float, float] | None = None,
 ) -> requests.Response:
     """Sends HTTP GET request to ODL.
@@ -50,9 +54,7 @@ def get_from_uri(
         requests.Response: Response returned by ODL for GET call.
     """
     url = f"{BASE_URL}/{uri}"
-    log.info(f"Sending GET request to {url}")
-    if not headers:
-        headers = {}
+    log.info(f"Sending GET request to {url} with headers {headers}")
     response = requests.get(
         url,
         headers=headers,
@@ -78,8 +80,15 @@ def get_from_uri(
         log.error(f"Response headers: {response.headers}")
         raise AssertionError("Unexpected failure in GET response.") from e
     else:
+        response_text = response.text
+        if normalize_json:
+            response_text = norm_json.normalize_json_text(
+                response_text,
+                jmes_path=jmes_path,
+                keys_with_volatiles=keys_with_volatiles,
+            )
         response_text = utils.truncate_long_text(
-            response.text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
+            response_text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
         )
         log.debug(f"Response: {response_text}")
         log.info(f"Response code: {response.status_code}")
@@ -93,6 +102,9 @@ def put_to_uri_request(
     headers: dict,
     data: dict | str,
     expected_code: int | List[int] | None = None,
+    normalize_json=False,
+    jmes_path=None,
+    keys_with_volatiles=(),
     http_timeout: float | tuple[float, float] | None = None,
 ) -> requests.Response:
     """Sends HTTP PUT request to ODL using provided data.
@@ -113,7 +125,10 @@ def put_to_uri_request(
         requests.Response: Response returned by ODL for PUT call.
     """
     url = f"{BASE_URL}/{uri}"
-    log.info(f"Sending PUT request to {url} using this data: {data}")
+    log.info(
+        f"Sending PUT request to {url} with headers {headers} containing the following "
+        f"payload: {data}"
+    )
     response = requests.put(
         url=url,
         data=data,
@@ -140,8 +155,15 @@ def put_to_uri_request(
         log.error(f"Response headers: {response.headers}")
         raise AssertionError("Unexpected failure in PUT response.") from e
     else:
+        response_text = response.text
+        if normalize_json:
+            response_text = norm_json.normalize_json_text(
+                response_text,
+                jmes_path=jmes_path,
+                keys_with_volatiles=keys_with_volatiles,
+            )
         response_text = utils.truncate_long_text(
-            response.text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
+            response_text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
         )
         log.debug(f"Response: {response_text}")
         log.info(f"Response code: {response.status_code}")
@@ -155,6 +177,9 @@ def post_to_uri(
     headers: dict,
     data: dict | str,
     expected_code: int | List[int] | None = None,
+    normalize_json=False,
+    jmes_path=None,
+    keys_with_volatiles=(),
     http_timeout: float | tuple[float, float] | None = None,
 ) -> requests.Response:
     """Send HTTP POST request to ODL.
@@ -175,7 +200,10 @@ def post_to_uri(
         requests.Response: Response returned by ODL for POST call.
     """
     url = f"{BASE_URL}/{uri}"
-    log.info(f"Sending to {url} this data: {data}")
+    log.info(
+        f"Sending POST request to {url} with headers {headers} containing the following "
+        "payload: {data}"
+    )
     response = requests.post(
         url=url,
         data=data,
@@ -202,8 +230,15 @@ def post_to_uri(
         log.error(f"Response headers: {response.headers}")
         raise AssertionError("Unexpected failure in POST response.") from e
     else:
+        response_text = response.text
+        if normalize_json:
+            response_text = norm_json.normalize_json_text(
+                response_text,
+                jmes_path=jmes_path,
+                keys_with_volatiles=keys_with_volatiles,
+            )
         response_text = utils.truncate_long_text(
-            response.text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
+            response_text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
         )
         log.debug(f"Response: {response_text}")
         log.info(f"Response code: {response.status_code}")
@@ -286,6 +321,26 @@ def resolve_templated_text(template_location: str, mapping: dict) -> str:
     return resolved_tempate
 
 
+def resolve_jmes_path(folder: str) -> str:
+    """Reads JMES path from file ${folder}${/}jmespath.expr if the file exists and
+    returns the JMES path. Empty string is returned otherwise.
+
+    Args:
+        folder (str): Path to the jmespath.expr text file.
+
+    Returns:
+        str: Evaluated template file.
+    """
+
+    try:
+        with open(f"{folder}/jmespath.expr") as jmes_expression_file:
+            jmes_expression = jmes_expression_file.read()
+    except FileNotFoundError:
+        return None
+
+    return jmes_expression
+
+
 def get_templated_request(
     temlate_dir: str,
     mapping: dict,
@@ -319,12 +374,19 @@ def get_templated_request(
         requests.Response: Response returned by ODL for GET call.
     """
     if json:
-        headers = {"Accept": "application/yang-data+json"}
+        accept = {"Accept": "application/yang-data+json"}
     else:
-        headers = {"Accept": "application/yang-data+xml"}
+        accept = {"Accept": "application/yang-data+xml"}
     uri = resolve_templated_text(temlate_dir + "/location.uri", mapping)
+    headers = accept
+    jmes_expression = resolve_jmes_path(temlate_dir)
     response = get_from_uri(
-        uri=uri, headers=headers, expected_code=expected_code, http_timeout=http_timeout
+        uri=uri,
+        headers=headers,
+        expected_code=expected_code,
+        normalize_json=json,
+        jmes_path=jmes_expression,
+        http_timeout=http_timeout,
     )
 
     if verify:
@@ -384,17 +446,24 @@ def put_templated_request(
     """
     if json:
         data_file_name = "data.json"
-        headers = {"Content-Type": "application/yang-data+json"}
+        content_type = {"Content-Type": "application/yang-data+json"}
+        accept = {}
     else:
         data_file_name = "data.xml"
-        headers = {"Accept": "application/xml", "Content-Type": "application/xml"}
+        content_type = {"Content-Type": "application/xml"}
+        accept = {"Accept": "application/xml"}
+        # headers = {"Accept": "application/xml", "Content-Type": "application/xml"}
     uri = resolve_templated_text(temlate_dir + "/location.uri", mapping)
+    headers = content_type | accept
     data = resolve_templated_text(temlate_dir + "/" + data_file_name, mapping)
+    jmes_expression = resolve_jmes_path(temlate_dir)
     response = put_to_uri_request(
         uri=uri,
         headers=headers,
         data=data,
         expected_code=expected_code,
+        jmes_path=jmes_expression,
+        normalize_json=json,
         http_timeout=http_timeout,
     )
 
@@ -426,7 +495,6 @@ def post_templated_request(
     json=True,
     verify: bool = False,
     expected_code: int | List[int] | None = None,
-    accept=None,
     http_timeout: float | tuple[float, float] | None = None,
 ) -> requests.Response:
     """Evaluates and sends POST request using template file.
@@ -456,19 +524,23 @@ def post_templated_request(
     """
     if json:
         data_file_name = "post_data.json"
-        headers = {"Content-Type": "application/yang-data+json"}
+        content_type = {"Content-Type": "application/yang-data+json"}
+        accept = {}
     else:
         data_file_name = "post_data.xml"
-        headers = {"Accept": "application/xml", "Content-Type": "application/xml"}
-    if accept:
-        headers["Accept"] = accept
+        content_type = {"Content-Type": "application/xml"}
+        accept = {"Accept": "application/xml"}
     uri = resolve_templated_text(temlate_dir + "/location.uri", mapping)
+    headers = content_type | accept
     data = resolve_templated_text(temlate_dir + "/" + data_file_name, mapping)
+    jmes_expression = resolve_jmes_path(temlate_dir)
     response = post_to_uri(
         uri=uri,
         headers=headers,
         data=data,
         expected_code=expected_code,
+        jmes_path=jmes_expression,
+        normalize_json=json,
         http_timeout=http_timeout,
     )
 
