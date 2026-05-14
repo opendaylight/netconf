@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e7cf03d_74449e78",
+        "filename": "pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-14T06:41:15Z",
+      "side": 1,
+      "message": "Is this name correct? Seems like it is copy testtool.",
+      "revId": "d8b9ad548ea8e05786e9f9a18d02359a594189a5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08a224cb_26f35c6a",
+        "filename": "tests/libraries/infra.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-14T06:41:15Z",
+      "side": 1,
+      "message": "Method doc says:\nDetermines which signal should be sent,\n            for gracefully it sends **SIGINT**, otherwise SIGKILL",
+      "range": {
+        "startLine": 306,
+        "startChar": 31,
+        "endLine": 306,
+        "endChar": 38
+      },
+      "revId": "d8b9ad548ea8e05786e9f9a18d02359a594189a5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d92f21e_e49c307f",
+        "filename": "tests/libraries/utils.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-14T06:41:15Z",
+      "side": 1,
+      "message": "This is duplicate method with method on line 410. The only difference I can see is typo in method documentation funtion-\u003efunction",
+      "revId": "d8b9ad548ea8e05786e9f9a18d02359a594189a5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
