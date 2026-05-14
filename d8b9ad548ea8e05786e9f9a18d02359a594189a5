@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ef4cb43b_f213742e",
+        "filename": "pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-14T08:52:13Z",
+      "side": 1,
+      "message": "netconf-testtool",
+      "parentUuid": "9e7cf03d_74449e78",
+      "revId": "d8b9ad548ea8e05786e9f9a18d02359a594189a5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "08a224cb_26f35c6a",
         "filename": "tests/libraries/infra.py",
         "patchSetId": 3
