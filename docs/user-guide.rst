@@ -94,6 +94,46 @@ focuses on RESTCONF.
      for retrieving data from configuration datastore for
      topology-netconf value of topology list.
 
+HTTP Protocol Support (HTTP/1.1, HTTP/2, HTTP/3)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+OpenDaylight's RESTCONF northbound and Event Stream (SSE) interfaces
+seamlessly support HTTP/1.1, HTTP/2, and HTTP/3. Because the protocol
+semantics are handled natively by the transport layer, RESTCONF requests,
+responses, and SSE event payloads remain exactly the same across all versions.
+
+**Protocol Requirements:**
+
+* **HTTP/3 requires HTTPS:** HTTP/3 is built on QUIC, which mandates built-in
+  TLS. To use HTTP/3, you must configure TLS by supplying the
+  ``tls-certificate`` and ``tls-private-key`` parameters in the
+  ``org.opendaylight.restconf.nb.rfc8040`` configuration. You must also use
+  ``https://`` instead of ``http://`` in your RESTCONF URLs.
+* **HTTP/3 uses UDP and Alt-Svc:** Because HTTP/3 operates over QUIC (UDP),
+  standard clients discover it via the Alternative Service (``Alt-Svc``)
+  header during an initial TCP connection. When TLS is configured, OpenDaylight
+  automatically advertises HTTP/3 on the configured ``bind-port`` with a default
+  ``http3-alt-svc-max-age`` of 3600 seconds (set this to 0 to explicitly disable
+  it).
+* **HTTP/2 Cleartext Support:** HTTP/2 can be used over encrypted connections
+  (HTTPS) or over standard cleartext (HTTP) using the HTTP/2 Cleartext (h2c)
+  upgrade mechanism.
+* **Client Capabilities:** Ensure your REST client (e.g., cURL, Postman) is
+  configured to negotiate HTTP/2 (``--http2``) or HTTP/3 (``--http3``).
+
+**Stream Multiplexing:**
+
+Unlike HTTP/1.1, HTTP/2 and HTTP/3 handle concurrent requests by multiplexing
+them into isolated child streams over a single connection. This drastically
+reduces the overhead of establishing multiple TCP connections while ensuring
+isolated state and authentication per stream.
+
+**Advanced Transport Configuration:**
+
+The underlying transport layer allows tuning for optimal memory and network
+performance, particularly when dealing with massive datastores or continuous
+event streams. These parameters are described in `Restconf northbound configuration`_
+
 Preconditions
 ^^^^^^^^^^^^^
 
@@ -1300,8 +1340,7 @@ certificate chain, and add a list of trusted CA and server certificates.
 
 .. code-block::
 
-    POST HTTP/1.1
-    /rests/operations/netconf-keystore:add-keystore-entry
+    POST /rests/operations/netconf-keystore:add-keystore-entry
     Content-Type: application/json
     Accept: application/json
 
@@ -1323,8 +1362,7 @@ certificate chain, and add a list of trusted CA and server certificates.
 
 .. code-block::
 
-    POST HTTP/1.1
-    /rests/operations/netconf-keystore:add-private-key
+    POST /rests/operations/netconf-keystore:add-private-key
     Content-Type: application/json
     Accept: application/json
 
@@ -1348,8 +1386,7 @@ certificate chain, and add a list of trusted CA and server certificates.
 
 .. code-block::
 
-    POST HTTP/1.1
-    /rests/operations/netconf-keystore:add-trusted-certificate
+    POST /rests/operations/netconf-keystore:add-trusted-certificate
     Content-Type: application/json
     Accept: application/json
 
@@ -2293,8 +2330,7 @@ with username and passwords specified.
 
 .. code-block::
 
-    PUT HTTP/1.1
-    /rests/data/odl-netconf-callhome-server:netconf-callhome-server/global/credentials
+    PUT /rests/data/odl-netconf-callhome-server:netconf-callhome-server/global/credentials
     Content-Type: application/json
     Accept: application/json
 
@@ -2330,8 +2366,7 @@ to the log.
 
 .. code-block::
 
-    PUT HTTP/1.1
-    /rests/data/odl-netconf-callhome-server:netconf-callhome-server/global/accept-all-ssh-keys
+    PUT /rests/data/odl-netconf-callhome-server:netconf-callhome-server/global/accept-all-ssh-keys
     Content-Type: application/json
     Accept: application/json
 
@@ -2373,8 +2408,7 @@ with device-id and connection parameters inside the ssh-client-params container.
 
 .. code-block::
 
-    PUT HTTP/1.1
-    /rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device=example
+    PUT /rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device=example
     Content-Type: application/json
     Accept: application/json
 
@@ -2403,8 +2437,7 @@ in such case values from global credentials will be used.
 
 .. code-block::
 
-    PUT HTTP/1.1
-    /rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device=example
+    PUT /rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device=example
     Content-Type: application/json
     Accept: application/json
 
@@ -2433,8 +2466,7 @@ Configuring Device with Global Credentials
 
 .. code-block::
 
-    PUT HTTP/1.1
-    /rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device=example
+    PUT /rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device=example
     Content-Type: application/json
     Accept: application/json
 
@@ -2458,8 +2490,7 @@ device-specific configuration. Format is same as in global credentials.
 
 .. code-block::
 
-    PUT HTTP/1.1
-    /rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device=example
+    PUT /rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device=example
     Content-Type: application/json
     Accept: application/json
 
@@ -2497,8 +2528,7 @@ among the allowed devices.
 
 .. code-block::
 
-    PUT HTTP/1.1
-    /rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device=example-device
+    PUT /rests/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device=example-device
     Content-Type: application/json
     Accept: application/json
 
