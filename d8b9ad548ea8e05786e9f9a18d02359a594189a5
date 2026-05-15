@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3651f58c_22a01b7a",
+        "filename": "pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-15T06:01:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef4cb43b_f213742e",
+      "revId": "d8b9ad548ea8e05786e9f9a18d02359a594189a5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "08a224cb_26f35c6a",
@@ -59,6 +77,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4577c6a9_c39c1fa8",
+        "filename": "tests/libraries/infra.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-15T06:01:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08a224cb_26f35c6a",
+      "range": {
+        "startLine": 306,
+        "startChar": 31,
+        "endLine": 306,
+        "endChar": 38
+      },
+      "revId": "d8b9ad548ea8e05786e9f9a18d02359a594189a5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6d92f21e_e49c307f",
@@ -72,6 +114,24 @@
       "writtenOn": "2026-05-14T06:41:15Z",
       "side": 1,
       "message": "This is duplicate method with method on line 410. The only difference I can see is typo in method documentation funtion-\u003efunction",
+      "revId": "d8b9ad548ea8e05786e9f9a18d02359a594189a5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c2e0fd6_d3fa040b",
+        "filename": "tests/libraries/utils.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-15T06:01:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d92f21e_e49c307f",
       "revId": "d8b9ad548ea8e05786e9f9a18d02359a594189a5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
