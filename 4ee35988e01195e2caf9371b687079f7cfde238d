@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c2fb2e0_9b3a675c",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-15T09:41:12Z",
+      "side": 1,
+      "message": "Why 16 KB? Is that enough?\n\nHttpObjectAggregator docs:\nmaxContentLength – the maximum length of the aggregated content in bytes. If the length of the aggregated content exceeds this value, handleOversizedMessag",
+      "range": {
+        "startLine": 42,
+        "startChar": 55,
+        "endLine": 42,
+        "endChar": 64
+      },
+      "revId": "4ee35988e01195e2caf9371b687079f7cfde238d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "841daab0_9133446b",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-15T09:41:12Z",
+      "side": 1,
+      "message": "Could you please split this into a separate method?",
+      "range": {
+        "startLine": 81,
+        "startChar": 45,
+        "endLine": 112,
+        "endChar": 13
+      },
+      "revId": "4ee35988e01195e2caf9371b687079f7cfde238d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9dc8510a_ff57403b",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp2SseService.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-15T09:41:12Z",
+      "side": 1,
+      "message": "This method has 109 lines of code. Could you please split it into smaller methods?",
+      "revId": "4ee35988e01195e2caf9371b687079f7cfde238d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34b64e36_b8541955",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-05-15T09:41:12Z",
+      "side": 1,
+      "message": "This does not need to be public.",
+      "range": {
+        "startLine": 118,
+        "startChar": 4,
+        "endLine": 118,
+        "endChar": 10
+      },
+      "revId": "4ee35988e01195e2caf9371b687079f7cfde238d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
