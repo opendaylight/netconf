@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b3230a7_a474a43e",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-15T12:35:53Z",
+      "side": 1,
+      "message": "This value is also used in RestconfSessionBootstrap for HttpObjectAggregator in HTTP/2 pipeline setup",
+      "parentUuid": "4c2fb2e0_9b3a675c",
+      "range": {
+        "startLine": 42,
+        "startChar": 55,
+        "endLine": 42,
+        "endChar": 64
+      },
+      "revId": "4ee35988e01195e2caf9371b687079f7cfde238d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "841daab0_9133446b",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-05-15T09:41:12Z",
       "side": 1,
       "message": "Could you please split this into a separate method?",
+      "range": {
+        "startLine": 81,
+        "startChar": 45,
+        "endLine": 112,
+        "endChar": 13
+      },
+      "revId": "4ee35988e01195e2caf9371b687079f7cfde238d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "694d340e_5a90fe7c",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-15T12:35:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "841daab0_9133446b",
       "range": {
         "startLine": 81,
         "startChar": 45,
@@ -64,6 +112,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "10fd910a_b0060fd6",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp2SseService.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-15T12:35:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9dc8510a_ff57403b",
+      "revId": "4ee35988e01195e2caf9371b687079f7cfde238d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34b64e36_b8541955",
@@ -77,6 +143,30 @@
       "writtenOn": "2026-05-15T09:41:12Z",
       "side": 1,
       "message": "This does not need to be public.",
+      "range": {
+        "startLine": 118,
+        "startChar": 4,
+        "endLine": 118,
+        "endChar": 10
+      },
+      "revId": "4ee35988e01195e2caf9371b687079f7cfde238d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc9d2069_c2ac832e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-15T12:35:53Z",
+      "side": 1,
+      "message": "It does, for ClientHttp2Session",
+      "parentUuid": "34b64e36_b8541955",
       "range": {
         "startLine": 118,
         "startChar": 4,
