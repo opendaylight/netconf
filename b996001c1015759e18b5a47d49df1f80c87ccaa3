@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6630abfd_fae8d17d",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-15T13:28:17Z",
+      "side": 1,
+      "message": "H3 has different port initially?",
+      "revId": "b996001c1015759e18b5a47d49df1f80c87ccaa3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
