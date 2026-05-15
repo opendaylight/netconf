@@ -16,6 +16,24 @@
       "message": "Just small fix for the typo, which I have now noticed\n\n@@ -37,7 +37,7 @@ log \u003d logging.getLogger(__name__)\n @pytest.mark.usefixtures(\"log_test_suite_start_end_to_karaf\")\n @pytest.mark.usefixtures(\"log_test_case_start_end_to_karaf\")\n @pytest.mark.run(order\u003d5)\n-class TestCrudeAction:\n+class TestCrudAction:\n \n     def get_config_data(self) -\u003e str:\n         \"\"\"Get and return the config data from the device.\n@@ -101,7 +101,7 @@ class TestCrudeAction:\n             \"\"\"\n         )\n     )\n-    def test_crude_action(self, allure_step_with_separate_logging):\n+    def test_crud_action(self, allure_step_with_separate_logging):\n \n         with allure_step_with_separate_logging(\n             \"step_check_device_is_not_configured_at_beginning\"",
       "revId": "a77ec757818049e8677d61cfbb595eeb828ab790",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c317673_55d79c25",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-15T08:41:10Z",
+      "side": 1,
+      "message": "It does not display properly, but these changes\n-class TestCrudeAction:\n+class TestCrudAction:\n\\-    def test_crude_action(self, allure_step_with_separate_logging):\n\\+    def test_crud_action(self, allure_step_with_separate_logging):",
+      "parentUuid": "32e1fb13_09c28f94",
+      "revId": "a77ec757818049e8677d61cfbb595eeb828ab790",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
