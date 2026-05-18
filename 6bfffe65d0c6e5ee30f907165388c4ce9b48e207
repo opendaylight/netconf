@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b716900_6c507ed2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T11:10:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "95d76e33_1adfc7e3",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "528dbd1c_5ece3dbe",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-13T07:50:21Z",
       "side": 1,
       "message": "coauthored also by:\nCo-authored-by: Gemini \u003cgemini@google.com\u003e",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4dec3068_4595a051",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T11:10:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "528dbd1c_5ece3dbe",
       "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f48d7e77_2a4815bb",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3061,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T11:10:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3688ef53_d4bc36ca",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f9be8395_c6e278a2",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-05-13T07:50:21Z",
       "side": 1,
       "message": "we do not need to guide user to setup IdP - the user should know the settings from his provider",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "729b3fa4_078b71fe",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3063,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T11:10:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9be8395_c6e278a2",
       "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75402189_dbaa8002",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3085,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T11:10:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a2ae71f_f30dff6a",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5c4e2ba2_da0b310d",
@@ -103,6 +193,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b2e7476_d7b92bb3",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3088,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T11:10:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c4e2ba2_da0b310d",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8616906a_80eaf131",
@@ -116,6 +224,24 @@
       "writtenOn": "2026-05-13T07:50:21Z",
       "side": 1,
       "message": "do I need really to provide all options? including scope?",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f325f9f_1a05da0f",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3098,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T11:10:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8616906a_80eaf131",
       "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -155,6 +281,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b311bb0_1d6b221c",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3108,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T11:10:01Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "58c3bf68_fa3bbb46",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3017dfff_749dd2db",
@@ -168,6 +312,24 @@
       "writtenOn": "2026-05-13T07:50:21Z",
       "side": 1,
       "message": "can be different than 30 minutes, just some session timeout/reload",
+      "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07c5e796_fdc20e5b",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3130,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T11:10:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3017dfff_749dd2db",
       "revId": "6bfffe65d0c6e5ee30f907165388c4ce9b48e207",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
