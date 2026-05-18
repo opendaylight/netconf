@@ -16,6 +16,24 @@
       "message": "H3 has different port initially?",
       "revId": "b996001c1015759e18b5a47d49df1f80c87ccaa3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "133a980c_e5fc4fa1",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-18T10:19:04Z",
+      "side": 1,
+      "message": "Added paragraph about Alt-svc and bind port",
+      "parentUuid": "6630abfd_fae8d17d",
+      "revId": "b996001c1015759e18b5a47d49df1f80c87ccaa3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
