@@ -34,6 +34,230 @@
       "parentUuid": "32e1fb13_09c28f94",
       "revId": "a77ec757818049e8677d61cfbb595eeb828ab790",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "740e7061_c1b11f04",
+        "filename": "tests/libraries/infra.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-18T12:31:55Z",
+      "side": 1,
+      "message": "occurrences 2xR - multipletimes in code",
+      "range": {
+        "startLine": 122,
+        "startChar": 15,
+        "endLine": 122,
+        "endChar": 25
+      },
+      "revId": "a77ec757818049e8677d61cfbb595eeb828ab790",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e93d174f_4bd8fce3",
+        "filename": "tests/libraries/infra.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-18T12:31:55Z",
+      "side": 1,
+      "message": "pid?\nmissing timeout",
+      "range": {
+        "startLine": 298,
+        "startChar": 8,
+        "endLine": 298,
+        "endChar": 15
+      },
+      "revId": "a77ec757818049e8677d61cfbb595eeb828ab790",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c7e6fe4_2ac9f4ef",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-18T12:31:55Z",
+      "side": 1,
+      "message": "testtool",
+      "range": {
+        "startLine": 347,
+        "startChar": 23,
+        "endLine": 347,
+        "endChar": 32
+      },
+      "revId": "a77ec757818049e8677d61cfbb595eeb828ab790",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee6b7c52_696b0d10",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-18T12:31:55Z",
+      "side": 1,
+      "message": "schemas",
+      "range": {
+        "startLine": 354,
+        "startChar": 51,
+        "endLine": 354,
+        "endChar": 58
+      },
+      "revId": "a77ec757818049e8677d61cfbb595eeb828ab790",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3345ab55_9221aecd",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-18T12:31:55Z",
+      "side": 1,
+      "message": "rpc?",
+      "range": {
+        "startLine": 388,
+        "startChar": 22,
+        "endLine": 388,
+        "endChar": 25
+      },
+      "revId": "a77ec757818049e8677d61cfbb595eeb828ab790",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d666e28c_4c572567",
+        "filename": "tests/libraries/templated_requests.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 571,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-18T12:31:55Z",
+      "side": 1,
+      "message": "template TYPO",
+      "range": {
+        "startLine": 571,
+        "startChar": 4,
+        "endLine": 571,
+        "endChar": 15
+      },
+      "revId": "a77ec757818049e8677d61cfbb595eeb828ab790",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4786cfd7_aa3195c2",
+        "filename": "tests/libraries/templated_requests.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 588,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-18T12:31:55Z",
+      "side": 1,
+      "message": "template",
+      "range": {
+        "startLine": 588,
+        "startChar": 30,
+        "endLine": 588,
+        "endChar": 38
+      },
+      "revId": "a77ec757818049e8677d61cfbb595eeb828ab790",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1dec0dc9_6317fcea",
+        "filename": "tests/libraries/utils.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-18T12:31:55Z",
+      "side": 1,
+      "message": "function",
+      "range": {
+        "startLine": 329,
+        "startChar": 22,
+        "endLine": 329,
+        "endChar": 30
+      },
+      "revId": "a77ec757818049e8677d61cfbb595eeb828ab790",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc1b71fb_f1fb8dbf",
+        "filename": "tests/libraries/utils.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-18T12:31:55Z",
+      "side": 1,
+      "message": "function",
+      "revId": "a77ec757818049e8677d61cfbb595eeb828ab790",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70e2da24_acfffbc9",
+        "filename": "tests/libraries/utils.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-18T12:31:55Z",
+      "side": 1,
+      "message": "revert these changes?",
+      "range": {
+        "startLine": 364,
+        "startChar": 4,
+        "endLine": 375,
+        "endChar": 68
+      },
+      "revId": "a77ec757818049e8677d61cfbb595eeb828ab790",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
