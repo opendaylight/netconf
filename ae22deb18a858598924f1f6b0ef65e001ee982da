@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f147f68a_54ee2220",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T10:40:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9b32c16_d8edbda7",
+      "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bf50abbd_10f846a2",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-13T07:35:14Z",
       "side": 1,
       "message": "no more only two, maybe, remove enumerating statement?",
+      "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac25777e_450bf600",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T10:40:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf50abbd_10f846a2",
       "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0393353_3c46fe72",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T10:40:09Z",
+      "side": 1,
+      "message": "done in https://git.opendaylight.org/gerrit/c/netconf/+/122843/3?usp\u003drelated-change",
+      "parentUuid": "599d10d7_49f1619a",
+      "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aa5d349f_6c3b540f",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-05-13T07:35:14Z",
       "side": 1,
       "message": "final var",
+      "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3bd58441_82054c82",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/model/ComponentsEntity.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T10:40:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa5d349f_6c3b540f",
       "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f653909d_0dac1669",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/model/security/Oauth2.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T10:40:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7564165_3f7d17b8",
+      "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6efb5cdf_efa42062",
@@ -103,6 +193,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1003a2af_f1f8af5c",
+        "filename": "protocol/restconf-openapi-common/src/main/resources/explorer/oauth2-redirect.html",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T10:40:09Z",
+      "side": 1,
+      "message": "moved to https://git.opendaylight.org/gerrit/c/netconf/+/122912",
+      "parentUuid": "6efb5cdf_efa42062",
+      "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4691b3bf_89641d03",
@@ -116,6 +224,24 @@
       "writtenOn": "2026-05-13T10:24:28Z",
       "side": 1,
       "message": "feature:install odl-netconf-topology odl-restconf-nb-jaxrs odl-restconf-openapi-jaxrs is not enough to make config effective",
+      "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e39c80e_b167c9ba",
+        "filename": "protocol/restconf-openapi-jaxrs/src/main/java/org/opendaylight/restconf/openapi/jaxrs/WebInitializer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T10:40:09Z",
+      "side": 1,
+      "message": "reworked, jaxrs openapi has its own config",
+      "parentUuid": "4691b3bf_89641d03",
       "revId": "ae22deb18a858598924f1f6b0ef65e001ee982da",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
