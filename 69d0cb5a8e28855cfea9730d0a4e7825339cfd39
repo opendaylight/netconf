@@ -16,6 +16,24 @@
       "message": "move to its own file",
       "revId": "69d0cb5a8e28855cfea9730d0a4e7825339cfd39",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5381f3e_d7678881",
+        "filename": "apps/restconf-nb/src/main/resources/restconf8040.cfg",
+        "patchSetId": 5
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-18T11:33:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09a48d20_6aee6c0b",
+      "revId": "69d0cb5a8e28855cfea9730d0a4e7825339cfd39",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
