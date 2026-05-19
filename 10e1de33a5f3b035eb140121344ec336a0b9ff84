@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ae7481c_5be7bda8",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-19T10:50:40Z",
+      "side": 1,
+      "message": "File: ClientSession.java\n  Issue: No handlerRemoved() override. handlerAdded() sets channel; if the handler is removed from the pipeline without triggering channelInactive() (e.g., pipeline\n    teardown in tests or unusual configurations), the channel reference is never cleared.\n  Severity: Minor\n  Recommendation: Override handlerRemoved() and call clearChannel() there, or consolidate to channelInactive.",
+      "revId": "10e1de33a5f3b035eb140121344ec336a0b9ff84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48c5b841_57ad2a53",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-19T10:50:40Z",
+      "side": 1,
+      "message": "File: ClientHttp1Session.java:55 and ClientHttp2Session.java:38\n  Issue: synchronized intrinsic lock on a concurrent collection is an anti-pattern. Locking on the collection object itself is confusing when the collection is\n    ConcurrentLinkedQueue/ConcurrentHashMap (which has its own internal locks). Future maintainers will be unsure which lock to acquire.\n  Severity: Moderate\n  Recommendation: Use a dedicated private final Object lock \u003d new Object(); (or a ReentrantLock) and document it clearly.",
+      "revId": "10e1de33a5f3b035eb140121344ec336a0b9ff84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6dbe02d0_eef50163",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-19T10:50:40Z",
+      "side": 1,
+      "message": "Issue: Incomplete synchronization — reads bypass the lock. executeRequest() holds synchronized(queue) / synchronized(map) while writing, but channelRead0() calls\n    queue.poll() / map.remove() and channelInactive() drains both collections without holding the same lock. This makes the critical section ineffective and leaves\n    TOCTOU windows open.\n  Severity: Major\n  Recommendation: Either (a) remove synchronized and rely solely on the concurrent collection\u0027s own guarantees (simpler and was the original intent, given the\n    ConcurrentLinkedQueue/ConcurrentHashMap choices), or (b) add the same synchronized block around all accesses including channelRead0 and channelInactive. Option (a)\n    is cleaner.",
+      "revId": "10e1de33a5f3b035eb140121344ec336a0b9ff84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6739034_664647d9",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-19T10:50:40Z",
+      "side": 1,
+      "message": "File: ClientHttp1Session.java:61-69 and ClientHttp2Session.java:51-64\n  Issue: Holding a lock over I/O. channel.writeAndFlush() is called while holding synchronized(queue) / synchronized(map). Flushing can involve network I/O and Netty\n    futures. Holding a monitor lock here blocks other threads from accessing the collection for the entire write duration, hurts throughput, and may cause a deadlock if\n\n    a Netty callback tries to acquire the same lock synchronously.\n  Severity: Major\n  Recommendation: Move writeAndFlush() outside the lock (see the incomplete-synchronization fix above — if you drop synchronized entirely this goes away naturally).",
+      "revId": "10e1de33a5f3b035eb140121344ec336a0b9ff84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ffa2393e_9fafaaac",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-19T10:50:40Z",
+      "side": 1,
+      "message": "Issue: Race between invoke() and channelInactive(). A caller can pass the channel !\u003d null guard in invoke(), then be preempted. channelInactive() runs, calls\n    clearChannel(), drains the collection, and returns. The original caller resumes, enters executeRequest(), and adds its callback to the (now-empty) collection. That\n    callback will never receive onFailure.\n  Severity: Major\n  Recommendation: The safest fix is to hold a single lock that guards both the channel reference and the collection mutation. E.g., in invoke(): acquire the lock,\n    snapshot the channel, add to collection, write — all under one lock; channelInactive() acquires the same lock, nulls the channel, drains.",
+      "revId": "10e1de33a5f3b035eb140121344ec336a0b9ff84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
