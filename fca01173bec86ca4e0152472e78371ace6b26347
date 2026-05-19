@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b2d7f91f_2b85e3a7",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPServerQuicBindFailureTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-19T08:09:49Z",
+      "side": 1,
+      "message": "can you add Javadoc?",
+      "revId": "fca01173bec86ca4e0152472e78371ace6b26347",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "32ed692f_b919bf54",
         "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPServerQuicBindFailureTest.java",
         "patchSetId": 4
@@ -32,6 +49,23 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "32ed692f_b919bf54",
+      "revId": "fca01173bec86ca4e0152472e78371ace6b26347",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18bb9134_af6f26cd",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPServerQuicBindFailureTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-19T08:09:49Z",
+      "side": 1,
+      "message": "can we avoid sleep?",
       "revId": "fca01173bec86ca4e0152472e78371ace6b26347",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
