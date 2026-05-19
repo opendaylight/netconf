@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbe396cc_bffeb439",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-19T14:16:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6ae7481c_5be7bda8",
+      "revId": "10e1de33a5f3b035eb140121344ec336a0b9ff84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "48c5b841_57ad2a53",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-19T10:50:40Z",
       "side": 1,
       "message": "File: ClientHttp1Session.java:55 and ClientHttp2Session.java:38\n  Issue: synchronized intrinsic lock on a concurrent collection is an anti-pattern. Locking on the collection object itself is confusing when the collection is\n    ConcurrentLinkedQueue/ConcurrentHashMap (which has its own internal locks). Future maintainers will be unsure which lock to acquire.\n  Severity: Moderate\n  Recommendation: Use a dedicated private final Object lock \u003d new Object(); (or a ReentrantLock) and document it clearly.",
+      "revId": "10e1de33a5f3b035eb140121344ec336a0b9ff84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f464e2e2_1aa3a170",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-19T14:16:34Z",
+      "side": 1,
+      "message": "I will reply to all comments on this class here.\nI looked into fixing this with ReentrantLock blocks to \"do not hold locks over I/O\". However, I realized that if we drop the lock before firing writeAndFlush(), we introduce a severe race condition for HTTP/1.1 pipelining: Thread B could be faster than Thread A, writing the requests out of order, which would cause us to map the server\u0027s responses to the wrong callbacks.\nFixing that with locks woud require multiple locks and also another queue for write to maintain order.\ninstead I tried to limit it to netty event loop\nchannelRead0 and channelInactive already run on it.\n\nI was already trying to do that here: https://git.opendaylight.org/gerrit/c/netconf/+/122680/comment/e003df1f_51c89f28/\nand to address that comment I added check if channel is still active.\nThen it was about datatype of queue variable, but now it is done to resolve reported issues and it is much simplier than with locks.\n\nLike this we ensure correct order without locking on synchronization.\n\ncomments also mention ClientHttp2Session, that is reworked in following patch and after that this issues are not present anymore, so I hope it is ok to left it like it is in this patch",
+      "parentUuid": "48c5b841_57ad2a53",
       "revId": "10e1de33a5f3b035eb140121344ec336a0b9ff84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c7e4cdc_5c3793ae",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-19T14:16:34Z",
+      "side": 1,
+      "message": "Responded in first comment",
+      "parentUuid": "6dbe02d0_eef50163",
+      "revId": "10e1de33a5f3b035eb140121344ec336a0b9ff84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f6739034_664647d9",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8464253f_48510932",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-19T14:16:34Z",
+      "side": 1,
+      "message": "Responded in first comment",
+      "parentUuid": "f6739034_664647d9",
+      "revId": "10e1de33a5f3b035eb140121344ec336a0b9ff84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ffa2393e_9fafaaac",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-05-19T10:50:40Z",
       "side": 1,
       "message": "Issue: Race between invoke() and channelInactive(). A caller can pass the channel !\u003d null guard in invoke(), then be preempted. channelInactive() runs, calls\n    clearChannel(), drains the collection, and returns. The original caller resumes, enters executeRequest(), and adds its callback to the (now-empty) collection. That\n    callback will never receive onFailure.\n  Severity: Major\n  Recommendation: The safest fix is to hold a single lock that guards both the channel reference and the collection mutation. E.g., in invoke(): acquire the lock,\n    snapshot the channel, add to collection, write — all under one lock; channelInactive() acquires the same lock, nulls the channel, drains.",
+      "revId": "10e1de33a5f3b035eb140121344ec336a0b9ff84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b7c5320_7f739a04",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-19T14:16:34Z",
+      "side": 1,
+      "message": "doing so would require to hold a lock during channel.writeAndFlush(), which brings us right back to the previous issue \nnetty aeventloop approach mentioned in first comment fiexes also this",
+      "parentUuid": "ffa2393e_9fafaaac",
       "revId": "10e1de33a5f3b035eb140121344ec336a0b9ff84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
