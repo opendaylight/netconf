@@ -16,6 +16,24 @@
       "message": "what\u0027s here percent encoded, please?",
       "revId": "7483d57630b232cd9031281e60d53d8ad4494dd1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b9bd9b5_dec92fa1",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-19T12:29:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "751f99b3_afc6c6c9",
+      "revId": "7483d57630b232cd9031281e60d53d8ad4494dd1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
