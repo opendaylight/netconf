@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1765ec3c_26f3ed29",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-19T09:34:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c5816df_eef8f9fa",
+      "revId": "0ea583145ea606064fadc200833b7c3a35a2fefa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0518e0ed_4fa564a4",
@@ -48,6 +66,30 @@
       "writtenOn": "2026-05-19T09:07:46Z",
       "side": 1,
       "message": "we can drop `this.`",
+      "range": {
+        "startLine": 54,
+        "startChar": 8,
+        "endLine": 54,
+        "endChar": 13
+      },
+      "revId": "0ea583145ea606064fadc200833b7c3a35a2fefa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d9a51f9_d70d1d40",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-19T09:34:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0518e0ed_4fa564a4",
       "range": {
         "startLine": 54,
         "startChar": 8,
@@ -75,6 +117,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1661d0a7_cb9a284e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-19T09:34:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "052fa9e8_740dd563",
+      "revId": "0ea583145ea606064fadc200833b7c3a35a2fefa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d8337e60_0bf9db19",
@@ -88,6 +148,24 @@
       "writtenOn": "2026-05-19T09:07:46Z",
       "side": 1,
       "message": "no usages after migration to multiplexHandler",
+      "revId": "0ea583145ea606064fadc200833b7c3a35a2fefa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "66a47fd3_bf11158e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseUtils.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-19T09:34:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8337e60_0bf9db19",
       "revId": "0ea583145ea606064fadc200833b7c3a35a2fefa",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
