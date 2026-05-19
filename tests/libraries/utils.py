@@ -134,6 +134,7 @@ def verify_jsons_match(
     json1_data_label: str = "json1",
     json2_data_label: str = "json2",
     volatiles_list: List[str] | Tuple[str] = (),
+    jmes_path: str | None = None,
 ):
     """Verify if provided jsons are the same after normalization.
 
@@ -146,15 +147,17 @@ def verify_jsons_match(
             label.
         volatiles_list (List[str] | Tuple[str]): List of volatiles values,
             which should be ingored in comparison.
+        jmes_path (str | None): Optional JMESPath expression used to query, filter,
+            or extract a specific subset of the JSON data prior to comparison.
 
     Returns:
         None
     """
     normalized_json1 = norm_json.normalize_json_text(
-        json1, keys_with_volatiles=volatiles_list
+        json1, keys_with_volatiles=volatiles_list, jmes_path=jmes_path
     )
     normalized_json2 = norm_json.normalize_json_text(
-        json2, keys_with_volatiles=volatiles_list
+        json2, keys_with_volatiles=volatiles_list, jmes_path=jmes_path
     )
     log.debug(f"{normalized_json1=}")
     log.debug(f"{normalized_json2=}")
