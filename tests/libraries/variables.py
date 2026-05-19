@@ -30,8 +30,8 @@ class Variables(BaseSettings):
     HEADERS_YANG_RFC8040_JSON: ClassVar[dict] = {
         "Content-Type": "application/yang-data+json"
     }
-    MAX_HTTP_RESPONSE_BODY_LOG_SIZE: int = 2000
-    MAX_VISUAL_DIFF_LOG_SIZE: int = 2000
+    MAX_HTTP_RESPONSE_BODY_LOG_SIZE: int = 10000
+    MAX_VISUAL_DIFF_LOG_SIZE: int = 10000
     ENABLE_GLOBAL_TEST_DEADLINES: bool = True
 
     ODL_NETCONF_MDSAL_PORT: int = 2830
