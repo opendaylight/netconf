@@ -6,10 +6,12 @@
 # and is available at http://www.eclipse.org/legal/epl-v10.html
 #
 
+import json
 import logging
 import os
 import string
 from typing import List
+from xml.dom import minidom
 
 import requests
 
@@ -30,13 +32,35 @@ DELETED_STATUS_CODES = {404, 409}
 log = logging.getLogger(__name__)
 
 
+def get_pretty_response(response: requests.Response) -> str:
+    """Tries to pretty-print a JSON response, falls back to raw text if not JSON."""
+    if not response.text:
+        return ""
+
+    content_type = response.headers.get("Content-Type", "").lower()
+
+    try:
+        if "json" in content_type:
+            return json.dumps(response.json(), indent=4)
+
+        elif "xml" in content_type:
+            parsed_xml = minidom.parseString(response.text)
+            pretty_xml = parsed_xml.toprettyxml(indent=" " * 4)
+            return "\n".join(
+                [line.rstrip() for line in pretty_xml.splitlines() if line.strip()]
+            )
+
+    except Exception:
+        # If parsing fails (e.g., malformed data), ignore and fall back below
+        pass
+
+    return response.text
+
+
 def get_from_uri(
     uri: str,
     headers: dict | None = None,
     expected_code: int | List[int] | None = None,
-    normalize_json=False,
-    jmes_path=None,
-    keys_with_volatiles=(),
     http_timeout: float | tuple[float, float] | None = None,
 ) -> requests.Response:
     """Sends HTTP GET request to ODL.
@@ -81,17 +105,11 @@ def get_from_uri(
         log.error(f"Response headers: {response.headers}")
         raise AssertionError("Unexpected failure in GET response.") from e
     else:
-        response_text = response.text
-        if normalize_json:
-            response_text = norm_json.normalize_json_text(
-                response_text,
-                jmes_path=jmes_path,
-                keys_with_volatiles=keys_with_volatiles,
-            )
-        response_text = utils.truncate_long_text(
-            response_text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
+        pretty_text = get_pretty_response(response)
+        truncated_response_text = utils.truncate_long_text(
+            pretty_text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
         )
-        log.debug(f"Response: {response_text}")
+        log.debug(f"Response: {truncated_response_text}")
         log.info(f"Response code: {response.status_code}")
         log.debug(f"Response headers: {response.headers}")
 
@@ -103,9 +121,6 @@ def put_to_uri_request(
     headers: dict,
     data: dict | str,
     expected_code: int | List[int] | None = None,
-    normalize_json=False,
-    jmes_path=None,
-    keys_with_volatiles=(),
     http_timeout: float | tuple[float, float] | None = None,
 ) -> requests.Response:
     """Sends HTTP PUT request to ODL using provided data.
@@ -156,17 +171,11 @@ def put_to_uri_request(
         log.error(f"Response headers: {response.headers}")
         raise AssertionError("Unexpected failure in PUT response.") from e
     else:
-        response_text = response.text
-        if normalize_json:
-            response_text = norm_json.normalize_json_text(
-                response_text,
-                jmes_path=jmes_path,
-                keys_with_volatiles=keys_with_volatiles,
-            )
-        response_text = utils.truncate_long_text(
-            response_text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
+        pretty_text = get_pretty_response(response)
+        truncated_response_text = utils.truncate_long_text(
+            pretty_text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
         )
-        log.debug(f"Response: {response_text}")
+        log.debug(f"Response: {truncated_response_text}")
         log.info(f"Response code: {response.status_code}")
         log.debug(f"Response headers: {response.headers}")
 
@@ -178,9 +187,6 @@ def post_to_uri(
     headers: dict,
     data: dict | str,
     expected_code: int | List[int] | None = None,
-    normalize_json=False,
-    jmes_path=None,
-    keys_with_volatiles=(),
     http_timeout: float | tuple[float, float] | None = None,
 ) -> requests.Response:
     """Send HTTP POST request to ODL.
@@ -203,7 +209,7 @@ def post_to_uri(
     url = f"{BASE_URL}/{uri}"
     log.info(
         f"Sending POST request to {url} with headers {headers} containing the following "
-        "payload: {data}"
+        f"payload: {data}"
     )
     response = requests.post(
         url=url,
@@ -231,17 +237,11 @@ def post_to_uri(
         log.error(f"Response headers: {response.headers}")
         raise AssertionError("Unexpected failure in POST response.") from e
     else:
-        response_text = response.text
-        if normalize_json:
-            response_text = norm_json.normalize_json_text(
-                response_text,
-                jmes_path=jmes_path,
-                keys_with_volatiles=keys_with_volatiles,
-            )
-        response_text = utils.truncate_long_text(
-            response_text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
+        pretty_text = get_pretty_response(response)
+        truncated_response_text = utils.truncate_long_text(
+            pretty_text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
         )
-        log.debug(f"Response: {response_text}")
+        log.debug(f"Response: {truncated_response_text}")
         log.info(f"Response code: {response.status_code}")
         log.debug(f"Response headers: {response.headers}")
 
@@ -294,10 +294,11 @@ def delete_from_uri_request(
         log.error(f"Response headers: {response.headers}")
         raise AssertionError("Unexpected failure in DELETE response.") from e
     else:
-        response_text = utils.truncate_long_text(
-            response.text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
+        pretty_text = get_pretty_response(response)
+        truncated_response_text = utils.truncate_long_text(
+            pretty_text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
         )
-        log.debug(f"Response: {response_text}")
+        log.debug(f"Response: {truncated_response_text}")
         log.info(f"Response code: {response.status_code}")
         log.debug(f"Response headers: {response.headers}")
 
@@ -343,7 +344,7 @@ def resolve_jmes_path(folder: str) -> str:
 
 
 def get_templated_request(
-    temlate_dir: str,
+    template_dir: str,
     mapping: dict,
     json: bool = True,
     verify: bool = False,
@@ -380,13 +381,11 @@ def get_templated_request(
         accept = {"Accept": "application/yang-data+xml"}
     uri = resolve_templated_text(template_dir + "/location.uri", mapping)
     headers = accept
-    jmes_expression = resolve_jmes_path(temlate_dir)
+    jmes_expression = resolve_jmes_path(template_dir)
     response = get_from_uri(
         uri=uri,
         headers=headers,
         expected_code=expected_code,
-        normalize_json=json,
-        jmes_path=jmes_expression,
         http_timeout=http_timeout,
     )
 
@@ -396,7 +395,7 @@ def get_templated_request(
             uri=template_dir + "/data." + file_name_suffix,
             mapping=mapping,
         )
-        volatiles_list = resolve_volatiles_path(temlate_dir)
+        volatiles_list = resolve_volatiles_path(template_dir)
         try:
             utils.verify_jsons_match(
                 response.text,
@@ -404,6 +403,7 @@ def get_templated_request(
                 "received response",
                 "expected response",
                 volatiles_list,
+                jmes_expression,
             )
         except AssertionError as e:
             raise AssertionError(
@@ -462,8 +462,6 @@ def put_templated_request(
         headers=headers,
         data=data,
         expected_code=expected_code,
-        jmes_path=jmes_expression,
-        normalize_json=json,
         http_timeout=http_timeout,
     )
 
@@ -472,7 +470,7 @@ def put_templated_request(
         expected_response = resolve_templated_text(
             template_dir + "/data." + file_name_suffix, mapping
         )
-        volatiles_list = resolve_volatiles_path(temlate_dir)
+        volatiles_list = resolve_volatiles_path(template_dir)
         try:
             utils.verify_jsons_match(
                 response.text,
@@ -480,6 +478,7 @@ def put_templated_request(
                 "received response",
                 "expected response",
                 volatiles_list,
+                jmes_expression,
             )
         except AssertionError as e:
             raise AssertionError(
@@ -490,7 +489,7 @@ def put_templated_request(
 
 
 def post_templated_request(
-    temlate_dir: str,
+    template_dir: str,
     mapping: dict,
     json=True,
     verify: bool = False,
@@ -539,8 +538,6 @@ def post_templated_request(
         headers=headers,
         data=data,
         expected_code=expected_code,
-        jmes_path=jmes_expression,
-        normalize_json=json,
         http_timeout=http_timeout,
     )
 
@@ -549,7 +546,7 @@ def post_templated_request(
         expected_response = resolve_templated_text(
             template_dir + "/data." + file_name_suffix, mapping
         )
-        volatiles_list = resolve_volatiles_path(temlate_dir)
+        volatiles_list = resolve_volatiles_path(template_dir)
         try:
             utils.verify_jsons_match(
                 response.text,
@@ -557,6 +554,7 @@ def post_templated_request(
                 "received response",
                 "expected response",
                 volatiles_list,
+                jmes_expression,
             )
         except AssertionError as e:
             raise AssertionError(
@@ -611,8 +609,6 @@ def post_as_json_rfc8040_templated(
         headers=headers,
         data=data,
         expected_code=expected_code,
-        jmes_path=jmes_expression,
-        normalize_json=json,
         http_timeout=http_timeout,
     )
 
@@ -639,7 +635,7 @@ def post_as_json_rfc8040_templated(
 
 
 def delete_templated_request(
-    temlate_dir: str,
+    template_dir: str,
     mapping: dict,
     expected_code: int | List[int] | None = None,
     http_timeout: float | tuple[float, float] | None = None,
@@ -696,7 +692,7 @@ def resolve_volatiles_path(template_dir) -> List[str]:
 
 
 def get_jinja_templated_request(
-    temlate_dir: str,
+    template_dir: str,
     mapping: dict,
     filters=None,
     json: bool = True,
@@ -736,9 +732,9 @@ def get_jinja_templated_request(
 
     if verify:
         expected_response = utils.render_jinja_template(
-            template_path=f"{temlate_dir}/data.j2", mapping=mapping, filters=filters
+            template_path=f"{template_dir}/data.j2", mapping=mapping, filters=filters
         )
-        volatiles_list = resolve_volatiles_path(temlate_dir)
+        volatiles_list = resolve_volatiles_path(template_dir)
         try:
             utils.verify_jsons_match(
                 response.text,
