@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e2b01a8_708c5094",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpoint.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-19T07:48:51Z",
+      "side": 1,
+      "message": "@NonNullByDefault",
+      "revId": "d2496d81a5750bc4a63bf9df8969de7788433da1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2be3e95_38841584",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpoint.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-19T07:48:51Z",
+      "side": 1,
+      "message": "Consider whenAllComplete and thin what happens when http3Server.shutdown() fails.\n\nAlso, maybe, we can use if-else and also local Future variables to simplify the code.",
+      "revId": "d2496d81a5750bc4a63bf9df8969de7788433da1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
