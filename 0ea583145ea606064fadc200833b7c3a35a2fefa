@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45a37928_5dec29e9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-19T09:07:46Z",
+      "side": 1,
+      "message": "Perhaps it would make sense to remove the Http2FrameListenerProvider and Http2ToHttpAdapter. They appear to be dead code after the migration",
+      "revId": "0ea583145ea606064fadc200833b7c3a35a2fefa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c5816df_eef8f9fa",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-19T09:07:46Z",
+      "side": 1,
+      "message": "`super.handlerAdded(ctx)` publishes `channel` via a volatile write, and `invoke()` can then run on an application thread after seeing `channel !\u003d null`. But `bootstrap` is assigned only after that volatile write, so the same thread is not guaranteed to see it initialized and can hit NPE at `bootstrap.open()`.\nIMO, we can assign bootstrap before super.handlerAdded(ctx)",
+      "revId": "0ea583145ea606064fadc200833b7c3a35a2fefa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0518e0ed_4fa564a4",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-19T09:07:46Z",
+      "side": 1,
+      "message": "we can drop `this.`",
+      "range": {
+        "startLine": 54,
+        "startChar": 8,
+        "endLine": 54,
+        "endChar": 13
+      },
+      "revId": "0ea583145ea606064fadc200833b7c3a35a2fefa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "052fa9e8_740dd563",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-19T09:07:46Z",
+      "side": 1,
+      "message": "`AttributeKey.valueOf(HTTPClient.class, \"authProviderFactory\")` for preventing collisions",
+      "revId": "0ea583145ea606064fadc200833b7c3a35a2fefa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8337e60_0bf9db19",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseUtils.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-19T09:07:46Z",
+      "side": 1,
+      "message": "no usages after migration to multiplexHandler",
+      "revId": "0ea583145ea606064fadc200833b7c3a35a2fefa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
