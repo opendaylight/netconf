@@ -16,6 +16,24 @@
       "message": "unnecessary line",
       "revId": "fca01173bec86ca4e0152472e78371ace6b26347",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47f97a7d_a2406583",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPServerQuicBindFailureTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-19T07:43:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "32ed692f_b919bf54",
+      "revId": "fca01173bec86ca4e0152472e78371ace6b26347",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
