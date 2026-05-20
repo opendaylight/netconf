@@ -16,6 +16,24 @@
       "message": "@Nullable Empty",
       "revId": "8a10941a7088d1c1db6601ff714d94a22dbe3d9c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bb0f49f_080361f5",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpoint.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-20T07:10:36Z",
+      "side": 1,
+      "message": "httpShutdown is Empty.value(), and Futures.getDone(httpShutdown) never returns null",
+      "parentUuid": "f54201a4_0cbf3fc6",
+      "revId": "8a10941a7088d1c1db6601ff714d94a22dbe3d9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
