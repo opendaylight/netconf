@@ -16,6 +16,161 @@
       "message": "I have also update the test to include `connected_netconf_testtools` which extracts some of tests steps for setup an teardown.",
       "revId": "d420238cbcb429d68dd12b7e77e76ce6ebbcfce3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1350cece_435f9344",
+        "filename": "tests/libraries/infra.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-20T11:10:01Z",
+      "side": 1,
+      "message": "verifies",
+      "range": {
+        "startLine": 295,
+        "startChar": 43,
+        "endLine": 295,
+        "endChar": 52
+      },
+      "revId": "d420238cbcb429d68dd12b7e77e76ce6ebbcfce3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66fde4fd_7e110325",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-20T11:10:01Z",
+      "side": 1,
+      "message": "testtool",
+      "range": {
+        "startLine": 347,
+        "startChar": 23,
+        "endLine": 347,
+        "endChar": 31
+      },
+      "revId": "d420238cbcb429d68dd12b7e77e76ce6ebbcfce3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "952607f8_2ac858c1",
+        "filename": "tests/libraries/templated_requests.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-20T11:10:01Z",
+      "side": 1,
+      "message": "name",
+      "range": {
+        "startLine": 363,
+        "startChar": 45,
+        "endLine": 363,
+        "endChar": 50
+      },
+      "revId": "d420238cbcb429d68dd12b7e77e76ce6ebbcfce3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4946a361_39aa28fc",
+        "filename": "tests/libraries/utils.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-20T11:10:01Z",
+      "side": 1,
+      "message": "won\u0027t",
+      "range": {
+        "startLine": 279,
+        "startChar": 52,
+        "endLine": 279,
+        "endChar": 57
+      },
+      "revId": "d420238cbcb429d68dd12b7e77e76ce6ebbcfce3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7135db86_c06d4ae8",
+        "filename": "tests/libraries/utils.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-20T11:10:01Z",
+      "side": 1,
+      "message": "number",
+      "range": {
+        "startLine": 334,
+        "startChar": 35,
+        "endLine": 334,
+        "endChar": 41
+      },
+      "revId": "d420238cbcb429d68dd12b7e77e76ce6ebbcfce3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27b78ec7_5e3f05f6",
+        "filename": "tests/libraries/utils.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-20T11:10:01Z",
+      "side": 1,
+      "message": "returned",
+      "revId": "d420238cbcb429d68dd12b7e77e76ce6ebbcfce3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4487b9fc_8323a970",
+        "filename": "tests/suites/CRUD-ACTION/test_crud_action.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-20T11:10:01Z",
+      "side": 1,
+      "message": "+1 level indentation for parameters?",
+      "range": {
+        "startLine": 95,
+        "startChar": 12,
+        "endLine": 99,
+        "endChar": 23
+      },
+      "revId": "d420238cbcb429d68dd12b7e77e76ce6ebbcfce3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
