@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c331a00_3a2ebe9f",
+        "filename": "tests/suites/CRUD/test_crud.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-20T11:19:42Z",
+      "side": 1,
+      "message": "is this used somewhere?",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 29
+      },
+      "revId": "24fcfba20c873433aa1814e898d378b97aa60c04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
