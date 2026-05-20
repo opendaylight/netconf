@@ -34,6 +34,24 @@
       "parentUuid": "f54201a4_0cbf3fc6",
       "revId": "8a10941a7088d1c1db6601ff714d94a22dbe3d9c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef11a32a_08d55df8",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpoint.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-20T07:19:06Z",
+      "side": 1,
+      "message": "I see a warning in IDE, do you?",
+      "parentUuid": "8bb0f49f_080361f5",
+      "revId": "8a10941a7088d1c1db6601ff714d94a22dbe3d9c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
