@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c673e58_1878a37f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-20T06:19:56Z",
+      "side": 1,
+      "message": "Part of data migration from integration/tests https://github.com/opendaylight/integration-test/commit/5f293f3ceef2c366e4bb8f684501ef73a9a7c440",
+      "revId": "11d4b801fd15545d5ea051cfd625aa0c705047df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
