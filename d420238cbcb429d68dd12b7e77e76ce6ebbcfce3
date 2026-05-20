@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfaff5d8_6314eee4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-20T05:23:33Z",
+      "side": 1,
+      "message": "I have also update the test to include `connected_netconf_testtools` which extracts some of tests steps for setup an teardown.",
+      "revId": "d420238cbcb429d68dd12b7e77e76ce6ebbcfce3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
