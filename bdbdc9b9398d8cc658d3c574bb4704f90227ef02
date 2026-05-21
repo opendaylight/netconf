@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1716a968_742dbcd8",
+        "filename": "tests/libraries/templated_requests.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-21T10:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "faa45a96_e6eb3bbd",
+      "revId": "bdbdc9b9398d8cc658d3c574bb4704f90227ef02",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1b960f6a_9ec26950",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-21T07:40:20Z",
       "side": 1,
       "message": "post_templated_request() still accepts temlate_dir, but the body now uses template_dir",
+      "revId": "bdbdc9b9398d8cc658d3c574bb4704f90227ef02",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bef9fe34_ced70c57",
+        "filename": "tests/libraries/templated_requests.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 493,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-21T10:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1b960f6a_9ec26950",
       "revId": "bdbdc9b9398d8cc658d3c574bb4704f90227ef02",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
