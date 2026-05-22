@@ -1,6 +1,29 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "37dec868_d30cfcab",
+        "filename": ".github/workflows/gerrit-sonar.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-05-22T09:53:46Z",
+      "side": 1,
+      "message": "extra space",
+      "range": {
+        "startLine": 59,
+        "startChar": 132,
+        "endLine": 59,
+        "endChar": 133
+      },
+      "revId": "414948788e903123c5282d1b61f5bdf088202ced",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "b9373caf_55a90912",
