@@ -43,6 +43,10 @@ class Variables(BaseSettings):
     CALLHOME_WHITELIST: str = (
         "restconf/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices"
     )
+    REQUEST_COUNT: int = 16384
+    RESTPERF_FILENAME: str = ""
+
+    CALLHOME_WHITELIST: str = "restconf/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices"
     NETCONF_KEYSTORE_DATA_URL: str = "restconf/data/netconf-keystore:keystore"
 
     MODULES_API: str = (
