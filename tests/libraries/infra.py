@@ -249,6 +249,20 @@ def get_file_content(path: str) -> str:
     return content
 
 
+def save_text_to_a_file(file_path: str, content: str):
+    """Writes text content to a file.
+
+    Args:
+        file_path (str): The destination file path.
+        content (str): The text content to write.
+
+    Returns:
+        None
+    """
+    with open(file_path, "w", encoding="utf-8") as file:
+        file.write(content)
+
+
 def copy_file(
     src_dir: str,
     src_file_name: str,
