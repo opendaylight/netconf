@@ -157,6 +157,19 @@
                                     </target>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>copy-rest-perf-client</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <copy file="${project.basedir}/usecase/netconf-testtool/target/rest-perf-client-${project.version}-rest-perf-client.jar"
+                                        tofile="${project.basedir}/tests/build_tools/rest-perf-client.jar" />
+                                    </target>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
