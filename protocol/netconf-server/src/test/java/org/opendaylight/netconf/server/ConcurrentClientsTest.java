@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -138,20 +139,7 @@ class ConcurrentClientsTest {
             }
         });
 
-        // create temp socket to get available port for test
-        serverAddress = InetAddress.getLoopbackAddress();
-        try (var socket = new ServerSocket(0)) {
-            serverPort = socket.getLocalPort();
-        }
-
-        final var address = IetfInetUtil.ipAddressFor(serverAddress);
-        final var port = new PortNumber(Uint16.valueOf(serverPort));
-        serverParams = new TcpServerParametersBuilder()
-            .setLocalBind(BindingMap.of(new LocalBindBuilder().setLocalAddress(address).setLocalPort(port).build()))
-            .build();
-        clientParams =
-            new TcpClientParametersBuilder().setRemoteAddress(new Host(address)).setRemotePort(port).build();
-
+        // Heavy object creation stays here
         getConfigMessage = requireNonNull(XmlFileLoader.xmlFileToNetconfMessage("netconfMessages/getConfig.xml"));
         clientHelloMessage = requireNonNull(XmlFileLoader.xmlFileToNetconfMessage("netconfMessages/client_hello.xml"));
     }
@@ -160,6 +148,21 @@ class ConcurrentClientsTest {
     static void afterAll() {
         clientExecutor.shutdownNow();
         timer.close();
+    }
+
+    @BeforeEach
+    void beforeEach() throws Exception {
+        serverAddress = InetAddress.getLoopbackAddress();
+        try (var socket = new ServerSocket(0)) {
+            serverPort = socket.getLocalPort();
+        }
+        final var address = IetfInetUtil.ipAddressFor(serverAddress);
+        final var port = new PortNumber(Uint16.valueOf(serverPort));
+        serverParams = new TcpServerParametersBuilder()
+            .setLocalBind(BindingMap.of(new LocalBindBuilder().setLocalAddress(address).setLocalPort(port).build()))
+            .build();
+        clientParams =
+            new TcpClientParametersBuilder().setRemoteAddress(new Host(address)).setRemotePort(port).build();
     }
 
     void startServer(final int threads, final Set<String> serverCapabilities) throws Exception {
@@ -191,8 +194,12 @@ class ConcurrentClientsTest {
 
     @AfterEach
     void afterEach() throws Exception {
-        server.shutdown().get(TIMEOUT, MILLISECONDS);
-        serverBootstrapFactory.close();
+        if (server != null) {
+            server.shutdown().get(TIMEOUT, MILLISECONDS);
+        }
+        if (serverBootstrapFactory != null) {
+            serverBootstrapFactory.close();
+        }
         if (clientFactory != null) {
             clientFactory.close();
         }
