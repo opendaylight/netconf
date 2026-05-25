@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ac06e88_abc7d531",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-05-25T11:40:13Z",
+      "side": 1,
+      "message": "Rewritten commit message to allign with commit message rules",
+      "revId": "2d0c0d372176bacdfe0a1b8d3831eba0a2001031",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
