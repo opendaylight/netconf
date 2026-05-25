@@ -145,7 +145,7 @@
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>copy-netconf-testtool</id>
+                                <id>copy-build-tools</id>
                                 <phase>pre-integration-test</phase>
                                 <goals>
                                     <goal>run</goal>
@@ -153,7 +153,9 @@
                                 <configuration>
                                     <target>
                                         <copy file="${project.basedir}/usecase/netconf-testtool/target/netconf-testtool-${project.version}-executable.jar"
-                                        tofile="${project.basedir}/tests/build_tools/netconf-testtool.jar" />
+                                        tofile="${project.basedir}/tests/build_tools/netconf-testtool.jar"/>
+                                        <copy file="${project.basedir}/usecase/netconf-testtool/target/rest-perf-client-${project.version}-rest-perf-client.jar"
+                                        tofile="${project.basedir}/tests/build_tools/rest-perf-client.jar"/>
                                     </target>
                                 </configuration>
                             </execution>
