@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee1ba054_7de76d44",
+        "filename": "tests/libraries/utils.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-05-26T10:10:33Z",
+      "side": 1,
+      "message": "we no more have bugzilla, we have `jira.opendaylight.org` redirected to `https://lf-opendaylight.atlassian.net`",
+      "revId": "46d73fa134bb708302714d021fb81bb3539822be",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
