@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0638f1b3_9ecc3e8d",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/EventStreamService.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-26T07:47:24Z",
+      "side": 1,
+      "message": "onStartFailure(Throwable)",
+      "revId": "73239c5d0ecd3b61687d536c4a64ff6504547853",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe11fbcc_92295342",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/EventStreamService.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-26T07:47:24Z",
+      "side": 1,
+      "message": "Throwable",
+      "revId": "73239c5d0ecd3b61687d536c4a64ff6504547853",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61afe0c2_410a4c99",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/TestUtils.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-26T07:47:24Z",
+      "side": 1,
+      "message": "Change to class-based lookup just like in SseUtills - it\u0027s more robust and won\u0027t fail if the handler\u0027s name ever changes.",
+      "revId": "73239c5d0ecd3b61687d536c4a64ff6504547853",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f54e1c1_21855ebc",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/TestUtils.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-26T07:47:24Z",
+      "side": 1,
+      "message": "Consider defining the 16 * 1024 as a constant instead of this magic literal",
+      "revId": "73239c5d0ecd3b61687d536c4a64ff6504547853",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
