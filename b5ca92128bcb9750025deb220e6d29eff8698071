@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ec8d027_4f0886bf",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-26T06:02:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fdc4d2c_adcd06ad",
+      "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "adf04668_f21f9f41",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-26T05:17:36Z",
       "side": 1,
       "message": "add indentation to keep it consistent",
+      "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f31fc587_29a80591",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-26T06:02:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "adf04668_f21f9f41",
       "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd88ecc3_6e1b1e07",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-26T06:02:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "69a2cbe5_6c9ad221",
+      "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a7d56d28_97ac0ffe",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-05-26T05:17:36Z",
       "side": 1,
       "message": "Calling the super.channelInactive(ctx) instead of the raw fireChannelInactive() would better match the convention. Even though it\u0027s functionally identical.",
+      "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d05a7705_968df47d",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-26T06:02:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a7d56d28_97ac0ffe",
       "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd0ca7e5_28eb41a8",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-26T06:02:49Z",
+      "side": 1,
+      "message": "This is here to maintain order, without it this can happen:\nThread A calls nextStreamId() and gets 3\nThread B calls nextStreamId() and gets 5\nThread B reaches channel.writeAndFlush() first\nThread A reaches channel.writeAndFlush() second\n\nthen netty would recived frames for 5 sooner then 3 and that would caused exception.\nAlso mind that HTTP/2 session is refactored in folowing patch and this logic is removed entirely",
+      "parentUuid": "464fcc37_b8ca131d",
+      "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "51384514_a010395c",
@@ -103,6 +193,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a1abda3_c6afc3ad",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-26T06:02:49Z",
+      "side": 1,
+      "message": "can\u0027t be, because of restconf.it usages",
+      "parentUuid": "51384514_a010395c",
+      "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb0f6fb7_475b97de",
@@ -116,6 +224,24 @@
       "writtenOn": "2026-05-26T05:17:36Z",
       "side": 1,
       "message": "same here",
+      "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f23e1971_d5bff82f",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-26T06:02:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fb0f6fb7_475b97de",
       "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
