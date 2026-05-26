@@ -141,6 +141,30 @@
       },
       "revId": "635834a09604554024683b521078060849e9e09c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e5e17f2_f4d59f58",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-26T07:56:09Z",
+      "side": 1,
+      "message": "The original goal was to remove the keepalive pause/resume mechanism and its suppressedCounter. The pure activity-based version achieved that, but it introduced a behaviour change: keepalive could be sent while a long-running user RPC was still in progress.\n\nTo avoid that behaviour change, we keep the activity-based scheduling model but add explicit in-flight user RPC tracking. This does reintroduce a counter, but it is no longer a keepalive suppression counter, and it does not drive enable/disable scheduling. It only represents outstanding user RPCs, while keepalive scheduling remains timer-driven.",
+      "parentUuid": "a57fb5a8_10ad33c2",
+      "range": {
+        "startLine": 150,
+        "startChar": 0,
+        "endLine": 151,
+        "endChar": 29
+      },
+      "revId": "635834a09604554024683b521078060849e9e09c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
