@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b48dbc3_07631729",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/EventStreamService.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-26T08:17:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0638f1b3_9ecc3e8d",
+      "revId": "73239c5d0ecd3b61687d536c4a64ff6504547853",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fe11fbcc_92295342",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-05-26T07:47:24Z",
       "side": 1,
       "message": "Throwable",
+      "revId": "73239c5d0ecd3b61687d536c4a64ff6504547853",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d91b0e8b_e7d40159",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/EventStreamService.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-26T08:17:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe11fbcc_92295342",
       "revId": "73239c5d0ecd3b61687d536c4a64ff6504547853",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f8c2238_235e8c20",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/TestUtils.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-26T08:17:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "61afe0c2_410a4c99",
+      "revId": "73239c5d0ecd3b61687d536c4a64ff6504547853",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f54e1c1_21855ebc",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-05-26T07:47:24Z",
       "side": 1,
       "message": "Consider defining the 16 * 1024 as a constant instead of this magic literal",
+      "revId": "73239c5d0ecd3b61687d536c4a64ff6504547853",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "20d63426_bde78b8d",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/TestUtils.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-26T08:17:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f54e1c1_21855ebc",
       "revId": "73239c5d0ecd3b61687d536c4a64ff6504547853",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
