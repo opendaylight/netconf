@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fdc4d2c_adcd06ad",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-26T05:17:36Z",
+      "side": 1,
+      "message": "call super.handlerAdded() for consistency and safety against future changes to the base class.",
+      "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "adf04668_f21f9f41",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/ClientSession.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-26T05:17:36Z",
+      "side": 1,
+      "message": "add indentation to keep it consistent",
+      "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69a2cbe5_6c9ad221",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-26T05:17:36Z",
+      "side": 1,
+      "message": "The comment \"Queue has to be populated first, simply because a response may arrive sooner than the successful callback\" was quite useful. Return it here for clarity.",
+      "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7d56d28_97ac0ffe",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp1Session.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-26T05:17:36Z",
+      "side": 1,
+      "message": "Calling the super.channelInactive(ctx) instead of the raw fireChannelInactive() would better match the convention. Even though it\u0027s functionally identical.",
+      "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "464fcc37_b8ca131d",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-26T05:17:36Z",
+      "side": 1,
+      "message": "The synchronization here is quite redundant. AtomicInteger already generates unique stream IDs atomically with no lock needed and ConcurrentHashMap provides thread-safe operations. Please revisit and reconsider.",
+      "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51384514_a010395c",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-26T05:17:36Z",
+      "side": 1,
+      "message": "can be private",
+      "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb0f6fb7_475b97de",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-26T05:17:36Z",
+      "side": 1,
+      "message": "same here",
+      "revId": "b5ca92128bcb9750025deb220e6d29eff8698071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
