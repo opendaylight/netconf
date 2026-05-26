@@ -117,6 +117,30 @@
       },
       "revId": "635834a09604554024683b521078060849e9e09c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a57fb5a8_10ad33c2",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacadeResponseWaitingTest.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-26T07:37:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c88791cb_9fb1078e",
+      "range": {
+        "startLine": 150,
+        "startChar": 0,
+        "endLine": 151,
+        "endChar": 29
+      },
+      "revId": "635834a09604554024683b521078060849e9e09c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
