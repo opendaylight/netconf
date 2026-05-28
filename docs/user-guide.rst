@@ -2487,8 +2487,79 @@ these cases, the server will keep a record by instantiating an operational devic
 will be no corresponding config device for these rogues. They can be identified readily
 because their device id, rather than being user-supplied, will be of the form
 "address:port". Note that if a device calls back multiple times, there will only be
-a single operatinal entry (even if the port changes); these devices are recognized by
+a single operational entry (even if the port changes); these devices are recognized by
 their unique host key.
+
+Disconnecting a Call Home Device
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The method to disconnect a device depends on how it was initially authorized to connect.
+
+Disconnecting an explicitly allowed device
+''''''''''''''''''''''''''''''''''''''''''
+
+If the device was explicitly added to the ``allowed-devices`` configurational datastore using
+its credentials or host key, you can disconnect it by sending a ``DELETE`` request to that exact
+configuration node.
+
+This action removes the device from the allowed list and actively severs the underlying TCP/SSH
+connection, which will also remove the device from the operational ``network-topology`` tree.
+
+.. code-block:: text
+
+    DELETE /restconf/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device={unique-id}
+    Accept: application/json
+
+Disconnecting a device when "accept-all-ssh-keys" is enabled
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+If the global ``accept-all-ssh-keys`` parameter is set to ``true``, devices are authorized
+dynamically and are only populated in the **operational** datastore. Because they do not exist in
+the **configurational** datastore, a standard ``DELETE`` request will not trigger the disconnect
+logic.
+
+Since there is no direct API to disconnect dynamically accepted devices, you can use a workaround
+to bridge the datastore gap: temporarily add the device to the configurational datastore, and then
+send a delete request.
+
+**Step 1: Register the active device in the configurational datastore**
+
+Send a ``PUT`` request using the exact ``unique-id`` of the currently connected device.
+
+.. code-block:: text
+
+    PUT /restconf/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device={unique-id}
+    Content-Type: application/json
+    Accept: application/json
+
+.. code-block:: json
+
+    {
+      "device": {
+        "unique-id": "{unique-id}",
+        "ssh-client-params": {
+          "host-key": "{device-host-key}"
+        }
+      }
+    }
+
+**Step 2: Delete the device configuration as for explicitly allowed device**
+
+Now that the device exists in the configurational datastore, you can safely send the ``DELETE``
+request. This triggers the Call Home server to drop the active socket and clean up the operational
+topology.
+
+.. code-block:: text
+
+    DELETE /restconf/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices/device={unique-id}
+    Accept: application/json
+
+.. note::
+
+    Dropping the connection from the ODL side doesn't stop the device from retrying call home.
+    After following this example, the device will reconnect on a different port.
+    This forced disconnect is useful when applying configuration changes, such as setting the
+    ``accept-all-ssh-keys`` parameter to ``false`` or removing allowed credentials.
 
 Southbound Call-Home API
 ~~~~~~~~~~~~~~~~~~~~~~~~
