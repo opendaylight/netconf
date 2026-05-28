@@ -234,7 +234,7 @@ public interface RestconfNettyEndpointModule {
         @DefaultValue("0.0.0.0")
         String bindAddress,
 
-        @DefaultValue("8182")
+        @DefaultValue("8181")
         @Min(1)
         @Max(65535)
         int bindPort,
