@@ -16,6 +16,125 @@
       "message": "recheck",
       "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91b576b4_a4871909",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-28T08:48:14Z",
+      "side": 1,
+      "message": "terminated*",
+      "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "118f874e_e9f6f988",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-28T08:48:14Z",
+      "side": 1,
+      "message": "Shouldn\u0027t we catch both RuntimeException and Error here? Just like the javadoc above claims?",
+      "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0aac310c_3e477b7d",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-28T08:48:14Z",
+      "side": 1,
+      "message": "\"schedules next keepalive with a fixed delay\" - the delay is no longer fixed but based on lastActivity.",
+      "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e01f6604_bf3a543b",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-28T08:48:14Z",
+      "side": 1,
+      "message": "Here we\u0027re not disabling anything. The keepalive was already stopped. Please change the log to reflect that - something like \"keepalive already stopped - ignoring timeout\".",
+      "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "acc9f75a_6ddefd6c",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-28T08:48:14Z",
+      "side": 1,
+      "message": "doesn\u0027t need to be synchronized. The field is volatile so assignments are visible to all threads. And the check in sendKeepalive() prevents races.",
+      "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d9d1315_c0d2df42",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-28T08:48:14Z",
+      "side": 1,
+      "message": "start the logging with \"{}: ...\" just like everywhere else",
+      "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3af62acc_2f20e3ee",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-28T08:48:14Z",
+      "side": 1,
+      "message": "This log is a copy of the one above (result \u003d\u003d null). But here the result isn\u0027t null - it\u0027s just empty. The log should reflect the difference. Also add \":\" at the beginning and \".\" at the end of the sentence to keep it consistent with the other logs.",
+      "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
