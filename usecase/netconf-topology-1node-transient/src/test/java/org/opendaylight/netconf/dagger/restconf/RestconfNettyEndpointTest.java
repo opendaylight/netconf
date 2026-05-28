@@ -57,7 +57,7 @@ class RestconfNettyEndpointTest {
         // Create Java HTTP Client
         try (var client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(3)).build()) {
             final var request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8182/restconf/data"))
+                .uri(URI.create("http://localhost:8181/restconf/data"))
                 .header("Authorization", "Basic YWRtaW46YWRtaW4=")
                 .header("Accept", "application/json")
                 .GET()
@@ -83,7 +83,7 @@ class RestconfNettyEndpointTest {
         try (var client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(3)).build()) {
             // Send GET request to invalid path
             final var request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8182/restconf/WRONG"))
+                .uri(URI.create("http://localhost:8181/restconf/WRONG"))
                 .header("Authorization", "Basic YWRtaW46YWRtaW4=")
                 .header("Accept", "application/json")
                 .GET()
@@ -110,7 +110,7 @@ class RestconfNettyEndpointTest {
         try (var client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(3)).build()) {
             // Send GET request with invalid Basic Auth credentials.
             final var request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8182/restconf/data"))
+                .uri(URI.create("http://localhost:8181/restconf/data"))
                 .header("Authorization", "Basic aW52YWxpZFVzZXI6YmFkUGFzcw==")
                 .header("Accept", "application/json")
                 .GET()
@@ -164,7 +164,7 @@ class RestconfNettyEndpointTest {
                     ]
                 }
                 """;
-            final var configUri = URI.create("http://localhost:8182/restconf/data/network-topology:network-topology"
+            final var configUri = URI.create("http://localhost:8181/restconf/data/network-topology:network-topology"
                 + "/topology=topology-netconf/node=test-device");
             final var putRequest = HttpRequest.newBuilder()
                 .uri(configUri)
@@ -181,7 +181,7 @@ class RestconfNettyEndpointTest {
                 + ". Body: " + putResponse.body());
 
             // Get operational data.
-            final var operUri = URI.create("http://localhost:8182/restconf/data/network-topology:network-topology"
+            final var operUri = URI.create("http://localhost:8181/restconf/data/network-topology:network-topology"
                     + "/topology=topology-netconf/node=test-device?content=nonconfig");
             final var getRequest = HttpRequest.newBuilder()
                 .uri(operUri)

@@ -14,6 +14,12 @@
         <feature version="[2,3)">odl-ietf-model-rfc8650</feature>
         <feature version="[14,15)">odl-netty-http3</feature>
         <feature version="[14,15)">odl-netty-quic</feature>
+        <!-- Distributions move Pax Web to 8182 via an etc overlay; for environments without it
+             (e.g. the SingleFeatureTest) do it here so Netty can take 8181. -->
+        <config name="org.ops4j.pax.web" override="true" append="true">
+            org.osgi.service.http.port = 8182
+            jetty.port = 8182
+        </config>
         <configfile finalname="etc/org.opendaylight.restconf.nb.rfc8040.cfg">
             mvn:org.opendaylight.netconf/restconf-nb/${project.version}/cfg/config
         </configfile>
