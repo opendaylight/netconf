@@ -70,7 +70,7 @@ public class Parameters {
 
         parser.addArgument("--port")
                 .type(Integer.class)
-                .setDefault(8182)
+                .setDefault(8181)
                 .help("Restconf server port")
                 .dest("port");
 

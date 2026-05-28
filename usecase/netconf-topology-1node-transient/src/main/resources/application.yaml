@@ -69,7 +69,7 @@ odl:
         maximum-fragment-length: 0
         heartbeat-interval: 10000
         bind-address: 0.0.0.0
-        bind-port: 8182
+        bind-port: 8181
         api-root-path: restconf
         boss-threads: 0
         worker-threads: 0

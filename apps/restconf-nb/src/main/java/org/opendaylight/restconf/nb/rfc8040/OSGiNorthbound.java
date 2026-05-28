@@ -83,7 +83,7 @@ public final class OSGiNorthbound {
         String bind$_$address() default "0.0.0.0";
 
         @AttributeDefinition(min = "1", max = "65535")
-        int bind$_$port() default 8182;
+        int bind$_$port() default 8181;
 
         @AttributeDefinition(name = "Number of Netty boss threads.", min = "0")
         int boss$_$threads() default 0;
