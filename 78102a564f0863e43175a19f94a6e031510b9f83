@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc65d1ea_53b5652f",
+        "filename": "protocol/netconf-server/src/test/java/org/opendaylight/netconf/server/ConcurrentClientsTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-05-28T08:14:27Z",
+      "side": 1,
+      "message": "serverAddress, serverPort, serverParams and clientParams don\u0027t need to be static anymore, since they are now written in non-static @BeforeEach.",
+      "revId": "78102a564f0863e43175a19f94a6e031510b9f83",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
