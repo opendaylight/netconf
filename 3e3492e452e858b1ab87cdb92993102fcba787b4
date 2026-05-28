@@ -16,6 +16,24 @@
       "message": "requires BC-1.84 😞",
       "revId": "3e3492e452e858b1ab87cdb92993102fcba787b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99f068b7_48d2e446",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-05-28T09:16:26Z",
+      "side": 1,
+      "message": "https://github.com/apache/mina-sshd/commit/6337151c0db3cd6d8162d8d97c8980fbfe558a42 causes:\n\njava.lang.NoClassDefFoundError: org/bouncycastle/crypto/params/MLKEMParameters\n\tat org.opendaylight.netconf.shaded.sshd@12.0.0-SNAPSHOT/org.opendaylight.netconf.shaded.sshd.common.kex.MLKEM$Parameters$1.getMLKEMParameters(MLKEM.java:54)\n\tat org.opendaylight.netconf.shaded.sshd@12.0.0-SNAPSHOT/org.opendaylight.netconf.shaded.sshd.common.kex.MLKEM$Parameters.isSupported(MLKEM.java:84)\n\tat org.opendaylight.netconf.shaded.sshd@12.0.0-SNAPSHOT/org.opendaylight.netconf.shaded.sshd.common.kex.BuiltinKEM$1.isSupported(BuiltinKEM.java:43)\n\tat org.opendaylight.netconf.shaded.sshd@12.0.0-SNAPSHOT/org.opendaylight.netconf.shaded.sshd.common.kex.BuiltinDHFactories$17.isSupported(BuiltinDHFactories.java:357)\n\nrendering PQC inoperative with BC-1.83",
+      "parentUuid": "81c0aca9_7ae15a02",
+      "revId": "3e3492e452e858b1ab87cdb92993102fcba787b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
