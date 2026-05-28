@@ -18,7 +18,7 @@ import org.springframework.boot.context.properties.bind.Name;
 
 class SpringbootConfigLoaderTest {
     private static final String BIND_ADDRESS = "0.0.0.0";
-    private static final int BIND_PORT = 8182;
+    private static final int BIND_PORT = 8181;
     private static final String API_ROOT_PATH = "restconf";
     private static final int BOSS_THREADS = 0;
     private static final List<String> CIPHERS = List.of("aes256-ctr", "aes192-ctr", "aes128-ctr");
