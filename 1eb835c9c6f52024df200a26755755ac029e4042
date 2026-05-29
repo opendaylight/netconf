@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec31e08a_89e3a041",
+        "filename": "tests/variables/netconf/CRUD/schemas/car@2014-08-18.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-29T10:45:01Z",
+      "side": 1,
+      "message": "stress - missing \"R\"",
+      "range": {
+        "startLine": 87,
+        "startChar": 69,
+        "endLine": 87,
+        "endChar": 74
+      },
+      "revId": "1eb835c9c6f52024df200a26755755ac029e4042",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f8233db_aa395158",
+        "filename": "tests/variables/netconf/CRUD/schemas/car@2014-08-18.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-29T10:45:01Z",
+      "side": 1,
+      "message": "same here",
+      "range": {
+        "startLine": 93,
+        "startChar": 68,
+        "endLine": 93,
+        "endChar": 73
+      },
+      "revId": "1eb835c9c6f52024df200a26755755ac029e4042",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
