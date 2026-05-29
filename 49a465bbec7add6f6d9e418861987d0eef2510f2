@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4d3aa37_da2c62ed",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-29T11:35:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91b576b4_a4871909",
+      "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "118f874e_e9f6f988",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-05-28T08:48:14Z",
       "side": 1,
       "message": "Shouldn\u0027t we catch both RuntimeException and Error here? Just like the javadoc above claims?",
+      "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2af0bf3_b91d912c",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-29T11:35:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "118f874e_e9f6f988",
       "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "06ad22a6_c042d9cb",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-29T11:35:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0aac310c_3e477b7d",
+      "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e01f6604_bf3a543b",
@@ -82,6 +136,24 @@
       "writtenOn": "2026-05-28T08:48:14Z",
       "side": 1,
       "message": "Here we\u0027re not disabling anything. The keepalive was already stopped. Please change the log to reflect that - something like \"keepalive already stopped - ignoring timeout\".",
+      "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc014771_b024145c",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-29T11:35:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e01f6604_bf3a543b",
       "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -103,6 +175,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba273e00_9b019b5b",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-29T11:35:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "acc9f75a_6ddefd6c",
+      "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8d9d1315_c0d2df42",
@@ -120,6 +210,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e54940a7_450695f8",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-29T11:35:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d9d1315_c0d2df42",
+      "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3af62acc_2f20e3ee",
@@ -133,6 +241,24 @@
       "writtenOn": "2026-05-28T08:48:14Z",
       "side": 1,
       "message": "This log is a copy of the one above (result \u003d\u003d null). But here the result isn\u0027t null - it\u0027s just empty. The log should reflect the difference. Also add \":\" at the beginning and \".\" at the end of the sentence to keep it consistent with the other logs.",
+      "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "503fca30_582a6281",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/KeepaliveSalFacade.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-05-29T11:35:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3af62acc_2f20e3ee",
       "revId": "49a465bbec7add6f6d9e418861987d0eef2510f2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
