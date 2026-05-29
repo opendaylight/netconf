@@ -7,8 +7,6 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -20,8 +18,8 @@ import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
-import org.opendaylight.netconf.shaded.sshd.common.kex.KexProposalOption;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -42,12 +40,12 @@ public final class SSHClient extends SSHTransportStack {
     private static final Logger LOG = LoggerFactory.getLogger(SSHClient.class);
 
     private final String subsystem;
-    private final SSHNegotiatedAlgListener algListener;
+    private final @Nullable SSHNegotiatedAlgListener algListener;
 
     private SSHClient(final String subsystem, final TransportChannelListener<? super SSHTransportChannel> listener,
             final SSHNegotiatedAlgListener algListener, final TransportSshClient sshClient) {
         super(listener, sshClient, sshClient.getSessionFactory());
-        this.algListener = requireNonNull(algListener);
+        this.algListener = algListener;
         // Mirrors check in ChannelSubsystem's constructor
         if (subsystem.isBlank()) {
             throw new IllegalArgumentException("Blank subsystem");
@@ -68,6 +66,14 @@ public final class SSHClient extends SSHTransportStack {
                 .serverAuthentication(clientParams.getServerAuthentication())
                 .configurator(configurator)
                 .buildChecked());
+    }
+
+    static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory,
+            final ScheduledExecutorService executorService, final String subsystem,
+            final TransportChannelListener<? super SSHTransportChannel> listener,
+            final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
+            throws UnsupportedConfigurationException {
+        return of(ioServiceFactory, executorService, subsystem, listener, null, clientParams, configurator);
     }
 
     @VisibleForTesting
@@ -99,14 +105,10 @@ public final class SSHClient extends SSHTransportStack {
         final var sessionId = sessionId(clientSession);
         LOG.debug("Authenticating session {}", sessionId);
         clientSession.auth().addListener(future -> onAuthComplete(future, sessionId));
-        final var kex = KeyExchangePolicy.CLIENT.algOf(clientSession.getNegotiatedKexParameter(
-            KexProposalOption.ALGORITHMS));
-        final var hostKey = PublicKeyPolicy.INSTANCE.algOf(clientSession.getNegotiatedKexParameter(
-            KexProposalOption.SERVERKEYS));
-        final var encryption = EncryptionPolicy.INSTANCE.algOf(clientSession.getNegotiatedKexParameter(
-            KexProposalOption.C2SENC));
-        final var mac = MacPolicy.INSTANCE.algOf(clientSession.getNegotiatedKexParameter(KexProposalOption.C2SMAC));
-        algListener.onAlgorithmsNegotiated(kex, hostKey, encryption, mac);
+        if (algListener != null) {
+            final var algs = NegotiatedAlgorithms.readFrom(clientSession);
+            algListener.onAlgorithmsNegotiated(algs.keyExchange(), algs.hostKey(), algs.encryption(), algs.mac());
+        }
     }
 
     private void onAuthComplete(final AuthFuture future, final Long sessionId) {
