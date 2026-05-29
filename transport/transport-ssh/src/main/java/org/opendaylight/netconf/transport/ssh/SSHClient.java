@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
-import org.opendaylight.netconf.shaded.sshd.common.kex.KexProposalOption;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -99,14 +98,8 @@ public final class SSHClient extends SSHTransportStack {
         final var sessionId = sessionId(clientSession);
         LOG.debug("Authenticating session {}", sessionId);
         clientSession.auth().addListener(future -> onAuthComplete(future, sessionId));
-        final var kex = KeyExchangePolicy.CLIENT.algOf(clientSession.getNegotiatedKexParameter(
-            KexProposalOption.ALGORITHMS));
-        final var hostKey = PublicKeyPolicy.INSTANCE.algOf(clientSession.getNegotiatedKexParameter(
-            KexProposalOption.SERVERKEYS));
-        final var encryption = EncryptionPolicy.INSTANCE.algOf(clientSession.getNegotiatedKexParameter(
-            KexProposalOption.C2SENC));
-        final var mac = MacPolicy.INSTANCE.algOf(clientSession.getNegotiatedKexParameter(KexProposalOption.C2SMAC));
-        algListener.onAlgorithmsNegotiated(kex, hostKey, encryption, mac);
+        final var algs = NegotiatedAlgorithms.readFrom(clientSession);
+        algListener.onAlgorithmsNegotiated(algs.keyExchange(), algs.hostKey(), algs.encryption(), algs.mac());
     }
 
     private void onAuthComplete(final AuthFuture future, final Long sessionId) {

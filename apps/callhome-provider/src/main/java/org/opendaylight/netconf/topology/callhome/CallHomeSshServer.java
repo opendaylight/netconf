@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
@@ -29,6 +30,7 @@ import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
+import org.opendaylight.netconf.transport.ssh.NegotiatedAlgorithms;
 import org.opendaylight.netconf.transport.ssh.SSHClient;
 import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
@@ -37,10 +39,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev251204.netconf.client.initiate.stack.grouping.transport.ssh.ssh.SshClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev251204.netconf.client.listen.stack.grouping.transport.ssh.ssh.TcpServerParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentityBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshEncryptionAlgorithm;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
 import org.opendaylight.yangtools.binding.util.BindingMap;
@@ -58,8 +56,6 @@ public final class CallHomeSshServer implements AutoCloseable {
     private final CallHomeSshSessionContextManager contextManager;
     private final SSHClient client;
 
-    private NegotiatedSshAlg sshAlg;
-
     @VisibleForTesting
     CallHomeSshServer(final TcpServerGrouping tcpServerParams, final long timeoutMillis,
             final SSHTransportStackFactory transportStackFactory,
@@ -75,16 +71,9 @@ public final class CallHomeSshServer implements AutoCloseable {
         final var transportChannelListener =
             new CallHomeTransportChannelListener(negotiatorFactory, contextManager, statusRecorder);
 
-        // FIXME: NETCONF-1579, This listener is triggered too late. Way to pass algorithms to NetconfDeviceSalFacade
-        //  is via createContext() in verifyServerKey() which runs earlier than when we have them.
-        final var algListener = new SSHNegotiatedAlgListener() {
-            @Override
-            public void onAlgorithmsNegotiated(final SshKeyExchangeAlgorithm kexAlgorithm,
-                    final SshPublicKeyAlgorithm hostKey, final SshEncryptionAlgorithm encryption,
-                    final SshMacAlgorithm mac) {
-                sshAlg = new NegotiatedSshAlg(kexAlgorithm, hostKey, encryption, mac);
-            }
-        };
+        // Negotiated algorithms are read from the session in verifyServerKey() where they are already available,
+        // so the algListener is not used here but must be non-null.
+        final SSHNegotiatedAlgListener algListener = (kex, hostKey, enc, mac) -> { };
 
         // SSH transport layer configuration
         // NB actual username will be assigned dynamically but predefined one is required for transport initialization
@@ -146,7 +135,8 @@ public final class CallHomeSshServer implements AutoCloseable {
                 authSettings.id(), remoteAddress);
             return false;
         }
-        final var context = contextManager.createContext(authSettings.id(), clientSession, sshAlg);
+        final var context = contextManager.createContext(authSettings.id(), clientSession,
+            readNegotiatedAlg(clientSession));
         if (context == null) {
             // if there is an issue creating context then the cause expected to be
             // logged within overridden createContext() method
@@ -158,6 +148,15 @@ public final class CallHomeSshServer implements AutoCloseable {
         authSettings.applyTo(clientSession);
         LOG.debug("Session context is created for SSH session: {}", context);
         return true;
+    }
+
+    @VisibleForTesting
+    static @Nullable NegotiatedSshAlg readNegotiatedAlg(final @NonNull ClientSession session) {
+        final var algs = NegotiatedAlgorithms.readFrom(session);
+        if (algs.keyExchange() == null || algs.hostKey() == null || algs.encryption() == null || algs.mac() == null) {
+            return null;
+        }
+        return new NegotiatedSshAlg(algs.keyExchange(), algs.hostKey(), algs.encryption(), algs.mac());
     }
 
     @Override
