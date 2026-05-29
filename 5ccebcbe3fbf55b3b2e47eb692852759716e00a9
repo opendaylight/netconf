@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a96d79a_960192f5",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-29T10:40:16Z",
+      "side": 1,
+      "message": "*by",
+      "range": {
+        "startLine": 200,
+        "startChar": 36,
+        "endLine": 200,
+        "endChar": 39
+      },
+      "revId": "5ccebcbe3fbf55b3b2e47eb692852759716e00a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
