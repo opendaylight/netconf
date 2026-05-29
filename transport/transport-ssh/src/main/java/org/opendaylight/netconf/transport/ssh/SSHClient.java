@@ -40,6 +40,9 @@ import org.slf4j.LoggerFactory;
  */
 public final class SSHClient extends SSHTransportStack {
     private static final Logger LOG = LoggerFactory.getLogger(SSHClient.class);
+    private static final SSHNegotiatedAlgListener NOOP = (kex, hostKey, encryption, mac) -> {
+        // no-op: caller is not interested in the negotiated algorithms
+    };
 
     private final String subsystem;
     private final SSHNegotiatedAlgListener algListener;
@@ -68,6 +71,14 @@ public final class SSHClient extends SSHTransportStack {
                 .serverAuthentication(clientParams.getServerAuthentication())
                 .configurator(configurator)
                 .buildChecked());
+    }
+
+    static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory,
+            final ScheduledExecutorService executorService, final String subsystem,
+            final TransportChannelListener<? super SSHTransportChannel> listener,
+            final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
+            throws UnsupportedConfigurationException {
+        return of(ioServiceFactory, executorService, subsystem, listener, NOOP, clientParams, configurator);
     }
 
     @VisibleForTesting
@@ -99,14 +110,12 @@ public final class SSHClient extends SSHTransportStack {
         final var sessionId = sessionId(clientSession);
         LOG.debug("Authenticating session {}", sessionId);
         clientSession.auth().addListener(future -> onAuthComplete(future, sessionId));
-        final var kex = KeyExchangePolicy.CLIENT.algOf(clientSession.getNegotiatedKexParameter(
-            KexProposalOption.ALGORITHMS));
-        final var hostKey = PublicKeyPolicy.INSTANCE.algOf(clientSession.getNegotiatedKexParameter(
-            KexProposalOption.SERVERKEYS));
-        final var encryption = EncryptionPolicy.INSTANCE.algOf(clientSession.getNegotiatedKexParameter(
-            KexProposalOption.C2SENC));
-        final var mac = MacPolicy.INSTANCE.algOf(clientSession.getNegotiatedKexParameter(KexProposalOption.C2SMAC));
-        algListener.onAlgorithmsNegotiated(kex, hostKey, encryption, mac);
+        final var algs = NegotiatedAlgorithms.of(
+            clientSession.getNegotiatedKexParameter(KexProposalOption.ALGORITHMS),
+            clientSession.getNegotiatedKexParameter(KexProposalOption.SERVERKEYS),
+            clientSession.getNegotiatedKexParameter(KexProposalOption.C2SENC),
+            clientSession.getNegotiatedKexParameter(KexProposalOption.C2SMAC));
+        algListener.onAlgorithmsNegotiated(algs.keyExchange(), algs.hostKey(), algs.encryption(), algs.mac());
     }
 
     private void onAuthComplete(final AuthFuture future, final Long sessionId) {
