@@ -95,6 +95,26 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
             .listen(newServerBootstrap(), listenParams);
     }
 
+    /**
+     * Builds and starts Call-Home SSH Client.
+     *
+     * @param subsystem bound subsystem name
+     * @param listener client channel listener, required
+     * @param listenParams TCP transport configuration addressing inbound connection, required
+     * @param clientParams SSH overlay configuration, required, should contain username
+     * @param configurator client factory manager configurator, optional
+     * @return a future producing {@link SSHClient}
+     * @throws UnsupportedConfigurationException if any of configurations is invalid or incomplete
+     * @throws NullPointerException if any of required parameters is null
+     */
+    public @NonNull ListenableFuture<SSHClient> listenClient(final String subsystem,
+            final TransportChannelListener<? super SSHTransportChannel> listener, final TcpServerGrouping listenParams,
+            final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
+            throws UnsupportedConfigurationException {
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, configurator)
+            .listen(newServerBootstrap(), listenParams);
+    }
+
     public @NonNull ListenableFuture<SSHServer> connectServer(final String subsystem,
             final TransportChannelListener<? super SSHTransportChannel> listener, final TcpClientGrouping connectParams,
             final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
