@@ -45,6 +45,29 @@
       },
       "revId": "1eb835c9c6f52024df200a26755755ac029e4042",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "223c335b_5bca14d0",
+        "filename": "tests/variables/netconf/CRUD/schemas/car@2014-08-18.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-29T10:46:04Z",
+      "side": 1,
+      "message": "new line at the end was removed",
+      "range": {
+        "startLine": 130,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 1
+      },
+      "revId": "1eb835c9c6f52024df200a26755755ac029e4042",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
