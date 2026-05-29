@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66d21996_6ddfdedf",
+        "filename": "tests/libraries/variables.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-05-29T11:02:05Z",
+      "side": 1,
+      "message": "declared twice?",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 113
+      },
+      "revId": "6adc8ff69e5e5812b092b13976cc3e2c9dc07439",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
