@@ -96,23 +96,23 @@ focuses on RESTCONF.
 .. important::
 
     This guide uses the default Netty-based RESTCONF endpoint,
-    ``http://localhost:8182/restconf``, which is activated by installing the ``odl-restconf-nb`` Karaf
+    ``http://localhost:8181/restconf``, which is activated by installing the ``odl-restconf-nb`` Karaf
     feature. The deprecated JAX-RS-based endpoint is available through ``odl-restconf-nb-jaxrs`` and is
-    typically exposed as ``http://localhost:8181/rests``.
+    typically exposed as ``http://localhost:8182/rests``.
 
     Resources for configuration and operational datastores start with ``/restconf/data/``, for example
-    ``http://localhost:8182/restconf/data/network-topology:network-topology`` returns both datastores. Use
+    ``http://localhost:8181/restconf/data/network-topology:network-topology`` returns both datastores. Use
     the ``content`` query parameter to distinguish between them:
-    ``http://localhost:8182/restconf/data/network-topology:network-topology?content=config`` for the
+    ``http://localhost:8181/restconf/data/network-topology:network-topology?content=config`` for the
     configuration datastore and
-    ``http://localhost:8182/restconf/data/network-topology:network-topology?content=nonconfig`` for the
+    ``http://localhost:8181/restconf/data/network-topology:network-topology?content=nonconfig`` for the
     operational datastore.
 
     If a data node in the path expression is a YANG leaf-list or list node, the path segment has to be
     constructed by having the leaf-list or list node name, followed by an "=" character, then followed by the
     leaf-list or list value. Reserved characters in the value must be percent-encoded, for example ``/`` as ``%2F``.
     The following URL retrieves configuration datastore data for the ``topology-netconf`` value of the topology list:
-    ``http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf?content=config``
+    ``http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf?content=config``
 
 HTTP Protocol Support (HTTP/1.1, HTTP/2, HTTP/3)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -175,7 +175,7 @@ to RESTCONF:
    :widths: 1 5
 
    * - rfc8040
-     - http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=new-netconf-device
+     - http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/node=new-netconf-device
 
 You could use the same body to create the new  NETCONF connector with a POST
 without specifying the node in the URL:
@@ -184,7 +184,7 @@ without specifying the node in the URL:
    :widths: 1 5
 
    * - rfc8040
-     - http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf
+     - http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf
 
 Payload for password authentication:
 
@@ -500,7 +500,7 @@ device:
    :widths: 1 5
 
    * - rfc8040
-     - http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=new-netconf-device
+     - http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/node=new-netconf-device
 
 .. note::
 
@@ -698,7 +698,7 @@ Reading data from the device
 Just invoke (no body needed):
 
 GET
-http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=new-netconf-device/yang-ext:mount?content=nonconfig
+http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/node=new-netconf-device/yang-ext:mount?content=nonconfig
 
 This will return the entire content of operation datastore from the
 device. To view just the configuration datastore, change **nonconfig**
@@ -715,7 +715,7 @@ In fact this request comes from the tutorial dedicated to the
 **ncmount** tutorial app.
 
 POST
-http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=new-netconf-device/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations
+http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/node=new-netconf-device/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations
 
 ::
 
@@ -751,7 +751,7 @@ shows how to invoke the get-schema RPC (get-schema is quite common among
 netconf devices). Invoke:
 
 POST
-http://localhost:8182/restconf/operations/network-topology:network-topology/topology=topology-netconf/node=new-netconf-device/yang-ext:mount/ietf-netconf-monitoring:get-schema
+http://localhost:8181/restconf/operations/network-topology:network-topology/topology=topology-netconf/node=new-netconf-device/yang-ext:mount/ietf-netconf-monitoring:get-schema
 
 ::
 
@@ -781,7 +781,7 @@ Opendaylight provides the way to stream the device notifications over a http ses
  .. code-block::
 
     POST
-    http://localhost:8182/restconf/operations/network-topology:network-topology/topology=topology-netconf/node=test_device/yang-ext:mount/notifications:create-subscription
+    http://localhost:8181/restconf/operations/network-topology:network-topology/topology=topology-netconf/node=test_device/yang-ext:mount/notifications:create-subscription
     Content-Type: application/json
     Accept: application/json
 
@@ -798,7 +798,7 @@ Opendaylight provides the way to stream the device notifications over a http ses
 .. code-block::
 
     POST
-    http://localhost:8182/restconf/operations/odl-device-notification:subscribe-device-notification
+    http://localhost:8181/restconf/operations/odl-device-notification:subscribe-device-notification
     Content-Type: application/json
     Accept: application/json
 
@@ -824,7 +824,7 @@ The response contains the stream name for reading the notifications.
 
 .. code-block::
 
-    http://localhost:8182/restconf/streams/{encoding}/{stream-name}
+    http://localhost:8181/restconf/streams/{encoding}/{stream-name}
 
 {stream-name} - being **stream-name** received in previous step
 
@@ -835,7 +835,7 @@ The request for xml encoding and **stream-name** from previous example would loo
 .. code-block::
 
     GET
-    http://localhost:8182/restconf/streams/xml/urn:uuid:91e630ec-1324-4f57-bae3-0925b6d11ffd
+    http://localhost:8181/restconf/streams/xml/urn:uuid:91e630ec-1324-4f57-bae3-0925b6d11ffd
     Accept: text/event-stream
 
 
@@ -957,11 +957,11 @@ The response should look something like this:
                 "access": [
                     {
                         "encoding": "json",
-                        "location": "http://127.0.0.1:8182/restconf/streams/json/urn:uuid:b3db417c-0305-473d-b6c8-2da01c543171"
+                        "location": "http://127.0.0.1:8181/restconf/streams/json/urn:uuid:b3db417c-0305-473d-b6c8-2da01c543171"
                     },
                     {
                         "encoding": "xml",
-                        "location": "http://127.0.0.1:8182/restconf/streams/xml/urn:uuid:b3db417c-0305-473d-b6c8-2da01c543171"
+                        "location": "http://127.0.0.1:8181/restconf/streams/xml/urn:uuid:b3db417c-0305-473d-b6c8-2da01c543171"
                     }
                 ],
                 "description": "Events occuring in OPERATIONAL datastore under /toaster:toaster/toasterStatus"
@@ -984,7 +984,7 @@ The request should look something like this:
 
 ::
 
-    curl -v -X GET  http://localhost:8182/restconf/streams/json/urn:uuid:b3db417c-0305-473d-b6c8-2da01c543171  -H "Content-Type: text/event-stream" -H "Authorization: Basic YWRtaW46YWRtaW4="
+    curl -v -X GET  http://localhost:8181/restconf/streams/json/urn:uuid:b3db417c-0305-473d-b6c8-2da01c543171  -H "Content-Type: text/event-stream" -H "Authorization: Basic YWRtaW46YWRtaW4="
 
 The subscription call may be modified with the following query parameters defined in the RESTCONF RFC:
 
@@ -1024,7 +1024,7 @@ POST request to:
 
 .. code-block::
 
-    http://localhost:8182/restconf/operations/ietf-subscribed-notifications:establish-subscription
+    http://localhost:8181/restconf/operations/ietf-subscribed-notifications:establish-subscription
 
 .. tabs::
 
@@ -1195,7 +1195,7 @@ To listen to the notifications for an established subscription, use the followin
 .. code-block::
 
     GET
-    http://localhost:8182/subscriptions/{subscription-id}
+    http://localhost:8181/subscriptions/{subscription-id}
     Accept: text/event-stream
 
 Replace {subscription-id} with the ID returned in the establish-subscription RPC response.
@@ -1211,7 +1211,7 @@ POST request to:
 
 .. code-block::
 
-    http://localhost:8182/restconf/operations/ietf-subscribed-notifications:modify-subscription
+    http://localhost:8181/restconf/operations/ietf-subscribed-notifications:modify-subscription
 
 .. tabs::
 
@@ -1265,7 +1265,7 @@ POST request to:
 
 .. code-block::
 
-    http://localhost:8182/restconf/operations/ietf-subscribed-notifications:modify-subscription
+    http://localhost:8181/restconf/operations/ietf-subscribed-notifications:modify-subscription
 
 .. tabs::
 
@@ -1309,7 +1309,7 @@ POST request to:
 
 .. code-block::
 
-    http://localhost:8182/restconf/operations/ietf-subscribed-notifications:kill-subscription
+    http://localhost:8181/restconf/operations/ietf-subscribed-notifications:kill-subscription
 
 .. tabs::
 
@@ -1499,7 +1499,7 @@ After netopeer is mounted successfully, its configuration can be read
 using RESTCONF by invoking:
 
 GET
-http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=netopeer/yang-ext:mount?content:config
+http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/node=netopeer/yang-ext:mount?content:config
 
 Mounting netopeer NETCONF server using key-based authentication SSH
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1539,7 +1539,7 @@ After netopeer is mounted successfully, its configuration can be read
 using RESTCONF by invoking:
 
 GET
-http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=netopeer/yang-ext:mount?content:config
+http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/node=netopeer/yang-ext:mount?content:config
 
 Mounting netopeer NETCONF server using key-based authentication TLS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1593,7 +1593,7 @@ After netopeer is mounted successfully, its configuration can be read
 using RESTCONF by invoking:
 
 GET
-http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=netopeer/yang-ext:mount?content:config
+http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/node=netopeer/yang-ext:mount?content:config
 
 SSH transport configuration
 ---------------------------
@@ -1613,13 +1613,13 @@ To access initial or modified topology default configuration invoke GET request 
 
 .. code-block::
 
-    http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/topology-types/netconf-node-topology:topology-netconf/ssh-transport-topology-parameters
+    http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/topology-types/netconf-node-topology:topology-netconf/ssh-transport-topology-parameters
 
 To change this configuration use PUT request to:
 
 .. code-block::
 
-    http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/topology-types/netconf-node-topology:topology-netconf/ssh-transport-topology-parameters
+    http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/topology-types/netconf-node-topology:topology-netconf/ssh-transport-topology-parameters
 
 .. tabs::
 
@@ -1756,7 +1756,7 @@ Device specific configuration can be set when mounting device or later with PUT 
 
 .. code-block::
 
-    http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device
+    http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device
 
 .. tabs::
 
@@ -1865,7 +1865,7 @@ Showing negotiated SSH parameters
 After the device successfully connects, the negotiated SSH transport parameters
 are stored in the operational datastore. They can be examined by invoking:
 
-GET http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device?content=nonconfig
+GET http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/node=17830-sim-device?content=nonconfig
 
 The response shows the negotiated algorithms in the
 negotiated-ssh-transport-parameters container:
@@ -2050,7 +2050,7 @@ Now the MD-SAL’s datastore can be read over RESTCONF via NETCONF by
 invoking:
 
 GET
-http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=controller-mdsal/yang-ext:mount?content:nonconfig
+http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/node=controller-mdsal/yang-ext:mount?content:nonconfig
 
 .. note::
 
@@ -2137,7 +2137,7 @@ XML
 ::
 
     <yang-library xmlns="urn:opendaylight:netconf-node-topology">
-      <yang-library-url xmlns="urn:opendaylight:netconf-node-topology">http://localhost:8182/restconf/data/ietf-yang-library:modules-state</yang-library-url>
+      <yang-library-url xmlns="urn:opendaylight:netconf-node-topology">http://localhost:8181/restconf/data/ietf-yang-library:modules-state</yang-library-url>
       <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
       <password xmlns="urn:opendaylight:netconf-node-topology">admin</password>
     </yang-library>
@@ -2161,7 +2161,7 @@ Restconf-nb configuration works through OSGi Configuration Admin interface, in t
 Netty endpoint related settings are also configurable:
 
 * ``bind-address``, which defaults to ``0.0.0.0``
-* ``bind-port``, which defaults to ``8182``
+* ``bind-port``, which defaults to ``8181``
 * ``api-root-path``, which defaults to ``restconf``
 * ``boss-threads``, which defaults to ``0``
 * ``worker-threads``, which defaults to ``0``
@@ -2253,7 +2253,7 @@ file, ``org.opendaylight.restconf.nb.rfc8040.cfg``, for example:
     ping-executor-name-prefix=ping-executor
     max-thread-count=1
     bind-address=0.0.0.0
-    bind-port=8182
+    bind-port=8181
     api-root-path=restconf
     boss-threads=0
     worker-threads=0
@@ -2283,7 +2283,7 @@ Or use Karaf CLI:
     opendaylight-user@root>config:property-set ping-executor-name-prefix "ping-executor"
     opendaylight-user@root>config:property-set max-thread-count 1
     opendaylight-user@root>config:property-set bind-address "0.0.0.0"
-    opendaylight-user@root>config:property-set bind-port 8182
+    opendaylight-user@root>config:property-set bind-port 8181
     opendaylight-user@root>config:property-set api-root-path "restconf"
     opendaylight-user@root>config:property-set boss-threads 0
     opendaylight-user@root>config:property-set worker-threads 0
@@ -2710,7 +2710,7 @@ Mounting NETCONF device that runs on NETCONF testtool:
 
 .. code-block:: bash
 
-  curl --location --request PUT 'http://127.0.0.1:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=testtool' \
+  curl --location --request PUT 'http://127.0.0.1:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/node=testtool' \
   --header 'Authorization: Basic YWRtaW46YWRtaW4=' \
   --header 'Content-Type: application/json' \
   --data-raw '{
@@ -2735,7 +2735,7 @@ Setting initial configuration on NETCONF device:
 
 .. code-block:: bash
 
-  curl --location --request PUT 'http://127.0.0.1:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=testtool/yang-ext:mount/test-module:root' \
+  curl --location --request PUT 'http://127.0.0.1:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/node=testtool/yang-ext:mount/test-module:root' \
   --header 'Authorization: Basic YWRtaW46YWRtaW4=' \
   --header 'Content-Type: application/json' \
   --data-raw '{
@@ -2842,7 +2842,7 @@ RESTCONF request:
 
 .. code-block:: bash
 
-    curl --location --request GET 'http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=testtool/yang-ext:mount/test-module:root/simple-root?content=config&fields=ll;nested/sample-x' \
+    curl --location --request GET 'http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/node=testtool/yang-ext:mount/test-module:root/simple-root?content=config&fields=ll;nested/sample-x' \
     --header 'Authorization: Basic YWRtaW46YWRtaW4=' \
     --header 'Cookie: JSESSIONID=node01h4w82eorc1k61866b71qjgj503.node0'
 
@@ -2898,7 +2898,7 @@ RESTCONF request:
 
 .. code-block:: bash
 
-    curl --location --request GET 'http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=testtool/yang-ext:mount/test-module:root/list-root?content=config&fields=top-list(nested-list/identifier)' \
+    curl --location --request GET 'http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/node=testtool/yang-ext:mount/test-module:root/list-root?content=config&fields=top-list(nested-list/identifier)' \
     --header 'Authorization: Basic YWRtaW46YWRtaW4=' \
     --header 'Cookie: JSESSIONID=node01h4w82eorc1k61866b71qjgj503.node0'
 
@@ -2996,7 +2996,7 @@ RESTCONF request:
 
 .. code-block:: bash
 
-    curl --location --request GET 'http://localhost:8182/restconf/data/network-topology:network-topology/topology=topology-netconf/node=testtool/yang-ext:mount/test-module:root/list-root?content=config&fields=branch-ab;top-list/next-data/switch-1' \
+    curl --location --request GET 'http://localhost:8181/restconf/data/network-topology:network-topology/topology=topology-netconf/node=testtool/yang-ext:mount/test-module:root/list-root?content=config&fields=branch-ab;top-list/next-data/switch-1' \
     --header 'Authorization: Basic YWRtaW46YWRtaW4=' \
     --header 'Cookie: JSESSIONID=node01jx6o5thwae9t1ft7c2zau5zbz4.node0'
 
@@ -3112,9 +3112,9 @@ Using the OpenAPI Explorer through HTTP
 
 2.  Navigate to OpenAPI in your web browser which is available at URLs:
 
--  http://localhost:8182/openapi/explorer/index.html for general overview
+-  http://localhost:8181/openapi/explorer/index.html for general overview
 
--  http://localhost:8182/openapi/api/v3/single for JSON data
+-  http://localhost:8181/openapi/api/v3/single for JSON data
 
 .. note::
 
@@ -3140,13 +3140,13 @@ OpenAPI Explorer can also be used for connected device. How to connect a device 
 
 OpenAPI URLs in that case would look like this:
 
--  `http://localhost:8182/openapi/explorer/index.html?urls.primaryName=17830-sim-device resources - RestConf RFC 8040 <http://localhost:8182/openapi/explorer/index.html?urls.primaryName=17830-sim-device%20resources%20-%20RestConf%20RFC%208040>`_ for device overview
+-  `http://localhost:8181/openapi/explorer/index.html?urls.primaryName=17830-sim-device resources - RestConf RFC 8040 <http://localhost:8181/openapi/explorer/index.html?urls.primaryName=17830-sim-device%20resources%20-%20RestConf%20RFC%208040>`_ for device overview
 
--  http://localhost:8182/openapi/api/v3/mounts/1 for JSON data
+-  http://localhost:8181/openapi/api/v3/mounts/1 for JSON data
 
--  `http://localhost:8182/openapi/api/v3/mounts/1/toaster?revision=2009-11-20 <http://localhost:8182/openapi/api/v3/mounts/1/toaster?revision=2009-11-20>`__ JSON data for given model
+-  `http://localhost:8181/openapi/api/v3/mounts/1/toaster?revision=2009-11-20 <http://localhost:8181/openapi/api/v3/mounts/1/toaster?revision=2009-11-20>`__ JSON data for given model
 
--  `http://localhost:8182/openapi/api/v3/mounts/1/definition-test <http://localhost:8182/openapi/api/v3/mounts/1/definition-test>`__ JSON data for given model without revision
+-  `http://localhost:8181/openapi/api/v3/mounts/1/definition-test <http://localhost:8181/openapi/api/v3/mounts/1/definition-test>`__ JSON data for given model without revision
 
 .. note::
 
