@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e33946ec_749919ed",
+        "filename": "tests/variables/netconf/CRUD/schemas/car@2014-08-18.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-01T07:52:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ec31e08a_89e3a041",
+      "range": {
+        "startLine": 87,
+        "startChar": 69,
+        "endLine": 87,
+        "endChar": 74
+      },
+      "revId": "1eb835c9c6f52024df200a26755755ac029e4042",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f8233db_aa395158",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "00a5a188_5ca98e75",
+        "filename": "tests/variables/netconf/CRUD/schemas/car@2014-08-18.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-01T07:52:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f8233db_aa395158",
+      "range": {
+        "startLine": 93,
+        "startChar": 68,
+        "endLine": 93,
+        "endChar": 73
+      },
+      "revId": "1eb835c9c6f52024df200a26755755ac029e4042",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "223c335b_5bca14d0",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-05-29T10:46:04Z",
       "side": 1,
       "message": "new line at the end was removed",
+      "range": {
+        "startLine": 130,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 1
+      },
+      "revId": "1eb835c9c6f52024df200a26755755ac029e4042",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf4d47f0_86e598a0",
+        "filename": "tests/variables/netconf/CRUD/schemas/car@2014-08-18.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-01T07:52:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "223c335b_5bca14d0",
       "range": {
         "startLine": 130,
         "startChar": 0,
