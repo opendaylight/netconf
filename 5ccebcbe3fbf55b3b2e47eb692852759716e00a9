@@ -22,6 +22,30 @@
       },
       "revId": "5ccebcbe3fbf55b3b2e47eb692852759716e00a9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2f8642c_c63589e5",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-01T07:52:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a96d79a_960192f5",
+      "range": {
+        "startLine": 200,
+        "startChar": 36,
+        "endLine": 200,
+        "endChar": 39
+      },
+      "revId": "5ccebcbe3fbf55b3b2e47eb692852759716e00a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
