@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc4d2117_b989f975",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 2649,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-06-01T14:12:56Z",
+      "side": 1,
+      "message": "I would use the same format as in the other examples  without `[]`, just do not confuse the user",
+      "revId": "dd9f4bddbc7d30e92f47e0d052ec6a66c3979123",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
