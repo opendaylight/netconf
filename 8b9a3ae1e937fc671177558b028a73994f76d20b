@@ -22,6 +22,30 @@
       },
       "revId": "8b9a3ae1e937fc671177558b028a73994f76d20b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab059ccf_cf469a16",
+        "filename": "usecase/karaf-static/src/main/assembly/etc/org.ops4j.pax.web.cfg",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-06-01T13:45:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ac46b309_b6c5a876",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 4,
+        "endChar": 18
+      },
+      "revId": "8b9a3ae1e937fc671177558b028a73994f76d20b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
