@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba5abd3f_2e85be9e",
+        "filename": "tests/suites/CRUD/test_crud.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-02T07:56:55Z",
+      "side": 1,
+      "message": "what is the base for this test?",
+      "revId": "4e6d0fbd5bac4f2a2e609f5d882fb04568cb1b5c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
