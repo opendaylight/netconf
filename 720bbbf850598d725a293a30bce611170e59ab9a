@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2473b466_3eb0b344",
+        "filename": "tests/suites/Apidocs/test_apidocs.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-02T07:54:00Z",
+      "side": 1,
+      "message": "Apidocs -\u003e RESTCONF OpenAPI",
+      "revId": "720bbbf850598d725a293a30bce611170e59ab9a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
