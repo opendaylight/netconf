@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b7fddaf5_49c17b09",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/NegotiatedAlgorithms.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-06-02T10:23:44Z",
+      "side": 1,
+      "message": "please do not create additional leaks sshd",
+      "range": {
+        "startLine": 12,
+        "startChar": 24,
+        "endLine": 12,
+        "endChar": 50
+      },
+      "revId": "50faa13a18f81a744afd3c485318dfb1db9231ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
