@@ -22,6 +22,29 @@
       },
       "revId": "50faa13a18f81a744afd3c485318dfb1db9231ca",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1335ffda_e0e525a6",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClient.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-06-02T10:25:51Z",
+      "side": 1,
+      "message": "I really do not like this \u0027oh it can be nullable and there is a magic IF somewhere\u0027...",
+      "range": {
+        "startLine": 43,
+        "startChar": 19,
+        "endLine": 43,
+        "endChar": 27
+      },
+      "revId": "50faa13a18f81a744afd3c485318dfb1db9231ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
