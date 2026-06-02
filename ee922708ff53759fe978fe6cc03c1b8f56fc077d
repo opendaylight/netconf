@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "74c48bf4_b05c683d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 18
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-02T12:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4e78aa46_f7cae2ee",
+      "revId": "ee922708ff53759fe978fe6cc03c1b8f56fc077d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d4aac296_8fb4bef3",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-02T07:50:10Z",
       "side": 1,
       "message": "yes, we can still use jira.opendaylight.org",
+      "revId": "ee922708ff53759fe978fe6cc03c1b8f56fc077d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ed2db6a_957c3891",
+        "filename": "tests/libraries/utils.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-02T12:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d4aac296_8fb4bef3",
       "revId": "ee922708ff53759fe978fe6cc03c1b8f56fc077d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
