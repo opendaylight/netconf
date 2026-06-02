@@ -16,6 +16,24 @@
       "message": "Apidocs -\u003e RESTCONF OpenAPI",
       "revId": "720bbbf850598d725a293a30bce611170e59ab9a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c09e3d7_febc93cb",
+        "filename": "tests/suites/Apidocs/test_apidocs.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-02T12:56:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2473b466_3eb0b344",
+      "revId": "720bbbf850598d725a293a30bce611170e59ab9a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
