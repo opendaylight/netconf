@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e3f9eca_c9fc4783",
+        "filename": "tests/conftest.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-02T12:56:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d34af3d_7a7f18de",
+      "revId": "3ef022ada61f616d9d64ab2f1900cea1e470db4d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6e5c353c_37691021",
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "35a8ded3_cb3c045b",
+        "filename": "tests/requirements.txt",
+        "patchSetId": 23
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-02T12:56:46Z",
+      "side": 1,
+      "message": "yes, it is needed by ssreceiver which is used in these tests (for catching notifications). https://github.com/opendaylight/netconf/blob/master/tests/tools/wstools/ssereceiver.py#L8",
+      "parentUuid": "6e5c353c_37691021",
+      "revId": "3ef022ada61f616d9d64ab2f1900cea1e470db4d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2dafa695_4a21527d",
         "filename": "tests/suites/notifications/test_notifications.py",
         "patchSetId": 23
@@ -48,6 +84,24 @@
       "writtenOn": "2026-06-02T07:53:17Z",
       "side": 1,
       "message": "IMO we have up to date docs at docs.opendaylight",
+      "revId": "3ef022ada61f616d9d64ab2f1900cea1e470db4d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a7c2405_b4a7fbe2",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-02T12:56:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2dafa695_4a21527d",
       "revId": "3ef022ada61f616d9d64ab2f1900cea1e470db4d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
