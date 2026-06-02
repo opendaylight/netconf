@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d34af3d_7a7f18de",
+        "filename": "tests/conftest.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-02T07:53:17Z",
+      "side": 1,
+      "message": "ssereceiver or play.py?",
+      "revId": "3ef022ada61f616d9d64ab2f1900cea1e470db4d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e5c353c_37691021",
+        "filename": "tests/requirements.txt",
+        "patchSetId": 23
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-02T07:53:17Z",
+      "side": 1,
+      "message": "why those? are there used in ODL ever before?",
+      "revId": "3ef022ada61f616d9d64ab2f1900cea1e470db4d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2dafa695_4a21527d",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-02T07:53:17Z",
+      "side": 1,
+      "message": "IMO we have up to date docs at docs.opendaylight",
+      "revId": "3ef022ada61f616d9d64ab2f1900cea1e470db4d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
