@@ -16,6 +16,24 @@
       "message": "I would use the same format as in the other examples  without `[]`, just do not confuse the user",
       "revId": "dd9f4bddbc7d30e92f47e0d052ec6a66c3979123",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "755d4076_77544a01",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 2649,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-02T05:51:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc4d2117_b989f975",
+      "revId": "dd9f4bddbc7d30e92f47e0d052ec6a66c3979123",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
