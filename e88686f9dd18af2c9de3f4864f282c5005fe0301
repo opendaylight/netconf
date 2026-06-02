@@ -22,6 +22,30 @@
       },
       "revId": "e88686f9dd18af2c9de3f4864f282c5005fe0301",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9fc6adb_923e8b61",
+        "filename": "usecase/karaf-static/src/main/assembly/etc/org.ops4j.pax.web.cfg",
+        "patchSetId": 3
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-06-02T11:11:02Z",
+      "side": 1,
+      "message": "We will scope this change only to the 12.0.0 Manganese distribution, where the intent is to make Netty RESTCONF available on 8181 while keeping the legacy JAX-RS/Pax Web stack out of the way for that release. This will be treated as a Manganese-specific distribution decision, not a general RESTCONF/JAX-RS port change.",
+      "parentUuid": "57c1bcfe_39bea298",
+      "range": {
+        "startLine": 3,
+        "startChar": 29,
+        "endLine": 3,
+        "endChar": 33
+      },
+      "revId": "e88686f9dd18af2c9de3f4864f282c5005fe0301",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
