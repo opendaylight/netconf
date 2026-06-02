@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e33ea9e9_ed79eec2",
+        "filename": "tests/variables/netconf/CRUD/schemas/car@2014-08-18.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-02T12:58:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5268bd9d_362f81d6",
+      "revId": "20375e52b892cf562a96f009c4fc8b64b94ae5c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c4098c71_1090e84f",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-02T07:49:20Z",
       "side": 1,
       "message": "really so big indent?",
+      "revId": "20375e52b892cf562a96f009c4fc8b64b94ae5c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40856b4d_ab9a3fac",
+        "filename": "tests/variables/netconf/CRUD/schemas/car@2014-08-18.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-02T12:58:06Z",
+      "side": 1,
+      "message": "it was like this in the original file https://github.com/opendaylight/controller/blob/452c65b8e4da465c49d65dd05e5537045adf4b1c/opendaylight/md-sal/samples/clustering-test-app/model/src/main/yang/car.yang#L116 But made it alligned with the previous line description.",
+      "parentUuid": "c4098c71_1090e84f",
       "revId": "20375e52b892cf562a96f009c4fc8b64b94ae5c1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
