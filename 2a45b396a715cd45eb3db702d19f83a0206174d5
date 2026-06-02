@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a53aadcd_a96fa02c",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 2652,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-02T08:09:33Z",
+      "side": 1,
+      "message": "can we format this long key?",
+      "revId": "2a45b396a715cd45eb3db702d19f83a0206174d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3bfaf07_741b1ea6",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 2657,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-02T08:09:33Z",
+      "side": 1,
+      "message": "I would expect that device is calling home again after some time and since the key is allowed its going to be connected..",
+      "revId": "2a45b396a715cd45eb3db702d19f83a0206174d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
