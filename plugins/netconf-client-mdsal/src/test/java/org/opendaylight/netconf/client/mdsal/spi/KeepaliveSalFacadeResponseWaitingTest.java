@@ -22,6 +22,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -83,8 +84,8 @@ class KeepaliveSalFacadeResponseWaitingTest {
      * Scheduling another keepalive task after successful keepalive rpc.
      */
     @Test
-    void testKeepalive() throws InterruptedException {
-        final var future = SettableFuture.create();
+    void testKeepalive() {
+        final var future = SettableFuture.<DefaultDOMRpcResult>create();
         future.set(new DefaultDOMRpcResult(node));
         doReturn(future).when(deviceRpc).invokeNetconf(GetConfig.QNAME,
             KeepaliveSalFacade.KeepaliveTask.KEEPALIVE_PAYLOAD);
@@ -130,7 +131,7 @@ class KeepaliveSalFacadeResponseWaitingTest {
         TimeUnit.MILLISECONDS.sleep(1500);
         getSettableFuture.set(new DefaultDOMRpcResult());
 
-        // Check if no keepalive is not called and there are 2 more tasks created
+        // Check that keepalive is not called and there are 2 more tasks created
         // (rescheduled tasks, because keepalive delay was not reached)
         verify(deviceRpc, after(1500).never()).invokeNetconf(GetConfig.QNAME,
             KeepaliveSalFacade.KeepaliveTask.KEEPALIVE_PAYLOAD);
@@ -149,7 +150,7 @@ class KeepaliveSalFacadeResponseWaitingTest {
      * during RPC processing.
      */
     @Test
-    void testRpcLongerThanKeepalive() throws InterruptedException {
+    void testRpcLongerThanKeepalive() {
         final var getSettableFuture = SettableFuture.create();
         doReturn(getSettableFuture).when(deviceDomRpc).invokeRpc(Get.QNAME, null);
         final var keepaliveFuture = SettableFuture.create();
@@ -182,7 +183,7 @@ class KeepaliveSalFacadeResponseWaitingTest {
      * Keepalive is blocked until all parallel RPCs have completed.
      */
     @Test
-    void testParallelRpcsBlockKeepaliveUntilAllFinish() throws InterruptedException {
+    void testParallelRpcsBlockKeepaliveUntilAllFinish() {
         final var firstGetFuture = SettableFuture.create();
         final var secondGetFuture = SettableFuture.create();
         doReturn(firstGetFuture, secondGetFuture).when(deviceDomRpc).invokeRpc(Get.QNAME, null);
@@ -263,11 +264,8 @@ class KeepaliveSalFacadeResponseWaitingTest {
             KeepaliveSalFacade.KeepaliveTask.KEEPALIVE_PAYLOAD);
     }
 
-    private void assertKeepaliveTaskState(final int minTaskCount) throws InterruptedException {
-        final var deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(1);
-        while (!hasKeepaliveTaskState(minTaskCount) && System.nanoTime() < deadline) {
-            TimeUnit.MILLISECONDS.sleep(10);
-        }
+    private void assertKeepaliveTaskState(final int minTaskCount) {
+        Awaitility.await().atMost(1, TimeUnit.SECONDS).until(() -> hasKeepaliveTaskState(minTaskCount));
 
         final var size = timer.keepaliveTasks.size();
         Assertions.assertTrue(size >= minTaskCount,
