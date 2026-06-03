@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc1cf29a_b728f9e9",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/NegotiatedAlgorithms.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-06-03T09:52:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b7fddaf5_49c17b09",
+      "range": {
+        "startLine": 12,
+        "startChar": 24,
+        "endLine": 12,
+        "endChar": 50
+      },
+      "revId": "50faa13a18f81a744afd3c485318dfb1db9231ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1335ffda_e0e525a6",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-02T10:25:51Z",
       "side": 1,
       "message": "I really do not like this \u0027oh it can be nullable and there is a magic IF somewhere\u0027...",
+      "range": {
+        "startLine": 43,
+        "startChar": 19,
+        "endLine": 43,
+        "endChar": 27
+      },
+      "revId": "50faa13a18f81a744afd3c485318dfb1db9231ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9e0c60b_8f1be765",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClient.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-06-03T09:52:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1335ffda_e0e525a6",
       "range": {
         "startLine": 43,
         "startChar": 19,
