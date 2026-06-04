@@ -69,6 +69,24 @@
       "parentUuid": "c4098c71_1090e84f",
       "revId": "20375e52b892cf562a96f009c4fc8b64b94ae5c1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5ccf8ae_70503c78",
+        "filename": "tests/variables/netconf/CRUD/schemas/car@2014-08-18.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-04T10:11:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "40856b4d_ab9a3fac",
+      "revId": "20375e52b892cf562a96f009c4fc8b64b94ae5c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
