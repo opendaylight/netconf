@@ -71,6 +71,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2eeda87f_48f722d7",
+        "filename": "tests/requirements.txt",
+        "patchSetId": 23
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-04T10:11:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35a8ded3_cb3c045b",
+      "revId": "3ef022ada61f616d9d64ab2f1900cea1e470db4d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2dafa695_4a21527d",
