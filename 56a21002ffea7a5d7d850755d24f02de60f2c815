@@ -22,6 +22,30 @@
       },
       "revId": "56a21002ffea7a5d7d850755d24f02de60f2c815",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ade15e9b_149481b3",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeSshServerAlgorithmTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-04T14:09:07Z",
+      "side": 1,
+      "message": "not resolved (sorry, I published comment as resolved)",
+      "parentUuid": "8e4a1a9e_90089efd",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 5
+      },
+      "revId": "56a21002ffea7a5d7d850755d24f02de60f2c815",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
