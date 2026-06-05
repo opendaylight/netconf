@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "008e3c5a_3c9f8433",
+        "filename": "protocol/netconf-common/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-06-05T13:42:52Z",
+      "side": 1,
+      "message": "alpha-sort, always",
+      "range": {
+        "startLine": 68,
+        "startChar": 21,
+        "endLine": 68,
+        "endChar": 47
+      },
+      "revId": "76a876f1a5c0ffd3a4d596899dac8a151e227808",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
