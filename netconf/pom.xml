@@ -29,7 +29,6 @@
   </properties>
 
   <modules>
-    <module>netconf-netty-util</module>
     <module>netconf-auth</module>
   </modules>
 </project>
