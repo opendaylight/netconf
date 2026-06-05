@@ -8,18 +8,26 @@
 module org.opendaylight.netconf.common {
     exports org.opendaylight.netconf.common;
     exports org.opendaylight.netconf.common.di;
+    exports org.opendaylight.netconf.common.handler.exi;
+    exports org.opendaylight.netconf.common.handler;
 
     requires transitive io.netty.common;
+    requires transitive org.opendaylight.netconf.api;
     requires transitive org.opendaylight.yangtools.yang.common;
     requires transitive org.opendaylight.yangtools.yang.model.api;
-    requires transitive org.opendaylight.netconf.api;
     requires com.google.common;
+    requires io.netty.handler;
+    requires org.opendaylight.netconf.codec;
+    requires org.opendaylight.odlparent.logging.markers;
+    requires org.opendaylight.yangtools.util;
     requires org.slf4j;
+    requires shaded.exificient;
 
     // Annotation-only dependencies
     requires static transitive java.annotation;
     requires static transitive javax.inject;
     requires static transitive org.eclipse.jdt.annotation;
+    requires static com.github.spotbugs.annotations;
     requires static org.osgi.annotation.bundle;
     requires static org.osgi.service.component.annotations;
     requires static org.osgi.service.metatype.annotations;

@@ -27,7 +27,7 @@ import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageWriter;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.codec.XMLMessageWriter;
-import org.opendaylight.netconf.nettyutil.AbstractNetconfExiSession;
+import org.opendaylight.netconf.common.AbstractNetconfExiSession;
 import org.opendaylight.netconf.server.api.monitoring.JavaCommonCounters;
 import org.opendaylight.netconf.server.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.server.spi.MutableCommonCounters;
