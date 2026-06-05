@@ -13,7 +13,7 @@ import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.codec.MessageDecoder;
-import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
+import org.opendaylight.netconf.common.AbstractChannelInitializer;
 
 public final class ClientChannelInitializer extends AbstractChannelInitializer<NetconfClientSession> {
     private final NetconfClientSessionNegotiatorFactory negotiatorFactory;
