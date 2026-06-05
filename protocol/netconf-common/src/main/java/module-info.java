@@ -15,6 +15,7 @@ module org.opendaylight.netconf.common {
     requires transitive org.opendaylight.netconf.api;
     requires com.google.common;
     requires org.slf4j;
+    requires shaded.exificient;
 
     // Annotation-only dependencies
     requires static transitive java.annotation;
@@ -23,4 +24,9 @@ module org.opendaylight.netconf.common {
     requires static org.osgi.annotation.bundle;
     requires static org.osgi.service.component.annotations;
     requires static org.osgi.service.metatype.annotations;
+    requires org.opendaylight.netconf.codec;
+    requires io.netty.handler;
+    requires org.opendaylight.odlparent.logging.markers;
+    requires org.opendaylight.yangtools.util;
+    requires com.github.spotbugs.annotations;
 }
