@@ -13,7 +13,7 @@ import java.util.List;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
-import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
+import org.opendaylight.netconf.common.NetconfSessionNegotiator;
 import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
 import org.opendaylight.netconf.transport.tls.SslHandlerFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
