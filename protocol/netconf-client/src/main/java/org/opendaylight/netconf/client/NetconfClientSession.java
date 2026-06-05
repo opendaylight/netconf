@@ -15,7 +15,7 @@ import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageWriter;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.codec.XMLMessageWriter;
-import org.opendaylight.netconf.nettyutil.AbstractNetconfExiSession;
+import org.opendaylight.netconf.common.AbstractNetconfExiSession;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
