@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
-import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
+import org.opendaylight.netconf.common.AbstractChannelInitializer;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.slf4j.Logger;
