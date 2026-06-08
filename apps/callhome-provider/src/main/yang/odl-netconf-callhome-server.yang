@@ -1,7 +1,15 @@
 module odl-netconf-callhome-server {
+  yang-version 1.1;
 
   namespace "urn:opendaylight:params:xml:ns:yang:netconf-callhome-server";
   prefix "callhome";
+
+  import ietf-netconf-client {
+    prefix ncc;
+    reference
+      "draft-ietf-netconf-netconf-client-server: A YANG Data Model for
+       NETCONF Clients and Servers (ietf-netconf-client revision 2025-12-04)";
+  }
 
   organization
    "OpenDaylight Project";
@@ -11,6 +19,22 @@ module odl-netconf-callhome-server {
 
   description
    "This module defines the northbound interface for OpenDaylight NETCONF Callhome.";
+
+  revision 2026-06-05 {
+    description
+      "Begins the migration towards the standard IETF 'ietf-netconf-client'
+       model (draft-ietf-netconf-netconf-client-server, work in progress;
+       ietf-netconf-client revision 2025-12-04): adds 'global/endpoints',
+       which reuses the IETF
+       'netconf-client-listen-stack-grouping' to describe the local listening
+       transport (NETCONF over SSH/TLS Call Home) and the client identity
+       OpenDaylight presents to calling devices.
+       The OpenDaylight-specific allow-list, inline host-keys, credentials,
+       mount-point-naming-strategy and operational device-status are retained
+       as-is, because the IETF model cannot express them.";
+    reference
+     "RFC 8071: NETCONF Call Home and RESTCONF Call Home";
+  }
 
   revision 2024-01-29 {
     description
@@ -80,6 +104,26 @@ module odl-netconf-callhome-server {
         }
         default IP_PORT;
         description "Mount name will be chosen as per this strategy in the absence of per device settings. Default is IP_PORT";
+      }
+
+      container endpoints {
+        description
+          "Listening endpoints OpenDaylight opens to accept incoming Call Home
+           connections. Reuses the IETF 'netconf-client-listen-stack-grouping'
+           (RFC HHHH / RFC 8071), which provides the TCP server parameters
+           (default ports 4334 for SSH and 4335 for TLS), the SSH/TLS client
+           identity OpenDaylight presents, and is gated by the IETF
+           'ssh-listen'/'tls-listen' features.";
+        list endpoint {
+          key "name";
+          description
+            "A listening endpoint for incoming Call Home connections.";
+          leaf name {
+            type string;
+            description "An arbitrary name for the listening endpoint.";
+          }
+          uses ncc:netconf-client-listen-stack-grouping;
+        }
       }
     }
 
