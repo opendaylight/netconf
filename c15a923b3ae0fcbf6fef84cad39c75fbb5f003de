@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e99675d_6b14b008",
+        "filename": "tests/libraries/infra.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-06-08T06:49:22Z",
+      "side": 1,
+      "message": "Missing content arg.",
+      "revId": "c15a923b3ae0fcbf6fef84cad39c75fbb5f003de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c99f6dfa_85270e38",
+        "filename": "tests/libraries/variables.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-06-08T06:49:22Z",
+      "side": 1,
+      "message": "Seems like duplicate name with constant above.",
+      "revId": "c15a923b3ae0fcbf6fef84cad39c75fbb5f003de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
