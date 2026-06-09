@@ -85,38 +85,14 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.ietf.model</groupId>
-            <artifactId>rfc8072</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.infrautils</groupId>
             <artifactId>inject.guice</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>mdsal-binding-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal</groupId>
             <artifactId>mdsal-binding-dom-adapter</artifactId>
             <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>mdsal-binding-test-utils</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>mdsal-common-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>mdsal-dom-api</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
@@ -130,27 +106,12 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-client-mdsal</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-dom-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-mdsal-spi</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-server-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -161,77 +122,6 @@
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-server-mdsal</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>sal-remote-impl</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf.model</groupId>
-            <artifactId>sal-remote</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf.model</groupId>
-            <artifactId>test-models</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>binding-generator</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>binding-runtime-spi</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-data-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-data-spi</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-data-tree-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-data-util</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-model-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-model-util</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>util</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-test-util</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.skyscreamer</groupId>
-            <artifactId>jsonassert</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.xmlunit</groupId>
-            <artifactId>xmlunit-assertj</artifactId>
         </dependency>
     </dependencies>
 
