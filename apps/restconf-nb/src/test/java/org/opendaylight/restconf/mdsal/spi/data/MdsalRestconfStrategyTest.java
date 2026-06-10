@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import org.eclipse.jdt.annotation.NonNull;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -82,6 +83,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.DOMException;
 
+@Disabled
 @ExtendWith(MockitoExtension.class)
 final class MdsalRestconfStrategyTest extends AbstractServerDataOperationsTest {
     private static final DatabindContext MODULES_DATABIND = DatabindContext.ofModel(

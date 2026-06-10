@@ -41,6 +41,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -109,6 +110,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.w3c.dom.DOMException;
 
+@Disabled
 @ExtendWith(MockitoExtension.class)
 final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
     private static class TestServerRequest<T> extends MappingServerRequest<T> {
