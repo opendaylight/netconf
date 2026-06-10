@@ -218,6 +218,19 @@ def log_message_to_karaf(message: str):
     execute_karaf_command(f"log:log 'ROBOT MESSAGE: {message}'")
 
 
+def is_karaf_feature_installed(feature_name: str) -> bool:
+    """Check if the given feature is found in the output of 'feature:list -i'.
+
+    Args:
+        feature_name (str): Exact name of the Karaf feature to look up.
+
+    Returns:
+        bool: True if the feature is installed, False otherwise.
+    """
+    output, _ = execute_karaf_command(f"feature:list -i | grep {feature_name}")
+    return any(line.split(" ")[0] == feature_name for line in output.splitlines())
+
+
 def is_process_still_running(pid: int):
     """Check if provided process did not finish yet.
 
