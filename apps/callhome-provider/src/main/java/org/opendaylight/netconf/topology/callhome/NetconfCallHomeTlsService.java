@@ -12,6 +12,7 @@ import java.net.UnknownHostException;
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.osgi.service.component.annotations.Activate;
@@ -30,18 +31,23 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
 
     @Activate
     @Inject
-    public NetconfCallHomeTlsService(
-            @Reference final NetconfTimer timer,
-            @Reference final CallHomeMountService mountService,
-            @Reference final CallHomeTlsAuthProvider authProvider,
-            @Reference final CallHomeStatusRecorder statusRecorder,
+    public NetconfCallHomeTlsService(@Reference final NetconfTimer timer,
+            @Reference final CallHomeMountService mountService, @Reference final CallHomeTlsAuthProvider authProvider,
+            @Reference final CallHomeStatusRecorder statusRecorder, @Reference final DataBroker dataBroker,
             final CallHomeMountService.Configuration configuration) {
 
-        LOG.info("Starting Call-Home TLS server at {}:{}", configuration.host(), configuration.tls$_$port());
         try {
+            // Prefer the bind configuration from the standard IETF listen endpoints (if present in the
+            // datastore at activation time), otherwise fall back to the static OSGi configuration.
+            final var bind = CallHomeListenEndpoints.readTlsBind(dataBroker);
+            final var bindAddress = bind == null ? null : bind.getAddress();
+            final var address = bindAddress != null ? bindAddress : InetAddress.getByName(configuration.host());
+            final var port = bind != null ? bind.getPort() : configuration.tls$_$port();
+
+            LOG.info("Starting Call-Home TLS server at {}:{}", address, port);
             server = CallHomeTlsServer.builder()
-                .withAddress(InetAddress.getByName(configuration.host()))
-                .withPort(configuration.tls$_$port())
+                .withAddress(address)
+                .withPort(port)
                 .withTimeout(configuration.connection$_$timeout$_$millis())
                 .withMaxConnections(configuration.max$_$connections())
                 .withAuthProvider(authProvider)

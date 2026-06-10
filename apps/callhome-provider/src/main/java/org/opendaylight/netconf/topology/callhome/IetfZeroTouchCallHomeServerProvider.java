@@ -12,6 +12,7 @@ import java.net.UnknownHostException;
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.osgi.service.component.annotations.Activate;
@@ -34,14 +35,21 @@ public final class IetfZeroTouchCallHomeServerProvider implements AutoCloseable 
             @Reference final CallHomeMountService mountService,
             @Reference final CallHomeSshAuthProvider authProvider,
             @Reference final CallHomeStatusRecorder statusRecorder,
+            @Reference final DataBroker dataBroker,
             final CallHomeMountService.Configuration configuration) {
 
-        LOG.info("Starting Call-Home SSH server at {}:{}", configuration.host(), configuration.ssh$_$port());
-
         try {
+            // Prefer the bind configuration from the standard IETF listen endpoints (if present in the
+            // datastore at activation time), otherwise fall back to the static OSGi configuration.
+            final var bind = CallHomeListenEndpoints.readSshBind(dataBroker);
+            final var address = bind != null && bind.getAddress() != null ? bind.getAddress()
+                : InetAddress.getByName(configuration.host());
+            final var port = bind != null ? bind.getPort() : configuration.ssh$_$port();
+
+            LOG.info("Starting Call-Home SSH server at {}:{}", address, port);
             server = CallHomeSshServer.builder()
-                .withAddress(InetAddress.getByName(configuration.host()))
-                .withPort(configuration.ssh$_$port())
+                .withAddress(address)
+                .withPort(port)
                 .withAuthProvider(authProvider)
                 .withStatusRecorder(statusRecorder)
                 .withTimeout(configuration.connection$_$timeout$_$millis())
