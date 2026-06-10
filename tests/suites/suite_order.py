@@ -16,6 +16,7 @@ class SuiteOrder(IntEnum):
     Add new entries at the desired position in the sequence.
     """
 
+    NETCONF_READY = auto()
     NORTHBOUND = auto()
     CALLHOME = auto()
     NOTIFICATIONS = auto()
