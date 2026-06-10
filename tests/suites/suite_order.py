@@ -16,11 +16,12 @@ class SuiteOrder(IntEnum):
     Update this file when adding a new suite or changing the run sequence.
     """
 
-    NORTHBOUND = 1
-    CALLHOME = 2
-    NOTIFICATIONS = 3
-    KEY_AUTH = 4
-    CRUD = 5
-    CRUD_ACTION = 6
-    APIDOCS = 7
-    RESTPERFCLIENT_MDSAL = 8
+    NETCONF_READY = 1
+    NORTHBOUND = 2
+    CALLHOME = 3
+    NOTIFICATIONS = 4
+    KEY_AUTH = 5
+    CRUD = 6
+    CRUD_ACTION = 7
+    APIDOCS = 8
+    RESTPERFCLIENT_MDSAL = 9
