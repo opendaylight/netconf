@@ -53,7 +53,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    protected RestconfTransaction prepareWriteExecution() {
+    public RestconfTransaction prepareWriteExecution() {
         return new MdsalRestconfTransaction(databind, dataBroker);
     }
 

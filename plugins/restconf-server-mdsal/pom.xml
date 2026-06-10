@@ -131,14 +131,15 @@
             <artifactId>yang-model-api</artifactId>
         </dependency>
 
-        <!-- test dependecies -->
+        <!-- test dependencies -->
         <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-test-util</artifactId>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc6241</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-server-api-testlib</artifactId>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc8072</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
@@ -146,12 +147,34 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>netconf-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>netconf-client-mdsal</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-server-api-testlib</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-data-util</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-model-util</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-data-util</artifactId>
+            <artifactId>yang-test-util</artifactId>
         </dependency>
     </dependencies>
 
@@ -161,6 +184,8 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <configuration>
                     <ignoredNonTestScopedDependencies>
+                        <ignoredNonTestScopedDependency>org.opendaylight.ietf.model:rfc8072</ignoredNonTestScopedDependency>
+                        <ignoredNonTestScopedDependency>org.opendaylight.yangtools:util</ignoredNonTestScopedDependency>
                         <ignoredNonTestScopedDependency>org.opendaylight.yangtools:yang-model-util</ignoredNonTestScopedDependency>
                         <ignoredNonTestScopedDependency>org.opendaylight.yangtools:yang-data-util</ignoredNonTestScopedDependency>
                     </ignoredNonTestScopedDependencies>

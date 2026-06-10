@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.mdsal.spi.data;
+package org.opendaylight.restconf.server.mdsal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -31,7 +31,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import org.eclipse.jdt.annotation.NonNull;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -52,12 +51,11 @@ import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.mdsal.spi.DOMServerRpcOperations;
 import org.opendaylight.restconf.mdsal.spi.DOMServerStrategy;
+import org.opendaylight.restconf.mdsal.spi.data.MdsalRestconfStrategy;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
-import org.opendaylight.restconf.server.mdsal.MdsalMountPointResolver;
-import org.opendaylight.restconf.server.mdsal.MdsalServerStrategy;
 import org.opendaylight.restconf.server.spi.CompositeServerStrategy;
 import org.opendaylight.restconf.server.spi.ExportingServerModulesOperations;
 import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
@@ -83,7 +81,6 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.DOMException;
 
-@Disabled
 @ExtendWith(MockitoExtension.class)
 final class MdsalRestconfStrategyTest extends AbstractServerDataOperationsTest {
     private static final DatabindContext MODULES_DATABIND = DatabindContext.ofModel(

@@ -552,7 +552,7 @@ public abstract class RestconfStrategy extends AbstractServerDataOperations {
      * @param path         the path to read
      * @param defaultsMode value of with-defaults parameter
      */
-    protected final void readData(final @NonNull ServerRequest<Optional<NormalizedNode>> getRequest,
+    public final void readData(final @NonNull ServerRequest<Optional<NormalizedNode>> getRequest,
             final @NonNull ContentParam content, final Data path, final WithDefaultsParam defaultsMode) {
         final var processor = new AsyncGetDataProcessor(path, defaultsMode);
         final var instance = path.instance();
