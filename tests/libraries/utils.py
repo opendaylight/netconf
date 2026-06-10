@@ -117,8 +117,8 @@ def report_known_bug_on_failure(bug_id: str):
     try:
         yield
     except AssertionError as e:
-        url = f"https://jira.opendaylight.org/browse/{bug_id}"
-        allure.dynamic.link(url, name=f"Related Bug {bug_id}")
+        url = f"https://lf-opendaylight.atlassian.net/issues/?jql=%22External%20issue%20ID%22~%22{bug_id}%22"
+        allure.dynamic.issue(url, name=f"This test fails due to {bug_id}")
         error_msg = (
             f"\nThis test failed due to a previously reported bug: {url}\n"
             f"Original error: {str(e)}"
@@ -379,7 +379,7 @@ def wait_until_function_returns_value_with_custom_value_validator(
     last_exception = None
     logger_buffer = None
 
-    for retry_num in range(retry_count):
+    for retry_num in range(1, retry_count+1):
         try:
             with deferred_logging() as logger_buffer:
                 result = function(*args, **kwargs)
@@ -405,5 +405,6 @@ def wait_until_function_returns_value_with_custom_value_validator(
         raise AssertionError(
             f"Failed to execute "
             f"{function.__name__}({','.join([str(arg) for arg in args])} "
-            f"{kwargs or ''}) after {retry_count} attempts."
+            f"{kwargs or ''}) after {retry_count} attempts.\n"
+            f"Last encountered error: {str(last_exception)}"
         ) from last_exception
