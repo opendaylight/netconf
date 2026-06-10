@@ -1,0 +1,10 @@
+module netconf1268 {
+  namespace "netconf:1268";
+  prefix "netconf1268";
+
+  container foo {
+    leaf bar {
+      type binary;
+    }
+  }
+}
