@@ -23,6 +23,7 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -64,6 +65,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.protocol.specification.SshCaseBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.protocol.specification.ssh._case.SshTransportParameters;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.protocol.specification.ssh._case.SshTransportParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.LoginPwUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.NetconfNodeAugmentBuilder;
@@ -225,6 +227,7 @@ public final class CallHomeMountService implements AutoCloseable {
     private final CallHomeTopology topology;
     private final Configuration config;
     private final Registration allowedDevicesReg;
+    private final SshTransportParameters sshTransportParameters;
 
     @Activate
     @Inject
@@ -246,6 +249,7 @@ public final class CallHomeMountService implements AutoCloseable {
             final DOMMountPointService mountService, final DeviceActionFactory deviceActionFactory,
             final Configuration config) {
         this.config = config;
+        sshTransportParameters = buildSshTransportParameters(dataBroker, config);
         allowedDevicesReg = dataBroker.registerTreeChangeListener(LogicalDatastoreType.CONFIGURATION, DEVICE_IDENTIFIER,
             this::onAllowedDevicesChanged);
         final var clientConfBuilderFactory = createClientConfigurationBuilderFactory();
@@ -259,6 +263,7 @@ public final class CallHomeMountService implements AutoCloseable {
     CallHomeMountService(final CallHomeTopology topology, final Configuration config) {
         this.topology = topology;
         this.config = config;
+        sshTransportParameters = buildSshTransportParameters(null, config);
         allowedDevicesReg = () -> {
             // do nothing
         };
@@ -335,12 +340,7 @@ public final class CallHomeMountService implements AutoCloseable {
                     final NegotiatedSshAlg sshAlg) {
                 final var remoteAddr = clientSession.getRemoteAddress();
                 topology.enableNode(asNode(id, remoteAddr, new ProtocolBuilder().setName(Protocol.Name.SSH)
-                    .setSpecification(new SshCaseBuilder().setSshTransportParameters(new SshTransportParametersBuilder()
-                        .setEncryption(parseEncryption(config.encryption()))
-                        .setHostKey(parseHostKey(config.host$_$keys()))
-                        .setKeyExchange(parseKeyExchange(config.key$_$exchange()))
-                        .setMac(parseMac(config.macs()))
-                        .build()).build())
+                    .setSpecification(new SshCaseBuilder().setSshTransportParameters(sshTransportParameters).build())
                     .build()), sshAlg);
                 final var netconfLayer = netconfLayerMapping.remove(id);
                 return netconfLayer == null ? null : new CallHomeSshSessionContext(id, remoteAddr, clientSession,
@@ -395,6 +395,27 @@ public final class CallHomeMountService implements AutoCloseable {
 
     private record NetconfLayer(String id, NetconfClientSessionListener sessionListener,
         SettableFuture<NetconfClientSession> netconfSessionFuture) {
+    }
+
+    private static @NonNull SshTransportParameters buildSshTransportParameters(final @Nullable DataBroker dataBroker,
+            final Configuration config) {
+        // Prefer the SSH algorithm lists from the standard IETF listen endpoint (if present in the datastore at
+        // activation time), otherwise fall back to the static OSGi configuration.
+        final var ietfParams = dataBroker == null ? null : CallHomeListenEndpoints.readSshTransportParams(dataBroker);
+        if (ietfParams != null) {
+            return new SshTransportParametersBuilder()
+                .setEncryption(ietfParams.getEncryption())
+                .setHostKey(ietfParams.getHostKey())
+                .setKeyExchange(ietfParams.getKeyExchange())
+                .setMac(ietfParams.getMac())
+                .build();
+        }
+        return new SshTransportParametersBuilder()
+            .setEncryption(parseEncryption(config.encryption()))
+            .setHostKey(parseHostKey(config.host$_$keys()))
+            .setKeyExchange(parseKeyExchange(config.key$_$exchange()))
+            .setMac(parseMac(config.macs()))
+            .build();
     }
 
     private static @NonNull KeyExchange parseKeyExchange(final String keyExchange) {
