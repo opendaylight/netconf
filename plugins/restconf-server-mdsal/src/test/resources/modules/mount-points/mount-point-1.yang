@@ -1,0 +1,11 @@
+module mount-point-1 {
+    namespace "mount:point:1";
+    prefix "point1";
+    revision "2016-01-01";
+
+    container cont {
+    }
+
+    list listA {
+    }
+}
