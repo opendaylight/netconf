@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.databind;
+package org.opendaylight.restconf.server.spi;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ class YangErrorsBodyTest extends AbstractJukeboxTest {
         QNameModule.ofRevision("instance:identifier:patch:module", "2015-11-21");
     private static final DatabindContext DATABIND = DatabindContext.ofModel(
         YangParserTestUtils.parseYangResources(YangErrorsBodyTest.class,
-            "/restconf/impl/ietf-restconf@2017-01-26.yang",
+            "/ietf-restconf/ietf-restconf@2017-01-26.yang",
             "/instance-identifier/instance-identifier-patch-module.yang"));
 
     @Test
