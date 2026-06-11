@@ -13,8 +13,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.collect.Lists;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -91,7 +91,9 @@ class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
 
     private static NetconfSessionPreferences getSessionCaps(final boolean addMonitor,
                                                             final Collection<String> additionalCapabilities) {
-        final var capabilities = Lists.newArrayList(CapabilityURN.BASE, CapabilityURN.BASE_1_1);
+        final var capabilities = new ArrayList<String>();
+        capabilities.add(CapabilityURN.BASE);
+        capabilities.add(CapabilityURN.BASE_1_1);
         if (addMonitor) {
             capabilities.add(NetconfState.QNAME.getNamespace().toString());
         }
