@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.databind;
+package org.opendaylight.restconf.server.mdsal;
 
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,8 +26,6 @@ import org.opendaylight.restconf.mdsal.spi.data.MdsalRestconfStrategy;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.PatchContext;
 import org.opendaylight.restconf.server.api.testlib.AbstractInstanceIdentifierTest;
-import org.opendaylight.restconf.server.mdsal.MdsalMountPointResolver;
-import org.opendaylight.restconf.server.mdsal.MdsalServerStrategy;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.restconf.server.spi.DefaultResourceContext;
 import org.opendaylight.restconf.server.spi.NotSupportedServerActionOperations;
