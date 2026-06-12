@@ -6,7 +6,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.mdsal.spi.data;
+package org.opendaylight.restconf.server.spi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -15,14 +15,13 @@ import java.util.Set;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.restconf.api.query.FieldsParam;
-import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
 import org.opendaylight.yangtools.databind.RequestException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
- * Unit test for {@link MdsalFieldsParam}.
+ * Unit test for {@link NormalizedNodeWriter}.
  */
 @ExtendWith(MockitoExtension.class)
 class MdsalFieldsParamTest extends AbstractFieldsTranslatorTest<Set<QName>> {
