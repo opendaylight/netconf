@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.mdsal.spi.data;
+package org.opendaylight.restconf.server.spi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTest {
+public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTest {
     private static final QNameModule Q_NAME_MODULE_TEST_SERVICES =
         QNameModule.ofRevision("tests:test-services", "2019-03-25");
     private static final QNameModule Q_NAME_MODULE_AUGMENTED_JUKEBOX =
@@ -36,9 +36,11 @@ abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTest {
     private static final QNameModule Q_NAME_MODULE_FOO = QNameModule.ofRevision("urn:foo", "2023-03-27");
 
     private static final EffectiveModelContext TEST_SERVICES_SCHEMA =
-        YangParserTestUtils.parseYangResourceDirectory("/test-services");
+        YangParserTestUtils.parseYangResources(AbstractFieldsTranslatorTest.class,
+            "/test-services/test-services@2019-03-25.yang");
     private static final EffectiveModelContext FOO_SCHEMA =
-        YangParserTestUtils.parseYangResourceDirectory("/same-qname-nodes");
+        YangParserTestUtils.parseYangResources(AbstractFieldsTranslatorTest.class,
+            "/same-qname-nodes/foo.yang");
 
     private DataSchemaContext jukeboxSchemaNode;
     private DataSchemaContext testServices;
