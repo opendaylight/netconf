@@ -13,6 +13,7 @@ import allure
 import pytest
 
 from libraries import infra
+from suites.suite_order import SuiteOrder
 from libraries import NetconfCallHome
 from libraries import restconf_utils
 from libraries import templated_requests
@@ -69,7 +70,7 @@ def test_teardown():
 @pytest.mark.usefixtures("preconditions")
 @pytest.mark.usefixtures("log_test_suite_start_end_to_karaf")
 @pytest.mark.usefixtures("log_test_case_start_end_to_karaf")
-@pytest.mark.run(order=2)
+@pytest.mark.run(order=SuiteOrder.CALLHOME)
 class TestCallHome:
 
     @allure.description(

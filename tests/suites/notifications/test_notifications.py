@@ -18,6 +18,7 @@ import allure
 import pytest
 
 from libraries import infra
+from suites.suite_order import SuiteOrder
 from libraries import restconf
 from libraries import templated_requests
 from libraries import utils
@@ -43,7 +44,7 @@ log = logging.getLogger(__name__)
 @pytest.mark.usefixtures("log_test_suite_start_end_to_karaf")
 @pytest.mark.usefixtures("log_test_case_start_end_to_karaf")
 @pytest.mark.usefixtures("teardown_kill_all_running_ssereceiver_processes")
-@pytest.mark.run(order=3)
+@pytest.mark.run(order=SuiteOrder.NOTIFICATIONS)
 class TestNotifications:
 
     def log_response(self, resp):

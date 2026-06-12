@@ -13,6 +13,7 @@ import allure
 import pytest
 
 from libraries import infra
+from suites.suite_order import SuiteOrder
 from libraries.NetconfSSH import NetconfSSH
 from libraries import utils
 from libraries.variables import variables
@@ -31,7 +32,7 @@ log = logging.getLogger(__name__)
 @pytest.mark.usefixtures("preconditions")
 @pytest.mark.usefixtures("log_test_suite_start_end_to_karaf")
 @pytest.mark.usefixtures("log_test_case_start_end_to_karaf")
-@pytest.mark.run(order=1)
+@pytest.mark.run(order=SuiteOrder.NORTHBOUND)
 class TestNorthbound:
 
     ssh_netconf_pid = None

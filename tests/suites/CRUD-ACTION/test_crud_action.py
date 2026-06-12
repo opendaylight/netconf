@@ -17,6 +17,7 @@ import allure
 import pytest
 
 from libraries import netconf
+from suites.suite_order import SuiteOrder
 from libraries import templated_requests
 from libraries import utils
 from libraries.variables import variables
@@ -39,7 +40,7 @@ log = logging.getLogger(__name__)
 @pytest.mark.usefixtures("preconditions")
 @pytest.mark.usefixtures("log_test_suite_start_end_to_karaf")
 @pytest.mark.usefixtures("log_test_case_start_end_to_karaf")
-@pytest.mark.run(order=6)
+@pytest.mark.run(order=SuiteOrder.CRUD_ACTION)
 class TestCrudAction:
 
     def get_config_data(self) -> str:
