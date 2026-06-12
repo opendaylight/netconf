@@ -20,6 +20,7 @@ from libraries import netconf
 from libraries import rest_perf_client
 from libraries import templated_requests
 from libraries.variables import variables
+from suites.suite_order import SuiteOrder
 
 
 USE_NETCONF_CONNECTOR = variables.USE_NETCONF_CONNECTOR
@@ -44,7 +45,7 @@ log = logging.getLogger(__name__)
 @pytest.mark.usefixtures("preconditions")
 @pytest.mark.usefixtures("log_test_suite_start_end_to_karaf")
 @pytest.mark.usefixtures("log_test_case_start_end_to_karaf")
-@pytest.mark.run(order=9)
+@pytest.mark.run(order=SuiteOrder.RESTPERFCLIENT_PERFORMANCE)
 class TestPerformance:
 
     @pytest.fixture
