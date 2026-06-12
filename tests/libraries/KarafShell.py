@@ -137,8 +137,12 @@ class KarafShell:
         Returns:
             str: Cleaned output.
         """
+        # Normalize \r\n to \n first so that trailing \r on each line is not
+        # mistaken for an in-line overwrite control character.
+        raw_text = raw_text.replace("\r\n", "\n")
         filtered_lines = []
         for line in raw_text.split("\n"):
+            # Handle genuine in-line overwrites: "old content\rnew content"
             final_line_state = line.split("\r")[-1]
             if not final_line_state.strip():
                 continue
