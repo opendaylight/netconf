@@ -5,11 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.databind;
+package org.opendaylight.restconf.server.spi;
 
 import java.io.InputStream;
 import org.opendaylight.restconf.server.api.JsonOperationInputBody;
 import org.opendaylight.restconf.server.api.OperationInputBody;
+import org.opendaylight.restconf.server.api.testlib.AbstractInstanceIdentifierTest;
 
 public class JsonOperationInputBodyTest extends AbstractOperationInputBodyTest {
     @Override
