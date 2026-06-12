@@ -63,6 +63,24 @@
       "message": "Probably we can now remove this FIXME.",
       "revId": "76a876f1a5c0ffd3a4d596899dac8a151e227808",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f928fd58_1d280044",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/AbstractNetconfSession.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-12T06:42:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6475cb70_76a98d0b",
+      "revId": "76a876f1a5c0ffd3a4d596899dac8a151e227808",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
