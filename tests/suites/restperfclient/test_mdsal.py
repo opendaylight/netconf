@@ -21,6 +21,7 @@ from libraries import rest_perf_client
 from libraries import templated_requests
 from libraries import utils
 from libraries.variables import variables
+from suites.suite_order import SuiteOrder
 
 
 ODL_IP = variables.ODL_IP
@@ -43,7 +44,7 @@ log = logging.getLogger(__name__)
 @pytest.mark.usefixtures("preconditions")
 @pytest.mark.usefixtures("log_test_suite_start_end_to_karaf")
 @pytest.mark.usefixtures("log_test_case_start_end_to_karaf")
-@pytest.mark.run(order=8)
+@pytest.mark.run(order=SuiteOrder.RESTPERFCLIENT_MDSAL)
 class TestMdsal:
 
     @pytest.fixture
