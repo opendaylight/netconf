@@ -1,0 +1,15 @@
+module netconf786 {
+  namespace netconf786;
+  prefix netconf786;
+
+  container foo {
+    leaf bar {
+      type uint32 {
+        range 1000..2000 {
+          error-message "bar error message";
+          error-app-tag "bar error app tag";
+        }
+      }
+    }
+  }
+}
