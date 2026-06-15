@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectModification.WithDataAfter;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -54,6 +55,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshPublicKeyAlgorithm;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.TransportParamsGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.Encryption;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.EncryptionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.transport.params.grouping.HostKey;
@@ -72,7 +74,9 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev25
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev260605.NetconfCallhomeServer;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev260605.netconf.callhome.server.AllowedDevices;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev260605.netconf.callhome.server.Global;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev260605.netconf.callhome.server.allowed.devices.Device;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev260605.netconf.callhome.server.global.Endpoints;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
@@ -88,6 +92,8 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service is responsible for call-home to topology integration.
@@ -217,17 +223,23 @@ public final class CallHomeMountService implements AutoCloseable {
         String host$_$keys() default "";
     }
 
+    private static final Logger LOG = LoggerFactory.getLogger(CallHomeMountService.class);
     private static final Pattern COMMA_WITH_WHITESPACE = Pattern.compile(",\\s*");
     private static final Protocol TLS_PROTOCOL = new ProtocolBuilder().setName(Protocol.Name.TLS).build();
     private static final DataObjectReference<Device> DEVICE_IDENTIFIER = DataObjectReference
         .builder(NetconfCallhomeServer.class).child(AllowedDevices.class)
         .child(Device.class).build();
+    private static final DataObjectReference<Endpoints> ENDPOINTS_IDENTIFIER = DataObjectReference
+        .builder(NetconfCallhomeServer.class).child(Global.class).child(Endpoints.class).build();
 
     private final Map<String, NetconfLayer> netconfLayerMapping = new ConcurrentHashMap<>();
     private final CallHomeTopology topology;
     private final Configuration config;
     private final Registration allowedDevicesReg;
-    private final SshTransportParameters sshTransportParameters;
+    private final Registration endpointsReg;
+
+    // Re-read on every incoming connection and refreshed in-place by onEndpointsChanged, hence volatile.
+    private volatile SshTransportParameters sshTransportParameters;
 
     @Activate
     @Inject
@@ -249,9 +261,12 @@ public final class CallHomeMountService implements AutoCloseable {
             final DOMMountPointService mountService, final DeviceActionFactory deviceActionFactory,
             final Configuration config) {
         this.config = config;
-        sshTransportParameters = buildSshTransportParameters(dataBroker, config);
+        sshTransportParameters = buildSshTransportParameters(CallHomeListenEndpoints.readSshTransportParams(dataBroker),
+            config);
         allowedDevicesReg = dataBroker.registerTreeChangeListener(LogicalDatastoreType.CONFIGURATION, DEVICE_IDENTIFIER,
             this::onAllowedDevicesChanged);
+        endpointsReg = dataBroker.registerTreeChangeListener(LogicalDatastoreType.CONFIGURATION, ENDPOINTS_IDENTIFIER,
+            this::onEndpointsChanged);
         final var clientConfBuilderFactory = createClientConfigurationBuilderFactory();
         final var clientFactory = createClientFactory();
         topology = new CallHomeTopology(topologyId, clientFactory, timer, schemaAssembler,
@@ -265,6 +280,9 @@ public final class CallHomeMountService implements AutoCloseable {
         this.config = config;
         sshTransportParameters = buildSshTransportParameters(null, config);
         allowedDevicesReg = () -> {
+            // do nothing
+        };
+        endpointsReg = () -> {
             // do nothing
         };
     }
@@ -384,6 +402,27 @@ public final class CallHomeMountService implements AutoCloseable {
         }
     }
 
+    /**
+     * Refreshes the SSH transport algorithms from the listen endpoints whenever
+     * {@code /netconf-callhome-server/global/endpoints} changes.
+     *
+     * <p>The listen socket (host/port) is bound once at activation and intentionally not rebound here; only the
+     * per-connection SSH algorithms are reloaded, so the next device that dials in negotiates with the updated
+     * parameters.
+     */
+    @VisibleForTesting
+    void onEndpointsChanged(final List<DataTreeModification<Endpoints>> changes) {
+        // The notification already carries the new state, so use it instead of re-reading the datastore. Apply the
+        // latest modification's after-state; a deletion (no after-state) falls back to the static OSGi configuration.
+        Endpoints endpoints = null;
+        for (var change : changes) {
+            endpoints = change.getRootNode() instanceof WithDataAfter<Endpoints> present ? present.dataAfter() : null;
+        }
+        sshTransportParameters = buildSshTransportParameters(CallHomeListenEndpoints.extractSshTransportParams(
+            endpoints), config);
+        LOG.info("Reloaded Call Home SSH transport parameters from listen endpoints");
+    }
+
     @PreDestroy
     @Deactivate
     @Override
@@ -391,17 +430,17 @@ public final class CallHomeMountService implements AutoCloseable {
         netconfLayerMapping.forEach((key, value) -> value.netconfSessionFuture.cancel(true));
         netconfLayerMapping.clear();
         allowedDevicesReg.close();
+        endpointsReg.close();
     }
 
     private record NetconfLayer(String id, NetconfClientSessionListener sessionListener,
         SettableFuture<NetconfClientSession> netconfSessionFuture) {
     }
 
-    private static @NonNull SshTransportParameters buildSshTransportParameters(final @Nullable DataBroker dataBroker,
-            final Configuration config) {
-        // Prefer the SSH algorithm lists from the standard IETF listen endpoint (if present in the datastore at
-        // activation time), otherwise fall back to the static OSGi configuration.
-        final var ietfParams = dataBroker == null ? null : CallHomeListenEndpoints.readSshTransportParams(dataBroker);
+    private static @NonNull SshTransportParameters buildSshTransportParameters(
+            final @Nullable TransportParamsGrouping ietfParams, final Configuration config) {
+        // Prefer the SSH algorithm lists from the standard IETF listen endpoint (when configured), otherwise fall
+        // back to the static OSGi configuration.
         if (ietfParams != null) {
             return new SshTransportParametersBuilder()
                 .setEncryption(ietfParams.getEncryption())

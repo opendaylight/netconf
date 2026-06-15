@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -45,6 +44,8 @@ import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.protocol.specification.SshCase;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.protocol.specification.ssh._case.SshTransportParameters;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.NetconfNodeAugment;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev260605.NetconfCallhomeServer;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev260605.netconf.callhome.server.AllowedDevices;
@@ -185,6 +186,40 @@ class CallHomeMountServiceTest {
         verify(topology, times(1)).disableNode(new NodeId(ID2));
     }
 
+    @Test
+    void createContextAppliesConfiguredSshTransportParameters() {
+        service = new CallHomeMountService(topology,
+            config("curve25519-sha256", "hmac-sha2-256", "aes256-ctr", "ssh-ed25519"));
+        reproduceEnsureNodeId2();
+        doReturn(SOCKET_ADDRESS).when(sshSession).getRemoteAddress();
+
+        assertNotNull(service.createSshSessionContextManager().createContext(ID1, sshSession, sshAlg));
+
+        final var params = sshTransportParametersOf(node1);
+        assertEquals(1, params.getKeyExchange().getKeyExchangeAlg().size());
+        assertEquals(1, params.getMac().getMacAlg().size());
+        assertEquals(1, params.getEncryption().getEncryptionAlg().size());
+        assertEquals(1, params.getHostKey().getHostKeyAlg().size());
+    }
+
+    @Test
+    void onEndpointsChangedRecomputesTransportParameters() {
+        service = new CallHomeMountService(topology, config("", "", "aes256-ctr, aes128-ctr", ""));
+        reproduceEnsureNodeId2();
+        doReturn(SOCKET_ADDRESS).when(sshSession).getRemoteAddress();
+
+        // a datastore notification triggers recomputation of the SSH algorithms
+        service.onEndpointsChanged(List.of());
+
+        assertNotNull(service.createSshSessionContextManager().createContext(ID1, sshSession, sshAlg));
+        assertEquals(2, sshTransportParametersOf(node1).getEncryption().getEncryptionAlg().size());
+    }
+
+    private static SshTransportParameters sshTransportParametersOf(final Node node) {
+        final var protocol = node.augmentation(NetconfNodeAugment.class).getNetconfNode().getProtocol();
+        return ((SshCase) protocol.getSpecification()).getSshTransportParameters();
+    }
+
     private void reproduceEnsureNodeId2() {
         /*
          * Reproduce behavior of org.opendaylight.netconf.topology.spi.AbstractNetconfTopology#ensureNode(Node)
@@ -209,7 +244,6 @@ class CallHomeMountServiceTest {
             }
             return null;
         }).when(topology).enableNode(any(Node.class), any());
-        doNothing().when(topology).disableNode(any(NodeId.class));
     }
 
     private static Device createMockDevice(final String deviceId) {
@@ -219,6 +253,11 @@ class CallHomeMountServiceTest {
     }
 
     private static CallHomeMountService.Configuration defaultConfig() {
+        return config("", "", "", "");
+    }
+
+    private static CallHomeMountService.Configuration config(final String keyExchange, final String macs,
+            final String encryption, final String hostKeys) {
         return new CallHomeMountService.Configuration() {
             @Override
             public String host() {
@@ -307,22 +346,22 @@ class CallHomeMountServiceTest {
 
             @Override
             public String key$_$exchange() {
-                return "";
+                return keyExchange;
             }
 
             @Override
             public String macs() {
-                return "";
+                return macs;
             }
 
             @Override
             public String encryption() {
-                return "";
+                return encryption;
             }
 
             @Override
             public String host$_$keys() {
-                return "";
+                return hostKeys;
             }
 
             @Override

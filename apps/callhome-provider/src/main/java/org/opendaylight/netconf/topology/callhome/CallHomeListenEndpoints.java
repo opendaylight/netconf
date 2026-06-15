@@ -38,8 +38,8 @@ import org.slf4j.LoggerFactory;
  * <p>Only the first matching endpoint is used because OpenDaylight currently opens a single listen
  * socket per transport (one SSH server and one TLS server). The datastore models a list of endpoints
  * to mirror the IETF {@code netconf-client-listen-stack-grouping} and to leave room for future
- * multi-listener support, until then, when several endpoints share a transport the one with the
- * lowest {@code name} (the list key) wins and the rest are ignored.
+ * multi-listener support. Until then, when several endpoints share a transport, the one with the
+ * lowest {@code name} (the list key) wins. The rest are ignored.
  */
 @NonNullByDefault
 final class CallHomeListenEndpoints {
@@ -66,13 +66,23 @@ final class CallHomeListenEndpoints {
     }
 
     /**
-     * Resolves the SSH transport parameters of the first configured SSH endpoint.
+     * Resolves the SSH transport parameters of the first configured SSH endpoint by reading the datastore.
      *
      * @return the host-key/key-exchange/encryption/MAC algorithms of the first configured SSH endpoint, or
      *     {@code null} when none is configured
      */
     static @Nullable TransportParamsGrouping readSshTransportParams(final DataBroker broker) {
-        final var endpoints = readEndpoints(broker);
+        return extractSshTransportParams(readEndpoints(broker));
+    }
+
+    /**
+     * Resolves the SSH transport parameters of the first configured SSH endpoint from an already-loaded
+     * {@code endpoints} container, e.g. one delivered by a data-tree change notification.
+     *
+     * @return the host-key/key-exchange/encryption/MAC algorithms of the first configured SSH endpoint, or
+     *     {@code null} when none is configured
+     */
+    static @Nullable TransportParamsGrouping extractSshTransportParams(final @Nullable Endpoints endpoints) {
         if (endpoints != null) {
             for (var endpoint : endpoints.nonnullEndpoint().values()) {
                 if (endpoint.getTransport() instanceof Ssh sshCase && sshCase.getSsh() != null) {
