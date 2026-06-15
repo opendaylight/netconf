@@ -5,12 +5,16 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.mdsal.spi.data;
+package org.opendaylight.netconf.client.mdsal.spi;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -29,6 +33,7 @@ import static org.opendaylight.netconf.api.EffectiveOperation.REPLACE;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
@@ -43,6 +48,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
@@ -52,11 +59,6 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfRpcFutureCallback;
-import org.opendaylight.netconf.client.mdsal.spi.AbstractDataStore;
-import org.opendaylight.netconf.client.mdsal.spi.DataOperationsService;
-import org.opendaylight.netconf.client.mdsal.spi.DataOperationsServiceImpl;
-import org.opendaylight.netconf.client.mdsal.spi.DataStoreService;
-import org.opendaylight.netconf.client.mdsal.spi.NetconfDataOperations;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
@@ -67,6 +69,7 @@ import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.DataGetParams;
+import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
@@ -77,6 +80,7 @@ import org.opendaylight.restconf.server.api.PatchEntity;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.TransportSession;
+import org.opendaylight.restconf.server.api.testlib.AbstractServerDataOperationsTest;
 import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.restconf.server.mdsal.MdsalServerStrategy;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
@@ -88,9 +92,13 @@ import org.opendaylight.restconf.server.spi.NotSupportedServerRpcOperations;
 import org.opendaylight.restconf.server.spi.ServerDataOperations;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
+import org.opendaylight.yangtools.databind.DatabindContext;
 import org.opendaylight.yangtools.databind.DatabindPath.Data;
 import org.opendaylight.yangtools.databind.ErrorInfo;
+import org.opendaylight.yangtools.databind.ErrorPath;
+import org.opendaylight.yangtools.databind.RequestException;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -103,14 +111,30 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.DOMException;
 
 @ExtendWith(MockitoExtension.class)
-final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
+class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
+    private static final DatabindContext MODULES_DATABIND = DatabindContext.ofModel(
+        YangParserTestUtils.parseYangResourceDirectory("/modules"));
+    private static final Data PATH_DATA = moudlesPath(PATH, MODULES_DATABIND);
+    private static final Data PATH_2_DATA = moudlesPath(PATH_2, MODULES_DATABIND);
+    private static final Data PATH_3_DATA = moudlesPath(PATH_3, MODULES_DATABIND);
+    private static final Data LEAF_SET_NODE_DATA = moudlesPath(LEAF_SET_NODE_PATH, MODULES_DATABIND);
+
+    private final CompletingServerRequest<Empty> dataDeleteRequest = new CompletingServerRequest<>();
+    private final CompletingServerRequest<DataPatchResult> dataPatchRequest = new CompletingServerRequest<>();
+    private final CompletingServerRequest<DataPostResult> dataPostRequest = new CompletingServerRequest<>();
+    private final CompletingServerRequest<DataYangPatchResult> dataYangPatchRequest = new CompletingServerRequest<>();
+
+    final CompletingServerRequest<DataPutResult> dataPutRequest = new CompletingServerRequest<>();
+
     private static class TestServerRequest<T> extends MappingServerRequest<T> {
         @NonNullByDefault
         TestServerRequest(final QueryParameters queryParameters, final PrettyPrintParam defaultPrettyPrint) {
@@ -160,8 +184,13 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         netconfData = new NetconfDataOperations(dataOperationService);
     }
 
-    @Override
-    ServerDataOperations testDeleteDataStrategy() {
+    @Test
+    void testDeleteData() throws Exception {
+        testDeleteDataStrategy().deleteData(dataDeleteRequest, new Data(JUKEBOX_DATABIND));
+        assertEquals(Empty.value(), dataDeleteRequest.getResult());
+    }
+
+    private ServerDataOperations testDeleteDataStrategy() {
         mockLockUnlockCommit();
         doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.empty(), Optional.of(
             DELETE), YangInstanceIdentifier.of());
@@ -170,8 +199,17 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations testNegativeDeleteDataStrategy() {
+    @Test
+    void testNegativeDeleteData() {
+        testNegativeDeleteDataStrategy().deleteData(dataDeleteRequest, new Data(JUKEBOX_DATABIND));
+        final var errors = assertThrows(RequestException.class, dataDeleteRequest::getResult).errors();
+        assertEquals(1, errors.size());
+        final var error = errors.get(0);
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.DATA_MISSING, error.tag());
+    }
+
+    private ServerDataOperations testNegativeDeleteDataStrategy() {
         mockLockUnlockDiscard();
 
         doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.empty(),
@@ -212,8 +250,13 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         verify(spyDataStoreService, never()).delete(SONG_LIST_PATH);
     }
 
-    @Override
-    ServerDataOperations testPostContainerDataStrategy() {
+    @Test
+    void testPostContainerData() throws Exception {
+        testPostContainerDataStrategy().createData(dataPostRequest, JUKEBOX_PATH, jukeboxPayload(EMPTY_JUKEBOX));
+        assertNotNull(dataPostRequest.getResult());
+    }
+
+    private ServerDataOperations testPostContainerDataStrategy() {
         mockLockUnlockCommit();
         doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.of(EMPTY_JUKEBOX),
             Optional.of(CREATE), JUKEBOX_IID);
@@ -222,9 +265,15 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations testPostListDataStrategy(final MapEntryNode entryNode,
-            final YangInstanceIdentifier node) {
+    @Test
+    void testPostListData() throws Exception {
+        testPostListDataStrategy(BAND_ENTRY, PLAYLIST_IID.node(BAND_ENTRY.name()))
+            .createData(dataPostRequest, jukeboxPath(PLAYLIST_IID), jukeboxPayload(PLAYLIST));
+        assertNotNull(dataPostRequest.getResult());
+    }
+
+    private ServerDataOperations testPostListDataStrategy(final MapEntryNode entryNode,
+        final YangInstanceIdentifier node) {
         mockLockUnlockCommit();
         doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.of(entryNode),
             Optional.of(CREATE), node);
@@ -233,8 +282,17 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations testPostDataFailStrategy(final DOMException domException) {
+    @Test
+    void testPostDataFail() {
+        final var domException = new DOMException((short) 414, "Post request failed");
+        testPostDataFailStrategy(domException).createData(dataPostRequest, JUKEBOX_PATH, jukeboxPayload(EMPTY_JUKEBOX));
+        final var errors = assertThrows(RequestException.class, dataPostRequest::getResult).errors();
+        assertEquals(1, errors.size());
+        final var info = assertInstanceOf(ErrorInfo.OfLiteral.class, errors.getFirst().info());
+        assertThat(info.elementBody()).contains(domException.getMessage());
+    }
+
+    private ServerDataOperations testPostDataFailStrategy(final DOMException domException) {
         mockLockUnlockDiscard();
         doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.of(EMPTY_JUKEBOX),
             Optional.of(CREATE), JUKEBOX_IID);
@@ -243,8 +301,13 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations testPatchContainerDataStrategy() {
+    @Test
+    void testPatchContainerData() throws Exception {
+        testPatchContainerDataStrategy().mergeData(dataPatchRequest, JUKEBOX_PATH, EMPTY_JUKEBOX);
+        dataPatchRequest.getResult();
+    }
+
+    private ServerDataOperations testPatchContainerDataStrategy() {
         mockLockUnlockCommit();
         doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.of(EMPTY_JUKEBOX),
             Optional.of(MERGE), JUKEBOX_IID);
@@ -253,8 +316,13 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations testPatchLeafDataStrategy() {
+    @Test
+    void testPatchLeafData() throws Exception {
+        testPatchLeafDataStrategy().mergeData(dataPatchRequest, GAP_PATH, GAP_LEAF);
+        dataPatchRequest.getResult();
+    }
+
+    private ServerDataOperations testPatchLeafDataStrategy() {
         mockLockUnlockCommit();
         doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.of(GAP_LEAF),
             Optional.of(MERGE), GAP_IID);
@@ -263,8 +331,13 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations testPatchListDataStrategy() {
+    @Test
+    void testPatchListData() throws Exception {
+        testPatchListDataStrategy().mergeData(dataPatchRequest, JUKEBOX_PATH, JUKEBOX_WITH_PLAYLIST);
+        dataPatchRequest.getResult();
+    }
+
+    private ServerDataOperations testPatchListDataStrategy() {
         mockLockUnlockCommit();
         doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.of(JUKEBOX_WITH_PLAYLIST),
             Optional.of(MERGE), JUKEBOX_IID);
@@ -531,22 +604,46 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
             serverError.info());
     }
 
-    @Override
-    ServerDataOperations testPatchDataReplaceMergeAndRemoveStrategy(final MapNode artistList) {
+    @Test
+    void testPatchDataReplaceMergeAndRemove() {
+        final var buildArtistList = ImmutableNodes.newSystemMapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(ARTIST_QNAME))
+            .withChild(ImmutableNodes.newMapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(ARTIST_QNAME, NAME_QNAME, "name of artist"))
+                .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of artist"))
+                .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "description of artist"))
+                .build())
+            .build();
+
+        patch(new PatchContext("patchRMRm",
+                List.of(new PatchEntity("edit1", Operation.Replace, ARTIST_DATA, buildArtistList),
+                    new PatchEntity("edit2", Operation.Merge, ARTIST_DATA, buildArtistList),
+                    new PatchEntity("edit3", Operation.Remove, ARTIST_CHILD_DATA))),
+            testPatchDataReplaceMergeAndRemoveStrategy(buildArtistList), false, ARTIST_DATA.databind());
+    }
+
+    private ServerDataOperations testPatchDataReplaceMergeAndRemoveStrategy(final MapNode artistList) {
         mockLockUnlockCommit();
         doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.of(artistList),
             Optional.of(MERGE), ARTIST_IID);
         doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.empty(),
             Optional.of(REMOVE), ARTIST_CHILD_IID);
         doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.of(artistList.body().iterator()
-                .next()), Optional.of(REPLACE), ARTIST_CHILD_IID);
+            .next()), Optional.of(REPLACE), ARTIST_CHILD_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfBaseOps)
             .editConfigCandidate(any(NetconfRpcFutureCallback.class), eq(mockNode), eq(false));
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations testPatchDataCreateAndDeleteStrategy() {
+    @Test
+    void testPatchDataCreateAndDelete() {
+        patch(new PatchContext("patchCD", List.of(
+                new PatchEntity("edit1", Operation.Create, PLAYER_DATA, EMPTY_JUKEBOX),
+                new PatchEntity("edit2", Operation.Delete, GAP_PATH))),
+            testPatchDataCreateAndDeleteStrategy(), true, PLAYER_DATA.databind());
+    }
+
+    private ServerDataOperations testPatchDataCreateAndDeleteStrategy() {
         mockLockUnlockCommit();
         doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.of(EMPTY_JUKEBOX),
             Optional.of(CREATE), PLAYER_IID);
@@ -557,8 +654,56 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations testPatchWithDataExistExceptionStrategy() {
+    @MethodSource
+    private static List<PatchContext> patchContext() {
+        final var buildArtistList = ImmutableNodes.newSystemMapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(ARTIST_QNAME))
+            .withChild(ImmutableNodes.newMapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(ARTIST_QNAME, NAME_QNAME, "name of artist"))
+                .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of artist"))
+                .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "description of artist"))
+                .build())
+            .build();
+        return List.of(
+            new PatchContext("VerifyNotExecutingLastPatchEntity", List.of(
+                new PatchEntity("edit1", Operation.Replace, ARTIST_DATA, buildArtistList),
+                new PatchEntity("edit2", Operation.Create, PLAYER_DATA, EMPTY_JUKEBOX),
+                new PatchEntity("edit3", Operation.Create, PLAYER_DATA, EMPTY_JUKEBOX))),
+            new PatchContext("VerifyExceptionOnLastPatchEntity", List.of(
+                new PatchEntity("edit1", Operation.Replace, ARTIST_DATA, buildArtistList),
+                new PatchEntity("edit2", Operation.Create, PLAYER_DATA, EMPTY_JUKEBOX)))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("patchContext")
+    void testPatchWithDataExistException(final PatchContext patchContext) throws Exception {
+        final var strategy = testPatchWithDataExistExceptionStrategy();
+        strategy.patchData(dataYangPatchRequest, new Data(ARTIST_DATA.databind()), patchContext);
+
+        final var patchStatusContext = dataYangPatchRequest.getResult().status();
+
+        assertFalse(patchStatusContext.ok());
+        assertNull(patchStatusContext.globalErrors());
+        assertEquals(2, patchStatusContext.editCollection().size());
+
+        final var delete = patchStatusContext.editCollection().getFirst();
+        assertTrue(delete.isOk());
+        assertEquals("edit1", delete.getEditId());
+        assertNull(delete.getEditErrors());
+
+        final var firstCreate = patchStatusContext.editCollection().getLast();
+        assertFalse(firstCreate.isOk());
+        assertEquals("edit2", firstCreate.getEditId());
+        assertNotNull(firstCreate.getEditErrors());
+        final var serverError = firstCreate.getEditErrors().getFirst();
+        assertEquals(ErrorTag.DATA_EXISTS, serverError.tag());
+        assertEquals(new ErrorPath(PLAYER_DATA), serverError.path());
+        assertNotNull(serverError.message());
+        assertEquals("Data already exists", serverError.message().elementBody());
+    }
+
+    private ServerDataOperations testPatchWithDataExistExceptionStrategy() {
         mockLockUnlockDiscard();
         final var rpcError = RpcResultBuilder.newError(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
             "Data already exists", null, "", null);
@@ -576,8 +721,13 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations testPatchMergePutContainerStrategy() {
+    @Test
+    void testPatchMergePutContainer() {
+        patch(new PatchContext("patchM", List.of(new PatchEntity("edit1", Operation.Merge, PLAYER_DATA,
+            EMPTY_JUKEBOX))), testPatchMergePutContainerStrategy(), false, PLAYER_DATA.databind());
+    }
+
+    private ServerDataOperations testPatchMergePutContainerStrategy() {
         mockLockUnlockCommit();
         doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.of(EMPTY_JUKEBOX),
             Optional.of(MERGE), PLAYER_IID);
@@ -586,21 +736,34 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations deleteNonexistentDataTestStrategy() {
+    @Test
+    void testDeleteNonexistentData() throws Exception {
+        deleteNonexistentDataTestStrategy().patchData(dataYangPatchRequest, new Data(JUKEBOX_DATABIND),
+            new PatchContext("patchD", List.of(new PatchEntity("edit1", Operation.Delete, GAP_PATH))));
+
+        final var status = dataYangPatchRequest.getResult().status();
+        assertEquals("patchD", status.patchId());
+        assertFalse(status.ok());
+        final var edits = status.editCollection();
+        assertEquals(1, edits.size());
+        final var edit = edits.get(0);
+        assertEquals("edit1", edit.getEditId());
+        assertTestDeleteNonexistentData(status, edit);
+    }
+
+    private ServerDataOperations deleteNonexistentDataTestStrategy() {
         mockLockUnlockDiscard();
         doReturn(mockNode).when(mockNetconfBaseOps).createEditConfigStructure(Optional.empty(), Optional.of(DELETE),
             GAP_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(mockNetconfBaseOps)
             .editConfigCandidate(any(NetconfRpcFutureCallback.class), eq(mockNode), eq(false));
         doReturn(Futures.immediateFailedFuture(new NetconfDocumentedException("Data missing", ErrorType.RPC,
-                ErrorTag.DATA_MISSING, ErrorSeverity.ERROR)))
+            ErrorTag.DATA_MISSING, ErrorSeverity.ERROR)))
             .when(mockNetconfBaseOps).commit(any(NetconfRpcFutureCallback.class));
         return netconfData;
     }
 
-    @Override
-    void assertTestDeleteNonexistentData(final PatchStatusContext status, final PatchStatusEntity edit) {
+    private void assertTestDeleteNonexistentData(final PatchStatusContext status, final PatchStatusEntity edit) {
         assertNull(edit.getEditErrors());
         final var globalErrors = status.globalErrors();
         assertNotNull(globalErrors);
@@ -611,15 +774,23 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         assertEquals(ErrorTag.DATA_MISSING, globalError.tag());
     }
 
-    @Override
-    ServerDataOperations readDataConfigTestStrategy() {
+    @Test
+    void readDataConfigTest() {
+        assertEquals(DATA_3, readData(ContentParam.CONFIG, PATH_DATA, readDataConfigTestStrategy()));
+    }
+
+    private ServerDataOperations readDataConfigTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(spyDataStoreService).get(CONFIGURATION, PATH,
             List.of());
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations readAllHavingOnlyConfigTestStrategy() {
+    @Test
+    void readAllHavingOnlyConfigTest() {
+        assertEquals(DATA_3, readData(ContentParam.ALL, PATH_DATA, readAllHavingOnlyConfigTestStrategy()));
+    }
+
+    private ServerDataOperations readAllHavingOnlyConfigTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(spyDataStoreService).get(CONFIGURATION, PATH,
             List.of());
         doReturn(immediateFluentFuture(Optional.empty())).when(spyDataStoreService).get(OPERATIONAL, PATH,
@@ -627,8 +798,12 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations readAllHavingOnlyNonConfigTestStrategy() {
+    @Test
+    void readAllHavingOnlyNonConfigTest() {
+        assertEquals(DATA_2, readData(ContentParam.ALL, PATH_2_DATA, readAllHavingOnlyNonConfigTestStrategy()));
+    }
+
+    private ServerDataOperations readAllHavingOnlyNonConfigTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(spyDataStoreService).get(OPERATIONAL, PATH_2,
             List.of());
         doReturn(immediateFluentFuture(Optional.empty())).when(spyDataStoreService).get(CONFIGURATION, PATH_2,
@@ -636,15 +811,27 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations readDataNonConfigTestStrategy() {
+    @Test
+    void readDataNonConfigTest() {
+        assertEquals(DATA_2, readData(ContentParam.NONCONFIG, PATH_2_DATA, readDataNonConfigTestStrategy()));
+    }
+
+    private ServerDataOperations readDataNonConfigTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(spyDataStoreService).get(OPERATIONAL, PATH_2,
             List.of());
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations readContainerDataAllTestStrategy() {
+    @Test
+    void readContainerDataAllTest() {
+        assertEquals(ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NODE_IDENTIFIER)
+            .withChild(CONTENT_LEAF)
+            .withChild(CONTENT_LEAF_2)
+            .build(), readData(ContentParam.ALL, PATH_DATA, readContainerDataAllTestStrategy()));
+    }
+
+    private ServerDataOperations readContainerDataAllTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(spyDataStoreService).get(CONFIGURATION, PATH,
             List.of());
         doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(spyDataStoreService).get(OPERATIONAL,PATH,
@@ -652,8 +839,16 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations readContainerDataConfigNoValueOfContentTestStrategy() {
+    @Test
+    void readContainerDataConfigNoValueOfContentTest() {
+        assertEquals(ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NODE_IDENTIFIER)
+            .withChild(CONTENT_LEAF)
+            .withChild(CONTENT_LEAF_2)
+            .build(), readData(ContentParam.ALL, PATH_DATA, readContainerDataConfigNoValueOfContentTestStrategy()));
+    }
+
+    private ServerDataOperations readContainerDataConfigNoValueOfContentTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(spyDataStoreService).get(CONFIGURATION, PATH,
             List.of());
         doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(spyDataStoreService).get(OPERATIONAL, PATH,
@@ -661,8 +856,15 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations readListDataAllTestStrategy() {
+    @Test
+    void readListDataAllTest() {
+        assertEquals(ImmutableNodes.newSystemMapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(QName.create("ns", "2016-02-28", "list")))
+            .withChild(CHECK_DATA)
+            .build(), readData(ContentParam.ALL, PATH_3_DATA, readListDataAllTestStrategy()));
+    }
+
+    private ServerDataOperations readListDataAllTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(LIST_DATA))).when(spyDataStoreService).get(OPERATIONAL, PATH_3,
             List.of());
         doReturn(immediateFluentFuture(Optional.of(LIST_DATA_2))).when(spyDataStoreService).get(CONFIGURATION, PATH_3,
@@ -670,8 +872,15 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations readOrderedListDataAllTestStrategy() {
+    @Test
+    void readOrderedListDataAllTest() {
+        assertEquals(ImmutableNodes.newUserMapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+            .withChild(CHECK_DATA)
+            .build(), readData(ContentParam.ALL, PATH_3_DATA, readOrderedListDataAllTestStrategy()));
+    }
+
+    private ServerDataOperations readOrderedListDataAllTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(ORDERED_MAP_NODE_1))).when(spyDataStoreService).get(OPERATIONAL,
             PATH_3, List.of());
         doReturn(immediateFluentFuture(Optional.of(ORDERED_MAP_NODE_2))).when(spyDataStoreService).get(CONFIGURATION,
@@ -679,8 +888,19 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations readUnkeyedListDataAllTestStrategy() {
+    @Test
+    void readUnkeyedListDataAllTest() {
+        assertEquals(ImmutableNodes.newUnkeyedListBuilder()
+            .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+            .withChild(ImmutableNodes.newUnkeyedListEntryBuilder()
+                .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
+                .withChild(UNKEYED_LIST_ENTRY_NODE_1.body().iterator().next())
+                .withChild(UNKEYED_LIST_ENTRY_NODE_2.body().iterator().next())
+                .build())
+            .build(), readData(ContentParam.ALL, PATH_3_DATA, readUnkeyedListDataAllTestStrategy()));
+    }
+
+    private ServerDataOperations readUnkeyedListDataAllTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(UNKEYED_LIST_NODE_1))).when(spyDataStoreService).get(OPERATIONAL,
             PATH_3, List.of());
         doReturn(immediateFluentFuture(Optional.of(UNKEYED_LIST_NODE_2))).when(spyDataStoreService).get(CONFIGURATION,
@@ -688,8 +908,18 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations readLeafListDataAllTestStrategy() {
+    @Test
+    void readLeafListDataAllTest() {
+        assertEquals(ImmutableNodes.<String>newSystemLeafSetBuilder()
+            .withNodeIdentifier(new NodeIdentifier(LEAF_LIST_QNAME))
+            .withValue(ImmutableList.<LeafSetEntryNode<String>>builder()
+                .addAll(LEAF_SET_NODE_1.body())
+                .addAll(LEAF_SET_NODE_2.body())
+                .build())
+            .build(), readData(ContentParam.ALL, LEAF_SET_NODE_DATA, readLeafListDataAllTestStrategy()));
+    }
+
+    private ServerDataOperations readLeafListDataAllTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(LEAF_SET_NODE_1))).when(spyDataStoreService)
             .get(OPERATIONAL, LEAF_SET_NODE_PATH, List.of());
         doReturn(immediateFluentFuture(Optional.of(LEAF_SET_NODE_2))).when(spyDataStoreService)
@@ -697,8 +927,18 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations readOrderedLeafListDataAllTestStrategy() {
+    @Test
+    void readOrderedLeafListDataAllTest() {
+        assertEquals(ImmutableNodes.<String>newUserLeafSetBuilder()
+            .withNodeIdentifier(new NodeIdentifier(LEAF_LIST_QNAME))
+            .withValue(ImmutableList.<LeafSetEntryNode<String>>builder()
+                .addAll(ORDERED_LEAF_SET_NODE_1.body())
+                .addAll(ORDERED_LEAF_SET_NODE_2.body())
+                .build())
+            .build(), readData(ContentParam.ALL, LEAF_SET_NODE_DATA, readOrderedLeafListDataAllTestStrategy()));
+    }
+
+    private ServerDataOperations readOrderedLeafListDataAllTestStrategy() {
         doReturn(immediateFluentFuture(Optional.of(ORDERED_LEAF_SET_NODE_1))).when(spyDataStoreService)
             .get(OPERATIONAL, LEAF_SET_NODE_PATH, List.of());
         doReturn(immediateFluentFuture(Optional.of(ORDERED_LEAF_SET_NODE_2))).when(spyDataStoreService)
@@ -706,20 +946,28 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         return netconfData;
     }
 
-    @Override
-    ServerDataOperations readDataWrongPathOrNoContentTestStrategy() {
+    @Test
+    void readDataWrongPathOrNoContentTest() {
+        assertReadDataWrongPathOrNoContent(() -> readData(ContentParam.CONFIG, PATH_2_DATA,
+            readDataWrongPathOrNoContentTestStrategy()));
+    }
+
+    private ServerDataOperations readDataWrongPathOrNoContentTestStrategy() {
         doReturn(immediateFluentFuture(Optional.empty())).when(spyDataStoreService).get(CONFIGURATION, PATH_2,
             List.of());
         return netconfData;
     }
 
-    @Override
-    void assertReadDataWrongPathOrNoContent(final Supplier<NormalizedNode> readResult) {
+    private void assertReadDataWrongPathOrNoContent(final Supplier<NormalizedNode> readResult) {
         assertNull(readResult.get());
     }
 
-    @Override
-    NormalizedNode readData(final ContentParam content, final Data path, final ServerDataOperations strategy) {
+    static Data moudlesPath(final YangInstanceIdentifier path) {
+        final var childAndStack = MODULES_DATABIND.schemaTree().enterPath(path).orElseThrow();
+        return new Data(MODULES_DATABIND, childAndStack.stack().toInference(), path, childAndStack.node());
+    }
+
+    private NormalizedNode readData(final ContentParam content, final Data path, final ServerDataOperations strategy) {
         try {
             return dataOperationService
                 .getData(path, new DataGetParams(content, DepthParam.max(), null, null))
@@ -728,6 +976,27 @@ final class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
         } catch (TimeoutException | InterruptedException | ExecutionException e) {
             throw new AssertionError(e);
         }
+    }
+
+    private void patch(final PatchContext patchContext, final ServerDataOperations strategy,
+        final boolean failed, final DatabindContext context) {
+        strategy.patchData(dataYangPatchRequest, new Data(context), patchContext);
+
+        final PatchStatusContext patchStatusContext;
+        try {
+            patchStatusContext = dataYangPatchRequest.getResult().status();
+        } catch (RequestException | InterruptedException | TimeoutException e) {
+            throw new AssertionError(e);
+        }
+
+        for (var entity : patchStatusContext.editCollection()) {
+            if (failed) {
+                assertTrue(entity.isOk(), "Edit " + entity.getEditId() + " failed");
+            } else {
+                assertTrue(entity.isOk());
+            }
+        }
+        assertTrue(patchStatusContext.ok());
     }
 
     private void mockLockUnlock()  {
