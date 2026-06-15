@@ -39,6 +39,7 @@ import org.opendaylight.yangtools.binding.DataObjectReference;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,6 +115,7 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
             Set.copyOf(credentials.getPasswords()), null);
     }
 
+    @Deactivate
     @Override
     public void close() {
         configReg.close();
