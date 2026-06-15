@@ -46,10 +46,6 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>concepts</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-common</artifactId>
         </dependency>
         <dependency>
@@ -78,11 +74,6 @@
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.ietf.model</groupId>
-            <artifactId>rfc8072</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -116,16 +107,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>mdsal-dom-spi</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-client-mdsal</artifactId>
             <scope>test</scope>
@@ -145,11 +126,6 @@
             <artifactId>restconf-server-api-testlib</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-server-mdsal</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-data-api</artifactId>
             <scope>test</scope>
@@ -161,17 +137,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-data-util</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-model-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-model-util</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
