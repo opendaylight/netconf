@@ -5,14 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.mdsal.spi.data;
+package org.opendaylight.netconf.client.mdsal.spi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.OPERATIONAL;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.parseYang;
 
 import com.google.common.util.concurrent.Futures;
@@ -23,14 +22,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
-import org.opendaylight.netconf.client.mdsal.spi.DataOperationsServiceImpl;
-import org.opendaylight.netconf.client.mdsal.spi.DataStoreService;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.server.api.DataGetParams;
-import org.opendaylight.restconf.server.api.testlib.CompletingServerRequest;
 import org.opendaylight.yangtools.databind.DatabindContext;
 import org.opendaylight.yangtools.databind.DatabindPath.Data;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -115,12 +109,6 @@ class NC1495Test {
 
     @Mock
     private DataStoreService dataStoreService;
-    @Mock
-    private DOMDataBroker dataBroker;
-    @Mock
-    private DOMDataTreeReadTransaction readTransaction;
-
-    final CompletingServerRequest<Optional<NormalizedNode>> getServerRequest = new CompletingServerRequest<>();
 
     @Test
     void testListOrderInNetconfDataOperation() throws Exception {
@@ -146,38 +134,6 @@ class NC1495Test {
             CONTAINER_INSTANCE, List.of());
         final var optionalNode = dataOperations.getData(CONTAINER_PATH, ALL_PARAMS).get(2, TimeUnit.SECONDS);
         final var normalizedNode = optionalNode.orElseThrow();
-
-        final var containerNode = assertInstanceOf(ContainerNode.class, normalizedNode);
-        assertEquals(1, containerNode.body().size());
-        assertEquals(LEAF_LIST, containerNode.body().iterator().next());
-    }
-
-    @Test
-    void testListOrderInMdsalRestconfStrategy() throws Exception {
-        final var restconfStrategy = new MdsalRestconfStrategy(DATABIND, dataBroker);
-        doReturn(readTransaction).when(dataBroker).newReadOnlyTransaction();
-        doReturn(immediateFluentFuture(Optional.of(CONTAINER_LIST))).when(readTransaction).read(CONFIGURATION,
-            CONTAINER_INSTANCE);
-        doReturn(immediateFluentFuture(Optional.of(CONTAINER_LIST))).when(readTransaction).read(OPERATIONAL,
-            CONTAINER_INSTANCE);
-        restconfStrategy.readData(getServerRequest, ContentParam.ALL, CONTAINER_PATH, null);
-        final var normalizedNode = getServerRequest.getResult().orElseThrow();
-
-        final var containerNode = assertInstanceOf(ContainerNode.class, normalizedNode);
-        assertEquals(1, containerNode.body().size());
-        assertEquals(LIST, containerNode.body().iterator().next());
-    }
-
-    @Test
-    void testLeafListOrderInMdsalRestconfStrategy() throws Exception {
-        final var restconfStrategy = new MdsalRestconfStrategy(DATABIND, dataBroker);
-        doReturn(readTransaction).when(dataBroker).newReadOnlyTransaction();
-        doReturn(immediateFluentFuture(Optional.of(CONTAINER_LEAF_LIST))).when(readTransaction).read(CONFIGURATION,
-            CONTAINER_INSTANCE);
-        doReturn(immediateFluentFuture(Optional.of(CONTAINER_LEAF_LIST))).when(readTransaction).read(OPERATIONAL,
-            CONTAINER_INSTANCE);
-        restconfStrategy.readData(getServerRequest, ContentParam.ALL, CONTAINER_PATH, null);
-        final var normalizedNode = getServerRequest.getResult().orElseThrow();
 
         final var containerNode = assertInstanceOf(ContainerNode.class, normalizedNode);
         assertEquals(1, containerNode.body().size());
