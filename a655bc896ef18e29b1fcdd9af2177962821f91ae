@@ -1,6 +1,40 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "d694696b_41d27aac",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-17T14:17:16Z",
+      "side": 1,
+      "message": "small a",
+      "revId": "a655bc896ef18e29b1fcdd9af2177962821f91ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f866fd4_006d2a67",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-17T14:17:16Z",
+      "side": 1,
+      "message": "do you mean anu difference in assisted and coathored?",
+      "revId": "a655bc896ef18e29b1fcdd9af2177962821f91ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "d9137056_f262e15c",
@@ -65,6 +99,40 @@
       "writtenOn": "2026-06-09T06:29:57Z",
       "side": 1,
       "message": "recheck",
+      "revId": "a655bc896ef18e29b1fcdd9af2177962821f91ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0059662_1294cc41",
+        "filename": "pom.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-17T14:17:16Z",
+      "side": 1,
+      "message": "cannot we move both files in one step?",
+      "revId": "a655bc896ef18e29b1fcdd9af2177962821f91ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1149f02_668a7e87",
+        "filename": "tests/libraries/variables.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-17T14:17:16Z",
+      "side": 1,
+      "message": "unrelated to patch",
       "revId": "a655bc896ef18e29b1fcdd9af2177962821f91ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
