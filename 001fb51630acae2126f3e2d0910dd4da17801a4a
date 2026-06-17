@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1decce2_267c3531",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeSshServer.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-17T12:04:48Z",
+      "side": 1,
+      "message": "can we extract values beforehand and only then make comparisons and create algs?",
+      "revId": "001fb51630acae2126f3e2d0910dd4da17801a4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37571fad_1f609539",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeSshServerAlgorithmTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-17T12:04:48Z",
+      "side": 1,
+      "message": "shorter names please 😄\n\nreturnsNullWhenAnyParamMissing(),mapsFactoryNamesToIanaTypes(), mapsAeadMacToNone(), etc.",
+      "revId": "001fb51630acae2126f3e2d0910dd4da17801a4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdf19b98_8dc312fd",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/NegotiatedAlgorithms.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-17T12:04:48Z",
+      "side": 1,
+      "message": "can we avoid default annotation since we then make nullable all parameters?",
+      "revId": "001fb51630acae2126f3e2d0910dd4da17801a4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82d358b5_bde7370e",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NegotiatedAlgorithmsTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-17T12:04:48Z",
+      "side": 1,
+      "message": "can we use https://www.baeldung.com/junit5-assertall-vs-multiple-assertions?",
+      "revId": "001fb51630acae2126f3e2d0910dd4da17801a4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
