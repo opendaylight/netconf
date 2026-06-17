@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "21acae1b_f342cea5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-17T19:29:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d694696b_41d27aac",
+      "revId": "a655bc896ef18e29b1fcdd9af2177962821f91ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6f866fd4_006d2a67",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-17T14:17:16Z",
       "side": 1,
       "message": "do you mean anu difference in assisted and coathored?",
+      "revId": "a655bc896ef18e29b1fcdd9af2177962821f91ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab329280_aa1e3e73",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-17T19:29:54Z",
+      "side": 1,
+      "message": "yes,as `co-authored-by` when something was directly generated or copy-pasted, `Assisted-by` when used indirectly like asking question.",
+      "parentUuid": "6f866fd4_006d2a67",
       "revId": "a655bc896ef18e29b1fcdd9af2177962821f91ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +156,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2a41c1d_f4530a11",
+        "filename": "pom.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-17T19:29:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0059662_1294cc41",
+      "revId": "a655bc896ef18e29b1fcdd9af2177962821f91ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a1149f02_668a7e87",
@@ -133,6 +187,24 @@
       "writtenOn": "2026-06-17T14:17:16Z",
       "side": 1,
       "message": "unrelated to patch",
+      "revId": "a655bc896ef18e29b1fcdd9af2177962821f91ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ede44c5e_bbe14186",
+        "filename": "tests/libraries/variables.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-17T19:29:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a1149f02_668a7e87",
       "revId": "a655bc896ef18e29b1fcdd9af2177962821f91ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
