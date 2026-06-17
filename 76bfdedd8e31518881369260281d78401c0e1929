@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a1e092b_65875ebd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-06-17T09:08:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a53b408c_7e7e833d",
+      "revId": "76bfdedd8e31518881369260281d78401c0e1929",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "07a638d6_9439225c",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-15T13:35:48Z",
       "side": 1,
       "message": "Could you please rename it to something like `connected_netconf_testtools`",
+      "revId": "76bfdedd8e31518881369260281d78401c0e1929",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfa4d815_2167763b",
+        "filename": "tests/suites/restperfclient/test_performance.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-06-17T09:08:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07a638d6_9439225c",
       "revId": "76bfdedd8e31518881369260281d78401c0e1929",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
