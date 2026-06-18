@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6974c6fe_9f1abade",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-06-18T08:46:53Z",
+      "side": 1,
+      "message": "Rebased to resolve conflict; Minor grammar change;",
+      "revId": "ee352ff193e5ec225684cac848bbc72d21df6919",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
