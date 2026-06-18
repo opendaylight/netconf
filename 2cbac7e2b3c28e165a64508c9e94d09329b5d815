@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3eccc9d1_3100a0d2",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/EXISchema.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-18T07:58:55Z",
+      "side": 0,
+      "message": "move flattening into separate commit, in addition, we could probably only collapse handler.exi → handler",
+      "revId": "2cbac7e2b3c28e165a64508c9e94d09329b5d815",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
