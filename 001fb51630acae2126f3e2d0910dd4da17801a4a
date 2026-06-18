@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a02da17a_44a8f911",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeSshServer.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-06-18T05:39:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a1decce2_267c3531",
+      "revId": "001fb51630acae2126f3e2d0910dd4da17801a4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "37571fad_1f609539",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-17T12:04:48Z",
       "side": 1,
       "message": "shorter names please 😄\n\nreturnsNullWhenAnyParamMissing(),mapsFactoryNamesToIanaTypes(), mapsAeadMacToNone(), etc.",
+      "revId": "001fb51630acae2126f3e2d0910dd4da17801a4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a564627_a6391d91",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeSshServerAlgorithmTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-06-18T05:39:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "37571fad_1f609539",
       "revId": "001fb51630acae2126f3e2d0910dd4da17801a4a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d59131bf_dec99295",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/NegotiatedAlgorithms.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-06-18T05:39:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bdf19b98_8dc312fd",
+      "revId": "001fb51630acae2126f3e2d0910dd4da17801a4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "82d358b5_bde7370e",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-06-17T12:04:48Z",
       "side": 1,
       "message": "can we use https://www.baeldung.com/junit5-assertall-vs-multiple-assertions?",
+      "revId": "001fb51630acae2126f3e2d0910dd4da17801a4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc3f214c_342d4da7",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NegotiatedAlgorithmsTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-06-18T05:39:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "82d358b5_bde7370e",
       "revId": "001fb51630acae2126f3e2d0910dd4da17801a4a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
