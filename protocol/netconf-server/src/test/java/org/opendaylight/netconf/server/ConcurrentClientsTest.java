@@ -53,7 +53,7 @@ import org.opendaylight.netconf.client.NetconfMessageUtil;
 import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
-import org.opendaylight.netconf.common.handler.exi.NetconfStartExiMessageProvider;
+import org.opendaylight.netconf.common.handler.NetconfStartExiMessageProvider;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
