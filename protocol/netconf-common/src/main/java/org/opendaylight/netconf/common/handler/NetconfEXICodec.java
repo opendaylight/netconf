@@ -16,7 +16,6 @@ import com.google.common.cache.LoadingCache;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageWriter;
-import org.opendaylight.netconf.common.handler.exi.EXIParameters;
 import org.opendaylight.netconf.shaded.exificient.core.EXIFactory;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
 import org.xml.sax.EntityResolver;

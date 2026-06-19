@@ -23,7 +23,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.common.handler.exi.EXIParameters;
 import org.xmlunit.builder.DiffBuilder;
 
 class NetconfEXIHandlersTest {

@@ -43,8 +43,8 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.codec.MessageWriter;
-import org.opendaylight.netconf.common.handler.exi.EXIParameters;
-import org.opendaylight.netconf.common.handler.exi.NetconfStartExiMessageProvider;
+import org.opendaylight.netconf.common.handler.EXIParameters;
+import org.opendaylight.netconf.common.handler.NetconfStartExiMessageProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.Uint32;
 

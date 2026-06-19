@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.common.handler.exi;
+package org.opendaylight.netconf.common.handler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
