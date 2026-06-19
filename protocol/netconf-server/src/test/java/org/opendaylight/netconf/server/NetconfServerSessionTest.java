@@ -37,7 +37,7 @@ import org.opendaylight.netconf.codec.MessageEncoder;
 import org.opendaylight.netconf.codec.MessageWriter;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
 import org.opendaylight.netconf.codec.XMLMessageWriter;
-import org.opendaylight.netconf.common.handler.exi.EXIParameters;
+import org.opendaylight.netconf.common.handler.EXIParameters;
 import org.opendaylight.netconf.common.handler.NetconfEXICodec;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfSsh;

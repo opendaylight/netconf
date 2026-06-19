@@ -8,7 +8,6 @@
 module org.opendaylight.netconf.common {
     exports org.opendaylight.netconf.common;
     exports org.opendaylight.netconf.common.di;
-    exports org.opendaylight.netconf.common.handler.exi;
     exports org.opendaylight.netconf.common.handler;
 
     requires transitive io.netty.common;
