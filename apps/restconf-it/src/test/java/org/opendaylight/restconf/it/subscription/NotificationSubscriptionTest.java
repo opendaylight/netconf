@@ -27,9 +27,9 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
     private static final String XML_ENCODING = "encode-xml";
     private static final String NETCONF_STREAM = "NETCONF";
     private static final String DELETE_SUBSCRIPTION_URI =
-        "/restconf/operations/ietf-subscribed-notifications:delete-subscription";
+        "/rests/operations/ietf-subscribed-notifications:delete-subscription";
     private static final String KILL_SUBSCRIPTION_URI =
-        "/restconf/operations/ietf-subscribed-notifications:kill-subscription";
+        "/rests/operations/ietf-subscribed-notifications:kill-subscription";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     /**
@@ -37,7 +37,7 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
      */
     @Test
     void defaultStreamAvailabilityTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, "/restconf/data/ietf-subscribed-notifications:streams",
+        final var response = invokeRequest(HttpMethod.GET, "/rests/data/ietf-subscribed-notifications:streams",
             APPLICATION_JSON);
         assertNotNull(response);
         assertNotNull(response.content());
@@ -130,8 +130,8 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 "stop-time": "2025-03-20T15:30:00Z"
               }
             }""";
-        final var response = invokeRequest(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI, APPLICATION_JSON, input,
-            APPLICATION_JSON);
+        final var response = invokeRequest(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI, APPLICATION_JSON,
+            APPLICATION_JSON, input);
         assertEquals(HttpResponseStatus.BAD_REQUEST, response.status());
     }
 
@@ -174,8 +174,8 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 "id": 99999
               }
             }""";
-        final var response = invokeRequest(HttpMethod.POST, DELETE_SUBSCRIPTION_URI, APPLICATION_JSON, input,
-            APPLICATION_JSON);
+        final var response = invokeRequest(HttpMethod.POST, DELETE_SUBSCRIPTION_URI, APPLICATION_JSON,
+            APPLICATION_JSON, input);
         assertEquals(HttpResponseStatus.BAD_REQUEST, response.status());
         final var jsonNode = OBJECT_MAPPER.readTree(response.content().toString(StandardCharsets.UTF_8));
         final var errorMessage = jsonNode.at("/errors/error/0/error-message").asText();
@@ -213,8 +213,8 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 "id": 99999
               }
             }""";
-        final var response = invokeRequest(HttpMethod.POST, KILL_SUBSCRIPTION_URI, APPLICATION_JSON, input,
-            APPLICATION_JSON);
+        final var response = invokeRequest(HttpMethod.POST, KILL_SUBSCRIPTION_URI, APPLICATION_JSON,
+            APPLICATION_JSON, input);
         assertEquals(HttpResponseStatus.BAD_REQUEST, response.status());
         final var jsonNode = OBJECT_MAPPER.readTree(response.content().toString(StandardCharsets.UTF_8));
         final var errorMessage = jsonNode.at("/errors/error/0/error-message").asText();
@@ -232,7 +232,7 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 "encoding": "%s"
               }
             }""", stream, JSON_ENCODING);
-        return invokeRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_JSON, input, APPLICATION_JSON);
+        return invokeRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_JSON, APPLICATION_JSON, input);
     }
 
     /**
@@ -247,7 +247,7 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 %s
                </stream-subtree-filter>
             </input>""", stream, filter);
-        return invokeRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_XML, input, APPLICATION_JSON);
+        return invokeRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_XML, APPLICATION_JSON, input);
     }
 
     private FullHttpRequest prepareEstablishRPCRequest() {
