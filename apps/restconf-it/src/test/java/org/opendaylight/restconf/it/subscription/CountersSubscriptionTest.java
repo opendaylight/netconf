@@ -61,7 +61,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
 
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
             final var receiversResponse =  invokeRequest(HttpMethod.GET,
-                "/restconf/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
+                "/rests/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
                 MediaTypes.APPLICATION_YANG_DATA_JSON, null, MediaTypes.APPLICATION_YANG_DATA_JSON);
             assertEquals(HttpResponseStatus.OK, receiversResponse.status());
             // verify 2 notification were sent ToasterRestocked and ToasterOutOfBread
@@ -100,7 +100,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
 
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
             final var receiversResponse = invokeRequest(HttpMethod.GET,
-                "/restconf/data/ietf-subscribed-notifications:subscriptions/" + "subscription=" + id + "/receivers",
+                "/rests/data/ietf-subscribed-notifications:subscriptions/" + "subscription=" + id + "/receivers",
                 MediaTypes.APPLICATION_YANG_DATA_JSON);
             assertEquals(HttpResponseStatus.OK, receiversResponse.status());
             // verify 2 notification were sent subscription-modified and ToasterRestocked
@@ -142,7 +142,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
 
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
             final var receiversResponse = invokeRequest(HttpMethod.GET,
-                "/restconf/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
+                "/rests/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
                 MediaTypes.APPLICATION_YANG_DATA_JSON, null, MediaTypes.APPLICATION_YANG_DATA_JSON);
 
             assertEquals(HttpResponseStatus.OK, receiversResponse.status());
@@ -153,7 +153,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
     }
 
     private static void assertCounter(final FullHttpResponse response, final String sent, final String excluded) {
-        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8), JSON_PARSER_CONFIGURATION)
+        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8), jsonParserConfiguration())
             .getJSONObject("ietf-subscribed-notifications:receivers")
             //there is only one receiver
             .getJSONArray("receiver").getJSONObject(0);
