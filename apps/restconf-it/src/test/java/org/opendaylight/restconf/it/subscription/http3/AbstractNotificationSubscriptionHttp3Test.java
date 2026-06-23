@@ -86,7 +86,7 @@ abstract class AbstractNotificationSubscriptionHttp3Test extends AbstractNotific
     protected NettyEndpointConfiguration createEndpointConfiguration(
         final HttpServerListenStackGrouping serverStackGrouping) {
         return new NettyEndpointConfiguration(
-            ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000), "restconf",
+            ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000), "rests",
             MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
             WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS,
             new HttpServerStackConfiguration(HTTPServerOverQuic.of(localAddress(), port(), certificate, privateKey,

@@ -102,7 +102,7 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
     void testListenModifiedNotification() throws Exception {
         // Modify the subscription
         final var response = invokeRequestKeepClient(HttpMethod.POST,
-            "/restconf/operations/ietf-subscribed-notifications:modify-subscription",
+            "/rests/operations/ietf-subscribed-notifications:modify-subscription",
             MediaTypes.APPLICATION_YANG_DATA_XML, """
              <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
                <id>2147483648</id>
@@ -132,7 +132,7 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
     void testListenDeleteNotification() throws Exception {
         // Delete the subscription
         final var response = invokeRequestKeepClient(HttpMethod.POST,
-            "/restconf/operations/ietf-subscribed-notifications:delete-subscription",
+            "/rests/operations/ietf-subscribed-notifications:delete-subscription",
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {
@@ -159,7 +159,7 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
     void testListenKillNotification() throws Exception {
         // Kill the subscription
         final var response = invokeRequestKeepClient(HttpMethod.POST,
-            "/restconf/operations/ietf-subscribed-notifications:kill-subscription",
+            "/rests/operations/ietf-subscribed-notifications:kill-subscription",
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {
