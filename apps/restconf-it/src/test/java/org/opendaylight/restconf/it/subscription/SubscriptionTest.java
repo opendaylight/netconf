@@ -67,7 +67,7 @@ public class SubscriptionTest extends AbstractNotificationSubscriptionTest {
         startSubscriptionStream(String.valueOf(subscriptionId));
         final var listener = startSubscriptionStream(String.valueOf(subscriptionId));
 
-        final var subscription = getStreamRegistry().lookupSubscription(subscriptionId);
+        final var subscription = streamRegistry().lookupSubscription(subscriptionId);
         Assertions.assertNotNull(subscription);
 
         validateToOperationalOutput(subscription, stopTime, 0);
