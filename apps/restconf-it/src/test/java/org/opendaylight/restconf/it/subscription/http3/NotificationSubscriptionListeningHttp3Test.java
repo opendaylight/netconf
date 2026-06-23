@@ -74,7 +74,7 @@ class NotificationSubscriptionListeningHttp3Test extends AbstractNotificationSub
 
         // Delete the subscription
         final var response = invokeRequestKeepClient(HttpMethod.POST,
-            "/restconf/operations/ietf-subscribed-notifications:delete-subscription",
+            "/rests/operations/ietf-subscribed-notifications:delete-subscription",
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {
@@ -141,7 +141,7 @@ class NotificationSubscriptionListeningHttp3Test extends AbstractNotificationSub
     }
 
     private String startSubscription() throws Exception {
-        final var uri = "/restconf/operations/ietf-subscribed-notifications:establish-subscription";
+        final var uri = "/rests/operations/ietf-subscribed-notifications:establish-subscription";
         final var response = invokeRequestKeepClient(HttpMethod.POST, uri,
             MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
