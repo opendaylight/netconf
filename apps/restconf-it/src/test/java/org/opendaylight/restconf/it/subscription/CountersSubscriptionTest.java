@@ -61,7 +61,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
 
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
             final var receiversResponse =  invokeRequest(HttpMethod.GET,
-                "/restconf/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
+                "/rests/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
                 MediaTypes.APPLICATION_YANG_DATA_JSON, null, MediaTypes.APPLICATION_YANG_DATA_JSON);
             assertEquals(HttpResponseStatus.OK, receiversResponse.status());
             // verify 2 notification were sent ToasterRestocked and ToasterOutOfBread
@@ -100,7 +100,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
 
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
             final var receiversResponse = invokeRequest(HttpMethod.GET,
-                "/restconf/data/ietf-subscribed-notifications:subscriptions/" + "subscription=" + id + "/receivers",
+                "/rests/data/ietf-subscribed-notifications:subscriptions/" + "subscription=" + id + "/receivers",
                 MediaTypes.APPLICATION_YANG_DATA_JSON);
             assertEquals(HttpResponseStatus.OK, receiversResponse.status());
             // verify 2 notification were sent subscription-modified and ToasterRestocked
@@ -142,7 +142,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
 
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
             final var receiversResponse = invokeRequest(HttpMethod.GET,
-                "/restconf/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
+                "/rests/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
                 MediaTypes.APPLICATION_YANG_DATA_JSON, null, MediaTypes.APPLICATION_YANG_DATA_JSON);
 
             assertEquals(HttpResponseStatus.OK, receiversResponse.status());
