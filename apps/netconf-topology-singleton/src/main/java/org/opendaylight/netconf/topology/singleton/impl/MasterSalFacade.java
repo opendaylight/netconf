@@ -17,6 +17,7 @@ import org.apache.pekko.cluster.Cluster;
 import org.apache.pekko.dispatch.OnComplete;
 import org.apache.pekko.pattern.Patterns;
 import org.apache.pekko.util.Timeout;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -59,7 +60,6 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private RemoteDeviceServices deviceServices = null;
     private DOMDataBroker deviceDataBroker = null;
     private NetconfDataTreeService netconfService = null;
-    private volatile NegotiatedSshAlg negotiatedSshKeys = null;
 
     /**
      * MasterSalFacade is responsible for handling the connection and disconnection
@@ -96,7 +96,8 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
     @Override
     public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
+            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services,
+            final @Nullable NegotiatedSshAlg negotiatedSshAlg) {
         currentSchema = requireNonNull(deviceSchema);
         netconfSessionPreferences = requireNonNull(sessionPreferences);
         deviceServices = requireNonNull(services);
@@ -113,7 +114,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
             @Override
             public void onComplete(final Throwable failure, final Object success) {
                 if (failure == null) {
-                    updateDeviceData();
+                    updateDeviceData(deviceSchema, sessionPreferences, negotiatedSshAlg);
                     return;
                 }
 
@@ -138,11 +139,6 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     @Override
     public void onNotification(final DOMNotification domNotification) {
         mount.publish(domNotification);
-    }
-
-    @Override
-    public void onSshAlgorithmsNegotiated(final NegotiatedSshAlg negotiatedSshAlg) {
-        this.negotiatedSshKeys = negotiatedSshAlg;
     }
 
     @Override
@@ -204,10 +200,11 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
             sourceIdentifiers, deviceServices), actorResponseWaitTime);
     }
 
-    private void updateDeviceData() {
+    private void updateDeviceData(final NetconfDeviceSchema deviceSchema,
+            final NetconfSessionPreferences sessionPreferences, final @Nullable NegotiatedSshAlg negotiatedSshAlg) {
         final String masterAddress = Cluster.get(actorSystem).selfAddress().toString();
         LOG.debug("{}: updateDeviceData with master address {}", id, masterAddress);
-        datastoreAdapter.updateClusteredDeviceData(true, masterAddress, currentSchema.capabilities(),
-                netconfSessionPreferences.sessionId(), negotiatedSshKeys);
+        datastoreAdapter.updateClusteredDeviceData(true, masterAddress, deviceSchema.capabilities(),
+                sessionPreferences.sessionId(), negotiatedSshAlg);
     }
 }

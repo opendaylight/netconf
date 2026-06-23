@@ -261,11 +261,10 @@ public abstract class AbstractNetconfTopology {
         // Instantiate the handler ...
         final var deviceSalFacade = createSalFacade(deviceId, netconfNode.getCredentials(),
             netconfNode.requireLockDatastore());
-        deviceSalFacade.onSshAlgorithmsNegotiated(sshAlg);
 
         final NetconfNodeHandler nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemaProvider,
             schemaManager, schemaAssembler, builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId,
-            netconfNode, nodeOptional, sshParams);
+            netconfNode, nodeOptional, sshParams, sshAlg);
 
         // ... record it ...
         activeConnectors.put(nodeId, nodeHandler);

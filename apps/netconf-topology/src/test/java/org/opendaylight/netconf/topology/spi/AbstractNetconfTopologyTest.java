@@ -182,7 +182,6 @@ class AbstractNetconfTopologyTest {
 
         doNothing().when(delegate).onDeviceFailed(exceptionCaptor.capture());
         doNothing().when(delegate).close();
-        doNothing().when(delegate).onSshAlgorithmsNegotiated(any());
         doThrow(new GeneralSecurityException()).when(encryptionService).decrypt(any());
 
         topology.onDataTreeChanged(testNode, ModificationType.WRITE);
