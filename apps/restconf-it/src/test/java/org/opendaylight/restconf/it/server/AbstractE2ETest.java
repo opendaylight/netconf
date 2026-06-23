@@ -16,65 +16,33 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.xmlunit.matchers.CompareMatcher.isSimilarTo;
 import static org.xmlunit.matchers.EvaluateXPathMatcher.hasXPath;
 
-import com.google.common.base.Splitter;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
-import org.apache.shiro.realm.AuthenticatingRealm;
-import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.eclipse.jdt.annotation.NonNull;
 import org.json.JSONObject;
-import org.json.JSONParserConfiguration;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.opendaylight.mdsal.binding.api.ActionSpec;
-import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.dom.adapter.BindingAdapterFactory;
-import org.opendaylight.mdsal.binding.dom.adapter.BindingDOMRpcProviderServiceAdapter;
-import org.opendaylight.mdsal.binding.dom.adapter.ConstantAdapterContext;
-import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractDataBrokerTest;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
-import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
-import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.broker.RouterDOMActionProviderService;
-import org.opendaylight.mdsal.dom.broker.RouterDOMActionService;
-import org.opendaylight.mdsal.dom.broker.RouterDOMNotificationService;
-import org.opendaylight.mdsal.dom.broker.RouterDOMRpcProviderService;
-import org.opendaylight.mdsal.dom.broker.RouterDOMRpcService;
-import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
-import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.odl.device.notification.SubscribeDeviceNotificationRpc;
 import org.opendaylight.netconf.rfc8639.impl.IetfSubscriptionFeatureProvider;
 import org.opendaylight.netconf.sal.remote.impl.CreateDataChangeEventSubscriptionRpc;
@@ -83,22 +51,12 @@ import org.opendaylight.netconf.transport.http.EventStreamService;
 import org.opendaylight.netconf.transport.http.EventStreamService.StreamControl;
 import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
-import org.opendaylight.netconf.transport.http.HTTPServerOverTcp;
 import org.opendaylight.netconf.transport.http.HttpClientStackConfiguration;
 import org.opendaylight.netconf.transport.http.SseUtils;
-import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
-import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
-import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.client.impl.ClientHttp1Session;
 import org.opendaylight.restconf.client.impl.ClientHttp2Session;
-import org.opendaylight.restconf.server.AAAShiroPrincipalService;
-import org.opendaylight.restconf.server.MessageEncoding;
-import org.opendaylight.restconf.server.NettyEndpointConfiguration;
-import org.opendaylight.restconf.server.SimpleNettyEndpoint;
+import org.opendaylight.restconf.it.AbstractIT;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
-import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
-import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
-import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.example.action.rev240919.Root;
 import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleAction;
@@ -106,11 +64,8 @@ import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionI
 import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionOutput;
 import org.opendaylight.yang.gen.v1.example.action.rev240919.root.ExampleActionOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.HttpServerListenStackGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.listen.stack.grouping.transport.HttpOverTcp;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.IetfSubscribedNotificationsData;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
-import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecServices;
 import org.opendaylight.yangtools.binding.generator.impl.DefaultBindingRuntimeGenerator;
 import org.opendaylight.yangtools.binding.meta.YangModuleInfo;
 import org.opendaylight.yangtools.binding.runtime.api.BindingRuntimeContext;
@@ -122,33 +77,16 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
-import org.opendaylight.yangtools.yang.common.Uint16;
-import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.model.spi.source.YangTextToIRSourceTransformer;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
-import org.opendaylight.yangtools.yang.source.ir.dagger.YangIRSourceModule;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xmlunit.diff.DefaultNodeMatcher;
-import org.xmlunit.diff.ElementSelectors;
 
-public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
-    private static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
-        new JSONParserConfiguration().withStrictMode();
+public abstract class AbstractE2ETest extends AbstractIT {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractE2ETest.class);
-    private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
-    private static final Uint32 FRAME_SIZE = Uint32.valueOf(16 * 1024);
-    private static final String ALT_SVC_HEADER = "h3=\":8443\"; ma=3600";
-    private static final Uint32 HTTP3_ALT_SVC_MAX_AGE_SECONDS = Uint32.valueOf(3600);
-    private static final Uint32 WRITE_BUFFER_LOW_WATER_MARK = Uint32.valueOf(32 * 1024);
-    private static final Uint32 WRITE_BUFFER_HIGH_WATER_MARK = Uint32.valueOf(64 * 1024);
     private static final BindingRuntimeGenerator GENERATOR = new DefaultBindingRuntimeGenerator();
 
     protected static final @NonNull YangParserFactory PARSER_FACTORY =
         DaggerDefaultYangParserComponent.create().parserFactory();
-
     private static final LoadingCache<Set<YangModuleInfo>, BindingRuntimeContext> RUNTIME_CONTEXT_CACHE = CacheBuilder
         .newBuilder().weakValues().build(new CacheLoader<>() {
             public BindingRuntimeContext load(final Set<YangModuleInfo> key) throws Exception {
@@ -162,32 +100,9 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
             }
         });
 
-    protected static final @NonNull YangTextToIRSourceTransformer TEXT_TO_IR = YangIRSourceModule.provideTextToIR();
-    protected static final Map<String, String> NS_CONTEXT = Map.of("r", "urn:ietf:params:xml:ns:yang:ietf-restconf");
-    protected static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
-    protected static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
-    protected static final String USERNAME = "username";
-    protected static final String PASSWORD = "pa$$w0Rd";
-    protected static final String APPLICATION_JSON = "application/json";
-    protected static final String APPLICATION_XML = "application/xml";
-
-    private static String localAddress;
-    private static BootstrapFactory bootstrapFactory;
-    private static SSHTransportStackFactory sshTransportStackFactory;
-
     private final List<StreamControl> streamControl = new ArrayList<>();
 
     private HttpClientStackGrouping invalidClientStackGrouping;
-    private DOMMountPointService domMountPointService;
-    private RpcProviderService rpcProviderService;
-    private String host;
-    private HttpClientStackGrouping clientStackGrouping;
-    private DOMRpcRouter domRpcRouter;
-    private SimpleNettyEndpoint endpoint;
-    private DOMNotificationRouter domNotificationRouter;
-    private MdsalRestconfStreamRegistry streamRegistry;
-
-    private int port;
 
     private volatile EventStreamService clientStreamService;
 
@@ -196,120 +111,28 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         return RUNTIME_CONTEXT_CACHE.getUnchecked(getModuleInfos());
     }
 
-    @BeforeAll
-    static void beforeAll() {
-        localAddress = InetAddress.getLoopbackAddress().getHostAddress();
-        bootstrapFactory = new BootstrapFactory("restconf-netty-e2e", 8);
-        sshTransportStackFactory = new SSHTransportStackFactory("netconf-netty-e2e", 8);
-    }
-
+    @Override
     @BeforeEach
     protected void beforeEach() throws Exception {
-        // transport configuration
-        port = randomBindablePort();
-        host = localAddress + ":" + port;
-        final var serverTransport = HTTPServerOverTcp.of(localAddress, port);
-        final var serverStackGrouping = new HttpServerListenStackGrouping() {
-            @Override
-            public Class<HttpServerListenStackGrouping> implementedInterface() {
-                return HttpServerListenStackGrouping.class;
-            }
-
-            @Override
-            public HttpOverTcp getTransport() {
-                return serverTransport;
-            }
-        };
-        clientStackGrouping = new HttpClientStackConfiguration(
-            ConfigUtils.clientTransportTcp(localAddress, port, USERNAME, PASSWORD));
+        super.beforeEach();
         invalidClientStackGrouping = new HttpClientStackConfiguration(
-            ConfigUtils.clientTransportTcp(localAddress, port, USERNAME, "wrong-password"));
-
-        // AAA services
-        final var securityManager = new DefaultWebSecurityManager(new AuthenticatingRealm() {
-            @Override
-            protected AuthenticationInfo doGetAuthenticationInfo(final AuthenticationToken token)
-                    throws AuthenticationException {
-                final var principal = (String) token.getPrincipal();
-                final var credentials = new String((char[]) token.getCredentials());
-                if (USERNAME.equals(principal) && PASSWORD.equals(credentials)) {
-                    return new SimpleAuthenticationInfo(principal, credentials, "user");
-                }
-                return null;
-            }
-        });
-        final var principalService = new AAAShiroPrincipalService(securityManager);
-
-        // MDSAL services
-        setup();
-        final var domDataBroker = getDomBroker();
-        final var schemaContext = getRuntimeContext().modelContext();
-        final var schemaService = new FixedDOMSchemaService(schemaContext);
-        final var dataBindProvider = new MdsalDatabindProvider(schemaService);
-        domRpcRouter = new DOMRpcRouter(schemaService);
-        domMountPointService = new DOMMountPointServiceImpl();
-        final var adapterContext = new ConstantAdapterContext(new DefaultBindingDOMCodecServices(getRuntimeContext()));
-        final var adapterFactory = new BindingAdapterFactory(adapterContext);
-        final var actionProviderService = adapterFactory.createActionProviderService(
-            new RouterDOMActionProviderService(domRpcRouter));
+            ConfigUtils.clientTransportTcp(localAddress(), port(), USERNAME, "wrong-password"));
         // action implementations
+        final var adapterFactory = new BindingAdapterFactory(adapterContext());
+        final var actionProviderService = adapterFactory.createActionProviderService(
+            new RouterDOMActionProviderService(domRpcRouter()));
         actionProviderService.registerImplementation(
             ActionSpec.builder(Root.class).build(ExampleAction.class), new ExampleActionImpl());
-        rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext,
-            new RouterDOMRpcProviderService(domRpcRouter));
-        domNotificationRouter = new DOMNotificationRouter(32);
-        final ClusterSingletonServiceProvider cssProvider = service -> {
-            service.instantiateServiceInstance();
-            return service::closeServiceInstance;
-        };
-
-        streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker,
-            new RouterDOMNotificationService(domNotificationRouter),
-            schemaService, uri -> uri.resolve("streams"), dataBindProvider, cssProvider);
-        final var rpcImplementations = List.<RpcImplementation>of(
-            // rpcImplementations
-            new CreateDataChangeEventSubscriptionRpc(streamRegistry, dataBindProvider, domDataBroker),
-            new SubscribeDeviceNotificationRpc(streamRegistry, domMountPointService)
-        );
-        final var server = new MdsalRestconfServer(dataBindProvider, domDataBroker,
-            new RouterDOMRpcService(domRpcRouter), new RouterDOMActionService(domRpcRouter), domMountPointService,
-            rpcImplementations);
-
-        // Netty endpoint
-        final var configuration = createEndpointConfiguration(serverStackGrouping);
-        endpoint = new SimpleNettyEndpoint(server, principalService, streamRegistry, bootstrapFactory, configuration);
     }
 
+    @Override
     @AfterEach
     protected void afterEach() throws Exception {
-        endpoint.close();
-        streamRegistry.close();
-        domNotificationRouter.close();
-        domRpcRouter.close();
         closeAllStreams();
         if (clientStreamService != null) {
             clientStreamService = null;
         }
-    }
-
-    @AfterAll
-    static void afterAll() {
-        bootstrapFactory.close();
-        sshTransportStackFactory.close();
-    }
-
-    /**
-     * {@return the localAddress}
-     */
-    protected static String localAddress() {
-        return localAddress;
-    }
-
-    /**
-     * {@return the sshTransportStackFactory}
-     */
-    protected static SSHTransportStackFactory sshTransportStackFactory() {
-        return sshTransportStackFactory;
+        super.afterEach();
     }
 
     /**
@@ -319,141 +142,13 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         return invalidClientStackGrouping;
     }
 
-    /**
-     * {@return the domMountPointService}
-     */
-    protected final DOMMountPointService domMountPointService() {
-        return domMountPointService;
-    }
-
-    /**
-     * {@return the rpcProviderService}
-     */
-    protected final RpcProviderService rpcProviderService() {
-        return rpcProviderService;
-    }
-
-    /**
-     * {@return the host}
-     */
-    protected final String host() {
-        return host;
-    }
-
-    /**
-     * {@return the port}
-     */
-    protected final int port() {
-        return port;
-    }
-
-    /**
-     * {@return the JSON parser configuration}
-     */
-    protected static JSONParserConfiguration jsonParserConfiguration() {
-        return JSON_PARSER_CONFIGURATION;
-    }
-
-    /**
-     * Find a local port which has a good chance of not failing {@code bind()} due to a conflict.
-     *
-     * @return a local port
-     */
-    protected static final int randomBindablePort() {
-        try (var socket = new ServerSocket(0)) {
-            return socket.getLocalPort();
-        } catch (IOException e) {
-            throw new AssertionError(e);
-        }
-    }
-
-    protected NettyEndpointConfiguration createEndpointConfiguration(
-            final HttpServerListenStackGrouping serverStackGrouping) {
-        return new NettyEndpointConfiguration(
-            ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000),
-            "rests", MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
-            WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS);
-    }
-
-    protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri) throws Exception {
-        return invokeRequest(buildRequest(method, uri, APPLICATION_JSON, null, null));
-    }
-
-    protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri, final String mediaType)
-            throws Exception {
-        return invokeRequest(buildRequest(method, uri, mediaType, null, null));
-    }
-
-    protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri, final String mediaType,
-            final String content) throws Exception {
-        return invokeRequest(buildRequest(method, uri, mediaType, content, null));
-    }
-
-    protected FullHttpResponse invokeRequest(final HttpMethod method, final String uri, final String mediaType,
-        final String acceptType, final String content) throws Exception {
-        return invokeRequest(buildRequest(method, uri, mediaType, content, acceptType));
-    }
-
-    protected FullHttpResponse invokeRequest(final FullHttpRequest request) throws Exception {
-        return invokeRequest(request, clientStackGrouping);
-    }
-
-    protected FullHttpResponse invokeRequest(final FullHttpRequest request, final HttpClientStackGrouping clientConf)
-            throws Exception {
-        final var clientSession = new ClientHttp1Session();
-        final var channelListener = new TestTransportChannelListener(transportChannel -> {
-            transportChannel.channel().pipeline().addLast("restconf-session", clientSession);
-        });
-        final var client = HTTPClient.connect(channelListener, bootstrapFactory.newBootstrap(),
-            clientConf, false).get(2, TimeUnit.SECONDS);
-        // await for connection
-        await().atMost(Duration.ofSeconds(2)).until(channelListener::initialized);
-        final var callback = new TestRequestCallback();
-        clientSession.invoke(request, callback);
-        // await for response
-        await().atMost(Duration.ofSeconds(2)).until(callback::completed);
-        client.shutdown().get(2, TimeUnit.SECONDS);
-        final var response = callback.response();
-        assertNotNull(response);
-        return response;
-    }
-
-    protected FullHttpRequest buildRequest(final HttpMethod method, final String uri, final String mediaType,
-            final String content, final String acceptType) {
-        final var contentBuf = content == null ? Unpooled.EMPTY_BUFFER
-            : Unpooled.wrappedBuffer(content.getBytes(StandardCharsets.UTF_8));
-        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri, contentBuf);
-        request.headers()
-            .set(HttpHeaderNames.HOST, host)
-            .set(HttpHeaderNames.ACCEPT, acceptType != null ? acceptType : mediaType)
-            .set(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
-        if (method != HttpMethod.GET && method != HttpMethod.HEAD) {
-            request.headers().set(HttpHeaderNames.CONTENT_TYPE, mediaType);
-        }
-        return request;
-    }
-
-    protected void assertContentJson(final String getRequestUri, final String expectedContent) throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, getRequestUri);
-        assertEquals(HttpResponseStatus.OK, response.status());
-        assertContentJson(response, expectedContent);
-    }
-
-    protected static void assertContentJson(final FullHttpResponse response, final String expectedContent) {
-        final var content = response.content().toString(StandardCharsets.UTF_8);
-        JSONAssert.assertEquals(expectedContent, content, JSONCompareMode.LENIENT);
-    }
-
-    protected void assertContentXml(final String getRequestUri, final String expectedContent) throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, getRequestUri, APPLICATION_XML);
-        assertEquals(HttpResponseStatus.OK, response.status());
-        assertContentXml(response, expectedContent);
-    }
-
-    protected static void assertContentXml(final FullHttpResponse response, final String expectedContent) {
-        final var content = response.content().toString(StandardCharsets.UTF_8);
-        assertThat(content, isSimilarTo(expectedContent).ignoreComments().ignoreWhitespace()
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byName)));
+    @Override
+    protected List<RpcImplementation> rpcImplementations(final DOMDataBroker domDataBroker,
+            final MdsalDatabindProvider dataBindProvider) {
+        return List.of(
+            new CreateDataChangeEventSubscriptionRpc(streamRegistry(), dataBindProvider, domDataBroker),
+            new SubscribeDeviceNotificationRpc(streamRegistry(), domMountPointService())
+        );
     }
 
     protected static void assertErrorResponseJson(final FullHttpResponse response, final ErrorType expectedErrorType,
@@ -468,7 +163,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         //         }]
         //    }
         // }
-        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8), JSON_PARSER_CONFIGURATION);
+        final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8), jsonParserConfiguration());
         final var error = json.getJSONObject("errors").getJSONArray("error").getJSONObject(0);
         assertNotNull(error);
         assertEquals(expectedErrorType.elementBody(), error.getString("error-type"));
@@ -555,7 +250,7 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
         //              "description": "..."
         //      }]
         // }
-        final var json = new JSONObject(content, JSON_PARSER_CONFIGURATION);
+        final var json = new JSONObject(content, jsonParserConfiguration());
         final var stream = json.getJSONArray("ietf-restconf-monitoring:stream").getJSONObject(0);
         for (var access : stream.getJSONArray("access")) {
             final var accessObj = (JSONObject) access;
@@ -582,8 +277,8 @@ public abstract class AbstractE2ETest extends AbstractDataBrokerTest {
             clientStreamService = SseUtils.enableClientSse(channel);
         });
 
-        final var streamClient = HTTPClient.connect(transportListener, bootstrapFactory.newBootstrap(),
-            clientStackGrouping, http2).get(2, TimeUnit.SECONDS);
+        final var streamClient = HTTPClient.connect(transportListener, bootstrapFactory().newBootstrap(),
+            clientStackGrouping(), http2).get(2, TimeUnit.SECONDS);
         await().atMost(Duration.ofSeconds(2)).until(transportListener::initialized);
         assertNotNull(clientStreamService);
         return streamClient;
