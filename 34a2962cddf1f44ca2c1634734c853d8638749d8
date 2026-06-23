@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79403651_01e49ac4",
+        "filename": "protocol/restconf-server-spi/src/test/resources/instance-identifier/instance-identifier-patch-module.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-06-23T10:19:22Z",
+      "side": 1,
+      "message": "this is duplicating resources: use symbolic links in restconf-nb to point to here instead of of copying it",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 6
+      },
+      "revId": "34a2962cddf1f44ca2c1634734c853d8638749d8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
