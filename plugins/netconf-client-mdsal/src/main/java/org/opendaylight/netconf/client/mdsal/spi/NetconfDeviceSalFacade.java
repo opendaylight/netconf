@@ -30,8 +30,6 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
     private final AtomicBoolean closed = new AtomicBoolean();
     private final boolean lockDatastore;
 
-    private NegotiatedSshAlg negotiatedSshKeys;
-
     protected final RemoteDeviceId id;
 
     public NetconfDeviceSalFacade(final RemoteDeviceId id, final DOMMountPointService mountPointService,
@@ -52,17 +50,9 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
     }
 
     @Override
-    public synchronized void onSshAlgorithmsNegotiated(final NegotiatedSshAlg negotiatedSshAlg) {
-        this.negotiatedSshKeys = negotiatedSshAlg;
-    }
-
-    public synchronized NegotiatedSshAlg negotiatedSshKeys() {
-        return negotiatedSshKeys;
-    }
-
-    @Override
     public synchronized void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
+            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services,
+            final NegotiatedSshAlg negotiatedSshAlg) {
         if (closed()) {
             LOG.warn("{}: Device mount was closed before device connected setup finished.", id);
             return;

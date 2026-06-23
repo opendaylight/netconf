@@ -12,6 +12,7 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
@@ -48,14 +49,15 @@ public class NetconfTopologyDeviceSalFacade extends NetconfDeviceSalFacade {
 
     @Override
     public synchronized void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
+            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services,
+            final NegotiatedSshAlg negotiatedSshAlg) {
         if (closed()) {
             LOG.warn("{}: Device adapter was closed before device connected setup finished.", id);
             return;
         }
-        super.onDeviceConnected(deviceSchema, sessionPreferences, services);
+        super.onDeviceConnected(deviceSchema, sessionPreferences, services, negotiatedSshAlg);
         datastoreAdapter.updateDeviceData(true, deviceSchema.capabilities(), sessionPreferences.sessionId(),
-            negotiatedSshKeys());
+            negotiatedSshAlg);
     }
 
     @Override

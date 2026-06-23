@@ -296,7 +296,8 @@ class KeepaliveSalFacadeResponseWaitingTest {
 
         @Override
         public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-                final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
+                final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services,
+                final NegotiatedSshAlg negotiatedSshAlg) {
             rpcs = assertInstanceOf(Rpcs.Normalized.class, services.rpcs());
         }
 
@@ -312,11 +313,6 @@ class KeepaliveSalFacadeResponseWaitingTest {
 
         @Override
         public void onNotification(final DOMNotification domNotification) {
-            // No-op
-        }
-
-        @Override
-        public void onSshAlgorithmsNegotiated(final NegotiatedSshAlg negotiatedSshAlg) {
             // No-op
         }
 

@@ -80,7 +80,7 @@ class KeepaliveSalFacadeTest {
 
     @Test
     void testKeepaliveSuccess() {
-        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
+        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID)
             .build()))).when(deviceRpc).invokeNetconf(any(), any());
@@ -88,20 +88,20 @@ class KeepaliveSalFacadeTest {
         final var services = new RemoteDeviceServices(deviceRpc, null);
         keepaliveSalFacade.onDeviceConnected(null, null, services);
 
-        verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
+        verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(), any());
         verify(deviceRpc, timeout(15000).times(5)).invokeNetconf(any(), any());
     }
 
     @Test
     void testKeepaliveRpcFailure() {
-        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
+        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(), any());
         doReturn(Futures.immediateFailedFuture(new IllegalStateException("illegal-state")))
                 .when(deviceRpc).invokeNetconf(any(), any());
         doNothing().when(listener).disconnect();
         final var remoteDeviceServices = new RemoteDeviceServices(rpcsTimeoutHandler.decorateRpcs(deviceRpc), null);
         keepaliveSalFacade.onDeviceConnected(null, null, remoteDeviceServices);
 
-        verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
+        verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(), any());
 
         // Should disconnect the session
         verify(listener, timeout(15000).times(1)).disconnect();
@@ -110,13 +110,13 @@ class KeepaliveSalFacadeTest {
 
     @Test
     void testKeepaliveSuccessWithRpcError() {
-        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
+        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(), any());
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(mock(RpcError.class)))).when(deviceRpc)
             .invokeNetconf(any(), any());
         final var remoteDeviceServices = new RemoteDeviceServices(rpcsTimeoutHandler.decorateRpcs(deviceRpc), null);
         keepaliveSalFacade.onDeviceConnected(null, null, remoteDeviceServices);
 
-        verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
+        verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(), any());
 
         // Shouldn't disconnect the session
         verify(listener, never()).disconnect();
@@ -126,7 +126,8 @@ class KeepaliveSalFacadeTest {
     @Test
     void testNonKeepaliveRpcFailure() {
         doAnswer(invocation -> proxyRpc = invocation.getArgument(2, RemoteDeviceServices.class).rpcs())
-                .when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(RemoteDeviceServices.class));
+                .when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(RemoteDeviceServices.class),
+                any());
         doReturn(Futures.immediateFailedFuture(new IllegalStateException("illegal-state")))
                 .when(deviceDomRpc).invokeRpc(any(), any());
 
@@ -143,14 +144,14 @@ class KeepaliveSalFacadeTest {
 
     @Test
     void testKeepaliveRpcResponseTimeout() {
-        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
+        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(), any());
         doNothing().when(listener).disconnect();
         doReturn(SettableFuture.create()).when(deviceRpc).invokeNetconf(any(), any());
 
         final var remoteDeviceServices = new RemoteDeviceServices(rpcsTimeoutHandler.decorateRpcs(deviceRpc), null);
         keepaliveSalFacade.onDeviceConnected(null, null, remoteDeviceServices);
 
-        verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(RemoteDeviceServices.class));
+        verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(RemoteDeviceServices.class), any());
 
         // Should disconnect the session because RPC result future is never resolved and keepalive delay is 1 sec
         verify(listener, timeout(115000).times(1)).disconnect();

@@ -125,6 +125,10 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private final @NonNull NetconfClientConfigurationBuilderFactory builderFactory;
     private final @NonNull SshTransportTopologyParameters sshParams;
 
+    // SSH algorithms known up-front for call-home connections (null for regular connections); used as the per-attempt
+    // baseline for negotiatedSshAlg.
+    private final NegotiatedSshAlg callHomeSshAlg;
+
     private final long maxBackoff;
     private final long maxAttempts;
     private final int minBackoff;
@@ -135,6 +139,9 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private @GuardedBy("this") long attempts;
     private @GuardedBy("this") long lastMultipliedBackoff;
     private @GuardedBy("this") Task currentTask;
+    // SSH algorithms negotiated for the current connection attempt: reset to callHomeSshAlg at the start of each
+    // attempt (lockedConnect) and updated by the SSHNegotiatedAlgListener during key establishment.
+    private @GuardedBy("this") NegotiatedSshAlg negotiatedSshAlg;
 
     public NetconfNodeHandler(final NetconfClientFactory clientFactory, final NetconfTimer timer,
             final BaseNetconfSchemaProvider baseSchemaProvider, final SchemaResourceManager schemaManager,
@@ -142,7 +149,8 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final RemoteDeviceHandler delegate,
             final RemoteDeviceId deviceId, final NodeId nodeId, final NetconfNode node,
-            final NetconfNodeAugmentedOptional nodeOptional, final SshTransportTopologyParameters sshParams) {
+            final NetconfNodeAugmentedOptional nodeOptional, final SshTransportTopologyParameters sshParams,
+            final NegotiatedSshAlg callHomeSshAlg) {
         this.clientFactory = requireNonNull(clientFactory);
         this.timer = requireNonNull(timer);
         this.delegate = requireNonNull(delegate);
@@ -151,6 +159,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         this.nodeId = requireNonNull(nodeId);
         this.builderFactory = requireNonNull(builderFactory);
         this.sshParams = requireNonNull(sshParams);
+        this.callHomeSshAlg = callHomeSshAlg;
 
         maxAttempts = node.requireMaxConnectionAttempts().toJava();
         minBackoff = node.requireMinBackoffMillis().toJava();
@@ -227,6 +236,9 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
     @Holding("this")
     private void lockedConnect() {
+        // Reset to the per-attempt baseline; the SSHNegotiatedAlgListener will refill it during key establishment for
+        // regular SSH connections.
+        negotiatedSshAlg = callHomeSshAlg;
         if (clientConfig == null) {
             try {
                 clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node, sshParams)
@@ -243,7 +255,9 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             public void onAlgorithmsNegotiated(final SshKeyExchangeAlgorithm kexAlgorithm,
                     final SshPublicKeyAlgorithm hostKey, final SshEncryptionAlgorithm encryption,
                     final SshMacAlgorithm mac) {
-                onSshAlgorithmsNegotiated(new NegotiatedSshAlg(kexAlgorithm, hostKey, encryption, mac));
+                synchronized (NetconfNodeHandler.this) {
+                    negotiatedSshAlg = new NegotiatedSshAlg(kexAlgorithm, hostKey, encryption, mac);
+                }
             }
         };
         final ListenableFuture<NetconfClientSession> connectFuture;
@@ -302,11 +316,16 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
     @Override
     public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
+            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services,
+            final NegotiatedSshAlg ignoredSshAlg) {
+        // The incoming algorithm is ignored: this handler owns the negotiated algorithms (captured by its
+        // SSHNegotiatedAlgListener or seeded from call-home), so it injects its own value when forwarding.
+        final NegotiatedSshAlg sshAlg;
         synchronized (this) {
             attempts = 0;
+            sshAlg = negotiatedSshAlg;
         }
-        delegate.onDeviceConnected(deviceSchema, sessionPreferences, services);
+        delegate.onDeviceConnected(deviceSchema, sessionPreferences, services, sshAlg);
     }
 
     @Override
@@ -328,11 +347,6 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     @Override
     public void onNotification(final DOMNotification domNotification) {
         delegate.onNotification(domNotification);
-    }
-
-    @Override
-    public void onSshAlgorithmsNegotiated(final NegotiatedSshAlg negotiatedSshAlg) {
-        delegate.onSshAlgorithmsNegotiated(negotiatedSshAlg);
     }
 
     private void reconnectOrFail() {

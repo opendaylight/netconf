@@ -9,6 +9,7 @@ package org.opendaylight.netconf.topology.spi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -48,6 +49,7 @@ import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -57,6 +59,7 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -111,6 +114,8 @@ class NetconfNodeHandlerTest {
     private ArgumentCaptor<NetconfSessionPreferences> prefsCaptor;
     @Captor
     private ArgumentCaptor<RemoteDeviceServices> servicesCaptor;
+    @Captor
+    private ArgumentCaptor<NegotiatedSshAlg> sshAlgCaptor;
 
     // Mock Timer-related things
     @Mock
@@ -165,7 +170,7 @@ class NetconfNodeHandlerTest {
                         .setPassword("testpassword")
                         .build())
                     .build())
-                .build(), null, AbstractNetconfTopology.defaultSshParams());
+                .build(), null, AbstractNetconfTopology.defaultSshParams(), null);
     }
 
     @AfterEach
@@ -185,13 +190,69 @@ class NetconfNodeHandlerTest {
 
         // when the device is connected, we propagate the information
         doNothing().when(delegate).onDeviceConnected(schemaCaptor.capture(), prefsCaptor.capture(),
-            servicesCaptor.capture());
+            servicesCaptor.capture(), sshAlgCaptor.capture());
         handler.onDeviceConnected(schema, netconfSessionPreferences, deviceServices);
 
         assertEquals(schema, schemaCaptor.getValue());
         assertEquals(netconfSessionPreferences, prefsCaptor.getValue());
         assertEquals(deviceServices, servicesCaptor.getValue());
+        // TCP-only connection: no SSH algorithms were negotiated
+        assertNull(sshAlgCaptor.getValue());
         assertEquals(0, handler.attempts());
+    }
+
+    @Test
+    void negotiatedSshAlgPropagatesWithDeviceConnected() throws Exception {
+        // capture the SSH algorithm listener handed to the client factory
+        final var algListenerCaptor = ArgumentCaptor.forClass(SSHNegotiatedAlgListener.class);
+        doReturn(Futures.immediateFuture(clientSession)).when(clientFactory)
+            .createClient(any(), algListenerCaptor.capture());
+        handler.connect();
+        verifyNoInteractions(delegate);
+
+        // simulate SSH key establishment negotiating algorithms
+        algListenerCaptor.getValue().onAlgorithmsNegotiated(null, null, null, null);
+        final var negotiated = new NegotiatedSshAlg(null, null, null, null);
+
+        final var schema = new NetconfDeviceSchema(DatabindContext.ofModel(modelContext),
+            NetconfDeviceCapabilities.empty());
+        final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE));
+        final var deviceServices = new RemoteDeviceServices(mock(Rpcs.Normalized.class), null);
+
+        // the negotiated algorithms must be delivered together with the connect event
+        doNothing().when(delegate).onDeviceConnected(any(), any(), any(), sshAlgCaptor.capture());
+        handler.onDeviceConnected(schema, netconfSessionPreferences, deviceServices);
+        assertEquals(negotiated, sshAlgCaptor.getValue());
+    }
+
+    @Test
+    void negotiatedSshAlgIsResetOnReconnect() throws Exception {
+        // capture the SSH algorithm listener handed to the client factory
+        final var algListenerCaptor = ArgumentCaptor.forClass(SSHNegotiatedAlgListener.class);
+        doReturn(Futures.immediateFuture(clientSession)).when(clientFactory)
+            .createClient(any(), algListenerCaptor.capture());
+        handler.connect();
+
+        // algorithms negotiated on the first connection attempt
+        algListenerCaptor.getValue().onAlgorithmsNegotiated(null, null, null, null);
+
+        final var schema = new NetconfDeviceSchema(DatabindContext.ofModel(modelContext),
+            NetconfDeviceCapabilities.empty());
+        final var netconfSessionPreferences = NetconfSessionPreferences.fromStrings(List.of(CapabilityURN.CANDIDATE));
+        final var deviceServices = new RemoteDeviceServices(mock(Rpcs.Normalized.class), null);
+
+        doNothing().when(delegate).onDeviceConnected(any(), any(), any(), sshAlgCaptor.capture());
+        handler.onDeviceConnected(schema, netconfSessionPreferences, deviceServices);
+        assertEquals(new NegotiatedSshAlg(null, null, null, null), sshAlgCaptor.getValue());
+
+        // a reconnect attempt must clear the previously negotiated algorithms so they are not reported stale
+        doReturn(timeout).when(timer).newTimeout(timerCaptor.capture(), anyLong(), any());
+        handler.onDeviceFailed(new AssertionError("connection dropped"));
+        timerCaptor.getValue().run(timeout);
+
+        // without a fresh negotiation, the next connect must report no algorithms
+        handler.onDeviceConnected(schema, netconfSessionPreferences, deviceServices);
+        assertNull(sshAlgCaptor.getValue());
     }
 
     @Test
@@ -299,7 +360,7 @@ class NetconfNodeHandlerTest {
                         .build())
                     .build())
                 .build(),
-                null, AbstractNetconfTopology.defaultSshParams());
+                null, AbstractNetconfTopology.defaultSshParams(), null);
 
         // return null when attempt to load credentials fot key id
         doReturn(null).when(credentialProvider).credentialForId(any());
@@ -342,7 +403,7 @@ class NetconfNodeHandlerTest {
                     .setPassword("testpassword")
                     .build())
                 .build())
-            .build(), null, AbstractNetconfTopology.defaultSshParams());
+            .build(), null, AbstractNetconfTopology.defaultSshParams(), null);
 
         // Test 1000 iterations and pick the smallest value.
         // Less iteration has higher chance to not catch NETCONF-1408 issue.
