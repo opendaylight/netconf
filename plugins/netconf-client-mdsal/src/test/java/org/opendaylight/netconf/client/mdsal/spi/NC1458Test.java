@@ -104,7 +104,7 @@ class NC1458Test {
         communicator.onSessionUp(session);
 
         // Do nothing when KeepaliveTask call onDeviceConnected in scheduled sendKeepalive method.
-        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
+        doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(), any());
     }
 
     @AfterEach

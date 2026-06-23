@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
@@ -29,8 +30,6 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
     private final NetconfDeviceMount mount;
     private final AtomicBoolean closed = new AtomicBoolean();
     private final boolean lockDatastore;
-
-    private NegotiatedSshAlg negotiatedSshKeys;
 
     protected final RemoteDeviceId id;
 
@@ -52,17 +51,9 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
     }
 
     @Override
-    public synchronized void onSshAlgorithmsNegotiated(final NegotiatedSshAlg negotiatedSshAlg) {
-        this.negotiatedSshKeys = negotiatedSshAlg;
-    }
-
-    public synchronized NegotiatedSshAlg negotiatedSshKeys() {
-        return negotiatedSshKeys;
-    }
-
-    @Override
     public synchronized void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
+            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services,
+            final @Nullable NegotiatedSshAlg negotiatedSshAlg) {
         if (closed()) {
             LOG.warn("{}: Device mount was closed before device connected setup finished.", id);
             return;
