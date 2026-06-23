@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2de8f5c9_674e18ca",
+        "filename": "plugins/netconf-client-mdsal/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-06-23T08:43:58Z",
+      "side": 1,
+      "message": "this should always be picked up from netconf-artifacts",
+      "range": {
+        "startLine": 277,
+        "startChar": 21,
+        "endLine": 277,
+        "endChar": 39
+      },
+      "revId": "5dcd620c985c1cd0f2712e82f890c2aee33aa70b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
