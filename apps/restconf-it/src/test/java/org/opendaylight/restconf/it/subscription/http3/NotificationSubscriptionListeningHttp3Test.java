@@ -140,7 +140,7 @@ class NotificationSubscriptionListeningHttp3Test extends AbstractNotificationSub
             }""", eventListener2.readNext(), JSONCompareMode.LENIENT);
     }
 
-    private String startSubscription() throws Exception {
+    private String startSubscription() {
         final var uri = "/rests/operations/ietf-subscribed-notifications:establish-subscription";
         final var response = invokeRequestKeepClient(HttpMethod.POST, uri,
             MediaTypes.APPLICATION_YANG_DATA_JSON,
@@ -155,7 +155,7 @@ class NotificationSubscriptionListeningHttp3Test extends AbstractNotificationSub
 
         // Extract subscription ID from response
         final var jsonContent = new JSONObject(response.content().toString(StandardCharsets.UTF_8),
-            JSON_PARSER_CONFIGURATION);
+            jsonParserConfiguration());
         return String.valueOf(jsonContent.getJSONObject("ietf-subscribed-notifications:output").getLong("id"));
     }
 }
