@@ -172,10 +172,13 @@ final class NetconfNodeContext implements AutoCloseable {
         // Instantiate the handler ...
         masterSalFacade = createSalFacade(remoteDeviceId, netconfNode.getCredentials(), netconfNode.getLockDatastore());
 
+        // No call-home baseline: call-home is not wired into the clustered/singleton topology today. If that
+        // changes, thread the pre-negotiated NegotiatedSshAlg through here the way CallHomeTopology does for the
+        // standalone netconf-topology.
         nodeHandler = new NetconfNodeHandler(setup.getNetconfClientFactory(), setup.getTimer(),
             setup.getBaseSchemaProvider(), schemaManager, setup.getSchemaAssembler(), builderFactory,
             deviceActionFactory, masterSalFacade, remoteDeviceId, configNode.getNodeId(), netconfNode, nodeOptional,
-            setup.getSshParams());
+            setup.getSshParams(), null);
         nodeHandler.connect();
     }
 
