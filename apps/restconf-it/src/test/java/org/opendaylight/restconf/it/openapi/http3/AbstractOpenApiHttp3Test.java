@@ -27,7 +27,6 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.json.JSONObject;
-import org.json.JSONParserConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.opendaylight.netconf.transport.http.HTTPServerOverQuic;
@@ -36,7 +35,6 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.it.openapi.AbstractOpenApiTest;
 import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
-import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.HttpServerListenStackGrouping;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -45,9 +43,6 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 public class AbstractOpenApiHttp3Test extends AbstractOpenApiTest {
-    private static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
-        new JSONParserConfiguration().withStrictMode();
-    private static final ErrorTagMapping ERROR_TAG_MAPPING = ErrorTagMapping.RFC8040;
     private static final String TOPOLOGY_URI =
         "/rests/data/network-topology:network-topology/topology=topology-netconf";
     private static final String DEVICE_NODE_URI = TOPOLOGY_URI + "/node=device-sim";
@@ -169,7 +164,7 @@ public class AbstractOpenApiHttp3Test extends AbstractOpenApiTest {
             .build());
 
         assertEquals(HttpResponseStatus.OK, response.status());
-        final var json = new JSONObject(response.content(), JSON_PARSER_CONFIGURATION);
+        final var json = new JSONObject(response.content(), jsonParserConfiguration());
         //{
         //  "netconf-node-topology:netconf-node": {
         //    "connection-status": "connected"
