@@ -64,7 +64,7 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
         final var subscriptionId = Uint32.valueOf(extractSubscriptionId(response));
         final var listener = startSubscriptionStream(String.valueOf(subscriptionId));
 
-        final var subscription = getStreamRegistry().lookupSubscription(subscriptionId);
+        final var subscription = streamRegistry().lookupSubscription(subscriptionId);
         assertNotNull(subscription);
 
         // try to publish ToasterRestocked notification
@@ -151,7 +151,7 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
         final var subscriptionId = Uint32.valueOf(extractSubscriptionId(response));
         final var listener = startSubscriptionStream(String.valueOf(subscriptionId));
 
-        final var subscription = getStreamRegistry().lookupSubscription(subscriptionId);
+        final var subscription = streamRegistry().lookupSubscription(subscriptionId);
         assertNotNull(subscription);
 
         // suspend subscription

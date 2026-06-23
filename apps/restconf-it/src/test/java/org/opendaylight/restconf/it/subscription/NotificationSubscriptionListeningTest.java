@@ -63,7 +63,7 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
 
         // Extract subscription ID from response
         final var jsonContent = new JSONObject(response.content().toString(StandardCharsets.UTF_8),
-            JSON_PARSER_CONFIGURATION);
+            jsonParserConfiguration());
         final var subscriptionId = jsonContent.getJSONObject("ietf-subscribed-notifications:output").getLong("id");
 
         // Start listening on notifications

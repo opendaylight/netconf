@@ -149,7 +149,7 @@ class NotificationSubscriptionListeningHttp2Test extends AbstractNotificationSub
 
         // Extract subscription ID from response
         final var jsonContent = new JSONObject(response.content().toString(StandardCharsets.UTF_8),
-            JSON_PARSER_CONFIGURATION);
+            jsonParserConfiguration());
         return String.valueOf(jsonContent.getJSONObject("ietf-subscribed-notifications:output").getLong("id"));
     }
 }
