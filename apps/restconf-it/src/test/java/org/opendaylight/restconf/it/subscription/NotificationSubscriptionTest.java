@@ -27,9 +27,9 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
     private static final String XML_ENCODING = "encode-xml";
     private static final String NETCONF_STREAM = "NETCONF";
     private static final String DELETE_SUBSCRIPTION_URI =
-        "/restconf/operations/ietf-subscribed-notifications:delete-subscription";
+        "/rests/operations/ietf-subscribed-notifications:delete-subscription";
     private static final String KILL_SUBSCRIPTION_URI =
-        "/restconf/operations/ietf-subscribed-notifications:kill-subscription";
+        "/rests/operations/ietf-subscribed-notifications:kill-subscription";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     /**
@@ -37,7 +37,7 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
      */
     @Test
     void defaultStreamAvailabilityTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, "/restconf/data/ietf-subscribed-notifications:streams",
+        final var response = invokeRequest(HttpMethod.GET, "/rests/data/ietf-subscribed-notifications:streams",
             APPLICATION_JSON);
         assertNotNull(response);
         assertNotNull(response.content());
