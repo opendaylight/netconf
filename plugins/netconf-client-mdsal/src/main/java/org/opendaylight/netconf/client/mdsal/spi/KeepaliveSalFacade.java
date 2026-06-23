@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.transform.dom.DOMSource;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -126,7 +127,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
     @Override
     public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
+            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services,
+            final @Nullable NegotiatedSshAlg negotiatedSshAlg) {
         final var devRpc = services.rpcs();
         task = new KeepaliveTask(devRpc);
 
@@ -141,7 +143,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         deviceHandler.onDeviceConnected(deviceSchema, sessionPreferences, new RemoteDeviceServices(keepaliveRpcs,
             // FIXME: wrap with keepalive
-            services.actions()));
+            services.actions()), negotiatedSshAlg);
 
         // We have performed a callback, which might have termined keepalives
         final var localTask = task;
@@ -172,11 +174,6 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
             localTask.recordActivity();
         }
         deviceHandler.onNotification(domNotification);
-    }
-
-    @Override
-    public void onSshAlgorithmsNegotiated(final NegotiatedSshAlg negotiatedSshAlg) {
-        deviceHandler.onSshAlgorithmsNegotiated(negotiatedSshAlg);
     }
 
     @Override
