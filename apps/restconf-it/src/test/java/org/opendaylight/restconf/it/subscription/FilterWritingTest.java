@@ -22,7 +22,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class FilterWritingTest extends AbstractNotificationSubscriptionTest {
-    private static final String URI = "/restconf/data/ietf-subscribed-notifications:filters";
+    private static final String URI = "/rests/data/ietf-subscribed-notifications:filters";
     private static final String URI_GET = URI + "/stream-filter=foo";
     private static final String FILTER_XML = """
         <stream-filter xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
