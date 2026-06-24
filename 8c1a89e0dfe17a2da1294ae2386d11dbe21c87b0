@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "073c0733_64bd4871",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-24T12:01:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9871e8c_15c17fae",
+      "revId": "8c1a89e0dfe17a2da1294ae2386d11dbe21c87b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0ded50fc_484fbba1",
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0ec7593_aed25857",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-24T12:01:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ded50fc_484fbba1",
+      "revId": "8c1a89e0dfe17a2da1294ae2386d11dbe21c87b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "07b87b0b_581d3760",
@@ -65,6 +101,24 @@
       "writtenOn": "2026-06-24T10:52:52Z",
       "side": 1,
       "message": "Please keep the argument order consistent with AbstractIT.invokeRequest().",
+      "revId": "8c1a89e0dfe17a2da1294ae2386d11dbe21c87b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0967f02e_7dfa8344",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-24T12:01:34Z",
+      "side": 1,
+      "message": "done in https://git.opendaylight.org/gerrit/c/netconf/+/123694",
+      "parentUuid": "07b87b0b_581d3760",
       "revId": "8c1a89e0dfe17a2da1294ae2386d11dbe21c87b0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
