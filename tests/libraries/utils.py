@@ -379,7 +379,7 @@ def wait_until_function_returns_value_with_custom_value_validator(
     last_exception = None
     logger_buffer = None
 
-    for retry_num in range(1, retry_count+1):
+    for retry_num in range(1, retry_count + 1):
         try:
             with deferred_logging() as logger_buffer:
                 result = function(*args, **kwargs)
