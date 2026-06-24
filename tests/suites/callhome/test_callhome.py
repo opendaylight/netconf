@@ -67,6 +67,11 @@ def test_teardown():
     )
 
 
+@pytest.mark.callhome
+@pytest.mark.netopeer2
+@pytest.mark.functional
+@pytest.mark.smoke
+@pytest.mark.single_device
 @pytest.mark.usefixtures("preconditions")
 @pytest.mark.usefixtures("log_test_suite_start_end_to_karaf")
 @pytest.mark.usefixtures("log_test_case_start_end_to_karaf")
@@ -85,6 +90,7 @@ class TestCallHome:
             """
         )
     )
+    @pytest.mark.authentication
     def test_callhome_over_ssh_with_correct_device_credentials(
         self, allure_step_with_separate_logging, netopeer_pub_key, test_teardown
     ):
@@ -110,6 +116,7 @@ class TestCallHome:
                 NETCONF_MOUNT_EXPECTED_VALUE,
             )
 
+    @pytest.mark.authentication
     def test_callhome_over_ssh_with_incorrect_device_credentials(
         self, allure_step_with_separate_logging, netopeer_pub_key, test_teardown
     ):
@@ -140,6 +147,7 @@ class TestCallHome:
                 NETCONF_MOUNT_EXPECTED_VALUE,
             )
 
+    @pytest.mark.authentication
     def test_callhome_over_ssh_with_correct_global_credentials(
         self, allure_step_with_separate_logging, netopeer_pub_key, test_teardown
     ):
@@ -166,6 +174,7 @@ class TestCallHome:
                 NETCONF_MOUNT_EXPECTED_VALUE,
             )
 
+    @pytest.mark.authentication
     def test_callhome_over_ssh_with_incorrect_global_credentials(
         self, allure_step_with_separate_logging, netopeer_pub_key, test_teardown
     ):
@@ -197,6 +206,7 @@ class TestCallHome:
                 NETCONF_MOUNT_EXPECTED_VALUE,
             )
 
+    @pytest.mark.authentication
     def test_callhome_over_ssh_with_incorrect_node_id(
         self,
         allure_step_with_separate_logging,
@@ -238,6 +248,7 @@ class TestCallHome:
                 NETCONF_MOUNT_EXPECTED_VALUE,
             )
 
+    @pytest.mark.authentication
     def test_callhome_with_rogue_devices(
         self, allure_step_with_separate_logging, incorrect_pub_key, test_teardown
     ):
@@ -263,6 +274,7 @@ class TestCallHome:
                 NETCONF_MOUNT_EXPECTED_VALUE,
             )
 
+    @pytest.mark.authentication
     def test_callhome_over_tls_with_correct_certificate_and_key(
         self, allure_step_with_separate_logging, test_teardown
     ):
