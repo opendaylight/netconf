@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc8c30c0_7e5f7f92",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-24T12:00:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c8ff006b_1ba1ff4d",
+      "revId": "9a44a04edd9ca0e55a519f05cc8f615bb76bf9e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "29c095b3_578053ed",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d87fdc30_dc5ae181",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-24T12:00:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "29c095b3_578053ed",
+      "revId": "9a44a04edd9ca0e55a519f05cc8f615bb76bf9e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "794376b9_60136ad3",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-06-24T10:36:37Z",
       "side": 1,
       "message": "same here",
+      "revId": "9a44a04edd9ca0e55a519f05cc8f615bb76bf9e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9306a26_a0e4b759",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/AbstractE2ETest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-24T12:00:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "794376b9_60136ad3",
       "revId": "9a44a04edd9ca0e55a519f05cc8f615bb76bf9e6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
