@@ -94,11 +94,11 @@ class TestNotifications:
         allure_step_with_separate_logging,
     ):
         with allure_step_with_separate_logging("step_set_controller_log_level"):
-            """Set controller log level."""
+            # Set controller log level.
             infra.execute_karaf_command(f"log:set {CONTROLLER_LOG_LEVEL}")
 
         with allure_step_with_separate_logging("step_create_dcn_stream"):
-            """Create DCN subscription."""
+            # Create DCN subscription.
             body = infra.get_file_content(
                 f"{TEMPLATE_FOLDER}/{RESTCONF_SUBSCRIBE_DATA}"
             )
@@ -120,7 +120,7 @@ class TestNotifications:
             self.RFC8040_DCN_STREAM_URI = RFC8040_DCN_STREAM_URI
 
         with allure_step_with_separate_logging("step_subscribe_to_dcn_stream"):
-            """Subscribe to DCN streams."""
+            # Subscribe to DCN streams.
             resp = templated_requests.get_from_uri(
                 self.RFC8040_DCN_STREAM_URI, headers=XML_MESSAGE_HEADERS
             )
@@ -137,7 +137,7 @@ class TestNotifications:
             self.STREAM_LOCATION = STREAM_LOCATION
 
         with allure_step_with_separate_logging("step_list_dcn_streams"):
-            """List DCN streams."""
+            # List DCN streams.
             resp = templated_requests.get_from_uri(
                 self.RFC8040_DCN_STREAM_URI, headers=XML_MESSAGE_HEADERS
             )
@@ -147,7 +147,7 @@ class TestNotifications:
             assert self.STREAM_LOCATION in resp.text
 
         with allure_step_with_separate_logging("step_start_receiver"):
-            """Start the WSS/SSE listener."""
+            # Start the WSS/SSE listener.
             self.ssreceiver_process = infra.shell(
                 f"python3 tools/wstools/ssereceiver.py --uri {self.STREAM_LOCATION} "
                 f"--logfile {RECEIVER_LOG_FILE}",
@@ -158,7 +158,7 @@ class TestNotifications:
             log.info(f"{output=}")
 
         with allure_step_with_separate_logging("step_change_ds_config"):
-            """Make a change in DS configuration."""
+            # Make a change in DS configuration.
             body = infra.get_file_content(f"{TEMPLATE_FOLDER}/{RESTCONF_CONFIG_DATA}")
             uri = f"{RESTCONF_ROOT}/data/network-topology:network-topology"
             resp = templated_requests.put_to_uri_request(
@@ -176,7 +176,7 @@ class TestNotifications:
             assert resp.status_code in templated_requests.ALLOWED_STATUS_CODES
 
         with allure_step_with_separate_logging("step_check_notification"):
-            """Check the WSS/SSE listener log for a change notification."""
+            # Check the WSS/SSE listener log for a change notification.
             rc, notification = infra.shell(f"cat {RECEIVER_LOG_FILE}")
             log.info(f"Notification: {notification}")
             self.notification = notification
@@ -189,11 +189,11 @@ class TestNotifications:
             assert "</notification>" in self.notification
 
         with allure_step_with_separate_logging("step_check_delete_notification"):
-            """Check the WSS/SSE listener log for a delete notification."""
+            # Check the WSS/SSE listener log for a delete notification.
             assert "<operation>deleted</operation>" in self.notification
 
         with allure_step_with_separate_logging("step_check_bug_3934"):
-            """Check the WSS/SSE listener log for the bug correction."""
+            # Check the WSS/SSE listener log for the bug correction.
             with utils.report_known_bug_on_failure("3934"):
                 data = infra.get_file_content(
                     f"{TEMPLATE_FOLDER}/{RESTCONF_CONFIG_DATA}"
@@ -208,5 +208,5 @@ class TestNotifications:
                 assert packed_data in packed_notification
 
         with allure_step_with_separate_logging("step_stop_receiver"):
-            """Stop the background WSS/SSE listener process."""
+            # Stop the background WSS/SSE listener process.
             infra.stop_process_by_pid(self.ssreceiver_process.pid)
