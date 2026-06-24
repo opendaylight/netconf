@@ -81,7 +81,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
              </input>""", id);
         final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
+            MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON, modifyInput);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
         // verify subscription-modified notification is not filtered out
@@ -154,7 +154,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
 
         // Establish subscription with filter reference
         final var establishResponse = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_JSON,
+            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {
                   "input": {
@@ -162,7 +162,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                     "encoding": "encode-json",
                     "stream-filter-name" : "foo"
                   }
-                }""", MediaTypes.APPLICATION_YANG_DATA_JSON);
+                }""");
 
         verifyToasterOutOfBreadFilter(establishResponse);
     }
