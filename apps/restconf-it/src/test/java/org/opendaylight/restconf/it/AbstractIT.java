@@ -296,12 +296,12 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
      * @param method the HTTP method
      * @param uri the target request URI
      * @param mediaType the expected media type, used as a fallback for the Accept header and for Content-Type
-     * @param content the optional body payload content
      * @param acceptType the explicit Accept header value override
+     * @param content the optional body payload content
      * @return a fully constructed HTTP request
      */
     protected @NonNull FullHttpRequest buildRequest(final @NonNull HttpMethod method, final @NonNull String uri,
-            final @NonNull String mediaType, final @Nullable String content, final @Nullable String acceptType) {
+            final @NonNull String mediaType, final @Nullable String acceptType, final @Nullable String content) {
         final var contentBuf = content == null ? Unpooled.EMPTY_BUFFER
             : Unpooled.wrappedBuffer(content.getBytes(StandardCharsets.UTF_8));
         final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri, contentBuf);

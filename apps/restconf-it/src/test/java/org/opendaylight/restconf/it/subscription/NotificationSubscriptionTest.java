@@ -103,8 +103,8 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 <toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/>
                </stream-subtree-filter>
             </input>""";
-        final var request2 = buildRequest(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI, APPLICATION_XML, modifyInput,
-            APPLICATION_XML);
+        final var request2 = buildRequest(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI, APPLICATION_XML, APPLICATION_XML,
+            modifyInput);
         final var response = invokeTwoRequests(request1, request2);
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
     }
@@ -157,8 +157,8 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 "id": 2147483648
               }
             }""";
-        final var request2 = buildRequest(HttpMethod.POST, KILL_SUBSCRIPTION_URI, APPLICATION_JSON, deleteInput,
-            APPLICATION_JSON);
+        final var request2 = buildRequest(HttpMethod.POST, KILL_SUBSCRIPTION_URI, APPLICATION_JSON, APPLICATION_JSON,
+            deleteInput);
         final var response = invokeTwoRequests(request1, request2);
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
     }
@@ -195,8 +195,8 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 "id": 2147483648
               }
             }""";
-        final var request2 = buildRequest(HttpMethod.POST, KILL_SUBSCRIPTION_URI, APPLICATION_JSON, killInput,
-            APPLICATION_JSON);
+        final var request2 = buildRequest(HttpMethod.POST, KILL_SUBSCRIPTION_URI, APPLICATION_JSON, APPLICATION_JSON,
+            killInput);
         final var response = invokeTwoRequests(request1, request2);
 
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
@@ -258,6 +258,6 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 "encoding": "%s"
               }
             }""", NETCONF_STREAM, JSON_ENCODING);
-        return buildRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_JSON, input, APPLICATION_JSON);
+        return buildRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_JSON, APPLICATION_JSON, input);
     }
 }

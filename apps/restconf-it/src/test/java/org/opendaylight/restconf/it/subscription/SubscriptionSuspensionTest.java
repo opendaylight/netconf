@@ -52,13 +52,13 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
     void testSubscriptionSuspension() throws Exception {
         // Establish subscription
         final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_JSON, """
+            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, """
                 {
                   "input": {
                     "stream": "NETCONF",
                     "encoding": "encode-json"
                   }
-                }""", MediaTypes.APPLICATION_YANG_DATA_JSON);
+                }""");
         assertEquals(HttpResponseStatus.OK, response.status());
 
         final var subscriptionId = Uint32.valueOf(extractSubscriptionId(response));
@@ -105,7 +105,7 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
               <stream-subtree-filter><toasterRestocked xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
             </input>""", subscriptionId);
         final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
+            MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON, modifyInput);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
         // consume subscription modified notification
@@ -139,13 +139,13 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
     void testSuspendSuspendedSubscription() throws Exception {
         // Establish subscription
         final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_JSON, """
+            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, """
                 {
                   "input": {
                     "stream": "NETCONF",
                     "encoding": "encode-json"
                   }
-                }""", MediaTypes.APPLICATION_YANG_DATA_JSON);
+                }""");
         assertEquals(HttpResponseStatus.OK, response.status());
 
         final var subscriptionId = Uint32.valueOf(extractSubscriptionId(response));

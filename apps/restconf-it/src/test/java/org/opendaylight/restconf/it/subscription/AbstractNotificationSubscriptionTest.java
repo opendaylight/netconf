@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -160,10 +162,11 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractIT {
         return response2;
     }
 
-    protected FullHttpResponse invokeRequestKeepClient(final HttpMethod method, final String uri,
-            final String contentType, final String content, final String acceptType) {
+    protected @NonNull FullHttpResponse invokeRequestKeepClient(final @NonNull HttpMethod method,
+            final @NonNull String uri, final @NonNull String mediaType, final @Nullable String acceptType,
+            final @Nullable String content) {
         final var callback = new TestRequestCallback();
-        rpcSession.invoke(buildRequest(method, uri, contentType, content, acceptType), callback);
+        rpcSession.invoke(buildRequest(method, uri, mediaType, acceptType, content), callback);
         // await for response
         await().atMost(Duration.ofSeconds(2)).until(callback::completed);
         final var response = callback.response();
@@ -237,7 +240,7 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractIT {
              """, filter);
 
         return invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_XML, input, MediaTypes.APPLICATION_YANG_DATA_JSON);
+            MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON, input);
     }
 
     /**
