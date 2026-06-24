@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdafa43e_3f29d68f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-06-24T10:52:52Z",
+      "side": 1,
+      "message": "FilteringSubscriptionTest.filterReferenceTest() was not refactored for the new AbstractIT.invokeRequest() signature. Incorrect order of arguments.",
+      "revId": "8c1a89e0dfe17a2da1294ae2386d11dbe21c87b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9871e8c_15c17fae",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-06-24T10:52:52Z",
+      "side": 1,
+      "message": "unused",
+      "revId": "8c1a89e0dfe17a2da1294ae2386d11dbe21c87b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ded50fc_484fbba1",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-06-24T10:52:52Z",
+      "side": 1,
+      "message": "@Override here and below",
+      "revId": "8c1a89e0dfe17a2da1294ae2386d11dbe21c87b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07b87b0b_581d3760",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-06-24T10:52:52Z",
+      "side": 1,
+      "message": "Please keep the argument order consistent with AbstractIT.invokeRequest().",
+      "revId": "8c1a89e0dfe17a2da1294ae2386d11dbe21c87b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
