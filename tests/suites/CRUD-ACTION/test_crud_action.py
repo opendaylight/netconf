@@ -106,7 +106,7 @@ class TestCrudAction:
                 schemas="variables/netconf/CRUD/schemas",
                 rpc_config=RPC_FILE,
                 mdsal=True,
-        )
+            )
         yield testtool_process
         with allure_step_with_separate_logging("step_stop_netconf_testtool"):
             # Stop netconf testtool.
