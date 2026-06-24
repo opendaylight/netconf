@@ -99,7 +99,7 @@ class TestCrudAction:
             subprocess.Popen: The running testtool process handler.
         """
         with allure_step_with_separate_logging("step_start_netconf_testtool"):
-            """Start netconf testtool."""
+            # Start netconf testtool.
             testtool_process = netconf.start_testtool(
                 "build_tools/netconf-testtool.jar",
                 device_count=1,
@@ -109,7 +109,7 @@ class TestCrudAction:
         )
         yield testtool_process
         with allure_step_with_separate_logging("step_stop_netconf_testtool"):
-            """Stop netconf testtool."""
+            # Stop netconf testtool.
             netconf.stop_testtool(testtool_process)
 
     @pytest.fixture
@@ -134,13 +134,13 @@ class TestCrudAction:
         with allure_step_with_separate_logging(
             "step_check_device_is_not_configured_at_beginning"
         ):
-            """Sanity check making sure our device is not there. Fail if found."""
+            # Sanity check making sure our device is not there. Fail if found.
             utils.wait_until_function_pass(
                 5, 20, netconf.check_device_has_no_netconf_connector, DEVICE_NAME
             )
 
         with allure_step_with_separate_logging("step_configure_device_on_netconf"):
-            """Make request to configure a testtool device on Netconf connector."""
+            # Make request to configure a testtool device on Netconf connector.
             global DEVICE_TYPE_RPC
             DEVICE_TYPE_RPC = "default" if USE_NETCONF_CONNECTOR else DEVICE_TYPE_RPC
             netconf.configure_device_in_netconf(
@@ -159,13 +159,13 @@ class TestCrudAction:
         with allure_step_with_separate_logging(
             "step_wait_for_device_to_become_connected"
         ):
-            """Wait until the device becomes available through Netconf."""
+            # Wait until the device becomes available through Netconf.
             netconf.wait_device_connected(DEVICE_NAME)
 
         yield
 
         with allure_step_with_separate_logging("step_deconfigure_device_from_netconf"):
-            """Make request to deconfigure the testtool device on Netconf connector."""
+            # Make request to deconfigure the testtool device on Netconf connector.
             netconf.configure_device_in_netconf(
                 DEVICE_NAME,
                 device_type=DEVICE_TYPE_RPC_DELETE,
@@ -176,14 +176,14 @@ class TestCrudAction:
         with allure_step_with_separate_logging(
             "step_check_device_going_to_be_gone_after_deconfiguring"
         ):
-            """Check that the device is really going to be gone. Fail
-            if found after one minute. This is an expected behavior as the
-            delete request is sent to the config subsystem which then triggers
-            asynchronous destruction of the netconf connector referring to the
-            device and the device's data. This test makes sure this
-            asynchronous operation does not take unreasonable amount of time
-            by making sure that both the netconf connector and the device's
-            data is gone before reporting success."""
+            # Check that the device is really going to be gone. Fail
+            # if found after one minute. This is an expected behavior as the
+            # delete request is sent to the config subsystem which then triggers
+            # asynchronous destruction of the netconf connector referring to the
+            # device and the device's data. This test makes sure this
+            # asynchronous operation does not take unreasonable amount of time
+            # by making sure that both the netconf connector and the device's
+            # data is gone before reporting success.
             netconf.wait_device_fully_removed(DEVICE_NAME)
 
     @allure.description(
@@ -202,15 +202,15 @@ class TestCrudAction:
     ):
 
         with allure_step_with_separate_logging("step_check_device_data_is_empty"):
-            """Get the device data and make sure it is empty."""
+            # Get the device data and make sure it is empty.
             escaped = re.escape(ODL_NETCONF_NAMESPACE)
             self.check_config_data(rf'<data xmlns="{escaped}"(\/>|><\/data>)', True)
 
         with allure_step_with_separate_logging(
             "step_invoke_yang1.1_action_via_xml_post"
         ):
-            """Send a sample test data label into the device and check that
-            the request went OK."""
+            # Send a sample test data label into the device and check that
+            # the request went OK.
             mapping = {"DEVICE_NAME": DEVICE_NAME, "RESTCONF_ROOT": RESTCONF_ROOT}
             templated_requests.post_templated_request(
                 f"{DIRECTORY_WITH_TEMPLATE_FOLDERS}/dataorigaction", mapping, json=False
@@ -219,8 +219,8 @@ class TestCrudAction:
         with allure_step_with_separate_logging(
             "step_invoke_yang1.1_action_via_json_post"
         ):
-            """Send a sample test data label into the device and check that
-            the request went OK."""
+            # Send a sample test data label into the device and check that
+            # the request went OK.
             mapping = {"DEVICE_NAME": DEVICE_NAME, "RESTCONF_ROOT": RESTCONF_ROOT}
             templated_requests.post_as_json_rfc8040_templated(
                 f"{DIRECTORY_WITH_TEMPLATE_FOLDERS}/dataorigaction", mapping, json=False
@@ -229,8 +229,8 @@ class TestCrudAction:
         with allure_step_with_separate_logging(
             "step_invoke_yang1.1_augmentation_via_xml_post"
         ):
-            """Send a sample test data label into the device and check that
-            the request went OK."""
+            # Send a sample test data label into the device and check that
+            # the request went OK.
             mapping = {"DEVICE_NAME": DEVICE_NAME, "RESTCONF_ROOT": RESTCONF_ROOT}
             templated_requests.post_templated_request(
                 f"{DIRECTORY_WITH_TEMPLATE_FOLDERS}/augment", mapping, json=False
@@ -239,8 +239,8 @@ class TestCrudAction:
         with allure_step_with_separate_logging(
             "step_invoke_yang1.1_augmentation_via_json_post"
         ):
-            """Send a sample test data label into the device and check that
-            the request went OK."""
+            # Send a sample test data label into the device and check that
+            # the request went OK.
             mapping = {"DEVICE_NAME": DEVICE_NAME, "RESTCONF_ROOT": RESTCONF_ROOT}
             templated_requests.post_as_json_rfc8040_templated(
                 f"{DIRECTORY_WITH_TEMPLATE_FOLDERS}/augment", mapping, json=False
