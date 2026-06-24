@@ -34,9 +34,9 @@ log = logging.getLogger(__name__)
 class TestApidocs:
 
     @allure.description(
-            textwrap.dedent(
-                """**Test suite to verify that RESTCONF OpenAPI is working.**"""
-            )
+        textwrap.dedent(
+            """**Test suite to verify that RESTCONF OpenAPI is working.**"""
+        )
     )
     def test_get_apidoc_apis(self, allure_step_with_separate_logging):
         with allure_step_with_separate_logging("step_get_apidoc_apis"):
