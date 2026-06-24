@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "33f7175a_9011a3de",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/AbstractIT.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-24T12:00:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d7307ad6_a3709f38",
+      "revId": "57d0c828a37241da3cf13b05432e49b0adcfee55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4f1c5e73_1c9f7998",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-24T10:33:10Z",
       "side": 1,
       "message": "extra indent for the wrapped arguments - and the same for the rest of the methods",
+      "revId": "57d0c828a37241da3cf13b05432e49b0adcfee55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "046ba674_999fdbf8",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/AbstractIT.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-24T12:00:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f1c5e73_1c9f7998",
       "revId": "57d0c828a37241da3cf13b05432e49b0adcfee55",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6fa7d0d_98a9b5e7",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/AbstractIT.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-24T12:00:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2d223a98_73e3589b",
+      "revId": "57d0c828a37241da3cf13b05432e49b0adcfee55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b0a6ec4f_b5474d68",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-06-24T10:33:10Z",
       "side": 1,
       "message": "The literal \"rests\" can be replaced with a named constant.. one is already used in AbstractOpenApiTest. Extract that one into AbstractIT and use it in both places.",
+      "revId": "57d0c828a37241da3cf13b05432e49b0adcfee55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "158d36a5_d2714c34",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/AbstractIT.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-24T12:00:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0a6ec4f_b5474d68",
       "revId": "57d0c828a37241da3cf13b05432e49b0adcfee55",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
