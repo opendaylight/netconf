@@ -51,14 +51,14 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
 
         // Establish subscription
         final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_JSON,
+            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {
                   "input": {
                     "stream": "NETCONF",
                     "encoding": "encode-json"
                   }
-                }""", MediaTypes.APPLICATION_YANG_DATA_JSON);
+                }""");
         assertEquals(HttpResponseStatus.OK, response.status());
 
         // Extract subscription ID from response
@@ -103,11 +103,11 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
         // Modify the subscription
         final var response = invokeRequestKeepClient(HttpMethod.POST,
             "/rests/operations/ietf-subscribed-notifications:modify-subscription",
-            MediaTypes.APPLICATION_YANG_DATA_XML, """
+            MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON, """
              <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
                <id>2147483648</id>
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
-             </input>""", MediaTypes.APPLICATION_YANG_DATA_JSON);
+             </input>""");
 
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
         JSONAssert.assertEquals("""
@@ -133,13 +133,13 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
         // Delete the subscription
         final var response = invokeRequestKeepClient(HttpMethod.POST,
             "/rests/operations/ietf-subscribed-notifications:delete-subscription",
-            MediaTypes.APPLICATION_YANG_DATA_JSON,
+            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {
                   "input": {
                     "id": 2147483648
                   }
-                }""", MediaTypes.APPLICATION_YANG_DATA_JSON);
+                }""");
 
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
         JSONAssert.assertEquals(TERMINATED_NOTIFICATION, eventListener.readNext(), JSONCompareMode.LENIENT);
@@ -160,13 +160,13 @@ class NotificationSubscriptionListeningTest extends AbstractNotificationSubscrip
         // Kill the subscription
         final var response = invokeRequestKeepClient(HttpMethod.POST,
             "/rests/operations/ietf-subscribed-notifications:kill-subscription",
-            MediaTypes.APPLICATION_YANG_DATA_JSON,
+            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {
                   "input": {
                     "id": 2147483648
                   }
-                }""", MediaTypes.APPLICATION_YANG_DATA_JSON);
+                }""");
 
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
         JSONAssert.assertEquals(TERMINATED_NOTIFICATION, eventListener.readNext(), JSONCompareMode.LENIENT);

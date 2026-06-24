@@ -34,14 +34,14 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
     void counterNotificationTest() throws Exception {
         // Establish subscription
         final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_JSON,
+            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 {
                   "input": {
                     "stream": "NETCONF",
                     "encoding": "encode-json"
                   }
-                }""", MediaTypes.APPLICATION_YANG_DATA_JSON);
+                }""");
         assertEquals(HttpResponseStatus.OK, response.status());
         final var id = extractSubscriptionId(response);
 
@@ -95,7 +95,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
              </input>""", id);
         final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
+            MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON, modifyInput);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
@@ -137,7 +137,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
              </input>""", id);
         final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
+            MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON, modifyInput);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {

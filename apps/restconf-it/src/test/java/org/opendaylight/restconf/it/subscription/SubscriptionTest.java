@@ -50,14 +50,14 @@ public class SubscriptionTest extends AbstractNotificationSubscriptionTest {
         final var stopTime = Instant.now().plus(Duration.ofDays(2));
         // Establish subscription
         final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_JSON, String.format("""
+            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, String.format("""
             {
               "input": {
                 "stream": "NETCONF",
                 "encoding": "encode-json",
                 "stop-time": "%s"
               }
-            }""", stopTime), MediaTypes.APPLICATION_YANG_DATA_JSON);
+            }""", stopTime));
         assertEquals(HttpResponseStatus.OK, response.status());
 
         final var subscriptionId = Uint32.valueOf(extractSubscriptionId(response));
