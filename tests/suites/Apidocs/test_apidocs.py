@@ -40,7 +40,7 @@ class TestApidocs:
     )
     def test_get_apidoc_apis(self, allure_step_with_separate_logging):
         with allure_step_with_separate_logging("step_get_apidoc_apis"):
-            """Get the Apidoc Apis list, check 200 status and apis string presence."""
+            # Get the Apidoc Apis list, check 200 status and apis string presence.
             response = templated_requests.get_templated_request(
                 f"{VAR_DIR}/openapi_v3", mapping=None, json=True, http_timeout=90
             )
