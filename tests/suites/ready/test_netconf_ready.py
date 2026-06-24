@@ -6,7 +6,7 @@
 # and is available at http://www.eclipse.org/legal/epl-v10.html
 #
 # Based on the original Robot Framework integration test:
-# https://github.com/opendaylight/integration-test/blob/master/csit/suites/netconf/ready/netconfready.robot
+# https://github.com/opendaylight/integration-test/blob/901c7e139945b436d95a44b3b592904c3d7a4f9f/csit/suites/netconf/ready/netconfready.robot
 #
 
 import logging
