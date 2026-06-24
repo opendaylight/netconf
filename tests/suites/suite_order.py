@@ -26,3 +26,4 @@ class SuiteOrder(IntEnum):
     APIDOCS = auto()
     RESTPERFCLIENT_MDSAL = auto()
     RESTPERFCLIENT_PERFORMANCE = auto()
+    GETMULTI = auto()
