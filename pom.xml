@@ -90,7 +90,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <tox.args></tox.args>
+                <tox.args>-- -m "(smoke and not performance) or always"</tox.args>
             </properties>
             <build>
                 <plugins>

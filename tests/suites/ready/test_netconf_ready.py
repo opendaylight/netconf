@@ -144,6 +144,9 @@ def check_netconf_mdsal_up_and_running() -> None:
     ), f"Expected MDSAL port {ODL_NETCONF_MDSAL_PORT} to be listening, got {count=}."
 
 
+@pytest.mark.always
+@pytest.mark.testtool
+@pytest.mark.single_device
 @pytest.mark.usefixtures("preconditions")
 @pytest.mark.usefixtures("log_test_suite_start_end_to_karaf")
 @pytest.mark.usefixtures("log_test_case_start_end_to_karaf")

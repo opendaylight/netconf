@@ -23,6 +23,10 @@ VAR_DIR = "variables/apidoc"
 log = logging.getLogger(__name__)
 
 
+@pytest.mark.openapi
+@pytest.mark.functional
+@pytest.mark.smoke
+@pytest.mark.single_device
 @pytest.mark.usefixtures("preconditions")
 @pytest.mark.usefixtures("log_test_suite_start_end_to_karaf")
 @pytest.mark.usefixtures("log_test_case_start_end_to_karaf")
