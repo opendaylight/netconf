@@ -35,7 +35,7 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
         final var stopTime = Instant.now().minus(Duration.ofDays(1));
         // Establish subscription
         final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_JSON,
+            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON,
             String.format("""
                 {
                   "input": {
@@ -43,7 +43,7 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
                     "encoding": "encode-json",
                     "stop-time": "%s"
                   }
-                }""", stopTime), MediaTypes.APPLICATION_YANG_DATA_JSON);
+                }""", stopTime));
         assertEquals(HttpResponseStatus.BAD_REQUEST, response.status());
         JSONAssert.assertEquals("""
             {
@@ -113,7 +113,7 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
                <stop-time>%s</stop-time>
              </input>""", subscriptionId1, newStopTime);
         final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
+            MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON, modifyInput);
 
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
@@ -184,7 +184,7 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
              </input>""", subscriptionId);
         final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
+            MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON, modifyInput);
 
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
@@ -219,7 +219,7 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
 
     private String establishSubscription(final Instant stopTime) {
         final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_JSON,
+            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON,
             String.format("""
             {
               "input": {
@@ -227,7 +227,7 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
                 "encoding": "encode-json",
                 "stop-time": "%s"
               }
-            }""", stopTime), MediaTypes.APPLICATION_YANG_DATA_JSON);
+            }""", stopTime));
         assertEquals(HttpResponseStatus.OK, response.status());
         return String.valueOf(extractSubscriptionId(response));
     }
