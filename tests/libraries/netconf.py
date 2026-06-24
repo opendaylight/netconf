@@ -7,10 +7,12 @@
 #
 
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 import logging
 import subprocess
 import math
+import re
 
 from libraries import infra
 from libraries import restconf
@@ -30,7 +32,9 @@ DEVICE_NAME_BASE = "netconf-scaling-device"
 TESTTOOL_BOOT_TIMEOUT = 60
 ENABLE_NETCONF_TEST_TIMEOUT = variables.ENABLE_GLOBAL_TEST_DEADLINES
 RESTCONF_ROOT = variables.RESTCONF_ROOT
+REST_API = variables.REST_API
 TOOLS_IP = variables.TOOLS_IP
+ODL_NETCONF_NAMESPACE = variables.ODL_NETCONF_NAMESPACE
 
 NETCONF_MOUNTED_DEVICE_TYPES = dict()
 
@@ -461,3 +465,144 @@ def check_netconf_test_timeout_not_expired(deadline_date: datetime):
     current_date = datetime.now()
     if current_date > deadline_date:
         raise AssertionError("The global time out period expired")
+
+
+def configure_device(
+    device_name: str, device_type: str = "full-uri-device", log_response: bool = True
+):
+    """Configure a single scaling device on the Netconf connector.
+
+    Per-device operation suitable for perform_operation_on_each_device. The
+    device's port is derived from the trailing index in its name so that each
+    device points at its own testtool port (FIRST_TESTTOOL_PORT + index).
+
+    Args:
+        device_name (str): The full name of the device in format NAME-INDEX
+            (e.g. 'netconf-scaling-device-0').
+        device_type (str): The template type for the device.
+        log_response (bool): Whether to log the operation's output. Accepted for
+            interface compatibility with perform_operation_on_each_device.
+
+    Returns:
+        None
+    """
+    number = int(device_name.split("-").pop())
+    device_port = FIRST_TESTTOOL_PORT + number
+    configure_device_in_netconf(
+        device_name, device_type=device_type, device_port=device_port
+    )
+
+
+def wait_connected(device_name: str, log_response: bool = True):
+    """Wait until a single scaling device becomes connected through Netconf.
+
+    Per-device operation suitable for perform_operation_on_each_device.
+
+    Args:
+        device_name (str): The name of the device to wait for.
+        log_response (bool): Whether to log the operation's output. Accepted for
+            interface compatibility with perform_operation_on_each_device.
+
+    Returns:
+        None
+    """
+    wait_device_connected(device_name, timeout=300, period=0.5)
+
+
+def deconfigure_device(device_name: str, log_response: bool = True):
+    """Deconfigure a single scaling device from the Netconf connector.
+
+    Per-device operation suitable for perform_operation_on_each_device.
+
+    Args:
+        device_name (str): The name of the device to be removed.
+        log_response (bool): Whether to log the operation's output. Accepted for
+            interface compatibility with perform_operation_on_each_device.
+
+    Returns:
+        None
+    """
+    remove_device_from_netconf(device_name)
+
+
+def check_device_deconfigured(device_name: str, log_response: bool = True):
+    """Wait until a single scaling device is completely gone from Netconf.
+
+    Per-device operation suitable for perform_operation_on_each_device.
+
+    Args:
+        device_name (str): The name of the device expected to disappear.
+        log_response (bool): Whether to log the operation's output. Accepted for
+            interface compatibility with perform_operation_on_each_device.
+
+    Returns:
+        None
+    """
+    wait_device_fully_removed(device_name, timeout=120, period=0.5)
+
+
+def check_device_data_is_empty(device_name: str, log_response: bool = True):
+    """Get the configuration data of a device and check that it is empty.
+
+    Per-device operation: requests the configuration data of the device mounted
+    onto its Netconf connector and asserts that the returned data is the empty
+    document (either '<data .../>' or '<data ...></data>').
+
+    Args:
+        device_name (str): The name of the device to query.
+        log_response (bool): Whether to log the operation's output. Accepted for
+            interface compatibility with perform_operation_on_each_device.
+
+    Returns:
+        None
+    """
+    uri = (
+        f"{REST_API}/network-topology:network-topology/topology=topology-netconf/"
+        f"node={device_name}/yang-ext:mount?content=config"
+    )
+    headers = {"Accept": "application/yang-data+xml"}
+    data = templated_requests.get_from_uri(uri, headers=headers).text
+    escaped = re.escape(ODL_NETCONF_NAMESPACE)
+    assert (
+        re.match(rf'<data xmlns="{escaped}"(\/>|></data>)', data) is not None
+    ), f"Device {device_name} returned unexpected non-empty data: {data}"
+
+
+def get_data_from_devices_concurrently(device_count: int, worker_count: int):
+    """Issue GET requests to every scaling device concurrently and verify them.
+
+    Reimplements the multi-threaded behavior of the netconf_tools/getter.py tool:
+    a pool of worker_count workers together issues a GET request for the
+    configuration data of each of the device_count devices and verifies that
+    each device returns empty data. All failures are collected and reported
+    together so that a single failing device does not mask the others.
+
+    The project's templated_requests helpers are reused instead of running the
+    standalone getter.py tool: its AuthStandalone helper hardcodes a RESTCONF
+    prefix (/rests/, port 8181) that does not match this project (restconf,
+    port 8182), and running in-process avoids spawning a subprocess and parsing
+    the tool's stdout.
+
+    Args:
+        device_count (int): The number of devices to query.
+        worker_count (int): The number of concurrent worker threads to use.
+
+    Returns:
+        None
+    """
+    device_names = [f"{DEVICE_NAME_BASE}-{number}" for number in range(device_count)]
+    errors = {}
+    with ThreadPoolExecutor(max_workers=worker_count) as executor:
+        future_to_name = {
+            executor.submit(check_device_data_is_empty, name): name
+            for name in device_names
+        }
+        for future in as_completed(future_to_name):
+            name = future_to_name[future]
+            try:
+                future.result()
+            except Exception as e:
+                errors[name] = str(e)
+    assert not errors, (
+        f"GET requests failed for {len(errors)}/{device_count} devices: {errors}"
+    )
