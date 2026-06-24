@@ -432,21 +432,21 @@ class TestNorthbound:
     def test_northbound(self, allure_step_with_separate_logging):
 
         with allure_step_with_separate_logging("step_connect_to_ODL_netconf"):
-            """Connect to ODL Netconf and fail if that is not possible."""
+            # Connect to ODL Netconf and fail if that is not possible.
             self.open_odl_netconf_conenction()
 
         with allure_step_with_separate_logging("step_get_config_running"):
-            """Make sure the configuration has only the default elements in it."""
+            # Make sure the configuration has only the default elements in it.
             self.check_test_object_not_present_in_config("get-config")
 
         with allure_step_with_separate_logging("step_missing_message_id_attribute"):
-            """Check that messages with missing "message-ID" attribute are rejected
-            with the correct error (RFC 6241, section 4.1)."""
+            # Check that messages with missing "message-ID" attribute are rejected
+            # with the correct error (RFC 6241, section 4.1).
             self.perform_test("missing-attr")
 
         with allure_step_with_separate_logging("step_additional_attributes_in_message"):
-            """Check that additional attributes in messages are returned properly
-            (RFC 6241, sections 4.1 and 4.2)."""
+            # Check that additional attributes in messages are returned properly
+            # (RFC 6241, sections 4.1 and 4.2).
             reply = self.load_and_send_message("additional-attr")
             assert 'xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"' in reply
             assert 'message-id="1"' in reply
@@ -459,8 +459,8 @@ class TestNorthbound:
         with allure_step_with_separate_logging(
             "step_send_stuff_in_undefined_namespace"
         ):
-            """Try to send something within an undefined namespace and check the reply
-            complains about the nonexistent namespace and element."""
+            # Try to send something within an undefined namespace and check the reply
+            # complains about the nonexistent namespace and element.
             reply = self.load_and_send_message("merge-nonexistent-namespace")
             assert (
                 "java.lang.NullPointerException" not in reply
@@ -469,95 +469,95 @@ class TestNorthbound:
             assert "<rpc-error>" in reply
 
         with allure_step_with_separate_logging("step_edit_config_first_batch_merge"):
-            """Request a "merge" operation adding an element in candidate configuration
-            and check the reply."""
+            # Request a "merge" operation adding an element in candidate configuration
+            # and check the reply.
             self.perform_test("merge-1")
 
         with allure_step_with_separate_logging(
             "step_get_config_running_to_confirm_no_edit_before_commit"
         ):
-            """Make sure the running configuration is still unchanged as the change
-            was not committed yet."""
+            # Make sure the running configuration is still unchanged as the change
+            # was not committed yet.
             self.check_test_object_not_present_in_config(
                 "get-config-no-edit-before-commit"
             )
 
         with allure_step_with_separate_logging("step_commit_edit"):
-            """Commit the change and check the reply."""
+            # Commit the change and check the reply.
             self.perform_test("commit-edit")
 
         with allure_step_with_separate_logging(
             "step_first_batch_in_config_running_to_confirm_edit_after_commit"
         ):
-            """Check that the change is now in the configuration."""
+            # Check that the change is now in the configuration.
             reply = self.load_and_send_message("get-config-edit-after-commit")
             self.check_first_batch_data_present(reply)
 
         with allure_step_with_separate_logging("step_terminate_connection_gracefully"):
-            """Close the session and disconnect."""
+            # Close the session and disconnect.
             self.close_odl_netconf_connection_gracefully()
 
         with allure_step_with_separate_logging(
             "step_reconnect_to_odl_netconf_after_graceful_session_end"
         ):
-            """Close the session and disconnect."""
+            # Close the session and disconnect.
             self.open_odl_netconf_conenction()
 
         with allure_step_with_separate_logging(
             "step_first_batch_in_config_running_after_reconnect"
         ):
-            """Check that the change is now in the configuration."""
+            # Check that the change is now in the configuration.
             reply = self.load_and_send_message("get-config-edit-after-commit")
             self.check_first_batch_data_present(reply)
 
         with allure_step_with_separate_logging(
             "step_edit_config_create_shall_fail_now"
         ):
-            """Request a "create" operation of an element that already exists and check
-            that it fails with the correct error
-            (RFC 6241, section 7.2, operation "create")."""
+            # Request a "create" operation of an element that already exists and check
+            # that it fails with the correct error
+            # (RFC 6241, section 7.2, operation "create").
             self.perform_test("create")
 
         with allure_step_with_separate_logging("step_delete_first_batch"):
-            """Delete the created element from the candidate configuration and check
-            the reply."""
+            # Delete the created element from the candidate configuration and check
+            # the reply.
             self.perform_test("delete")
 
         with allure_step_with_separate_logging(
             "step_get_config_running_to_confirm_no_delete_before_commit"
         ):
-            """Make sure the element is still present in the running configuration
-            as the delete command was not committed yet."""
+            # Make sure the element is still present in the running configuration
+            # as the delete command was not committed yet.
             reply = self.load_and_send_message("get-config-no-delete-before-commit")
             self.check_first_batch_data_present(reply)
 
         with allure_step_with_separate_logging("step_commit_delete"):
-            """Commit the deletion of the element and check the reply."""
+            # Commit the deletion of the element and check the reply.
             self.perform_test("commit-delete")
 
         with allure_step_with_separate_logging(
             "step_get_config_running_to_confirm_delete_after_commit"
         ):
-            """Check that the element is gone."""
+            # Check that the element is gone.
             self.check_test_object_not_present_in_config(
                 "get-config-delete-after-commit"
             )
 
         with allure_step_with_separate_logging("step_commit_no_transaction"):
-            """Attempt to perform "commit" when there are no changes in the candidate
-            configuration and check that it returns OK status."""
+            # Attempt to perform "commit" when there are no changes in the candidate
+            # configuration and check that it returns OK status.
             self.perform_test("commit-no-transaction")
             # report_failure_due_to_bug()
 
         with allure_step_with_separate_logging("step_edit_config_second_batch_merge"):
-            """Create an element to be discarded and check the reply."""
+            # Create an element to be discarded and check the reply.
             self.perform_test("merge-2")
 
         with allure_step_with_separate_logging(
             "step_get_and_check_config_candidate_for_discard"
         ):
-            """Check that the element to be discarded is present in the candidate
-            configuration."""
+            # Check that the element to be discarded is present in the candidate
+            # configuration.
             reply = self.load_and_send_message("get-config-candidate")
             self.check_first_batch_data_not_present(reply)
             self.check_second_batch_data_present(reply)
@@ -565,90 +565,90 @@ class TestNorthbound:
         with allure_step_with_separate_logging(
             "step_discard_changes_using_discard_request"
         ):
-            """Ask the server to discard the candidate and check the reply."""
+            # Ask the server to discard the candidate and check the reply.
             self.perform_test("commit-discard")
 
         with allure_step_with_separate_logging(
             "step_get_and_check_config_candidate_to_confirm_discard"
         ):
-            """Check that the element was really discarded."""
+            # Check that the element was really discarded.
             self.check_test_object_not_present_in_config("get-config-candidate-discard")
 
         with allure_step_with_separate_logging(
             "step_edit_config_multiple_batch_merge_create"
         ):
-            """Use a create request with the third batch to create
-            the infrastructure."""
+            # Use a create request with the third batch to create
+            # the infrastructure.
             self.perform_test("merge-multiple-create")
 
         with allure_step_with_separate_logging(
             "step_edit_config_multiple_batch_merge_third"
         ):
-            """Use a create request with the third batch to create
-            the infrastructure."""
+            # Use a create request with the third batch to create
+            # the infrastructure.
             self.perform_test("merge-multiple-1")
 
         with allure_step_with_separate_logging(
             "step_edit_config_multiple_batch_merge_fourth"
         ):
-            """Use a merge request with the third batch to create the infrastructure."""
+            # Use a merge request with the third batch to create the infrastructure.
             self.perform_test("merge-multiple-2")
 
         with allure_step_with_separate_logging(
             "step_edit_config_multiple_batch_merge_fifth"
         ):
-            """Add a "name4" subelement to the element and check the reply."""
+            # Add a "name4" subelement to the element and check the reply.
             self.perform_test("merge-multiple-3")
 
         with allure_step_with_separate_logging("step_commit_multiple_merge"):
-            """Commit the changes and check the reply."""
+            # Commit the changes and check the reply.
             self.perform_test("merge-multiple-commit")
 
         with allure_step_with_separate_logging(
             "step_multiple_batch_data_in_running_config"
         ):
-            """Check that the 3 subelements are now present in the running
-            configuration."""
+            # Check that the 3 subelements are now present in the running
+            # configuration.
             reply = self.load_and_send_message("merge-multiple-check")
             self.check_multiple_batch_data_present(reply)
 
         with allure_step_with_separate_logging(
             "step_abbort_connection_to_simulate_session_failure"
         ):
-            """Simulate session failure by disconnecting without terminating
-            the session."""
+            # Simulate session failure by disconnecting without terminating
+            # the session.
             self.abort_odl_netconf_connection()
 
         with allure_step_with_separate_logging(
             "step_reconnect_to_odl_netconf_after_session_failure"
         ):
-            """Reconnect to ODL Netconf and fail if that is not possible."""
+            # Reconnect to ODL Netconf and fail if that is not possible.
             self.open_odl_netconf_conenction()
 
         with allure_step_with_separate_logging(
             "step_mutlitple_batch_data_in_running_config_after_session_failure"
         ):
-            """Check that the 3 subelements are now present in the running
-            configuration."""
+            # Check that the 3 subelements are now present in the running
+            # configuration.
             reply = self.load_and_send_message("merge-multiple-check")
             self.check_multiple_batch_data_present(reply)
 
         with allure_step_with_separate_logging("step_edit_multiple_merge_data"):
-            """Add another subelement named "test" to the element and check
-            the reply."""
+            # Add another subelement named "test" to the element and check
+            # the reply.
             self.perform_test("merge-multiple-edit")
 
         with allure_step_with_separate_logging(
             "step_commit_multiple_modules_merge_edit"
         ):
-            """Commit the addition of the "test" subelement and check the reply."""
+            # Commit the addition of the "test" subelement and check the reply.
             self.perform_test("merge-multiple-edit-commit")
 
         with allure_step_with_separate_logging(
             "step_check_multiple_modules_merge_edit"
         ):
-            """Check that the "test" subelement exists and has correct value for
-            "port" subelement."""
+            # Check that the "test" subelement exists and has correct value for
+            # "port" subelement.
             reply = self.load_and_send_message("merge-multiple-edit-check")
             assert "<id>test</id>" in reply
             assert "<model>Dixi</model>" in reply
@@ -656,20 +656,20 @@ class TestNorthbound:
             assert "<year>1928</year>" in reply
 
         with allure_step_with_separate_logging("step_update_multiple_modules_merge"):
-            """Update the value of the "port" subelement of the "test" subelement
-            and check the reply."""
+            # Update the value of the "port" subelement of the "test" subelement
+            # and check the reply.
             self.perform_test("merge-multiple-update")
 
         with allure_step_with_separate_logging(
             "step_commit_multiple_modules_merge_update"
         ):
-            """Commit the update and check the reply."""
+            # Commit the update and check the reply.
             self.perform_test("merge-multiple-update-commit")
 
         with allure_step_with_separate_logging(
             "step_check_multiple_modules_merge_update"
         ):
-            """Check that the value of the "port" was really updated."""
+            # Check that the value of the "port" was really updated.
             reply = self.load_and_send_message("merge-multiple-update-check")
             assert "<id>test</id>" in reply
             assert "<model>Bentley Speed Six</model>" in reply
@@ -680,20 +680,20 @@ class TestNorthbound:
             assert "<year>1928</year>" not in reply
 
         with allure_step_with_separate_logging("step_replace_multiple_modules_merge"):
-            """Replace the content of the "test" with another completely different
-            and check the reply."""
+            # Replace the content of the "test" with another completely different
+            # and check the reply.
             self.perform_test("merge-multiple-replace")
 
         with allure_step_with_separate_logging(
             "step_commit_multiple_modules_merge_replace"
         ):
-            """Commit the replace and check the reply."""
+            # Commit the replace and check the reply.
             self.perform_test("merge-multiple-replace-commit")
 
         with allure_step_with_separate_logging(
             "step_check_multiple_modules_merge_replace"
         ):
-            """Check that the new content is there and the old content is gone."""
+            # Check that the new content is there and the old content is gone.
             reply = self.load_and_send_message("merge-multiple-replace-check")
             assert "<id>REPLACE</id>" in reply
             assert "<manufacturer>FIAT</manufacturer>" in reply
@@ -728,25 +728,25 @@ class TestNorthbound:
             assert "<id>test</id>" not in reply
 
         with allure_step_with_separate_logging("step_remove_test_data"):
-            """Remove the testing elements and all their subelements and check
-            the reply."""
+            # Remove the testing elements and all their subelements and check
+            # the reply.
             self.perform_test("merge-multiple-remove")
 
         with allure_step_with_separate_logging("step_commit_test_data_removal"):
-            """Commit the removal and check the reply."""
+            # Commit the removal and check the reply.
             self.perform_test("merge-multiple-remove-commit")
 
         with allure_step_with_separate_logging("step_connector_simpliefied_pattern"):
-            """Several requests in a (simplified) pattern typical for requests from
-            netconf-connector."""
+            # Several requests in a (simplified) pattern typical for requests from
+            # netconf-connector.
             self.perform_test("none-replace")
             self.perform_test("commit-edit")
             self.perform_test("delete")
             self.perform_test("commit-edit")
 
         with allure_step_with_separate_logging("step_test_bug_7791"):
-            """Send (checking replies) series of netconf messages to trigger
-            https://bugs.opendaylight.org/show_bug.cgi?id=7791"""
+            # Send (checking replies) series of netconf messages to trigger
+            # https://bugs.opendaylight.org/show_bug.cgi?id=7791
             with utils.report_known_bug_on_failure("7791"):
                 self.perform_test("bug7791-1")
                 self.perform_test("bug7791-2")
@@ -755,29 +755,29 @@ class TestNorthbound:
                 self.perform_test("commit-edit")
 
         with allure_step_with_separate_logging("step_delete_not_existing_element"):
-            """Attempt to delete the elements again and check that it fails with
-            the correct error."""
+            # Attempt to delete the elements again and check that it fails with
+            # the correct error.
             self.perform_test("delete-not-existing")
 
         with allure_step_with_separate_logging(
             "step_commit_delete_not_existing_module"
         ):
-            """Attempt to commit and check the reply."""
+            # Attempt to commit and check the reply.
             with utils.report_known_bug_on_failure("4455"):
                 self.perform_test("commit-no-transaction")
 
         with allure_step_with_separate_logging("step_remove_not_existing_module"):
-            """Attempt to remove the "module" element again and check that
-            the operation is "silently ignored"."""
+            # Attempt to remove the "module" element again and check that
+            # the operation is "silently ignored".
             self.perform_test("remove-not-existing")
 
         with allure_step_with_separate_logging(
             "step_commit_remove_not_existing_module"
         ):
-            """Attempt to commit and check the reply."""
+            # Attempt to commit and check the reply.
             with utils.report_known_bug_on_failure("4455"):
                 self.perform_test("remove-not-existing-commit")
 
         with allure_step_with_separate_logging("step_close_session"):
-            """Close the session and check that it was closed properly."""
+            # Close the session and check that it was closed properly.
             self.perform_test("close-session")

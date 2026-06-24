@@ -97,8 +97,8 @@ class TestCallHome:
         with allure_step_with_separate_logging(
             "step_callhome_over_ssh_with_correct_device_credentials"
         ):
-            """Correct credentials should result to successful mount.
-            CONNECTED should be the device status."""
+            # Correct credentials should result to successful mount.
+            # CONNECTED should be the device status.
             NetconfCallHome.register_ssh_call_home_device_in_odl_controller(
                 device_name="netopeer2",
                 hostkey=netopeer_pub_key,
@@ -123,8 +123,8 @@ class TestCallHome:
         with allure_step_with_separate_logging(
             "step_callhome_over_ssh_with_incorrect_device_credentials"
         ):
-            """Incorrect credentials should result to failed mount.
-            FAILED_AUTH_FAILURE should be the device status."""
+            # Incorrect credentials should result to failed mount.
+            # FAILED_AUTH_FAILURE should be the device status.
             NetconfCallHome.register_ssh_call_home_device_in_odl_controller(
                 device_name="netopeer2",
                 hostkey=netopeer_pub_key,
@@ -154,8 +154,8 @@ class TestCallHome:
         with allure_step_with_separate_logging(
             "step_callhome_over_ssh_with_correct_global_credentials"
         ):
-            """CallHome SSH device registered with global credentials
-            should result to successful mount."""
+            # CallHome SSH device registered with global credentials
+            # should result to successful mount.
             NetconfCallHome.register_global_credentials_for_ssh_call_home_devices(
                 username="root", password="root"
             )
@@ -181,8 +181,8 @@ class TestCallHome:
         with allure_step_with_separate_logging(
             "step_callhome_over_ssh_with_incorrect_global_credentials"
         ):
-            """CallHome SSH device registered with wrong global credentials
-            should fail to mount."""
+            # CallHome SSH device registered with wrong global credentials
+            # should fail to mount.
             NetconfCallHome.register_global_credentials_for_ssh_call_home_devices(
                 username="root", password="incorrect"
             )
@@ -217,8 +217,8 @@ class TestCallHome:
         with allure_step_with_separate_logging(
             "step_callhome_over_ssh_with_incorrect_node_id"
         ):
-            """CallHome from device that does not have an entry in per-device
-            credential with result to mount point failure."""
+            # CallHome from device that does not have an entry in per-device
+            # credential with result to mount point failure.
             NetconfCallHome.register_ssh_call_home_device_in_odl_controller(
                 device_name="incorrect_hostname",
                 hostkey=incorrect_pub_key,
@@ -253,9 +253,9 @@ class TestCallHome:
         self, allure_step_with_separate_logging, incorrect_pub_key, test_teardown
     ):
         with allure_step_with_separate_logging("step_callhome_with_rogue_devices"):
-            """A Rogue Device will fail to callhome and wont be able to mount
-            because the keys are not added in whitelist. FAILED_NOT_ALLOWED
-            should be the device status."""
+            # A Rogue Device will fail to callhome and wont be able to mount
+            # because the keys are not added in whitelist. FAILED_NOT_ALLOWED
+            # should be the device status.
             NetconfCallHome.register_ssh_call_home_device_in_odl_controller(
                 device_name="netopeer2",
                 hostkey=incorrect_pub_key,
@@ -281,8 +281,8 @@ class TestCallHome:
         with allure_step_with_separate_logging(
             "step_callhome_over_tls_with_correct_certificate_and_key"
         ):
-            """Using correct certificate and key pair should result to successful
-            mount. CONNECTED should be the device status."""
+            # Using correct certificate and key pair should result to successful
+            # mount. CONNECTED should be the device status.
             NetconfCallHome.register_keys_and_certificates_in_odl_cotroller()
             NetconfCallHome.register_tls_call_home_device_in_odl_controller(
                 device_name="netopeer2",

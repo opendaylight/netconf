@@ -90,16 +90,15 @@ class TestKeyAuth:
         with allure_step_with_separate_logging(
             "step_check_device_is_not_configured_at_beginning"
         ):
-            """Sanity check making sure our device is not there. Fail if found."""
+            # Sanity check making sure our device is not there. Fail if found.
             utils.wait_until_function_pass(
                 5, 20, netconf.check_device_has_no_netconf_connector, DEVICE_NAME
             )
 
         with allure_step_with_separate_logging("step_configure_device_on_netconf"):
-            """Make request to configure netconf netopeer with wrong password.
-            Correct auth is netconf/netconf. ODL should connect to device using
-            public key auth as password auth will fail.
-            """
+            # Make request to configure netconf netopeer with wrong password.
+            # Correct auth is netconf/netconf. ODL should connect to device using
+            # public key auth as password auth will fail.
             netconf.configure_device_in_netconf(
                 DEVICE_NAME,
                 device_type=DEVICE_TYPE_KEY,
@@ -113,22 +112,22 @@ class TestKeyAuth:
         with allure_step_with_separate_logging(
             "step_wait_for_device_to_become_connected"
         ):
-            """Wait until the device becomes available through Netconf."""
+            # Wait until the device becomes available through Netconf.
             netconf.wait_device_connected(DEVICE_NAME)
 
         with allure_step_with_separate_logging("step_deconfigure_device_from_netconf"):
-            """Make request to deconfigure the testtool device on Netconf connector."""
+            # Make request to deconfigure the testtool device on Netconf connector.
             netconf.remove_device_from_netconf(DEVICE_NAME)
 
         with allure_step_with_separate_logging(
             "step_check_device_going_to_be_gone_after_deconfiguring"
         ):
-            """Check that the device is really going to be gone. Fail
-            if found after one minute. This is an expected behavior as the
-            delete request is sent to the config subsystem which then triggers
-            asynchronous destruction of the netconf connector referring to the
-            device and the device's data. This test makes sure this
-            asynchronous operation does not take unreasonable amount of time
-            by making sure that both the netconf connector and the device's
-            data is gone before reporting success."""
+            # Check that the device is really going to be gone. Fail
+            # if found after one minute. This is an expected behavior as the
+            # delete request is sent to the config subsystem which then triggers
+            # asynchronous destruction of the netconf connector referring to the
+            # device and the device's data. This test makes sure this
+            # asynchronous operation does not take unreasonable amount of time
+            # by making sure that both the netconf connector and the device's
+            # data is gone before reporting success.
             netconf.wait_device_fully_removed(DEVICE_NAME)
