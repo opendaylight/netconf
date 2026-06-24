@@ -5,6 +5,9 @@
 # terms of the Eclipse Public License v1.0 which accompanies this distribution,
 # and is available at http://www.eclipse.org/legal/epl-v10.html
 #
+# Based on the original Robot Framework integration test:
+# https://github.com/opendaylight/integration-test/blob/901c7e139945b436d95a44b3b592904c3d7a4f9f/csit/suites/netconf/MDSAL/northbound.robot
+#
 
 import logging
 import textwrap
