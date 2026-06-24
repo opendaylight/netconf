@@ -20,9 +20,7 @@ DEVICE_STATUS = (
     "allowed-devices?content=nonconfig"
 )
 WHITELIST = variables.CALLHOME_WHITELIST
-GLOBAL_CONFIG_URL = (
-    "/restconf/data/odl-netconf-callhome-server:netconf-callhome-server/global/credentials"
-)
+GLOBAL_CONFIG_URL = "/restconf/data/odl-netconf-callhome-server:netconf-callhome-server/global/credentials"
 NETCONF_KEYSTORE_URL = "/restconf/operations/netconf-keystore"
 NETCONF_KEYSTORE_DATA_URL = variables.NETCONF_KEYSTORE_DATA_URL
 
