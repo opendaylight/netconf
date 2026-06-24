@@ -161,7 +161,7 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractIT {
     }
 
     protected FullHttpResponse invokeRequestKeepClient(final HttpMethod method, final String uri,
-            final String contentType, final String content, final String acceptType) {
+            final String contentType, final String acceptType, final String content) {
         final var callback = new TestRequestCallback();
         rpcSession.invoke(buildRequest(method, uri, contentType, content, acceptType), callback);
         // await for response
@@ -237,7 +237,7 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractIT {
              """, filter);
 
         return invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
-            MediaTypes.APPLICATION_YANG_DATA_XML, input, MediaTypes.APPLICATION_YANG_DATA_JSON);
+            MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON, input);
     }
 
     /**
