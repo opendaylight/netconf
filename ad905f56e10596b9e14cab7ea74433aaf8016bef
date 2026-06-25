@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5acd3ac4_a4ae15b8",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-06-25T07:02:26Z",
+      "side": 1,
+      "message": "add @Nullable/@NonNull on nullable params and return value",
+      "revId": "ad905f56e10596b9e14cab7ea74433aaf8016bef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08662c9b_ebd65508",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-06-25T07:02:26Z",
+      "side": 1,
+      "message": "Can we decide between contentType and mediaType? Here and in invokeRequest/buildRequest",
+      "revId": "ad905f56e10596b9e14cab7ea74433aaf8016bef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae6b14af_02327b9c",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-06-25T07:02:26Z",
+      "side": 1,
+      "message": "wrong argument order",
+      "revId": "ad905f56e10596b9e14cab7ea74433aaf8016bef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
