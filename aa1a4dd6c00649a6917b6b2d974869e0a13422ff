@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "097e3d99_fae67748",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/AbstractIT.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-06-25T08:07:14Z",
+      "side": 1,
+      "message": "Since we end-up annotating nullability for the analogous invokeRequestKeepClient() in the later patch, it\u0027s probably a good idea to annotate these helpers as well, right?",
+      "revId": "aa1a4dd6c00649a6917b6b2d974869e0a13422ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
