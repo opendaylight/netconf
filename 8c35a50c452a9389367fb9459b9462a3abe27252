@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d3a0b46_c5e505d4",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-06-25T08:09:46Z",
+      "side": 1,
+      "message": "@Nullable final String acceptType - everywhere else is @Nullable after final.",
+      "revId": "8c35a50c452a9389367fb9459b9462a3abe27252",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
