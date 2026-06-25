@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3571c9e6_8f6df0a8",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-25T07:33:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5acd3ac4_a4ae15b8",
+      "revId": "ad905f56e10596b9e14cab7ea74433aaf8016bef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "08662c9b_ebd65508",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "68c203ef_e4fb91de",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-25T07:33:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08662c9b_ebd65508",
+      "revId": "ad905f56e10596b9e14cab7ea74433aaf8016bef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae6b14af_02327b9c",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-06-25T07:02:26Z",
       "side": 1,
       "message": "wrong argument order",
+      "revId": "ad905f56e10596b9e14cab7ea74433aaf8016bef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2094be7c_e2bf82d2",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/FilteringSubscriptionTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-25T07:33:38Z",
+      "side": 1,
+      "message": "Fixed in previous patch",
+      "parentUuid": "ae6b14af_02327b9c",
       "revId": "ad905f56e10596b9e14cab7ea74433aaf8016bef",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
