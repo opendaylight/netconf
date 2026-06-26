@@ -22,6 +22,30 @@
       },
       "revId": "34a2962cddf1f44ca2c1634734c853d8638749d8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c7678db_212d4ffb",
+        "filename": "protocol/restconf-server-spi/src/test/resources/instance-identifier/instance-identifier-patch-module.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-26T10:34:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "79403651_01e49ac4",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 6
+      },
+      "revId": "34a2962cddf1f44ca2c1634734c853d8638749d8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
