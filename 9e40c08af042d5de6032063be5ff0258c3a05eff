@@ -22,6 +22,30 @@
       },
       "revId": "9e40c08af042d5de6032063be5ff0258c3a05eff",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4f4dfc0_dbf5fda2",
+        "filename": "protocol/restconf-openapi-common/src/test/java/org/opendaylight/restconf/openapi/impl/Oauth2DocumentTest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-26T07:52:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d12e71be_21575f13",
+      "range": {
+        "startLine": 34,
+        "startChar": 49,
+        "endLine": 34,
+        "endChar": 51
+      },
+      "revId": "9e40c08af042d5de6032063be5ff0258c3a05eff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
