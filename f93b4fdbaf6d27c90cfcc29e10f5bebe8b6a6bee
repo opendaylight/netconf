@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52f6a8ac_d5a88d37",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-26T09:05:46Z",
+      "side": 1,
+      "message": "Let\u0027s move to Assisted-by:",
+      "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
