@@ -16,6 +16,24 @@
       "message": "Please move Co-authored-by under Change-Id.",
       "revId": "2a81c5416c12a94d22e8021c8f215cb95ea096fd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "caca23d6_34613b27",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-06-26T08:22:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4067f356_0b6156c0",
+      "revId": "2a81c5416c12a94d22e8021c8f215cb95ea096fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
