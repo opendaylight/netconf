@@ -16,6 +16,74 @@
       "message": "Let\u0027s move to Assisted-by:",
       "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5690f7a2_9c7bc8f1",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 509,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-26T19:49:21Z",
+      "side": 1,
+      "message": "If you could keep the period argument as in robot tests for 0.5.",
+      "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26d5bc2c_333619ee",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 541,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-26T19:49:21Z",
+      "side": 1,
+      "message": "Also here to use the period.",
+      "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "991ee2f4_ea3af06d",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 574,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-26T19:49:21Z",
+      "side": 1,
+      "message": "What is the reason for switching from `getter.py` script to other solution? Is it for complicated parsing of test results, performance or some other reason? `getter.py` already uses multi-threading and also reusing single session.",
+      "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ccfebad_9d2daaaa",
+        "filename": "tests/suites/getmulti/test_getmulti.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-26T19:49:21Z",
+      "side": 1,
+      "message": "not sure if `expected to fail` maybe more like\n\n`This step is expected to pass; if it fails, a link to the known bug is logged.`",
+      "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
