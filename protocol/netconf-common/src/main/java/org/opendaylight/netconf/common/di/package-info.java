@@ -6,6 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 /**
- * Components exposed for dependency injection.
+ * {@link org.opendaylight.netconf.common.NetconfTimer} implementation for use with
+ * JSR-330-compatible dependency injection frameworks.
  */
 package org.opendaylight.netconf.common.di;

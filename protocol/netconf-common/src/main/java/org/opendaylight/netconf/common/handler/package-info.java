@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 /**
- * Components exposed for dependency injection.
+ * Netty channel handlers for NETCONF message encoding, decoding, and EXI compression.
  */
 @org.osgi.annotation.bundle.Export
 package org.opendaylight.netconf.common.handler;
