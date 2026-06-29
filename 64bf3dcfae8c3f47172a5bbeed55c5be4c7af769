@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "54dc48ea_2e0575c0",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-06-29T14:28:14Z",
+      "side": 1,
+      "message": "1. MD-SAL notification thread (write, on config change) — onEndpointsChanged reassigns it wholesale.                                                                                                                                     \n2. Incoming-connection threads (read, per dial-in) — createContext reads it; several devices can connect concurrently.                                                                                            \n  The race is #2 reading while #1 writes (a device connecting while the endpoint config changes). volatile guarantees the reader sees either the old or the new fully-built immutable object but never a stale or half-published one. No thread does a read-modify-write, so volatile is enough",
+      "parentUuid": "0fbb68d1_ff31bb21",
+      "revId": "64bf3dcfae8c3f47172a5bbeed55c5be4c7af769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "efafbace_b1f0a91f",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-29T08:16:50Z",
       "side": 1,
       "message": "Can you standardize Javadoc?\n\nFirst line.\n\n\u003cp\u003eAnother paragraphs...",
+      "revId": "64bf3dcfae8c3f47172a5bbeed55c5be4c7af769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e74c7d90_8b008b7b",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-06-29T14:28:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "efafbace_b1f0a91f",
       "revId": "64bf3dcfae8c3f47172a5bbeed55c5be4c7af769",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "136f6258_9d29cbea",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpointsTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-06-29T14:28:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "11d7734c_c95c10ed",
+      "revId": "64bf3dcfae8c3f47172a5bbeed55c5be4c7af769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7ff87943_44b1ce2f",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-06-29T08:16:50Z",
       "side": 1,
       "message": "What the reason to test empty strings?",
+      "revId": "64bf3dcfae8c3f47172a5bbeed55c5be4c7af769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bdd3e5d_f252e407",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeMountServiceTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-06-29T14:28:14Z",
+      "side": 1,
+      "message": "used as the baseline for the unrelated context-creation tests, where the   \nalgorithms don\u0027t matter. They mirror the real production default In CallHomeMountService.Configuration",
+      "parentUuid": "7ff87943_44b1ce2f",
       "revId": "64bf3dcfae8c3f47172a5bbeed55c5be4c7af769",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
