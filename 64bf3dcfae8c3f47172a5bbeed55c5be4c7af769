@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0fbb68d1_ff31bb21",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-29T08:16:50Z",
+      "side": 1,
+      "message": "Why volatile? What kind of async access you you expect - is volatile enough in your case?\n\nIIRC - volatile is just for reading.",
+      "revId": "64bf3dcfae8c3f47172a5bbeed55c5be4c7af769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "efafbace_b1f0a91f",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-29T08:16:50Z",
+      "side": 1,
+      "message": "Can you standardize Javadoc?\n\nFirst line.\n\n\u003cp\u003eAnother paragraphs...",
+      "revId": "64bf3dcfae8c3f47172a5bbeed55c5be4c7af769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11d7734c_c95c10ed",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpointsTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-29T08:16:50Z",
+      "side": 1,
+      "message": "can you javadoc test cases?",
+      "revId": "64bf3dcfae8c3f47172a5bbeed55c5be4c7af769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ff87943_44b1ce2f",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeMountServiceTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-29T08:16:50Z",
+      "side": 1,
+      "message": "What the reason to test empty strings?",
+      "revId": "64bf3dcfae8c3f47172a5bbeed55c5be4c7af769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
