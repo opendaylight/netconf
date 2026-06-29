@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd3052f2_4c931006",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/handler/exi/package-info.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-29T07:23:49Z",
+      "side": 1,
+      "message": "Can we have more meaningful Javadoc?",
+      "revId": "91d0941b53c707867a710b6e40e8a7998573c035",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
