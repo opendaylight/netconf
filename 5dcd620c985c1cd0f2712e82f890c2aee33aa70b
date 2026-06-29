@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7ed0779_9cd330b1",
+        "filename": "plugins/netconf-client-mdsal/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-29T08:50:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2de8f5c9_674e18ca",
+      "range": {
+        "startLine": 277,
+        "startChar": 21,
+        "endLine": 277,
+        "endChar": 39
+      },
+      "revId": "5dcd620c985c1cd0f2712e82f890c2aee33aa70b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "226949f8_9f2d5d79",
@@ -61,6 +85,30 @@
       "side": 1,
       "message": "see how `restconf-server-api-testlib` is split out instead of having a test-jar in restconf-server-api.",
       "parentUuid": "226949f8_9f2d5d79",
+      "range": {
+        "startLine": 162,
+        "startChar": 34,
+        "endLine": 162,
+        "endChar": 42
+      },
+      "revId": "5dcd620c985c1cd0f2712e82f890c2aee33aa70b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6234d77_3068d1a3",
+        "filename": "protocol/restconf-server-spi/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-29T08:50:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "04a8baed_b5e248fa",
       "range": {
         "startLine": 162,
         "startChar": 34,
