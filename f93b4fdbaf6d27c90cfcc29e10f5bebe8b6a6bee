@@ -71,6 +71,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "eb776645_4671706f",
+        "filename": "tests/suites/getmulti/test_getmulti.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-29T10:59:53Z",
+      "side": 1,
+      "message": "I believe it could be kept at the level of 500 devices. When I tried to run it, it took about 89 second to run, which is good from my perspective. This will be a performance type of test and would not be run regularly with GHA verify job.",
+      "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "346c149e_7b6f4e28",
+        "filename": "tests/suites/getmulti/test_getmulti.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-06-29T10:59:53Z",
+      "side": 1,
+      "message": "If you could also add these tags (marks) as it is done here, but with different tags https://git.opendaylight.org/gerrit/c/netconf/+/123690/5/tests/suites/restperfclient/test_performance.py\n\nTo add:\n@pytest.mark.testtool\n@pytest.mark.performance\n@pytest.mark.multi_device",
+      "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9ccfebad_9d2daaaa",
         "filename": "tests/suites/getmulti/test_getmulti.py",
         "patchSetId": 2
