@@ -16,6 +16,24 @@
       "message": "HHHH? is that for future RFC? it would be better to explicitly say that we are working with draft and mention its version",
       "revId": "a6c55fcee3fd5398b31cbcd4011e33874c8ded7e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c7a9854_b51617d2",
+        "filename": "apps/callhome-provider/src/main/yang/odl-netconf-callhome-server.yang",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-06-29T08:44:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "037ef147_f2004c15",
+      "revId": "a6c55fcee3fd5398b31cbcd4011e33874c8ded7e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
