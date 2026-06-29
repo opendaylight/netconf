@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c5ae9ef_a17b0c74",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-29T08:16:54Z",
+      "side": 1,
+      "message": "This looks to be not correct syntax for oneline return statement",
+      "revId": "21171754bdb871cca4f7ed2b7b5b3a6501520d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee4cb0de_ea8620fa",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-29T08:16:54Z",
+      "side": 1,
+      "message": "IMO we have no other options that SSH or TLS, should not we log this as warning at least?",
+      "revId": "21171754bdb871cca4f7ed2b7b5b3a6501520d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "271c3bf4_fba1175f",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-29T08:16:54Z",
+      "side": 1,
+      "message": "Shouldn\u0027t we call Thread.currentThread().interrupt();?",
+      "revId": "21171754bdb871cca4f7ed2b7b5b3a6501520d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61e521b7_8e543dbd",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/IetfZeroTouchCallHomeServerProvider.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-29T08:16:54Z",
+      "side": 1,
+      "message": "Can we instead ensure that configuration is there by default on startup?",
+      "revId": "21171754bdb871cca4f7ed2b7b5b3a6501520d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e64d8ae0_c6939640",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/IetfZeroTouchCallHomeServerProvider.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-29T08:16:54Z",
+      "side": 1,
+      "message": "Does this means that we follow two models? I expect static OSGi configuration to follow YANG model as well..",
+      "revId": "21171754bdb871cca4f7ed2b7b5b3a6501520d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4bc13871_1cff1fcc",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/NetconfCallHomeTlsService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-29T08:16:54Z",
+      "side": 1,
+      "message": "Introduce variable for bind.getAddress()",
+      "revId": "21171754bdb871cca4f7ed2b7b5b3a6501520d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
