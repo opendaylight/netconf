@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "037ef147_f2004c15",
+        "filename": "apps/callhome-provider/src/main/yang/odl-netconf-callhome-server.yang",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-06-29T08:16:57Z",
+      "side": 1,
+      "message": "HHHH? is that for future RFC? it would be better to explicitly say that we are working with draft and mention its version",
+      "revId": "a6c55fcee3fd5398b31cbcd4011e33874c8ded7e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
