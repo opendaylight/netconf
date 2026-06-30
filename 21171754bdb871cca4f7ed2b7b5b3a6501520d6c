@@ -123,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad09453d_404f3a8b",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/IetfZeroTouchCallHomeServerProvider.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-06-30T14:06:34Z",
+      "side": 1,
+      "message": "Will be done in https://lf-opendaylight.atlassian.net/browse/NETCONF-1655",
+      "parentUuid": "61e521b7_8e543dbd",
+      "revId": "21171754bdb871cca4f7ed2b7b5b3a6501520d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e64d8ae0_c6939640",
@@ -136,6 +154,24 @@
       "writtenOn": "2026-06-29T08:16:54Z",
       "side": 1,
       "message": "Does this means that we follow two models? I expect static OSGi configuration to follow YANG model as well..",
+      "revId": "21171754bdb871cca4f7ed2b7b5b3a6501520d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fc64842_ceddce84",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/IetfZeroTouchCallHomeServerProvider.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-06-30T14:06:34Z",
+      "side": 1,
+      "message": "Will be done in https://lf-opendaylight.atlassian.net/browse/NETCONF-1655",
+      "parentUuid": "e64d8ae0_c6939640",
       "revId": "21171754bdb871cca4f7ed2b7b5b3a6501520d6c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
