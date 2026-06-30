@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d565abd_9fb020a4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-30T09:50:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0511b855_f63190d0",
+      "revId": "1b58be90f7b53a7c2e626ec2276c0291de3c3775",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "efb9013d_74ec8e02",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-29T14:26:58Z",
       "side": 1,
       "message": "Private static method should be at the bottom of the class.\nhttps://docs.opendaylight.org/en/stable-potassium/contributor-guides/coding-guidelines/coding-guidelines-java.html#classes-methods-fields-ordering",
+      "revId": "1b58be90f7b53a7c2e626ec2276c0291de3c3775",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4fd02fb5_e9523b3b",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/NetconfFieldsParamTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-06-30T09:50:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "efb9013d_74ec8e02",
       "revId": "1b58be90f7b53a7c2e626ec2276c0291de3c3775",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
