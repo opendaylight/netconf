@@ -1,6 +1,75 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "80d53dca_8ff768a5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-06-30T12:22:59Z",
+      "side": 1,
+      "message": "missed space",
+      "range": {
+        "startLine": 9,
+        "startChar": 38,
+        "endLine": 9,
+        "endChar": 65
+      },
+      "revId": "a653c410790a4fb628d75fae69b58bbc51a92e55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad3901eb_484e6a79",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-06-30T12:22:59Z",
+      "side": 1,
+      "message": "missed space",
+      "range": {
+        "startLine": 11,
+        "startChar": 20,
+        "endLine": 11,
+        "endChar": 53
+      },
+      "revId": "a653c410790a4fb628d75fae69b58bbc51a92e55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "211e43ef_7d244a44",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-06-30T12:22:59Z",
+      "side": 1,
+      "message": "and here also",
+      "range": {
+        "startLine": 13,
+        "startChar": 5,
+        "endLine": 13,
+        "endChar": 12
+      },
+      "revId": "a653c410790a4fb628d75fae69b58bbc51a92e55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "a203ab50_abb20d09",
@@ -14,6 +83,23 @@
       "writtenOn": "2026-06-30T08:38:31Z",
       "side": 1,
       "message": "recheck",
+      "revId": "a653c410790a4fb628d75fae69b58bbc51a92e55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f395670e_7f65882f",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-06-30T12:22:59Z",
+      "side": 1,
+      "message": "This async callback captures negotiatedSshAlg for one connection but later reads mutable currentSchema and netconfSessionPreferences, so a stale callback after reconnect can publish mixed operational data from different sessions",
       "revId": "a653c410790a4fb628d75fae69b58bbc51a92e55",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
