@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fcce02b6_b20818ce",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-01T10:16:06Z",
+      "side": 1,
+      "message": "let\u0027s stick with\n```\n/**\n * {@return ...}\n */\n```",
+      "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a81b53bd_966aa624",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-01T10:16:06Z",
+      "side": 1,
+      "message": "what\u0027s broker nulability?",
+      "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "077363bb_caa7507b",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-01T10:16:06Z",
+      "side": 1,
+      "message": "why first?",
+      "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "387c4cad_99318d3b",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-01T10:16:06Z",
+      "side": 1,
+      "message": "you do not need to align {@code null}, just start from beginning of line",
+      "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b978911_c48c1b8d",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-01T10:16:06Z",
+      "side": 1,
+      "message": "what if we are in else just because of inconsistent `ssh` value?",
+      "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2c35415_a6f129c2",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-01T10:16:06Z",
+      "side": 1,
+      "message": "less lines, as possible",
+      "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b089d10_917c73ca",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-01T10:16:06Z",
+      "side": 1,
+      "message": "probably we would need at least comment or trace logging?",
+      "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
