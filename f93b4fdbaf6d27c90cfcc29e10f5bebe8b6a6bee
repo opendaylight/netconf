@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "67bf3e7a_0366b3b7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-07-01T08:31:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52f6a8ac_d5a88d37",
+      "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5690f7a2_9c7bc8f1",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-26T19:49:21Z",
       "side": 1,
       "message": "If you could keep the period argument as in robot tests for 0.5.",
+      "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "434099da_56b4f735",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 509,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-07-01T08:31:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5690f7a2_9c7bc8f1",
       "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5dce965c_79e8e35e",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 541,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-07-01T08:31:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "26d5bc2c_333619ee",
+      "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "991ee2f4_ea3af06d",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-06-26T19:49:21Z",
       "side": 1,
       "message": "What is the reason for switching from `getter.py` script to other solution? Is it for complicated parsing of test results, performance or some other reason? `getter.py` already uses multi-threading and also reusing single session.",
+      "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "932b642a_631583e4",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 574,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-07-01T08:31:41Z",
+      "side": 1,
+      "message": "Based on all i\u0027ve seen/understood: getter.py\u0027s AuthStandalone hardcodes the\nprefix /rests/ and port 8181; then this repo serves RESTCONF at /restconf/ on\n8182 -\u003e so the tool 404s and can\u0027t be used without editing it (also I\u0027m pretty sure it\u0027s unused here). Thiskeeps the same threaded\ndesign (ThreadPoolExecutor of worker_count workers) but reuses\ntemplated_requests, which already targets the right endpoint (we can inline). ~90s for 500 devices. Obviously I am open to making any changes if need be.",
+      "parentUuid": "991ee2f4_ea3af06d",
       "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "479cf262_04bd76eb",
+        "filename": "tests/suites/getmulti/test_getmulti.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-07-01T08:31:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eb776645_4671706f",
+      "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "346c149e_7b6f4e28",
@@ -103,6 +193,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d564ff05_2ba7d47c",
+        "filename": "tests/suites/getmulti/test_getmulti.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-07-01T08:31:41Z",
+      "side": 1,
+      "message": "Alright, I added @pytest.mark.testtool / performance / multi_device. \n\n(they warn as unregistered until the marks-registration change (123690) lands, so I am assuming that this should go in after it, correct? — and that change needs to register multi_device (it currently shows single_device)).",
+      "parentUuid": "346c149e_7b6f4e28",
+      "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ccfebad_9d2daaaa",
@@ -116,6 +224,24 @@
       "writtenOn": "2026-06-26T19:49:21Z",
       "side": 1,
       "message": "not sure if `expected to fail` maybe more like\n\n`This step is expected to pass; if it fails, a link to the known bug is logged.`",
+      "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e162c1ce_00f05217",
+        "filename": "tests/suites/getmulti/test_getmulti.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-07-01T08:31:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ccfebad_9d2daaaa",
       "revId": "f93b4fdbaf6d27c90cfcc29e10f5bebe8b6a6bee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
