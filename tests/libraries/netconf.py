@@ -606,3 +606,45 @@ def get_data_from_devices_concurrently(device_count: int, worker_count: int):
     assert not errors, (
         f"GET requests failed for {len(errors)}/{device_count} devices: {errors}"
     )
+
+
+def configure_device_and_verify(
+    device_name: str, device_type: str = "full-uri-device", log_response: bool = True
+):
+    """Configure a single scaling device and wait until it is connected.
+
+    Per-device operation suitable for perform_operation_on_each_device: configures
+    the device on the Netconf connector and then waits for it to become connected
+    before returning, so devices are brought up and verified one at a time.
+
+    Args:
+        device_name (str): The full name of the device in format NAME-INDEX
+            (e.g. 'netconf-scaling-device-0').
+        device_type (str): The template type for the device.
+        log_response (bool): Whether to log the operation's output. Accepted for
+            interface compatibility with perform_operation_on_each_device.
+
+    Returns:
+        None
+    """
+    configure_device(device_name, device_type=device_type, log_response=log_response)
+    wait_connected(device_name, log_response=log_response)
+
+
+def deconfigure_device_and_verify(device_name: str, log_response: bool = True):
+    """Deconfigure a single scaling device and wait until it is fully removed.
+
+    Per-device operation suitable for perform_operation_on_each_device:
+    deconfigures the device from the Netconf connector and then waits until it has
+    completely disappeared from the Netconf topology before returning.
+
+    Args:
+        device_name (str): The name of the device to be removed.
+        log_response (bool): Whether to log the operation's output. Accepted for
+            interface compatibility with perform_operation_on_each_device.
+
+    Returns:
+        None
+    """
+    deconfigure_device(device_name, log_response=log_response)
+    check_device_deconfigured(device_name, log_response=log_response)
