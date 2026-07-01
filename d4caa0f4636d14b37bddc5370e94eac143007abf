@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "534ce37f_6f693ec0",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-07-01T13:02:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "585bf09d_7e2150ac",
+      "revId": "d4caa0f4636d14b37bddc5370e94eac143007abf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "82415332_77c552f5",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8681288b_6ce5c959",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpointsTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-07-01T13:02:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "82415332_77c552f5",
+      "revId": "d4caa0f4636d14b37bddc5370e94eac143007abf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "604b86e1_ce101ef3",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-07-01T10:22:59Z",
       "side": 1,
       "message": "do we have a case for TLS?",
+      "revId": "d4caa0f4636d14b37bddc5370e94eac143007abf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98de2ca6_0155431d",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeMountServiceTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-07-01T13:02:29Z",
+      "side": 1,
+      "message": "TLS Call Home has no reloadable transport parameters",
+      "parentUuid": "604b86e1_ce101ef3",
       "revId": "d4caa0f4636d14b37bddc5370e94eac143007abf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
