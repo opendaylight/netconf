@@ -28,4 +28,5 @@ class SuiteOrder(IntEnum):
     RESTPERFCLIENT_MDSAL = auto()
     RESTPERFCLIENT_PERFORMANCE = auto()
     GETMULTI = auto()
+    GETSINGLE = auto()
     SCALE_MAX_DEVICES = auto()
