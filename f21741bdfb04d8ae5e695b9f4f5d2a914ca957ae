@@ -141,6 +141,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "736cc8a8_bea1700c",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-07-01T11:29:18Z",
+      "side": 1,
+      "message": "checkstyle requires at least 4 spaces before",
+      "parentUuid": "c13a7d82_f545e7dd",
+      "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b978911_c48c1b8d",
