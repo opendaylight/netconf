@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "40212e8a_f209136b",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-07-01T11:26:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fcce02b6_b20818ce",
+      "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a81b53bd_966aa624",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-01T10:16:06Z",
       "side": 1,
       "message": "what\u0027s broker nulability?",
+      "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78a1fdf2_c6f73eb3",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-07-01T11:26:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a81b53bd_966aa624",
       "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4b2653f_eccdd76b",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-07-01T11:26:51Z",
+      "side": 1,
+      "message": "CallHome currently opens one listen socket per transport (one SSH server and one TLS server). Although netconf-client-listen-stack-grouping permits multiple listeners and leaves room for future support, only one listener is used per transport today, so the first match is taken.",
+      "parentUuid": "077363bb_caa7507b",
+      "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "387c4cad_99318d3b",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-07-01T10:16:06Z",
       "side": 1,
       "message": "you do not need to align {@code null}, just start from beginning of line",
+      "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c13a7d82_f545e7dd",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-07-01T11:26:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "387c4cad_99318d3b",
       "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "33cfa5e3_119b5884",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-07-01T11:26:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8b978911_c48c1b8d",
+      "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2c35415_a6f129c2",
@@ -103,6 +193,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f2af73f_59bceffa",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-07-01T11:26:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2c35415_a6f129c2",
+      "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9b089d10_917c73ca",
@@ -116,6 +224,24 @@
       "writtenOn": "2026-07-01T10:16:06Z",
       "side": 1,
       "message": "probably we would need at least comment or trace logging?",
+      "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "842e1974_3a958113",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeListenEndpoints.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-07-01T11:26:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b089d10_917c73ca",
       "revId": "f21741bdfb04d8ae5e695b9f4f5d2a914ca957ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
