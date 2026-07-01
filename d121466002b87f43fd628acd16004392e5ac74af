@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "def9b497_270d429b",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperationsTest.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 888,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2026-07-01T08:05:45Z",
+      "side": 1,
+      "message": "This also seems to be duplicated in MdsalRestconfStrategyTest.",
+      "revId": "d121466002b87f43fd628acd16004392e5ac74af",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae49db02_7c0cc7c1",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDataOperationsTest.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 899,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2026-07-01T08:05:45Z",
+      "side": 1,
+      "message": "This method is duplicated in MdsalRestconfStrategyTest\nCant we just move this method to AbstractServerDataOperationsTest ?",
+      "revId": "d121466002b87f43fd628acd16004392e5ac74af",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
