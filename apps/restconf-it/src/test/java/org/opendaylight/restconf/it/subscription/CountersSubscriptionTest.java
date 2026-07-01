@@ -62,7 +62,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
             final var receiversResponse =  invokeRequest(HttpMethod.GET,
                 "/rests/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
-                MediaTypes.APPLICATION_YANG_DATA_JSON, null, MediaTypes.APPLICATION_YANG_DATA_JSON);
+                MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, null);
             assertEquals(HttpResponseStatus.OK, receiversResponse.status());
             // verify 2 notification were sent ToasterRestocked and ToasterOutOfBread
             assertCounter(receiversResponse, "2", "0");
@@ -143,7 +143,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
             final var receiversResponse = invokeRequest(HttpMethod.GET,
                 "/rests/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
-                MediaTypes.APPLICATION_YANG_DATA_JSON, null, MediaTypes.APPLICATION_YANG_DATA_JSON);
+                MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, null);
 
             assertEquals(HttpResponseStatus.OK, receiversResponse.status());
             // verify 2 notification were sent subscription-modified and ToasterOutOfBread and 1 excluded

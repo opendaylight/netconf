@@ -142,7 +142,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
         // create filter
         final var postFilterResponse = invokeRequest(HttpMethod.POST,
             "/rests/data/ietf-subscribed-notifications:filters",
-            MediaTypes.APPLICATION_YANG_DATA_XML,  MediaTypes.APPLICATION_YANG_DATA_JSON,
+            MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 <stream-filter xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
                  <name>foo</name>
