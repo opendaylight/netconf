@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfb413ea_c2b152ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-07-02T11:40:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86c11c4d_7ca9db86",
+      "revId": "e5306fb8e094eafb4526f7362bdbc6b493f2d2fb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0c238bbc_10b96792",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-02T08:08:00Z",
       "side": 1,
       "message": "If you could also here keep the same count as in robot tests",
+      "revId": "e5306fb8e094eafb4526f7362bdbc6b493f2d2fb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2e6a438_b0d5bbdb",
+        "filename": "tests/suites/getsingle/test_getsingle.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-07-02T11:40:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0c238bbc_10b96792",
       "revId": "e5306fb8e094eafb4526f7362bdbc6b493f2d2fb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
