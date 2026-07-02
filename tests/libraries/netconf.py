@@ -21,7 +21,7 @@ from libraries import templated_requests
 from libraries import utils
 from libraries.variables import variables
 
-MAX_HEAP = "1G"
+MAX_HEAP = "4G"
 TESTTOOL_DEFAULT_JAVA_OPTIONS = (
     f"-Xmx{MAX_HEAP} -Djava.security.egd=file:/dev/./urandom"
 )
