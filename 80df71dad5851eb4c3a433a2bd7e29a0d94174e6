@@ -69,6 +69,24 @@
       "parentUuid": "2252597c_3ba3b24f",
       "revId": "80df71dad5851eb4c3a433a2bd7e29a0d94174e6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eae94e55_011c8b1b",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1826,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-02T13:54:07Z",
+      "side": 1,
+      "message": "Fixed in https://git.opendaylight.org/gerrit/c/netconf/+/122127",
+      "parentUuid": "c5b382aa_a0c11f44",
+      "revId": "80df71dad5851eb4c3a433a2bd7e29a0d94174e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
