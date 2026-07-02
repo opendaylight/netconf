@@ -21,7 +21,7 @@ from libraries import templated_requests
 from libraries import utils
 from libraries.variables import variables
 
-MAX_HEAP = "1G"
+MAX_HEAP = "4G"
 TESTTOOL_DEFAULT_JAVA_OPTIONS = (
     f"-Xmx{MAX_HEAP} -Djava.security.egd=file:/dev/./urandom"
 )
@@ -603,6 +603,6 @@ def get_data_from_devices_concurrently(device_count: int, worker_count: int):
                 future.result()
             except Exception as e:
                 errors[name] = str(e)
-    assert not errors, (
-        f"GET requests failed for {len(errors)}/{device_count} devices: {errors}"
-    )
+    assert (
+        not errors
+    ), f"GET requests failed for {len(errors)}/{device_count} devices: {errors}"
