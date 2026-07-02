@@ -133,9 +133,8 @@ def count_port_occurrences(port: int, state: str, name: str) -> int:
     rc, stdout = shell(
         f'ss -punta 2> /dev/null | grep -E "{state} .+:{port} .+{name}" | wc -l'
     )
-    log.warn(f"{stdout=}")
     assert (
-        rc == 0
+        int(stdout) == 1
     ), f"Failed to check number of occurrences for {port=} {state=} {name=}"
     return int(stdout)
 
