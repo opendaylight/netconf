@@ -1,0 +1,8 @@
+{
+  "network-topology:topology": [
+    {
+      "topology-id": "topology-netconf",
+      "node": []
+    }
+  ]
+}
