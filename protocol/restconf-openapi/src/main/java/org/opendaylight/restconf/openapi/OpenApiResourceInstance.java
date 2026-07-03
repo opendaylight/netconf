@@ -53,6 +53,8 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         new HeadersResponse(HttpResponseStatus.OK, GHO_METHOD_NOT_ALLOWED.headers());
     private static final HeadersResponse JSON_OK = HeadersResponse.of(HttpResponseStatus.OK,
         HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
+    private static final String FORWARDED = "Forwarded";
+    private static final String X_FORWARDED_PROTO = "X-Forwarded-Proto";
 
     private final OpenApiService service;
 
@@ -75,7 +77,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
 
         final var segment = peeler.next();
         return switch (segment) {
-            case "api" -> api(method, targetUri, peeler, xrd);
+            case "api" -> api(method, targetUri, peeler, xrd, headers);
             case "explorer" -> explorer(method, peeler);
             default -> EmptyResponse.NOT_FOUND;
         };
@@ -83,7 +85,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
 
     // the /api resource
     private Response api(final ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler,
-            final XRD xrd) {
+            final XRD xrd, final HttpHeaders headers) {
         final var restconf = xrd.lookupLink(LinkRelation.RESTCONF);
         if (restconf == null) {
             return EmptyResponse.NOT_FOUND;
@@ -103,42 +105,47 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
 
         final var next = peeler.next();
         return switch (next) {
-            case "mounts" -> peeler.hasNext() ? apiMounts(method, targetUri, peeler)
+            case "mounts" -> peeler.hasNext() ? apiMounts(method, targetUri, peeler, headers)
                 : switch (method) {
                     case GET -> new EntityRequestResponse(service.getListOfMounts());
                     case HEAD -> JSON_OK;
                     case OPTIONS -> GHO_OK;
                     default -> GHO_METHOD_NOT_ALLOWED;
                 };
-            case "single" -> single(method, targetUri, peeler);
+            case "single" -> single(method, targetUri, peeler, headers);
             case "ui" -> HeadersResponse.of(HttpResponseStatus.SEE_OTHER,
                 HttpHeaderNames.LOCATION, "/" + path() + "/explorer/index.html");
             default -> peeler.hasNext() ? EmptyResponse.NOT_FOUND
                 : switch (method) {
-                    case GET -> apiModule(targetUri, next, true);
-                    case HEAD -> apiModule(targetUri, next, false);
+                    case GET -> apiModule(targetUri, next, true, headers);
+                    case HEAD -> apiModule(targetUri, next, false, headers);
                     case OPTIONS -> GHO_OK;
                     default -> GHO_METHOD_NOT_ALLOWED;
                 };
         };
     }
 
-    private Response apiModule(final URI targetUri, final String module, final boolean withContent) {
+    private Response apiModule(final URI targetUri, final String module, final boolean withContent,
+            final HttpHeaders headers) {
         final var params = queryParams(targetUri);
         final var revision = params.lookup("revision");
         final var width = params.lookup("width", Integer::valueOf);
         final var depth = params.lookup("depth", Integer::valueOf);
+        final var forwardedHeader = headers.get(FORWARDED);
+        final var forwardedProtoHeader = headers.get(X_FORWARDED_PROTO);
 
         final DocumentEntity entity;
         try {
-            entity = service.getDocByModule(module, revision, targetUri, width, depth);
+            entity = service.getDocByModule(module, revision, targetUri, width, depth, forwardedHeader,
+                forwardedProtoHeader);
         } catch (IOException e) {
             return new ExceptionRequestResponse(e);
         }
         return withContent ? new EntityRequestResponse(entity) : JSON_OK;
     }
 
-    private Response apiMounts(final ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler) {
+    private Response apiMounts(final ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler,
+            final HttpHeaders headers) {
         final var instanceStr = peeler.next();
         final long instance;
         try {
@@ -149,8 +156,8 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
 
         if (!peeler.hasNext()) {
             return switch (method) {
-                case GET -> apiMount(targetUri, instance, true);
-                case HEAD -> apiMount(targetUri, instance, false);
+                case GET -> apiMount(targetUri, instance, true, headers);
+                case HEAD -> apiMount(targetUri, instance, false, headers);
                 case OPTIONS -> GHO_OK;
                 default -> GHO_METHOD_NOT_ALLOWED;
             };
@@ -159,20 +166,24 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         final var next = peeler.next();
         return peeler.hasNext() ? EmptyResponse.NOT_FOUND : switch (next) {
             case "meta" -> prepareMountsInstanceMeta(method, targetUri, instance);
-            default -> prepareMountsInstanceModule(method, targetUri, instance, next);
+            default -> prepareMountsInstanceModule(method, targetUri, instance, next, headers);
         };
     }
 
-    private Response apiMount(final URI targetUri, final long instance, final boolean withContent) {
+    private Response apiMount(final URI targetUri, final long instance, final boolean withContent,
+            final HttpHeaders headers) {
         final var params = queryParams(targetUri);
         final var width = params.lookup("width", Integer::valueOf);
         final var depth = params.lookup("depth", Integer::valueOf);
         final var offset = params.lookup("offset", Integer::valueOf);
         final var limit = params.lookup("limit", Integer::valueOf);
+        final var forwardedHeader = headers.get(FORWARDED);
+        final var forwardedProtoHeader = headers.get(X_FORWARDED_PROTO);
 
         final DocumentEntity entity;
         try {
-            entity = service.getMountDoc(instance, targetUri, width, depth, offset, limit);
+            entity = service.getMountDoc(instance, targetUri, width, depth, offset, limit, forwardedHeader,
+                forwardedProtoHeader);
         } catch (IOException e) {
             return new ExceptionRequestResponse(e);
         }
@@ -204,36 +215,40 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
     }
 
     private Response prepareMountsInstanceModule(final ImplementedMethod method, final URI targetUri,
-            final long instance, final String module) {
+            final long instance, final String module, final HttpHeaders headers) {
         return switch (method) {
-            case GET -> prepareMountsInstanceModuleGet(targetUri, instance, module, true);
-            case HEAD -> prepareMountsInstanceModuleGet(targetUri, instance, module, false);
+            case GET -> prepareMountsInstanceModuleGet(targetUri, instance, module, true, headers);
+            case HEAD -> prepareMountsInstanceModuleGet(targetUri, instance, module, false, headers);
             case OPTIONS -> GHO_OK;
             default -> GHO_METHOD_NOT_ALLOWED;
         };
     }
 
     private Response prepareMountsInstanceModuleGet(final URI targetUri, final long instance, final String module,
-            final boolean withContent) {
+            final boolean withContent, final HttpHeaders headers) {
         final var params = queryParams(targetUri);
         final var revision = params.lookup("revision");
         final var width = params.lookup("width", Integer::valueOf);
         final var depth = params.lookup("depth", Integer::valueOf);
+        final var forwardedHeader = headers.get(FORWARDED);
+        final var forwardedProtoHeader = headers.get(X_FORWARDED_PROTO);
 
         final DocumentEntity entity;
         try {
-            entity = service.getMountDocByModule(instance, module, revision, targetUri, width, depth);
+            entity = service.getMountDocByModule(instance, module, revision, targetUri, width, depth, forwardedHeader,
+                forwardedProtoHeader);
         } catch (IOException e) {
             return new ExceptionRequestResponse(e);
         }
         return withContent ? new EntityRequestResponse(entity) : JSON_OK;
     }
 
-    private Response single(final ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler) {
+    private Response single(final ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler,
+            final HttpHeaders headers) {
         if (!peeler.hasNext()) {
             return switch (method) {
-                case GET -> single(targetUri, true);
-                case HEAD -> single(targetUri, false);
+                case GET -> single(targetUri, true, headers);
+                case HEAD -> single(targetUri, false, headers);
                 case OPTIONS -> GHO_OK;
                 default -> GHO_METHOD_NOT_ALLOWED;
             };
@@ -246,16 +261,19 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         };
     }
 
-    private Response single(final URI targetUri, final boolean withContent) {
+    private Response single(final URI targetUri, final boolean withContent, final HttpHeaders headers) {
         final var params = queryParams(targetUri);
         final var width = params.lookup("width", Integer::valueOf);
         final var depth = params.lookup("depth", Integer::valueOf);
         final var offset = params.lookup("offset", Integer::valueOf);
         final var limit = params.lookup("limit", Integer::valueOf);
+        final var forwardedHeader = headers.get(FORWARDED);
+        final var forwardedProtoHeader = headers.get(X_FORWARDED_PROTO);
 
         final DocumentEntity entity;
         try {
-            entity = service.getAllModulesDoc(targetUri, width, depth, offset, limit);
+            entity = service.getAllModulesDoc(targetUri, width, depth, offset, limit, forwardedHeader,
+                forwardedProtoHeader);
         } catch (IOException e) {
             return new ExceptionRequestResponse(e);
         }
