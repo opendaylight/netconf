@@ -16,9 +16,11 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -34,6 +36,7 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 
 public abstract class BaseYangOpenApiGenerator {
     private static final String CONTROLLER_RESOURCE_NAME = "Controller";
+    private static final Pattern FORWARDED_PROTO_PATTERN = Pattern.compile("(?i)proto=\"?(\\w+)\"?");
 
     private final DOMSchemaService schemaService;
     private final @Nullable OpenApiOauth2Configuration oauth2Config;
@@ -69,12 +72,13 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public DocumentEntity getControllerModulesDoc(final URI uri, final int width, final int depth,
-            final int offset, final int limit, final String basePath) {
+            final int offset, final int limit, final String basePath, final @Nullable String forwardedHeader,
+            final @Nullable String forwardedProtoHeader) {
         final var modelContext = modelContext();
-        final var schema = createSchemaFromUri(uri);
+        final var scheme = resolveScheme(uri, forwardedHeader, forwardedProtoHeader);
         final var host = createHostFromUri(uri);
         final var title = "Controller modules of RESTCONF";
-        final var url = schema + "://" + host + "/";
+        final var url = scheme + "://" + host + "/";
         final var modulesWithoutDuplications = getModulesWithoutDuplications(modelContext);
         final var portionOfModels = getModelsSublist(modulesWithoutDuplications, offset, limit);
         return new DocumentEntity(modelContext, title, url, securityRequirements(), CONTROLLER_RESOURCE_NAME, "",
@@ -88,14 +92,16 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public DocumentEntity getApiDeclaration(final String module, final String revision, final URI uri, final int width,
-            final int depth, final String basePath) throws IOException {
+            final int depth, final String basePath, final @Nullable String forwardedHeader,
+            final @Nullable String forwardedProtoHeader) throws IOException {
         return getApiDeclaration(module, revision, uri, modelContext(), "", CONTROLLER_RESOURCE_NAME, width, depth,
-            basePath);
+            basePath, forwardedHeader, forwardedProtoHeader);
     }
 
     public DocumentEntity getApiDeclaration(final String moduleName, final String revision, final URI uri,
             final EffectiveModelContext modelContext, final String urlPrefix, final @NonNull String deviceName,
-            final int width, final int depth, final String basePath) throws IOException {
+            final int width, final int depth, final String basePath, final @Nullable String forwardedHeader,
+            final @Nullable String forwardedProtoHeader) throws IOException {
         final Optional<Revision> rev;
 
         try {
@@ -107,10 +113,10 @@ public abstract class BaseYangOpenApiGenerator {
         final var module = modelContext.findModule(moduleName, rev).orElseThrow(
             () -> new IOException("Could not find module by name,revision: " + moduleName + "," + revision));
 
-        final var schema = createSchemaFromUri(uri);
+        final var scheme = resolveScheme(uri, forwardedHeader, forwardedProtoHeader);
         final var host = createHostFromUri(uri);
         final var title = module.getName();
-        final var url = schema + "://" + host + "/";
+        final var url = scheme + "://" + host + "/";
         final var modules = List.of(module);
         return new DocumentEntity(modelContext, title, url, securityRequirements(), deviceName, urlPrefix, true,
             false, modules, basePath, width, depth, oauth2Config);
@@ -125,7 +131,26 @@ public abstract class BaseYangOpenApiGenerator {
         return uri.getHost() + portPart;
     }
 
-    public String createSchemaFromUri(final URI uri) {
+    public String resolveScheme(final URI uri, final @Nullable String forwardedHeader,
+            final @Nullable String forwardedProtoHeader) {
+        // RFC 7239 Forwarded header
+        if (forwardedHeader != null) {
+            final var firstElement = forwardedHeader.split(",")[0];
+            final var matcher = FORWARDED_PROTO_PATTERN.matcher(firstElement);
+            if (matcher.find()) {
+                return matcher.group(1).toLowerCase(Locale.ROOT);
+            }
+        }
+
+        // X-Forwarded-Proto header
+        if (forwardedProtoHeader != null) {
+            final var firstProto = forwardedProtoHeader.split(",")[0].trim();
+            if (!firstProto.isEmpty()) {
+                return firstProto.toLowerCase(Locale.ROOT);
+            }
+        }
+
+        // Scheme from URI
         return uri.getScheme();
     }
 
