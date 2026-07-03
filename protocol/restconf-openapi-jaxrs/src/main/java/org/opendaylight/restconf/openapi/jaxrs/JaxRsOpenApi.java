@@ -16,6 +16,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -34,10 +35,13 @@ public final class JaxRsOpenApi {
     @GET
     @Path("/single")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllModulesDoc(@Context final UriInfo uriInfo, @QueryParam("width") final Integer width,
-            @QueryParam("depth") final Integer depth, @QueryParam("offset") final Integer offset,
-            @QueryParam("limit") final Integer limit) throws IOException {
-        final var resultStream = openApiService.getAllModulesDoc(uriInfo.getRequestUri(), width, depth, offset, limit);
+    public Response getAllModulesDoc(@Context final UriInfo uriInfo, @Context final HttpHeaders headers,
+            @QueryParam("width") final Integer width, @QueryParam("depth") final Integer depth,
+            @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit) throws IOException {
+        final String forwarded = headers.getHeaderString("Forwarded");
+        final String xForwardedProto = headers.getHeaderString("X-Forwarded-Proto");
+        final var resultStream = openApiService.getAllModulesDoc(
+            uriInfo.getRequestUri(), width, depth, offset, limit, forwarded, xForwardedProto);
         return Response.ok(resultStream).build();
     }
 

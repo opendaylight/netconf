@@ -10,6 +10,7 @@ package org.opendaylight.restconf.openapi.api;
 import com.google.common.collect.ImmutableCollection;
 import java.io.IOException;
 import java.net.URI;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.openapi.model.DocumentEntity;
 import org.opendaylight.restconf.openapi.model.MetadataEntity;
 import org.opendaylight.restconf.openapi.model.MountPointsEntity;
@@ -52,8 +53,8 @@ public interface OpenApiService {
      *         child nodes specified by {@code width}.
      * @throws IOException When I/O error occurs.
      */
-    DocumentEntity getAllModulesDoc(URI uri, Integer width, Integer depth, Integer offset, Integer limit)
-            throws IOException;
+    DocumentEntity getAllModulesDoc(URI uri, Integer width, Integer depth, Integer offset, Integer limit,
+            String forwarded, String xForwardedProto) throws IOException;
 
     /**
      * Generate a metadata document for all or paginated modules of the controller schema context.

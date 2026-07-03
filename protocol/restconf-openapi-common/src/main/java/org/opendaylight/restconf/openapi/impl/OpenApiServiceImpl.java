@@ -59,9 +59,10 @@ public final class OpenApiServiceImpl implements OpenApiService, AutoCloseable {
 
     @Override
     public DocumentEntity getAllModulesDoc(final URI uri, final @Nullable Integer width, final @Nullable Integer depth,
-            final @Nullable Integer offset, final @Nullable Integer limit) throws IOException {
+            final @Nullable Integer offset, final @Nullable Integer limit, final @Nullable String forwarded,
+            final @Nullable String xForwardedProto) {
         return openApiGeneratorRFC8040.getControllerModulesDoc(uri, unboxOrZero(width), unboxOrZero(depth),
-            unboxOrZero(offset), unboxOrZero(limit), basePath);
+            unboxOrZero(offset), unboxOrZero(limit), basePath, forwarded, xForwardedProto);
     }
 
     @Override

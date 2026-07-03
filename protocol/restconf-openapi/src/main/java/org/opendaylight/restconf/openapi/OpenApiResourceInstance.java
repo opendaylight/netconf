@@ -75,7 +75,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
 
         final var segment = peeler.next();
         return switch (segment) {
-            case "api" -> api(method, targetUri, peeler, xrd);
+            case "api" -> api(method, targetUri, peeler, xrd, headers);
             case "explorer" -> explorer(method, peeler);
             default -> EmptyResponse.NOT_FOUND;
         };
@@ -83,7 +83,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
 
     // the /api resource
     private Response api(final ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler,
-            final XRD xrd) {
+            final XRD xrd, final HttpHeaders headers) {
         final var restconf = xrd.lookupLink(LinkRelation.RESTCONF);
         if (restconf == null) {
             return EmptyResponse.NOT_FOUND;
@@ -110,7 +110,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
                     case OPTIONS -> GHO_OK;
                     default -> GHO_METHOD_NOT_ALLOWED;
                 };
-            case "single" -> single(method, targetUri, peeler);
+            case "single" -> single(method, targetUri, peeler, headers);
             case "ui" -> HeadersResponse.of(HttpResponseStatus.SEE_OTHER,
                 HttpHeaderNames.LOCATION, "/" + path() + "/explorer/index.html");
             default -> peeler.hasNext() ? EmptyResponse.NOT_FOUND
@@ -229,11 +229,12 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         return withContent ? new EntityRequestResponse(entity) : JSON_OK;
     }
 
-    private Response single(final ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler) {
+    private Response single(final ImplementedMethod method, final URI targetUri, final SegmentPeeler peeler,
+            final HttpHeaders headers) {
         if (!peeler.hasNext()) {
             return switch (method) {
-                case GET -> single(targetUri, true);
-                case HEAD -> single(targetUri, false);
+                case GET -> single(targetUri, true, headers);
+                case HEAD -> single(targetUri, false, headers);
                 case OPTIONS -> GHO_OK;
                 default -> GHO_METHOD_NOT_ALLOWED;
             };
@@ -246,7 +247,7 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         };
     }
 
-    private Response single(final URI targetUri, final boolean withContent) {
+    private Response single(final URI targetUri, final boolean withContent, final HttpHeaders headers) {
         final var params = queryParams(targetUri);
         final var width = params.lookup("width", Integer::valueOf);
         final var depth = params.lookup("depth", Integer::valueOf);
@@ -254,8 +255,10 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
         final var limit = params.lookup("limit", Integer::valueOf);
 
         final DocumentEntity entity;
+        final String forwarded = headers.get("Forwarded");
+        final String xfp = headers.get("X-Forwarded-Proto");
         try {
-            entity = service.getAllModulesDoc(targetUri, width, depth, offset, limit);
+            entity = service.getAllModulesDoc(targetUri, width, depth, offset, limit, forwarded, xfp);
         } catch (IOException e) {
             return new ExceptionRequestResponse(e);
         }
