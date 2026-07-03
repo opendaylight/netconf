@@ -48,12 +48,14 @@ public interface OpenApiService {
      *      of a YANG module.
      * @param offset First model to read. 0 means read from the first model.
      * @param limit The number of models to read. 0 means read all models.
+     * @param forwardedHeader "Forwarded" header provided by a reverse proxy.
+     * @param forwardedProtoHeader "X-Forwarded-Proto" header provided by a reverse proxy.
      * @return the OpenAPI document for number of modules specified by {@code offset} and {@code limit}, with number
      *         child nodes specified by {@code width}.
      * @throws IOException When I/O error occurs.
      */
-    DocumentEntity getAllModulesDoc(URI uri, Integer width, Integer depth, Integer offset, Integer limit)
-            throws IOException;
+    DocumentEntity getAllModulesDoc(URI uri, Integer width, Integer depth, Integer offset, Integer limit,
+            String forwardedHeader, String forwardedProtoHeader) throws IOException;
 
     /**
      * Generate a metadata document for all or paginated modules of the controller schema context.
@@ -74,9 +76,24 @@ public interface OpenApiService {
 
     /**
      * Generates Swagger compliant document listing APIs for module.
+     *
+     * @param module Module name to read.
+     * @param revision Module revision.
+     * @param uri Requests {@link URI}.
+     * @param width Width is the number of child nodes processed for each module/node. This means that for example with
+     *      width=3 we will process schema only for first 3 nodes in each module and each node that we process after.
+     *      Value set to 0 or lesser means ignore width and to process all child nodes of a YANG module.
+     * @param depth Depth to which the OpenAPI document is generated, the number of levels of the module that are
+     *      processed in depth. For example, depth=1 means that the module will be processed with its children, but
+     *      their children will be ignored. Value set to 0 or lesser means ignore depth and to process all child nodes
+     *      of a YANG module.
+     * @param forwardedHeader "Forwarded" header provided by a reverse proxy.
+     * @param forwardedProtoHeader "X-Forwarded-Proto" header provided by a reverse proxy.
+     * @return Response containing document listing APIs for module.
+     * @throws IOException When I/O error occurs.
      */
-    DocumentEntity getDocByModule(String module, String revision, URI uri, Integer width, Integer depth)
-            throws IOException;
+    DocumentEntity getDocByModule(String module, String revision, URI uri, Integer width, Integer depth,
+            String forwardedHeader, String forwardedProtoHeader) throws IOException;
 
     /**
      * Generates index document for Swagger UI. This document lists out all modules with link to get APIs for each
@@ -95,11 +112,13 @@ public interface OpenApiService {
      *      processed in depth. For example, depth=1 means that the module will be processed with it's children, but
      *      their children will be ignored. Value set to 0 or lesser means ignore depth and to process all child nodes
      *      of a YANG module.
+     * @param forwardedHeader "Forwarded" header provided by a reverse proxy.
+     * @param forwardedProtoHeader "X-Forwarded-Proto" header provided by a reverse proxy.
      * @return the OpenAPI document for all modules with number child nodes specified by {@code width}.
      * @throws IOException When I/O error occurs.
      */
     DocumentEntity getMountDocByModule(long instanceNum, String module, String revision, URI uri, Integer width,
-        Integer depth) throws IOException;
+            Integer depth, String forwardedHeader, String forwardedProtoHeader) throws IOException;
 
     /**
      * Generate OpenAPI specification document listing APIs for all modules of mount point. Generates OpenAPI
@@ -129,12 +148,14 @@ public interface OpenApiService {
      *      of a YANG module.
      * @param offset First model to read. 0 means read from the first model.
      * @param limit The number of models to read. 0 means read all models.
+     * @param forwardedHeader "Forwarded" header provided by a reverse proxy.
+     * @param forwardedProtoHeader "X-Forwarded-Proto" header provided by a reverse proxy.
      * @return the OpenAPI document for number of modules specified by {@code offset} and {@code limit} with number
      *         child nodes specified by {@code width}.
      * @throws IOException When I/O error occurs.
      */
-    DocumentEntity getMountDoc(long instanceNum, URI uri, Integer width, Integer depth, Integer offset,
-        Integer limit) throws IOException;
+    DocumentEntity getMountDoc(long instanceNum, URI uri, Integer width, Integer depth, Integer offset, Integer limit,
+            String forwardedHeader, String forwardedProtoHeader) throws IOException;
 
     /**
      * Generate a metadata document for all or paginated modules of the mount point schema context.
