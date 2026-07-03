@@ -78,7 +78,7 @@ class ToasterDocumentTest extends AbstractDocumentTest {
     @MethodSource
     void getMountDocByModuleTest(final String revision, final String jsonPath) throws Exception {
         final var expectedJson = getExpectedDoc("toaster-document/" + jsonPath);
-        final var moduleDoc = getMountDocByModule(TOASTER, revision);
+        final var moduleDoc = getMountDocByModule(TOASTER, revision, null, null);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 
