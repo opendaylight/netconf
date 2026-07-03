@@ -76,7 +76,7 @@ abstract class AbstractDocumentTest {
     protected static String getAllModulesDoc(final int width, final int depth, final int offset, final int limit)
             throws Exception {
         return assertOpenApiEntity(openApiService.getAllModulesDoc(new URI(URI + "single"), width, depth, offset,
-            limit));
+            limit, null, null));
     }
 
     protected static String getDocByModule(final String moduleName, final String revision) throws Exception {

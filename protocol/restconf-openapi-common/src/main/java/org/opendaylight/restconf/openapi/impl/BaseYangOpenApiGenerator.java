@@ -16,9 +16,11 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -69,9 +71,10 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public DocumentEntity getControllerModulesDoc(final URI uri, final int width, final int depth,
-            final int offset, final int limit, final String basePath) {
+            final int offset, final int limit, final String basePath, final String forwarded,
+            final String xForwardedProto) {
         final var modelContext = modelContext();
-        final var schema = createSchemaFromUri(uri);
+        final var schema = resolveScheme(uri, forwarded, xForwardedProto);
         final var host = createHostFromUri(uri);
         final var title = "Controller modules of RESTCONF";
         final var url = schema + "://" + host + "/";
@@ -126,6 +129,24 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public String createSchemaFromUri(final URI uri) {
+        return uri.getScheme();
+    }
+
+    public String resolveScheme(final URI uri, final String forwarded, final String xForwardedProto) {
+        // 1. RFC 7239 Forwarded header
+        if (forwarded != null) {
+            final var m = Pattern.compile("(?i)proto=(\\w+)").matcher(forwarded);
+            if (m.find()) {
+                return m.group(1).toLowerCase(Locale.ROOT);
+            }
+        }
+
+        // 2. De-facto X-Forwarded-Proto header
+        if (xForwardedProto != null && !xForwardedProto.isBlank()) {
+            return xForwardedProto.trim().toLowerCase(Locale.ROOT);
+        }
+
+        // 3. Fallback
         return uri.getScheme();
     }
 
