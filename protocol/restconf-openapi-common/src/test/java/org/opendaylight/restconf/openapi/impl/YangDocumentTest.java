@@ -258,7 +258,7 @@ class YangDocumentTest extends AbstractDocumentTest {
     void getMountDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
             throws Exception {
         final var expectedJson = getExpectedDoc("yang-document/" + jsonPath);
-        final var moduleDoc = getMountDocByModule(moduleName, revision);
+        final var moduleDoc = getMountDocByModule(moduleName, revision, null, null);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 

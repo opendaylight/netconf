@@ -16,6 +16,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -34,10 +35,13 @@ public final class JaxRsOpenApi {
     @GET
     @Path("/single")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllModulesDoc(@Context final UriInfo uriInfo, @QueryParam("width") final Integer width,
-            @QueryParam("depth") final Integer depth, @QueryParam("offset") final Integer offset,
-            @QueryParam("limit") final Integer limit) throws IOException {
-        final var resultStream = openApiService.getAllModulesDoc(uriInfo.getRequestUri(), width, depth, offset, limit);
+    public Response getAllModulesDoc(@Context final UriInfo uriInfo, @Context final HttpHeaders headers,
+            @QueryParam("width") final Integer width, @QueryParam("depth") final Integer depth,
+            @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit) throws IOException {
+        final String forwarded = headers.getHeaderString("Forwarded");
+        final String xForwardedProto = headers.getHeaderString("X-Forwarded-Proto");
+        final var resultStream = openApiService.getAllModulesDoc(
+            uriInfo.getRequestUri(), width, depth, offset, limit, forwarded, xForwardedProto);
         return Response.ok(resultStream).build();
     }
 
@@ -55,8 +59,12 @@ public final class JaxRsOpenApi {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDocByModule(@PathParam("module") final String module,
             @QueryParam("revision") final String revision, @Context final UriInfo uriInfo,
-            @QueryParam("width") final Integer width, @QueryParam("depth") final Integer depth) throws IOException {
-        final var resultStream = openApiService.getDocByModule(module, revision, uriInfo.getRequestUri(), width, depth);
+            @Context final HttpHeaders headers, @QueryParam("width") final Integer width,
+            @QueryParam("depth") final Integer depth) throws IOException {
+        final String forwardedHeader = headers.getHeaderString("Forwarded");
+        final String forwardedProtoHeader = headers.getHeaderString("X-Forwarded-Proto");
+        final var resultStream = openApiService.getDocByModule(module, revision, uriInfo.getRequestUri(), width, depth,
+            forwardedHeader, forwardedProtoHeader);
         return Response.ok(resultStream).build();
     }
 
@@ -80,10 +88,12 @@ public final class JaxRsOpenApi {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMountDocByModule(@PathParam("instance") final long instanceNum,
             @PathParam("module") final String module, @QueryParam("revision") final String revision,
-            @Context final UriInfo uriInfo, @QueryParam("width") final Integer width,
-            @QueryParam("depth") final Integer depth) throws IOException {
+            @Context final UriInfo uriInfo, @Context final HttpHeaders headers,
+            @QueryParam("width") final Integer width, @QueryParam("depth") final Integer depth) throws IOException {
+        final String forwardedHeader = headers.getHeaderString("Forwarded");
+        final String forwardedProtoHeader = headers.getHeaderString("X-Forwarded-Proto");
         final var resultStream = openApiService.getMountDocByModule(instanceNum, module, revision,
-            uriInfo.getRequestUri(), width, depth);
+            uriInfo.getRequestUri(), width, depth, forwardedHeader, forwardedProtoHeader);
         return Response.ok(resultStream).build();
     }
 
@@ -92,10 +102,13 @@ public final class JaxRsOpenApi {
     @Path("/mounts/{instance}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMountDoc(@PathParam("instance") final long instanceNum, @Context final UriInfo uriInfo,
-            @QueryParam("width") final Integer width, @QueryParam("depth") final Integer depth,
-            @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit) throws IOException {
+            @Context final HttpHeaders headers, @QueryParam("width") final Integer width,
+            @QueryParam("depth") final Integer depth, @QueryParam("offset") final Integer offset,
+            @QueryParam("limit") final Integer limit) throws IOException {
+        final String forwardedHeader = headers.getHeaderString("Forwarded");
+        final String forwardedProtoHeader = headers.getHeaderString("X-Forwarded-Proto");
         final var resultStream = openApiService.getMountDoc(instanceNum, uriInfo.getRequestUri(), width, depth, offset,
-            limit);
+            limit, forwardedHeader, forwardedProtoHeader);
         return Response.ok(resultStream).build();
     }
 

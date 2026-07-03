@@ -16,9 +16,11 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -69,9 +71,10 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public DocumentEntity getControllerModulesDoc(final URI uri, final int width, final int depth,
-            final int offset, final int limit, final String basePath) {
+            final int offset, final int limit, final String basePath, final String forwardedHeader,
+            final String forwardedProtoHeader) {
         final var modelContext = modelContext();
-        final var schema = createSchemaFromUri(uri);
+        final var schema = resolveScheme(uri, forwardedHeader, forwardedProtoHeader);
         final var host = createHostFromUri(uri);
         final var title = "Controller modules of RESTCONF";
         final var url = schema + "://" + host + "/";
@@ -88,14 +91,16 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public DocumentEntity getApiDeclaration(final String module, final String revision, final URI uri, final int width,
-            final int depth, final String basePath) throws IOException {
+            final int depth, final String basePath, final String forwardedHeader, final String forwardedProtoHeader)
+            throws IOException {
         return getApiDeclaration(module, revision, uri, modelContext(), "", CONTROLLER_RESOURCE_NAME, width, depth,
-            basePath);
+            basePath, forwardedHeader, forwardedProtoHeader);
     }
 
     public DocumentEntity getApiDeclaration(final String moduleName, final String revision, final URI uri,
             final EffectiveModelContext modelContext, final String urlPrefix, final @NonNull String deviceName,
-            final int width, final int depth, final String basePath) throws IOException {
+            final int width, final int depth, final String basePath, final String forwardedHeader,
+            final String forwardedProtoHeader) throws IOException {
         final Optional<Revision> rev;
 
         try {
@@ -107,7 +112,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var module = modelContext.findModule(moduleName, rev).orElseThrow(
             () -> new IOException("Could not find module by name,revision: " + moduleName + "," + revision));
 
-        final var schema = createSchemaFromUri(uri);
+        final var schema = resolveScheme(uri, forwardedHeader, forwardedProtoHeader);
         final var host = createHostFromUri(uri);
         final var title = module.getName();
         final var url = schema + "://" + host + "/";
@@ -126,6 +131,23 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public String createSchemaFromUri(final URI uri) {
+        return uri.getScheme();
+    }
+
+    public String resolveScheme(final URI uri, final String forwardedHeader, final String forwardedProtoHeader) {
+        // RFC 7239 Forwarded header
+        if (forwardedHeader != null) {
+            final var m = Pattern.compile("(?i)proto=(\\w+)").matcher(forwardedHeader);
+            if (m.find()) {
+                return m.group(1).toLowerCase(Locale.ROOT);
+            }
+        }
+
+        // De-facto X-Forwarded-Proto header
+        if (forwardedProtoHeader != null && !forwardedProtoHeader.isBlank()) {
+            return forwardedProtoHeader.trim().toLowerCase(Locale.ROOT);
+        }
+
         return uri.getScheme();
     }
 
