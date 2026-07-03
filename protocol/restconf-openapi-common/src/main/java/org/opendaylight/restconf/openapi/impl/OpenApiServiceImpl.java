@@ -53,9 +53,10 @@ public final class OpenApiServiceImpl implements OpenApiService, AutoCloseable {
 
     @Override
     public DocumentEntity getAllModulesDoc(final URI uri, final @Nullable Integer width, final @Nullable Integer depth,
-            final @Nullable Integer offset, final @Nullable Integer limit) throws IOException {
+            final @Nullable Integer offset, final @Nullable Integer limit, final @Nullable String forwardedHeader,
+            final @Nullable String forwardedProtoHeader) throws IOException {
         return openApiGeneratorRFC8040.getControllerModulesDoc(uri, unboxOrZero(width), unboxOrZero(depth),
-            unboxOrZero(offset), unboxOrZero(limit), basePath);
+            unboxOrZero(offset), unboxOrZero(limit), basePath, forwardedHeader, forwardedProtoHeader);
     }
 
     @Override
@@ -69,9 +70,10 @@ public final class OpenApiServiceImpl implements OpenApiService, AutoCloseable {
      */
     @Override
     public DocumentEntity getDocByModule(final String module, final String revision, final URI uri,
-            final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
+            final @Nullable Integer width, final @Nullable Integer depth, final @Nullable String forwardedHeader,
+            final @Nullable String forwardedProtoHeader) throws IOException {
         return openApiGeneratorRFC8040.getApiDeclaration(module, revision, uri, unboxOrZero(width), unboxOrZero(depth),
-            basePath);
+            basePath, forwardedHeader, forwardedProtoHeader);
     }
 
     @Override
@@ -81,17 +83,18 @@ public final class OpenApiServiceImpl implements OpenApiService, AutoCloseable {
 
     @Override
     public DocumentEntity getMountDocByModule(final long instanceNum, final String module, final String revision,
-            final URI uri, final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
+            final URI uri, final @Nullable Integer width, final @Nullable Integer depth,
+            final @Nullable String forwardedHeader, final @Nullable String forwardedProtoHeader) throws IOException {
         return mountPointOpenApiRFC8040.getMountPointApi(uri, instanceNum, module, revision, unboxOrZero(width),
-            unboxOrZero(depth), basePath);
+            unboxOrZero(depth), basePath, forwardedHeader, forwardedProtoHeader);
     }
 
     @Override
     public DocumentEntity getMountDoc(final long instanceNum, final URI uri, final @Nullable Integer width,
-            final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
-            throws IOException {
+            final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit,
+            final @Nullable String forwardedHeader, final @Nullable String forwardedProtoHeader) throws IOException {
         return mountPointOpenApiRFC8040.getMountPointApi(uri, instanceNum, unboxOrZero(width), unboxOrZero(depth),
-            unboxOrZero(offset), unboxOrZero(limit), basePath);
+            unboxOrZero(offset), unboxOrZero(limit), basePath, forwardedHeader, forwardedProtoHeader);
     }
 
     @Override
