@@ -16,6 +16,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -25,6 +26,9 @@ import org.opendaylight.restconf.openapi.api.OpenApiService;
 @Provider
 @Path("/")
 public final class JaxRsOpenApi {
+    private static final String FORWARDED = "Forwarded";
+    private static final String X_FORWARDED_PROTO = "X-Forwarded-Proto";
+
     private final OpenApiService openApiService;
     private final String basePath;
 
@@ -36,11 +40,13 @@ public final class JaxRsOpenApi {
     @GET
     @Path("/single")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllModulesDoc(@Context final UriInfo uriInfo, @QueryParam("width") final Integer width,
-            @QueryParam("depth") final Integer depth, @QueryParam("offset") final Integer offset,
-            @QueryParam("limit") final Integer limit) throws IOException {
-        final var resultStream = openApiService.getAllModulesDoc(uriInfo.getRequestUri(), width, depth, offset, limit,
-            basePath);
+    public Response getAllModulesDoc(@Context final UriInfo uriInfo, @Context final HttpHeaders headers,
+            @QueryParam("width") final Integer width, @QueryParam("depth") final Integer depth,
+            @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit) throws IOException {
+        final var forwardedHeader = headers.getHeaderString(FORWARDED);
+        final var forwardedProtoHeader = headers.getHeaderString(X_FORWARDED_PROTO);
+        final var resultStream = openApiService.getAllModulesDoc(
+            uriInfo.getRequestUri(), width, depth, offset, limit, basePath, forwardedHeader, forwardedProtoHeader);
         return Response.ok(resultStream).build();
     }
 
@@ -58,9 +64,12 @@ public final class JaxRsOpenApi {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDocByModule(@PathParam("module") final String module,
             @QueryParam("revision") final String revision, @Context final UriInfo uriInfo,
-            @QueryParam("width") final Integer width, @QueryParam("depth") final Integer depth) throws IOException {
+            @Context final HttpHeaders headers, @QueryParam("width") final Integer width,
+            @QueryParam("depth") final Integer depth) throws IOException {
+        final var forwardedHeader = headers.getHeaderString(FORWARDED);
+        final var forwardedProtoHeader = headers.getHeaderString(X_FORWARDED_PROTO);
         final var resultStream = openApiService.getDocByModule(module, revision, uriInfo.getRequestUri(), width, depth,
-            basePath);
+            basePath, forwardedHeader, forwardedProtoHeader);
         return Response.ok(resultStream).build();
     }
 
@@ -84,10 +93,12 @@ public final class JaxRsOpenApi {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMountDocByModule(@PathParam("instance") final long instanceNum,
             @PathParam("module") final String module, @QueryParam("revision") final String revision,
-            @Context final UriInfo uriInfo, @QueryParam("width") final Integer width,
-            @QueryParam("depth") final Integer depth) throws IOException {
+            @Context final UriInfo uriInfo, @Context final HttpHeaders headers,
+            @QueryParam("width") final Integer width, @QueryParam("depth") final Integer depth) throws IOException {
+        final var forwardedHeader = headers.getHeaderString(FORWARDED);
+        final var forwardedProtoHeader = headers.getHeaderString(X_FORWARDED_PROTO);
         final var resultStream = openApiService.getMountDocByModule(instanceNum, module, revision,
-            uriInfo.getRequestUri(), width, depth, basePath);
+            uriInfo.getRequestUri(), width, depth, basePath, forwardedHeader, forwardedProtoHeader);
         return Response.ok(resultStream).build();
     }
 
@@ -96,10 +107,13 @@ public final class JaxRsOpenApi {
     @Path("/mounts/{instance}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMountDoc(@PathParam("instance") final long instanceNum, @Context final UriInfo uriInfo,
-            @QueryParam("width") final Integer width, @QueryParam("depth") final Integer depth,
-            @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit) throws IOException {
+            @Context final HttpHeaders headers, @QueryParam("width") final Integer width,
+            @QueryParam("depth") final Integer depth, @QueryParam("offset") final Integer offset,
+            @QueryParam("limit") final Integer limit) throws IOException {
+        final var forwardedHeader = headers.getHeaderString(FORWARDED);
+        final var forwardedProtoHeader = headers.getHeaderString(X_FORWARDED_PROTO);
         final var resultStream = openApiService.getMountDoc(instanceNum, uriInfo.getRequestUri(), width, depth, offset,
-            limit, basePath);
+            limit, basePath, forwardedHeader, forwardedProtoHeader);
         return Response.ok(resultStream).build();
     }
 
