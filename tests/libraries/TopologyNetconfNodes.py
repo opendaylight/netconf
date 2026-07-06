@@ -71,10 +71,11 @@ def configure_device_range(
     for i in range(first_device_id, first_device_id + device_count):
         name = "{}-{}".format(device_name_prefix, i)
         device_names.append(name)
+        current_device_port = device_port + (i - first_device_id)
         if use_node_encapsulation:
-            edits.append(get_encapsulated_payload(name, device_ipaddress, device_port))
+            edits.append(get_encapsulated_payload(name, device_ipaddress, current_device_port))
         else:
-            edits.append(get_legacy_payload(name, device_ipaddress, device_port))
+            edits.append(get_legacy_payload(name, device_ipaddress, current_device_port))
 
     data = """
     {
