@@ -71,10 +71,11 @@ def configure_device_range(
     for i in range(first_device_id, first_device_id + device_count):
         name = "{}-{}".format(device_name_prefix, i)
         device_names.append(name)
+        current_device_port = device_port + (i - first_device_id)
         if use_node_encapsulation:
-            edits.append(get_encapsulated_payload(name, device_ipaddress, device_port))
+            edits.append(get_encapsulated_payload(name, device_ipaddress, current_device_port))
         else:
-            edits.append(get_legacy_payload(name, device_ipaddress, device_port))
+            edits.append(get_legacy_payload(name, device_ipaddress, current_device_port))
 
     data = """
     {
@@ -273,12 +274,20 @@ def await_devices_connected(
 def main(args):
     # FIXME: add proper option parsing
     if args[0] == "configure":
+        first_device_port = 17830
+        device_count = int(args[1])
+        if first_device_port + device_count > 65_535:
+            raise ValueError(
+                f"Maximum usable TCP port number 65535 would be exceeded "
+                f"while using first device port as {first_device_port} "
+                f"and number of devices provided is {device_count}."
+            )
         names = configure_device_range(
             restconf_url="http://127.0.0.1:8181/rests",
             device_name_prefix="example",
             device_ipaddress="127.0.0.1",
-            device_port=17830,
-            device_count=int(args[1]),
+            device_port=first_device_port,
+            device_count=device_count,
             use_node_encapsulation=True,
         )
         print(names)
