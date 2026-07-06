@@ -404,9 +404,11 @@ def deploy_custom_rpc(rpc_config: str | None) -> str:
 
 
 def perform_operation_on_each_device(
-    operation: Callable, count: int, timeout: int = 45, log_response: bool = True
+    operation: Callable, count: int, timeout: int = 45 * 60, log_response: bool = True
 ):
     """Execute a specified operation on number of specified devices.
+
+    Default value for timeout is 45 minutes (45 * 60 seconds)
 
     Args:
         operation (Callable): The function to be execute on each device.
