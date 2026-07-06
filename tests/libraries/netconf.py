@@ -29,12 +29,13 @@ DIRECTORY_WITH_DEVICE_TEMPLATES = "variables/netconf/device"
 FIRST_TESTTOOL_PORT = 17830
 BASE_NETCONF_DEVICE_PORT = 17830
 DEVICE_NAME_BASE = "netconf-scaling-device"
-TESTTOOL_BOOT_TIMEOUT = 60
 ENABLE_NETCONF_TEST_TIMEOUT = variables.ENABLE_GLOBAL_TEST_DEADLINES
 RESTCONF_ROOT = variables.RESTCONF_ROOT
 REST_API = variables.REST_API
 TOOLS_IP = variables.TOOLS_IP
 ODL_NETCONF_NAMESPACE = variables.ODL_NETCONF_NAMESPACE
+TESTTOOL_BASE_STARTUP_TIMEOUT = 20
+TESTTOOL_PER_DEVICE_TIMEOUT = 1
 
 NETCONF_MOUNTED_DEVICE_TYPES = dict()
 
@@ -200,50 +201,39 @@ def wait_device_connected(device_name: str, timeout: int = 20, period: int = 1):
     )
 
 
-def check_device_is_up(last_port: int):
-    """Verify port is actively used by the device
+def wait_all_devices_are_up_and_running(device_count, timeout, log_response):
+    """Wait until all simulated devices are listening on their designated ports.
+
+    Retry function run every second until all device_count ports are in LISTEN
+    state or the total timeout is exceeded.
 
     Args:
-        last_port (int): The port number to check for a 'LISTEN' state.
-
-    Returns:
-        None
+        device_count (int): Expected number of devices to be listening.
+        timeout (int): Maximum seconds to wait for all devices to come up.
+        log_response (bool): Whether to log the operation's output.
     """
-    count = infra.count_port_occurrences(last_port, "LISTEN", "")
-    assert count == 1
-
-
-def check_device_is_up_and_running(device_number: int):
-    """Check device port is open.
-
-    Query ss whether testtool device with the specified number has its port
-    open and fail if not.
-
-    Args:
-        device_number (int): The index number of the device.
-
-    Returns:
-        None
-    """
-    device_port = FIRST_TESTTOOL_PORT + device_number
-    check_device_is_up(device_port)
-
-
-def wait_device_is_up_and_running(device_name: str, log_response: bool = True):
-    """Wait until the device is fully started and listening on its designated port.
-
-    Args:
-        device_name (str): The full name of the device. It needs to be in format
-            NAME-INDEX (e.g., 'netconf-scaling-device-5').
-        log_response (bool): Whether to log the polling responses. Defaults to True.
-
-    Returns:
-        None
-    """
-    number = int(device_name.split("-").pop())
     utils.wait_until_function_pass(
-        TESTTOOL_BOOT_TIMEOUT, 1, check_device_is_up_and_running, number
+        timeout, 1, check_devices_are_up_and_running, device_count
     )
+
+
+def check_devices_are_up_and_running(device_count):
+    """Confirm testtool has finished booting all simulated devices.
+
+    Testtool opens one port per device sequentially during startup.
+    Check all the expected ports were opened for listening.
+
+    Args:
+        device_count (int): Expected number of simulated devices.
+    """
+    rc, stdout = infra.shell(
+        f"ss -Hpunta state listening"
+        f" 'sport >= :{FIRST_TESTTOOL_PORT} and sport <= :{FIRST_TESTTOOL_PORT + device_count - 1}'"
+        f" | wc -l"
+    )
+    assert (
+        int(stdout) == device_count
+    ), f"Number of ports in LISTEN state {int(stdout)} does not match expected {device_count}."
 
 
 def remove_device_from_netconf(device_name: str):
@@ -329,8 +319,11 @@ def start_testtool(
     logfile = utils.get_log_file_name("testtool")
     process = infra.shell(f"{command} >tmp/{logfile} 2>&1", run_in_background=True)
     process.testtool_log_filename = logfile
-    perform_operation_on_each_device(
-        wait_device_is_up_and_running, device_count, log_response=log_response
+    wait_running_timeout = (
+        TESTTOOL_BASE_STARTUP_TIMEOUT + device_count * TESTTOOL_PER_DEVICE_TIMEOUT
+    )
+    wait_all_devices_are_up_and_running(
+        device_count, timeout=wait_running_timeout, log_response=log_response
     )
 
     return process
