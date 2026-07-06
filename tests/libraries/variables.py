@@ -33,6 +33,8 @@ class Variables(BaseSettings):
     MAX_HTTP_RESPONSE_BODY_LOG_SIZE: int = 10000
     MAX_VISUAL_DIFF_LOG_SIZE: int = 10000
     ENABLE_GLOBAL_TEST_DEADLINES: bool = True
+    TESTTOOL_MAX_HEAP: str = "4G"
+    CONTROLLER_MAX_MEM: str = "12G"
 
     ODL_NETCONF_MDSAL_PORT: int = 2830
     ODL_NETCONF_PASSWORD: str = "admin"
