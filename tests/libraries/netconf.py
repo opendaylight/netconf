@@ -21,9 +21,9 @@ from libraries import templated_requests
 from libraries import utils
 from libraries.variables import variables
 
-MAX_HEAP = "4G"
+TESTTOOL_MAX_HEAP = variables.TESTTOOL_MAX_HEAP
 TESTTOOL_DEFAULT_JAVA_OPTIONS = (
-    f"-Xmx{MAX_HEAP} -Djava.security.egd=file:/dev/./urandom"
+    f"-Xmx{TESTTOOL_MAX_HEAP} -Djava.security.egd=file:/dev/./urandom"
 )
 DIRECTORY_WITH_DEVICE_TEMPLATES = "variables/netconf/device"
 FIRST_TESTTOOL_PORT = 17830
