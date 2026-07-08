@@ -8,7 +8,7 @@
 # These variables are considered global and immutable, so their names are in ALL_CAPS.
 #
 
-from typing import ClassVar
+from typing import ClassVar, List
 from pydantic_settings import BaseSettings
 
 
@@ -35,6 +35,12 @@ class Variables(BaseSettings):
     ENABLE_GLOBAL_TEST_DEADLINES: bool = True
     TESTTOOL_MAX_HEAP: str = "4G"
     CONTROLLER_MAX_MEM: str = "12G"
+
+    # Loopback aliases, one per ODL cluster member. 127.0.0.x all route to the
+    # local host on Linux without any extra network configuration, letting
+    # each member bind the same ports (Karaf SSH, RESTCONF, ...) on its own
+    # address instead of clashing on 0.0.0.0.
+    CLUSTER_MEMBER_IPS: List[str] = ["127.0.0.1", "127.0.0.2", "127.0.0.3"]
 
     ODL_NETCONF_MDSAL_PORT: int = 2830
     ODL_NETCONF_PASSWORD: str = "admin"
