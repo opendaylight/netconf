@@ -17,7 +17,7 @@ from libraries.KarafShell import KarafShell
 from libraries.variables import variables
 
 CONTROLLER_MAX_MEM = variables.CONTROLLER_MAX_MEM
-KARAF_SHELL_INSTANCE = None
+karaf_shell_instances = dict()
 
 log = logging.getLogger(__name__)
 
@@ -141,63 +141,98 @@ def count_port_occurrences(port: int, state: str, name: str) -> int:
     return int(stdout)
 
 
-def start_odl_with_features(features: tuple[str], timeout: int = 60):
+def start_odl_with_features(
+    features: tuple[str],
+    cwd: str = "opendaylight"
+):
     """Starts ODL with installed provided features.
 
     Args:
         features (tuple[str]): Features to be installed in ODL.
-        timeout (int): Timeout within which it needs to start ODL, otherwise fail.
+        cwd (str): Distribution directory to start, relative to the working
+            directory. Defaults to the single-node distribution, but cluster
+            members each get their own copy.
 
     Returns:
         None
     """
+
     # set config with the required features
     shell(
         f"sed -ie 's/\(featuresBoot=\|featuresBoot =\)/featuresBoot = "
         f"{",".join(features)},/g' etc/org.apache.karaf.features.cfg",
-        cwd="opendaylight",
+        cwd=cwd,
     )
 
     shell(
         "sed -ie 's/memory-mapped = true/memory-mapped = false/g' "
         "system/org/opendaylight/controller/sal-clustering-config/*/"
         "sal-clustering-config-*-factorypekkoconf.xml",
-        cwd="opendaylight",
+        cwd=cwd,
     )
 
     # start ODL
-    shell(f"JAVA_OPTS=-Xmx{CONTROLLER_MAX_MEM} ./bin/start", cwd="opendaylight")
+    shell(f"JAVA_OPTS=-Xmx{CONTROLLER_MAX_MEM} ./bin/start", cwd=cwd)
 
-    # wait for proper message with timeout
+
+def wait_for_odl_ready(cwd: str = "opendaylight", timeout: int = 60):
+    """Blocks until ODL logs "System ready" in the given distribution.
+
+    Args:
+        cwd (str): Distribution directory whose log to poll.
+        timeout (int): Seconds to wait before failing.
+
+    Returns:
+        None
+    """
     interval = 5
     retry_shell_command(
         timeout // interval,
         interval,
         "grep 'org.opendaylight.infrautils.*System ready' data/log/karaf.log",
-        cwd="opendaylight",
+        cwd=cwd,
     )
 
 
-def execute_karaf_command(command: str) -> tuple[str, str]:
+def stop_all_karaf_instances():
+    """Kills every running Karaf main process.
+
+    Matches on the process command line, so it stops all ODL instances at
+    once regardless of how many are running (single node or cluster members).
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    shell("kill $(pgrep -f org.apache.karaf.main.[M]ain | grep -v ^$$\\$)")
+
+
+def execute_karaf_command(
+    command: str, host: str = "127.0.0.1", port: int = 8101
+) -> tuple[str, str]:
     """Executed specific command using ODL karaf CLI console
 
     It usses ssh connection to connect to karaf CLI.
 
     Args:
         command (str): Command to be executed.
+        host (str): Address of the karaf instance to connect to. Defaults to
+            the single-node address; cluster members each get their own.
+        port (int): Karaf SSH port of the instance to connect to.
 
     Returns:
         tuple[str, str]: Stdout from karaf CLI, stderr from karaf CLI.
     """
-    global KARAF_SHELL_INSTANCE
+    log.info(f"Executing command '{command}' on karaf console {host}:{port}.")
 
-    log.info(f"Executing command '{command}' on karaf console.")
-
-    if KARAF_SHELL_INSTANCE is None:
-        KARAF_SHELL_INSTANCE = KarafShell(host="127.0.0.1", port=8101)
+    if (host, port) not in karaf_shell_instances:
+        karaf_shell_instances[(host,port)] = KarafShell(host=host, port=port)
+    shell_instance = karaf_shell_instances[(host,port)]
 
     try:
-        stdout = KARAF_SHELL_INSTANCE.execute(command)
+        stdout = shell_instance.execute(command)
         log.info(f"Command Output:\n{stdout}")
 
         return stdout, ""

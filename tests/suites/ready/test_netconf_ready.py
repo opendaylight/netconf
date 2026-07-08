@@ -147,7 +147,7 @@ def check_netconf_mdsal_up_and_running() -> None:
 @pytest.mark.always
 @pytest.mark.testtool
 @pytest.mark.single_device
-@pytest.mark.usefixtures("preconditions")
+@pytest.mark.usefixtures("odl_standalone")
 @pytest.mark.usefixtures("log_test_suite_start_end_to_karaf")
 @pytest.mark.usefixtures("log_test_case_start_end_to_karaf")
 @pytest.mark.run(order=SuiteOrder.NETCONF_READY)

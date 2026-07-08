@@ -46,7 +46,7 @@ log = logging.getLogger(__name__)
 @pytest.mark.restperfclient
 @pytest.mark.performance
 @pytest.mark.single_device
-@pytest.mark.usefixtures("preconditions")
+@pytest.mark.usefixtures("odl_standalone")
 @pytest.mark.usefixtures("log_test_suite_start_end_to_karaf")
 @pytest.mark.usefixtures("log_test_case_start_end_to_karaf")
 @pytest.mark.run(order=SuiteOrder.RESTPERFCLIENT_PERFORMANCE)
