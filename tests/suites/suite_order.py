@@ -23,6 +23,7 @@ class SuiteOrder(IntEnum):
     KEY_AUTH = auto()
     CRUD = auto()
     CRUD_ACTION = auto()
+    CRUD_RPC = auto()
     APIDOCS = auto()
     RESTPERFCLIENT_MDSAL = auto()
     RESTPERFCLIENT_PERFORMANCE = auto()
