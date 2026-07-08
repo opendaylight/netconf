@@ -15,21 +15,14 @@ import pytest
 from typing import ContextManager, Generator, Iterator, Callable, List, Optional, Set
 
 
+from libraries import cluster
 from libraries import infra
 from libraries.variables import variables
 
 ODL_IP = variables.ODL_IP
 TOOLS_IP = variables.TOOLS_IP
 KARAF_LOG_LEVEL = variables.KARAF_LOG_LEVEL
-ODL_FEATRUES = [
-    "odl-infrautils-ready",
-    "odl-restconf-nb",
-    "odl-netconf-mdsal",
-    "odl-restconf-openapi",
-    "odl-clustering-test-app",
-    "odl-netconf-topology",
-    "odl-netconf-callhome-ssh"
-]
+CLUSTER_MEMBER_IPS = variables.CLUSTER_MEMBER_IPS
 
 log = logging.getLogger(__name__)
 
@@ -48,6 +41,40 @@ def pytest_addoption(parser):
         default=None,
         help="Comma-separated list of step tags to skip",
     )
+
+
+@pytest.hookimpl(trylast=True)
+def pytest_collection_modifyitems(items):
+    """Keeps standalone and cluster tests from running in the same session.
+
+    Both odl_standalone and odl_three_node_cluster stage the ODL
+    distribution under the same `opendaylight` directory and ports, so
+    running both fixtures in one pytest session would have them fight over
+    that state. When a run collects both kinds of tests, standalone takes
+    priority and the cluster ones are skipped.
+
+    trylast=True so this runs after pytest's own -m/-k deselection: an
+    explicit `-m cluster` run only ever collects cluster items in the first
+    place, so it must not be second-guessed here.
+
+    Args:
+        items (list[pytest.Item]): Tests collected for this session.
+
+    Returns:
+        None
+    """
+    has_standalone = any(item.get_closest_marker("standalone") for item in items)
+    has_cluster = any(item.get_closest_marker("cluster") for item in items)
+    if not (has_standalone and has_cluster):
+        return
+
+    skip_cluster = pytest.mark.skip(
+        reason="Skipped: standalone and cluster tests cannot run in the same "
+        "session; standalone takes priority."
+    )
+    for item in items:
+        if item.get_closest_marker("cluster"):
+            item.add_marker(skip_cluster)
 
 
 @pytest.fixture
@@ -133,8 +160,8 @@ def step_tag_checker(
 
 
 @pytest.fixture(scope="session")
-def preconditions():
-    """Fixture for basic test session setup.
+def odl_standalone():
+    """Fixture for single instance standalone test session setup.
 
     It handles setting features to be installed, starting karaf, etc.
 
@@ -146,10 +173,54 @@ def preconditions():
     """
     infra.shell("rm -rf tmp && mkdir tmp")
     infra.shell("ls results || mkdir results")
-    infra.start_odl_with_features(ODL_FEATRUES, timeout=580)
+    odl_standalone_features = [
+        "odl-infrautils-ready",
+        "odl-restconf-nb",
+        "odl-netconf-mdsal",
+        "odl-restconf-openapi",
+        "odl-clustering-test-app",
+        "odl-netconf-topology",
+        "odl-netconf-callhome-ssh",
+    ]
+    infra.start_odl_with_features(odl_standalone_features)
+    infra.wait_for_odl_ready(timeout=600)
     infra.execute_karaf_command(f"log:set {KARAF_LOG_LEVEL}")
     yield
-    infra.shell("kill $(pgrep -f org.apache.karaf.main.[M]ain | grep -v ^$$\$)")
+    infra.stop_all_karaf_instances()
+
+
+@pytest.fixture(scope="session")
+def odl_three_node_cluster():
+    """Fixture for 3-node ODL cluster session setup.
+
+    Stages one Karaf distribution per entry in CLUSTER_MEMBER_IPS (member 1
+    reuses the distribution `preconditions` would otherwise start), wires
+    them into a single pekko cluster and starts every member in order.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    infra.shell("rm -rf tmp && mkdir tmp")
+    infra.shell("ls results || mkdir results")
+    cluster.setup_cluster()
+    odl_three_node_cluster_features = [
+        "odl-infrautils-ready",
+        "odl-restconf-nb",
+        "odl-netconf-mdsal",
+        "odl-restconf-openapi",
+        "odl-clustering-test-app",
+        "odl-netconf-clustered-topology",
+        "odl-netconf-callhome-ssh",
+    ]
+    cluster.start_cluster(odl_three_node_cluster_features)
+    cluster.wait_cluter_ready(timeout=600)
+    for member_ip in CLUSTER_MEMBER_IPS:
+        infra.execute_karaf_command(f"log:set {KARAF_LOG_LEVEL}", host=member_ip)
+    yield
+    infra.stop_all_karaf_instances()
 
 
 @pytest.fixture(scope="class")
