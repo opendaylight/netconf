@@ -47,5 +47,6 @@ node_modules/
 tests/allure-results/
 tests/build_tools/
 tests/opendaylight/
+tests/opendaylight-member-*/
 tests/results/
 tests/tmp/
