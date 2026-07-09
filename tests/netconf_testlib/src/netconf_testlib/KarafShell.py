@@ -10,7 +10,7 @@ import logging
 import time
 import re
 
-from libraries import ssh_utils
+from netconf_testlib import ssh_utils
 
 log = logging.getLogger(__name__)
 

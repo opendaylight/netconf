@@ -1,3 +1,4 @@
+-e ./netconf_testlib
 aiohttp==3.13.5
 aiohttp_sse_client==0.2.1
 allure-pytest==2.14.3

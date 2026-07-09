@@ -91,6 +91,8 @@
             </activation>
             <properties>
                 <tox.args>-- -m "(smoke and not performance) or always"</tox.args>
+                <twine.username/>
+                <twine.password/>
             </properties>
             <build>
                 <plugins>
@@ -175,6 +177,22 @@
                                     <executable>tox</executable>
                                     <commandlineArgs>-e pytest ${tox.args}</commandlineArgs>
                                     <workingDirectory>${project.basedir}/tests</workingDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>python-publish-wheel</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>tox</executable>
+                                    <commandlineArgs>-e publish</commandlineArgs>
+                                    <workingDirectory>${project.basedir}/tests</workingDirectory>
+                                    <environmentVariables>
+                                        <TWINE_USERNAME>${twine.username}</TWINE_USERNAME>
+                                        <TWINE_PASSWORD>${twine.password}</TWINE_PASSWORD>
+                                    </environmentVariables>
                                 </configuration>
                             </execution>
                         </executions>

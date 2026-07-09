@@ -15,10 +15,10 @@ import textwrap
 import allure
 import pytest
 
-from libraries import infra
-from libraries.NetconfSSH import NetconfSSH
-from libraries import utils
-from libraries.variables import variables
+from netconf_testlib import infra
+from netconf_testlib.NetconfSSH import NetconfSSH
+from netconf_testlib import utils
+from netconf_testlib.variables import variables
 from suites.suite_order import SuiteOrder
 
 ODL_NETCONF_MDSAL_PORT = variables.ODL_NETCONF_MDSAL_PORT
