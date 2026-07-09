@@ -15,7 +15,7 @@ import textwrap
 import allure
 import pytest
 
-from libraries import infra
+from controller_testlib import infra
 from libraries.NetconfSSH import NetconfSSH
 from libraries import utils
 from libraries.variables import variables

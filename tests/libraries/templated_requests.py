@@ -15,8 +15,9 @@ from xml.dom import minidom
 
 import requests
 
-from libraries import norm_json
-from libraries import utils
+from controller_testlib import norm_json
+
+from . import utils
 from libraries.variables import variables
 
 ODL_IP = variables.ODL_IP
@@ -392,7 +393,7 @@ def get_templated_request(
     if verify:
         file_name_suffix = "json" if json else "xml"
         expected_response = resolve_templated_text(
-            uri=template_dir + "/data." + file_name_suffix,
+            template_dir + "/data." + file_name_suffix,
             mapping=mapping,
         )
         volatiles_list = resolve_volatiles_path(template_dir)

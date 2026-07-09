@@ -91,7 +91,34 @@
             </activation>
             <properties>
                 <tox.args>-- -m "(smoke and not performance) or always"</tox.args>
+                <skip.pytest>false</skip.pytest>
+                <controller.version>14.0.0-SNAPSHOT</controller.version>
             </properties>
+            <!-- controller-testlib (unpacked below) is published to a locally running Nexus 3
+                 instance rather than nexus.opendaylight.org; see controller-testlib's pom.xml
+                 for the matching distributionManagement override. -->
+            <repositories>
+                <repository>
+                    <id>nexus-local-releases</id>
+                    <url>http://localhost:8081/repository/maven-releases/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>nexus-local-snapshots</id>
+                    <url>http://localhost:8081/repository/maven-snapshots/</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
             <build>
                 <plugins>
                     <plugin>
@@ -114,7 +141,35 @@
                                             <directory>${project.basedir}/tests/build_tools</directory>
                                             <followSymlinks>false</followSymlinks>
                                         </fileset>
+                                        <fileset>
+                                            <directory>${project.basedir}/tests/controller_testlib</directory>
+                                            <followSymlinks>false</followSymlinks>
+                                        </fileset>
                                     </filesets>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-controller-testlib</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.opendaylight.controller</groupId>
+                                            <artifactId>controller-testlib</artifactId>
+                                            <version>${controller.version}</version>
+                                            <includes>controller_testlib/**</includes>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <outputDirectory>${project.basedir}/tests</outputDirectory>
                                 </configuration>
                             </execution>
                         </executions>
@@ -172,6 +227,7 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
+                                    <skip>${skip.pytest}</skip>
                                     <executable>tox</executable>
                                     <commandlineArgs>-e pytest ${tox.args}</commandlineArgs>
                                     <workingDirectory>${project.basedir}/tests</workingDirectory>

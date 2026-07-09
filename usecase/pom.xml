@@ -29,6 +29,7 @@
         <module>karaf</module>
         <module>karaf-static</module>
         <module>netconf-test-perf</module>
+        <module>netconf-testlib</module>
         <module>netconf-testtool</module>
         <module>netconf-topology-1node-transient</module>
     </modules>

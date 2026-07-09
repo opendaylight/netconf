@@ -17,7 +17,9 @@ import xml.etree.ElementTree as ET
 import allure
 import pytest
 
-from libraries import infra
+from controller_testlib import infra
+
+from controller_testlib import karaf
 from libraries import restconf
 from libraries import templated_requests
 from libraries import utils
@@ -96,7 +98,7 @@ class TestNotifications:
     ):
         with allure_step_with_separate_logging("step_set_controller_log_level"):
             # Set controller log level.
-            infra.execute_karaf_command(f"log:set {CONTROLLER_LOG_LEVEL}")
+            karaf.execute_karaf_command(f"log:set {CONTROLLER_LOG_LEVEL}")
 
         with allure_step_with_separate_logging("step_create_dcn_stream"):
             # Create DCN subscription.

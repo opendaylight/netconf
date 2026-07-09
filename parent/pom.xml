@@ -38,4 +38,19 @@
         <tag>HEAD</tag>
         <url>https://git.opendaylight.org/gerrit/gitweb?p=netconf.git;a=summary</url>
     </scm>
+
+    <!-- Overrides the inherited distributionManagement (nexus.opendaylight.org) so that
+         `mvn deploy` on modules using netconf-parent (e.g. usecase/netconf-testlib) publishes
+         to a locally running Nexus 3 instance instead. Matching <server> credentials
+         (ids nexus-local-releases / nexus-local-snapshots) must be present in ~/.m2/settings.xml. -->
+    <distributionManagement>
+        <repository>
+            <id>nexus-local-releases</id>
+            <url>http://localhost:8081/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-local-snapshots</id>
+            <url>http://localhost:8081/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

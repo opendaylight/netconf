@@ -15,7 +15,9 @@ import textwrap
 import allure
 import pytest
 
-from libraries import infra
+from controller_testlib import infra
+from controller_testlib import karaf
+
 from libraries import netconf
 from libraries import templated_requests
 from libraries import utils
@@ -160,10 +162,10 @@ class TestNetconfReady:
         Restores the default log level on teardown.
         """
         if DEBUG_LOGGING_FOR_EVERYTHING:
-            infra.execute_karaf_command("log:set DEBUG")
+            karaf.execute_karaf_command("log:set DEBUG")
         yield
         if DEBUG_LOGGING_FOR_EVERYTHING:
-            infra.execute_karaf_command("log:set INFO")
+            karaf.execute_karaf_command("log:set INFO")
 
     @allure.description(
         textwrap.dedent(
@@ -288,7 +290,7 @@ class TestNetconfReady:
         )
     )
     def test_mdsal_ready(self, allure_step_with_separate_logging):
-        if not infra.is_karaf_feature_installed("odl-netconf-mdsal"):
+        if not karaf.is_karaf_feature_installed("odl-netconf-mdsal"):
             pytest.skip(
                 "The 'odl-netconf-mdsal' feature is not installed, skipping port "
                 "readiness check."

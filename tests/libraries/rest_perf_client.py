@@ -9,8 +9,9 @@
 import logging
 import math
 
-from libraries import infra
-from libraries import utils
+from controller_testlib import infra
+
+from . import utils
 from libraries.variables import variables
 
 

@@ -10,7 +10,7 @@ import json
 import logging
 from typing import List
 
-from libraries import templated_requests
+from . import templated_requests
 
 
 log = logging.getLogger(__name__)

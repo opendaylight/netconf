@@ -9,9 +9,10 @@
 import logging
 
 
-from libraries import infra
-from libraries import restconf_utils
-from libraries import templated_requests
+from controller_testlib import infra
+
+from . import restconf_utils
+from . import templated_requests
 from libraries.variables import variables
 
 HEADERS = variables.HEADERS
