@@ -15,7 +15,7 @@ import textwrap
 import allure
 import pytest
 
-from libraries import templated_requests
+from netconf_testlib import templated_requests
 from suites.suite_order import SuiteOrder
 
 VAR_DIR = "variables/apidoc"

@@ -16,10 +16,11 @@ import textwrap
 import allure
 import pytest
 
-from libraries import netconf
-from libraries import templated_requests
-from libraries import utils
-from libraries.variables import variables
+import controller_testlib.utils
+from netconf_testlib import netconf
+from netconf_testlib import templated_requests
+from netconf_testlib import utils
+from netconf_testlib.variables import variables
 from suites.suite_order import SuiteOrder
 
 DIRECTORY_WITH_TEMPLATE_FOLDERS = "variables/netconf/CRUD"
@@ -150,7 +151,9 @@ class TestCrud:
         ):
             # Get the list of configured devices and search for our device there.
             # Fail if not found.
-            utils.wait_until_function_pass(5, 1, self.count_netconf_connectors)
+            controller_testlib.utils.wait_until_function_pass(
+                5, 1, self.count_netconf_connectors
+            )
 
         with allure_step_with_separate_logging(
             "step_wait_for_device_to_become_connected"
@@ -261,7 +264,7 @@ class TestCrud:
             "step_check_modified_device_data_is_still_there"
         ):
             # Get the device data and make sure it contains the modified content.
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 60,
                 1,
                 self.check_config_data,

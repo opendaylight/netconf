@@ -15,11 +15,12 @@ import textwrap
 import allure
 import pytest
 
-from libraries import infra
-from libraries import netconf
-from libraries import templated_requests
-from libraries import utils
-from libraries.variables import variables
+from controller_testlib import infra
+from controller_testlib import karaf
+import controller_testlib.utils
+from netconf_testlib import netconf
+from netconf_testlib import templated_requests
+from netconf_testlib.variables import variables
 from suites.suite_order import SuiteOrder
 
 
@@ -82,14 +83,14 @@ def check_netconf_topology_ready():
             device_password="admin",
         )
         mapping = {"DEVICE_NAME": DEVICE_NAME, "RESTCONF_ROOT": RESTCONF_ROOT}
-        utils.wait_until_function_pass(
+        controller_testlib.utils.wait_until_function_pass(
             10,
             3,
             templated_requests.get_templated_request,
             f"{NETCONF_FOLDER}/full-uri-mount",
             mapping,
         )
-        utils.wait_until_function_pass(
+        controller_testlib.utils.wait_until_function_pass(
             5,
             3,
             templated_requests.get_templated_request,
@@ -128,7 +129,7 @@ def check_netconf_up_and_running(pretty_print: bool = False) -> None:
             f"but found {newline_count} newline(s)."
         )
 
-    with utils.report_known_bug_on_failure("5832"):
+    with controller_testlib.utils.report_known_bug_on_failure("5832"):
         assert "data model content does not exist" not in resp.text
 
 
@@ -160,10 +161,10 @@ class TestNetconfReady:
         Restores the default log level on teardown.
         """
         if DEBUG_LOGGING_FOR_EVERYTHING:
-            infra.execute_karaf_command("log:set DEBUG")
+            karaf.execute_karaf_command("log:set DEBUG")
         yield
         if DEBUG_LOGGING_FOR_EVERYTHING:
-            infra.execute_karaf_command("log:set INFO")
+            karaf.execute_karaf_command("log:set INFO")
 
     @allure.description(
         textwrap.dedent(
@@ -190,7 +191,9 @@ class TestNetconfReady:
         with allure_step_with_separate_logging(
             "step_check_whether_netconf_topology_is_ready"
         ):
-            utils.wait_until_function_pass(10, 1, check_netconf_topology_ready)
+            controller_testlib.utils.wait_until_function_pass(
+                10, 1, check_netconf_topology_ready
+            )
 
     @pytest.mark.dependency(name="test_netconf_connector_ready")
     @allure.description(
@@ -223,13 +226,13 @@ class TestNetconfReady:
             ),
             (
                 "step_wait_for_netconf_connector",
-                lambda: utils.wait_until_function_pass(
+                lambda: controller_testlib.utils.wait_until_function_pass(
                     NETCONFREADY_WAIT, 1, check_netconf_up_and_running
                 ),
             ),
             (
                 "step_wait_even_longer",
-                lambda: utils.wait_until_function_pass(
+                lambda: controller_testlib.utils.wait_until_function_pass(
                     NETCONFREADY_FALLBACK_WAIT, 1, check_netconf_up_and_running
                 ),
             ),
@@ -252,8 +255,8 @@ class TestNetconfReady:
                 device_name=DEVICE_NAME, device_type="configure-via-topology"
             )
             netconf.remove_device_from_netconf(device_name=DEVICE_NAME)
-            with utils.report_known_bug_on_failure("5014"):
-                utils.run_function_and_expect_error(check_netconf_up_and_running)
+            with controller_testlib.utils.report_known_bug_on_failure("5014"):
+                controller_testlib.utils.run_function_and_expect_error(check_netconf_up_and_running)
 
         pytest.fail(
             f"Netconf connector did not become ready during the whole wait time. "
@@ -288,12 +291,12 @@ class TestNetconfReady:
         )
     )
     def test_mdsal_ready(self, allure_step_with_separate_logging):
-        if not infra.is_karaf_feature_installed("odl-netconf-mdsal"):
+        if not karaf.is_karaf_feature_installed("odl-netconf-mdsal"):
             pytest.skip(
                 "The 'odl-netconf-mdsal' feature is not installed, skipping port "
                 "readiness check."
             )
         with allure_step_with_separate_logging("step_wait_for_mdsal"):
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 NETCONFREADY_WAIT_MDSAL, 1, check_netconf_mdsal_up_and_running
             )

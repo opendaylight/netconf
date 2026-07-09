@@ -91,6 +91,10 @@
             </activation>
             <properties>
                 <tox.args>-- -m "(smoke and not performance) or always"</tox.args>
+                <skip.pytest>false</skip.pytest>
+                <skip.smoke>false</skip.smoke>
+                <twine.username/>
+                <twine.password/>
             </properties>
             <build>
                 <plugins>
@@ -172,9 +176,27 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
+                                    <skip>${skip.pytest}</skip>
                                     <executable>tox</executable>
                                     <commandlineArgs>-e pytest ${tox.args}</commandlineArgs>
                                     <workingDirectory>${project.basedir}/tests</workingDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>python-publish-wheel</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>tox</executable>
+                                    <commandlineArgs>-e publish</commandlineArgs>
+                                    <workingDirectory>${project.basedir}/tests</workingDirectory>
+                                    <environmentVariables>
+                                        <TWINE_USERNAME>${twine.username}</TWINE_USERNAME>
+                                        <TWINE_PASSWORD>${twine.password}</TWINE_PASSWORD>
+                                        <SKIP_SMOKE_CHECK>${skip.smoke}</SKIP_SMOKE_CHECK>
+                                    </environmentVariables>
                                 </configuration>
                             </execution>
                         </executions>
