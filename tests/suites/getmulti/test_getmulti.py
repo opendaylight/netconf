@@ -16,9 +16,9 @@ import textwrap
 import allure
 import pytest
 
-from libraries import netconf
-from libraries import utils
-from libraries.variables import variables
+import controller_testlib.utils
+from netconf_testlib import netconf
+from netconf_testlib.variables import variables
 from suites.suite_order import SuiteOrder
 
 
@@ -109,7 +109,7 @@ class TestGetmulti:
         with allure_step_with_separate_logging("step_deconfigure_devices"):
             """Make requests to deconfigure the testtool devices. This step is
             expected to pass; if it fails, a link to the known bug is logged."""
-            with utils.report_known_bug_on_failure("4547"):
+            with controller_testlib.utils.report_known_bug_on_failure("4547"):
                 netconf.perform_operation_on_each_device(
                     netconf.deconfigure_device,
                     DEVICE_COUNT,

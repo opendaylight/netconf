@@ -15,15 +15,29 @@ from xml.dom import minidom
 
 import requests
 
-from libraries import norm_json
-from libraries import utils
-from libraries.variables import variables
+import controller_testlib.utils
+from netconf_testlib import utils
+import netconf_testlib.variables
 
-ODL_IP = variables.ODL_IP
-RESTCONF_PORT = variables.RESTCONF_PORT
-MAX_HTTP_RESPONSE_BODY_LOG_SIZE = variables.MAX_HTTP_RESPONSE_BODY_LOG_SIZE
-HEADERS_YANG_RFC8040_JSON = variables.HEADERS_YANG_RFC8040_JSON
-BASE_URL = f"http://{ODL_IP}:{RESTCONF_PORT}"
+MAX_HTTP_RESPONSE_BODY_LOG_SIZE = (
+    netconf_testlib.variables.variables.MAX_HTTP_RESPONSE_BODY_LOG_SIZE
+)
+HEADERS_YANG_RFC8040_JSON = (
+    netconf_testlib.variables.variables.HEADERS_YANG_RFC8040_JSON
+)
+
+
+def _base_url() -> str:
+    """Builds the RESTCONF base URL from the current variables singleton.
+
+    Read live (not frozen at import time) so a downstream project's own
+    Variables subclass - e.g. one that overrides RESTCONF_PORT and replaces
+    netconf_testlib.variables.variables with its own instance - is actually
+    honored by every request this module makes.
+    """
+    current = netconf_testlib.variables.variables
+    return f"http://{current.ODL_IP}:{current.RESTCONF_PORT}"
+
 
 ALLOWED_STATUS_CODES = {200, 201, 204}
 ALLOWED_DELETE_STATUS_CODES = {200, 201, 204, 404, 409}
@@ -78,7 +92,7 @@ def get_from_uri(
     Returns:
         requests.Response: Response returned by ODL for GET call.
     """
-    url = f"{BASE_URL}/{uri}"
+    url = f"{_base_url()}/{uri}"
     log.info(f"Sending GET request to {url} with headers {headers}")
     response = requests.get(
         url,
@@ -106,7 +120,7 @@ def get_from_uri(
         raise AssertionError("Unexpected failure in GET response.") from e
     else:
         pretty_text = get_pretty_response(response)
-        truncated_response_text = utils.truncate_long_text(
+        truncated_response_text = controller_testlib.utils.truncate_long_text(
             pretty_text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
         )
         log.debug(f"Response: {truncated_response_text}")
@@ -140,7 +154,7 @@ def put_to_uri_request(
     Returns:
         requests.Response: Response returned by ODL for PUT call.
     """
-    url = f"{BASE_URL}/{uri}"
+    url = f"{_base_url()}/{uri}"
     log.info(
         f"Sending PUT request to {url} with headers {headers} containing the following "
         f"payload: {data}"
@@ -172,7 +186,7 @@ def put_to_uri_request(
         raise AssertionError("Unexpected failure in PUT response.") from e
     else:
         pretty_text = get_pretty_response(response)
-        truncated_response_text = utils.truncate_long_text(
+        truncated_response_text = controller_testlib.utils.truncate_long_text(
             pretty_text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
         )
         log.debug(f"Response: {truncated_response_text}")
@@ -206,7 +220,7 @@ def post_to_uri(
     Returns:
         requests.Response: Response returned by ODL for POST call.
     """
-    url = f"{BASE_URL}/{uri}"
+    url = f"{_base_url()}/{uri}"
     log.info(
         f"Sending POST request to {url} with headers {headers} containing the following "
         f"payload: {data}"
@@ -238,7 +252,7 @@ def post_to_uri(
         raise AssertionError("Unexpected failure in POST response.") from e
     else:
         pretty_text = get_pretty_response(response)
-        truncated_response_text = utils.truncate_long_text(
+        truncated_response_text = controller_testlib.utils.truncate_long_text(
             pretty_text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
         )
         log.debug(f"Response: {truncated_response_text}")
@@ -268,7 +282,7 @@ def delete_from_uri_request(
     Returns:
         requests.Response: Response returned by ODL for DELETE call.
     """
-    url = f"{BASE_URL}/{uri}"
+    url = f"{_base_url()}/{uri}"
     log.info(f"Sending DELETE request to {url}")
     response = requests.delete(
         url=url,
@@ -295,7 +309,7 @@ def delete_from_uri_request(
         raise AssertionError("Unexpected failure in DELETE response.") from e
     else:
         pretty_text = get_pretty_response(response)
-        truncated_response_text = utils.truncate_long_text(
+        truncated_response_text = controller_testlib.utils.truncate_long_text(
             pretty_text, MAX_HTTP_RESPONSE_BODY_LOG_SIZE
         )
         log.debug(f"Response: {truncated_response_text}")
@@ -392,7 +406,7 @@ def get_templated_request(
     if verify:
         file_name_suffix = "json" if json else "xml"
         expected_response = resolve_templated_text(
-            uri=template_dir + "/data." + file_name_suffix,
+            template_dir + "/data." + file_name_suffix,
             mapping=mapping,
         )
         volatiles_list = resolve_volatiles_path(template_dir)

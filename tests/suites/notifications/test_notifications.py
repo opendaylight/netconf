@@ -17,11 +17,12 @@ import xml.etree.ElementTree as ET
 import allure
 import pytest
 
-from libraries import infra
-from libraries import restconf
-from libraries import templated_requests
-from libraries import utils
-from libraries.variables import variables
+from controller_testlib import infra
+from controller_testlib import karaf
+import controller_testlib.utils
+from netconf_testlib import restconf
+from netconf_testlib import templated_requests
+from netconf_testlib.variables import variables
 from suites.suite_order import SuiteOrder
 
 
@@ -96,7 +97,7 @@ class TestNotifications:
     ):
         with allure_step_with_separate_logging("step_set_controller_log_level"):
             # Set controller log level.
-            infra.execute_karaf_command(f"log:set {CONTROLLER_LOG_LEVEL}")
+            karaf.execute_karaf_command(f"log:set {CONTROLLER_LOG_LEVEL}")
 
         with allure_step_with_separate_logging("step_create_dcn_stream"):
             # Create DCN subscription.
@@ -195,7 +196,7 @@ class TestNotifications:
 
         with allure_step_with_separate_logging("step_check_bug_3934"):
             # Check the WSS/SSE listener log for the bug correction.
-            with utils.report_known_bug_on_failure("3934"):
+            with controller_testlib.utils.report_known_bug_on_failure("3934"):
                 data = infra.get_file_content(
                     f"{TEMPLATE_FOLDER}/{RESTCONF_CONFIG_DATA}"
                 )

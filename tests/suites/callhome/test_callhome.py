@@ -15,12 +15,12 @@ import textwrap
 import allure
 import pytest
 
-from libraries import infra
-from libraries import NetconfCallHome
-from libraries import restconf_utils
-from libraries import templated_requests
-from libraries import utils
-from libraries.variables import variables
+from controller_testlib import infra
+import controller_testlib.utils
+from netconf_testlib import NetconfCallHome
+from netconf_testlib import restconf_utils
+from netconf_testlib import templated_requests
+from netconf_testlib.variables import variables
 from suites.suite_order import SuiteOrder
 
 MOUNT_POINT_URL = (
@@ -108,10 +108,10 @@ class TestCallHome:
                 username="root",
                 password="root",
             )
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 45, 2, NetconfCallHome.check_device_status, "netopeer2", "CONNECTED"
             )
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 15,
                 2,
                 restconf_utils.check_for_elements_at_uri,
@@ -134,17 +134,17 @@ class TestCallHome:
                 username="root",
                 password="incorrect",
             )
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 45,
                 2,
                 NetconfCallHome.check_device_status,
                 "netopeer2",
                 "FAILED_AUTH_FAILURE",
             )
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 15,
                 2,
-                utils.run_function_and_expect_error,
+                controller_testlib.utils.run_function_and_expect_error,
                 restconf_utils.check_for_elements_at_uri,
                 MOUNT_POINT_URL,
                 NETCONF_MOUNT_EXPECTED_VALUE,
@@ -166,10 +166,10 @@ class TestCallHome:
                 device_name="netopeer2",
                 hostkey=netopeer_pub_key,
             )
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 45, 2, NetconfCallHome.check_device_status, "netopeer2", "CONNECTED"
             )
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 15,
                 2,
                 restconf_utils.check_for_elements_at_uri,
@@ -193,17 +193,17 @@ class TestCallHome:
                 device_name="netopeer2",
                 hostkey=netopeer_pub_key,
             )
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 45,
                 2,
                 NetconfCallHome.check_device_status,
                 "netopeer2",
                 "FAILED_AUTH_FAILURE",
             )
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 15,
                 2,
-                utils.run_function_and_expect_error,
+                controller_testlib.utils.run_function_and_expect_error,
                 restconf_utils.check_for_elements_at_uri,
                 MOUNT_POINT_URL,
                 NETCONF_MOUNT_EXPECTED_VALUE,
@@ -232,20 +232,20 @@ class TestCallHome:
                 device_name="netopeer2",
                 hostkey=netopeer_pub_key,
             )
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 45, 2, NetconfCallHome.check_device_status, "netopeer2", "DISCONNECTED"
             )
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 15,
                 2,
                 NetconfCallHome.check_device_status,
                 "incorrect_hostname",
                 "DISCONNECTED",
             )
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 15,
                 2,
-                utils.run_function_and_expect_error,
+                controller_testlib.utils.run_function_and_expect_error,
                 restconf_utils.check_for_elements_at_uri,
                 MOUNT_POINT_URL,
                 NETCONF_MOUNT_EXPECTED_VALUE,
@@ -265,13 +265,13 @@ class TestCallHome:
                 username="root",
                 password="root",
             )
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 45, 2, NetconfCallHome.check_device_status, None, "FAILED_NOT_ALLOWED"
             )
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 15,
                 2,
-                utils.run_function_and_expect_error,
+                controller_testlib.utils.run_function_and_expect_error,
                 restconf_utils.check_for_elements_at_uri,
                 MOUNT_POINT_URL,
                 NETCONF_MOUNT_EXPECTED_VALUE,
@@ -292,10 +292,10 @@ class TestCallHome:
                 key_id="tls-device-key",
                 certificate_id="tls-device-certificate",
             )
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 45, 2, NetconfCallHome.check_device_status, "netopeer2", "CONNECTED"
             )
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 15,
                 2,
                 restconf_utils.check_for_elements_at_uri,

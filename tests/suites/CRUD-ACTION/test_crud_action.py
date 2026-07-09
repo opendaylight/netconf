@@ -16,10 +16,11 @@ import textwrap
 import allure
 import pytest
 
-from libraries import netconf
-from libraries import templated_requests
-from libraries import utils
-from libraries.variables import variables
+import controller_testlib.utils
+from netconf_testlib import netconf
+from netconf_testlib import templated_requests
+from netconf_testlib import utils
+from netconf_testlib.variables import variables
 from suites.suite_order import SuiteOrder
 
 DIRECTORY_WITH_TEMPLATE_FOLDERS = "variables/netconf/CRUD"
@@ -135,7 +136,7 @@ class TestCrudAction:
             "step_check_device_is_not_configured_at_beginning"
         ):
             # Sanity check making sure our device is not there. Fail if found.
-            utils.wait_until_function_pass(
+            controller_testlib.utils.wait_until_function_pass(
                 5, 20, netconf.check_device_has_no_netconf_connector, DEVICE_NAME
             )
 

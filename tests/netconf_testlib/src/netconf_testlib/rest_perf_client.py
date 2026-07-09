@@ -9,15 +9,10 @@
 import logging
 import math
 
-from libraries import infra
-from libraries import utils
-from libraries.variables import variables
+from controller_testlib import infra
+import controller_testlib.utils
+import netconf_testlib.variables
 
-
-ODL_IP = variables.ODL_IP
-ODL_USER = variables.ODL_USER
-ODL_PASSWORD = variables.ODL_PASSWORD
-RESTCONF_PORT = variables.RESTCONF_PORT
 
 log = logging.getLogger(__name__)
 
@@ -27,11 +22,11 @@ def invoke_restperfclient(
     url: str,
     timeout: float,
     testcase: str = "",
-    ip: str = ODL_IP,
-    port: int = RESTCONF_PORT,
+    ip: str | None = None,
+    port: int | None = None,
     asynchronous: bool = False,
-    user: str = ODL_USER,
-    password: str = ODL_PASSWORD,
+    user: str | None = None,
+    password: str | None = None,
 ) -> str:
     """Invoke RestPerfClient on the specified URL with the specified timeout.
 
@@ -43,17 +38,29 @@ def invoke_restperfclient(
         url (str): RESTCONF URL used for update requests.
         timeout (float): Maximum time in seconds to wait for restperfclient to finish.
         testcase (str): Name of the executed test case (used in log file name).
-        ip (str): Target server IP address.
-        port (int): Target server port number.
+        ip (str | None): Target server IP address. Defaults to the current
+            variables.ODL_IP, resolved at call time.
+        port (int | None): Target server port number. Defaults to the current
+            variables.RESTCONF_PORT, resolved at call time.
         asynchronous (bool): Flag indicating if next request should be sent before
             processing response for the previous request.
-        user (str): RESTCONF username.
-        password (str): RESTCONF password.
+        user (str | None): RESTCONF username. Defaults to the current
+            variables.ODL_USER, resolved at call time.
+        password (str | None): RESTCONF password. Defaults to the current
+            variables.ODL_PASSWORD, resolved at call time.
 
     Returns:
         str: Path to the generated RestPerfClient logs file.
     """
-    log_file_name = utils.get_log_file_name("restperfclient", testcase)
+    current_variables = netconf_testlib.variables.variables
+    ip = ip if ip is not None else current_variables.ODL_IP
+    port = port if port is not None else current_variables.RESTCONF_PORT
+    user = user if user is not None else current_variables.ODL_USER
+    password = password if password is not None else current_variables.ODL_PASSWORD
+
+    log_file_name = controller_testlib.utils.get_log_file_name(
+        "restperfclient", testcase
+    )
     log_file = "tmp/" + log_file_name
     timeout_in_minutes = math.ceil(timeout / 60)
     command = (
@@ -69,7 +76,7 @@ def invoke_restperfclient(
         f" 2>&1 | tee '{log_file}'"
     )
     try:
-        with utils.report_known_bug_on_failure("5413"):
+        with controller_testlib.utils.report_known_bug_on_failure("5413"):
             log.info(f"Running restperfclient: {command}")
             # Add 2 minutes headroom over the restperfclient's own timeout
             rc, output = infra.shell(command, timeout=timeout + 120)

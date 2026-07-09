@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2025 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+# Copyright (c) 2026 PANTHEON.tech, s.r.o. and others.  All rights reserved.
 #
 # This program and the accompanying materials are made available under the
 # terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -7,54 +7,13 @@
 #
 # These variables are considered global and immutable, so their names are in ALL_CAPS.
 #
+# This is the project-local variables module every controller_testlib/
+# netconf_testlib consumer is expected to provide (see
+# controller_testlib.variables._LazyVariables). netconf's own test suite
+# needs no overrides beyond what netconf_testlib.Variables already declares,
+# so this just instantiates that class directly.
+#
 
-from typing import ClassVar
-from pydantic_settings import BaseSettings
-
-
-class Variables(BaseSettings):
-    """
-    Defines all global test settings, which can be overridden by environment
-    variables.
-    """
-
-    ODL_IP: str = "127.0.0.1"
-    ODL_USER: str = "admin"
-    ODL_PASSWORD: str = "admin"
-    RESTCONF_PORT: int = 8182
-    RESTCONF_ROOT: str = "restconf"
-    REST_API: str = f"{RESTCONF_ROOT}/data"
-    TOOLS_IP: str = "127.0.1.0"
-    KARAF_LOG_LEVEL: str = "INFO"
-    HEADERS: ClassVar[dict] = {"Content-Type": "application/json"}
-    HEADERS_YANG_RFC8040_JSON: ClassVar[dict] = {
-        "Content-Type": "application/yang-data+json"
-    }
-    MAX_HTTP_RESPONSE_BODY_LOG_SIZE: int = 10000
-    MAX_VISUAL_DIFF_LOG_SIZE: int = 10000
-    ENABLE_GLOBAL_TEST_DEADLINES: bool = True
-
-    ODL_NETCONF_MDSAL_PORT: int = 2830
-    ODL_NETCONF_PASSWORD: str = "admin"
-    ODL_NETCONF_PROMPT: str = "]]>]]>"
-    ODL_NETCONF_USER: str = "admin"
-    ODL_NETCONF_NAMESPACE: str = "urn:ietf:params:xml:ns:netconf:base:1.0"
-
-    CALLHOME_WHITELIST: str = (
-        "restconf/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices"
-    )
-    NETCONF_KEYSTORE_DATA_URL: str = "restconf/data/netconf-keystore:keystore"
-
-    MODULES_API: str = (
-        "/restconf/data/ietf-yang-library:modules-state?content=nonconfig"
-    )
-
-    USE_NETCONF_CONNECTOR: bool = False
-
-    XML_MESSAGE_HEADERS: ClassVar[dict] = {
-        "Content-Type": "application/xml",
-        "Accept": "application/xml",
-    }
-
+from netconf_testlib.variables import Variables
 
 variables = Variables()

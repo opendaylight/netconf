@@ -14,12 +14,12 @@ import subprocess
 import math
 import re
 
-from libraries import infra
-from libraries import restconf
-from libraries import restconf_utils
-from libraries import templated_requests
-from libraries import utils
-from libraries.variables import variables
+from controller_testlib import infra
+import controller_testlib.utils
+from netconf_testlib import restconf
+from netconf_testlib import restconf_utils
+from netconf_testlib import templated_requests
+import netconf_testlib.variables
 
 MAX_HEAP = "1G"
 TESTTOOL_DEFAULT_JAVA_OPTIONS = (
@@ -30,11 +30,6 @@ FIRST_TESTTOOL_PORT = 17830
 BASE_NETCONF_DEVICE_PORT = 17830
 DEVICE_NAME_BASE = "netconf-scaling-device"
 TESTTOOL_BOOT_TIMEOUT = 60
-ENABLE_NETCONF_TEST_TIMEOUT = variables.ENABLE_GLOBAL_TEST_DEADLINES
-RESTCONF_ROOT = variables.RESTCONF_ROOT
-REST_API = variables.REST_API
-TOOLS_IP = variables.TOOLS_IP
-ODL_NETCONF_NAMESPACE = variables.ODL_NETCONF_NAMESPACE
 
 NETCONF_MOUNTED_DEVICE_TYPES = dict()
 
@@ -126,7 +121,7 @@ def configure_device_in_netconf(
     device_name: str,
     device_type: str = "default",
     device_port: int = FIRST_TESTTOOL_PORT,
-    device_address: str = TOOLS_IP,
+    device_address: str | None = None,
     device_user: str = "admin",
     device_password: str = "topsecret",
     device_key: str = "device-key",
@@ -140,7 +135,8 @@ def configure_device_in_netconf(
         device_name (str): The name of the device to be configured.
         device_type (str): The template type for the device.
         device_port (int): The port the device is listening on.
-        device_address (str): The IP address of the device.
+        device_address (str | None): The IP address of the device. Defaults to
+            the current variables.TOOLS_IP, resolved at call time.
         device_user (str): Username for device authentication.
         device_password (str): Password for device authentication.
         device_key (str): Device key identifier.
@@ -152,6 +148,9 @@ def configure_device_in_netconf(
     Returns:
         None
     """
+    current_variables = netconf_testlib.variables.variables
+    if device_address is None:
+        device_address = current_variables.TOOLS_IP
     mapping = {
         "DEVICE_IP": device_address,
         "DEVICE_NAME": device_name,
@@ -160,7 +159,7 @@ def configure_device_in_netconf(
         "DEVICE_PASSWORD": device_password,
         "DEVICE_KEY": device_key,
         "SCHEMA_DIRECTORY": schema_directory,
-        "RESTCONF_ROOT": RESTCONF_ROOT,
+        "RESTCONF_ROOT": current_variables.RESTCONF_ROOT,
     }
     if http_method == "post":
         templated_requests.post_templated_request(
@@ -195,7 +194,7 @@ def wait_device_connected(device_name: str, timeout: int = 20, period: int = 1):
     Returns:
         None
     """
-    utils.wait_until_function_pass(
+    controller_testlib.utils.wait_until_function_pass(
         math.ceil(timeout / period), period, check_device_connected, device_name
     )
 
@@ -241,7 +240,7 @@ def wait_device_is_up_and_running(device_name: str, log_response: bool = True):
         None
     """
     number = int(device_name.split("-").pop())
-    utils.wait_until_function_pass(
+    controller_testlib.utils.wait_until_function_pass(
         TESTTOOL_BOOT_TIMEOUT, 1, check_device_is_up_and_running, number
     )
 
@@ -256,7 +255,10 @@ def remove_device_from_netconf(device_name: str):
         None
     """
     device_type = NETCONF_MOUNTED_DEVICE_TYPES.pop(device_name)
-    mapping = {"DEVICE_NAME": device_name, "RESTCONF_ROOT": RESTCONF_ROOT}
+    mapping = {
+        "DEVICE_NAME": device_name,
+        "RESTCONF_ROOT": netconf_testlib.variables.variables.RESTCONF_ROOT,
+    }
     templated_requests.delete_templated_request(
         f"{DIRECTORY_WITH_DEVICE_TEMPLATES}/{device_type}", mapping
     )
@@ -283,7 +285,7 @@ def wait_device_fully_removed(device_name: str, timeout: int = 10, period: int =
     Returns:
         None
     """
-    utils.wait_until_function_pass(
+    controller_testlib.utils.wait_until_function_pass(
         math.ceil(timeout / period), period, check_device_completely_gone, device_name
     )
 
@@ -326,7 +328,7 @@ def start_testtool(
     rpc_config_option = deploy_custom_rpc(rpc_config)
     command = f"java {java_options} -jar {filename} {tool_options} --device-count {device_count} --debug {debug} {schemas_option} {rpc_config_option} --md-sal {mdsal}"
     log.info(f"Running testtool: {command}")
-    logfile = utils.get_log_file_name("testtool")
+    logfile = controller_testlib.utils.get_log_file_name("testtool")
     process = infra.shell(f"{command} >tmp/{logfile} 2>&1", run_in_background=True)
     process.testtool_log_filename = logfile
     perform_operation_on_each_device(
@@ -460,7 +462,7 @@ def check_netconf_test_timeout_not_expired(deadline_date: datetime):
     Returns:
         None
     """
-    if not ENABLE_NETCONF_TEST_TIMEOUT:
+    if not netconf_testlib.variables.variables.ENABLE_GLOBAL_TEST_DEADLINES:
         return
     current_date = datetime.now()
     if current_date > deadline_date:
@@ -556,13 +558,14 @@ def check_device_data_is_empty(device_name: str, log_response: bool = True):
     Returns:
         None
     """
+    current_variables = netconf_testlib.variables.variables
     uri = (
-        f"{REST_API}/network-topology:network-topology/topology=topology-netconf/"
-        f"node={device_name}/yang-ext:mount?content=config"
+        f"{current_variables.REST_API}/network-topology:network-topology/"
+        f"topology=topology-netconf/node={device_name}/yang-ext:mount?content=config"
     )
     headers = {"Accept": "application/yang-data+xml"}
     data = templated_requests.get_from_uri(uri, headers=headers).text
-    escaped = re.escape(ODL_NETCONF_NAMESPACE)
+    escaped = re.escape(current_variables.ODL_NETCONF_NAMESPACE)
     assert (
         re.match(rf'<data xmlns="{escaped}"(\/>|></data>)', data) is not None
     ), f"Device {device_name} returned unexpected non-empty data: {data}"
@@ -603,6 +606,6 @@ def get_data_from_devices_concurrently(device_count: int, worker_count: int):
                 future.result()
             except Exception as e:
                 errors[name] = str(e)
-    assert not errors, (
-        f"GET requests failed for {len(errors)}/{device_count} devices: {errors}"
-    )
+    assert (
+        not errors
+    ), f"GET requests failed for {len(errors)}/{device_count} devices: {errors}"

@@ -15,10 +15,11 @@ import textwrap
 import allure
 import pytest
 
-from libraries import infra
-from libraries.NetconfSSH import NetconfSSH
-from libraries import utils
-from libraries.variables import variables
+from controller_testlib import infra
+import controller_testlib.utils
+from netconf_testlib.NetconfSSH import NetconfSSH
+from netconf_testlib import utils
+from netconf_testlib.variables import variables
 from suites.suite_order import SuiteOrder
 
 ODL_NETCONF_MDSAL_PORT = variables.ODL_NETCONF_MDSAL_PORT
@@ -750,7 +751,7 @@ class TestNorthbound:
         with allure_step_with_separate_logging("step_test_bug_7791"):
             # Send (checking replies) series of netconf messages to trigger
             # https://bugs.opendaylight.org/show_bug.cgi?id=7791
-            with utils.report_known_bug_on_failure("7791"):
+            with controller_testlib.utils.report_known_bug_on_failure("7791"):
                 self.perform_test("bug7791-1")
                 self.perform_test("bug7791-2")
                 self.perform_test("commit-edit")
@@ -766,7 +767,7 @@ class TestNorthbound:
             "step_commit_delete_not_existing_module"
         ):
             # Attempt to commit and check the reply.
-            with utils.report_known_bug_on_failure("4455"):
+            with controller_testlib.utils.report_known_bug_on_failure("4455"):
                 self.perform_test("commit-no-transaction")
 
         with allure_step_with_separate_logging("step_remove_not_existing_module"):
@@ -778,7 +779,7 @@ class TestNorthbound:
             "step_commit_remove_not_existing_module"
         ):
             # Attempt to commit and check the reply.
-            with utils.report_known_bug_on_failure("4455"):
+            with controller_testlib.utils.report_known_bug_on_failure("4455"):
                 self.perform_test("remove-not-existing-commit")
 
         with allure_step_with_separate_logging("step_close_session"):

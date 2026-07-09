@@ -8,11 +8,9 @@
 
 import logging
 
-from libraries.variables import variables
+import netconf_testlib.variables
 
 log = logging.getLogger(__name__)
-
-RESTCONF_ROOT = variables.RESTCONF_ROOT
 
 
 def generate_uri(identifier, datastore_flag: str = "config", *node_value_list):
@@ -57,11 +55,12 @@ def generate_rfc8040_uri(identifier, datastore_flag: str = "config", *node_value
     node_value_path = ""
     for nv in node_value_list:
         node_value_path += f"/{nv}"
+    restconf_root = netconf_testlib.variables.variables.RESTCONF_ROOT
     if datastore_flag == "config":
-        uri = f"{RESTCONF_ROOT}/data/{identifier}{node_value_path}?content=config"
+        uri = f"{restconf_root}/data/{identifier}{node_value_path}?content=config"
     elif datastore_flag == "operational":
-        uri = f"{RESTCONF_ROOT}/data/{identifier}{node_value_path}?content=nonconfig"
+        uri = f"{restconf_root}/data/{identifier}{node_value_path}?content=nonconfig"
     else:
-        uri = f"{RESTCONF_ROOT}/operations/{identifier}"
+        uri = f"{restconf_root}/operations/{identifier}"
 
     return uri

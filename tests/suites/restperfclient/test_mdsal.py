@@ -15,12 +15,12 @@ import textwrap
 import allure
 import pytest
 
-from libraries import infra
-from libraries import netconf
-from libraries import rest_perf_client
-from libraries import templated_requests
-from libraries import utils
-from libraries.variables import variables
+from controller_testlib import infra
+import controller_testlib.utils
+from netconf_testlib import netconf
+from netconf_testlib import rest_perf_client
+from netconf_testlib import templated_requests
+from netconf_testlib.variables import variables
 from suites.suite_order import SuiteOrder
 
 
@@ -179,7 +179,7 @@ class TestMdsal:
             # This is a separate test case to distinguish between restperfclient
             # failure and failed requests. Failed requests are rejected because
             # we don't want to test performance of ODL rejecting our requests.
-            with utils.report_known_bug_on_failure("5581"):
+            with controller_testlib.utils.report_known_bug_on_failure("5581"):
                 assert (
                     rest_perf_client.grep_restperfclient_log(
                         connector_log, "thread timed out"

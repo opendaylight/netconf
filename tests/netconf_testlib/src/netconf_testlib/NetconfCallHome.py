@@ -9,20 +9,17 @@
 import logging
 
 
-from libraries import infra
-from libraries import restconf_utils
-from libraries import templated_requests
-from libraries.variables import variables
+from controller_testlib import infra
+from netconf_testlib import restconf_utils
+from netconf_testlib import templated_requests
+import netconf_testlib.variables
 
-HEADERS = variables.HEADERS
 DEVICE_STATUS = (
     "/restconf/data/odl-netconf-callhome-server:netconf-callhome-server/"
     "allowed-devices?content=nonconfig"
 )
-WHITELIST = variables.CALLHOME_WHITELIST
 GLOBAL_CONFIG_URL = "/restconf/data/odl-netconf-callhome-server:netconf-callhome-server/global/credentials"
 NETCONF_KEYSTORE_URL = "/restconf/operations/netconf-keystore"
-NETCONF_KEYSTORE_DATA_URL = variables.NETCONF_KEYSTORE_DATA_URL
 
 CREATE_GLOBAL_CREDENTIALS_REQ = (
     "variables/netconf/callhome/json/create_global_credentials.json"
@@ -71,7 +68,7 @@ def register_keys_and_certificates_in_odl_cotroller():
     templated_requests.post_to_uri(
         uri=f"{NETCONF_KEYSTORE_URL}:add-keystore-entry",
         data=body,
-        headers=HEADERS,
+        headers=netconf_testlib.variables.variables.HEADERS,
         expected_code=templated_requests.ALLOWED_STATUS_CODES,
     )
 
@@ -84,7 +81,7 @@ def register_keys_and_certificates_in_odl_cotroller():
     templated_requests.post_to_uri(
         uri=f"{NETCONF_KEYSTORE_URL}:add-private-key",
         data=body,
-        headers=HEADERS,
+        headers=netconf_testlib.variables.variables.HEADERS,
         expected_code=templated_requests.ALLOWED_STATUS_CODES,
     )
 
@@ -97,7 +94,7 @@ def register_keys_and_certificates_in_odl_cotroller():
     templated_requests.post_to_uri(
         uri=f"{NETCONF_KEYSTORE_URL}:add-trusted-certificate",
         data=body,
-        headers=HEADERS,
+        headers=netconf_testlib.variables.variables.HEADERS,
         expected_code=templated_requests.ALLOWED_STATUS_CODES,
     )
 
@@ -118,7 +115,7 @@ def register_global_credentials_for_ssh_call_home_devices(username: str, passwor
     templated_requests.put_to_uri_request(
         uri=GLOBAL_CONFIG_URL,
         data=body,
-        headers=HEADERS,
+        headers=netconf_testlib.variables.variables.HEADERS,
         expected_code=templated_requests.ALLOWED_STATUS_CODES,
     )
 
@@ -149,9 +146,9 @@ def register_ssh_call_home_device_in_odl_controller(
     body = body.replace("{password}", password)
     body = body.replace("{hostkey}", hostkey)
     resp = templated_requests.post_to_uri(
-        uri=WHITELIST,
+        uri=netconf_testlib.variables.variables.CALLHOME_WHITELIST,
         data=body,
-        headers=HEADERS,
+        headers=netconf_testlib.variables.variables.HEADERS,
         expected_code=templated_requests.ALLOWED_STATUS_CODES,
     )
 
@@ -202,9 +199,9 @@ def register_tls_call_home_device_in_odl_controller(
     body = body.replace("{key_id}", key_id)
     body = body.replace("{certificate_id}", certificate_id)
     templated_requests.post_to_uri(
-        uri=WHITELIST,
+        uri=netconf_testlib.variables.variables.CALLHOME_WHITELIST,
         data=body,
-        headers=HEADERS,
+        headers=netconf_testlib.variables.variables.HEADERS,
         expected_code=templated_requests.ALLOWED_STATUS_CODES,
     )
 
