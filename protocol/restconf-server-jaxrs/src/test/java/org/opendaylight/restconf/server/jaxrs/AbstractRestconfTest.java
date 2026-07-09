@@ -10,13 +10,18 @@ package org.opendaylight.restconf.server.jaxrs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import java.text.ParseException;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
@@ -130,9 +135,20 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
 
     static final Response assertResponse(final int expectedStatus, final Consumer<AsyncResponse> invocation) {
         final var ar = mock(AsyncResponse.class);
-        doReturn(true).when(ar).resume(any(Response.class));
+        final var resumeThread = new AtomicReference<Thread>();
+        final var resumed = new CountDownLatch(1);
+        doAnswer(inv -> {
+            resumeThread.set(Thread.currentThread());
+            resumed.countDown();
+            return true;
+        }).when(ar).resume(any(Response.class));
 
         invocation.accept(ar);
+
+        assertTrue(Uninterruptibles.awaitUninterruptibly(resumed, 1, TimeUnit.SECONDS),
+            "AsyncResponse.resume() was not invoked");
+        final var thread = resumeThread.get();
+        assertTrue(thread.isVirtual(), "AsyncResponse.resume() must run on a virtual thread, but ran on " + thread);
 
         final var captor = ArgumentCaptor.forClass(Response.class);
         verify(ar).resume(captor.capture());
