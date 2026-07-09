@@ -8,7 +8,7 @@
 
 import logging
 
-from libraries.variables import variables
+from netconf_testlib.variables import variables
 
 log = logging.getLogger(__name__)
 

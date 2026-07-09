@@ -14,12 +14,12 @@ import subprocess
 import math
 import re
 
-from libraries import infra
-from libraries import restconf
-from libraries import restconf_utils
-from libraries import templated_requests
-from libraries import utils
-from libraries.variables import variables
+from netconf_testlib import infra
+from netconf_testlib import restconf
+from netconf_testlib import restconf_utils
+from netconf_testlib import templated_requests
+from netconf_testlib import utils
+from netconf_testlib.variables import variables
 
 MAX_HEAP = "1G"
 TESTTOOL_DEFAULT_JAVA_OPTIONS = (

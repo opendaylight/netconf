@@ -15,12 +15,12 @@ import textwrap
 import allure
 import pytest
 
-from libraries import infra
-from libraries import NetconfCallHome
-from libraries import restconf_utils
-from libraries import templated_requests
-from libraries import utils
-from libraries.variables import variables
+from netconf_testlib import infra
+from netconf_testlib import NetconfCallHome
+from netconf_testlib import restconf_utils
+from netconf_testlib import templated_requests
+from netconf_testlib import utils
+from netconf_testlib.variables import variables
 from suites.suite_order import SuiteOrder
 
 MOUNT_POINT_URL = (

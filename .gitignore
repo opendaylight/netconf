@@ -49,3 +49,5 @@ tests/build_tools/
 tests/opendaylight/
 tests/results/
 tests/tmp/
+tests/netconf_testlib/build/
+tests/netconf_testlib/src/*.egg-info/

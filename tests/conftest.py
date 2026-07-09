@@ -15,8 +15,8 @@ import pytest
 from typing import ContextManager, Generator, Iterator, Callable, List, Optional, Set
 
 
-from libraries import infra
-from libraries.variables import variables
+from netconf_testlib import infra
+from netconf_testlib.variables import variables
 
 ODL_IP = variables.ODL_IP
 TOOLS_IP = variables.TOOLS_IP

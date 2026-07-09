@@ -9,9 +9,9 @@
 import logging
 import math
 
-from libraries import infra
-from libraries import utils
-from libraries.variables import variables
+from netconf_testlib import infra
+from netconf_testlib import utils
+from netconf_testlib.variables import variables
 
 
 ODL_IP = variables.ODL_IP

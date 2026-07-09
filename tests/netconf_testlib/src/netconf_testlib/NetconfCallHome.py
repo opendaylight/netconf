@@ -9,10 +9,10 @@
 import logging
 
 
-from libraries import infra
-from libraries import restconf_utils
-from libraries import templated_requests
-from libraries.variables import variables
+from netconf_testlib import infra
+from netconf_testlib import restconf_utils
+from netconf_testlib import templated_requests
+from netconf_testlib.variables import variables
 
 HEADERS = variables.HEADERS
 DEVICE_STATUS = (
