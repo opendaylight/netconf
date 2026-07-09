@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
 import java.text.ParseException;
@@ -135,7 +136,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         invocation.accept(ar);
 
         final var captor = ArgumentCaptor.forClass(Response.class);
-        verify(ar).resume(captor.capture());
+        verify(ar, timeout(1000)).resume(captor.capture());
         final var response = captor.getValue();
         assertEquals(expectedStatus, response.getStatus());
         return response;
