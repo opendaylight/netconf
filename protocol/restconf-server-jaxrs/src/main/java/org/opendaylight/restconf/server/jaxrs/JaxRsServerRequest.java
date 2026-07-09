@@ -9,6 +9,8 @@ package org.opendaylight.restconf.server.jaxrs;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
@@ -26,6 +28,8 @@ import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.MappingServerRequest;
 import org.opendaylight.yangtools.databind.RequestException;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ServerRequest} originating in {@link JaxRsRestconf}.
@@ -33,6 +37,17 @@ import org.opendaylight.yangtools.yang.common.QName;
  * @param <T> type of reported result
  */
 abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
+    private static final Logger LOG = LoggerFactory.getLogger(JaxRsServerRequest.class);
+    // Resuming on a virtual thread ensures response commit never runs on a thread that happens to complete an
+    // upstream future -- notably never on ForkJoinPool.commonPool(), whose InnocuousForkJoinWorkerThread rejects
+    // Jetty's setContextClassLoader() call during commit.
+    private static final ExecutorService RESUME_EXECUTOR = Executors.newThreadPerTaskExecutor(Thread.ofVirtual()
+        .name("restconf-server-jaxrs-resp-", 0)
+        .inheritInheritableThreadLocals(false)
+        .uncaughtExceptionHandler(
+            (thread, exception) -> LOG.warn("Unhandled request-phase failure", exception))
+        .factory());
+
     private final @NonNull QName requestEncoding;
     private final @NonNull AsyncResponse ar;
 
@@ -86,14 +101,14 @@ abstract class JaxRsServerRequest<T> extends MappingServerRequest<T> {
             failWith(e);
             return;
         }
-        ar.resume(response);
+        RESUME_EXECUTOR.execute(() -> ar.resume(response));
     }
 
     @Override
     protected final void onFailure(final HttpStatusCode status, final FormattableBody body) {
-        ar.resume(Response.status(status.code(), status.phrase())
+        RESUME_EXECUTOR.execute(() -> ar.resume(Response.status(status.code(), status.phrase())
             .entity(new JaxRsFormattableBody(body, prettyPrint()))
-            .build());
+            .build()));
     }
 
     @NonNullByDefault
