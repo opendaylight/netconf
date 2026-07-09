@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c47cb693_1f1b4933",
+        "filename": "tests/suites/getsingle/test_getsingle.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-09T07:39:42Z",
+      "side": 1,
+      "message": "There is no more NETCONF_CONNECTOR feature in NETCONF? What\u0027s the difference when this is \"enabled\"? Can we just remove it?",
+      "revId": "93846b3a5fff91ce59db901d9514e657e394000b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
