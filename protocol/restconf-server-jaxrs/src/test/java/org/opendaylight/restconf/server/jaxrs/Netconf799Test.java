@@ -7,22 +7,17 @@
  */
 package org.opendaylight.restconf.server.jaxrs;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 
 import com.google.common.util.concurrent.Futures;
-import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
@@ -60,10 +55,6 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
     @Mock
     private DOMMountPointService mountPointService;
     @Mock
-    private AsyncResponse asyncResponse;
-    @Captor
-    private ArgumentCaptor<Response> captor;
-    @Mock
     private SecurityContext sc;
     @Mock
     private Registry streamRegistry;
@@ -82,16 +73,15 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
                 dataBroker, rpcService, actionService, mountPointService),
             streamRegistry, senderFactory, ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE);
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
-        doReturn(true).when(asyncResponse).resume(captor.capture());
-        restconf.postDataJSON(ApiPath.parse("instance-identifier-module:cont/cont1/reset"),
+
+        final var apiPath = ApiPath.parse("instance-identifier-module:cont/cont1/reset");
+        final var response = AbstractRestconfTest.assertResponse(204, ar -> restconf.postDataJSON(apiPath,
             stringInputStream("""
             {
               "instance-identifier-module:input": {
                 "delay": 600
               }
-            }"""), uriInfo, sc, asyncResponse);
-        final var response = captor.getValue();
-        assertEquals(204, response.getStatus());
+            }"""), uriInfo, sc, ar));
         assertNull(response.getEntity());
     }
 
