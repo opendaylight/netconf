@@ -12,6 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
 
 import com.google.common.util.concurrent.Futures;
 import javax.ws.rs.container.AsyncResponse;
@@ -82,7 +84,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
                 dataBroker, rpcService, actionService, mountPointService),
             streamRegistry, senderFactory, ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE);
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
-        doReturn(true).when(asyncResponse).resume(captor.capture());
+        doReturn(true).when(asyncResponse).resume(Response.class);
         restconf.postDataJSON(ApiPath.parse("instance-identifier-module:cont/cont1/reset"),
             stringInputStream("""
             {
@@ -90,6 +92,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
                 "delay": 600
               }
             }"""), uriInfo, sc, asyncResponse);
+        verify(asyncResponse, timeout(1000)).resume(captor.capture());
         final var response = captor.getValue();
         assertEquals(204, response.getStatus());
         assertNull(response.getEntity());
