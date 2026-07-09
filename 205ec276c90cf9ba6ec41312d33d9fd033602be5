@@ -1,0 +1,310 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97b9c1d6_b700b206",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "add @param for the parameters just like above",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "006bfcb2_16af977a",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "annotate the new parameters with @Nullable",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "568ac839_be5fcb26",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "scheme",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78153fa1_a212f1a9",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "same here",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "afde831c_d33ea7c0",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "same here",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a33322a4_d1748ee0",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "scheme",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d425ffd2_07520224",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "This helper is called together with resolveScheme, however it\u0027s non-static. Keep these two consistent (both static or both non-static)",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d7309fc_6d0431d9",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "annotate nullability",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9950af97_909e1b38",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/impl/OpenApiServiceImpl.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "why did we drop the \"throws IOException\" here?",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42bba75f_a251fad5",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "annotate the new parameters with @Nullable",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0870d716_a6c0af72",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "same here",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2916612_5842e722",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "resolveScheme() is declared static, yet it\u0027s called on instance here. Either change the call, or the method signature.",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "356b0c1f_c39733ca",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "rename to \"scheme\"",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb52c3be_a4b13ea0",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "same here",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23d39adb_1bbe3c9b",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "rename to \"scheme\"",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b0b2533_57a8d5f8",
+        "filename": "protocol/restconf-openapi-common/src/test/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGeneratorTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "keep the naming of the parameters consistent with production - forwardedHeader, forwardedProtoHeader",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f35ee178_8df22d98",
+        "filename": "protocol/restconf-openapi-common/src/test/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGeneratorTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "Missing coveage:\n- A Forwarded header without a \"proto\u003d\" token that must fall through to X-Forwarded-Proto / URI.\n- Multiple comma-separated \"Forwarded\" elements (multi-proxy) where the leftmost \"proto\" should win — the behaviour of \"find()\".\n- We are never actually testing the case-normalisation for the \"Forwarded\" branch. Every \"proto\u003d\" value in the data below is already\n  lowercase \"https\", so \"matcher.group(1).toLowerCase(Locale.ROOT)\" is never actually exercised. In contract the X-Forwarded-Proto branch is covered via \" HTTPS \")",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5501f454_91048e4e",
+        "filename": "protocol/restconf-openapi-common/src/test/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGeneratorTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-09T08:12:21Z",
+      "side": 1,
+      "message": "X-Forwarded-Proto",
+      "revId": "205ec276c90cf9ba6ec41312d33d9fd033602be5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
