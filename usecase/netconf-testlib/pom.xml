@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2026 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+
+ This program and the accompanying materials are made available under the
+ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ and is available at http://www.eclipse.org/legal/epl-v10.html
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.opendaylight.netconf</groupId>
+        <artifactId>netconf-parent</artifactId>
+        <version>12.0.0-SNAPSHOT</version>
+        <relativePath>../../parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>netconf-testlib</artifactId>
+    <name>${project.artifactId}</name>
+    <packaging>jar</packaging>
+
+    <properties>
+        <sonar.skip>true</sonar.skip>
+        <!-- usecase-parent defaults these to true; this module exists to be
+             consumed by other projects (e.g. bgpcep), so it must actually deploy. -->
+        <maven.deploy.skip>false</maven.deploy.skip>
+        <maven.install.skip>false</maven.install.skip>
+    </properties>
+
+    <build>
+        <resources>
+            <resource>
+                <!-- Only the modules actually consumed by the pytest suites in ../../tests/suites
+                     are included here. AuthStandalone.py, ClusterEntities.py, excepts.py,
+                     TopologyNetconfNodes.py and UtilLibrary.py are legacy/unused and stay out. -->
+                <directory>${project.basedir}/../../tests/libraries</directory>
+                <targetPath>netconf_testlib</targetPath>
+                <includes>
+                    <include>infra.py</include>
+                    <include>KarafShell.py</include>
+                    <include>NetconfCallHome.py</include>
+                    <include>netconf.py</include>
+                    <include>NetconfSSH.py</include>
+                    <include>norm_json.py</include>
+                    <include>restconf.py</include>
+                    <include>restconf_utils.py</include>
+                    <include>rest_perf_client.py</include>
+                    <include>ssh_utils.py</include>
+                    <include>templated_requests.py</include>
+                    <include>utils.py</include>
+                    <include>variables.py</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+</project>

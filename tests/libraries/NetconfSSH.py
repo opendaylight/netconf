@@ -9,7 +9,7 @@
 import logging
 import time
 
-from libraries import ssh_utils
+from . import ssh_utils
 
 log = logging.getLogger(__name__)
 

@@ -9,9 +9,9 @@
 import logging
 import math
 
-from libraries import infra
-from libraries import utils
-from libraries.variables import variables
+from . import infra
+from . import utils
+from .variables import variables
 
 
 ODL_IP = variables.ODL_IP

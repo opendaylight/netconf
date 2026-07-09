@@ -12,8 +12,8 @@ import subprocess
 
 import psutil
 
-from libraries import utils
-from libraries.KarafShell import KarafShell
+from . import utils
+from .KarafShell import KarafShell
 
 KARAF_SHELL_INSTANCE = None
 
