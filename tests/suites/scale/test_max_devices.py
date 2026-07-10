@@ -69,8 +69,6 @@ def _get_juniper_schemas() -> str:
 @pytest.mark.multi_device
 @pytest.mark.standalone
 @pytest.mark.usefixtures("odl_standalone")
-@pytest.mark.usefixtures("log_test_suite_start_end_to_karaf")
-@pytest.mark.usefixtures("log_test_case_start_end_to_karaf")
 @pytest.mark.run(order=SuiteOrder.SCALE_MAX_DEVICES)
 class TestMaxDevices:
 
