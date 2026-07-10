@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3112f764_9be27f18",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-07-10T16:03:47Z",
+      "side": 1,
+      "message": "I believe here does not have to be a space",
+      "revId": "ddc5a50005b19b9f545de1ca08b46079a57be78b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9dc12f0_4a0d79b2",
+        "filename": "tests/suites/CRUD-RPC/test_crud_rpc.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-07-10T16:03:47Z",
+      "side": 1,
+      "message": "It might be good to put some docstring to functions/methods",
+      "revId": "ddc5a50005b19b9f545de1ca08b46079a57be78b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
