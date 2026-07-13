@@ -33,6 +33,24 @@
       "message": "I\u0027ll need to look at this more closely, but the indirection should probably be done in EOS...",
       "revId": "a553ab71fd2cc6573714aec4491abc1e6b9b1c30",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50fbb3c9_39bfa7a5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-13T08:35:55Z",
+      "side": 1,
+      "message": "that\u0027s probably in https://git.opendaylight.org/gerrit/c/controller/+/123904 and https://git.opendaylight.org/gerrit/c/controller/+/123902\n\nhere, we are fixing Netty endpoint, before the patch never ending request, with patch error is handled correctly in respones",
+      "parentUuid": "4cfbde19_144a02d7",
+      "revId": "a553ab71fd2cc6573714aec4491abc1e6b9b1c30",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
