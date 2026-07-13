@@ -17,7 +17,6 @@ from libraries import infra
 from libraries.variables import variables
 
 CLUSTER_MEMBER_IPS = variables.CLUSTER_MEMBER_IPS
-KARAF_SSH_PORT = 8101
 
 log = logging.getLogger(__name__)
 

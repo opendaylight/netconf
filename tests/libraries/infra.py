@@ -212,6 +212,7 @@ def stop_all_karaf_instances():
 def execute_karaf_command(
     command: str, host: str = "127.0.0.1", port: int = 8101
 ) -> tuple[str, str]:
+
     """Executed specific command using ODL karaf CLI console
 
     It usses ssh connection to connect to karaf CLI.
@@ -231,6 +232,7 @@ def execute_karaf_command(
         karaf_shell_instances[(host,port)] = KarafShell(host=host, port=port)
     shell_instance = karaf_shell_instances[(host,port)]
 
+
     try:
         stdout = shell_instance.execute(command)
         log.info(f"Command Output:\n{stdout}")
@@ -242,30 +244,36 @@ def execute_karaf_command(
         return "", str(e)
 
 
-def log_message_to_karaf(message: str):
+def log_message_to_karaf(message: str, host: str = "127.0.0.1"):
     """Log specific mesage to ODL karaf
 
     It usses ssh connection to connect to karaf CLI.
 
     Args:
         message (str): Message to be logged.
+        host (str): Address of the karaf instance to log to. Defaults to
+            the single-node address; cluster members each get their own.
 
     Returns:
         None
     """
-    execute_karaf_command(f"log:log 'ROBOT MESSAGE: {message}'")
+    execute_karaf_command(f"log:log 'ROBOT MESSAGE: {message}'", host=host)
 
 
-def is_karaf_feature_installed(feature_name: str) -> bool:
+def is_karaf_feature_installed(feature_name: str, host: str = "127.0.0.1") -> bool:
     """Check if the given feature is found in the output of 'feature:list -i'.
 
     Args:
         feature_name (str): Exact name of the Karaf feature to look up.
+        host (str): Address of the karaf instance to check. Defaults to
+            the single-node address; cluster members each get their own.
 
     Returns:
         bool: True if the feature is installed, False otherwise.
     """
-    output, _ = execute_karaf_command(f"feature:list -i | grep {feature_name}")
+    output, _ = execute_karaf_command(
+        f"feature:list -i | grep {feature_name}", host=host
+    )
     return any(line.split(" ")[0] == feature_name for line in output.splitlines())
 
 
