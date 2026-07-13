@@ -11,13 +11,18 @@ import logging
 from typing import List
 
 from libraries import templated_requests
+from libraries.variables import variables
 
+ODL_IP = variables.ODL_IP
 
 log = logging.getLogger(__name__)
 
 
 def check_for_elements_at_uri(
-    uri: str, elements: List[str], pretty_print_json: bool = False
+    uri: str,
+    elements: List[str],
+    pretty_print_json: bool = False,
+    host: str = ODL_IP,
 ):
     """
     A GET is made at the supplied ${uri} and every item in the list of ${elements}
@@ -28,11 +33,14 @@ def check_for_elements_at_uri(
         elements (List[str]): List of elements which are expected to be present
             in response.
         pretty_print_json (bool): Log received message in pretty format.
+        host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
+            the only node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to target a different cluster member.
 
     Returns:
         None
     """
-    resp = templated_requests.get_from_uri(uri=uri, expected_code=None)
+    resp = templated_requests.get_from_uri(uri=uri, expected_code=None, host=host)
     if pretty_print_json:
         log.info(json.dumps(resp.json()))
     else:
@@ -44,7 +52,7 @@ def check_for_elements_at_uri(
         ), f"Expected element: {i} was not found in the response: {resp.text}"
 
 
-def no_content_from_uri(uri, headers=None):
+def no_content_from_uri(uri, headers=None, host: str = ODL_IP):
     """Invoke a requests.get and return on error 404 (No content) or will fail and log
     the content. Invokes a requests.get for ${uri} using headers from ${headers}.
 
@@ -56,8 +64,13 @@ def no_content_from_uri(uri, headers=None):
     Args:
         uri (str): Uri location.
         headers (dict): HTTP headers to use for the GET request.
+        host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
+            the only node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to target a different cluster member.
 
     Returns:
         None
     """
-    templated_requests.get_from_uri(uri=uri, headers=headers, expected_code=(404, 409))
+    templated_requests.get_from_uri(
+        uri=uri, headers=headers, expected_code=(404, 409), host=host
+    )
