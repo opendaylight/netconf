@@ -33,6 +33,7 @@ ENABLE_NETCONF_TEST_TIMEOUT = variables.ENABLE_GLOBAL_TEST_DEADLINES
 RESTCONF_ROOT = variables.RESTCONF_ROOT
 REST_API = variables.REST_API
 TOOLS_IP = variables.TOOLS_IP
+ODL_IP = variables.ODL_IP
 ODL_NETCONF_NAMESPACE = variables.ODL_NETCONF_NAMESPACE
 TESTTOOL_BASE_STARTUP_TIMEOUT = 20
 TESTTOOL_PER_DEVICE_TIMEOUT = 1
@@ -42,12 +43,15 @@ NETCONF_MOUNTED_DEVICE_TYPES = dict()
 log = logging.getLogger(__name__)
 
 
-def check_device_has_no_netconf_connector(device_name: str):
+def check_device_has_no_netconf_connector(device_name: str, host: str = ODL_IP):
     """Check that there are no instances of the specified device
     in the Netconf topology.
 
     Args:
         device_name (str): The name of the device to be checked.
+        host (str): Node to query. Defaults to ODL_IP (node 1 / the only
+            node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to check a different cluster member.
 
     Returns:
         None
@@ -56,15 +60,18 @@ def check_device_has_no_netconf_connector(device_name: str):
     # whether the device has no netconf connector but whether the device is present
     # in the netconf topology or not. Rename, proposed new name:
     # Check_Device_Not_Present_In_Netconf_Topology
-    count = count_netconf_connectors_for_device(device_name)
+    count = count_netconf_connectors_for_device(device_name, host=host)
     assert count == 0
 
 
-def check_device_connected(device_name: str):
+def check_device_connected(device_name: str, host: str = ODL_IP):
     """Check that the specified device is accessible from Netconf.
 
     Args:
         device_name (str): The name of the device to be verified.
+        host (str): Node to query. Defaults to ODL_IP (node 1 / the only
+            node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to check a different cluster member.
 
     Returns:
         None
@@ -75,36 +82,42 @@ def check_device_connected(device_name: str):
         "topology=topology-netconf",
         f"node={device_name}",
     )
-    resp = templated_requests.get_from_uri(uri)
+    resp = templated_requests.get_from_uri(uri, host=host)
     device_status = resp.text
     assert 'connection-status":"connected"' in device_status
 
 
-def check_device_completely_gone(device_name: str):
+def check_device_completely_gone(device_name: str, host: str = ODL_IP):
     """Check that the specified device has no Netconf connectors nor associated data.
 
     Args:
         device_name (str): The name of the device to be verified as removed.
+        host (str): Node to query. Defaults to ODL_IP (node 1 / the only
+            node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to check a different cluster member.
 
     Returns:
         None
     """
-    check_device_has_no_netconf_connector(device_name)
+    check_device_has_no_netconf_connector(device_name, host=host)
     uri = restconf.generate_uri(
         "network-topology:network-topology",
         "config",
         'topology="topology-netconf"',
         f"node={device_name}",
     )
-    restconf_utils.no_content_from_uri(uri)
+    restconf_utils.no_content_from_uri(uri, host=host)
 
 
-def count_netconf_connectors_for_device(device_name: str) -> int:
+def count_netconf_connectors_for_device(device_name: str, host: str = ODL_IP) -> int:
     """Count all instances of the specified device in the Netconf topology
     (usually 0 or 1).
 
     Args:
         device_name (str): The name of the device to be counted.
+        host (str): Node to query. Defaults to ODL_IP (node 1 / the only
+            node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to check a different cluster member.
 
     Returns:
         int: The number of times the device appears in the Netconf topology.
@@ -115,7 +128,7 @@ def count_netconf_connectors_for_device(device_name: str) -> int:
     # so right now it is as FIXME. Proposed new name:
     # Count_Device_Instances_In_Netconf_Topology
     uri = restconf.generate_uri("network-topology:network-topology", "operational")
-    resp = templated_requests.get_from_uri(uri)
+    resp = templated_requests.get_from_uri(uri, host=host)
     mounts = resp.text
     log.info(f"{mounts=}")
     actual_count = len(mounts.split(f'"node-id":"{device_name}"')) - 1
@@ -134,6 +147,7 @@ def configure_device_in_netconf(
     schema_directory: str = "/tmp/schema",
     http_timeout: float | tuple[float, float] | None = None,
     http_method: str = "put",
+    host: str = ODL_IP,
 ):
     """Tell Netconf about the specified device so it can add it into its configuration.
 
@@ -149,6 +163,10 @@ def configure_device_in_netconf(
         http_timeout (float | tuple[float, float] | None): How many seconds to wait for
             the server to send data before giving up.
         http_method (str): The HTTP method to use ("put" or "post").
+        host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
+            the only node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to configure through a different
+            cluster member.
 
     Returns:
         None
@@ -169,6 +187,7 @@ def configure_device_in_netconf(
             mapping,
             http_timeout=http_timeout,
             json=False,
+            host=host,
         )
     else:
         templated_requests.put_templated_request(
@@ -176,11 +195,14 @@ def configure_device_in_netconf(
             mapping,
             http_timeout=http_timeout,
             json=False,
+            host=host,
         )
         NETCONF_MOUNTED_DEVICE_TYPES[device_name] = device_type
 
 
-def wait_device_connected(device_name: str, timeout: int = 20, period: int = 1):
+def wait_device_connected(
+    device_name: str, timeout: int = 20, period: int = 1, host: str = ODL_IP
+):
     """Wait for the device to become connected.
 
     It is more readable to use this function in a test case than to put the whole
@@ -192,12 +214,19 @@ def wait_device_connected(device_name: str, timeout: int = 20, period: int = 1):
             Note: If the timeout is not evenly divisible by the period, the total
             allowed wait time will be rounded up to the nearest multiple of the period.
         period (int): Time in seconds between polling attempts.
+        host (str): Node to query. Defaults to ODL_IP (node 1 / the only
+            node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to check a different cluster member.
 
     Returns:
         None
     """
     utils.wait_until_function_pass(
-        math.ceil(timeout / period), period, check_device_connected, device_name
+        math.ceil(timeout / period),
+        period,
+        check_device_connected,
+        device_name,
+        host=host,
     )
 
 
@@ -236,11 +265,15 @@ def check_devices_are_up_and_running(device_count):
     ), f"Number of ports in LISTEN state {int(stdout)} does not match expected {device_count}."
 
 
-def remove_device_from_netconf(device_name: str):
+def remove_device_from_netconf(device_name: str, host: str = ODL_IP):
     """Tell Netconf to deconfigure the specified device.
 
     Args:
         device_name (str): The name of the device to be removed.
+        host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
+            the only node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to deconfigure through a different
+            cluster member.
 
     Returns:
         None
@@ -248,11 +281,13 @@ def remove_device_from_netconf(device_name: str):
     device_type = NETCONF_MOUNTED_DEVICE_TYPES.pop(device_name)
     mapping = {"DEVICE_NAME": device_name, "RESTCONF_ROOT": RESTCONF_ROOT}
     templated_requests.delete_templated_request(
-        f"{DIRECTORY_WITH_DEVICE_TEMPLATES}/{device_type}", mapping
+        f"{DIRECTORY_WITH_DEVICE_TEMPLATES}/{device_type}", mapping, host=host
     )
 
 
-def wait_device_fully_removed(device_name: str, timeout: int = 10, period: int = 1):
+def wait_device_fully_removed(
+    device_name: str, timeout: int = 10, period: int = 1, host: str = ODL_IP
+):
     """Wait until all netconf connectors for the device with the given name disappear.
 
     Call of Remove_Device_From_Netconf returns before netconf gets
@@ -269,12 +304,19 @@ def wait_device_fully_removed(device_name: str, timeout: int = 10, period: int =
             Note: If the timeout is not evenly divisible by the period, the total
             allowed wait time will be rounded up to the nearest multiple of the period.
         period (int): Time in seconds between polling attempts.
+        host (str): Node to query. Defaults to ODL_IP (node 1 / the only
+            node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to check a different cluster member.
 
     Returns:
         None
     """
     utils.wait_until_function_pass(
-        math.ceil(timeout / period), period, check_device_completely_gone, device_name
+        math.ceil(timeout / period),
+        period,
+        check_device_completely_gone,
+        device_name,
+        host=host,
     )
 
 
