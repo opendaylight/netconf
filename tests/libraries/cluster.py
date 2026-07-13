@@ -17,8 +17,56 @@ from libraries import infra
 from libraries.variables import variables
 
 CLUSTER_MEMBER_IPS = variables.CLUSTER_MEMBER_IPS
+ODL_IP = variables.ODL_IP
 
 log = logging.getLogger(__name__)
+
+# Whether the current pytest session is running the cluster topology.
+# Set once via set_is_cluster_run(), from conftest's cluster setup fixture.
+_is_cluster_run = False
+
+
+def set_is_cluster_run(value: bool):
+    """Records whether this pytest session is running the cluster topology.
+
+    Args:
+        value (bool): True if this session is running cluster-marked tests.
+
+    Returns:
+        None
+    """
+    global _is_cluster_run
+    _is_cluster_run = value
+
+
+def is_cluster_run() -> bool:
+    """Whether this pytest session is running the cluster topology.
+
+    Args:
+        None
+
+    Returns:
+        bool: True for a cluster session, False for standalone.
+    """
+    return _is_cluster_run
+
+
+def active_nodes() -> list[str]:
+    """Every ODL node address in play for this pytest session.
+
+    Generic building block for anything that needs to act on "all nodes
+    currently under test" -- not just Karaf logging. Single-node code paths
+    still work unmodified since standalone sessions get a one-element list.
+
+    Args:
+        None
+
+    Returns:
+        list[str]: CLUSTER_MEMBER_IPS for a cluster session, otherwise a
+            single-element list containing just ODL_IP.
+    """
+    return CLUSTER_MEMBER_IPS if is_cluster_run() else [ODL_IP]
+
 
 # Config files whose bind address defaults to every interface (0.0.0.0),
 # which only one member per host can hold. Value is the key as it appears
@@ -218,6 +266,7 @@ def setup_cluster():
     ):
         _configure_member_network(cwd, member_ip)
         _configure_member_cluster(cwd, index, CLUSTER_MEMBER_IPS)
+    set_is_cluster_run(True)
 
 
 def start_cluster(features: list[str]):
