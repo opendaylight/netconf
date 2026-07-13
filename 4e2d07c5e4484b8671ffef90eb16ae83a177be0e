@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a7249c8_c0809139",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-13T07:46:03Z",
+      "side": 1,
+      "message": "why do we need forwarded header?",
+      "revId": "4e2d07c5e4484b8671ffef90eb16ae83a177be0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5236833f_cad51ead",
+        "filename": "protocol/restconf-openapi-common/src/test/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGeneratorTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-13T07:46:03Z",
+      "side": 1,
+      "message": "add javadoc describing test",
+      "revId": "4e2d07c5e4484b8671ffef90eb16ae83a177be0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
