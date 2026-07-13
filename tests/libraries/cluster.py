@@ -17,24 +17,62 @@ from libraries import infra
 from libraries.variables import variables
 
 CLUSTER_MEMBER_IPS = variables.CLUSTER_MEMBER_IPS
+ODL_IP = variables.ODL_IP
 
 log = logging.getLogger(__name__)
+
+# Whether the current pytest session is running the cluster topology.
+# Set once via set_is_cluster_run(), from conftest's cluster setup fixture.
+_is_cluster_run = False
+
+
+def set_is_cluster_run(value: bool):
+    """Records whether this pytest session is running the cluster topology.
+
+    Args:
+        value (bool): True if this session is running cluster-marked tests.
+
+    Returns:
+        None
+    """
+    global _is_cluster_run
+    _is_cluster_run = value
+
+
+def is_cluster_run() -> bool:
+    """Whether this pytest session is running the cluster topology.
+
+    Args:
+        None
+
+    Returns:
+        bool: True for a cluster session, False for standalone.
+    """
+    return _is_cluster_run
+
+
+def active_nodes() -> list[str]:
+    """Every ODL node address in play for this pytest session.
+
+    Generic building block for anything that needs to act on "all nodes
+    currently under test" -- not just Karaf logging. Single-node code paths
+    still work unmodified since standalone sessions get a one-element list.
+
+    Args:
+        None
+
+    Returns:
+        list[str]: CLUSTER_MEMBER_IPS for a cluster session, otherwise a
+            single-element list containing just ODL_IP.
+    """
+    return CLUSTER_MEMBER_IPS if is_cluster_run() else [ODL_IP]
+
 
 # Config files whose bind address defaults to every interface (0.0.0.0),
 # which only one member per host can hold. Value is the key as it appears
 # in the file, whether currently active, commented out, or not present yet
 # (e.g. org.opendaylight.netconf.ssh.cfg isn't shipped; Felix ConfigAdmin
 # falls back to its metatype default of 0.0.0.0 until the file exists).
-#
-# Note: pax-web-jetty actually starts TWO separate connectors on :8181 --
-# "jetty-default" from etc/jetty.xml (resolves ${jetty.host} as a plain JVM
-# system property, hence the etc/system.properties entry below) and its own
-# "default" HttpService connector. That second one is NOT controlled by
-# org.osgi.service.http.host (verified by decompiling pax-web-runtime-8.0.34:
-# that key doesn't exist in this version at all) but by
-# org.ops4j.pax.web.listening.addresses (comma-separated, defaults to
-# "0.0.0.0"). Both connectors must be pinned, or whichever binds its
-# specific address first blocks the other's 0.0.0.0 bind on the same port.
 _MEMBER_BIND_ADDRESS_SETTINGS = (
     ("etc/org.apache.karaf.shell.cfg", "sshHost"),
     ("etc/org.opendaylight.restconf.nb.rfc8040.cfg", "bind-address"),
@@ -67,21 +105,14 @@ def _prepare_member_directories():
 
 
 def _ensure_pekko_conf_exists(cwd: str):
-    """Materializes configuration/initial/pekko.conf if ODL never booted here.
+    """Ensures configuration/initial/pekko.conf exists before ODL starts.
 
-    A fresh distribution copy only ships the shipped default under
-    system/.../sal-clustering-config/<version>/sal-clustering-config-<version>-pekkoconf.xml;
-    configuration/initial/pekko.conf (the file actually read at runtime) is
-    normally materialized either by ODL itself on first boot or by
-    bin/configure_cluster.sh's own bootstrap step. Since member setup runs
-    before ODL is started, and cluster wiring may be skipped, do the same
-    fallback copy here so there's always a file to edit.
+    Because the runtime pekko.conf is normally generated on ODL's first boot,
+    this copies the default configuration template into place so it is
+    available to edit during setup.
 
     Args:
         cwd (str): Member's distribution directory.
-
-    Returns:
-        None
     """
     infra.shell(
         "mkdir -p configuration/initial && "
@@ -155,8 +186,7 @@ def _fix_configure_cluster_script(cwd: str):
     "127.0.0.1 127.0.0.2 127.0.0.3"), regardless of whether the seed list was
     passed comma- or space-separated. Every member then gets that whole
     string written into pekko.conf as its own hostname, which pekko fails to
-    bind to. Dropping the inner quotes restores the word splitting the script
-    already relies on elsewhere (e.g. `for ip in "${CONTROLLERIPS[@]}"`).
+    bind to.
 
     Args:
         cwd (str): Member's distribution directory.
@@ -172,7 +202,7 @@ def _fix_configure_cluster_script(cwd: str):
 
 
 def _configure_member_cluster(cwd: str, index: int, member_ips: list[str]):
-    """Wires a member into the pekko cluster via ODL's own tooling.
+    """Wires a member into the pekko cluster via custom shell script.
 
     Runs bin/configure_cluster.sh, which points this member's pekko.conf
     seed-nodes at every member and adds it as a replica in module-shards.conf.
@@ -233,10 +263,11 @@ def setup_cluster():
     ):
         _configure_member_network(cwd, member_ip)
         _configure_member_cluster(cwd, index, CLUSTER_MEMBER_IPS)
+    set_is_cluster_run(True)
 
 
 def start_cluster(features: list[str]):
-    """Stages, configures and starts an ODL cluster.
+    """Starts ODL cluster members with a specified set of features.
 
     All members are launched before any of them is awaited: each member's
     pekko actor system needs its peers reachable to finish joining the
