@@ -28,3 +28,4 @@ class SuiteOrder(IntEnum):
     RESTPERFCLIENT_PERFORMANCE = auto()
     GETMULTI = auto()
     SCALE_MAX_DEVICES = auto()
+    CLUSTERING_CRUD = auto()

@@ -19,7 +19,6 @@ from libraries import cluster
 from libraries import infra
 from libraries.variables import variables
 
-ODL_IP = variables.ODL_IP
 TOOLS_IP = variables.TOOLS_IP
 KARAF_LOG_LEVEL = variables.KARAF_LOG_LEVEL
 CLUSTER_MEMBER_IPS = variables.CLUSTER_MEMBER_IPS
@@ -45,7 +44,8 @@ def pytest_addoption(parser):
 
 @pytest.hookimpl(trylast=True)
 def pytest_collection_modifyitems(items):
-    """Keeps standalone and cluster tests from running in the same session.
+    """Keeps standalone and cluster tests from running in the same session,
+    and records which topology this session is actually running.
 
     Both odl_standalone and odl_three_node_cluster stage the ODL
     distribution under the same `opendaylight` directory and ports, so
@@ -65,6 +65,7 @@ def pytest_collection_modifyitems(items):
     """
     has_standalone = any(item.get_closest_marker("standalone") for item in items)
     has_cluster = any(item.get_closest_marker("cluster") for item in items)
+
     if not (has_standalone and has_cluster):
         return
 
@@ -249,31 +250,43 @@ def teardown_kill_all_running_ssereceiver_processes():
 def log_test_suite_start_end_to_karaf(request: pytest.FixtureRequest):
     """Fixture to log in karaf test suite start and end markers
 
+    Logs to every node in cluster.active_nodes(): all cluster members for a
+    cluster session, or just the single standalone node otherwise.
+
     Args:
         request (FixtureRequest): Request fixture for accessing test context.
 
     Returns:
         None
     """
-    infra.log_message_to_karaf(f"Starting suite {request.cls.__name__}")
+    hosts = cluster.active_nodes()
+    for host in hosts:
+        infra.log_message_to_karaf(f"Starting suite {request.cls.__name__}", host=host)
     yield
-    infra.log_message_to_karaf(f"End of suite {request.cls.__name__}")
+    for host in hosts:
+        infra.log_message_to_karaf(f"End of suite {request.cls.__name__}", host=host)
 
 
 @pytest.fixture(scope="function", autouse=True)
 def log_test_case_start_end_to_karaf(request: pytest.FixtureRequest):
     """Fixture to log in karaf test case start and end markers
 
+    Logs to every node in cluster.active_nodes(): all cluster members for a
+    cluster session, or just the single standalone node otherwise.
+
     Args:
         request (FixtureRequest): Request fixture for accessing test context.
 
     Returns:
         None
     """
-    infra.log_message_to_karaf(
-        f"Starting test {request.cls.__name__}.{request.node.name}"
-    )
+    hosts = cluster.active_nodes()
+    for host in hosts:
+        infra.log_message_to_karaf(
+            f"Starting test {request.cls.__name__}.{request.node.name}", host=host
+        )
     yield
-    infra.log_message_to_karaf(
-        f"End of test {request.cls.__name__}.{request.node.name}"
-    )
+    for host in hosts:
+        infra.log_message_to_karaf(
+            f"End of test {request.cls.__name__}.{request.node.name}", host=host
+        )
