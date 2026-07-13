@@ -23,13 +23,29 @@ ODL_IP = variables.ODL_IP
 RESTCONF_PORT = variables.RESTCONF_PORT
 MAX_HTTP_RESPONSE_BODY_LOG_SIZE = variables.MAX_HTTP_RESPONSE_BODY_LOG_SIZE
 HEADERS_YANG_RFC8040_JSON = variables.HEADERS_YANG_RFC8040_JSON
-BASE_URL = f"http://{ODL_IP}:{RESTCONF_PORT}"
 
 ALLOWED_STATUS_CODES = {200, 201, 204}
 ALLOWED_DELETE_STATUS_CODES = {200, 201, 204, 404, 409}
 DELETED_STATUS_CODES = {404, 409}
 
 log = logging.getLogger(__name__)
+
+
+def restconf_base_url(host: str = ODL_IP) -> str:
+    """Builds the RESTCONF base URL for a given node.
+
+    Defaults to ODL_IP, which is node 1 in a cluster (CLUSTER_MEMBER_IPS[0])
+    and the only node in a single-node setup. Pass a different address (e.g.
+    from variables.CLUSTER_MEMBER_IPS) to target another cluster member --
+    all members listen on the same RESTCONF_PORT.
+
+    Args:
+        host (str): Address of the node to target.
+
+    Returns:
+        str: RESTCONF base URL, without a trailing slash.
+    """
+    return f"http://{host}:{RESTCONF_PORT}"
 
 
 def get_pretty_response(response: requests.Response) -> str:
@@ -62,6 +78,7 @@ def get_from_uri(
     headers: dict | None = None,
     expected_code: int | List[int] | None = None,
     http_timeout: float | tuple[float, float] | None = None,
+    host: str = ODL_IP,
 ) -> requests.Response:
     """Sends HTTP GET request to ODL.
 
@@ -74,11 +91,14 @@ def get_from_uri(
         http_timeout (float | tuple[float, float] | None): How many seconds to wait for
             the server to send data before giving up. Can be a single float or a
             (connect timeout, read timeout) tuple.
+        host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
+            the only node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to target a different cluster member.
 
     Returns:
         requests.Response: Response returned by ODL for GET call.
     """
-    url = f"{BASE_URL}/{uri}"
+    url = f"{restconf_base_url(host)}/{uri}"
     log.info(f"Sending GET request to {url} with headers {headers}")
     response = requests.get(
         url,
@@ -122,6 +142,7 @@ def put_to_uri_request(
     data: dict | str,
     expected_code: int | List[int] | None = None,
     http_timeout: float | tuple[float, float] | None = None,
+    host: str = ODL_IP,
 ) -> requests.Response:
     """Sends HTTP PUT request to ODL using provided data.
 
@@ -136,11 +157,14 @@ def put_to_uri_request(
         http_timeout (float | tuple[float, float] | None): How many seconds to wait for
             the server to send data before giving up. Can be a single float or a
             (connect timeout, read timeout) tuple.
+        host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
+            the only node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to target a different cluster member.
 
     Returns:
         requests.Response: Response returned by ODL for PUT call.
     """
-    url = f"{BASE_URL}/{uri}"
+    url = f"{restconf_base_url(host)}/{uri}"
     log.info(
         f"Sending PUT request to {url} with headers {headers} containing the following "
         f"payload: {data}"
@@ -188,6 +212,7 @@ def post_to_uri(
     data: dict | str,
     expected_code: int | List[int] | None = None,
     http_timeout: float | tuple[float, float] | None = None,
+    host: str = ODL_IP,
 ) -> requests.Response:
     """Send HTTP POST request to ODL.
 
@@ -202,11 +227,14 @@ def post_to_uri(
         http_timeout (float | tuple[float, float] | None): How many seconds to wait for
             the server to send data before giving up. Can be a single float or a
             (connect timeout, read timeout) tuple.
+        host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
+            the only node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to target a different cluster member.
 
     Returns:
         requests.Response: Response returned by ODL for POST call.
     """
-    url = f"{BASE_URL}/{uri}"
+    url = f"{restconf_base_url(host)}/{uri}"
     log.info(
         f"Sending POST request to {url} with headers {headers} containing the following "
         f"payload: {data}"
@@ -252,6 +280,7 @@ def delete_from_uri_request(
     uri: str,
     expected_code: int | List[int] | None = None,
     http_timeout: float | tuple[float, float] | None = None,
+    host: str = ODL_IP,
 ) -> requests.Response:
     """Sends HTTP DELETE request to ODL.
 
@@ -264,11 +293,14 @@ def delete_from_uri_request(
         http_timeout (float | tuple[float, float] | None): How many seconds to wait for
             the server to send data before giving up. Can be a single float or a
             (connect timeout, read timeout) tuple.
+        host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
+            the only node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to target a different cluster member.
 
     Returns:
         requests.Response: Response returned by ODL for DELETE call.
     """
-    url = f"{BASE_URL}/{uri}"
+    url = f"{restconf_base_url(host)}/{uri}"
     log.info(f"Sending DELETE request to {url}")
     response = requests.delete(
         url=url,
@@ -350,6 +382,7 @@ def get_templated_request(
     verify: bool = False,
     expected_code: int | List[int] | None = None,
     http_timeout: float | tuple[float, float] | None = None,
+    host: str = ODL_IP,
 ) -> requests.Response:
     """Evaluates and sends GET request using template file.
 
@@ -371,6 +404,9 @@ def get_templated_request(
         http_timeout (float | tuple[float, float] | None): How many seconds to wait for
             the server to send data before giving up. Can be a single float or a
             (connect timeout, read timeout) tuple.
+        host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
+            the only node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to target a different cluster member.
 
     Returns:
         requests.Response: Response returned by ODL for GET call.
@@ -387,6 +423,7 @@ def get_templated_request(
         headers=headers,
         expected_code=expected_code,
         http_timeout=http_timeout,
+        host=host,
     )
 
     if verify:
@@ -420,6 +457,7 @@ def put_templated_request(
     verify: bool = False,
     expected_code: int | List[int] | None = None,
     http_timeout: float | tuple[float, float] | None = None,
+    host: str = ODL_IP,
 ) -> requests.Response:
     """Evaluates and sends PUT request using template file.
 
@@ -441,6 +479,9 @@ def put_templated_request(
         http_timeout (float | tuple[float, float] | None): How many seconds to wait for
             the server to send data before giving up. Can be a single float or a
             (connect timeout, read timeout) tuple.
+        host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
+            the only node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to target a different cluster member.
 
     Returns:
         requests.Response: Response returned by ODL for PUT call.
@@ -463,6 +504,7 @@ def put_templated_request(
         data=data,
         expected_code=expected_code,
         http_timeout=http_timeout,
+        host=host,
     )
 
     if verify:
@@ -495,6 +537,7 @@ def post_templated_request(
     verify: bool = False,
     expected_code: int | List[int] | None = None,
     http_timeout: float | tuple[float, float] | None = None,
+    host: str = ODL_IP,
 ) -> requests.Response:
     """Evaluates and sends POST request using template file.
 
@@ -516,6 +559,9 @@ def post_templated_request(
         http_timeout (float | tuple[float, float] | None): How many seconds to wait for
             the server to send data before giving up. Can be a single float or a
             (connect timeout, read timeout) tuple.
+        host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
+            the only node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to target a different cluster member.
 
 
     Returns:
@@ -539,6 +585,7 @@ def post_templated_request(
         data=data,
         expected_code=expected_code,
         http_timeout=http_timeout,
+        host=host,
     )
 
     if verify:
@@ -571,6 +618,7 @@ def post_as_json_rfc8040_templated(
     verify: bool = False,
     expected_code: int | List[int] | None = None,
     http_timeout: float | tuple[float, float] | None = None,
+    host: str = ODL_IP,
 ) -> requests.Response:
     """Evaluates and sends POST request using template file.
 
@@ -592,6 +640,9 @@ def post_as_json_rfc8040_templated(
         http_timeout (float | tuple[float, float] | None): How many seconds to wait for
             the server to send data before giving up. Can be a single float or a
             (connect timeout, read timeout) tuple.
+        host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
+            the only node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to target a different cluster member.
 
 
     Returns:
@@ -610,6 +661,7 @@ def post_as_json_rfc8040_templated(
         data=data,
         expected_code=expected_code,
         http_timeout=http_timeout,
+        host=host,
     )
 
     if verify:
@@ -639,6 +691,7 @@ def delete_templated_request(
     mapping: dict,
     expected_code: int | List[int] | None = None,
     http_timeout: float | tuple[float, float] | None = None,
+    host: str = ODL_IP,
 ) -> requests.Response:
     """Evaluates and sends DELETE request using template file.
 
@@ -656,13 +709,16 @@ def delete_templated_request(
         http_timeout (float | tuple[float, float] | None): How many seconds to wait for
             the server to send data before giving up. Can be a single float or a
             (connect timeout, read timeout) tuple.
+        host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
+            the only node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to target a different cluster member.
 
     Returns:
         requests.Response: Response returned by ODL for DELETE call.
     """
     uri = resolve_templated_text(template_dir + "/location.uri", mapping)
     response = delete_from_uri_request(
-        uri=uri, expected_code=expected_code, http_timeout=http_timeout
+        uri=uri, expected_code=expected_code, http_timeout=http_timeout, host=host
     )
 
     return response
@@ -699,6 +755,7 @@ def get_jinja_templated_request(
     verify: bool = False,
     expected_code: int | List[int] | None = None,
     http_timeout: float | tuple[float, float] | None = None,
+    host: str = ODL_IP,
 ) -> requests.Response:
     """Sends GET request and verifies response using jinja template file.
 
@@ -717,6 +774,9 @@ def get_jinja_templated_request(
         http_timeout (float | tuple[float, float] | None): How many seconds to wait for
             the server to send data before giving up. Can be a single float or a
             (connect timeout, read timeout) tuple.
+        host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
+            the only node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to target a different cluster member.
 
     Returns:
         requests.Response: Response returned by ODL for GET call.
@@ -727,7 +787,11 @@ def get_jinja_templated_request(
         headers = {"Accept": "application/yang-data+xml"}
     uri = resolve_templated_text(template_dir + "/location.uri", mapping)
     response = get_from_uri(
-        uri=uri, headers=headers, expected_code=expected_code, http_timeout=http_timeout
+        uri=uri,
+        headers=headers,
+        expected_code=expected_code,
+        http_timeout=http_timeout,
+        host=host,
     )
 
     if verify:
