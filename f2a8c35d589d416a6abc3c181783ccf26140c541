@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d3139f3_4f87b316",
+        "filename": "tests/libraries/TopologyNetconfNodes.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-14T10:20:55Z",
+      "side": 1,
+      "message": "Is device_port always a int?",
+      "revId": "f2a8c35d589d416a6abc3c181783ccf26140c541",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ecd4c90b_4310b8f8",
+        "filename": "tests/libraries/TopologyNetconfNodes.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-14T10:20:55Z",
+      "side": 1,
+      "message": "can this fail if we have high number of devices? like 65535?",
+      "revId": "f2a8c35d589d416a6abc3c181783ccf26140c541",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
