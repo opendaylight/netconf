@@ -16,6 +16,24 @@
       "message": "There is no more NETCONF_CONNECTOR feature in NETCONF? What\u0027s the difference when this is \"enabled\"? Can we just remove it?",
       "revId": "93846b3a5fff91ce59db901d9514e657e394000b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53c55a0f_0c0894aa",
+        "filename": "tests/suites/getsingle/test_getsingle.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-07-14T11:41:41Z",
+      "side": 1,
+      "message": "Done - removed the dead flag.\n\nFollow-up question: I included this because I was using other things already in the project as reference when writing my code - hence this same dead flag is present in multiple other places. Specifically:\n\n\u003e tests/suites/getsingle/test_getsingle.py (already removed)\n\u003e tests/suites/getmulti/test_getmulti.py\n\u003e tests/suites/restperfclient/test_performance.py\n\u003e tests/suites/restperfclient/test_mdsal.py\n\u003e tests/suites/CRUD/test_crud.py\n\u003e tests/suites/CRUD-ACTION/test_crud_action.py\n\u003e tests/suites/ready/test_netconf_ready.py\n\u003e tests/suites/KeyAuth/test_keyauth.py\n\u003e tests/libraries/variables.py (the field definition)\n\nSo should a new separate follow-up change be created where all of these occurences are addressed (removed)?\n\n(Note: getmulti and performance are already merged, so the follow-up would touch merged code)",
+      "parentUuid": "c47cb693_1f1b4933",
+      "revId": "93846b3a5fff91ce59db901d9514e657e394000b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
