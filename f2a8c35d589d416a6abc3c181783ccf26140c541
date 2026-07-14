@@ -33,6 +33,42 @@
       "message": "can this fail if we have high number of devices? like 65535?",
       "revId": "f2a8c35d589d416a6abc3c181783ccf26140c541",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15e3a505_b5026a48",
+        "filename": "tests/libraries/TopologyNetconfNodes.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-07-14T14:00:18Z",
+      "side": 1,
+      "message": "It is not settable to any other value, then what is hardcoded to int `17830`",
+      "parentUuid": "2d3139f3_4f87b316",
+      "revId": "f2a8c35d589d416a6abc3c181783ccf26140c541",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "785a4b87_2fe8d0d0",
+        "filename": "tests/libraries/TopologyNetconfNodes.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-07-14T14:00:18Z",
+      "side": 1,
+      "message": "Added validation for max TCP port number. https://git.opendaylight.org/gerrit/c/netconf/+/123856/2/tests/libraries/TopologyNetconfNodes.py#277",
+      "parentUuid": "ecd4c90b_4310b8f8",
+      "revId": "f2a8c35d589d416a6abc3c181783ccf26140c541",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
