@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "18a0ee22_505aa82f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-14T08:25:59Z",
+      "side": 1,
+      "message": "Forwarded: for\u003d192.0.2.60;proto\u003dhttps, for\u003d203.0.113.43;proto\u003dhttp;by\u003d10.0.0.1\n\nTo resolve NETCONF-1648 (\"OpenAPI: Wrong scheme behind proxy\"), where OpenDaylight (ODL) is running behind a proxy and serving OpenAPI (Swagger UI) definitions, you must use the leftmost proto value, which is https.",
+      "revId": "4e2d07c5e4484b8671ffef90eb16ae83a177be0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4a7249c8_c0809139",
         "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
         "patchSetId": 11
