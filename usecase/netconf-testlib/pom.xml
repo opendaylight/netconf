@@ -25,32 +25,115 @@
              consumed by other projects (e.g. bgpcep), so it must actually deploy. -->
         <maven.deploy.skip>false</maven.deploy.skip>
         <maven.install.skip>false</maven.install.skip>
+        <controller.version>14.0.0-SNAPSHOT</controller.version>
+        <skip.importCheck>false</skip.importCheck>
     </properties>
+
+    <!-- controller-testlib is published to a locally running Nexus 3 instance rather than
+         nexus.opendaylight.org; needed here so the import-check below (which needs
+         controller_testlib importable) can resolve it. -->
+    <repositories>
+        <repository>
+            <id>nexus-local-releases</id>
+            <url>http://localhost:8081/repository/maven-releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>nexus-local-snapshots</id>
+            <url>http://localhost:8081/repository/maven-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <build>
         <resources>
             <resource>
                 <!-- Only the modules actually consumed by the pytest suites in ../../tests/suites
                      are included here. AuthStandalone.py, ClusterEntities.py, excepts.py,
-                     TopologyNetconfNodes.py and UtilLibrary.py are legacy/unused and stay out. -->
+                     TopologyNetconfNodes.py and UtilLibrary.py are legacy/unused and stay out.
+                     infra.py, KarafShell.py, norm_json.py and ssh_utils.py are NOT netconf's own:
+                     they live only in controller-testlib now (this jar's own internal modules
+                     import them from there), so they are deliberately left out here to avoid
+                     shipping the same file under two different package names. -->
                 <directory>${project.basedir}/../../tests/libraries</directory>
                 <targetPath>netconf_testlib</targetPath>
                 <includes>
-                    <include>infra.py</include>
-                    <include>KarafShell.py</include>
+                    <!-- Makes the unpacked directory a regular package rather than an implicit
+                         namespace package, so it always wins over any other "netconf_testlib"
+                         that might happen to be importable (e.g. a stale pip-installed wheel)
+                         instead of losing to it based on sys.path order. -->
+                    <include>__init__.py</include>
                     <include>NetconfCallHome.py</include>
                     <include>netconf.py</include>
                     <include>NetconfSSH.py</include>
-                    <include>norm_json.py</include>
                     <include>restconf.py</include>
                     <include>restconf_utils.py</include>
                     <include>rest_perf_client.py</include>
-                    <include>ssh_utils.py</include>
                     <include>templated_requests.py</include>
                     <include>utils.py</include>
                     <include>variables.py</include>
                 </includes>
             </resource>
         </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!-- Needed so the import-check below (which imports this module's own
+                             just-built netconf_testlib content) can also resolve
+                             controller_testlib, exactly like a real downstream consumer would. -->
+                        <id>unpack-controller-testlib-for-import-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.opendaylight.controller</groupId>
+                                    <artifactId>controller-testlib</artifactId>
+                                    <version>${controller.version}</version>
+                                    <includes>controller_testlib/**</includes>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.basedir}/../../tests</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>import-check-netconf-testlib</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skip.importCheck}</skip>
+                            <executable>tox</executable>
+                            <commandlineArgs>
+                                -e import-check -- ${project.build.outputDirectory} netconf_testlib
+                            </commandlineArgs>
+                            <workingDirectory>${project.basedir}/../../tests</workingDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 </project>

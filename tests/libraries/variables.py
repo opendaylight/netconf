@@ -9,23 +9,27 @@
 #
 
 from typing import ClassVar
-from pydantic_settings import BaseSettings
+
+from controller_testlib.variables import ControllerVariables
 
 
-class Variables(BaseSettings):
+class Variables(ControllerVariables):
     """
     Defines all global test settings, which can be overridden by environment
     variables.
     """
 
-    ODL_IP: str = "127.0.0.1"
-    ODL_USER: str = "admin"
-    ODL_PASSWORD: str = "admin"
     RESTCONF_PORT: int = 8182
     RESTCONF_ROOT: str = "restconf"
-    REST_API: str = f"{RESTCONF_ROOT}/data"
-    TOOLS_IP: str = "127.0.1.0"
-    KARAF_LOG_LEVEL: str = "INFO"
+    ODL_FEATURES: ClassVar[list[str]] = [
+        "odl-infrautils-ready",
+        "odl-restconf-nb",
+        "odl-netconf-mdsal",
+        "odl-restconf-openapi",
+        "odl-clustering-test-app",
+        "odl-netconf-topology",
+        "odl-netconf-callhome-ssh",
+    ]
     HEADERS: ClassVar[dict] = {"Content-Type": "application/json"}
     HEADERS_YANG_RFC8040_JSON: ClassVar[dict] = {
         "Content-Type": "application/yang-data+json"

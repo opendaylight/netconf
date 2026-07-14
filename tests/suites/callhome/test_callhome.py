@@ -15,7 +15,7 @@ import textwrap
 import allure
 import pytest
 
-from libraries import infra
+from controller_testlib import infra
 from libraries import NetconfCallHome
 from libraries import restconf_utils
 from libraries import templated_requests

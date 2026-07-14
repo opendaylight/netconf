@@ -14,12 +14,13 @@ import subprocess
 import math
 import re
 
-from . import infra
+from controller_testlib import infra
+
 from . import restconf
 from . import restconf_utils
 from . import templated_requests
 from . import utils
-from .variables import variables
+from libraries.variables import variables
 
 MAX_HEAP = "1G"
 TESTTOOL_DEFAULT_JAVA_OPTIONS = (

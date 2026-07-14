@@ -8,7 +8,7 @@
 
 import logging
 
-from .variables import variables
+from libraries.variables import variables
 
 log = logging.getLogger(__name__)
 

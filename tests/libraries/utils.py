@@ -17,8 +17,9 @@ import allure
 import difflib
 import xml.dom.minidom
 
-from . import norm_json
-from .variables import variables
+from controller_testlib import norm_json
+
+from libraries.variables import variables
 
 MAX_VISUAL_DIFF_LOG_SIZE = variables.MAX_VISUAL_DIFF_LOG_SIZE
 

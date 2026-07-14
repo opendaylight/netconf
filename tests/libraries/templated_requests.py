@@ -15,9 +15,10 @@ from xml.dom import minidom
 
 import requests
 
-from . import norm_json
+from controller_testlib import norm_json
+
 from . import utils
-from .variables import variables
+from libraries.variables import variables
 
 ODL_IP = variables.ODL_IP
 RESTCONF_PORT = variables.RESTCONF_PORT

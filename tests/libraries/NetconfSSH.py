@@ -9,7 +9,7 @@
 import logging
 import time
 
-from . import ssh_utils
+from controller_testlib import ssh_utils
 
 log = logging.getLogger(__name__)
 

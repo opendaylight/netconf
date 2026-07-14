@@ -15,7 +15,7 @@ import textwrap
 import allure
 import pytest
 
-from libraries import infra
+from controller_testlib import infra
 from libraries import netconf
 from libraries import rest_perf_client
 from libraries import templated_requests

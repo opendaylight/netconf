@@ -9,10 +9,11 @@
 import logging
 
 
-from . import infra
+from controller_testlib import infra
+
 from . import restconf_utils
 from . import templated_requests
-from .variables import variables
+from libraries.variables import variables
 
 HEADERS = variables.HEADERS
 DEVICE_STATUS = (
