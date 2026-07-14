@@ -35,6 +35,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee5aac49_dfcb6830",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-07-14T14:49:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "18a0ee22_505aa82f",
+      "revId": "4e2d07c5e4484b8671ffef90eb16ae83a177be0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "60048cbb_9ffd41dd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-07-14T14:49:43Z",
+      "side": 1,
+      "message": "Adapted it so for RFC 7239 forwarded header only firs element is searched.\nalso added test case for this\n\nX-Forwarded-Proto is now treated as list and only first element is taken\nalso added test cases",
+      "parentUuid": "5aebd756_ef21814c",
+      "revId": "4e2d07c5e4484b8671ffef90eb16ae83a177be0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4a7249c8_c0809139",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-07-13T07:46:03Z",
       "side": 1,
       "message": "why do we need forwarded header?",
+      "revId": "4e2d07c5e4484b8671ffef90eb16ae83a177be0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9035e822_6931365e",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-07-14T14:49:43Z",
+      "side": 1,
+      "message": "we are checking first for RFC 7239 \"Forwarded\" header and then legacy  X-Forwarded-Proto header",
+      "parentUuid": "4a7249c8_c0809139",
       "revId": "4e2d07c5e4484b8671ffef90eb16ae83a177be0e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e2c05d9_6268ab30",
+        "filename": "protocol/restconf-openapi-common/src/test/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGeneratorTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-07-14T14:49:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5236833f_cad51ead",
+      "revId": "4e2d07c5e4484b8671ffef90eb16ae83a177be0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cb99660d_cc5b177d",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-07-14T08:20:47Z",
       "side": 1,
       "message": "do we have test what happens when we have:\n\n```\nForwarded: for\u003d192.0.2.60;proto\u003dhttps, for\u003d203.0.113.43;proto\u003dhttp;by\u003d10.0.0.1\n```",
+      "revId": "4e2d07c5e4484b8671ffef90eb16ae83a177be0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b537745b_a58f940d",
+        "filename": "protocol/restconf-openapi-common/src/test/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGeneratorTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-07-14T14:49:43Z",
+      "side": 1,
+      "message": "different proto in multiple elements is covered by:\n            Arguments.of(HTTPS, uriHttp, \"for\u003d192.168.1.1;proto\u003dhttps, for\u003d192.168.1.2;proto\u003dhttp\", null),\n            Arguments.of(HTTP, uriHttps, \"for\u003d192.168.1.1;proto\u003dhttp, for\u003d192.168.1.2;proto\u003dhttps\", null),\n\nto confirm first element\u0027s proto is used",
+      "parentUuid": "cb99660d_cc5b177d",
       "revId": "4e2d07c5e4484b8671ffef90eb16ae83a177be0e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
