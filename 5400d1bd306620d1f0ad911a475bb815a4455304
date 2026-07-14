@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9548a734_cbf638c4",
+        "filename": "protocol/restconf-server-jaxrs/src/main/java/org/opendaylight/restconf/server/jaxrs/JaxRsServerRequest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-14T14:43:20Z",
+      "side": 1,
+      "message": "ar.resume() here and below swallow exceptions.. no propagation, no logging",
+      "revId": "5400d1bd306620d1f0ad911a475bb815a4455304",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d96cc164_91ee5b3f",
+        "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/AbstractRestconfTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-14T14:43:20Z",
+      "side": 1,
+      "message": "consider making this literal into a shared constant, as it is defined even in Netconf799Test",
+      "revId": "5400d1bd306620d1f0ad911a475bb815a4455304",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "294f4894_c9f58365",
+        "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/Netconf799Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-07-14T14:43:20Z",
+      "side": 1,
+      "message": "The stubbing here is unnecessary, as the return value of resume() is never used anyway: RESUME_EXECUTOR.execute(() -\u003e ar.resume(response));",
+      "revId": "5400d1bd306620d1f0ad911a475bb815a4455304",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
