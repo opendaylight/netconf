@@ -30,3 +30,4 @@ class SuiteOrder(IntEnum):
     GETMULTI = auto()
     GETSINGLE = auto()
     SCALE_MAX_DEVICES = auto()
+    CLUSTERING_CRUD = auto()

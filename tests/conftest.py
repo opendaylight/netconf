@@ -208,11 +208,8 @@ def odl_three_node_cluster():
     odl_three_node_cluster_features = [
         "odl-infrautils-ready",
         "odl-restconf-nb",
-        "odl-netconf-mdsal",
-        "odl-restconf-openapi",
-        "odl-clustering-test-app",
         "odl-netconf-clustered-topology",
-        "odl-netconf-callhome-ssh",
+        "odl-jolokia",
     ]
     cluster.start_cluster(odl_three_node_cluster_features)
     cluster.wait_cluter_ready(timeout=600)
