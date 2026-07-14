@@ -33,6 +33,23 @@
       "message": "add javadoc describing test",
       "revId": "4e2d07c5e4484b8671ffef90eb16ae83a177be0e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb99660d_cc5b177d",
+        "filename": "protocol/restconf-openapi-common/src/test/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGeneratorTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-14T08:20:47Z",
+      "side": 1,
+      "message": "do we have test what happens when we have:\n\n```\nForwarded: for\u003d192.0.2.60;proto\u003dhttps, for\u003d203.0.113.43;proto\u003dhttp;by\u003d10.0.0.1\n```",
+      "revId": "4e2d07c5e4484b8671ffef90eb16ae83a177be0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
