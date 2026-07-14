@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5aebd756_ef21814c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-14T08:25:22Z",
+      "side": 1,
+      "message": "To ensure the OpenAPI servlet correctly determines the URL scheme behind a reverse proxy, the ODL RESTCONF-OpenAPI servlet needs to evaluate the headers in this priority order:\n\nCheck standard RFC 7239 Forwarded:\n\nIt should parse the first comma-separated element in the list: for\u003d192.0.2.60;proto\u003dhttps.\n\nExtract the proto value (which is https).\n\nFallback to legacy X-Forwarded-Proto:\n\nIf the standard header is absent, parse X-Forwarded-Proto. Since proxies often write comma-separated lists here too (e.g., https, http), it should select the first (leftmost) entry.\n\nLocal Scheme Fallback:\n\nIf neither header exists, default to the servlet request\u0027s local scheme (request.getScheme()).",
+      "revId": "4e2d07c5e4484b8671ffef90eb16ae83a177be0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4a7249c8_c0809139",
         "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
         "patchSetId": 11
