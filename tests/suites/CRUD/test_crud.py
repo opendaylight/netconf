@@ -76,7 +76,7 @@ class TestCrud:
         else:
             assert expected == data
 
-    def count_netconf_connectors(self):
+    def verify_single_netconf_connector(self):
         """Verifies that exactly one Netconf connector exists for the test device.
 
         It is expected, that only single testtool device is connected to the ODL.
@@ -149,7 +149,7 @@ class TestCrud:
         ):
             # Get the list of configured devices and search for our device there.
             # Fail if not found.
-            utils.wait_until_function_pass(5, 1, self.count_netconf_connectors)
+            utils.wait_until_function_pass(5, 1, self.verify_single_netconf_connector)
 
         with allure_step_with_separate_logging(
             "step_wait_for_device_to_become_connected"
