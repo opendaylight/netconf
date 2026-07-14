@@ -16,6 +16,23 @@
       "message": "addressed comment about unused flag in code;",
       "revId": "1422cbcaee31308beadcc618b76cf75c2d0290ef",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23395e34_79a878f3",
+        "filename": "tests/suites/getsingle/test_getsingle.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-14T12:41:27Z",
+      "side": 1,
+      "message": "can we remove DEVICE_TYPE?",
+      "revId": "1422cbcaee31308beadcc618b76cf75c2d0290ef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
