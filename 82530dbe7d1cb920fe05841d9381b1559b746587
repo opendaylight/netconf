@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77abb0c3_a34d6240",
+        "filename": "tests/libraries/variables.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-15T06:23:11Z",
+      "side": 1,
+      "message": "why not 8?",
+      "revId": "82530dbe7d1cb920fe05841d9381b1559b746587",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
