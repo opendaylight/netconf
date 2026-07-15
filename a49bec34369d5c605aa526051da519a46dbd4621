@@ -33,6 +33,24 @@
       "message": "unexplained change",
       "revId": "a49bec34369d5c605aa526051da519a46dbd4621",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7be5b11a_6a53c498",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-07-15T13:16:39Z",
+      "side": 1,
+      "message": "Explained in commite message `Increase max heap space for tetsttool so it would allign with value used in jenkins jobs for max devices scale tests.`",
+      "parentUuid": "753b0323_cd63397d",
+      "revId": "a49bec34369d5c605aa526051da519a46dbd4621",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
