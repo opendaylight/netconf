@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd72d471_dc2e9da5",
+        "filename": "protocol/restconf-server-jaxrs/src/main/java/org/opendaylight/restconf/server/jaxrs/JaxRsServerRequest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-07-15T09:37:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9548a734_cbf638c4",
+      "revId": "5400d1bd306620d1f0ad911a475bb815a4455304",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d96cc164_91ee5b3f",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "06b55c85_cd732cb3",
+        "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/AbstractRestconfTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-07-15T09:37:32Z",
+      "side": 1,
+      "message": "doesn\u0027t seem like common practice, and it\u0027s only 2 uses over 2 classes",
+      "parentUuid": "d96cc164_91ee5b3f",
+      "revId": "5400d1bd306620d1f0ad911a475bb815a4455304",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "294f4894_c9f58365",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-07-14T14:43:20Z",
       "side": 1,
       "message": "The stubbing here is unnecessary, as the return value of resume() is never used anyway: RESUME_EXECUTOR.execute(() -\u003e ar.resume(response));",
+      "revId": "5400d1bd306620d1f0ad911a475bb815a4455304",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47471190_d7de3e1c",
+        "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/Netconf799Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-07-15T09:37:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "294f4894_c9f58365",
       "revId": "5400d1bd306620d1f0ad911a475bb815a4455304",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
