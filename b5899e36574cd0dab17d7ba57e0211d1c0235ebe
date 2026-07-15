@@ -16,6 +16,24 @@
       "message": "can we document it?",
       "revId": "b5899e36574cd0dab17d7ba57e0211d1c0235ebe",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2886aa1a_223ddc9e",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-07-15T13:17:30Z",
+      "side": 1,
+      "message": "Added comment in docstring \n`Default value for timeout is 45 minutes (45 * 60 seconds)`\nand also it is mentioned in commit message",
+      "parentUuid": "86d4f008_b0098f36",
+      "revId": "b5899e36574cd0dab17d7ba57e0211d1c0235ebe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
