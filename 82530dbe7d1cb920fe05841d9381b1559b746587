@@ -16,6 +16,24 @@
       "message": "why not 8?",
       "revId": "82530dbe7d1cb920fe05841d9381b1559b746587",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ec1b799_59eaab97",
+        "filename": "tests/libraries/variables.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-07-15T13:17:39Z",
+      "side": 1,
+      "message": "In original jenkins job for scale max devices it was set to 12G https://github.com/opendaylight/releng-builder/blob/master/jjb/netconf/netconf-scale.yaml#L83",
+      "parentUuid": "77abb0c3_a34d6240",
+      "revId": "82530dbe7d1cb920fe05841d9381b1559b746587",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
