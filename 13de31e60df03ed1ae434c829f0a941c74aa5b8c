@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "020cd64b_4ce6f69b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 14
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-07-15T08:42:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b2ac4df7_8de75bc6",
+      "revId": "13de31e60df03ed1ae434c829f0a941c74aa5b8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3228cf07_123c44e6",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-15T06:12:13Z",
       "side": 1,
       "message": "trim? can it fail when there are no elements after split?",
+      "revId": "13de31e60df03ed1ae434c829f0a941c74aa5b8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05870304_f34f145f",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-07-15T08:42:37Z",
+      "side": 1,
+      "message": "even if its empty it will return at leas one empty element\n\ntrim - not necessary here, unlike in X-Forwarded-Proto header where whole first element becomes the scheme, here we use matcher.find() which will find \"proto\u003d\" inside that element no matter how many whitespaces is around that element.",
+      "parentUuid": "3228cf07_123c44e6",
       "revId": "13de31e60df03ed1ae434c829f0a941c74aa5b8c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
