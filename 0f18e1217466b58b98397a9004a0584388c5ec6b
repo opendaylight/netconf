@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8940c2aa_456c7038",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-15T06:38:14Z",
+      "side": 1,
+      "message": "you can contact each node in a working cluster, why do we need this patch? document in commit messgae",
+      "revId": "0f18e1217466b58b98397a9004a0584388c5ec6b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
