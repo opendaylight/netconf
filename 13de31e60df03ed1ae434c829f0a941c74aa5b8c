@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2ac4df7_8de75bc6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 14
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-15T06:12:13Z",
+      "side": 1,
+      "message": "Assisted-by:?",
+      "revId": "13de31e60df03ed1ae434c829f0a941c74aa5b8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3228cf07_123c44e6",
+        "filename": "protocol/restconf-openapi-common/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-15T06:12:13Z",
+      "side": 1,
+      "message": "trim? can it fail when there are no elements after split?",
+      "revId": "13de31e60df03ed1ae434c829f0a941c74aa5b8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6640a61_b3a925ec",
+        "filename": "protocol/restconf-openapi-common/src/test/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGeneratorTest.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-15T06:12:13Z",
+      "side": 1,
+      "message": "what\u0027s the separator `,` or `;`?",
+      "revId": "13de31e60df03ed1ae434c829f0a941c74aa5b8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
