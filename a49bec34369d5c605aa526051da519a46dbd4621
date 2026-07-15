@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "a49bec34369d5c605aa526051da519a46dbd4621",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "753b0323_cd63397d",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-15T06:19:04Z",
+      "side": 1,
+      "message": "unexplained change",
+      "revId": "a49bec34369d5c605aa526051da519a46dbd4621",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
