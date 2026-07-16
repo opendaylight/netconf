@@ -138,20 +138,27 @@ public abstract class BaseYangOpenApiGenerator {
             final var firstElement = forwardedHeader.split(",", 2)[0];
             final var matcher = FORWARDED_PROTO_PATTERN.matcher(firstElement);
             if (matcher.find()) {
-                return matcher.group(1).toLowerCase(Locale.ROOT);
+                final var proto = matcher.group(1).toLowerCase(Locale.ROOT);
+                if (isSupportedScheme(proto)) {
+                    return proto;
+                }
             }
         }
 
         // X-Forwarded-Proto header
         if (forwardedProtoHeader != null) {
-            final var firstProto = forwardedProtoHeader.split(",", 2)[0].trim();
-            if (!firstProto.isEmpty()) {
-                return firstProto.toLowerCase(Locale.ROOT);
+            final var firstProto = forwardedProtoHeader.split(",", 2)[0].trim().toLowerCase(Locale.ROOT);
+            if (isSupportedScheme(firstProto)) {
+                return firstProto;
             }
         }
 
         // Scheme from URI
         return uri.getScheme();
+    }
+
+    private static boolean isSupportedScheme(final String scheme) {
+        return "http".equals(scheme) || "https".equals(scheme);
     }
 
     public static List<Module> getModulesWithoutDuplications(final @NonNull EffectiveModelContext modelContext) {
