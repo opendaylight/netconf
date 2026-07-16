@@ -32,6 +32,8 @@ class BaseYangOpenApiGeneratorTest {
      * comma-separated element of the RFC 7239 {@code Forwarded} header wins if it carries a {@code proto} value,
      * otherwise the leftmost entry of the legacy {@code X-Forwarded-Proto} header is used, otherwise the request
      * URI's own scheme is used. A {@code proto} present only in a later {@code Forwarded} element is ignored.
+     * Only {@code http} and {@code https} are accepted from the headers; any other value is ignored and resolution
+     * falls through to the next source.
      */
     @ParameterizedTest
     @MethodSource("proxyHeaders")
@@ -82,6 +84,12 @@ class BaseYangOpenApiGeneratorTest {
 
             // Malformed X-Forwarded-Proto header falls back to the URI scheme
             Arguments.of(HTTP, uriHttp, null, ",https"),
+
+            // Schemes other than http/https are not accepted, resolution falls through to the next source
+            Arguments.of(HTTP, uriHttp, "proto=ftp", null),
+            Arguments.of(HTTPS, uriHttp, "proto=ftp", HTTPS),
+            Arguments.of(HTTP, uriHttp, null, "javascript"),
+            Arguments.of(HTTP, uriHttp, null, "\"><img src=x"),
 
             // X-Forwarded-Proto header
             Arguments.of(HTTPS, uriHttp, null, HTTPS),
