@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "05e443a4_70b1ca23",
+        "filename": "tests/conftest.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-07-16T06:14:32Z",
+      "side": 1,
+      "message": "update the docstring",
+      "parentUuid": "912a2ed6_e9e9667d",
+      "revId": "b3a110f869fa8834e17d52b1374434bfc1c486cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5c60417e_d900bfd1",
@@ -54,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "af30a7bc_b6a42844",
+        "filename": "tests/conftest.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-07-16T06:14:32Z",
+      "side": 1,
+      "message": "There is `and` because if **not** both are set, then it is ok and no need to change anything. The problem is if both are set, then should skip clustering tests.",
+      "parentUuid": "5c60417e_d900bfd1",
+      "revId": "b3a110f869fa8834e17d52b1374434bfc1c486cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0fc09b8e_3f40b8f2",
         "filename": "tests/libraries/cluster.py",
         "patchSetId": 6
@@ -65,6 +101,24 @@
       "writtenOn": "2026-07-15T06:36:10Z",
       "side": 1,
       "message": "IMO we do not have any sal-clustering config, we have just https://github.com/opendaylight/controller/tree/master/opendaylight/md-sal/sal-clustering-config/src/main/resources/initial",
+      "revId": "b3a110f869fa8834e17d52b1374434bfc1c486cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2932445b_865b46a7",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-07-16T06:14:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0fc09b8e_3f40b8f2",
       "revId": "b3a110f869fa8834e17d52b1374434bfc1c486cb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
