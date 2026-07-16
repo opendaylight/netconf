@@ -52,6 +52,24 @@
       "parentUuid": "53c55a0f_0c0894aa",
       "revId": "93846b3a5fff91ce59db901d9514e657e394000b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7c5e904_a55532d1",
+        "filename": "tests/suites/getsingle/test_getsingle.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-07-16T08:02:53Z",
+      "side": 1,
+      "message": "Done - dead flag touching getsingle removed here, additional clean-up in a separate change.",
+      "parentUuid": "629c8ac3_ba61aacf",
+      "revId": "93846b3a5fff91ce59db901d9514e657e394000b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
