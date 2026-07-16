@@ -16,6 +16,24 @@
       "message": "timeout(1000) returns as soon as the call is seen, so this passes identically for a synchronous ar.resume(), reverting JaxRsServerRequest would bring back with a green suite. Could we record Thread.currentThread() in a doAnswer() and assert isVirtual(), so the invariant the patch exists for is actually pinned?",
       "revId": "b82a8014d39a7666aeb37f23e55d3f08f1c52300",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0f87eb1_1da7e67f",
+        "filename": "protocol/restconf-server-jaxrs/src/test/java/org/opendaylight/restconf/server/jaxrs/AbstractRestconfTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-16T07:25:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d568594_896720fa",
+      "revId": "b82a8014d39a7666aeb37f23e55d3f08f1c52300",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
