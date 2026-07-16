@@ -108,6 +108,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "03fe3547_2c9589ed",
+        "filename": "tests/conftest.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-07-16T08:09:32Z",
+      "side": 1,
+      "message": "It would evaluate this condition as true and return\n\n`\u003e\u003e\u003e if not (None and None):`\n`...     print(1)`\n`... else:`\n`...     print(2)`\n`... `\n`1`",
+      "parentUuid": "8974cdf0_69175f29",
+      "revId": "b3a110f869fa8834e17d52b1374434bfc1c486cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0fc09b8e_3f40b8f2",
         "filename": "tests/libraries/cluster.py",
         "patchSetId": 6
