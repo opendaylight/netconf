@@ -14,7 +14,6 @@ import static org.opendaylight.netconf.transport.http.HTTPTransportStack.MAX_HTT
 import com.google.common.util.concurrent.FutureCallback;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpContentDecompressor;
@@ -23,7 +22,7 @@ import io.netty.handler.codec.http2.Http2StreamChannel;
 import io.netty.handler.codec.http2.Http2StreamChannelBootstrap;
 import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
-import java.nio.channels.ClosedChannelException;
+import java.io.IOException;
 import java.util.Locale;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
@@ -59,10 +58,10 @@ public final class ClientHttp2Session extends ClientSession {
             final @NonNull FutureCallback<FullHttpResponse> callback) {
         bootstrap.open().addListener(future -> {
             if (!future.isSuccess()) {
-                LOG.error("Failed to open HTTP/2 stream for request {}", request.uri(), future.cause());
                 // Prevent memory leak if stream creation fails
                 request.release();
-                callback.onFailure(future.cause());
+                callback.onFailure(
+                    new IOException("Failed to open HTTP/2 stream for request " + request.uri(), future.cause()));
                 return;
             }
 
@@ -79,49 +78,13 @@ public final class ClientHttp2Session extends ClientSession {
                 }
             }
             streamChannel.pipeline().addLast(new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));
-            addChannelHandler(streamChannel, callback);
+            streamChannel.pipeline().addLast(new SingleResponseHandler(callback));
             streamChannel.writeAndFlush(request).addListener(writeFuture -> {
                 if (!writeFuture.isSuccess()) {
                     LOG.error("Failed to write request to HTTP/2 stream {}", streamChannel.id(), writeFuture.cause());
                     streamChannel.pipeline().fireExceptionCaught(writeFuture.cause());
                 }
             });
-        });
-    }
-
-    private void addChannelHandler(final @NonNull Http2StreamChannel streamChannel,
-            final @NonNull FutureCallback<FullHttpResponse> callback) {
-        streamChannel.pipeline().addLast(new SimpleChannelInboundHandler<FullHttpResponse>() {
-            private boolean completed = false;
-
-            @Override
-            protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpResponse response) {
-                if (!completed) {
-                    completed = true;
-                    LOG.debug("Received HTTP/2 response {} on stream {}", response.status(), streamChannel.id());
-                    callback.onSuccess(response);
-                }
-            }
-
-            @Override
-            public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
-                if (!completed) {
-                    completed = true;
-                    LOG.warn("Exception caught during HTTP/2 request on stream {}", streamChannel.id(), cause);
-                    callback.onFailure(cause);
-                }
-                ctx.close();
-            }
-
-            @Override
-            public void channelInactive(final ChannelHandlerContext ctx) {
-                if (!completed) {
-                    completed = true;
-                    LOG.debug("HTTP/2 stream {} closed by remote peer", streamChannel.id());
-                    callback.onFailure(new ClosedChannelException());
-                }
-                ctx.fireChannelInactive();
-            }
         });
     }
 
