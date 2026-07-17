@@ -113,7 +113,7 @@ public abstract class AbstractTransportStack<C extends TransportChannel> impleme
         return helper.add("listener", listener).add("state", state);
     }
 
-    protected static final @NonNull ListenableFuture<Empty> toListenableFuture(final Future<?> nettyFuture) {
+    public static final @NonNull ListenableFuture<Empty> toListenableFuture(final Future<?> nettyFuture) {
         final var ret = SettableFuture.<Empty>create();
         nettyFuture.addListener(future -> {
             final var cause = future.cause();
