@@ -1,0 +1,90 @@
+module odl-http-client {
+  yang-version 1.1;
+  namespace "urn:opendaylight:yang:http:client";
+  prefix "ohc";
+
+  description
+    "OpenDaylight configuration model for HTTP clients.
+
+     Copyright (c) 2026 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+
+     This program and the accompanying materials are made available under the
+     terms of the Eclipse Public License v1.0 which accompanies this distribution,
+     and is available at http://www.eclipse.org/legal/epl-v10.html";
+
+  revision "2026-07-17" {
+    description "Initial revision";
+  }
+
+  import ietf-http-client {
+    prefix httpc;
+  }
+
+  import ietf-udp-client {
+    prefix udpc;
+  }
+
+  import ietf-tls-client {
+    prefix tlsc;
+  }
+
+  import odl-codegen-extensions {
+    prefix oce;
+  }
+
+  import odl-quic-common {
+    prefix oqc;
+  }
+
+  feature quic-supported {
+    description
+      "Indicates that the server supports configuring HTTP/3
+       clients to initiate connections over QUIC.";
+    reference
+      "RFC 9114: HTTP/3";
+  }
+
+  grouping http3-client-grouping {
+    description
+      "Extends http-client-stack-grouping with a QUIC-based HTTP/3
+       transport case. The case mirrors the shape published in
+       draft-ietf-netconf-http-client-server-18, adapted to the
+       ietf-udp-client revision available here and extended with
+       QUIC-level transport parameters.";
+
+    uses httpc:http-client-stack-grouping {
+      augment transport {
+        oce:augment-identifier quic-under-http;
+
+        case quic {
+          if-feature quic-supported;
+
+          container quic {
+            description
+              "Container for the QUIC-based HTTP/3 protocols.";
+            container udp-client-parameters {
+              description
+                "UDP client parameters.";
+              uses udpc:udp-client;
+            }
+            container tls-client-parameters {
+              description
+                "TLS client parameters.";
+              uses tlsc:tls-client-grouping;
+            }
+            container http-client-parameters {
+              description
+                "HTTP client parameters.";
+              uses httpc:http-client-grouping;
+            }
+            container quic-client-parameters {
+              description
+                "QUIC-level client parameters.";
+              uses oqc:transport-params-grouping;
+            }
+          }
+        }
+      }
+    }
+  }
+}
