@@ -112,7 +112,7 @@ class MdsalDomBrokerTest {
         final var modelContext = component.modelContext();
         final var classPathModels = modelContext.getModules();
         assertThat(classPathModels)
-            .hasSize(65)
+            .hasSize(66)
             .extracting(ModuleLike::getSourceIdentifier)
             .extracting(SourceIdentifier::toYangFilename)
             .containsExactlyInAnyOrder(
