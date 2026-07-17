@@ -91,7 +91,7 @@ class HTTPServerQuicBindFailureTest {
             server.shutdown().get(5, TimeUnit.SECONDS);
         }
 
-        // shutdown() routes through QuicUnderlay.shutdown(), which calls quicGroup.shutdownGracefully().
+        // shutdown() routes through ClientQuicUnderlay.shutdown(), which calls quicGroup.shutdownGracefully().
         assertTrue(awaitNoNewHttp3Threads(baselineIds, 5_000),
             () -> "Leaked HTTP/3 threads after shutdown: " + newHttp3Threads(baselineIds));
     }
