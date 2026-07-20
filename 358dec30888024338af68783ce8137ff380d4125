@@ -33,6 +33,23 @@
       "message": "recheck",
       "revId": "358dec30888024338af68783ce8137ff380d4125",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00692cb7_38d7d392",
+        "filename": "tests/suites/getsingle/test_getsingle.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-20T09:02:47Z",
+      "side": 1,
+      "message": "should not this be separated by two lines?",
+      "revId": "358dec30888024338af68783ce8137ff380d4125",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
