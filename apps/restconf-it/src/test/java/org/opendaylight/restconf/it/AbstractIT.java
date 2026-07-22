@@ -23,10 +23,16 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +42,10 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.json.JSONParserConfiguration;
@@ -60,12 +70,18 @@ import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.netconf.transport.http.HTTPClient;
+import org.opendaylight.netconf.transport.http.HTTPScheme;
+import org.opendaylight.netconf.transport.http.HTTPServerOverQuic;
 import org.opendaylight.netconf.transport.http.HTTPServerOverTcp;
 import org.opendaylight.netconf.transport.http.HttpClientStackConfiguration;
+import org.opendaylight.netconf.transport.http.HttpServerStackConfiguration;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.client.ClientSession;
 import org.opendaylight.restconf.client.impl.ClientHttp1Session;
+import org.opendaylight.restconf.client.impl.ClientHttp2Session;
+import org.opendaylight.restconf.client.impl.ClientHttp3Session;
 import org.opendaylight.restconf.it.server.TestRequestCallback;
 import org.opendaylight.restconf.it.server.TestTransportChannelListener;
 import org.opendaylight.restconf.server.AAAShiroPrincipalService;
@@ -78,11 +94,14 @@ import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.http.client.stack.grouping.transport.Tls;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.HttpServerListenStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.listen.stack.grouping.transport.HttpOverTcp;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.client.rev260717.http3.client.grouping.quic.under.http.Quic;
 import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecServices;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.common.Uint64;
 import org.opendaylight.yangtools.yang.model.spi.source.YangTextToIRSourceTransformer;
 import org.opendaylight.yangtools.yang.source.ir.dagger.YangIRSourceModule;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -118,6 +137,9 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
     private static final Uint32 HTTP3_ALT_SVC_MAX_AGE_SECONDS = Uint32.valueOf(3600);
     private static final Uint32 WRITE_BUFFER_LOW_WATER_MARK = Uint32.valueOf(32 * 1024);
     private static final Uint32 WRITE_BUFFER_HIGH_WATER_MARK = Uint32.valueOf(64 * 1024);
+    private static final Uint64 QUIC_INITIAL_MAX_DATA = Uint64.valueOf(4L * 1024 * 1024);
+    private static final Uint64 QUIC_INITIAL_MAX_STREAM_DATA_BIDI_REMOTE = Uint64.valueOf(256L * 1024);
+    private static final Uint32 QUIC_INITIAL_MAX_STREAMS_BIDI = Uint32.valueOf(100);
 
     private static String localAddress;
     private static BootstrapFactory bootstrapFactory;
@@ -127,6 +149,9 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
     private RpcProviderService rpcProviderService;
     private String host;
     private HttpClientStackGrouping clientStackGrouping;
+    private HttpClientStackGrouping quicClientStackGrouping;
+    private PrivateKey quicPrivateKey;
+    private X509Certificate quicCertificate;
     private DOMRpcRouter domRpcRouter;
     private SimpleNettyEndpoint endpoint;
     private DOMNotificationRouter domNotificationRouter;
@@ -171,6 +196,23 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
         };
         clientStackGrouping = new HttpClientStackConfiguration(
             ConfigUtils.clientTransportTcp(localAddress, port, USERNAME, PASSWORD));
+
+        // HTTP/3 (QUIC) listener, bound alongside the TCP one above, so any test can drive HTTP/3 requests
+        // via quicClientStackGrouping() without having to stand up its own server/certificate.
+        final var quicKeyGen = KeyPairGenerator.getInstance("RSA");
+        quicKeyGen.initialize(2048);
+        final var quicKeyPair = quicKeyGen.generateKeyPair();
+        quicPrivateKey = quicKeyPair.getPrivate();
+        final var quicX500Name = new X500Name("CN=TestCertificate");
+        final var quicNow = Instant.now();
+        final var quicCertBuilder = new JcaX509v3CertificateBuilder(quicX500Name,
+            BigInteger.valueOf(quicNow.toEpochMilli()), Date.from(quicNow), Date.from(quicNow.plus(Duration.ofDays(1))),
+            quicX500Name, quicKeyPair.getPublic());
+        quicCertificate = new JcaX509CertificateConverter().getCertificate(
+            quicCertBuilder.build(new JcaContentSignerBuilder("SHA256withRSA").build(quicPrivateKey)));
+        quicClientStackGrouping = new HttpClientStackConfiguration(ConfigUtils.clientTransportQuic(localAddress, port,
+            quicCertificate, QUIC_INITIAL_MAX_DATA, QUIC_INITIAL_MAX_STREAM_DATA_BIDI_REMOTE,
+            QUIC_INITIAL_MAX_STREAMS_BIDI, USERNAME, PASSWORD));
 
         // AAA services
         final var securityManager = new DefaultWebSecurityManager(new AuthenticatingRealm() {
@@ -245,6 +287,14 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
         }
     }
 
+    /**
+     * The HTTP protocol versions {@link #invokeRequest(FullHttpRequest, ProtocolVersion)} can drive a request
+     * over. Intended for use with {@code @ParameterizedTest @EnumSource(ProtocolVersion.class)}, so a single test
+     * method covers HTTP/1.1, HTTP/2 and HTTP/3 without repeating the client-transport-configuration/http2-flag
+     * derivation in every test class.
+     */
+    public enum ProtocolVersion { HTTP_1_1, HTTP_2, HTTP_3 }
+
     protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri)
             throws Exception {
         return invokeRequest(buildRequest(method, uri, APPLICATION_JSON, null, null));
@@ -266,28 +316,92 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
         return invokeRequest(buildRequest(method, uri, mediaType, acceptType, content));
     }
 
+    protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
+            final @NonNull ProtocolVersion version) throws Exception {
+        return invokeRequest(buildRequest(method, uri, APPLICATION_JSON, null, null), version);
+    }
+
+    protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
+            final @NonNull ProtocolVersion version, final @NonNull String mediaType) throws Exception {
+        return invokeRequest(buildRequest(method, uri, mediaType, null, null), version);
+    }
+
+    protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
+            final @NonNull ProtocolVersion version, final @NonNull String mediaType, final @Nullable String content)
+            throws Exception {
+        return invokeRequest(buildRequest(method, uri, mediaType, null, content), version);
+    }
+
+    protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
+            final @NonNull ProtocolVersion version, final @NonNull String mediaType,
+            final @Nullable String acceptType, final @Nullable String content) throws Exception {
+        return invokeRequest(buildRequest(method, uri, mediaType, acceptType, content), version);
+    }
+
     protected FullHttpResponse invokeRequest(final @NonNull FullHttpRequest request) throws Exception {
-        return invokeRequest(request, clientStackGrouping);
+        return invokeRequest(request, clientStackGrouping, false);
     }
 
     protected FullHttpResponse invokeRequest(final @NonNull FullHttpRequest request,
             final @NonNull HttpClientStackGrouping clientConf) throws Exception {
-        final var clientSession = new ClientHttp1Session();
+        return invokeRequest(request, clientConf, false);
+    }
+
+    /**
+     * Invokes a request using the given {@link ProtocolVersion}, resolving the matching client transport
+     * configuration ({@link #clientStackGrouping()} for HTTP/1.1 and HTTP/2, {@link #quicClientStackGrouping()}
+     * for HTTP/3) and {@code http2} flag.
+     *
+     * @param request the request to send
+     * @param version the HTTP protocol version to use
+     * @return the received response
+     */
+    protected FullHttpResponse invokeRequest(final @NonNull FullHttpRequest request,
+            final @NonNull ProtocolVersion version) throws Exception {
+        return invokeRequest(request,
+            version == ProtocolVersion.HTTP_3 ? quicClientStackGrouping : clientStackGrouping,
+            version == ProtocolVersion.HTTP_2);
+    }
+
+    /**
+     * Invokes a request against the given client transport configuration, using HTTP/1.1, HTTP/2 or HTTP/3
+     * depending on the configured transport: a {@code quic} transport always uses HTTP/3 ({@code http2} is then
+     * ignored), while a {@code tcp}/{@code tls} transport uses HTTP/2 or HTTP/1.1 per {@code http2}.
+     *
+     * @param request the request to send
+     * @param clientConf the client transport configuration
+     * @param http2 whether to use HTTP/2 over the tcp/tls transport; ignored for the quic transport
+     * @return the received response
+     */
+    protected FullHttpResponse invokeRequest(final @NonNull FullHttpRequest request,
+            final @NonNull HttpClientStackGrouping clientConf, final boolean http2) throws Exception {
+        final var clientSession = newClientSession(clientConf, http2);
         final var channelListener = new TestTransportChannelListener(transportChannel -> {
             transportChannel.channel().pipeline().addLast("restconf-session", clientSession);
         });
         final var client = HTTPClient.connect(channelListener, bootstrapFactory.newBootstrap(),
-            clientConf, false).get(2, TimeUnit.SECONDS);
+            clientConf, http2).get(5, TimeUnit.SECONDS);
         // await for connection
-        await().atMost(Duration.ofSeconds(2)).until(channelListener::initialized);
+        await().atMost(Duration.ofSeconds(5)).until(channelListener::initialized);
         final var callback = new TestRequestCallback();
         clientSession.invoke(request, callback);
         // await for response
-        await().atMost(Duration.ofSeconds(2)).until(callback::completed);
-        client.shutdown().get(2, TimeUnit.SECONDS);
+        await().atMost(Duration.ofSeconds(5)).until(callback::completed);
+        client.shutdown().get(5, TimeUnit.SECONDS);
         final var response = callback.response();
         assertNotNull(response);
         return response;
+    }
+
+    private static ClientSession newClientSession(final HttpClientStackGrouping clientConf, final boolean http2) {
+        final var transport = clientConf.getTransport();
+        if (transport instanceof Quic) {
+            return new ClientHttp3Session();
+        }
+        if (http2) {
+            return new ClientHttp2Session(transport instanceof Tls ? HTTPScheme.HTTPS : HTTPScheme.HTTP);
+        }
+        return new ClientHttp1Session();
     }
 
     /**
@@ -321,6 +435,13 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
         assertContentJson(response, expectedContent);
     }
 
+    protected void assertContentJson(final String getRequestUri, final String expectedContent,
+            final @NonNull ProtocolVersion version) throws Exception {
+        final var response = invokeRequest(HttpMethod.GET, getRequestUri, version);
+        assertEquals(HttpResponseStatus.OK, response.status());
+        assertContentJson(response, expectedContent);
+    }
+
     protected static void assertContentJson(final FullHttpResponse response, final String expectedContent) {
         final var content = response.content().toString(StandardCharsets.UTF_8);
         JSONAssert.assertEquals(expectedContent, content, JSONCompareMode.LENIENT);
@@ -343,7 +464,10 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
         return new NettyEndpointConfiguration(
             ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000), RESTS, MessageEncoding.JSON,
             serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, WRITE_BUFFER_LOW_WATER_MARK, WRITE_BUFFER_HIGH_WATER_MARK,
-            ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS);
+            ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS,
+            new HttpServerStackConfiguration(HTTPServerOverQuic.of(localAddress, port, quicCertificate,
+                quicPrivateKey, QUIC_INITIAL_MAX_DATA, QUIC_INITIAL_MAX_STREAM_DATA_BIDI_REMOTE,
+                QUIC_INITIAL_MAX_STREAMS_BIDI)));
     }
 
     protected List<RpcImplementation> rpcImplementations(final DOMDataBroker domDataBroker,
@@ -405,6 +529,14 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
      */
     protected final HttpClientStackGrouping clientStackGrouping() {
         return clientStackGrouping;
+    }
+
+    /**
+     * {@return the QUIC (HTTP/3) client transport configuration}, targeting the QUIC listener that
+     * {@link #createEndpointConfiguration(HttpServerListenStackGrouping)} bootstraps alongside the plain TCP one
+     */
+    protected final HttpClientStackGrouping quicClientStackGrouping() {
+        return quicClientStackGrouping;
     }
 
     /**
