@@ -13,15 +13,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.opendaylight.restconf.it.ProtocolVersion;
 
 class UiTest extends AbstractOpenApiTest {
-    @Test
-    void uiAvailableTest() throws Exception {
-        var response = invokeRequest(HttpMethod.GET, API_V3_PATH + "/ui", TEXT_HTML, TEXT_HTML, null);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void uiAvailableTest(final ProtocolVersion version) throws Exception {
+        var response = invokeRequest(HttpMethod.GET, API_V3_PATH + "/ui", version, TEXT_HTML, TEXT_HTML, null);
         assertEquals(HttpResponseStatus.SEE_OTHER, response.status());
         final var location = response.headers().get("location");
-        response = invokeRequest(HttpMethod.GET, location, TEXT_HTML, TEXT_HTML, null);
+        response = invokeRequest(HttpMethod.GET, location, version, TEXT_HTML, TEXT_HTML, null);
         assertEquals("""
             <!-- HTML for static distribution bundle build -->
             <!DOCTYPE html>
