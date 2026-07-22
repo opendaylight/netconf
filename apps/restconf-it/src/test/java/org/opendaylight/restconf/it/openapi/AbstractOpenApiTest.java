@@ -195,4 +195,14 @@ public class AbstractOpenApiTest extends AbstractIT {
     protected static String fillPort(final String jsonString, final int port) throws JsonProcessingException {
         return fillPort(jsonString, port, "http");
     }
+
+    /**
+     * {@return the scheme the given {@link ProtocolVersion} is served over}: {@code https} for HTTP/3 (QUIC is
+     * always TLS), {@code http} for HTTP/1.1 and HTTP/2 (served over plain TCP in these tests).
+     *
+     * @param version the HTTP protocol version
+     */
+    protected static String schemeOf(final ProtocolVersion version) {
+        return version == ProtocolVersion.HTTP_3 ? "https" : "http";
+    }
 }
