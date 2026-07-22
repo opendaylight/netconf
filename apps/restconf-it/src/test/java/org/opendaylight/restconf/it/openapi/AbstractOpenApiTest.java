@@ -9,6 +9,7 @@ package org.opendaylight.restconf.it.openapi;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opendaylight.restconf.it.ProtocolVersion.HTTP_1_1;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -111,7 +112,7 @@ public class AbstractOpenApiTest extends AbstractIT {
                     "network-topology:topology": [{
                         "topology-id":"topology-netconf"
                     }]
-                }""");
+                }""", HTTP_1_1);
         final var input = """
             {
                "network-topology:node": [{
@@ -128,7 +129,7 @@ public class AbstractOpenApiTest extends AbstractIT {
                }]
             }
             """.formatted(localAddress(), devicePort, DEVICE_USERNAME, DEVICE_PASSWORD);
-        final var response = invokeRequest(HttpMethod.POST, TOPOLOGY_URI, APPLICATION_JSON, input);
+        final var response = invokeRequest(HttpMethod.POST, TOPOLOGY_URI, HTTP_1_1, APPLICATION_JSON, input);
         assertEquals(HttpResponseStatus.CREATED, response.status());
         // wait till connected
         await().atMost(Duration.ofSeconds(50)).pollInterval(Duration.ofMillis(500))
@@ -136,7 +137,7 @@ public class AbstractOpenApiTest extends AbstractIT {
     }
 
     private boolean deviceConnectedJson() throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, DEVICE_STATUS_URI);
+        final var response = invokeRequest(HttpMethod.GET, DEVICE_STATUS_URI, HTTP_1_1);
         assertEquals(HttpResponseStatus.OK, response.status());
         final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8), jsonParserConfiguration());
         //{
@@ -190,9 +191,5 @@ public class AbstractOpenApiTest extends AbstractIT {
         final var json = (ObjectNode) MAPPER.readTree(jsonString);
         json.putArray("servers").add(MAPPER.readTree("{\"url\": \"" + scheme + "://127.0.0.1:" + port + "/\"}"));
         return MAPPER.writeValueAsString(json);
-    }
-
-    protected static String fillPort(final String jsonString, final int port) throws JsonProcessingException {
-        return fillPort(jsonString, port, "http");
     }
 }
