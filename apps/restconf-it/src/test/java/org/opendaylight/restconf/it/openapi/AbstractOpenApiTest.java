@@ -9,6 +9,8 @@ package org.opendaylight.restconf.it.openapi;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opendaylight.restconf.it.AbstractIT.ProtocolVersion.HTTP_1_1;
+import static org.opendaylight.restconf.it.AbstractIT.ProtocolVersion.HTTP_3;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -111,7 +113,7 @@ public class AbstractOpenApiTest extends AbstractIT {
                     "network-topology:topology": [{
                         "topology-id":"topology-netconf"
                     }]
-                }""");
+                }""", HTTP_1_1);
         final var input = """
             {
                "network-topology:node": [{
@@ -128,7 +130,7 @@ public class AbstractOpenApiTest extends AbstractIT {
                }]
             }
             """.formatted(localAddress(), devicePort, DEVICE_USERNAME, DEVICE_PASSWORD);
-        final var response = invokeRequest(HttpMethod.POST, TOPOLOGY_URI, APPLICATION_JSON, input);
+        final var response = invokeRequest(HttpMethod.POST, TOPOLOGY_URI, HTTP_1_1, APPLICATION_JSON, input);
         assertEquals(HttpResponseStatus.CREATED, response.status());
         // wait till connected
         await().atMost(Duration.ofSeconds(50)).pollInterval(Duration.ofMillis(500))
@@ -136,7 +138,7 @@ public class AbstractOpenApiTest extends AbstractIT {
     }
 
     private boolean deviceConnectedJson() throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, DEVICE_STATUS_URI);
+        final var response = invokeRequest(HttpMethod.GET, DEVICE_STATUS_URI, HTTP_1_1);
         assertEquals(HttpResponseStatus.OK, response.status());
         final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8), jsonParserConfiguration());
         //{
@@ -192,7 +194,13 @@ public class AbstractOpenApiTest extends AbstractIT {
         return MAPPER.writeValueAsString(json);
     }
 
-    protected static String fillPort(final String jsonString, final int port) throws JsonProcessingException {
-        return fillPort(jsonString, port, "http");
+    /**
+     * {@return the scheme the given {@link ProtocolVersion} is served over}: {@code https} for HTTP/3 (QUIC is
+     * always TLS), {@code http} for HTTP/1.1 and HTTP/2 (served over plain TCP in these tests).
+     *
+     * @param version the HTTP protocol version
+     */
+    protected static String schemeOf(final ProtocolVersion version) {
+        return version == HTTP_3 ? "https" : "http";
     }
 }
