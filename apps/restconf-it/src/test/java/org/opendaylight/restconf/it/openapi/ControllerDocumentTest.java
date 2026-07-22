@@ -13,23 +13,26 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opendaylight.restconf.it.ProtocolVersion;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class ControllerDocumentTest extends AbstractOpenApiTest {
-    @Test
-    void controllerAllDocTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void controllerAllDocTest(final ProtocolVersion version) throws Exception {
         final var expectedJson = getExpectedDoc("openapi-documents/controller-all.json");
 
-        final var response = invokeRequest(HttpMethod.GET, API_V3_PATH + "/single");
+        final var response = invokeRequest(HttpMethod.GET, API_V3_PATH + "/single", version);
         assertEquals(HttpResponseStatus.OK, response.status());
 
         final var resultDoc = response.content().toString(StandardCharsets.UTF_8);
-        JSONAssert.assertEquals(fillPort(expectedJson, port()), resultDoc, JSONCompareMode.NON_EXTENSIBLE);
+        JSONAssert.assertEquals(fillPort(expectedJson, port(), schemeOf(version)), resultDoc,
+            JSONCompareMode.NON_EXTENSIBLE);
     }
 
     /**
@@ -37,15 +40,17 @@ class ControllerDocumentTest extends AbstractOpenApiTest {
      */
     @ParameterizedTest
     @MethodSource
-    void getDocByModuleTest(final String revision, final String jsonPath) throws Exception {
+    void getDocByModuleTest(final String revision, final String jsonPath, final ProtocolVersion version)
+            throws Exception {
         final var expectedJson = getExpectedDoc("openapi-documents/" + jsonPath);
         final var uri = API_V3_PATH + "/" + TOASTER + "?revision=" + revision;
 
-        final var response = invokeRequest(HttpMethod.GET, uri);
+        final var response = invokeRequest(HttpMethod.GET, uri, version);
         assertEquals(HttpResponseStatus.OK, response.status());
 
         final var resultDoc = response.content().toString(StandardCharsets.UTF_8);
-        JSONAssert.assertEquals(fillPort(expectedJson, port()), resultDoc, JSONCompareMode.NON_EXTENSIBLE);
+        JSONAssert.assertEquals(fillPort(expectedJson, port(), schemeOf(version)), resultDoc,
+            JSONCompareMode.NON_EXTENSIBLE);
     }
 
     private static Stream<Arguments> getDocByModuleTest() {
@@ -53,7 +58,8 @@ class ControllerDocumentTest extends AbstractOpenApiTest {
         return Stream.of(
             Arguments.of(TOASTER_REV, "controller-toaster.json"),
             Arguments.of(TOASTER_OLD_REV, "controller-toaster-old.json")
-        );
+        ).flatMap(base -> Stream.of(ProtocolVersion.values())
+            .map(version -> Arguments.of(base.get()[0], base.get()[1], version)));
     }
 
     private static String getExpectedDoc(final String jsonPath) throws Exception {
