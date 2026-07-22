@@ -7,21 +7,15 @@
  */
 package org.opendaylight.restconf.it.openapi.http2;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.opendaylight.restconf.it.openapi.AbstractOpenApiTest;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractOpenApiHttp2Test extends AbstractOpenApiTest {
@@ -45,20 +39,6 @@ abstract class AbstractOpenApiHttp2Test extends AbstractOpenApiTest {
     @AfterAll
     protected void afterClass() {
         http2Client.close();
-    }
-
-    @Override
-    protected void assertContentJson(final String getRequestUri, final String expectedContent) throws Exception {
-        final var response = http2Client.send(HttpRequest.newBuilder()
-            .GET()
-            .uri(new URI("http://" + host() + getRequestUri))
-            .build(), HttpResponse.BodyHandlers.ofString());
-
-        assertEquals(200, response.statusCode());
-        assertEquals(HttpClient.Version.HTTP_2, response.version());
-
-        final var content = response.body();
-        JSONAssert.assertEquals(expectedContent, content, JSONCompareMode.LENIENT);
     }
 
     protected URI createApiUri(final String path) throws URISyntaxException {
