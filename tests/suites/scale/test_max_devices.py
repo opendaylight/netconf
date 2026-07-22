@@ -32,6 +32,7 @@ BASE_PORT = netconf.FIRST_TESTTOOL_PORT
 NUM_WORKERS = 20
 TIMEOUT_FACTOR = 20
 MIN_CONNECT_TIMEOUT = 300
+TESTTOOL_BASE_STARTUP_TIMEOUT = 60
 DEVICES_RESULT_FILE = "results/devices.csv"
 CRUD_SCHEMAS = "variables/netconf/CRUD/schemas"
 SCHEMA_MODEL = "juniper"
@@ -105,6 +106,7 @@ class TestMaxDevices:
                         device_count=device_count,
                         schemas=schemas,
                         debug=False,
+                        base_startup_timeout=TESTTOOL_BASE_STARTUP_TIMEOUT,
                     )
 
                 new_count = device_count - len(device_names)
