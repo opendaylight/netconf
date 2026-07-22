@@ -17,9 +17,9 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opendaylight.netconf.test.tool.NetconfDeviceSimulator;
 import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
@@ -68,16 +68,18 @@ class MountPointDocumentTest extends AbstractOpenApiTest {
     /**
      * Tests the swagger document that is result of the call to the '/mounts/1' endpoint.
      */
-    @Disabled
-    @Test
-    void getMountDocTest() throws Exception {
+    @Disabled("NETCONF-1566: HTTPClient content length limitation")
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void getMountDocTest(final ProtocolVersion version) throws Exception {
         final var expectedJson = getExpectedDoc("openapi-documents/device-all.json");
 
-        final var response = invokeRequest(HttpMethod.GET, API_V3_PATH + "/mounts/1");
+        final var response = invokeRequest(HttpMethod.GET, API_V3_PATH + "/mounts/1", version);
         assertEquals(HttpResponseStatus.OK, response.status());
 
         final var resultDoc = response.content().toString(StandardCharsets.UTF_8);
-        JSONAssert.assertEquals(expectedJson, resultDoc, JSONCompareMode.NON_EXTENSIBLE);
+        JSONAssert.assertEquals(fillPort(expectedJson, port(), schemeOf(version)), resultDoc,
+            JSONCompareMode.NON_EXTENSIBLE);
     }
 
     /**
@@ -85,15 +87,17 @@ class MountPointDocumentTest extends AbstractOpenApiTest {
      */
     @ParameterizedTest
     @MethodSource
-    void getMountDocByModuleTest(final String revision, final String jsonPath) throws Exception {
+    void getMountDocByModuleTest(final String revision, final String jsonPath, final ProtocolVersion version)
+            throws Exception {
         final var expectedJson = getExpectedDoc("openapi-documents/" + jsonPath);
         final var uri = API_V3_PATH + "/mounts/1/" + TOASTER + "?revision=" + revision;
 
-        final var response = invokeRequest(HttpMethod.GET, uri);
+        final var response = invokeRequest(HttpMethod.GET, uri, version);
         assertEquals(HttpResponseStatus.OK, response.status());
 
         final var resultDoc = response.content().toString(StandardCharsets.UTF_8);
-        JSONAssert.assertEquals(fillPort(expectedJson, port()), resultDoc, JSONCompareMode.NON_EXTENSIBLE);
+        JSONAssert.assertEquals(fillPort(expectedJson, port(), schemeOf(version)), resultDoc,
+            JSONCompareMode.NON_EXTENSIBLE);
     }
 
     private static Stream<Arguments> getMountDocByModuleTest() {
@@ -101,21 +105,23 @@ class MountPointDocumentTest extends AbstractOpenApiTest {
         return Stream.of(
             Arguments.of(TOASTER_REV, "device-toaster.json"),
             Arguments.of(TOASTER_OLD_REV, "device-toaster-old.json")
-        );
+        ).flatMap(base -> Stream.of(ProtocolVersion.values())
+            .map(version -> Arguments.of(base.get()[0], base.get()[1], version)));
     }
 
     /**
      * Tests the swagger document that is result of the call to the '/mounts' endpoint.
      */
-    @Test
-    void getMountsTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void getMountsTest(final ProtocolVersion version) throws Exception {
         assertContentJson(API_V3_PATH + "/mounts", """
             [
                 {
                     "instance": "/network-topology/topology=topology-netconf/node=device-sim/",
                     "id": "1"
                 }
-            ]""");
+            ]""", version);
     }
 
     private static String getExpectedDoc(final String jsonPath) throws Exception {
