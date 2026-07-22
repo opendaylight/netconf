@@ -330,6 +330,7 @@ def start_testtool(
     java_options: str = TESTTOOL_DEFAULT_JAVA_OPTIONS,
     mdsal: bool = True,
     log_response: bool = True,
+    base_startup_timeout: int = TESTTOOL_BASE_STARTUP_TIMEOUT,
 ) -> subprocess.Popen:
     """Start the Netconf testtool in the background and wait to become responsive.
 
@@ -349,6 +350,9 @@ def start_testtool(
         java_options (str): JVM arguments for the testtool execution.
         mdsal (bool): Whether to use MD-SAL datastore.
         log_response (bool): Whether to log the startup polling responses.
+        base_startup_timeout (int): Base timeout (in seconds) to wait for the
+            testtool to start, before adding the per-device timeout. Override
+            when deploying larger schemas that take longer to load.
 
     Returns:
         subprocess.Popen: The background process object representing the running
@@ -362,7 +366,7 @@ def start_testtool(
     process = infra.shell(f"{command} >tmp/{logfile} 2>&1", run_in_background=True)
     process.testtool_log_filename = logfile
     wait_running_timeout = (
-        TESTTOOL_BASE_STARTUP_TIMEOUT + device_count * TESTTOOL_PER_DEVICE_TIMEOUT
+        base_startup_timeout + device_count * TESTTOOL_PER_DEVICE_TIMEOUT
     )
     wait_all_devices_are_up_and_running(
         device_count, timeout=wait_running_timeout, log_response=log_response
