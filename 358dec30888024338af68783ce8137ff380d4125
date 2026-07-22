@@ -86,6 +86,24 @@
       "parentUuid": "f24f9ae3_984e6b85",
       "revId": "358dec30888024338af68783ce8137ff380d4125",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10941608_483fcfb5",
+        "filename": "tests/suites/getsingle/test_getsingle.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-07-22T07:59:27Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "79b6788c_024d143c",
+      "revId": "358dec30888024338af68783ce8137ff380d4125",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
