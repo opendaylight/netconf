@@ -18,10 +18,10 @@ import org.junit.jupiter.api.Test;
 class UiTest extends AbstractOpenApiTest {
     @Test
     void uiAvailableTest() throws Exception {
-        var response = invokeRequest(HttpMethod.GET, API_V3_PATH + "/ui", null, TEXT_HTML, null);
+        var response = invokeRequest(HttpMethod.GET, API_V3_PATH + "/ui", TEXT_HTML, TEXT_HTML, null);
         assertEquals(HttpResponseStatus.SEE_OTHER, response.status());
         final var location = response.headers().get("location");
-        response = invokeRequest(HttpMethod.GET, location, null, TEXT_HTML, null);
+        response = invokeRequest(HttpMethod.GET, location, TEXT_HTML, TEXT_HTML, null);
         assertEquals("""
             <!-- HTML for static distribution bundle build -->
             <!DOCTYPE html>
