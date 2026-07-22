@@ -9,6 +9,7 @@ package org.opendaylight.restconf.it.openapi;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opendaylight.restconf.it.ProtocolVersion.HTTP_1_1;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,6 +39,7 @@ import org.opendaylight.netconf.topology.impl.NetconfTopologyImpl;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactoryImpl;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.restconf.it.AbstractIT;
+import org.opendaylight.restconf.it.ProtocolVersion;
 import org.opendaylight.restconf.it.server.NullAAAEncryptionService;
 import org.opendaylight.restconf.openapi.OpenApiResourceProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
@@ -104,6 +106,10 @@ public class AbstractOpenApiTest extends AbstractIT {
     }
 
     protected void mountDeviceJson(final int devicePort) throws Exception {
+        mountDeviceJson(devicePort, HTTP_1_1);
+    }
+
+    protected void mountDeviceJson(final int devicePort, final ProtocolVersion version) throws Exception {
         // validate topology node is defined
         assertContentJson(TOPOLOGY_URI,
             """
@@ -111,7 +117,7 @@ public class AbstractOpenApiTest extends AbstractIT {
                     "network-topology:topology": [{
                         "topology-id":"topology-netconf"
                     }]
-                }""");
+                }""", version);
         final var input = """
             {
                "network-topology:node": [{
@@ -128,15 +134,15 @@ public class AbstractOpenApiTest extends AbstractIT {
                }]
             }
             """.formatted(localAddress(), devicePort, DEVICE_USERNAME, DEVICE_PASSWORD);
-        final var response = invokeRequest(HttpMethod.POST, TOPOLOGY_URI, APPLICATION_JSON, input);
+        final var response = invokeRequest(HttpMethod.POST, TOPOLOGY_URI, version, APPLICATION_JSON, input);
         assertEquals(HttpResponseStatus.CREATED, response.status());
         // wait till connected
         await().atMost(Duration.ofSeconds(50)).pollInterval(Duration.ofMillis(500))
-            .until(this::deviceConnectedJson);
+            .until(() -> deviceConnectedJson(version));
     }
 
-    private boolean deviceConnectedJson() throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, DEVICE_STATUS_URI);
+    private boolean deviceConnectedJson(final ProtocolVersion version) throws Exception {
+        final var response = invokeRequest(HttpMethod.GET, DEVICE_STATUS_URI, version);
         assertEquals(HttpResponseStatus.OK, response.status());
         final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8), jsonParserConfiguration());
         //{
@@ -190,9 +196,5 @@ public class AbstractOpenApiTest extends AbstractIT {
         final var json = (ObjectNode) MAPPER.readTree(jsonString);
         json.putArray("servers").add(MAPPER.readTree("{\"url\": \"" + scheme + "://127.0.0.1:" + port + "/\"}"));
         return MAPPER.writeValueAsString(json);
-    }
-
-    protected static String fillPort(final String jsonString, final int port) throws JsonProcessingException {
-        return fillPort(jsonString, port, "http");
     }
 }
