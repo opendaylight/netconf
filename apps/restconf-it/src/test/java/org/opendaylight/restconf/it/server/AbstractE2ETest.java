@@ -55,6 +55,7 @@ import org.opendaylight.netconf.transport.http.HttpClientStackConfiguration;
 import org.opendaylight.netconf.transport.http.SseUtils;
 import org.opendaylight.restconf.client.impl.ClientHttp1Session;
 import org.opendaylight.restconf.client.impl.ClientHttp2Session;
+import org.opendaylight.restconf.client.impl.ClientHttp3Session;
 import org.opendaylight.restconf.it.AbstractIT;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
@@ -103,6 +104,7 @@ public abstract class AbstractE2ETest extends AbstractIT {
     private final List<StreamControl> streamControl = new ArrayList<>();
 
     private HttpClientStackGrouping invalidClientStackGrouping;
+    private HttpClientStackGrouping invalidQuicClientStackGrouping;
 
     private volatile EventStreamService clientStreamService;
 
@@ -117,6 +119,7 @@ public abstract class AbstractE2ETest extends AbstractIT {
         super.beforeEach();
         invalidClientStackGrouping = new HttpClientStackConfiguration(
             ConfigUtils.clientTransportTcp(localAddress(), port(), USERNAME, "wrong-password"));
+        invalidQuicClientStackGrouping = quicClientStackGrouping(USERNAME, "wrong-password");
         // action implementations
         final var adapterFactory = new BindingAdapterFactory(adapterContext());
         final var actionProviderService = adapterFactory.createActionProviderService(
@@ -140,6 +143,15 @@ public abstract class AbstractE2ETest extends AbstractIT {
      */
     protected final HttpClientStackGrouping invalidClientStackGrouping() {
         return invalidClientStackGrouping;
+    }
+
+    /**
+     * {@return the invalid (wrong-password) client transport configuration matching the given protocol version}
+     *
+     * @param version the HTTP protocol version
+     */
+    protected final HttpClientStackGrouping invalidClientStackGrouping(final ProtocolVersion version) {
+        return version == ProtocolVersion.HTTP_3 ? invalidQuicClientStackGrouping : invalidClientStackGrouping;
     }
 
     @Override
@@ -196,6 +208,11 @@ public abstract class AbstractE2ETest extends AbstractIT {
         assertOptionsResponse(invokeRequest(HttpMethod.OPTIONS, uri), methods);
     }
 
+    protected void assertOptions(final String uri, final Set<String> methods, final ProtocolVersion version)
+            throws Exception {
+        assertOptionsResponse(invokeRequest(HttpMethod.OPTIONS, uri, version), methods);
+    }
+
     protected static void assertOptionsResponse(final FullHttpResponse response, final Set<String> methods) {
         assertEquals(HttpResponseStatus.OK, response.status());
         assertHeaderValue(response, HttpHeaderNames.ALLOW, methods);
@@ -213,6 +230,11 @@ public abstract class AbstractE2ETest extends AbstractIT {
         assertHead(uri, APPLICATION_XML);
     }
 
+    protected void assertHead(final String uri, final ProtocolVersion version) throws Exception {
+        assertHead(uri, APPLICATION_JSON, version);
+        assertHead(uri, APPLICATION_XML, version);
+    }
+
     protected void assertHead(final String uri, final String mediaType) throws Exception {
         final var getResponse = invokeRequest(HttpMethod.GET, uri, mediaType);
         assertEquals(HttpResponseStatus.OK, getResponse.status());
@@ -220,6 +242,25 @@ public abstract class AbstractE2ETest extends AbstractIT {
 
         // HEAD response contains same headers as GET but empty body
         final var headResponse = invokeRequest(HttpMethod.HEAD, uri, mediaType);
+        assertEquals(HttpResponseStatus.OK, headResponse.status());
+        getResponse.headers().remove(HttpHeaderNames.CONTENT_LENGTH);
+        if (getResponse.headers().contains(HttpHeaderNames.CONNECTION)) {
+            assertEquals("close", getResponse.headers().get(HttpHeaderNames.CONNECTION));
+            getResponse.headers().remove(HttpHeaderNames.CONNECTION);
+        }
+        headResponse.headers().remove(HttpHeaderNames.CONTENT_LENGTH);
+        assertEquals(getResponse.headers(), headResponse.headers());
+        assertEquals(0, headResponse.content().readableBytes());
+    }
+
+    protected void assertHead(final String uri, final String mediaType, final ProtocolVersion version)
+            throws Exception {
+        final var getResponse = invokeRequest(HttpMethod.GET, uri, version, mediaType);
+        assertEquals(HttpResponseStatus.OK, getResponse.status());
+        assertTrue(getResponse.content().readableBytes() > 0);
+
+        // HEAD response contains same headers as GET but empty body
+        final var headResponse = invokeRequest(HttpMethod.HEAD, uri, version, mediaType);
         assertEquals(HttpResponseStatus.OK, headResponse.status());
         getResponse.headers().remove(HttpHeaderNames.CONTENT_LENGTH);
         if (getResponse.headers().contains(HttpHeaderNames.CONNECTION)) {
@@ -261,25 +302,22 @@ public abstract class AbstractE2ETest extends AbstractIT {
         return null;
     }
 
-    protected HTTPClient startStreamClient() throws Exception {
-        return startStreamClient(false);
-    }
-
-    protected HTTPClient startStreamClient(final boolean http2) throws Exception {
+    protected HTTPClient startStreamClient(final ProtocolVersion version) throws Exception {
         final var transportListener = new TestTransportChannelListener(channel -> {
-            final ChannelHandler session;
-            if (http2) {
-                session = new ClientHttp2Session(HTTPScheme.HTTP);
-            } else {
-                session = new ClientHttp1Session();
-            }
+            final ChannelHandler session = switch (version) {
+                case HTTP_1_1 -> new ClientHttp1Session();
+                case HTTP_2 -> new ClientHttp2Session(HTTPScheme.HTTP);
+                case HTTP_3 -> new ClientHttp3Session();
+            };
             channel.channel().pipeline().addLast("restconf-session", session);
             clientStreamService = SseUtils.enableClientSse(channel);
         });
 
+        final var clientConf = version == ProtocolVersion.HTTP_3
+            ? quicClientStackGrouping(USERNAME, PASSWORD) : clientStackGrouping();
         final var streamClient = HTTPClient.connect(transportListener, bootstrapFactory().newBootstrap(),
-            clientStackGrouping(), http2).get(2, TimeUnit.SECONDS);
-        await().atMost(Duration.ofSeconds(2)).until(transportListener::initialized);
+            clientConf, version == ProtocolVersion.HTTP_2).get(5, TimeUnit.SECONDS);
+        await().atMost(Duration.ofSeconds(5)).until(transportListener::initialized);
         assertNotNull(clientStreamService);
         return streamClient;
     }

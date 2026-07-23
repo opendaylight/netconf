@@ -24,8 +24,9 @@ import javax.net.ssl.SSLException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
 import org.opendaylight.netconf.client.SslContextFactory;
 import org.opendaylight.netconf.client.mdsal.DeviceActionFactoryImpl;
@@ -100,8 +101,9 @@ class MountPointE2ETest extends AbstractE2ETest {
         super.afterEach();
     }
 
-    @Test
-    void dataCRUDJsonTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void dataCRUDJsonTest(final ProtocolVersion version) throws Exception {
         startDeviceSimulator(true);
         mountDeviceJson();
 
@@ -117,12 +119,12 @@ class MountPointE2ETest extends AbstractE2ETest {
                     }]
                 }
             }""";
-        var response = invokeRequest(HttpMethod.POST, DEVICE_MOUNT_URI, APPLICATION_JSON, initialData);
+        var response = invokeRequest(HttpMethod.POST, DEVICE_MOUNT_URI, version, APPLICATION_JSON, initialData);
         assertEquals(HttpResponseStatus.CREATED, response.status());
-        assertContentJson(DEVICE_DATA_ROOT_URI, initialData);
+        assertContentJson(DEVICE_DATA_ROOT_URI, initialData, version);
 
         // update (merge)
-        response = invokeRequest(HttpMethod.PATCH, DEVICE_DATA_ROOT_URI, APPLICATION_JSON, """
+        response = invokeRequest(HttpMethod.PATCH, DEVICE_DATA_ROOT_URI, version, APPLICATION_JSON, """
             {
                 "device-sim:data-root": {
                     "properties" : [{
@@ -142,7 +144,7 @@ class MountPointE2ETest extends AbstractE2ETest {
                         "value": "value-updated"
                     }]
                 }
-            }""");
+            }""", version);
 
         // replace
         final var replaceData = """
@@ -155,27 +157,28 @@ class MountPointE2ETest extends AbstractE2ETest {
                     }]
                 }
             }""";
-        response = invokeRequest(HttpMethod.PUT, DEVICE_DATA_ROOT_URI, APPLICATION_JSON, replaceData);
+        response = invokeRequest(HttpMethod.PUT, DEVICE_DATA_ROOT_URI, version, APPLICATION_JSON, replaceData);
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
-        assertContentJson(DEVICE_DATA_ROOT_URI, replaceData);
+        assertContentJson(DEVICE_DATA_ROOT_URI, replaceData, version);
 
         // delete
-        response = invokeRequest(HttpMethod.DELETE, DEVICE_DATA_ROOT_URI);
+        response = invokeRequest(HttpMethod.DELETE, DEVICE_DATA_ROOT_URI, version);
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
         // validate deleted
-        response = invokeRequest(HttpMethod.GET, DEVICE_DATA_ROOT_URI);
+        response = invokeRequest(HttpMethod.GET, DEVICE_DATA_ROOT_URI, version);
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
 
-    @Test
-    void notificationStreamJsonTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void notificationStreamJsonTest(final ProtocolVersion version) throws Exception {
         startDeviceSimulator(false);
         mountDeviceJson();
 
         var response = invokeRequest(HttpMethod.POST, """
             /rests/operations/network-topology:network-topology/topology=topology-netconf/node=device-sim\
             /yang-ext:mount/notifications:create-subscription""",
-            APPLICATION_JSON, """
+            version, APPLICATION_JSON, """
                 {
                     "input": {
                         "stream": "NETCONF"
@@ -186,7 +189,7 @@ class MountPointE2ETest extends AbstractE2ETest {
         // create notification stream
         response = invokeRequest(HttpMethod.POST,
             "/rests/operations/odl-device-notification:subscribe-device-notification",
-            APPLICATION_JSON, """
+            version, APPLICATION_JSON, """
                 {
                     "input": {
                         "path": "/network-topology:network-topology/topology[topology-id='topology-netconf']\
@@ -208,14 +211,15 @@ class MountPointE2ETest extends AbstractE2ETest {
         assertNotNull(streamUrl, "Stream URL not found");
 
         // start stream
-        final var streamClient = startStreamClient();
+        final var streamClient = startStreamClient(version);
         try {
             final var eventListener = startStream(streamUrl.getPath());
 
-            // NB: testing single predefined event with 2 sec delay
+            // NB: testing single predefined event with a 6 sec delay
             // due to device simulator starts sending events immediately after subscription
             // so restconf server may drop events occurred in interval between stream start
-            // via netconf and actual consumption via restconf.
+            // via netconf and actual consumption via restconf. The delay accommodates HTTP/3's slower
+            // stream setup, so readNext() here is given a correspondingly longer timeout.
             // Also devise simulator does not respect defined events order.
 
             JSONAssert.assertEquals("""
@@ -225,25 +229,26 @@ class MountPointE2ETest extends AbstractE2ETest {
                             "event-message": "Event message"
                         }
                     }
-                }""", eventListener.readNext(), JSONCompareMode.LENIENT);
+                }""", eventListener.readNext(6, TimeUnit.SECONDS), JSONCompareMode.LENIENT);
 
             // terminate stream
             closeAllStreams();
             await().atMost(Duration.ofSeconds(1)).until(eventListener::ended);
 
         } finally {
-            streamClient.shutdown().get(2, TimeUnit.SECONDS);
+            streamClient.shutdown().get(5, TimeUnit.SECONDS);
         }
     }
 
-    @Test
-    void yangPatchJsonTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void yangPatchJsonTest(final ProtocolVersion version) throws Exception {
         startDeviceSimulator(true);
         mountDeviceJson();
 
         // CRUD
-        var response = invokeRequest(HttpMethod.PATCH, DEVICE_DATA_ROOT_URI, MediaTypes.APPLICATION_YANG_PATCH_JSON,
-            MediaTypes.APPLICATION_YANG_DATA_JSON, """
+        var response = invokeRequest(HttpMethod.PATCH, DEVICE_DATA_ROOT_URI, version,
+            MediaTypes.APPLICATION_YANG_PATCH_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, """
             {
                 "ietf-yang-patch:yang-patch" : {
                     "patch-id" : "patch1",
@@ -300,16 +305,17 @@ class MountPointE2ETest extends AbstractE2ETest {
                         }
                     ]
                 }
-            }""");
+            }""", version);
     }
 
-    @Test
-    void negotiatedSshParametersTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void negotiatedSshParametersTest(final ProtocolVersion version) throws Exception {
         startDeviceSimulator(true);
         mountDeviceJson();
 
         final var response = invokeRequest(HttpMethod.GET,
-            "/rests/data/network-topology:network-topology/topology=topology-netconf");
+            "/rests/data/network-topology:network-topology/topology=topology-netconf", version);
         assertEquals(HttpResponseStatus.OK, response.status());
 
         final var expected = """

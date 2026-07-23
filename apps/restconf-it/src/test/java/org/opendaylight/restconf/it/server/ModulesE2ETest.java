@@ -17,25 +17,29 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class ModulesE2ETest extends AbstractE2ETest {
     private static final String MODULE_URI = "/rests/modules/network-topology?revision=2013-10-21";
 
-    @Test
-    void optionsTest() throws Exception {
-        assertOptions(MODULE_URI, Set.of("GET", "HEAD", "OPTIONS"));
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void optionsTest(final ProtocolVersion version) throws Exception {
+        assertOptions(MODULE_URI, Set.of("GET", "HEAD", "OPTIONS"), version);
     }
 
-    @Test
-    void headTest() throws Exception {
-        assertHead(MODULE_URI, RFC6020_YIN_MEDIA_TYPE);
-        assertHead(MODULE_URI, RFC6020_YANG_MEDIA_TYPE);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void headTest(final ProtocolVersion version) throws Exception {
+        assertHead(MODULE_URI, RFC6020_YIN_MEDIA_TYPE, version);
+        assertHead(MODULE_URI, RFC6020_YANG_MEDIA_TYPE, version);
     }
 
-    @Test
-    void readYinTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, MODULE_URI, RFC6020_YIN_MEDIA_TYPE);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void readYinTest(final ProtocolVersion version) throws Exception {
+        final var response = invokeRequest(HttpMethod.GET, MODULE_URI, version, RFC6020_YIN_MEDIA_TYPE);
         assertEquals(HttpResponseStatus.OK, response.status());
         assertEquals(RFC6020_YIN_MEDIA_TYPE, response.headers().get(HttpHeaderNames.CONTENT_TYPE));
         final var content = response.content().toString(StandardCharsets.UTF_8);
@@ -44,9 +48,10 @@ class ModulesE2ETest extends AbstractE2ETest {
             "<module xmlns=\"urn:ietf:params:xml:ns:yang:yin:1\" name=\"network-topology\""));
     }
 
-    @Test
-    void readYangTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, MODULE_URI, RFC6020_YANG_MEDIA_TYPE);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void readYangTest(final ProtocolVersion version) throws Exception {
+        final var response = invokeRequest(HttpMethod.GET, MODULE_URI, version, RFC6020_YANG_MEDIA_TYPE);
         assertEquals(HttpResponseStatus.OK, response.status());
         assertEquals(RFC6020_YANG_MEDIA_TYPE, response.headers().get(HttpHeaderNames.CONTENT_TYPE));
         final var content = response.content().toString(StandardCharsets.UTF_8);
