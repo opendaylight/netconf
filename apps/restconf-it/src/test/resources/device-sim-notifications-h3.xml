@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  Copyright (c) 2026 PANTHEON.tech s.r.o. and others. All rights reserved.
+
+  This program and the accompanying materials are made available under the
+  terms of the Eclipse Public License v1.0 which accompanies this distribution,
+  and is available at http://www.eclipse.org/legal/epl-v10.html
+  -->
+<notifications>
+    <!-- https://docs.opendaylight.org/projects/netconf/en/stable/testtool.html#notification-support -->
+    <notification>
+        <!-- Delay 6 seconds after subscription request: To give enough time
+             for HTTP/3's stream setup (a fresh QUIC handshake per request) to complete
+             before the notification fires. HTTP/1.1 and HTTP/2 use a shorter delay -
+             see device-sim-notifications.xml - since their connection setup is faster. -->
+        <delay>6</delay>
+        <content><![CDATA[
+        <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
+            <eventTime>XXXX</eventTime>
+            <device-event xmlns="test:device:simulator">
+                <event-message>Event message</event-message>
+            </device-event>
+        </notification>
+    ]]></content>
+    </notification>
+</notifications>

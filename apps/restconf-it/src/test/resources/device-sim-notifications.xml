@@ -9,7 +9,9 @@
 <notifications>
     <!-- https://docs.opendaylight.org/projects/netconf/en/stable/testtool.html#notification-support -->
     <notification>
-        <!-- delay 2 seconds after subscription request -->
+        <!-- Delay 2 seconds after subscription request, for HTTP/1.1 and HTTP/2: enough time for
+             TCP (+ TLS) connection setup to complete before the notification fires. HTTP/3 needs
+             more time for its QUIC handshake - see device-sim-notifications-h3.xml. -->
         <delay>2</delay>
         <content><![CDATA[
         <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
