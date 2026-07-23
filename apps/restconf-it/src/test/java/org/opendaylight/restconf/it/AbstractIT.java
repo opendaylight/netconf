@@ -15,6 +15,7 @@ import static org.xmlunit.matchers.CompareMatcher.isSimilarTo;
 
 import com.google.common.base.Splitter;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -69,12 +70,14 @@ import org.opendaylight.mdsal.dom.broker.RouterDOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.transport.http.ConfigUtils;
+import org.opendaylight.netconf.transport.http.EventStreamService;
 import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.netconf.transport.http.HTTPServerOverQuic;
 import org.opendaylight.netconf.transport.http.HTTPServerOverTcp;
 import org.opendaylight.netconf.transport.http.HttpClientStackConfiguration;
 import org.opendaylight.netconf.transport.http.HttpServerStackConfiguration;
+import org.opendaylight.netconf.transport.http.SseUtils;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -152,6 +155,7 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
     private HttpClientStackGrouping quicClientStackGrouping;
     private PrivateKey quicPrivateKey;
     private X509Certificate quicCertificate;
+    private volatile EventStreamService clientStreamService;
     private DOMRpcRouter domRpcRouter;
     private SimpleNettyEndpoint endpoint;
     private DOMNotificationRouter domNotificationRouter;
@@ -210,9 +214,7 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
             quicX500Name, quicKeyPair.getPublic());
         quicCertificate = new JcaX509CertificateConverter().getCertificate(
             quicCertBuilder.build(new JcaContentSignerBuilder("SHA256withRSA").build(quicPrivateKey)));
-        quicClientStackGrouping = new HttpClientStackConfiguration(ConfigUtils.clientTransportQuic(localAddress, port,
-            quicCertificate, QUIC_INITIAL_MAX_DATA, QUIC_INITIAL_MAX_STREAM_DATA_BIDI_REMOTE,
-            QUIC_INITIAL_MAX_STREAMS_BIDI, USERNAME, PASSWORD));
+        quicClientStackGrouping = quicClientStackGrouping(USERNAME, PASSWORD);
 
         // AAA services
         final var securityManager = new DefaultWebSecurityManager(new AuthenticatingRealm() {
@@ -262,6 +264,7 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
 
     @AfterEach
     protected void afterEach() throws Exception {
+        clientStreamService = null;
         endpoint.close();
         streamRegistry.close();
         domNotificationRouter.close();
@@ -445,6 +448,13 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
         assertContentXml(response, expectedContent);
     }
 
+    protected void assertContentXml(final String getRequestUri, final String expectedContent,
+            final @NonNull ProtocolVersion version) throws Exception {
+        final var response = invokeRequest(HttpMethod.GET, getRequestUri, version, APPLICATION_XML);
+        assertEquals(HttpResponseStatus.OK, response.status());
+        assertContentXml(response, expectedContent);
+    }
+
     protected static void assertContentXml(final FullHttpResponse response, final String expectedContent) {
         final var content = response.content().toString(StandardCharsets.UTF_8);
         assertThat(content, isSimilarTo(expectedContent).ignoreComments().ignoreWhitespace()
@@ -529,6 +539,54 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
      */
     protected final HttpClientStackGrouping quicClientStackGrouping() {
         return quicClientStackGrouping;
+    }
+
+    /**
+     * Builds a QUIC (HTTP/3) client transport configuration for the given credentials, targeting the same QUIC
+     * listener as {@link #quicClientStackGrouping()}. Useful for tests that need a client configured with, e.g.,
+     * intentionally wrong credentials (mirroring {@code invalidClientStackGrouping} for the tcp/tls transports).
+     *
+     * @param username username
+     * @param password password
+     * @return a QUIC client transport configuration
+     */
+    protected final HttpClientStackGrouping quicClientStackGrouping(final String username, final String password) {
+        return new HttpClientStackConfiguration(ConfigUtils.clientTransportQuic(localAddress, port, quicCertificate,
+            QUIC_INITIAL_MAX_DATA, QUIC_INITIAL_MAX_STREAM_DATA_BIDI_REMOTE, QUIC_INITIAL_MAX_STREAMS_BIDI,
+            username, password));
+    }
+
+    /**
+     * {@return the {@link EventStreamService} enabled on the client connection established by the most recent
+     * {@link #startStreamClient(ProtocolVersion)} call}
+     */
+    protected final EventStreamService clientStreamService() {
+        return clientStreamService;
+    }
+
+    /**
+     * Establishes a client connection with SSE enabled, using the given {@link ProtocolVersion}.
+     *
+     * @param version the HTTP protocol version to use
+     * @return the connected {@link HTTPClient}
+     */
+    protected HTTPClient startStreamClient(final ProtocolVersion version) throws Exception {
+        final var transportListener = new TestTransportChannelListener(channel -> {
+            final ChannelHandler session = switch (version) {
+                case HTTP_1_1 -> new ClientHttp1Session();
+                case HTTP_2 -> new ClientHttp2Session(HTTPScheme.HTTP);
+                case HTTP_3 -> new ClientHttp3Session();
+            };
+            channel.channel().pipeline().addLast("restconf-session", session);
+            clientStreamService = SseUtils.enableClientSse(channel);
+        });
+        final var clientConf = version == ProtocolVersion.HTTP_3
+            ? quicClientStackGrouping(USERNAME, PASSWORD) : clientStackGrouping();
+        final var streamClient = HTTPClient.connect(transportListener, bootstrapFactory().newBootstrap(),
+            clientConf, version == ProtocolVersion.HTTP_2).get(5, TimeUnit.SECONDS);
+        await().atMost(Duration.ofSeconds(5)).until(transportListener::initialized);
+        assertNotNull(clientStreamService);
+        return streamClient;
     }
 
     /**
