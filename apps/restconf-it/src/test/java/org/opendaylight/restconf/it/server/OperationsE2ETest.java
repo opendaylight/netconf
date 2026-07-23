@@ -14,10 +14,12 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.opendaylight.mdsal.eos.dom.simple.SimpleDOMEntityOwnershipService;
 import org.opendaylight.mdsal.singleton.impl.EOSClusterSingletonServiceProvider;
 import org.opendaylight.netconf.keystore.legacy.impl.DefaultNetconfKeystoreService;
+import org.opendaylight.restconf.it.ProtocolVersion;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
@@ -47,8 +49,9 @@ class OperationsE2ETest extends AbstractE2ETest {
         super.afterEach();
     }
 
-    @Test
-    void readOperationsJsonTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void readOperationsJsonTest(final ProtocolVersion version) throws Exception {
         // check those we'll use in tests
         assertContentJson(OPERATIONS_URI, """
             {
@@ -60,20 +63,22 @@ class OperationsE2ETest extends AbstractE2ETest {
                     "netconf-keystore:add-trusted-certificate" : [null],
                     "netconf-keystore:remove-trusted-certificate" : [null],
                 }
-            }""");
+            }""", version);
     }
 
-    @Test
-    void readSingleOperationJsonTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void readSingleOperationJsonTest(final ProtocolVersion version) throws Exception {
         assertContentJson(SUBSCRIBE_DEVICE_NOTIFICATIONS_URI, """
             {
                 "odl-device-notification:subscribe-device-notification": [null],
-            }""");
+            }""", version);
     }
 
-    @Test
-    void createKeystoreEntryTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.POST, ADD_KEYSTORE_ENTRY,
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void createKeystoreEntryTest(final ProtocolVersion version) throws Exception {
+        final var response = invokeRequest(HttpMethod.POST, ADD_KEYSTORE_ENTRY, version,
             APPLICATION_XML, """
             <input xmlns="urn:opendaylight:netconf:keystore">
                 <key-credential>
@@ -136,22 +141,24 @@ class OperationsE2ETest extends AbstractE2ETest {
             TPZBZkI5g5rMEytc1WxYtJ1pojplCiwqBD1OFVjAi2oTV0Gnm+M9ArCMEZbYRsIeXZdQleH1wfzs/eTJgBz2yp5AZ/51I6Q0RayYWXVXBoJ\
             S3ov6OqF8EZBArVsAeaN1F+xqPWBnIT06gd++TY=</private-key>
             </key-credential>
-            """);
+            """, version);
     }
 
-    @Test
-    void invalidOperationErrorXMLTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void invalidOperationErrorXMLTest(final ProtocolVersion version) throws Exception {
         final var response = invokeRequest(HttpMethod.POST,
-            "/rests/operations/netconf-keystore:invalid-operation",
+            "/rests/operations/netconf-keystore:invalid-operation", version,
             APPLICATION_XML, """
                 <input xmlns="urn:opendaylight:netconf:keystore" />""");
         assertErrorResponseXml(response, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
 
-    @Test
-    void missingDataErrorXmlTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void missingDataErrorXmlTest(final ProtocolVersion version) throws Exception {
         final var response = invokeRequest(HttpMethod.POST,
-            ADD_KEYSTORE_ENTRY,
+            ADD_KEYSTORE_ENTRY, version,
             APPLICATION_XML,
             """
                 <input xmlns="urn:opendaylight:netconf:keystore">
@@ -163,10 +170,11 @@ class OperationsE2ETest extends AbstractE2ETest {
         assertErrorResponseXml(response, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
     }
 
-    @Test
-    void invalidDataErrorXmlTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void invalidDataErrorXmlTest(final ProtocolVersion version) throws Exception {
         final var response = invokeRequest(HttpMethod.POST,
-            ADD_KEYSTORE_ENTRY,
+            ADD_KEYSTORE_ENTRY, version,
             APPLICATION_XML,
             """
                 <input xmlns="urn:opendaylight:netconf:keystore">
@@ -179,17 +187,19 @@ class OperationsE2ETest extends AbstractE2ETest {
         assertErrorResponseXml(response, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
     }
 
-    @Test
-    void invalidMediaTypeTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.POST, ADD_KEYSTORE_ENTRY, WRONG_TYPE,"""
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void invalidMediaTypeTest(final ProtocolVersion version) throws Exception {
+        final var response = invokeRequest(HttpMethod.POST, ADD_KEYSTORE_ENTRY, version, WRONG_TYPE, """
                 <input xmlns="urn:opendaylight:netconf:keystore" />""");
         assertEquals(HttpResponseStatus.NOT_ACCEPTABLE, response.status());
     }
 
-    @Test
-    void unimplementedRpcErrorTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void unimplementedRpcErrorTest(final ProtocolVersion version) throws Exception {
         final var response = invokeRequest(HttpMethod.POST,
-            "/rests/operations/example-jukebox:play",
+            "/rests/operations/example-jukebox:play", version,
             APPLICATION_JSON,
             """
                 {
@@ -201,14 +211,16 @@ class OperationsE2ETest extends AbstractE2ETest {
         assertErrorResponseJson(response, ErrorType.RPC, ErrorTag.OPERATION_FAILED);
     }
 
-    @Test
-    void operationsOptionsTest() throws Exception {
-        assertOptions(OPERATIONS_URI, Set.of("GET", "HEAD", "OPTIONS"));
-        assertOptions(SUBSCRIBE_DEVICE_NOTIFICATIONS_URI, Set.of("GET", "HEAD", "OPTIONS", "POST"));
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void operationsOptionsTest(final ProtocolVersion version) throws Exception {
+        assertOptions(OPERATIONS_URI, Set.of("GET", "HEAD", "OPTIONS"), version);
+        assertOptions(SUBSCRIBE_DEVICE_NOTIFICATIONS_URI, Set.of("GET", "HEAD", "OPTIONS", "POST"), version);
     }
 
-    @Test
-    void operationsHeadTest() throws Exception {
-        assertHead(OPERATIONS_URI);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void operationsHeadTest(final ProtocolVersion version) throws Exception {
+        assertHead(OPERATIONS_URI, version);
     }
 }
