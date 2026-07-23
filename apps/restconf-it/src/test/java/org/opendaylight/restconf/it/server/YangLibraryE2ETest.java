@@ -8,34 +8,39 @@
 package org.opendaylight.restconf.it.server;
 
 import java.util.Set;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class YangLibraryE2ETest extends AbstractE2ETest {
     private static final String URI = "/rests/yang-library-version";
 
-    @Test
-    void readJsonTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void readJsonTest(final ProtocolVersion version) throws Exception {
         assertContentJson(URI, """
             {
               "ietf-restconf:yang-library-version": "2019-01-04"
-            }""");
+            }""", version);
     }
 
-    @Test
-    void readXmlTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void readXmlTest(final ProtocolVersion version) throws Exception {
         assertContentXml(URI, """
             <ietf-restconf:yang-library-version xmlns:ietf-restconf="urn:ietf:params:xml:ns:yang:ietf-restconf">
                 2019-01-04
-            </ietf-restconf:yang-library-version>""");
+            </ietf-restconf:yang-library-version>""", version);
     }
 
-    @Test
-    void headTest() throws Exception {
-        assertHead(URI);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void headTest(final ProtocolVersion version) throws Exception {
+        assertHead(URI, version);
     }
 
-    @Test
-    void optionsTest() throws Exception {
-        assertOptions(URI, Set.of("GET", "OPTIONS", "HEAD"));
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void optionsTest(final ProtocolVersion version) throws Exception {
+        assertOptions(URI, Set.of("GET", "OPTIONS", "HEAD"), version);
     }
 }
