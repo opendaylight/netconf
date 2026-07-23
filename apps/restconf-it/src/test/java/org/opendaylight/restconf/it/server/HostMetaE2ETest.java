@@ -13,28 +13,33 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.util.Set;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.it.ProtocolVersion;
 
 class HostMetaE2ETest extends AbstractE2ETest {
     private static final String XRD_URI = "/.well-known/host-meta";
     private static final String JRD_URI = "/.well-known/host-meta.json";
 
-    @Test
-    void optionsTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void optionsTest(final ProtocolVersion version) throws Exception {
         final var methods = Set.of("GET", "HEAD", "OPTIONS");
-        assertOptions(XRD_URI, methods);
-        assertOptions(JRD_URI, methods);
+        assertOptions(XRD_URI, methods, version);
+        assertOptions(JRD_URI, methods, version);
     }
 
-    @Test
-    void headTest() throws Exception {
-        assertHead(XRD_URI, MediaTypes.APPLICATION_XRD_XML);
-        assertHead(JRD_URI, APPLICATION_JSON);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void headTest(final ProtocolVersion version) throws Exception {
+        assertHead(XRD_URI, MediaTypes.APPLICATION_XRD_XML, version);
+        assertHead(JRD_URI, APPLICATION_JSON, version);
     }
 
-    @Test
-    void readJsonTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void readJsonTest(final ProtocolVersion version) throws Exception {
         assertContentJson(JRD_URI, """
             {
               "links": [ {
@@ -42,12 +47,13 @@ class HostMetaE2ETest extends AbstractE2ETest {
                 "href": "/rests"
               } ]
             }
-            """);
+            """, version);
     }
 
-    @Test
-    void readXmlTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, XRD_URI);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void readXmlTest(final ProtocolVersion version) throws Exception {
+        final var response = invokeRequest(HttpMethod.GET, XRD_URI, version);
         assertEquals(HttpResponseStatus.OK, response.status());
         assertEquals(MediaTypes.APPLICATION_XRD_XML, response.headers().get(HttpHeaderNames.CONTENT_TYPE));
         assertContentXml(response, """
