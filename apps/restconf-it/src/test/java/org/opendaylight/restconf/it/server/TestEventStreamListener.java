@@ -36,7 +36,11 @@ public final class TestEventStreamListener implements EventStreamListener {
     }
 
     public String readNext() throws InterruptedException {
-        return queue.poll(5, TimeUnit.SECONDS);
+        return readNext(5, TimeUnit.SECONDS);
+    }
+
+    public String readNext(final long timeout, final TimeUnit unit) throws InterruptedException {
+        return queue.poll(timeout, unit);
     }
 
     @Override
