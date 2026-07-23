@@ -10,6 +10,7 @@ package org.opendaylight.restconf.it.server;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opendaylight.restconf.it.ProtocolVersion.HTTP_1_1;
 
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -24,8 +25,9 @@ import javax.net.ssl.SSLException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
 import org.opendaylight.netconf.client.SslContextFactory;
 import org.opendaylight.netconf.client.mdsal.DeviceActionFactoryImpl;
@@ -39,6 +41,7 @@ import org.opendaylight.netconf.topology.impl.NetconfTopologyImpl;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactoryImpl;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.it.ProtocolVersion;
 import org.opendaylight.yang.gen.v1.test.device.simulator.rev240917.DeviceSimData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.NotificationsData;
@@ -100,9 +103,10 @@ class MountPointE2ETest extends AbstractE2ETest {
         super.afterEach();
     }
 
-    @Test
-    void dataCRUDJsonTest() throws Exception {
-        startDeviceSimulator(true);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void dataCRUDJsonTest(final ProtocolVersion version) throws Exception {
+        startDeviceSimulator(true, version);
         mountDeviceJson();
 
         // create
@@ -117,12 +121,12 @@ class MountPointE2ETest extends AbstractE2ETest {
                     }]
                 }
             }""";
-        var response = invokeRequest(HttpMethod.POST, DEVICE_MOUNT_URI, APPLICATION_JSON, initialData);
+        var response = invokeRequest(HttpMethod.POST, DEVICE_MOUNT_URI, version, APPLICATION_JSON, initialData);
         assertEquals(HttpResponseStatus.CREATED, response.status());
-        assertContentJson(DEVICE_DATA_ROOT_URI, initialData);
+        assertContentJson(DEVICE_DATA_ROOT_URI, initialData, version);
 
         // update (merge)
-        response = invokeRequest(HttpMethod.PATCH, DEVICE_DATA_ROOT_URI, APPLICATION_JSON, """
+        response = invokeRequest(HttpMethod.PATCH, DEVICE_DATA_ROOT_URI, version, APPLICATION_JSON, """
             {
                 "device-sim:data-root": {
                     "properties" : [{
@@ -142,7 +146,7 @@ class MountPointE2ETest extends AbstractE2ETest {
                         "value": "value-updated"
                     }]
                 }
-            }""");
+            }""", version);
 
         // replace
         final var replaceData = """
@@ -155,27 +159,28 @@ class MountPointE2ETest extends AbstractE2ETest {
                     }]
                 }
             }""";
-        response = invokeRequest(HttpMethod.PUT, DEVICE_DATA_ROOT_URI, APPLICATION_JSON, replaceData);
+        response = invokeRequest(HttpMethod.PUT, DEVICE_DATA_ROOT_URI, version, APPLICATION_JSON, replaceData);
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
-        assertContentJson(DEVICE_DATA_ROOT_URI, replaceData);
+        assertContentJson(DEVICE_DATA_ROOT_URI, replaceData, version);
 
         // delete
-        response = invokeRequest(HttpMethod.DELETE, DEVICE_DATA_ROOT_URI);
+        response = invokeRequest(HttpMethod.DELETE, DEVICE_DATA_ROOT_URI, version);
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
         // validate deleted
-        response = invokeRequest(HttpMethod.GET, DEVICE_DATA_ROOT_URI);
+        response = invokeRequest(HttpMethod.GET, DEVICE_DATA_ROOT_URI, version);
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
 
-    @Test
-    void notificationStreamJsonTest() throws Exception {
-        startDeviceSimulator(false);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void notificationStreamJsonTest(final ProtocolVersion version) throws Exception {
+        startDeviceSimulator(false, version);
         mountDeviceJson();
 
         var response = invokeRequest(HttpMethod.POST, """
             /rests/operations/network-topology:network-topology/topology=topology-netconf/node=device-sim\
             /yang-ext:mount/notifications:create-subscription""",
-            APPLICATION_JSON, """
+            version, APPLICATION_JSON, """
                 {
                     "input": {
                         "stream": "NETCONF"
@@ -186,7 +191,7 @@ class MountPointE2ETest extends AbstractE2ETest {
         // create notification stream
         response = invokeRequest(HttpMethod.POST,
             "/rests/operations/odl-device-notification:subscribe-device-notification",
-            APPLICATION_JSON, """
+            version, APPLICATION_JSON, """
                 {
                     "input": {
                         "path": "/network-topology:network-topology/topology[topology-id='topology-netconf']\
@@ -204,18 +209,19 @@ class MountPointE2ETest extends AbstractE2ETest {
         assertNotNull(streamName, "Stream name is undefined");
 
         // get stream URL from restconf-state
-        final var streamUrl = getStreamUrlJson(streamName);
+        final var streamUrl = getStreamUrlJson(streamName, version);
         assertNotNull(streamUrl, "Stream URL not found");
 
         // start stream
-        final var streamClient = startStreamClient();
+        final var streamClient = startStreamClient(version);
         try {
             final var eventListener = startStream(streamUrl.getPath());
 
-            // NB: testing single predefined event with 2 sec delay
+            // NB: testing single predefined event with a 6 sec delay
             // due to device simulator starts sending events immediately after subscription
             // so restconf server may drop events occurred in interval between stream start
-            // via netconf and actual consumption via restconf.
+            // via netconf and actual consumption via restconf. The delay accommodates HTTP/3's slower
+            // stream setup, so readNext() here is given a correspondingly longer timeout.
             // Also devise simulator does not respect defined events order.
 
             JSONAssert.assertEquals("""
@@ -225,25 +231,26 @@ class MountPointE2ETest extends AbstractE2ETest {
                             "event-message": "Event message"
                         }
                     }
-                }""", eventListener.readNext(), JSONCompareMode.LENIENT);
+                }""", eventListener.readNext(6, TimeUnit.SECONDS), JSONCompareMode.LENIENT);
 
             // terminate stream
             closeAllStreams();
             await().atMost(Duration.ofSeconds(1)).until(eventListener::ended);
 
         } finally {
-            streamClient.shutdown().get(2, TimeUnit.SECONDS);
+            streamClient.shutdown().get(5, TimeUnit.SECONDS);
         }
     }
 
-    @Test
-    void yangPatchJsonTest() throws Exception {
-        startDeviceSimulator(true);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void yangPatchJsonTest(final ProtocolVersion version) throws Exception {
+        startDeviceSimulator(true, version);
         mountDeviceJson();
 
         // CRUD
-        var response = invokeRequest(HttpMethod.PATCH, DEVICE_DATA_ROOT_URI, MediaTypes.APPLICATION_YANG_PATCH_JSON,
-            MediaTypes.APPLICATION_YANG_DATA_JSON, """
+        var response = invokeRequest(HttpMethod.PATCH, DEVICE_DATA_ROOT_URI, version,
+            MediaTypes.APPLICATION_YANG_PATCH_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, """
             {
                 "ietf-yang-patch:yang-patch" : {
                     "patch-id" : "patch1",
@@ -300,16 +307,17 @@ class MountPointE2ETest extends AbstractE2ETest {
                         }
                     ]
                 }
-            }""");
+            }""", version);
     }
 
-    @Test
-    void negotiatedSshParametersTest() throws Exception {
-        startDeviceSimulator(true);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void negotiatedSshParametersTest(final ProtocolVersion version) throws Exception {
+        startDeviceSimulator(true, version);
         mountDeviceJson();
 
         final var response = invokeRequest(HttpMethod.GET,
-            "/rests/data/network-topology:network-topology/topology=topology-netconf");
+            "/rests/data/network-topology:network-topology/topology=topology-netconf", version);
         assertEquals(HttpResponseStatus.OK, response.status());
 
         final var expected = """
@@ -335,7 +343,7 @@ class MountPointE2ETest extends AbstractE2ETest {
         assertContentJson(response, expected);
     }
 
-    private void startDeviceSimulator(final boolean mdsal) throws Exception {
+    private void startDeviceSimulator(final boolean mdsal, final ProtocolVersion version) throws Exception {
         // mdsal = true --> settable mode, mdsal datastore
         // mdsal = false --> simulated mode, data is taken from conf files
         devicePort = randomBindablePort();
@@ -348,11 +356,14 @@ class MountPointE2ETest extends AbstractE2ETest {
         if (mdsal) {
             configBuilder.setModels(Set.of(DeviceSimData.META.moduleInfo(), IetfNetconfData.META.moduleInfo()));
         } else {
+            // HTTP/3's QUIC handshake takes longer than HTTP/1.1/HTTP/2's connection setup, so it gets its own
+            // notification fixture with a longer delay before the notification fires (see the fixtures themselves).
+            final var notificationFile = version == ProtocolVersion.HTTP_3
+                ? "/device-sim-notifications-h3.xml" : "/device-sim-notifications.xml";
             configBuilder
                 .setModels(Set.of(DeviceSimData.META.moduleInfo(), IetfNetconfData.META.moduleInfo(),
                     NotificationsData.META.moduleInfo()))
-                .setNotificationFile(Path.of(getClass().getResource("/device-sim-notifications.xml").toURI())
-                    .toFile());
+                .setNotificationFile(Path.of(getClass().getResource(notificationFile).toURI()).toFile());
         }
         deviceSimulator = new NetconfDeviceSimulator(configBuilder.build());
         deviceSimulator.start();
@@ -366,7 +377,7 @@ class MountPointE2ETest extends AbstractE2ETest {
                     "network-topology:topology": [{
                         "topology-id":"topology-netconf"
                     }]
-                }""");
+                }""", HTTP_1_1);
         final var input = """
             {
                "network-topology:node": [{
@@ -383,7 +394,7 @@ class MountPointE2ETest extends AbstractE2ETest {
                }]
             }
             """.formatted(localAddress(), devicePort, DEVICE_USERNAME, DEVICE_PASSWORD);
-        final var response = invokeRequest(HttpMethod.POST, TOPOLOGY_URI, APPLICATION_JSON, input);
+        final var response = invokeRequest(HttpMethod.POST, TOPOLOGY_URI, HTTP_1_1, APPLICATION_JSON, input);
         assertEquals(HttpResponseStatus.CREATED, response.status());
         // wait till connected
         await().atMost(Duration.ofSeconds(5)).pollInterval(Duration.ofMillis(500))
@@ -391,7 +402,7 @@ class MountPointE2ETest extends AbstractE2ETest {
     }
 
     private boolean deviceConnectedJson() throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, DEVICE_STATUS_URI);
+        final var response = invokeRequest(HttpMethod.GET, DEVICE_STATUS_URI, HTTP_1_1);
         assertEquals(HttpResponseStatus.OK, response.status());
         final var json = new JSONObject(response.content().toString(StandardCharsets.UTF_8), jsonParserConfiguration());
         //{
