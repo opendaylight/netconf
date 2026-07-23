@@ -9,14 +9,17 @@ package org.opendaylight.restconf.it.server;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opendaylight.restconf.it.ProtocolVersion.HTTP_1_1;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.it.ProtocolVersion;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
@@ -52,17 +55,18 @@ class DataE2ETest extends AbstractE2ETest {
         resetDataNode();
     }
 
-    @Test
-    void dataCRUDJsonTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void dataCRUDJsonTest(final ProtocolVersion version) throws Exception {
         // create
-        var response = invokeRequest(HttpMethod.POST, PARENT_URI, APPLICATION_JSON, INITIAL_NODE_JSON);
+        var response = invokeRequest(HttpMethod.POST, PARENT_URI, version, APPLICATION_JSON, INITIAL_NODE_JSON);
         assertEquals(HttpResponseStatus.CREATED, response.status());
 
         // read (validate created)
-        assertContentJson(ITEM_URI, INITIAL_NODE_JSON);
+        assertContentJson(ITEM_URI, INITIAL_NODE_JSON, version);
 
         // update (merge)
-        response = invokeRequest(HttpMethod.PATCH, ITEM_URI, APPLICATION_JSON,
+        response = invokeRequest(HttpMethod.PATCH, ITEM_URI, version, APPLICATION_JSON,
             """
                 {
                     "example-jukebox:artist": [
@@ -90,7 +94,7 @@ class DataE2ETest extends AbstractE2ETest {
                             }]
                         }
                     ]
-                }""");
+                }""", version);
 
         // replace
         final var replaceNode = """
@@ -106,46 +110,49 @@ class DataE2ETest extends AbstractE2ETest {
                         }
                     ]
                 }""";
-        response = invokeRequest(HttpMethod.PUT, ITEM_URI, APPLICATION_JSON, replaceNode);
+        response = invokeRequest(HttpMethod.PUT, ITEM_URI, version, APPLICATION_JSON, replaceNode);
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
 
         // validate replaced
-        assertContentJson(ITEM_URI, replaceNode);
+        assertContentJson(ITEM_URI, replaceNode, version);
 
         // delete
-        response = invokeRequest(HttpMethod.DELETE, ITEM_URI);
+        response = invokeRequest(HttpMethod.DELETE, ITEM_URI, version);
         assertEquals(HttpResponseStatus.NO_CONTENT, response.status());
 
         // validate deleted
-        response = invokeRequest(HttpMethod.GET, ITEM_URI);
+        response = invokeRequest(HttpMethod.GET, ITEM_URI, version);
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
 
-    @Test
-    void dataExistsErrorJsonTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void dataExistsErrorJsonTest(final ProtocolVersion version) throws Exception {
         // insert data first time
-        var response = invokeRequest(HttpMethod.POST, PARENT_URI, APPLICATION_JSON, INITIAL_NODE_JSON);
+        var response = invokeRequest(HttpMethod.POST, PARENT_URI, version, APPLICATION_JSON, INITIAL_NODE_JSON);
         assertEquals(HttpResponseStatus.CREATED, response.status());
         // subsequent insert of same node
-        response = invokeRequest(HttpMethod.POST, PARENT_URI, APPLICATION_JSON, INITIAL_NODE_JSON);
+        response = invokeRequest(HttpMethod.POST, PARENT_URI, version, APPLICATION_JSON, INITIAL_NODE_JSON);
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS);
     }
 
-    @Test
-    void dataMissingErrorJsonTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void dataMissingErrorJsonTest(final ProtocolVersion version) throws Exception {
         // GET case
-        var response = invokeRequest(HttpMethod.GET, ITEM_URI);
+        var response = invokeRequest(HttpMethod.GET, ITEM_URI, version);
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
         // DELETE case
-        response = invokeRequest(HttpMethod.DELETE, ITEM_URI);
+        response = invokeRequest(HttpMethod.DELETE, ITEM_URI, version);
         assertErrorResponseJson(response, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
 
-    @Test
-    void invokeActionTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void invokeActionTest(final ProtocolVersion version) throws Exception {
         // invoke action
-        final var response = invokeRequest(HttpMethod.POST, ACTIONS_URI + "/example-action", APPLICATION_JSON,
-            ACTION_INPUT_JSON);
+        final var response = invokeRequest(HttpMethod.POST, ACTIONS_URI + "/example-action", version,
+            APPLICATION_JSON, ACTION_INPUT_JSON);
         assertContentJson(response, """
             {
                 "example-action:output": {
@@ -154,11 +161,12 @@ class DataE2ETest extends AbstractE2ETest {
             }""");
     }
 
-    @Test
-    void invokeActionWithBadInputsTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void invokeActionWithBadInputsTest(final ProtocolVersion version) throws Exception {
         // invoke action
-        final var response = invokeRequest(HttpMethod.POST, ACTIONS_URI + "/example-action", APPLICATION_JSON,
-            """
+        final var response = invokeRequest(HttpMethod.POST, ACTIONS_URI + "/example-action", version,
+            APPLICATION_JSON, """
             {
                 "input": {
                     "wrong-data": "Some wrong data"
@@ -168,18 +176,20 @@ class DataE2ETest extends AbstractE2ETest {
             + "(example:action?revision=2024-09-19)input.", HttpResponseStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @Test
-    void invokeNotImplementedActionTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void invokeNotImplementedActionTest(final ProtocolVersion version) throws Exception {
         // invoke not implemented action
-        final var response = invokeRequest(HttpMethod.POST, ACTIONS_URI + "/not-implemented", APPLICATION_JSON,
-            ACTION_INPUT_JSON);
+        final var response = invokeRequest(HttpMethod.POST, ACTIONS_URI + "/not-implemented", version,
+            APPLICATION_JSON, ACTION_INPUT_JSON);
         assertErrorResponseJson(response, ErrorType.RPC, ErrorTag.OPERATION_FAILED);
     }
 
-    @Test
-    void yangPatchTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void yangPatchTest(final ProtocolVersion version) throws Exception {
         // CRUD
-        var response = invokeRequest(HttpMethod.PATCH, ITEM_URI, MediaTypes.APPLICATION_YANG_PATCH_JSON,
+        var response = invokeRequest(HttpMethod.PATCH, ITEM_URI, version, MediaTypes.APPLICATION_YANG_PATCH_JSON,
             MediaTypes.APPLICATION_YANG_DATA_JSON, """
             {
                 "ietf-yang-patch:yang-patch" : {
@@ -246,13 +256,14 @@ class DataE2ETest extends AbstractE2ETest {
                         ]
                     }
                 ]
-            }""");
+            }""", version);
     }
 
-    @Test
-    void yangPatchDataMissingErrorTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void yangPatchDataMissingErrorTest(final ProtocolVersion version) throws Exception {
         // One correct edit, one - not
-        var response = invokeRequest(HttpMethod.PATCH, ITEM_URI, MediaTypes.APPLICATION_YANG_PATCH_JSON,
+        var response = invokeRequest(HttpMethod.PATCH, ITEM_URI, version, MediaTypes.APPLICATION_YANG_PATCH_JSON,
             MediaTypes.APPLICATION_YANG_DATA_JSON, """
             {
                 "ietf-yang-patch:yang-patch" : {
@@ -306,10 +317,11 @@ class DataE2ETest extends AbstractE2ETest {
             }""");
     }
 
-    @Test
-    void yangPatchDataExistsErrorTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void yangPatchDataExistsErrorTest(final ProtocolVersion version) throws Exception {
         // One correct edit, one - not
-        var response = invokeRequest(HttpMethod.PATCH, ITEM_URI, MediaTypes.APPLICATION_YANG_PATCH_JSON,
+        var response = invokeRequest(HttpMethod.PATCH, ITEM_URI, version, MediaTypes.APPLICATION_YANG_PATCH_JSON,
             MediaTypes.APPLICATION_YANG_DATA_JSON, """
             {
                 "ietf-yang-patch:yang-patch" : {
@@ -370,32 +382,34 @@ class DataE2ETest extends AbstractE2ETest {
             }""");
     }
 
-    @Test
-    void dataOptionsTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void dataOptionsTest(final ProtocolVersion version) throws Exception {
         final var patchAcceptTypes =  Set.of("text/xml", APPLICATION_JSON, APPLICATION_XML,
             MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_XML,
             MediaTypes.APPLICATION_YANG_PATCH_JSON, MediaTypes.APPLICATION_YANG_PATCH_XML);
         // root
-        var response = invokeRequest(HttpMethod.OPTIONS, DATA_URI);
+        var response = invokeRequest(HttpMethod.OPTIONS, DATA_URI, version);
         assertOptionsResponse(response, Set.of("GET", "POST", "PUT", "PATCH", "OPTIONS", "HEAD"));
         assertHeaderValue(response, HttpHeaderNames.ACCEPT_PATCH, patchAcceptTypes);
 
         // non-root also deletable
-        response = invokeRequest(HttpMethod.OPTIONS, PARENT_URI);
+        response = invokeRequest(HttpMethod.OPTIONS, PARENT_URI, version);
         assertOptionsResponse(response, Set.of("GET", "POST", "PUT", "PATCH", "OPTIONS", "HEAD", "DELETE"));
         assertHeaderValue(response, HttpHeaderNames.ACCEPT_PATCH, patchAcceptTypes);
     }
 
-    @Test
-    void dataHeadTest() throws Exception {
-        assertHead(DATA_URI);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void dataHeadTest(final ProtocolVersion version) throws Exception {
+        assertHead(DATA_URI, version);
     }
 
     private void resetDataNode() throws Exception {
         // ensure data node exists before we insert a child node
         var response = invokeRequest(HttpMethod.PUT,
             "/rests/data/example-jukebox:jukebox",
-            APPLICATION_JSON,
+            HTTP_1_1, APPLICATION_JSON,
             """
                 {
                     "example-jukebox:jukebox": {
