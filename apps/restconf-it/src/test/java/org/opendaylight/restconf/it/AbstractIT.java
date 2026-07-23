@@ -210,9 +210,7 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
             quicX500Name, quicKeyPair.getPublic());
         quicCertificate = new JcaX509CertificateConverter().getCertificate(
             quicCertBuilder.build(new JcaContentSignerBuilder("SHA256withRSA").build(quicPrivateKey)));
-        quicClientStackGrouping = new HttpClientStackConfiguration(ConfigUtils.clientTransportQuic(localAddress, port,
-            quicCertificate, QUIC_INITIAL_MAX_DATA, QUIC_INITIAL_MAX_STREAM_DATA_BIDI_REMOTE,
-            QUIC_INITIAL_MAX_STREAMS_BIDI, USERNAME, PASSWORD));
+        quicClientStackGrouping = quicClientStackGrouping(USERNAME, PASSWORD);
 
         // AAA services
         final var securityManager = new DefaultWebSecurityManager(new AuthenticatingRealm() {
@@ -453,6 +451,13 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
         assertContentXml(response, expectedContent);
     }
 
+    protected void assertContentXml(final String getRequestUri, final String expectedContent,
+            final @NonNull ProtocolVersion version) throws Exception {
+        final var response = invokeRequest(HttpMethod.GET, getRequestUri, version, APPLICATION_XML);
+        assertEquals(HttpResponseStatus.OK, response.status());
+        assertContentXml(response, expectedContent);
+    }
+
     protected static void assertContentXml(final FullHttpResponse response, final String expectedContent) {
         final var content = response.content().toString(StandardCharsets.UTF_8);
         assertThat(content, isSimilarTo(expectedContent).ignoreComments().ignoreWhitespace()
@@ -537,6 +542,21 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
      */
     protected final HttpClientStackGrouping quicClientStackGrouping() {
         return quicClientStackGrouping;
+    }
+
+    /**
+     * Builds a QUIC (HTTP/3) client transport configuration for the given credentials, targeting the same QUIC
+     * listener as {@link #quicClientStackGrouping()}. Useful for tests that need a client configured with, e.g.,
+     * intentionally wrong credentials (mirroring {@code invalidClientStackGrouping} for the tcp/tls transports).
+     *
+     * @param username username
+     * @param password password
+     * @return a QUIC client transport configuration
+     */
+    protected final HttpClientStackGrouping quicClientStackGrouping(final String username, final String password) {
+        return new HttpClientStackConfiguration(ConfigUtils.clientTransportQuic(localAddress, port, quicCertificate,
+            QUIC_INITIAL_MAX_DATA, QUIC_INITIAL_MAX_STREAM_DATA_BIDI_REMOTE, QUIC_INITIAL_MAX_STREAMS_BIDI,
+            username, password));
     }
 
     /**
