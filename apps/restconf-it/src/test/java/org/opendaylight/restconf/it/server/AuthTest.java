@@ -15,11 +15,13 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Stream;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
-
+import org.opendaylight.restconf.it.ProtocolVersion;
 
 class AuthTest extends AbstractE2ETest {
     private static List<String> targets() {
@@ -30,41 +32,50 @@ class AuthTest extends AbstractE2ETest {
             "/rests/modules/network-topology?revision=2013-10-21");
     }
 
+    private static Stream<Arguments> targetsAndVersions() {
+        return targets().stream()
+            .flatMap(uri -> Stream.of(ProtocolVersion.values()).map(version -> Arguments.of(uri, version)));
+    }
+
     @ParameterizedTest
-    @MethodSource("targets")
-    void authorized(final String uri) throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, uri);
+    @MethodSource("targetsAndVersions")
+    void authorized(final String uri, final ProtocolVersion version) throws Exception {
+        final var response = invokeRequest(HttpMethod.GET, uri, version);
         assertResponse(response, HttpResponseStatus.OK);
     }
 
     @ParameterizedTest
-    @MethodSource("targets")
-    void unauthorized(final String uri) throws Exception {
+    @MethodSource("targetsAndVersions")
+    void unauthorized(final String uri, final ProtocolVersion version) throws Exception {
         final var request = buildRequest(HttpMethod.GET, uri, APPLICATION_JSON, null, null);
-        final var response = invokeRequest(request, invalidClientStackGrouping());
+        final var response = invokeRequest(request, invalidClientStackGrouping(version),
+            version == ProtocolVersion.HTTP_2);
         assertResponse(response, HttpResponseStatus.UNAUTHORIZED);
     }
 
-    @Test
-    void testStreamAuthorized() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void testStreamAuthorized(final ProtocolVersion version) throws Exception {
         final var response = invokeRequest(HttpMethod.GET,
-            "/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream=" + createStream());
+            "/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream=" + createStream(version), version);
         assertResponse(response, HttpResponseStatus.OK);
     }
 
-    @Test
-    void testStreamUnauthorized() throws Exception {
-        final var stream = createStream();
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void testStreamUnauthorized(final ProtocolVersion version) throws Exception {
+        final var stream = createStream(version);
         final var request = buildRequest(HttpMethod.GET,
             "/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream=" + stream,
             APPLICATION_JSON, null, null);
-        final var response = invokeRequest(request, invalidClientStackGrouping());
+        final var response = invokeRequest(request, invalidClientStackGrouping(version),
+            version == ProtocolVersion.HTTP_2);
         assertResponse(response, HttpResponseStatus.UNAUTHORIZED);
     }
 
-    private String createStream() throws Exception {
+    private String createStream(final ProtocolVersion version) throws Exception {
         final var response = invokeRequest(HttpMethod.POST,
-            "/rests/operations/sal-remote:create-data-change-event-subscription",
+            "/rests/operations/sal-remote:create-data-change-event-subscription", version,
             APPLICATION_JSON,
             """
                 {
