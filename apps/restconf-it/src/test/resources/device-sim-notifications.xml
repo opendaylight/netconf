@@ -9,8 +9,10 @@
 <notifications>
     <!-- https://docs.opendaylight.org/projects/netconf/en/stable/testtool.html#notification-support -->
     <notification>
-        <!-- delay 2 seconds after subscription request -->
-        <delay>2</delay>
+        <!-- Delay 6 seconds after subscription request: To give enough time
+             for HTTP/3's stream setup (a fresh QUIC handshake per request) to complete
+             before the notification fires.-->
+        <delay>6</delay>
         <content><![CDATA[
         <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
             <eventTime>XXXX</eventTime>
