@@ -39,6 +39,7 @@ import java.net.InetSocketAddress;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -180,6 +181,7 @@ public abstract sealed class HTTPClient extends HTTPTransportStack
             .initialMaxStreamDataBidirectionalLocal(initialMaxStreamData)
             .initialMaxStreamDataBidirectionalRemote(initialMaxStreamData)
             .initialMaxStreamsBidirectional(quicClientParams.requireInitialMaxStreamsBidi().longValue())
+            .maxIdleTimeout(quicClientParams.requireMaxIdleTimeout().getValue().longValue(), TimeUnit.MILLISECONDS)
             .build();
 
         final var client = new QuicHTTPClient(listener);
@@ -296,7 +298,7 @@ public abstract sealed class HTTPClient extends HTTPTransportStack
             throw new UnsupportedConfigurationException("Missing quic-client-parameters");
         }
         if (parameters.getInitialMaxData() == null || parameters.getInitialMaxStreamDataBidiRemote() == null
-                || parameters.getInitialMaxStreamsBidi() == null) {
+                || parameters.getInitialMaxStreamsBidi() == null || parameters.getMaxIdleTimeout() == null) {
             throw new UnsupportedConfigurationException("Incomplete quic-client-parameters");
         }
         return parameters;
