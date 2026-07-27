@@ -247,6 +247,22 @@ public final class OSGiNorthbound {
                 """,
             min = "0", max = "1152921504606846976")
         long http3$_$initial$_$max$_$streams$_$bidirectional() default 100;
+
+        @AttributeDefinition(
+            name = "HTTP/3 max idle timeout (milliseconds)",
+            description = """
+                QUIC max idle timeout: an HTTP/3 connection idle for longer than this is silently closed, even if
+                the peer never sends a CONNECTION_CLOSE frame. This configures the QUIC max_idle_timeout transport
+                parameter defined in RFC9000(https://www.rfc-editor.org/rfc/rfc9000.html#section-18.2-4.4.1).
+                Set to 0 to disable the check.
+                A subscription's SSE stream is otherwise silent at the QUIC layer, so this must stay well above
+                'heartbeat-interval', and 'heartbeat-interval' must not itself be 0, or a healthy but quiet
+                subscription is closed once this timeout elapses.
+                The maximum value follows the QUIC variable-length integer encoding defined in
+                RFC9000(https://www.rfc-editor.org/rfc/rfc9000.html#section-16), which allows values up to 2^62 - 1.
+                """,
+            min = "0", max = "4611686018427387903")
+        long http3$_$max$_$idle$_$timeout() default 30000;
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
@@ -337,7 +353,8 @@ public final class OSGiNorthbound {
                 tlsCertKey.certificate(), tlsCertKey.privateKey(),
                 Uint64.valueOf(configuration.http3$_$initial$_$max$_$data()),
                 Uint64.valueOf(configuration.http3$_$initial$_$max$_$stream$_$data$_$bidirectional$_$remote()),
-                Uint32.valueOf(configuration.http3$_$initial$_$max$_$streams$_$bidirectional())))
+                Uint32.valueOf(configuration.http3$_$initial$_$max$_$streams$_$bidirectional()),
+                Uint64.valueOf(configuration.http3$_$max$_$idle$_$timeout())))
             : null;
 
         // advertise non-zero h3 support only when we have TLS (h3 requirement)
