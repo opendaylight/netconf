@@ -33,3 +33,4 @@ class SuiteOrder(IntEnum):
     CLUSTERING_CRUD = auto()
     CLUSTERING_ENTITY = auto()
     CLUSTERING_OUTAGES = auto()
+    CLUSTERING_SCALE_PERFORMANCE = auto()
