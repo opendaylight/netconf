@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "015a02b6_a31a180e",
+        "filename": "transport/transport-http/src/main/yang/odl-http-client.yang",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-27T14:00:33Z",
+      "side": 1,
+      "message": "isn\u0027t there any standard model we can use?",
+      "revId": "97394c070963a19260917ca2417744e207442369",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
