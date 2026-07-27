@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "015ec4ae_e24389ed",
+        "filename": "protocol/restconf-client/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-27T14:02:37Z",
+      "side": 1,
+      "message": "abcd order pelase",
+      "revId": "51e891bddbbf11246ed6641d0273513b7a60d368",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
