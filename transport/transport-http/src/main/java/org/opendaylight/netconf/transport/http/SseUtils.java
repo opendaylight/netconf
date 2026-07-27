@@ -14,6 +14,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.http2.Http2MultiplexHandler;
+import io.netty.handler.codec.quic.QuicChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +41,12 @@ public final class SseUtils {
      */
     public static EventStreamService enableClientSse(final HTTPTransportChannel channel) {
         final var nettyChannel = channel.channel();
-        final var pipeline = nettyChannel.pipeline();
+        if (nettyChannel instanceof QuicChannel) {
+            // http 3
+            return new ClientHttp3SseService(channel);
+        }
 
+        final var pipeline = nettyChannel.pipeline();
         final var http2AdapterContext = pipeline.context(Http2MultiplexHandler.class);
         if (http2AdapterContext != null) {
             // http 2
@@ -113,7 +118,9 @@ public final class SseUtils {
 
                 if (splitIndex >= 0) {
                     final var name = splitIndex == 0 ? "" : line.substring(0, splitIndex);
-                    final var valueIndex = line.charAt(splitIndex + 1) == ' ' ? splitIndex + 2 : splitIndex + 1;
+                    // the colon may be the last character, e.g. in an empty "data:" field
+                    final var valueIndex = splitIndex < maxIndex && line.charAt(splitIndex + 1) == ' '
+                        ? splitIndex + 2 : splitIndex + 1;
                     final var value = valueIndex > maxIndex ? "" : line.substring(valueIndex);
                     return name.isEmpty() && value.isEmpty() ? null : new SseField(name, value);
                 }
