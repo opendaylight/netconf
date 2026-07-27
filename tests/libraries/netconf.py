@@ -589,7 +589,10 @@ def check_device_deconfigured(device_name: str, log_response: bool = True):
 
 
 def check_device_data_is_empty(
-    device_name: str, log_response: bool = True, host: str = ODL_IP
+    device_name: str,
+    log_response: bool = True,
+    host: str = ODL_IP,
+    http_timeout: float | tuple[float, float] | None = None,
 ):
     """Get the configuration data of a device and check that it is empty.
 
@@ -604,11 +607,13 @@ def check_device_data_is_empty(
         host (str): Node to query. Defaults to ODL_IP (node 1 / the only
             node); pass another address (e.g. from
             variables.CLUSTER_MEMBER_IPS) to check a different cluster member.
+        http_timeout (float | tuple[float, float] | None): How many seconds to wait for
+            the response before giving up. See requests' documentation for details.
 
     Returns:
         None
     """
-    data = get_device_config_data(device_name, host=host)
+    data = get_device_config_data(device_name, host=host, http_timeout=http_timeout)
     assert re.match(EMPTY_DEVICE_DATA_PATTERN, data) is not None, (
         f"Device {device_name} on host {host} returned unexpected "
         f"non-empty data: {data}"
@@ -697,7 +702,11 @@ def deconfigure_device_and_verify(device_name: str, log_response: bool = True):
     check_device_deconfigured(device_name, log_response=log_response)
 
 
-def get_device_config_data(device_name: str, host: str = ODL_IP) -> str:
+def get_device_config_data(
+    device_name: str,
+    host: str = ODL_IP,
+    http_timeout: float | tuple[float, float] | None = None,
+) -> str:
     """Get the configuration data of a device mounted onto a Netconf connector.
 
     Returns the current state of the data, suitable to be used with
@@ -709,6 +718,8 @@ def get_device_config_data(device_name: str, host: str = ODL_IP) -> str:
         host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
             the only node); pass another address (e.g. from
             variables.CLUSTER_MEMBER_IPS) to query a different cluster member.
+        http_timeout (float | tuple[float, float] | None): How many seconds to wait for
+            the response before giving up. See requests' documentation for details.
 
     Returns:
         str: The raw XML text representation of the device's configuration data.
@@ -718,7 +729,9 @@ def get_device_config_data(device_name: str, host: str = ODL_IP) -> str:
         f"node={device_name}/yang-ext:mount?content=config"
     )
     headers = {"Accept": "application/yang-data+xml"}
-    return templated_requests.get_from_uri(uri, headers=headers, host=host).text
+    return templated_requests.get_from_uri(
+        uri, headers=headers, host=host, http_timeout=http_timeout
+    ).text
 
 
 def check_device_config_data(
