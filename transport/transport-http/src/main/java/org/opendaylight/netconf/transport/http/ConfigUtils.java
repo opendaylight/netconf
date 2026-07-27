@@ -177,6 +177,7 @@ public final class ConfigUtils {
      *        streams the server may open toward this client. HTTP/3 servers never open bidirectional streams
      *        themselves, so this does not bound the number of concurrent requests the client may have in flight;
      *        that is instead governed by the server's own {@code initial_max_streams_bidi}
+     * @param maxIdleTimeout QUIC {@code max_idle_timeout}, in milliseconds; zero disables the check
      * @param username username
      * @param password password
      * @return transport configuration
@@ -184,7 +185,7 @@ public final class ConfigUtils {
     public static Transport clientTransportQuic(final @NonNull String host, final int port,
             final @NonNull Certificate certificate, final @NonNull Uint64 initialMaxData,
             final @NonNull Uint64 initialMaxStreamDataBidirectionalRemote,
-            final @NonNull Uint32 initialMaxStreamsBidirectional,
+            final @NonNull Uint32 initialMaxStreamsBidirectional, final @NonNull Uint64 maxIdleTimeout,
             final @Nullable String username, final @Nullable String password) {
         return new QuicBuilder()
             .setQuic(new org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.client.rev260717.http3.client
@@ -204,6 +205,7 @@ public final class ConfigUtils {
                     .setInitialMaxData(new Varint(initialMaxData))
                     .setInitialMaxStreamDataBidiRemote(new Varint(initialMaxStreamDataBidirectionalRemote))
                     .setInitialMaxStreamsBidi(initialMaxStreamsBidirectional)
+                    .setMaxIdleTimeout(new Varint(maxIdleTimeout))
                     .build())
                 .build())
             .build();
