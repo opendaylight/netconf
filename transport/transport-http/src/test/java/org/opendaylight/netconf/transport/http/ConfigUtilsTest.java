@@ -25,13 +25,14 @@ class ConfigUtilsTest {
     private static final Uint64 INITIAL_MAX_DATA = Uint64.valueOf(4L * 1024 * 1024);
     private static final Uint64 INITIAL_MAX_STREAM_DATA_BIDI = Uint64.valueOf(256L * 1024);
     private static final Uint32 INITIAL_MAX_STREAMS_BIDI = Uint32.valueOf(100);
+    private static final Uint64 MAX_IDLE_TIMEOUT = Uint64.valueOf(30_000);
 
     @Test
     void clientTransportQuicWithAuth() throws Exception {
         final var cert = TestUtils.generateX509CertData("RSA").certificate();
 
         final var transport = ConfigUtils.clientTransportQuic(HOST, PORT, cert, INITIAL_MAX_DATA,
-            INITIAL_MAX_STREAM_DATA_BIDI, INITIAL_MAX_STREAMS_BIDI, "user", "pass");
+            INITIAL_MAX_STREAM_DATA_BIDI, INITIAL_MAX_STREAMS_BIDI, MAX_IDLE_TIMEOUT, "user", "pass");
 
         final var quic = assertInstanceOf(Quic.class, transport).getQuic();
 
@@ -43,6 +44,7 @@ class ConfigUtilsTest {
         assertEquals(INITIAL_MAX_DATA, quicParams.getInitialMaxData().getValue());
         assertEquals(INITIAL_MAX_STREAM_DATA_BIDI, quicParams.getInitialMaxStreamDataBidiRemote().getValue());
         assertEquals(INITIAL_MAX_STREAMS_BIDI, quicParams.getInitialMaxStreamsBidi());
+        assertEquals(MAX_IDLE_TIMEOUT, quicParams.getMaxIdleTimeout().getValue());
 
         // mirrors HTTPClient.collectTrustCertificates()'s own read-side of this exact structure
         final var eeCerts = quic.getTlsClientParameters().getServerAuthentication().getEeCerts();
@@ -60,7 +62,7 @@ class ConfigUtilsTest {
     void clientTransportQuicWithoutAuth() throws Exception {
         final var cert = TestUtils.generateX509CertData("RSA");
         final var transport = ConfigUtils.clientTransportQuic(HOST, PORT, cert.certificate(), INITIAL_MAX_DATA,
-            INITIAL_MAX_STREAM_DATA_BIDI, INITIAL_MAX_STREAMS_BIDI, null, null);
+            INITIAL_MAX_STREAM_DATA_BIDI, INITIAL_MAX_STREAMS_BIDI, MAX_IDLE_TIMEOUT, null, null);
 
         final var quic = assertInstanceOf(Quic.class, transport).getQuic();
         assertNull(quic.getHttpClientParameters().getClientIdentity());
