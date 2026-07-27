@@ -66,5 +66,22 @@ module odl-quic-common {
         "RFC 9000: QUIC: A UDP-Based Multiplexed and Secure Transport,
          Sections 4.6 and 18.2";
     }
+
+    leaf max-idle-timeout {
+      type varint;
+      units "milliseconds";
+      default "30000";
+      description
+        "The QUIC max_idle_timeout transport parameter. A connection that
+         remains idle for longer than this is silently closed and its state
+         discarded by the endpoint enforcing it, even if the peer never sends
+         a CONNECTION_CLOSE frame, e.g. because it crashed or a middlebox
+         dropped the path. This is the only liveness check a QUIC endpoint
+         gets, since QUIC runs over UDP and so has no equivalent of TCP's
+         SO_KEEPALIVE. A value of zero disables the check.";
+      reference
+        "RFC 9000: QUIC: A UDP-Based Multiplexed and Secure Transport,
+         Sections 10.1 and 18.2";
+    }
   }
 }
