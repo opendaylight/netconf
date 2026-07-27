@@ -44,6 +44,15 @@ class SseUtilsTest {
     }
 
     @Test
+    void parseFieldEndingWithColon() {
+        SseUtils.processChunks(byteBuf("data:\r\nevent:\r\n"), eventStreamListener);
+
+        final var inOrder = inOrder(eventStreamListener);
+        inOrder.verify(eventStreamListener).onEventField("data", "");
+        inOrder.verify(eventStreamListener).onEventField("event", "");
+    }
+
+    @Test
     void parseChunks() {
         final var content = byteBuf("field: value\r\nfield-name-only\r\n: comment-message\r\n: \r\nxy:  z\r\n");
         SseUtils.processChunks(content, eventStreamListener);
