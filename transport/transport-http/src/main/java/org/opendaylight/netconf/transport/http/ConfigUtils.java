@@ -30,10 +30,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.inline.or.truststore.certs.grouping.inline.or.truststore.inline.InlineDefinitionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.inline.or.truststore.certs.grouping.inline.or.truststore.inline.inline.definition.CertificateBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.client.rev260717.http3.client.grouping.quic.under.http.QuicBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.client.rev260717.http3.client.grouping.quic.under.http.quic.quic.QuicClientParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.client.rev260717.http3.client.grouping.quic.under.http.quic.quic.QuicClientParameters;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.client.rev260717.http3.client.grouping.quic.under.http.quic.quic.TlsClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.client.rev260717.http3.client.grouping.quic.under.http.quic.quic.UdpClientParametersBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.quic.common.rev260415.Varint;
 import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -171,20 +170,17 @@ public final class ConfigUtils {
      * @param host remote address
      * @param port remote port
      * @param certificate server certificate
-     * @param initialMaxData QUIC {@code initial_max_data}
-     * @param initialMaxStreamDataBidirectionalRemote QUIC {@code initial_max_stream_data_bidi_remote}
-     * @param initialMaxStreamsBidirectional QUIC {@code initial_max_streams_bidi}, i.e. how many bidirectional
-     *        streams the server may open toward this client. HTTP/3 servers never open bidirectional streams
-     *        themselves, so this does not bound the number of concurrent requests the client may have in flight;
-     *        that is instead governed by the server's own {@code initial_max_streams_bidi}
+     * @param quicClientParameters QUIC transport tuning, e.g. built via {@code new QuicClientParametersBuilder()
+     *        .setInitialMaxData(...).setInitialMaxStreamDataBidiRemote(...).setInitialMaxStreamsBidi(...)
+     *        .setMaxIdleTimeout(...).build()}; a builder is used instead of individual parameters here since
+     *        several of them share the same {@link Uint64}/{@link Uint32} types, so passing them positionally
+     *        risks silently swapping them
      * @param username username
      * @param password password
      * @return transport configuration
      */
     public static Transport clientTransportQuic(final @NonNull String host, final int port,
-            final @NonNull Certificate certificate, final @NonNull Uint64 initialMaxData,
-            final @NonNull Uint64 initialMaxStreamDataBidirectionalRemote,
-            final @NonNull Uint32 initialMaxStreamsBidirectional,
+            final @NonNull Certificate certificate, final @NonNull QuicClientParameters quicClientParameters,
             final @Nullable String username, final @Nullable String password) {
         return new QuicBuilder()
             .setQuic(new org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.client.rev260717.http3.client
@@ -200,11 +196,7 @@ public final class ConfigUtils {
                     .rev260717.http3.client.grouping.quic.under.http.quic.quic.HttpClientParametersBuilder()
                     .setClientIdentity(clientIdentity(username, password))
                     .build())
-                .setQuicClientParameters(new QuicClientParametersBuilder()
-                    .setInitialMaxData(new Varint(initialMaxData))
-                    .setInitialMaxStreamDataBidiRemote(new Varint(initialMaxStreamDataBidirectionalRemote))
-                    .setInitialMaxStreamsBidi(initialMaxStreamsBidirectional)
-                    .build())
+                .setQuicClientParameters(requireNonNull(quicClientParameters))
                 .build())
             .build();
     }
