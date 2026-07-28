@@ -82,7 +82,6 @@ class TestPerformance:
         with allure_step_with_separate_logging("step_start_testtool"):
             # Start test tool, then wait for all its devices to become online.
             testtool_process = netconf.start_testtool(
-                "build_tools/netconf-testtool.jar",
                 device_count=1,
                 schemas=f"{DIRECTORY_WITH_CRUD_TEMPLATES}/schemas",
                 debug=False,
