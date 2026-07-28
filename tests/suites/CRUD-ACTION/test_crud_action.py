@@ -61,7 +61,6 @@ class TestCrudAction:
         with allure_step_with_separate_logging("step_start_netconf_testtool"):
             # Start netconf testtool.
             testtool_process = netconf.start_testtool(
-                "build_tools/netconf-testtool.jar",
                 device_count=1,
                 schemas="variables/netconf/CRUD/schemas",
                 rpc_config=RPC_FILE,
