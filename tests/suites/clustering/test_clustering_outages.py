@@ -223,7 +223,6 @@ class TestClusteringOutages:
         with allure_step_with_separate_logging("step_start_netconf_testtool"):
             # Deploy and start test tool, then wait for its device to become online.
             testtool_process = netconf.start_testtool(
-                "build_tools/netconf-testtool.jar",
                 device_count=1,
                 schemas="variables/netconf/CRUD/schemas",
             )
