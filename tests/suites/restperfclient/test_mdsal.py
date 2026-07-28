@@ -122,17 +122,32 @@ class TestMdsal:
             # This is a separate test case to distinguish between restperfclient
             # failure and failed requests. Failed requests are rejected because
             # we don't want to test performance of ODL rejecting our requests.
-            assert (
-                rest_perf_client.grep_restperfclient_log(direct_log, "thread timed out")
-                == ""
+
+            # Check for 'thread timed out'
+            timed_out_logs = rest_perf_client.grep_restperfclient_log(
+                direct_log, "thread timed out"
             )
-            assert (
-                rest_perf_client.grep_restperfclient_log(direct_log, "Request failed")
-                == ""
+            assert not timed_out_logs, (
+                f"restperfclient log contains thread timeout errors "
+                f"({direct_log}):\n{timed_out_logs}"
             )
-            assert (
-                rest_perf_client.grep_restperfclient_log(direct_log, "Status code")
-                == ""
+
+            # Check for 'Request failed'
+            failed_request_logs = rest_perf_client.grep_restperfclient_log(
+                direct_log, "Request failed"
+            )
+            assert not failed_request_logs, (
+                f"restperfclient log contains failed requests ({direct_log}):\n"
+                f"{failed_request_logs}"
+            )
+
+            # Check for 'Status code'
+            status_code_logs = rest_perf_client.grep_restperfclient_log(
+                direct_log, "Status code"
+            )
+            assert not status_code_logs, (
+                "restperfclient log contains unexpected status code entries "
+                f"({direct_log}):\n{status_code_logs}"
             )
 
         with allure_step_with_separate_logging("step_collect_direct_access_logs"):
@@ -179,23 +194,31 @@ class TestMdsal:
             # failure and failed requests. Failed requests are rejected because
             # we don't want to test performance of ODL rejecting our requests.
             with utils.report_known_bug_on_failure("5581"):
-                assert (
-                    rest_perf_client.grep_restperfclient_log(
-                        connector_log, "thread timed out"
-                    )
-                    == ""
+                # Check for 'thread timed out'
+                timed_out_logs = rest_perf_client.grep_restperfclient_log(
+                    connector_log, "thread timed out"
                 )
-                assert (
-                    rest_perf_client.grep_restperfclient_log(
-                        connector_log, "Request failed"
-                    )
-                    == ""
+                assert not timed_out_logs, (
+                    f"restperfclient log contains thread timeout errors "
+                    f"({connector_log}):\n{timed_out_logs}"
                 )
-                assert (
-                    rest_perf_client.grep_restperfclient_log(
-                        connector_log, "Status code"
-                    )
-                    == ""
+
+                # Check for 'Request failed'
+                failed_request_logs = rest_perf_client.grep_restperfclient_log(
+                    connector_log, "Request failed"
+                )
+                assert not failed_request_logs, (
+                    f"restperfclient log contains failed requests "
+                    f"({connector_log}):\n{failed_request_logs}"
+                )
+
+                # Check for 'Status code'
+                status_code_logs = rest_perf_client.grep_restperfclient_log(
+                    connector_log, "Status code"
+                )
+                assert not status_code_logs, (
+                    "restperfclient log contains unexpected status code "
+                    f"entries ({connector_log}):\n{status_code_logs}"
                 )
 
         with allure_step_with_separate_logging("step_collect_connector_access_logs"):
