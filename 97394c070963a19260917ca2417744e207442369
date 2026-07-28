@@ -16,6 +16,24 @@
       "message": "isn\u0027t there any standard model we can use?",
       "revId": "97394c070963a19260917ca2417744e207442369",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1058126_96d40e8e",
+        "filename": "transport/transport-http/src/main/yang/odl-http-client.yang",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-07-28T10:24:58Z",
+      "side": 1,
+      "message": "model ietf-netconf-http-client-server is still a draft,\nnewer version dropped http-client-stack-grouping completly, that would require more complex rework.\nThis augment add QUIC option as added in draft v18,\nWe cannot update it directly as it uses older version of ietf-udp-client than we have (using udpc:udp-client-grouping instead of udpc:udp-client).\n\nThis also add our own odl-quic-common container for the QUIC transport parameters, mirroring exactly how the equivalent case is already done on the server side (odl-http-server.yang)",
+      "parentUuid": "015a02b6_a31a180e",
+      "revId": "97394c070963a19260917ca2417744e207442369",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
