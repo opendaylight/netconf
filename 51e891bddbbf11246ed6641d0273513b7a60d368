@@ -16,6 +16,24 @@
       "message": "abcd order pelase",
       "revId": "51e891bddbbf11246ed6641d0273513b7a60d368",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3fc0155_ac6065ee",
+        "filename": "protocol/restconf-client/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-07-28T10:29:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "015ec4ae_e24389ed",
+      "revId": "51e891bddbbf11246ed6641d0273513b7a60d368",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
