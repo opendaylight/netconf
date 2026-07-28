@@ -102,7 +102,6 @@ class TestMaxDevices:
                     f"step_start_testtool_{device_count}_devices"
                 ):
                     testtool_process = netconf.start_testtool(
-                        "build_tools/netconf-testtool.jar",
                         device_count=device_count,
                         schemas=schemas,
                         debug=False,
