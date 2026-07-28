@@ -53,7 +53,6 @@ class TestGetsingle:
             """Deploy and start test tool, then wait for all its devices to
             become online."""
             testtool_process = netconf.start_testtool(
-                "build_tools/netconf-testtool.jar",
                 device_count=DEVICE_COUNT,
                 debug=False,
                 mdsal=True,
