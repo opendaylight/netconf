@@ -327,7 +327,6 @@ def wait_device_fully_removed(
 
 
 def start_testtool(
-    filename: str,
     device_count: int = 10,
     debug: bool = True,
     schemas: str | None = None,
@@ -347,7 +346,6 @@ def start_testtool(
     remote machine and the additional schemas argument is left out.
 
     Args:
-        filename (str): The path to the testtool jar file.
         device_count (int): The number of Netconf devices to simulate.
         debug (bool): Whether to start the testtool with debug log level.
         schemas (str | None): Path to additional schemas to deploy.
@@ -366,7 +364,11 @@ def start_testtool(
     """
     schemas_option = deploy_additional_schemas(schemas)
     rpc_config_option = deploy_custom_rpc(rpc_config)
-    command = f"java {java_options} -jar {filename} {tool_options} --device-count {device_count} --debug {debug} {schemas_option} {rpc_config_option} --md-sal {mdsal}"
+    command = (
+        f"java {java_options} -jar build_tools/netconf-testtool.jar {tool_options}"
+        f" --device-count {device_count} --debug {debug} {schemas_option}"
+        f" {rpc_config_option} --md-sal {mdsal}"
+    )
     log.info(f"Running testtool: {command}")
     logfile = utils.get_log_file_name("testtool")
     process = infra.shell(f"{command} >tmp/{logfile} 2>&1", run_in_background=True)
