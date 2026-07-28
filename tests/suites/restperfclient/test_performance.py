@@ -163,14 +163,30 @@ class TestPerformance:
             # This is a separate step to distinguish between restperfclient failure
             # and failed requests. Failed requests are rejected because we don't want
             # to test performance of ODL rejecting our requests.
-            assert (
-                rest_perf_client.grep_restperfclient_log(perf_log, "thread timed out")
-                == ""
+
+            # Check for 'thread timed out'
+            timed_out_logs = rest_perf_client.grep_restperfclient_log(
+                perf_log, "thread timed out"
             )
-            assert (
-                rest_perf_client.grep_restperfclient_log(perf_log, "Request failed")
-                == ""
+            assert not timed_out_logs, (
+                f"restperfclient log contains thread timeout errors ({perf_log}):\n"
+                f"{timed_out_logs}"
             )
-            assert (
-                rest_perf_client.grep_restperfclient_log(perf_log, "Status code") == ""
+
+            # Check for 'Request failed'
+            failed_request_logs = rest_perf_client.grep_restperfclient_log(
+                perf_log, "Request failed"
+            )
+            assert not failed_request_logs, (
+                f"restperfclient log contains failed requests ({perf_log}):\n"
+                f"{failed_request_logs}"
+            )
+
+            # Check for 'Status code'
+            status_code_logs = rest_perf_client.grep_restperfclient_log(
+                perf_log, "Status code"
+            )
+            assert not status_code_logs, (
+                "restperfclient log contains unexpected status code entries "
+                f"({perf_log}):\n{status_code_logs}"
             )
