@@ -17,9 +17,11 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.it.ProtocolVersion;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterOutOfBread;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterRestocked;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -30,8 +32,9 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
     private static final NodeIdentifier BREAD_NODEID =
         NodeIdentifier.create(QName.create(ToasterRestocked.QNAME, "amountOfBread").intern());
 
-    @Test
-    void counterNotificationTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void counterNotificationTest(final ProtocolVersion version) throws Exception {
         // Establish subscription
         final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON,
@@ -45,7 +48,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
         assertEquals(HttpResponseStatus.OK, response.status());
         final var id = extractSubscriptionId(response);
 
-        startSubscriptionStream(String.valueOf(id));
+        startSubscriptionStream(String.valueOf(id), version);
 
         final var toasterRestockedNotification = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(ToasterRestocked.QNAME))
@@ -62,15 +65,16 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
             final var receiversResponse =  invokeRequest(HttpMethod.GET,
                 "/rests/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
-                MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, null);
+                version, MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, null);
             assertEquals(HttpResponseStatus.OK, receiversResponse.status());
             // verify 2 notification were sent ToasterRestocked and ToasterOutOfBread
             assertCounter(receiversResponse, "2", "0");
         });
     }
 
-    @Test
-    void counterNotificationWithFilterTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void counterNotificationWithFilterTest(final ProtocolVersion version) throws Exception {
         final var response = establishFilteredSubscription("""
             <toasterRestocked xmlns="http://netconfcentral.org/ns/toaster">
               <amountOfBread/>
@@ -80,7 +84,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
         assertEquals(HttpResponseStatus.OK, response.status());
         final var id = extractSubscriptionId(response);
 
-        startSubscriptionStream(String.valueOf(id));
+        startSubscriptionStream(String.valueOf(id), version);
 
         final var toasterRestockedNotification = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(ToasterRestocked.QNAME))
@@ -101,22 +105,23 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
             final var receiversResponse = invokeRequest(HttpMethod.GET,
                 "/rests/data/ietf-subscribed-notifications:subscriptions/" + "subscription=" + id + "/receivers",
-                MediaTypes.APPLICATION_YANG_DATA_JSON);
+                version, MediaTypes.APPLICATION_YANG_DATA_JSON);
             assertEquals(HttpResponseStatus.OK, receiversResponse.status());
             // verify 2 notification were sent subscription-modified and ToasterRestocked
             assertCounter(receiversResponse, "2", "0");
         });
     }
 
-    @Test
-    void excludedCounterNotificationTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void excludedCounterNotificationTest(final ProtocolVersion version) throws Exception {
         final var response = establishFilteredSubscription(
             "<toasterOutOfBread xmlns=\"http://netconfcentral.org/ns/toaster\"/>");
 
         assertEquals(HttpResponseStatus.OK, response.status());
         final var id = extractSubscriptionId(response);
 
-        startSubscriptionStream(String.valueOf(id));
+        startSubscriptionStream(String.valueOf(id), version);
 
         final var toasterRestockedNotification = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(ToasterRestocked.QNAME))
@@ -143,7 +148,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
             final var receiversResponse = invokeRequest(HttpMethod.GET,
                 "/rests/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
-                MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, null);
+                version, MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, null);
 
             assertEquals(HttpResponseStatus.OK, receiversResponse.status());
             // verify 2 notification were sent subscription-modified and ToasterOutOfBread and 1 excluded

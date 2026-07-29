@@ -23,9 +23,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.it.ProtocolVersion;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterRestocked;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.InsufficientResources;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -48,8 +50,9 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
     private static final String FORMATTED_EVENT_TIME = EVENT_TIME.atZone(ZoneId.systemDefault())
         .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
-    @Test
-    void testSubscriptionSuspension() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void testSubscriptionSuspension(final ProtocolVersion version) throws Exception {
         // Establish subscription
         final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, """
@@ -62,7 +65,7 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
         assertEquals(HttpResponseStatus.OK, response.status());
 
         final var subscriptionId = Uint32.valueOf(extractSubscriptionId(response));
-        final var listener = startSubscriptionStream(String.valueOf(subscriptionId));
+        final var listener = startSubscriptionStream(String.valueOf(subscriptionId), version);
 
         final var subscription = streamRegistry().lookupSubscription(subscriptionId);
         assertNotNull(subscription);
@@ -135,8 +138,9 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
             }""", FORMATTED_EVENT_TIME), listener.readNext(), JSONCompareMode.STRICT);
     }
 
-    @Test
-    void testSuspendSuspendedSubscription() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void testSuspendSuspendedSubscription(final ProtocolVersion version) throws Exception {
         // Establish subscription
         final var response = invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, """
@@ -149,7 +153,7 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
         assertEquals(HttpResponseStatus.OK, response.status());
 
         final var subscriptionId = Uint32.valueOf(extractSubscriptionId(response));
-        final var listener = startSubscriptionStream(String.valueOf(subscriptionId));
+        final var listener = startSubscriptionStream(String.valueOf(subscriptionId), version);
 
         final var subscription = streamRegistry().lookupSubscription(subscriptionId);
         assertNotNull(subscription);

@@ -16,8 +16,10 @@ import java.nio.charset.StandardCharsets;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.it.ProtocolVersion;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
@@ -54,69 +56,75 @@ class FilterWritingTest extends AbstractNotificationSubscriptionTest {
     }
 
     @Disabled("FIXME fails to parse JSON anydata")
-    @Test
-    void writeJsonSubtreeFilterTest() throws Exception {
-        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_JSON,
-            MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_JSON);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void writeJsonSubtreeFilterTest(final ProtocolVersion version) throws Exception {
+        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, version,
+            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_JSON);
         assertEquals(HttpResponseStatus.CREATED, postFilterResponse.status());
     }
 
-    @Test
-    void writeXmlSubtreeFilterTest() throws Exception {
-        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_XML,
-            MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_XML);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void writeXmlSubtreeFilterTest(final ProtocolVersion version) throws Exception {
+        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, version,
+            MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_XML);
         assertEquals(HttpResponseStatus.CREATED, postFilterResponse.status());
     }
 
     @Disabled("FIXME fails to parse JSON anydata")
-    @Test
-    void writeJsonReadJsonSubtreeFilterTest() throws Exception {
-        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_JSON,
-            MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_JSON);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void writeJsonReadJsonSubtreeFilterTest(final ProtocolVersion version) throws Exception {
+        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, version,
+            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_JSON);
         assertEquals(HttpResponseStatus.CREATED, postFilterResponse.status());
 
-        final var getFilterResponse = invokeRequest(HttpMethod.GET, URI_GET, MediaTypes.APPLICATION_YANG_DATA_JSON,
-            MediaTypes.APPLICATION_YANG_DATA_JSON, null);
+        final var getFilterResponse = invokeRequest(HttpMethod.GET, URI_GET, version,
+            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, null);
         final var result = getFilterResponse.content().toString(StandardCharsets.UTF_8);
         assertEquals(HttpResponseStatus.OK, getFilterResponse.status());
         JSONAssert.assertEquals(EXPECTED_FILTER_JSON, result, JSONCompareMode.LENIENT);
     }
 
     @Disabled("FIXME fails to parse JSON anydata")
-    @Test
-    void writeJsonReadXmlSubtreeFilterTest() throws Exception {
-        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_JSON,
-            MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_JSON);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void writeJsonReadXmlSubtreeFilterTest(final ProtocolVersion version) throws Exception {
+        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, version,
+            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_JSON);
         assertEquals(HttpResponseStatus.CREATED, postFilterResponse.status());
 
-        final var getFilterResponse = invokeRequest(HttpMethod.GET, URI_GET, MediaTypes.APPLICATION_YANG_DATA_XML,
-            MediaTypes.APPLICATION_YANG_DATA_XML, null);
+        final var getFilterResponse = invokeRequest(HttpMethod.GET, URI_GET, version,
+            MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_XML, null);
         final var result = getFilterResponse.content().toString(StandardCharsets.UTF_8);
         assertEquals(HttpResponseStatus.OK, getFilterResponse.status());
         assertTrue(XMLUnit.compareXML(FILTER_XML, result).identical());
     }
 
-    @Test
-    void writeXmlReadJsonSubtreeFilterTest() throws Exception {
-        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_XML,
-            MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_XML);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void writeXmlReadJsonSubtreeFilterTest(final ProtocolVersion version) throws Exception {
+        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, version,
+            MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_XML);
         assertEquals(HttpResponseStatus.CREATED, postFilterResponse.status());
 
-        final var getFilterResponse = invokeRequest(HttpMethod.GET, URI_GET, MediaTypes.APPLICATION_YANG_DATA_JSON,
-            MediaTypes.APPLICATION_YANG_DATA_JSON, null);
+        final var getFilterResponse = invokeRequest(HttpMethod.GET, URI_GET, version,
+            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, null);
         final var result = getFilterResponse.content().toString(StandardCharsets.UTF_8);
         assertEquals(HttpResponseStatus.OK, getFilterResponse.status());
         JSONAssert.assertEquals(EXPECTED_FILTER_JSON, result, JSONCompareMode.LENIENT);
     }
 
-    @Test
-    void writeXmlReadXmlSubtreeFilterTest() throws Exception {
-        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_XML,
-            MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_XML);
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void writeXmlReadXmlSubtreeFilterTest(final ProtocolVersion version) throws Exception {
+        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, version,
+            MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_XML);
         assertEquals(HttpResponseStatus.CREATED, postFilterResponse.status());
 
-        final var getFilterResponse = invokeRequest(HttpMethod.GET, URI_GET, MediaTypes.APPLICATION_YANG_DATA_XML,
-            MediaTypes.APPLICATION_YANG_DATA_XML, null);
+        final var getFilterResponse = invokeRequest(HttpMethod.GET, URI_GET, version,
+            MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_XML, null);
         final var result = getFilterResponse.content().toString(StandardCharsets.UTF_8);
         assertEquals(HttpResponseStatus.OK, getFilterResponse.status());
         assertTrue(XMLUnit.compareXML(FILTER_XML, result).identical());
