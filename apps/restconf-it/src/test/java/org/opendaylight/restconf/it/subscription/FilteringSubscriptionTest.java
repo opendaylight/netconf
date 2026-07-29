@@ -21,9 +21,11 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.it.ProtocolVersion;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterOutOfBread;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.toaster.rev091120.ToasterRestocked;
 import org.opendaylight.yang.gen.v1.test.notification.rev250303.ExampleNotification;
@@ -50,8 +52,9 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
         .withChild(ImmutableNodes.leafNode(BREAD_NODEID, 1))
         .build();
 
-    @Test
-    void filterNotificationReceivedTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void filterNotificationReceivedTest(final ProtocolVersion version) throws Exception {
         final var response = establishFilteredSubscription("""
             <toasterRestocked xmlns="http://netconfcentral.org/ns/toaster">
               <amountOfBread/>
@@ -60,7 +63,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
 
         assertEquals(HttpResponseStatus.OK, response.status());
         final var id = extractSubscriptionId(response);
-        final var eventListener = startSubscriptionStream(String.valueOf(id));
+        final var eventListener = startSubscriptionStream(String.valueOf(id), version);
 
         publishService().putNotification(new DOMNotificationEvent.Rfc6020(TOASTER_RESTOCKED_NOTIFICATION, EVENT_TIME));
 
@@ -97,15 +100,17 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
             }""".formatted(id), eventListener.readNext(), JSONCompareMode.LENIENT);
     }
 
-    @Test
-    void filterNotificationNotReceivedTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void filterNotificationNotReceivedTest(final ProtocolVersion version) throws Exception {
         final var response = establishFilteredSubscription(
             "<toasterOutOfBread xmlns=\"http://netconfcentral.org/ns/toaster\"/>");
-        verifyToasterOutOfBreadFilter(response);
+        verifyToasterOutOfBreadFilter(response, version);
     }
 
-    @Test
-    void filteredOutNotificationTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void filteredOutNotificationTest(final ProtocolVersion version) throws Exception {
         final var response = establishFilteredSubscription("""
             <example-notification xmlns="test:notification">
               <entry>
@@ -116,7 +121,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
 
         assertEquals(HttpResponseStatus.OK, response.status());
         final var id = extractSubscriptionId(response);
-        final var eventListener = startSubscriptionStream(String.valueOf(id));
+        final var eventListener = startSubscriptionStream(String.valueOf(id), version);
 
         final var exampleNotification = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(ExampleNotification.QNAME))
@@ -137,12 +142,13 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
     }
 
     @Disabled("Will be disabled until YANGTOOLS-1670 has been resolved")
-    @Test
-    void filterReferenceTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void filterReferenceTest(final ProtocolVersion version) throws Exception {
         // create filter
         final var postFilterResponse = invokeRequest(HttpMethod.POST,
             "/rests/data/ietf-subscribed-notifications:filters",
-            MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON,
+            version, MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
                 <stream-filter xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
                  <name>foo</name>
@@ -164,16 +170,17 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                   }
                 }""");
 
-        verifyToasterOutOfBreadFilter(establishResponse);
+        verifyToasterOutOfBreadFilter(establishResponse, version);
     }
 
     /**
      * Verifies if toasterOutOfBread filter works as expected.
      */
-    private void verifyToasterOutOfBreadFilter(final FullHttpResponse establishResponse) throws Exception {
+    private void verifyToasterOutOfBreadFilter(final FullHttpResponse establishResponse, final ProtocolVersion version)
+            throws Exception {
         assertEquals(HttpResponseStatus.OK, establishResponse.status());
         final var id = extractSubscriptionId(establishResponse);
-        final var eventListener = startSubscriptionStream(String.valueOf(id));
+        final var eventListener = startSubscriptionStream(String.valueOf(id), version);
         publishService().putNotification(new DOMNotificationEvent.Rfc6020(TOASTER_RESTOCKED_NOTIFICATION, EVENT_TIME));
 
         // verify toasterRestocked notification is filtered out

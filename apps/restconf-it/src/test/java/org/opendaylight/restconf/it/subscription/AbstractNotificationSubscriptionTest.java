@@ -10,11 +10,11 @@ package org.opendaylight.restconf.it.subscription;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opendaylight.restconf.it.ProtocolVersion.HTTP_1_1;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpMethod;
@@ -40,13 +40,11 @@ import org.opendaylight.netconf.rfc8639.ModifySubscriptionRpc;
 import org.opendaylight.netconf.rfc8639.impl.IetfSubscriptionFeatureProvider;
 import org.opendaylight.netconf.transport.http.EventStreamService;
 import org.opendaylight.netconf.transport.http.HTTPClient;
-import org.opendaylight.netconf.transport.http.HTTPScheme;
-import org.opendaylight.netconf.transport.http.SseUtils;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.client.ClientSession;
 import org.opendaylight.restconf.client.impl.ClientHttp1Session;
-import org.opendaylight.restconf.client.impl.ClientHttp2Session;
 import org.opendaylight.restconf.it.AbstractIT;
+import org.opendaylight.restconf.it.ProtocolVersion;
 import org.opendaylight.restconf.it.server.TestEventStreamListener;
 import org.opendaylight.restconf.it.server.TestRequestCallback;
 import org.opendaylight.restconf.it.server.TestTransportChannelListener;
@@ -86,7 +84,6 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractIT {
     static final String ESTABLISH_SUBSCRIPTION_URI =
         "/rests/operations/ietf-subscribed-notifications:establish-subscription";
 
-    private EventStreamService clientStreamService;
     private HTTPClient subscriptionStreamClient;
     private HTTPClient rpcClient;
     private EventStreamService.StreamControl streamControl;
@@ -104,7 +101,11 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractIT {
         super.beforeEach();
         notificationPublishService = new RouterDOMPublishNotificationService(domNotificationRouter());
 
-        // Initialize the RPC connection
+        // Initialize the RPC connection. Subscription management (establish/modify/delete/kill-subscription)
+        // requires a persistent connection: HTTP/2 and HTTP/3 tie each request to its own stream, which closes
+        // once the response completes, and closing that stream terminates the subscription along with it.
+        // HTTP/1.1's persistent connection keeps the subscription alive regardless of which ProtocolVersion the
+        // SSE listening stream itself uses (see startSubscriptionStream(String, ProtocolVersion)).
         rpcSession = new ClientHttp1Session();
         final var rpcListener = new TestTransportChannelListener(channel -> {
             channel.channel().pipeline().addLast("restconf-session", rpcSession);
@@ -121,17 +122,30 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractIT {
             rpcClient.shutdown().get(2, TimeUnit.SECONDS);
             rpcClient = null;
         }
-        if (clientStreamService != null) {
-            clientStreamService = null;
-        }
         if (subscriptionStreamClient != null) {
-            subscriptionStreamClient.shutdown().get(2, TimeUnit.SECONDS);
+            subscriptionStreamClient.shutdown().get(5, TimeUnit.SECONDS);
             subscriptionStreamClient = null;
         }
         if (streamControl != null) {
             streamControl = null;
         }
         super.afterEach();
+    }
+
+    // Pinned to HTTP_1_1 regardless of caller: subscription management requires HTTP/1.1's persistent connection
+    // (see the rpcSession setup in beforeEach()), so these version-less overloads must not end up issuing their
+    // request over HTTP/2 or HTTP/3 through some other inherited default.
+    @Override
+    protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
+            final @NonNull String mediaType) throws Exception {
+        return invokeRequest(method, uri, HTTP_1_1, mediaType);
+    }
+
+    @Override
+    protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
+            final @NonNull String mediaType, final @Nullable String acceptType, final @Nullable String content)
+            throws Exception {
+        return invokeRequest(method, uri, HTTP_1_1, mediaType, acceptType, content);
     }
 
     FullHttpResponse invokeTwoRequests(final FullHttpRequest request1, final FullHttpRequest request2)
@@ -174,39 +188,22 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractIT {
         return response;
     }
 
-    protected HTTPClient startStreamClient(final boolean http2) throws Exception {
-        final var transportListener = new TestTransportChannelListener(channel -> {
-            final ChannelHandler session;
-            if (http2) {
-                session = new ClientHttp2Session(HTTPScheme.HTTP);
-            } else {
-                session = new ClientHttp1Session();
-            }
-            channel.channel().pipeline().addLast("restconf-session", session);
-            clientStreamService = SseUtils.enableClientSse(channel);
-        });
-        final var streamClient = HTTPClient.connect(transportListener, bootstrapFactory().newBootstrap(),
-            clientStackGrouping(), http2).get(2, TimeUnit.SECONDS);
-        await().atMost(Duration.ofSeconds(2)).until(transportListener::initialized);
-        assertNotNull(clientStreamService);
-        return streamClient;
-    }
-
     protected TestEventStreamListener startSubscriptionStream(final String subscriptionId) throws Exception {
-        return startSubscriptionStream(subscriptionId, false);
+        subscriptionStreamClient = startStreamClient(HTTP_1_1);
+        return startSubscriptionStreamOnExistingClient(subscriptionId);
     }
 
-    protected TestEventStreamListener startSubscriptionStream(final String subscriptionId, final boolean http2)
-            throws Exception {
-        subscriptionStreamClient = startStreamClient(http2);
+    protected TestEventStreamListener startSubscriptionStream(final String subscriptionId,
+            final ProtocolVersion version) throws Exception {
+        subscriptionStreamClient = startStreamClient(version);
         return startSubscriptionStreamOnExistingClient(subscriptionId);
     }
 
     protected TestEventStreamListener startSubscriptionStreamOnExistingClient(final String subscriptionId)
             throws Exception {
-        assertNotNull(clientStreamService);
+        assertNotNull(clientStreamService());
         final var eventListener = new TestEventStreamListener();
-        clientStreamService.startEventStream("localhost", "/subscriptions/" + subscriptionId, eventListener,
+        clientStreamService().startEventStream("localhost", "/subscriptions/" + subscriptionId, eventListener,
             new EventStreamService.StartCallback() {
                 @Override
                 public void onStreamStarted(final EventStreamService.StreamControl control) {
