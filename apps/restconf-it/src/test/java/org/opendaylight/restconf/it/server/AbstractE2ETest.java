@@ -23,7 +23,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
@@ -34,7 +33,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import org.eclipse.jdt.annotation.NonNull;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
@@ -50,12 +48,7 @@ import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.netconf.transport.http.EventStreamService;
 import org.opendaylight.netconf.transport.http.EventStreamService.StreamControl;
 import org.opendaylight.netconf.transport.http.HTTPClient;
-import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.netconf.transport.http.HttpClientStackConfiguration;
-import org.opendaylight.netconf.transport.http.SseUtils;
-import org.opendaylight.restconf.client.impl.ClientHttp1Session;
-import org.opendaylight.restconf.client.impl.ClientHttp2Session;
-import org.opendaylight.restconf.client.impl.ClientHttp3Session;
 import org.opendaylight.restconf.it.AbstractIT;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
@@ -106,8 +99,6 @@ public abstract class AbstractE2ETest extends AbstractIT {
     private HttpClientStackGrouping invalidClientStackGrouping;
     private HttpClientStackGrouping invalidQuicClientStackGrouping;
 
-    private volatile EventStreamService clientStreamService;
-
     @Override
     protected BindingRuntimeContext getRuntimeContext() {
         return RUNTIME_CONTEXT_CACHE.getUnchecked(getModuleInfos());
@@ -132,9 +123,6 @@ public abstract class AbstractE2ETest extends AbstractIT {
     @AfterEach
     protected void afterEach() throws Exception {
         closeAllStreams();
-        if (clientStreamService != null) {
-            clientStreamService = null;
-        }
         super.afterEach();
     }
 
@@ -313,49 +301,10 @@ public abstract class AbstractE2ETest extends AbstractIT {
         return startStreamClient(false);
     }
 
-    protected HTTPClient startStreamClient(final boolean http2) throws Exception {
-        final var transportListener = new TestTransportChannelListener(channel -> {
-            final ChannelHandler session;
-            if (http2) {
-                session = new ClientHttp2Session(HTTPScheme.HTTP);
-            } else {
-                session = new ClientHttp1Session();
-            }
-            channel.channel().pipeline().addLast("restconf-session", session);
-            clientStreamService = SseUtils.enableClientSse(channel);
-        });
-
-        final var streamClient = HTTPClient.connect(transportListener, bootstrapFactory().newBootstrap(),
-            clientStackGrouping(), http2).get(2, TimeUnit.SECONDS);
-        await().atMost(Duration.ofSeconds(2)).until(transportListener::initialized);
-        assertNotNull(clientStreamService);
-        return streamClient;
-    }
-
-    protected HTTPClient startStreamClient(final ProtocolVersion version) throws Exception {
-        final var transportListener = new TestTransportChannelListener(channel -> {
-            final ChannelHandler session = switch (version) {
-                case HTTP_1_1 -> new ClientHttp1Session();
-                case HTTP_2 -> new ClientHttp2Session(HTTPScheme.HTTP);
-                case HTTP_3 -> new ClientHttp3Session();
-            };
-            channel.channel().pipeline().addLast("restconf-session", session);
-            clientStreamService = SseUtils.enableClientSse(channel);
-        });
-
-        final var clientConf = version == ProtocolVersion.HTTP_3
-            ? quicClientStackGrouping(USERNAME, PASSWORD) : clientStackGrouping();
-        final var streamClient = HTTPClient.connect(transportListener, bootstrapFactory().newBootstrap(),
-            clientConf, version == ProtocolVersion.HTTP_2).get(5, TimeUnit.SECONDS);
-        await().atMost(Duration.ofSeconds(5)).until(transportListener::initialized);
-        assertNotNull(clientStreamService);
-        return streamClient;
-    }
-
     protected TestEventStreamListener startStream(final String uri) {
         final var eventListener = new TestEventStreamListener();
         final int initSize = streamControl.size();
-        clientStreamService.startEventStream("localhost", uri, eventListener,
+        clientStreamService().startEventStream("localhost", uri, eventListener,
             new EventStreamService.StartCallback() {
                 @Override
                 public void onStreamStarted(final StreamControl control) {
