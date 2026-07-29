@@ -21,7 +21,10 @@ import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.it.ProtocolVersion;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
@@ -63,12 +66,13 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
      * Tests that a subscription is correctly terminated when the stop-time is reached
      * and a subscription-terminated notification is received.
      */
-    @Test
-    void subscriptionStopTimeTerminationTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void subscriptionStopTimeTerminationTest(final ProtocolVersion version) throws Exception {
         final var subscriptionId = establishSubscription(Instant.now().plus(Duration.ofSeconds(2)));
 
         // Start listening on notifications
-        final var eventListener = startSubscriptionStream(subscriptionId);
+        final var eventListener = startSubscriptionStream(subscriptionId, version);
 
         final var notification = Awaitility.await().atMost(2, TimeUnit.SECONDS).until(eventListener::readNext,
             Objects::nonNull);
@@ -85,7 +89,7 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
             """.formatted(subscriptionId), notification, JSONCompareMode.LENIENT);
 
         // Assert exception when try to listen to subscription after it should be terminated
-        assertThrows(ConditionTimeoutException.class, () -> startSubscriptionStream(subscriptionId));
+        assertThrows(ConditionTimeoutException.class, () -> startSubscriptionStream(subscriptionId, version));
     }
 
     /**
@@ -94,14 +98,15 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
      * <p>Initially, the first subscription has a later stop-time than the second.
      * After modification, it should terminate before the second one.
      */
-    @Test
-    void subscriptionStopTimeModifiedTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void subscriptionStopTimeModifiedTest(final ProtocolVersion version) throws Exception {
         final var subscriptionId1 = establishSubscription(Instant.now().plus(Duration.ofHours(1)));
         final var subscriptionId2 = establishSubscription(Instant.now().plus(Duration.ofSeconds(8)));
 
         // Start listening on notifications
-        final var eventListener1 = startSubscriptionStream(subscriptionId1);
-        final var eventListener2 = startSubscriptionStream(subscriptionId2);
+        final var eventListener1 = startSubscriptionStream(subscriptionId1, version);
+        final var eventListener2 = startSubscriptionStream(subscriptionId2, version);
 
         // modify the first subscription to have earlier stop time than the second one
         final var newStopTime = Instant.now().plus(Duration.ofSeconds(2));
@@ -169,12 +174,13 @@ public class StopTimeTest extends AbstractNotificationSubscriptionTest {
      * <p>Test that modifying subscription with absent field of stop-time doesn't affect stop-time and subscription is
      * properly terminated when time is reached.
      */
-    @Test
-    void subscriptionModifiedAbsentStopTimeTest() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ProtocolVersion.class)
+    void subscriptionModifiedAbsentStopTimeTest(final ProtocolVersion version) throws Exception {
         final var subscriptionId = establishSubscription(Instant.now().plus(Duration.ofSeconds(2)));
 
         // Start listening on notifications
-        final var eventListener = startSubscriptionStream(subscriptionId);
+        final var eventListener = startSubscriptionStream(subscriptionId, version);
 
         // modify the subscription with absent stop time
         final var modifyInput = """
