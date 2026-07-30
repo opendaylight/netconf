@@ -200,11 +200,16 @@ public final class ResponseWriter extends ChannelInboundHandlerAdapter {
     }
 
     /**
-     * Schedule a drain on the event loop (or run inline if no executor / already on EL).
+     * Schedule a drain on the event loop (or run inline if no executor). Always dispatches through the executor,
+     * even when already on the event loop, and never drains inline when one is available: a direct
+     * {@code writeAndFlush()} issued off the event loop is deferred by Netty into its own internal task queue, to
+     * be run later. Draining inline here instead could write out whatever is already queued before Netty gets
+     * around to running that earlier-scheduled off-loop write, reordering the two relative to each other.
+     * Submitting the drain through the same executor places it in that same FIFO task queue, behind any off-loop
+     * write that was scheduled earlier, so relative order is preserved.
      */
     private void scheduleDrain() {
         if (!(state instanceof Writable)) {
-            // Not Writable (Inactive or Unwritable) -> do not schedule
             return;
         }
         if (context == null) {
@@ -212,8 +217,7 @@ public final class ResponseWriter extends ChannelInboundHandlerAdapter {
         }
         final var localCtx = context;
         final var exec = localCtx.executor();
-        if (exec == null || exec.inEventLoop()) {
-            // Inline drain: ensures the first put is consumed before the next producer call
+        if (exec == null) {
             drainOnEventLoop(localCtx);
         } else {
             exec.execute(() -> drainOnEventLoop(localCtx));
