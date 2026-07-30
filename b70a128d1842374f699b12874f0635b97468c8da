@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1ca6d89_4686bb72",
+        "filename": "tests/conftest.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-07-30T06:28:26Z",
+      "side": 1,
+      "message": "Can you add description to commit message why odl-jolokia is needed as a new feature in this test case?",
+      "revId": "b70a128d1842374f699b12874f0635b97468c8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2637c3ee_a8d0a22d",
+        "filename": "tests/suites/clustering/test_clustering_crud.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-07-30T06:28:26Z",
+      "side": 1,
+      "message": "This part is little bit outdated. I think we can remove it.",
+      "range": {
+        "startLine": 246,
+        "startChar": 12,
+        "endLine": 247,
+        "endChar": 35
+      },
+      "revId": "b70a128d1842374f699b12874f0635b97468c8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
