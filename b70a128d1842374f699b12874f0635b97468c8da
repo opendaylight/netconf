@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "caf7ce1b_54a99db3",
+        "filename": "tests/conftest.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-30T10:32:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c1ca6d89_4686bb72",
+      "revId": "b70a128d1842374f699b12874f0635b97468c8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2637c3ee_a8d0a22d",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-07-30T06:28:26Z",
       "side": 1,
       "message": "This part is little bit outdated. I think we can remove it.",
+      "range": {
+        "startLine": 246,
+        "startChar": 12,
+        "endLine": 247,
+        "endChar": 35
+      },
+      "revId": "b70a128d1842374f699b12874f0635b97468c8da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "491459a7_d24c1c92",
+        "filename": "tests/suites/clustering/test_clustering_crud.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-07-30T10:32:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2637c3ee_a8d0a22d",
       "range": {
         "startLine": 246,
         "startChar": 12,
