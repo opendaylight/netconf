@@ -106,22 +106,17 @@ public final class ResponseWriter extends ChannelInboundHandlerAdapter {
         if (HttpVersion.HTTP_1_1.equals(version)) {
             response.headers().set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED);
         }
-        switch (state) {
-            case Inactive ignored -> {
-                LOG.debug("Rejecting sendResponseStart");
-                return false;
-            }
-            case Unwritable ignored -> {
-                LOG.debug("Channel unwritable, adding first chunk to queue");
-                blockPut(response);
-                scheduleDrain();
-                return true;
-            }
-            case Writable writable -> {
-                writable.ctx.writeAndFlush(response);
-                return true;
-            }
+        if (state instanceof Inactive) {
+            LOG.debug("Rejecting sendResponseStart");
+            return false;
         }
+        // Always enqueue, even when Writable: a direct writeAndFlush() issued off the event loop races Netty's
+        // own internal task queue against drainOnEventLoop's on-loop writes of whatever is already queued, and
+        // the two are not ordered relative to each other. Routing everything through pendingChunks +
+        // drainOnEventLoop is the only way to guarantee a single, consistent write order for the response.
+        blockPut(response);
+        scheduleDrain();
+        return true;
     }
 
     /**
@@ -134,27 +129,13 @@ public final class ResponseWriter extends ChannelInboundHandlerAdapter {
     @NonNullByDefault
     boolean sendResponsePart(final ByteBuf chunk) {
         final var content = new DefaultHttpContent(chunk);
-        switch (state) {
-            case Inactive ignored -> {
-                LOG.debug("Rejecting response part");
-                return false;
-            }
-            case Unwritable ignored -> {
-                LOG.debug("Channel unwritable, adding part chunk to queue");
-                blockPut(content);
-                scheduleDrain();
-                return true;
-            }
-            case Writable writable -> {
-                if (pendingChunks.isEmpty()) {
-                    writable.ctx.writeAndFlush(content);
-                } else {
-                    blockPut(content);
-                    scheduleDrain();
-                }
-                return true;
-            }
+        if (state instanceof Inactive) {
+            LOG.debug("Rejecting response part");
+            return false;
         }
+        blockPut(content);
+        scheduleDrain();
+        return true;
     }
 
     /**
@@ -166,27 +147,13 @@ public final class ResponseWriter extends ChannelInboundHandlerAdapter {
     boolean sendResponseEnd(final ReadOnlyHttpHeaders trailers) {
         final var lastContent = new DefaultLastHttpContent(Unpooled.EMPTY_BUFFER);
         lastContent.trailingHeaders().add(trailers);
-        switch (state) {
-            case Inactive ignored -> {
-                LOG.debug("Rejecting response end");
-                return false;
-            }
-            case Unwritable ignored -> {
-                LOG.debug("Channel unwritable, adding end chunk to queue");
-                blockPut(lastContent);
-                scheduleDrain();
-                return true;
-            }
-            case Writable writable -> {
-                if (pendingChunks.isEmpty()) {
-                    writable.ctx.writeAndFlush(lastContent);
-                } else {
-                    blockPut(lastContent);
-                    scheduleDrain();
-                }
-                return true;
-            }
+        if (state instanceof Inactive) {
+            LOG.debug("Rejecting response end");
+            return false;
         }
+        blockPut(lastContent);
+        scheduleDrain();
+        return true;
     }
 
     private void blockPut(final HttpObject obj) {
