@@ -45,8 +45,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev241010.TlsServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev241010.tls.server.grouping.server.identity.auth.type.Certificate;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.udp.server.rev251216.udp.server.LocalBind;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260415.http3.server.grouping.QuicUnderHttp;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260415.http3.server.grouping.quic.under.http.QuicServerParameters;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.http3.server.grouping.QuicUnderHttp;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.http3.server.grouping.quic.under.http.QuicServerParameters;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
