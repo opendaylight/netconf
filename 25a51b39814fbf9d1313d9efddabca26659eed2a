@@ -16,6 +16,24 @@
       "message": "Can we reuse the existing bootstrap.config().group() here instead of creating a new EventLoopGroup?\n\nThis method runs once per connection, so every QUIC connection allocates its own thread pool. The TCP/TLS path in this class reuses the caller\u0027s bootstrap group. QUIC probably should do the same.",
       "revId": "25a51b39814fbf9d1313d9efddabca26659eed2a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dde9d3cd_9cbca358",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-07-31T12:52:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b1d7650d_fdfa3df4",
+      "revId": "25a51b39814fbf9d1313d9efddabca26659eed2a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
