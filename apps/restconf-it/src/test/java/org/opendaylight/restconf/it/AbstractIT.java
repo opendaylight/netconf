@@ -633,4 +633,18 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
     protected final int port() {
         return port;
     }
+
+    /**
+     * {@return the QUIC {@code initial_max_data} transport parameter}
+     */
+    protected static Uint64 quicInitialMaxData() {
+        return QUIC_INITIAL_MAX_DATA;
+    }
+
+    /**
+     * {@return the QUIC {@code initial_max_stream_data_bidi_remote} transport parameter}
+     */
+    protected static Uint64 quicInitialMaxStreamDataBidiRemote() {
+        return QUIC_INITIAL_MAX_STREAM_DATA_BIDI_REMOTE;
+    }
 }
