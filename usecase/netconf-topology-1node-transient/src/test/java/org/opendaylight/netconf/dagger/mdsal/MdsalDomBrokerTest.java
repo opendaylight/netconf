@@ -161,7 +161,7 @@ class MdsalDomBrokerTest {
                 "ietf-udp-server@2025-12-16.yang",
                 "ietf-x509-cert-to-name@2014-12-10.yang",
                 "odl-codegen-extensions@2024-06-27.yang",
-                "odl-http-server@2026-04-15.yang",
+                "odl-http-server@2026-07-31.yang",
                 "odl-quic-common@2026-04-15.yang",
                 "iana-ssh-encryption-algs@2024-10-16.yang",
                 "iana-ssh-key-exchange-algs@2024-10-16.yang",
