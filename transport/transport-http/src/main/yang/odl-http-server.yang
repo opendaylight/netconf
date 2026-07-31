@@ -12,6 +12,20 @@ module odl-http-server {
      terms of the Eclipse Public License v1.0 which accompanies this distribution,
      and is available at http://www.eclipse.org/legal/epl-v10.html";
 
+  revision "2026-07-31" {
+    description
+      "Add configurable request size limits to the HTTP server listen stack,
+       augmented in below 'http-server-parameters' of every transport case:
+
+       - 'server-limits' holds the limits defined by the HTTP specifications,
+         each rejecting an over-sized request with its own status code:
+         max-initial-line-length (414), max-header-size (431) and
+         max-request-body-size (413);
+       - 'odl-server-limits' holds parameters of OpenDaylight's Netty-based
+         implementation, which only affect how a request is buffered and never
+         reject it: max-chunk-size and bytebuf-allocator.";
+  }
+
   revision "2026-04-15" {
     description "Initial revision";
   }
@@ -26,6 +40,87 @@ module odl-http-server {
 
   import odl-quic-common {
     prefix oqc;
+  }
+
+  grouping server-limits-grouping {
+    description
+      "Limits on the size of an incoming HTTP request, each rejecting an
+       over-sized request with a status code defined by HTTP. Kept here rather
+       than in ietf-http-server, which is replaced wholesale on refresh.";
+
+    container server-limits {
+      description
+        "HTTP server request size limits.";
+
+      leaf max-initial-line-length {
+        type uint32;
+        default 8192;
+        description
+          "Maximum length of the request line, in octets. Exceeding it is
+           rejected with '414 URI Too Long'. The default follows RFC 9112
+           rather than Netty's own 4096.";
+        reference
+          "RFC 9112: HTTP/1.1, Section 3
+           RFC 9110: HTTP Semantics, Section 15.5.15";
+      }
+
+      leaf max-header-size {
+        type uint32;
+        default 16384;
+        description
+          "Maximum size of the request header section, in octets. Exceeding it
+           is rejected with '431 Request Header Fields Too Large'.";
+        reference
+          "RFC 9112: HTTP/1.1, Section 5
+           RFC 6585: Additional HTTP Status Codes, Section 5";
+      }
+
+      leaf max-request-body-size {
+        type uint32;
+        default 10485760;
+        description
+          "Maximum size of the request body, in octets, counted after transfer
+           coding is decoded. Exceeding it is rejected with '413 Content Too
+           Large'.";
+        reference
+          "RFC 9110: HTTP Semantics, Section 15.5.14";
+      }
+    }
+  }
+
+  grouping odl-server-limits-grouping {
+    description
+      "Tuning knobs specific to OpenDaylight's Netty-based implementation.
+       Unlike server-limits-grouping, none of these reject a request.";
+
+    container odl-server-limits {
+      description
+        "OpenDaylight-specific Netty HTTP server tuning.";
+
+      leaf max-chunk-size {
+        type uint32;
+        default 8192;
+        description
+          "Maximum HTTP/1.1 chunk size emitted by the Netty decoder. Bounds
+           how much body reaches the pipeline at a time, not the body itself.";
+      }
+
+      leaf bytebuf-allocator {
+        type enumeration {
+          enum pooled {
+            description
+              "Use Netty's pooled ByteBuf allocator.";
+          }
+          enum default {
+            description
+              "Use Netty's default ByteBuf allocator.";
+          }
+        }
+        default pooled;
+        description
+          "Netty ByteBuf allocator mode.";
+      }
+    }
   }
 
   grouping http3-server-grouping {
@@ -46,6 +141,39 @@ module odl-http-server {
             "QUIC-level server parameters.";
           uses oqc:transport-params-grouping;
         }
+      }
+    }
+  }
+
+  grouping odl-http-server-listen-stack-grouping {
+    description
+      "The HTTP server listen stack with all ODL-specific additions; this is
+       the grouping consumers should use. The limits are layered on top of
+       http3-server-grouping because each 'uses' of the stack expands into its
+       own copy of the schema tree.";
+
+    uses http3-server-grouping {
+      augment transport/http-over-tcp/http-over-tcp/http-server-parameters {
+        oce:augment-identifier limits-under-http-tcp;
+
+        uses server-limits-grouping;
+        uses odl-server-limits-grouping;
+      }
+
+      augment transport/http-over-tls/http-over-tls/http-server-parameters {
+        oce:augment-identifier limits-under-http-tls;
+
+        uses server-limits-grouping;
+        uses odl-server-limits-grouping;
+      }
+
+      augment transport/http-over-quic/http-over-quic/http-server-parameters {
+        if-feature https:quic-supported;
+
+        oce:augment-identifier limits-under-http-quic;
+
+        uses server-limits-grouping;
+        uses odl-server-limits-grouping;
       }
     }
   }
