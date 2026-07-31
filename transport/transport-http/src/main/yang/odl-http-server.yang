@@ -12,6 +12,21 @@ module odl-http-server {
      terms of the Eclipse Public License v1.0 which accompanies this distribution,
      and is available at http://www.eclipse.org/legal/epl-v10.html";
 
+  revision "2026-07-31" {
+    description
+      "Add configurable request limits to the HTTP server listen stack,
+       augmented in below 'http-server-parameters' of the TCP and TLS transport
+       cases:
+
+       - 'server-limits' holds the bounds the HTTP specifications define, along
+         with what happens when one is exceeded: max-initial-line-length (414),
+         max-header-size (431), max-request-body-size (413) and
+         max-frame-size (FRAME_SIZE_ERROR);
+       - 'odl-server-limits' holds knobs of OpenDaylight's Netty-based
+         implementation which have no counterpart in the specifications:
+         max-request-chunk-size.";
+  }
+
   revision "2026-04-15" {
     description "Initial revision";
   }
@@ -26,6 +41,98 @@ module odl-http-server {
 
   import odl-quic-common {
     prefix oqc;
+  }
+
+  grouping server-limits-grouping {
+    description
+      "Bounds on an incoming HTTP request which the HTTP specifications define,
+       including what an implementation does when one is exceeded. Kept here
+       rather than in ietf-http-server, which is replaced wholesale on refresh.";
+
+    container server-limits {
+      description
+        "HTTP server request limits.";
+
+      leaf max-initial-line-length {
+        type uint32 {
+          range "1..2147483647";
+        }
+        default 8192;
+        description
+          "Maximum length of the request line, in octets. Exceeding it is
+           rejected with '414 URI Too Long'. The default follows RFC 9112
+           rather than Netty's own 4096.";
+        reference
+          "RFC 9112: HTTP/1.1, Section 3
+           RFC 9110: HTTP Semantics, Section 15.5.15";
+      }
+
+      leaf max-header-size {
+        type uint32 {
+          range "1..2147483647";
+        }
+        default 16384;
+        description
+          "Maximum size of the request header section, in octets. Exceeding it
+           is rejected with '431 Request Header Fields Too Large'.
+
+           On HTTP/2 this is advertised as SETTINGS_MAX_HEADER_LIST_SIZE, which
+           counts the uncompressed field list plus 32 octets of overhead per
+           field rather than the octets on the wire. The two are therefore
+           close but not identical measures of the same intent.";
+        reference
+          "RFC 9112: HTTP/1.1, Section 5
+           RFC 6585: Additional HTTP Status Codes, Section 5
+           RFC 9113: HTTP/2, Section 6.5.2";
+      }
+
+      leaf max-request-body-size {
+        type uint32 {
+          range "1..2147483647";
+        }
+        default 10485760;
+        description
+          "Maximum size of the request body, in octets, counted after transfer
+           coding is decoded. Exceeding it is rejected with '413 Content Too
+           Large'.";
+        reference
+          "RFC 9110: HTTP Semantics, Section 15.5.14";
+      }
+
+      leaf max-frame-size {
+        type uint32 {
+          range "16384..16777215";
+        }
+        default 16384;
+        description
+          "Maximum HTTP/2 frame payload size, in octets, advertised as
+           SETTINGS_MAX_FRAME_SIZE. A larger frame is a FRAME_SIZE_ERROR.";
+        reference
+          "RFC 9113: HTTP/2, Section 6.5.2";
+      }
+    }
+  }
+
+  grouping odl-server-limits-grouping {
+    description
+      "Knobs of OpenDaylight's Netty-based implementation which have no
+       counterpart in the HTTP specifications.";
+
+    container odl-server-limits {
+      description
+        "OpenDaylight-specific Netty HTTP server tuning.";
+
+      leaf max-request-chunk-size {
+        type uint32 {
+          range "1..2147483647";
+        }
+        default 8192;
+        description
+          "Maximum HTTP/1.1 chunk size emitted by the Netty request decoder.
+           Bounds how much body reaches the pipeline at a time, not the body
+           itself.";
+      }
+    }
   }
 
   grouping http3-server-grouping {
@@ -46,6 +153,34 @@ module odl-http-server {
             "QUIC-level server parameters.";
           uses oqc:transport-params-grouping;
         }
+      }
+    }
+  }
+
+  grouping odl-http-server-listen-stack-grouping {
+    description
+      "The HTTP server listen stack with all ODL-specific additions; this is
+       the grouping consumers should use. The limits are layered on top of
+       http3-server-grouping because each 'uses' of the stack expands into its
+       own copy of the schema tree.
+
+       There is deliberately no such augment under http-over-quic: an HTTP/3
+       listener is an alternative service of an existing endpoint, and shares
+       that endpoint's limits.";
+
+    uses http3-server-grouping {
+      augment transport/http-over-tcp/http-over-tcp/http-server-parameters {
+        oce:augment-identifier limits-under-http-tcp;
+
+        uses server-limits-grouping;
+        uses odl-server-limits-grouping;
+      }
+
+      augment transport/http-over-tls/http-over-tls/http-server-parameters {
+        oce:augment-identifier limits-under-http-tls;
+
+        uses server-limits-grouping;
+        uses odl-server-limits-grouping;
       }
     }
   }
