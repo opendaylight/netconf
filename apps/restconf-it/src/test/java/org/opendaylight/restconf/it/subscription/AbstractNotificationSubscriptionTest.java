@@ -135,14 +135,12 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractIT {
     // Pinned to HTTP_1_1 regardless of caller: subscription management requires HTTP/1.1's persistent connection
     // (see the rpcSession setup in beforeEach()), so these version-less overloads must not end up issuing their
     // request over HTTP/2 or HTTP/3 through some other inherited default.
-    @Override
-    protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
+    protected FullHttpResponse invokeRequestHttp1(final @NonNull HttpMethod method, final @NonNull String uri,
             final @NonNull String mediaType) throws Exception {
         return invokeRequest(method, uri, HTTP_1_1, mediaType);
     }
 
-    @Override
-    protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
+    FullHttpResponse invokeRequestHttp1(final @NonNull HttpMethod method, final @NonNull String uri,
             final @NonNull String mediaType, final @Nullable String acceptType, final @Nullable String content)
             throws Exception {
         return invokeRequest(method, uri, HTTP_1_1, mediaType, acceptType, content);
