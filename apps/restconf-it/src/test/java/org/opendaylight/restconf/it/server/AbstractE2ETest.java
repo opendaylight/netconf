@@ -127,13 +127,6 @@ public abstract class AbstractE2ETest extends AbstractIT {
     }
 
     /**
-     * {@return the invalidClientStackGrouping}
-     */
-    protected final HttpClientStackGrouping invalidClientStackGrouping() {
-        return invalidClientStackGrouping;
-    }
-
-    /**
      * {@return the invalid (wrong-password) client transport configuration matching the given protocol version}
      *
      * @param version the HTTP protocol version
