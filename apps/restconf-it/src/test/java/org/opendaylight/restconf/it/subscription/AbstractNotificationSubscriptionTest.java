@@ -128,14 +128,12 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractIT {
         super.afterEach();
     }
 
-    @Override
-    protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
+    FullHttpResponse invokeRequestHttp1(final @NonNull HttpMethod method, final @NonNull String uri,
             final @NonNull String mediaType) throws Exception {
         return invokeRequest(method, uri, HTTP_1_1, mediaType);
     }
 
-    @Override
-    protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
+    FullHttpResponse invokeRequestHttp1(final @NonNull HttpMethod method, final @NonNull String uri,
             final @NonNull String mediaType, final @Nullable String acceptType, final @Nullable String content)
             throws Exception {
         return invokeRequest(method, uri, HTTP_1_1, mediaType, acceptType, content);
