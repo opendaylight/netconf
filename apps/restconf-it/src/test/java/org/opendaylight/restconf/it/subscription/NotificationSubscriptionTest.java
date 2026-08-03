@@ -37,7 +37,7 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
      */
     @Test
     void defaultStreamAvailabilityTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, "/rests/data/ietf-subscribed-notifications:streams",
+        final var response = invokeRequestHttp1(HttpMethod.GET, "/rests/data/ietf-subscribed-notifications:streams",
             APPLICATION_JSON);
         assertNotNull(response);
         assertNotNull(response.content());
@@ -130,7 +130,7 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 "stop-time": "2025-03-20T15:30:00Z"
               }
             }""";
-        final var response = invokeRequest(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI, APPLICATION_JSON,
+        final var response = invokeRequestHttp1(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI, APPLICATION_JSON,
             APPLICATION_JSON, input);
         assertEquals(HttpResponseStatus.BAD_REQUEST, response.status());
     }
@@ -140,7 +140,7 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
      */
     @Test
     void listenToNonExistentSubscriptionTest() throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, "/subscriptions/99999", "text/event-stream");
+        final var response = invokeRequestHttp1(HttpMethod.GET, "/subscriptions/99999", "text/event-stream");
         assertEquals(HttpResponseStatus.NOT_FOUND, response.status());
     }
 
@@ -174,7 +174,7 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 "id": 99999
               }
             }""";
-        final var response = invokeRequest(HttpMethod.POST, DELETE_SUBSCRIPTION_URI, APPLICATION_JSON,
+        final var response = invokeRequestHttp1(HttpMethod.POST, DELETE_SUBSCRIPTION_URI, APPLICATION_JSON,
             APPLICATION_JSON, input);
         assertEquals(HttpResponseStatus.BAD_REQUEST, response.status());
         final var jsonNode = OBJECT_MAPPER.readTree(response.content().toString(StandardCharsets.UTF_8));
@@ -213,7 +213,7 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 "id": 99999
               }
             }""";
-        final var response = invokeRequest(HttpMethod.POST, KILL_SUBSCRIPTION_URI, APPLICATION_JSON,
+        final var response = invokeRequestHttp1(HttpMethod.POST, KILL_SUBSCRIPTION_URI, APPLICATION_JSON,
             APPLICATION_JSON, input);
         assertEquals(HttpResponseStatus.BAD_REQUEST, response.status());
         final var jsonNode = OBJECT_MAPPER.readTree(response.content().toString(StandardCharsets.UTF_8));
@@ -232,7 +232,7 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 "encoding": "%s"
               }
             }""", stream, JSON_ENCODING);
-        return invokeRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_JSON, APPLICATION_JSON, input);
+        return invokeRequestHttp1(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_JSON, APPLICATION_JSON, input);
     }
 
     /**
@@ -247,7 +247,7 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
                 %s
                </stream-subtree-filter>
             </input>""", stream, filter);
-        return invokeRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_XML, APPLICATION_JSON, input);
+        return invokeRequestHttp1(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_XML, APPLICATION_JSON, input);
     }
 
     private FullHttpRequest prepareEstablishRPCRequest() {
