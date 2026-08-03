@@ -127,14 +127,12 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractIT {
         super.afterEach();
     }
 
-    @Override
-    protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
+    FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
             final @NonNull String mediaType) throws Exception {
         return invokeRequest(method, uri, HTTP_1_1, mediaType);
     }
 
-    @Override
-    protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
+    FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
             final @NonNull String mediaType, final @Nullable String acceptType, final @Nullable String content)
             throws Exception {
         return invokeRequest(method, uri, HTTP_1_1, mediaType, acceptType, content);
@@ -168,7 +166,7 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractIT {
         return response2;
     }
 
-    protected @NonNull FullHttpResponse invokeRequestKeepClient(final @NonNull HttpMethod method,
+    @NonNull FullHttpResponse invokeRequestKeepClient(final @NonNull HttpMethod method,
             final @NonNull String uri, final @NonNull String mediaType, final @Nullable String acceptType,
             final @Nullable String content) {
         final var callback = new TestRequestCallback();
@@ -180,18 +178,18 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractIT {
         return response;
     }
 
-    protected TestEventStreamListener startSubscriptionStream(final String subscriptionId) throws Exception {
+    TestEventStreamListener startSubscriptionStream(final String subscriptionId) throws Exception {
         subscriptionStreamClient = startStreamClient(HTTP_1_1);
         return startSubscriptionStreamOnExistingClient(subscriptionId);
     }
 
-    protected TestEventStreamListener startSubscriptionStream(final String subscriptionId,
+    TestEventStreamListener startSubscriptionStream(final String subscriptionId,
             final ProtocolVersion version) throws Exception {
         subscriptionStreamClient = startStreamClient(version);
         return startSubscriptionStreamOnExistingClient(subscriptionId);
     }
 
-    protected TestEventStreamListener startSubscriptionStreamOnExistingClient(final String subscriptionId)
+    TestEventStreamListener startSubscriptionStreamOnExistingClient(final String subscriptionId)
             throws Exception {
         assertNotNull(clientStreamService());
         final var eventListener = new TestEventStreamListener();
@@ -212,7 +210,7 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractIT {
         return eventListener;
     }
 
-    protected final DOMNotificationPublishService publishService() {
+    final DOMNotificationPublishService publishService() {
         return notificationPublishService;
     }
 
