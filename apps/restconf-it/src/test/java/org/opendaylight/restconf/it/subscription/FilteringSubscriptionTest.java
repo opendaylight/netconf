@@ -140,7 +140,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
     @Test
     void filterReferenceTest() throws Exception {
         // create filter
-        final var postFilterResponse = invokeRequest(HttpMethod.POST,
+        final var postFilterResponse = invokeRequestHttp1(HttpMethod.POST,
             "/rests/data/ietf-subscribed-notifications:filters",
             MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON,
             """
