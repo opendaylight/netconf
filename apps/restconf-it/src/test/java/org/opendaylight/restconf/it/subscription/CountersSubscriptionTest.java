@@ -60,7 +60,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
             Instant.now()));
 
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
-            final var receiversResponse =  invokeRequest(HttpMethod.GET,
+            final var receiversResponse =  invokeRequestHttp1(HttpMethod.GET,
                 "/rests/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
                 MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, null);
             assertEquals(HttpResponseStatus.OK, receiversResponse.status());
@@ -99,7 +99,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
-            final var receiversResponse = invokeRequest(HttpMethod.GET,
+            final var receiversResponse = invokeRequestHttp1(HttpMethod.GET,
                 "/rests/data/ietf-subscribed-notifications:subscriptions/" + "subscription=" + id + "/receivers",
                 MediaTypes.APPLICATION_YANG_DATA_JSON);
             assertEquals(HttpResponseStatus.OK, receiversResponse.status());
@@ -141,7 +141,7 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
-            final var receiversResponse = invokeRequest(HttpMethod.GET,
+            final var receiversResponse = invokeRequestHttp1(HttpMethod.GET,
                 "/rests/data/ietf-subscribed-notifications:subscriptions/subscription=" + id + "/receivers",
                 MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON, null);
 
