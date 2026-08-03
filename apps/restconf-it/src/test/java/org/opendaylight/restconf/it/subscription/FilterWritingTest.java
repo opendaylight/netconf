@@ -56,14 +56,14 @@ class FilterWritingTest extends AbstractNotificationSubscriptionTest {
     @Disabled("FIXME fails to parse JSON anydata")
     @Test
     void writeJsonSubtreeFilterTest() throws Exception {
-        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_JSON,
+        final var postFilterResponse = invokeRequestHttp1(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_JSON,
             MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_JSON);
         assertEquals(HttpResponseStatus.CREATED, postFilterResponse.status());
     }
 
     @Test
     void writeXmlSubtreeFilterTest() throws Exception {
-        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_XML,
+        final var postFilterResponse = invokeRequestHttp1(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_XML,
             MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_XML);
         assertEquals(HttpResponseStatus.CREATED, postFilterResponse.status());
     }
@@ -71,11 +71,11 @@ class FilterWritingTest extends AbstractNotificationSubscriptionTest {
     @Disabled("FIXME fails to parse JSON anydata")
     @Test
     void writeJsonReadJsonSubtreeFilterTest() throws Exception {
-        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_JSON,
+        final var postFilterResponse = invokeRequestHttp1(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_JSON,
             MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_JSON);
         assertEquals(HttpResponseStatus.CREATED, postFilterResponse.status());
 
-        final var getFilterResponse = invokeRequest(HttpMethod.GET, URI_GET, MediaTypes.APPLICATION_YANG_DATA_JSON,
+        final var getFilterResponse = invokeRequestHttp1(HttpMethod.GET, URI_GET, MediaTypes.APPLICATION_YANG_DATA_JSON,
             MediaTypes.APPLICATION_YANG_DATA_JSON, null);
         final var result = getFilterResponse.content().toString(StandardCharsets.UTF_8);
         assertEquals(HttpResponseStatus.OK, getFilterResponse.status());
@@ -85,11 +85,11 @@ class FilterWritingTest extends AbstractNotificationSubscriptionTest {
     @Disabled("FIXME fails to parse JSON anydata")
     @Test
     void writeJsonReadXmlSubtreeFilterTest() throws Exception {
-        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_JSON,
+        final var postFilterResponse = invokeRequestHttp1(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_JSON,
             MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_JSON);
         assertEquals(HttpResponseStatus.CREATED, postFilterResponse.status());
 
-        final var getFilterResponse = invokeRequest(HttpMethod.GET, URI_GET, MediaTypes.APPLICATION_YANG_DATA_XML,
+        final var getFilterResponse = invokeRequestHttp1(HttpMethod.GET, URI_GET, MediaTypes.APPLICATION_YANG_DATA_XML,
             MediaTypes.APPLICATION_YANG_DATA_XML, null);
         final var result = getFilterResponse.content().toString(StandardCharsets.UTF_8);
         assertEquals(HttpResponseStatus.OK, getFilterResponse.status());
@@ -98,11 +98,11 @@ class FilterWritingTest extends AbstractNotificationSubscriptionTest {
 
     @Test
     void writeXmlReadJsonSubtreeFilterTest() throws Exception {
-        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_XML,
+        final var postFilterResponse = invokeRequestHttp1(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_XML,
             MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_XML);
         assertEquals(HttpResponseStatus.CREATED, postFilterResponse.status());
 
-        final var getFilterResponse = invokeRequest(HttpMethod.GET, URI_GET, MediaTypes.APPLICATION_YANG_DATA_JSON,
+        final var getFilterResponse = invokeRequestHttp1(HttpMethod.GET, URI_GET, MediaTypes.APPLICATION_YANG_DATA_JSON,
             MediaTypes.APPLICATION_YANG_DATA_JSON, null);
         final var result = getFilterResponse.content().toString(StandardCharsets.UTF_8);
         assertEquals(HttpResponseStatus.OK, getFilterResponse.status());
@@ -111,11 +111,11 @@ class FilterWritingTest extends AbstractNotificationSubscriptionTest {
 
     @Test
     void writeXmlReadXmlSubtreeFilterTest() throws Exception {
-        final var postFilterResponse = invokeRequest(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_XML,
+        final var postFilterResponse = invokeRequestHttp1(HttpMethod.POST, URI, MediaTypes.APPLICATION_YANG_DATA_XML,
             MediaTypes.APPLICATION_YANG_DATA_JSON, FILTER_XML);
         assertEquals(HttpResponseStatus.CREATED, postFilterResponse.status());
 
-        final var getFilterResponse = invokeRequest(HttpMethod.GET, URI_GET, MediaTypes.APPLICATION_YANG_DATA_XML,
+        final var getFilterResponse = invokeRequestHttp1(HttpMethod.GET, URI_GET, MediaTypes.APPLICATION_YANG_DATA_XML,
             MediaTypes.APPLICATION_YANG_DATA_XML, null);
         final var result = getFilterResponse.content().toString(StandardCharsets.UTF_8);
         assertEquals(HttpResponseStatus.OK, getFilterResponse.status());
