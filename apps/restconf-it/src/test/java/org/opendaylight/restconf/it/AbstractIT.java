@@ -292,27 +292,6 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
         }
     }
 
-    protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri)
-            throws Exception {
-        return invokeRequest(buildRequest(method, uri, APPLICATION_JSON, null, null));
-    }
-
-    protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
-            final @NonNull String mediaType) throws Exception {
-        return invokeRequest(buildRequest(method, uri, mediaType, null, null));
-    }
-
-    protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
-            final @NonNull String mediaType, final @Nullable String content) throws Exception {
-        return invokeRequest(buildRequest(method, uri, mediaType, null, content));
-    }
-
-    protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
-            final @NonNull String mediaType, final @Nullable String acceptType, final @Nullable String content)
-            throws Exception {
-        return invokeRequest(buildRequest(method, uri, mediaType, acceptType, content));
-    }
-
     protected FullHttpResponse invokeRequest(final @NonNull HttpMethod method, final @NonNull String uri,
             final @NonNull ProtocolVersion version) throws Exception {
         return invokeRequest(buildRequest(method, uri, APPLICATION_JSON, null, null), version);
@@ -333,15 +312,6 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
             final @NonNull ProtocolVersion version, final @NonNull String mediaType,
             final @Nullable String acceptType, final @Nullable String content) throws Exception {
         return invokeRequest(buildRequest(method, uri, mediaType, acceptType, content), version);
-    }
-
-    protected FullHttpResponse invokeRequest(final @NonNull FullHttpRequest request) throws Exception {
-        return invokeRequest(request, clientStackGrouping, false);
-    }
-
-    protected FullHttpResponse invokeRequest(final @NonNull FullHttpRequest request,
-            final @NonNull HttpClientStackGrouping clientConf) throws Exception {
-        return invokeRequest(request, clientConf, false);
     }
 
     /**
@@ -426,12 +396,6 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
         return request;
     }
 
-    protected void assertContentJson(final String getRequestUri, final String expectedContent) throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, getRequestUri);
-        assertEquals(HttpResponseStatus.OK, response.status());
-        assertContentJson(response, expectedContent);
-    }
-
     protected void assertContentJson(final String getRequestUri, final String expectedContent,
             final @NonNull ProtocolVersion version) throws Exception {
         final var response = invokeRequest(HttpMethod.GET, getRequestUri, version);
@@ -442,12 +406,6 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
     protected static void assertContentJson(final FullHttpResponse response, final String expectedContent) {
         final var content = response.content().toString(StandardCharsets.UTF_8);
         JSONAssert.assertEquals(expectedContent, content, JSONCompareMode.LENIENT);
-    }
-
-    protected void assertContentXml(final String getRequestUri, final String expectedContent) throws Exception {
-        final var response = invokeRequest(HttpMethod.GET, getRequestUri, APPLICATION_XML);
-        assertEquals(HttpResponseStatus.OK, response.status());
-        assertContentXml(response, expectedContent);
     }
 
     protected void assertContentXml(final String getRequestUri, final String expectedContent,
