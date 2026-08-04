@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cfd1280_89e333dd",
+        "filename": "transport/transport-http/src/main/yang/odl-http-client.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-04T14:00:51Z",
+      "side": 1,
+      "message": "does not this overlap with model from @Yaroslav?",
+      "revId": "19f87dee151e0a618e34aa50f1d07d47fecdc4df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
