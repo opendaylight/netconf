@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8102e84_819c274f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-04T13:59:57Z",
+      "side": 1,
+      "message": "Are certificates nonnull?",
+      "revId": "583a9397c32985da899b92f8498445f38526ab45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55b3809b_dbc4cc52",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/QuicHTTPClient.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-04T13:59:57Z",
+      "side": 1,
+      "message": "nulalbility?",
+      "revId": "583a9397c32985da899b92f8498445f38526ab45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
