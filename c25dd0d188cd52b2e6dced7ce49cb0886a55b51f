@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67ebd9e4_2555c7a4",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-04T13:57:22Z",
+      "side": 1,
+      "message": "why do we need `completed`?",
+      "revId": "c25dd0d188cd52b2e6dced7ce49cb0886a55b51f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "baf08cee_d32436eb",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-04T13:57:22Z",
+      "side": 1,
+      "message": "where can I find it?",
+      "revId": "c25dd0d188cd52b2e6dced7ce49cb0886a55b51f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
