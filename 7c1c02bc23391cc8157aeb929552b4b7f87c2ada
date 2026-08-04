@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f38f5b64_a448549d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-04T13:27:06Z",
+      "side": 1,
+      "message": "are we parametrizing tests or adding new client?",
+      "revId": "7c1c02bc23391cc8157aeb929552b4b7f87c2ada",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
