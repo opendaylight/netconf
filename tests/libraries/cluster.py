@@ -86,9 +86,11 @@ _MEMBER_BIND_ADDRESS_SETTINGS = (
 def _prepare_member_directories():
     """Stages one fresh Karaf distribution copy per cluster member.
 
-    Member 1 reuses the `opendaylight` directory staged by the build.
-    Every other member gets a clean copy of it, replacing any leftovers
-    from a previous run.
+    Member 1 is (re)staged from the `opendaylight` directory staged by the
+    build; every other member gets a clean copy of it. Any member directory
+    left over from a previous run is removed first so re-runs on the same
+    workspace start clean (the build only refreshes `opendaylight`, not the
+    per-member copies).
 
     Args:
         None
@@ -97,6 +99,15 @@ def _prepare_member_directories():
         None
     """
     dirs = get_cluster_dirs()
+    # Guard for rm -rf calls below; every entry must be a plain, non-empty,
+    # relative member directory name; assert makes the invariant explicit
+    # to prevent a recursive delete on an empty, absolute or parent path
+    # in any future refactor.
+    assert all(
+        name and name.startswith("opendaylight-member-") and "/" not in name
+        for name in dirs
+    ), f"unexpected cluster member directory name in {dirs}"
+    infra.shell(f"rm -rf {dirs[0]}")
     infra.shell(f"mv opendaylight {dirs[0]}")
     for target_dir in dirs[1:]:
         infra.shell(f"rm -rf {target_dir}")
