@@ -16,6 +16,24 @@
       "message": "are we parametrizing tests or adding new client?",
       "revId": "7c1c02bc23391cc8157aeb929552b4b7f87c2ada",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3dea937a_883ec21d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-05T09:05:44Z",
+      "side": 1,
+      "message": "moved this to NETCONF 1637 task",
+      "parentUuid": "f38f5b64_a448549d",
+      "revId": "7c1c02bc23391cc8157aeb929552b4b7f87c2ada",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
