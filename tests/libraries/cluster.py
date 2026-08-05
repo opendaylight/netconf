@@ -14,10 +14,14 @@
 import logging
 
 from libraries import infra
+from libraries import templated_requests
+from libraries import utils
 from libraries.variables import variables
 
 CLUSTER_MEMBER_IPS = variables.CLUSTER_MEMBER_IPS
 ODL_IP = variables.ODL_IP
+RESTCONF_ROOT = variables.RESTCONF_ROOT
+CONTROLLER_MAX_MEM = variables.CONTROLLER_MAX_MEM
 
 log = logging.getLogger(__name__)
 
@@ -310,3 +314,188 @@ def wait_cluter_ready(timeout=600):
     """
     for cwd in get_cluster_dirs():
         infra.wait_for_odl_ready(cwd, timeout=timeout)
+
+
+def get_member_ip(member: int) -> str:
+    """Address of cluster member ``member``.
+
+    Members are numbered from 1, matching pekko's ``member-N`` node names and
+    the 1-based index passed to bin/configure_cluster.sh during setup.
+
+    Args:
+        member (int): 1-based member number.
+
+    Returns:
+        str: The member's address from CLUSTER_MEMBER_IPS.
+    """
+    return CLUSTER_MEMBER_IPS[member - 1]
+
+
+def _get_member_process_pattern(member: int) -> str:
+    """pgrep/pkill pattern matching only member ``member``'s Karaf process.
+
+    Every member's distribution directory name (opendaylight-member-N) appears
+    verbatim in its Java command line via -Dkaraf.base, so it uniquely
+    identifies that member's process. The leading character is wrapped in a
+    class ([o]) so the pattern never matches the shell that runs pgrep/pkill
+    itself -- the classic self-match avoidance also used by
+    infra.stop_all_karaf_instances.
+
+    Args:
+        member (int): 1-based member number.
+
+    Returns:
+        str: Regex suitable for `pgrep -f` / `pkill -f`.
+    """
+    return f"[o]pendaylight-member-{member}"
+
+
+def _verify_member_stopped(member: int):
+    """Asserts member ``member`` has no running Karaf process.
+
+    Args:
+        member (int): 1-based member number.
+
+    Returns:
+        None
+    """
+    # `|| true` keeps the expected no-match case (pgrep exit 1, which is what we
+    # want here) from being logged as a shell error; the assertion is decided by
+    # stdout being empty, not by the exit code.
+    _, out = infra.shell(f"pgrep -f '{_get_member_process_pattern(member)}' || true")
+    assert not out.strip(), f"member-{member} Karaf process is still running"
+
+
+def kill_member(member: int):
+    """Forcibly kills a single cluster member and waits for it to be gone.
+
+    Sends SIGKILL to the member's Karaf process (simulating an abrupt node
+    failure) then polls until no matching process remains.
+
+    Args:
+        member (int): 1-based member number to kill.
+
+    Returns:
+        None
+    """
+    log.info(f"Killing cluster member-{member} ({get_member_ip(member)})")
+    infra.shell(f"pkill -9 -f '{_get_member_process_pattern(member)}'")
+    utils.wait_until_function_pass(12, 5, _verify_member_stopped, member)
+
+
+def _verify_restconf_available(member: int):
+    """Asserts RESTCONF answers on member ``member``.
+
+    Args:
+        member (int): 1-based member number.
+
+    Returns:
+        None
+    """
+    templated_requests.get_from_uri(
+        f"{RESTCONF_ROOT}/data/network-topology:network-topology?content=config",
+        host=get_member_ip(member),
+        http_timeout=10,
+    )
+
+
+def start_member(member: int, timeout: int = 300):
+    """Restarts a single cluster member and waits until RESTCONF is available.
+
+    Reuses the member's existing distribution directory (already configured and
+    wired into the cluster by setup_cluster), so unlike start_odl_with_features
+    it does not re-edit featuresBoot. Readiness is decided by polling RESTCONF
+    rather than grepping the log for "System ready", because the pre-kill
+    "System ready" line survives the restart and would match immediately.
+
+    Args:
+        member (int): 1-based member number to start.
+        timeout (int): Seconds to wait for RESTCONF before failing.
+
+    Returns:
+        None
+    """
+    member_dir = get_member_dir(member - 1)
+    log.info(
+        f"Starting cluster member-{member} ({get_member_ip(member)}) from {member_dir}"
+    )
+    infra.shell(f"JAVA_OPTS=-Xmx{CONTROLLER_MAX_MEM} ./bin/start", cwd=member_dir)
+    interval = 5
+    utils.wait_until_function_pass(
+        timeout // interval, interval, _verify_restconf_available, member
+    )
+
+
+def _parse_member_number(node_name: str) -> int:
+    """Parses a pekko node name like "member-2" into its 1-based number.
+
+    Args:
+        node_name (str): Node name in "member-N" form.
+
+    Returns:
+        int: The member number N.
+    """
+    return int(node_name.replace("member-", ""))
+
+
+# Entity type under which mdsal's cluster singleton service elects the owner of
+# a netconf device. The device's entity name is a long DataObjectIdentifier
+# blob embedding the topology node id (its exact form is codegen- and
+# version-specific), so the entity is located by the node id substring rather
+# than by reconstructing the name.
+_NETCONF_ELECTION_ENTITY_TYPE = "org.opendaylight.mdsal.ServiceEntityType"
+
+
+def _get_entities(host: str) -> list[dict]:
+    """Returns every entity-owner entity as reported by ``host``.
+
+    Args:
+        host (str): Cluster member to send the RPC to.
+
+    Returns:
+        list[dict]: One dict per entity, each carrying "type", "name",
+            "owner-node" and "candidate-nodes".
+    """
+    uri = f"{RESTCONF_ROOT}/operations/odl-entity-owners:get-entities"
+    headers = {"Content-Type": "application/json", "Accept": "application/json"}
+    response = templated_requests.post_to_uri(uri, headers=headers, data="", host=host)
+    return response.json()["odl-entity-owners:output"].get("entities", [])
+
+
+def get_device_entity_owner_and_followers(
+    device_name: str, host: str = ODL_IP
+) -> tuple[int, list[int]]:
+    """Returns the owner and followers of the entity representing a netconf device.
+
+    Calls the odl-entity-owners:get-entities RPC on ``host`` and locates the
+    ClusterSingletonService election entity for ``device_name`` -- the one
+    whose type is the mdsal ServiceEntityType and whose name embeds the
+    device's topology node id. The returned "member-N" node names are mapped to
+    member numbers; followers are all candidates other than the owner, sorted
+    ascending.
+
+    Args:
+        device_name (str): Name of the mounted netconf device.
+        host (str): Cluster member to send the RPC to.
+
+    Returns:
+        tuple[int, list[int]]: (owner member number, follower member numbers).
+    """
+    matches = [
+        entity
+        for entity in _get_entities(host)
+        if entity.get("type") == _NETCONF_ELECTION_ENTITY_TYPE
+        and f"value={device_name}}}" in entity.get("name", "")
+    ]
+    assert len(matches) == 1, (
+        f"expected exactly one {_NETCONF_ELECTION_ENTITY_TYPE} entity for device "
+        f"{device_name}, found {len(matches)}"
+    )
+    entity = matches[0]
+
+    owner = _parse_member_number(entity["owner-node"])
+    candidates = sorted(
+        _parse_member_number(node) for node in entity["candidate-nodes"]
+    )
+    followers = [candidate for candidate in candidates if candidate != owner]
+    return owner, followers
