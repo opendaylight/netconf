@@ -16,6 +16,24 @@
       "message": "still needs to be protected?",
       "revId": "49db19b34c5885aa9a40b386e55816ed5240a2a6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0c27b61_0713c260",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-05T09:06:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c9cdf63d_95bdb71d",
+      "revId": "49db19b34c5885aa9a40b386e55816ed5240a2a6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
