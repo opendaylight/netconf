@@ -16,6 +16,24 @@
       "message": "does not this overlap with model from @Yaroslav?",
       "revId": "19f87dee151e0a618e34aa50f1d07d47fecdc4df",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6de53d5_0a981a18",
+        "filename": "transport/transport-http/src/main/yang/odl-http-client.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-05T09:02:27Z",
+      "side": 1,
+      "message": "I am mirroring odl-http-server intentionally here, and I am using odl-quic-common here (both Yaroslav\u0027s models)\nShared part is in quic-common and its used by both client and server, there should be no model duplicity",
+      "parentUuid": "3cfd1280_89e333dd",
+      "revId": "19f87dee151e0a618e34aa50f1d07d47fecdc4df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
