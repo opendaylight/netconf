@@ -33,6 +33,24 @@
       "message": "interesting, did we have before HTTP3 test with such a delay?",
       "revId": "d8b6339ef75e13c69b599f5b55447540df6d49ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5b2b06b_04265c80",
+        "filename": "apps/restconf-it/src/test/resources/device-sim-notifications.xml",
+        "patchSetId": 8
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-05T09:06:26Z",
+      "side": 1,
+      "message": "we did not\nold test established quic in beforeEach, so when test started channel was open, now it is established only after test execution start, inside body of test, so it needs more time to establish it during test",
+      "parentUuid": "d46ad593_491f6b57",
+      "revId": "d8b6339ef75e13c69b599f5b55447540df6d49ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
