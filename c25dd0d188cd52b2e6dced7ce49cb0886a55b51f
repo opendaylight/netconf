@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9d46a52_d11d342d",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-05T09:05:05Z",
+      "side": 1,
+      "message": "There are three independent paths that can call callback.onSuccess/onFailure here — channelRead0 (success), exceptionCaught (error), and channelInactive (stream/connection closed)\n\nchannelInactive fires after both of the other once the QUIC stream closes. So comlated is used to guarante that callback is finished only once.\nsame as done for HTTP2 and sseService",
+      "parentUuid": "67ebd9e4_2555c7a4",
+      "revId": "c25dd0d188cd52b2e6dced7ce49cb0886a55b51f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "baf08cee_d32436eb",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-04T13:57:22Z",
       "side": 1,
       "message": "where can I find it?",
+      "revId": "c25dd0d188cd52b2e6dced7ce49cb0886a55b51f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52ba9e09_24f5bacd",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-05T09:05:05Z",
+      "side": 1,
+      "message": "Line 89",
+      "parentUuid": "baf08cee_d32436eb",
       "revId": "c25dd0d188cd52b2e6dced7ce49cb0886a55b51f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
