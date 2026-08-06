@@ -50,6 +50,7 @@ public abstract class NettyEndpoint {
         try {
             final var serverBootstrap = bootstrapFactory.newServerBootstrap()
                 .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, writeBufferWaterMark);
+
             httpServer = HTTPServer.listen(listener, serverBootstrap,
                 configuration.transportConfiguration()).get();
         } catch (UnsupportedConfigurationException | ExecutionException | InterruptedException e) {
