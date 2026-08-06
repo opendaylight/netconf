@@ -25,6 +25,8 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.TooLongHttpHeaderException;
+import io.netty.handler.codec.http.TooLongHttpLineException;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.util.AsciiString;
 import java.net.URI;
@@ -130,6 +132,19 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
         // non-null indicates HTTP/2 request, which we need to propagate to any response
         final var streamId = headers.getInt(STREAM_ID);
         final var version = msg.protocolVersion();
+
+        // before anything else: the decoder may have given up on the request, in which case nothing below can be
+        // trusted -- the URI and headers are whatever had been parsed before the limit was hit
+        final var decoderResult = msg.decoderResult();
+        if (decoderResult.isFailure()) {
+            final var cause = decoderResult.cause();
+            LOG.debug("Cannot decode request {}", msg, cause);
+            msg.release();
+            // note: not 'version' -- a request whose line did not parse is reported as HTTP/1.0 by the decoder, and
+            //       answering an HTTP/1.1 client in HTTP/1.0 would be a second error on top of the first
+            respond(ctx, streamId, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, statusOf(cause)));
+            return;
+        }
 
         // first things first:
         // - HTTP semantics: we MUST have the equivalent of a Host header, as per
@@ -237,6 +252,24 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
             LOG.warn("Unexpected error while preparing {} request to {}", method, targetUri, e);
             return new ExceptionRequestResponse(e);
         }
+    }
+
+    /**
+     * Map a decoder failure onto the status code HTTP defines for it. The two size limits enforced by the HTTP/1.1
+     * decoder have dedicated codes; anything else is a malformed request.
+     *
+     * @param cause the decoder failure
+     * @return the status code to respond with
+     */
+    @VisibleForTesting
+    static final @NonNull HttpResponseStatus statusOf(final @Nullable Throwable cause) {
+        if (cause instanceof TooLongHttpLineException) {
+            return HttpResponseStatus.REQUEST_URI_TOO_LONG;
+        }
+        if (cause instanceof TooLongHttpHeaderException) {
+            return HttpResponseStatus.REQUEST_HEADER_FIELDS_TOO_LARGE;
+        }
+        return HttpResponseStatus.BAD_REQUEST;
     }
 
     @VisibleForTesting
