@@ -26,8 +26,14 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.odl.http.server.listen.stack.grouping.LimitsUnderHttpTcpBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.odl.server.limits.grouping.OdlServerLimits;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.odl.server.limits.grouping.OdlServerLimitsBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.server.limits.grouping.ServerLimits;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.server.limits.grouping.ServerLimitsBuilder;
 import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint16;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 /**
  * Utility class for creating {@link HttpOverTcp} configurations for {@link HTTPServer}.
@@ -48,7 +54,20 @@ public final class HTTPServerOverTcp {
      * @return transport configuration
      */
     public static @NonNull HttpOverTcp of(final @NonNull String host, final int port) {
-        return of(host, port, null);
+        return of(host, port, (Map<String, String>) null);
+    }
+
+    /**
+     * Builds transport configuration for {@link HTTPServer} using TCP transport underlay with no authorization.
+     *
+     * @param host local address
+     * @param port local port
+     * @param limits limits to impose on inbound requests
+     * @return transport configuration
+     */
+    public static @NonNull HttpOverTcp of(final @NonNull String host, final int port,
+            final @NonNull HTTPServerLimits limits) {
+        return of(host, port, null, limits);
     }
 
     /**
@@ -62,6 +81,22 @@ public final class HTTPServerOverTcp {
      */
     public static @NonNull HttpOverTcp of(final @NonNull String host, final int port,
             final @Nullable Map<String, String> userCryptHashMap) {
+        return of(host, port, userCryptHashMap, HTTPServerLimits.DEFAULT);
+    }
+
+    /**
+     * Builds transport configuration for {@link HTTPServer} using TCP transport underlay with Basic Authorization.
+     *
+     * @param host local address
+     * @param port local port
+     * @param userCryptHashMap user credentials map for Basic Authorization where key is username and value is a
+     *      {@link CryptHash} value for user password
+     * @param limits limits to impose on inbound requests
+     * @return transport configuration
+     */
+    public static @NonNull HttpOverTcp of(final @NonNull String host, final int port,
+            final @Nullable Map<String, String> userCryptHashMap, final @NonNull HTTPServerLimits limits) {
+        requireNonNull(limits);
         return of(
             new TcpServerParametersBuilder()
                 .setLocalBind(BindingMap.of(new LocalBindBuilder()
@@ -69,7 +104,13 @@ public final class HTTPServerOverTcp {
                     .setLocalPort(new PortNumber(Uint16.valueOf(port)))
                     .build()))
                 .build(),
-            new HttpServerParametersBuilder().setClientAuthentication(clientAuthentication(userCryptHashMap)).build());
+            new HttpServerParametersBuilder()
+                .setClientAuthentication(clientAuthentication(userCryptHashMap))
+                .addAugmentation(new LimitsUnderHttpTcpBuilder()
+                    .setServerLimits(serverLimits(limits))
+                    .setOdlServerLimits(odlServerLimits(limits))
+                    .build())
+                .build());
     }
 
     /**
@@ -87,6 +128,33 @@ public final class HTTPServerOverTcp {
                 .setTcpServerParameters(tcpParams)
                 .setHttpServerParameters(httpParams)
                 .build())
+            .build();
+    }
+
+    /**
+     * Project {@code limits} onto the {@code server-limits} container the listen stack carries.
+     *
+     * @param limits the limits to encode
+     * @return the corresponding container
+     */
+    static @NonNull ServerLimits serverLimits(final @NonNull HTTPServerLimits limits) {
+        return new ServerLimitsBuilder()
+            .setMaxInitialLineLength(Uint32.valueOf(limits.maxInitialLineLength()))
+            .setMaxHeaderSize(Uint32.valueOf(limits.maxHeaderSize()))
+            .setMaxRequestBodySize(Uint32.valueOf(limits.maxRequestBodySize()))
+            .setMaxFrameSize(Uint32.valueOf(limits.maxFrameSize()))
+            .build();
+    }
+
+    /**
+     * Project {@code limits} onto the {@code odl-server-limits} container the listen stack carries.
+     *
+     * @param limits the limits to encode
+     * @return the corresponding container
+     */
+    static @NonNull OdlServerLimits odlServerLimits(final @NonNull HTTPServerLimits limits) {
+        return new OdlServerLimitsBuilder()
+            .setMaxRequestChunkSize(Uint32.valueOf(limits.maxRequestChunkSize()))
             .build();
     }
 
