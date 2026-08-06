@@ -17,7 +17,6 @@ import pytest
 
 from libraries import cluster
 from libraries import netconf
-from libraries import templated_requests
 from libraries import utils
 from libraries.variables import variables
 from suites.suite_order import SuiteOrder
@@ -28,7 +27,6 @@ DEVICE_NAME = "netconf-test-device"
 DEVICE_TYPE = "configure-via-topology"
 DIRECTORY_WITH_TEMPLATE_FOLDERS = "variables/netconf/CRUD"
 
-RESTCONF_ROOT = variables.RESTCONF_ROOT
 ODL_NETCONF_NAMESPACE = variables.ODL_NETCONF_NAMESPACE
 
 # The suite mirrors the original Robot "node1/node2/node3" roles: the device is
@@ -64,121 +62,6 @@ log = logging.getLogger(__name__)
 @pytest.mark.usefixtures("odl_three_node_cluster")
 @pytest.mark.run(order=SuiteOrder.CLUSTERING_ENTITY)
 class TestClusteringEntity:
-
-    def get_config_data(self, host: str) -> str:
-        """Get and return the config data from the device, as seen by one node.
-
-        Args:
-            host (str): Cluster member to query.
-
-        Returns:
-            str: The raw XML text representation of the device's configuration data.
-        """
-        url = (
-            f"{RESTCONF_ROOT}/data/network-topology:network-topology/topology="
-            f"topology-netconf/node={DEVICE_NAME}/yang-ext:mount?content=config"
-        )
-        headers = {"Accept": "application/yang-data+xml"}
-        return templated_requests.get_from_uri(url, headers=headers, host=host).text
-
-    def check_config_data(self, host: str, expected: str):
-        """Validates the mounted device's configuration data as seen by one node.
-
-        Args:
-            host (str): Cluster member to query.
-            expected (str): The expected string to validate against.
-
-        Returns:
-            None
-        """
-        data = self.get_config_data(host)
-        assert expected == data
-
-    def create_device_data(self, folder: str, host: str, expected: str):
-        """POSTs templated data to the device via one node and confirms it applied.
-
-        Right after the device mounts, the cluster's entity ownership and the
-        device's mount points are still settling, so a create routed through a
-        node can hit a transient 5xx ("commit when lock is released") or return
-        2xx yet never reach the device. Reading the value back inside the retry
-        rides over both: the POST is (re)issued until the device actually
-        reflects it. The payload is only POSTed when not already present, so a
-        retry after a confirmed create does not conflict.
-
-        Args:
-            folder (str): Template folder holding the payload to POST.
-            host (str): Cluster member to send the request to.
-            expected (str): Config data expected on ``host`` once the write lands.
-
-        Returns:
-            None
-        """
-        mapping = {"DEVICE_NAME": DEVICE_NAME, "RESTCONF_ROOT": RESTCONF_ROOT}
-
-        def post_and_verify():
-            """POST the payload if absent, then assert the device reflects it."""
-            if self.get_config_data(host) != expected:
-                templated_requests.post_templated_request(
-                    folder, mapping, json=False, host=host
-                )
-            assert self.get_config_data(host) == expected
-
-        utils.wait_until_function_pass(CLUSTER_RECOVERY_TIMEOUT, 1, post_and_verify)
-
-    def wait_device_ownership_settled(self, host: str):
-        """Waits until all three members are candidates for the device entity.
-
-        Being connected on a node is not enough: right after a fresh mount or an
-        owner restart the entity ownership and the device's mount points are
-        still churning, and data operations issued during that window can be
-        silently lost. Owner + two followers means every member has registered
-        as a candidate and the churn has settled.
-
-        Args:
-            host (str): Cluster member to query.
-
-        Returns:
-            None
-        """
-
-        def ownership_settled():
-            """Assert the device entity has an owner and two followers."""
-            _, followers = cluster.get_device_entity_owner_and_followers(
-                DEVICE_NAME, host=host
-            )
-            assert len(followers) == 2, f"ownership not settled, followers={followers}"
-
-        utils.wait_until_function_pass(CLUSTER_RECOVERY_TIMEOUT, 1, ownership_settled)
-
-    def modify_device_data(self, folder: str, host: str, expected: str):
-        """PUTs templated data to the device via one node and confirms it applied.
-
-        Beyond the transient 5xx any cluster write can hit (see
-        create_device_data), a write routed through a node whose device mount
-        point is still churning -- e.g. just after the original owner is
-        restarted and ownership is re-settling -- can return 2xx yet never reach
-        the device. Reading the value back inside the retry turns that silent
-        no-op into a retryable failure: the PUT is reissued until the device
-        actually reflects it. A PUT is idempotent, so reissuing is always safe.
-
-        Args:
-            folder (str): Template folder holding the payload to PUT.
-            host (str): Cluster member to send the request to.
-            expected (str): Config data expected on ``host`` once the write lands.
-
-        Returns:
-            None
-        """
-        mapping = {"DEVICE_NAME": DEVICE_NAME, "RESTCONF_ROOT": RESTCONF_ROOT}
-
-        def put_and_verify():
-            """PUT the payload, then assert the device now reflects ``expected``."""
-            templated_requests.put_templated_request(
-                folder, mapping, json=False, host=host
-            )
-            assert self.get_config_data(host) == expected
-
-        utils.wait_until_function_pass(CLUSTER_RECOVERY_TIMEOUT, 1, put_and_verify)
 
     @pytest.fixture()
     def netconf_testtool(self, allure_step_with_separate_logging):
@@ -253,7 +136,7 @@ class TestClusteringEntity:
             # Being connected on every node does not mean the device's entity
             # ownership has settled; wait for owner + two followers so the
             # initial data operations are not lost to post-mount churn.
-            self.wait_device_ownership_settled(CONFIGURER_IP)
+            cluster.wait_device_ownership_settled(DEVICE_NAME, host=CONFIGURER_IP)
 
         yield
 
@@ -291,13 +174,21 @@ class TestClusteringEntity:
             # Check there really is no data present on any of the nodes.
             for host in NODE_IPS:
                 utils.wait_until_function_pass(
-                    DEVICE_CHECK_TIMEOUT, 1, self.check_config_data, host, EMPTY_DATA
+                    DEVICE_CHECK_TIMEOUT,
+                    1,
+                    netconf.check_device_config_data,
+                    DEVICE_NAME,
+                    EMPTY_DATA,
+                    host=host,
                 )
 
         with allure_step_with_separate_logging("step_create_device_data_via_node2"):
             # Create some data on the device and propagate it throughout the cluster.
-            self.create_device_data(
-                f"{DIRECTORY_WITH_TEMPLATE_FOLDERS}/dataorig", SETTER_IP, ORIGINAL_DATA
+            cluster.create_device_data(
+                DEVICE_NAME,
+                f"{DIRECTORY_WITH_TEMPLATE_FOLDERS}/dataorig",
+                ORIGINAL_DATA,
+                host=SETTER_IP,
             )
 
         with allure_step_with_separate_logging(
@@ -306,7 +197,12 @@ class TestClusteringEntity:
             # Check the data we just added is visible on every node.
             for host in NODE_IPS:
                 utils.wait_until_function_pass(
-                    DEVICE_CHECK_TIMEOUT, 1, self.check_config_data, host, ORIGINAL_DATA
+                    DEVICE_CHECK_TIMEOUT,
+                    1,
+                    netconf.check_device_config_data,
+                    DEVICE_NAME,
+                    ORIGINAL_DATA,
+                    host=host,
                 )
 
         with allure_step_with_separate_logging(
@@ -346,9 +242,10 @@ class TestClusteringEntity:
                     utils.wait_until_function_pass(
                         DEVICE_CHECK_TIMEOUT,
                         1,
-                        self.check_config_data,
-                        host,
+                        netconf.check_device_config_data,
+                        DEVICE_NAME,
                         ORIGINAL_DATA,
+                        host=host,
                     )
 
         with allure_step_with_separate_logging(
@@ -356,10 +253,11 @@ class TestClusteringEntity:
         ):
             # Attempt to modify the data via a follower after recovery.
             with utils.report_known_bug_on_failure("4968"):
-                self.modify_device_data(
+                cluster.modify_device_data(
+                    DEVICE_NAME,
                     f"{DIRECTORY_WITH_TEMPLATE_FOLDERS}/datamod1",
-                    follower1_ip,
                     MODIFIED_DATA,
+                    host=follower1_ip,
                 )
 
         with allure_step_with_separate_logging(
@@ -371,9 +269,10 @@ class TestClusteringEntity:
                     utils.wait_until_function_pass(
                         DEVICE_CHECK_TIMEOUT,
                         1,
-                        self.check_config_data,
-                        host,
+                        netconf.check_device_config_data,
+                        DEVICE_NAME,
                         MODIFIED_DATA,
+                        host=host,
                     )
 
         with allure_step_with_separate_logging("step_restart_original_entity_owner"):
@@ -392,7 +291,9 @@ class TestClusteringEntity:
                 netconf.wait_device_connected(
                     DEVICE_NAME, host=host, timeout=DEVICE_CHECK_TIMEOUT
                 )
-            self.wait_device_ownership_settled(original_owner_ip)
+            cluster.wait_device_ownership_settled(
+                DEVICE_NAME, host=original_owner_ip
+            )
 
         with allure_step_with_separate_logging(
             "step_check_config_data_after_original_owner_restart"
@@ -402,9 +303,10 @@ class TestClusteringEntity:
                 utils.wait_until_function_pass(
                     DEVICE_CHECK_TIMEOUT,
                     1,
-                    self.check_config_data,
-                    original_owner_ip,
+                    netconf.check_device_config_data,
+                    DEVICE_NAME,
                     MODIFIED_DATA,
+                    host=original_owner_ip,
                 )
 
         with allure_step_with_separate_logging(
@@ -412,10 +314,11 @@ class TestClusteringEntity:
         ):
             # Check that the original owner is still able to modify the data.
             with utils.report_known_bug_on_failure("5761"):
-                self.modify_device_data(
+                cluster.modify_device_data(
+                    DEVICE_NAME,
                     f"{DIRECTORY_WITH_TEMPLATE_FOLDERS}/datamod2",
-                    original_owner_ip,
                     MODIFIED_DATA_2,
+                    host=original_owner_ip,
                 )
 
         with allure_step_with_separate_logging(
@@ -426,7 +329,8 @@ class TestClusteringEntity:
                 utils.wait_until_function_pass(
                     DEVICE_CHECK_TIMEOUT,
                     1,
-                    self.check_config_data,
-                    host,
+                    netconf.check_device_config_data,
+                    DEVICE_NAME,
                     MODIFIED_DATA_2,
+                    host=host,
                 )
