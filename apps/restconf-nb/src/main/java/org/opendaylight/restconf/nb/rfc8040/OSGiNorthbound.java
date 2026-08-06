@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.transport.http.HTTPServerLimits;
 import org.opendaylight.netconf.transport.http.HTTPServerOverQuic;
 import org.opendaylight.netconf.transport.http.HTTPServerOverTcp;
 import org.opendaylight.netconf.transport.http.HTTPServerOverTls;
@@ -146,6 +147,47 @@ public final class OSGiNorthbound {
                 """,
             min = "16384", max = "16777215")
         int http2$_$max$_$frame$_$size() default 16384; // 16 KiB
+
+        @AttributeDefinition(
+            name = "HTTP/1.1 max request line length (bytes)",
+            description = """
+                Maximum length of an inbound HTTP/1.1 request line. A request exceeding it is rejected
+                with '414 URI Too Long'. RFC9112 recommends supporting at least 8000 octets, so the
+                default is above Netty's own 4096.
+                """,
+            min = "1")
+        int http1$_$max$_$initial$_$line$_$length() default 8192; // 8 KiB
+
+        @AttributeDefinition(
+            name = "HTTP/1.1 max header section size (bytes)",
+            description = """
+                Maximum size of the inbound HTTP/1.1 header section. A request exceeding it is rejected
+                with '431 Request Header Fields Too Large'. On HTTP/2 the same value is advertised as
+                SETTINGS_MAX_HEADER_LIST_SIZE, which measures the uncompressed field list rather than the
+                octets on the wire.
+                """,
+            min = "1")
+        int http1$_$max$_$header$_$size() default 16384; // 16 KiB
+
+        @AttributeDefinition(
+            name = "HTTP/1.1 request decoder chunk size (bytes)",
+            description = """
+                Maximum size of a single HTTP object emitted by the HTTP/1.1 request decoder. This bounds how
+                much of a request body reaches the pipeline at a time; it is not a limit on the body itself.
+
+                Not to be confused with 'http1-chunk-size', which sizes outbound response chunks.
+                """,
+            min = "1")
+        int http1$_$max$_$request$_$chunk$_$size() default 8192; // 8 KiB
+
+        @AttributeDefinition(
+            name = "HTTP max request body size (bytes)",
+            description = """
+                Maximum size of an aggregated inbound request body. A request exceeding it is rejected with
+                '413 Content Too Large'. Applies to HTTP/1.1, HTTP/2 and HTTP/3 alike.
+                """,
+            min = "1")
+        int http$_$request$_$body$_$max$_$size() default 10485760; // 10 MiB
 
         @AttributeDefinition(
             name = "HTTP write buffer low watermark (bytes)",
@@ -316,10 +358,17 @@ public final class OSGiNorthbound {
         final var tlsCertKey = TlsUtils.readCertificateKey(configuration.tls$_$certificate(),
             configuration.tls$_$private$_$key());
 
+        final var limits = new HTTPServerLimits(
+            configuration.http1$_$max$_$initial$_$line$_$length(),
+            configuration.http1$_$max$_$header$_$size(),
+            configuration.http1$_$max$_$request$_$chunk$_$size(),
+            configuration.http$_$request$_$body$_$max$_$size(),
+            configuration.http2$_$max$_$frame$_$size());
+
         final var transport = tlsCertKey != null
             ? HTTPServerOverTls.of(configuration.bind$_$address(), configuration.bind$_$port(),
-                tlsCertKey.certificate(), tlsCertKey.privateKey())
-            : HTTPServerOverTcp.of(configuration.bind$_$address(), configuration.bind$_$port());
+                tlsCertKey.certificate(), tlsCertKey.privateKey(), limits)
+            : HTTPServerOverTcp.of(configuration.bind$_$address(), configuration.bind$_$port(), limits);
         final var http3Transport = tlsCertKey != null
             ? new HttpServerStackConfiguration(HTTPServerOverQuic.of(
                 configuration.bind$_$address(), configuration.bind$_$port(),
@@ -341,7 +390,6 @@ public final class OSGiNorthbound {
             Uint32.valueOf(configuration.heartbeat$_$interval()), configuration.api$_$root$_$path(),
             parseDefaultEncoding(configuration.default$_$encoding()), new HttpServerStackConfiguration(transport),
             Uint32.valueOf(configuration.http1$_$chunk$_$size()),
-            Uint32.valueOf(configuration.http2$_$max$_$frame$_$size()),
             Uint32.valueOf(configuration.http$_$write$_$buffer$_$low$_$watermark()),
             Uint32.valueOf(configuration.http$_$write$_$buffer$_$high$_$watermark()),
             altSvc, Uint32.valueOf(configuration.http3$_$alt$_$svc$_$max$_$age()), http3Transport)

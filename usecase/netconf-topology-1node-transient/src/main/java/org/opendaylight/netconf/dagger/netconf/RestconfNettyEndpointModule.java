@@ -24,6 +24,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.dagger.springboot.config.ConfigLoader;
+import org.opendaylight.netconf.transport.http.HTTPServerLimits;
 import org.opendaylight.netconf.transport.http.HTTPServerOverTcp;
 import org.opendaylight.netconf.transport.http.HttpServerStackConfiguration;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
@@ -109,7 +110,8 @@ public interface RestconfNettyEndpointModule {
     @Provides
     @Singleton
     static NettyEndpointConfiguration nettyEndpointConfiguration(final RFC8040Configuration config) {
-        final var httpOverTcp = HTTPServerOverTcp.of(config.bindAddress(), config.bindPort());
+        final var httpOverTcp = HTTPServerOverTcp.of(config.bindAddress(), config.bindPort(),
+            HTTPServerLimits.DEFAULT.withMaxFrameSize(config.http2MaxFrameSize));
         final var svcHeader = buildAltSvcHeader(config.bindPort, 0);
 
         return new NettyEndpointConfiguration(
@@ -117,8 +119,9 @@ public interface RestconfNettyEndpointModule {
             PrettyPrintParam.of(config.prettyPrint), Uint16.valueOf(config.maximumFragmentLength),
             Uint32.valueOf(config.heartbeatInterval), config.apiRootPath, parseDefaultEncoding(config.defaultEncoding),
             new HttpServerStackConfiguration(httpOverTcp), Uint32.valueOf(config.httpChunkSize),
-            Uint32.valueOf(config.http2MaxFrameSize), Uint32.valueOf(config.httpWriteBufferLowWatermark),
-            Uint32.valueOf(config.httpWriteBufferHighWatermark), svcHeader, Uint32.valueOf(config.http3AltSvcMaxAge()));
+            Uint32.valueOf(config.httpWriteBufferLowWatermark),
+            Uint32.valueOf(config.httpWriteBufferHighWatermark), svcHeader,
+            Uint32.valueOf(config.http3AltSvcMaxAge()));
     }
 
     @Provides
