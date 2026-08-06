@@ -63,7 +63,6 @@ import org.xmlunit.diff.ElementSelectors;
 
 abstract class AbstractHttp3E2ETest extends AbstractE2ETest {
     private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
-    private static final Uint32 FRAME_SIZE = Uint32.valueOf(16 * 1024);
     private static final String ALT_SVC_HEADER = "h3=\":8443\"; ma=3600";
     private static final Uint32 HTTP3_ALT_SVC_MAX_AGE_SECONDS = Uint32.valueOf(3600);
     private static final Uint64 HTTP3_INITIAL_MAX_DATA = Uint64.valueOf(4L * 1024 * 1024);
@@ -113,7 +112,7 @@ abstract class AbstractHttp3E2ETest extends AbstractE2ETest {
             final HttpServerListenStackGrouping serverStackGrouping) {
         return new NettyEndpointConfiguration(
             ERROR_TAG_MAPPING, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000), RESTS,
-            MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
+            MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
             WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS,
             new HttpServerStackConfiguration(HTTPServerOverQuic.of(localAddress(), port(), certificate, privateKey,
                 HTTP3_INITIAL_MAX_DATA, HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE,

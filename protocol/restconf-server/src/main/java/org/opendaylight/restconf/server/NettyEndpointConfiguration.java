@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.transport.http.HTTPServerLimits;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
@@ -53,7 +54,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     private final @NonNull List<String> apiRootPath;
     private final @NonNull MessageEncoding defaultEncoding;
     private final @NonNull Uint32 chunkSize;
-    private final @NonNull Uint32 frameSize;
+    private final @NonNull HTTPServerLimits limits;
     private final @NonNull Uint32 writeBufferLowWaterMark;
     private final @NonNull Uint32 writeBufferHighWaterMark;
     private final @NonNull String altSvcHeaderValue;
@@ -63,7 +64,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     private NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
             final List<String> apiRootPath, final MessageEncoding defaultEncoding,
-            final HttpServerListenStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
+            final HttpServerListenStackGrouping transportConfiguration, final Uint32 chunkSize,
             final Uint32 writeBufferLowWaterMark, final Uint32 writeBufferHighWaterMark,
             final String altSvcHeaderValue, final Uint32 http3AltSvcMaxAgeSeconds,
             final @Nullable HttpServerListenStackGrouping http3TransportConfiguration) {
@@ -73,17 +74,13 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         this.altSvcHeaderValue = requireNonNull(altSvcHeaderValue);
         this.http3TransportConfiguration = http3TransportConfiguration;
         this.http3AltSvcMaxAgeSeconds = requireNonNull(http3AltSvcMaxAgeSeconds);
+        // the limits live in the transport configuration, augmented in by odl-http-server
+        limits = HTTPServerLimits.of(transportConfiguration);
 
         if (chunkSize.intValue() < 1) {
             throw new IllegalArgumentException("Chunks have to have at least one byte");
         }
         this.chunkSize = chunkSize;
-
-        if (frameSize.intValue() < 16384 || frameSize.intValue() > 16777215) {
-            throw new IllegalArgumentException(
-                "HTTP/2 frame size must be between 16384 bytes (16 KiB) and 16777215 bytes (16 MiB)");
-        }
-        this.frameSize = frameSize;
 
         final var lowWaterMark = requireNonNull(writeBufferLowWaterMark);
         if (lowWaterMark.longValue() > Integer.MAX_VALUE) {
@@ -113,23 +110,21 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
             final MessageEncoding defaultEncoding, final HttpServerListenStackGrouping transportConfiguration,
-            final Uint32 chunkSize, final Uint32 frameSize, final Uint32 writeBufferLowWaterMark,
-            final Uint32 writeBufferHighWaterMark, final String altSvcHeaderValue,
-            final Uint32 http3AltSvcMaxAgeSeconds) {
+            final Uint32 chunkSize, final Uint32 writeBufferLowWaterMark, final Uint32 writeBufferHighWaterMark,
+            final String altSvcHeaderValue, final Uint32 http3AltSvcMaxAgeSeconds) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
-            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize,
+            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize,
             writeBufferLowWaterMark, writeBufferHighWaterMark, altSvcHeaderValue, http3AltSvcMaxAgeSeconds, null);
     }
 
     public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
             final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
             final MessageEncoding defaultEncoding, final HttpServerListenStackGrouping transportConfiguration,
-            final Uint32 chunkSize, final Uint32 frameSize, final Uint32 writeBufferLowWaterMark,
-            final Uint32 writeBufferHighWaterMark, final String altSvcHeaderValue,
-            final Uint32 http3AltSvcMaxAgeSeconds,
+            final Uint32 chunkSize, final Uint32 writeBufferLowWaterMark, final Uint32 writeBufferHighWaterMark,
+            final String altSvcHeaderValue, final Uint32 http3AltSvcMaxAgeSeconds,
             final @Nullable HttpServerListenStackGrouping http3TransportConfiguration) {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
-            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize,
+            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize,
             writeBufferLowWaterMark, writeBufferHighWaterMark, altSvcHeaderValue, http3AltSvcMaxAgeSeconds,
             http3TransportConfiguration);
     }
@@ -138,9 +133,8 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     public NettyEndpointConfiguration(final HttpServerListenStackGrouping transportConfiguration,
             final HttpServerListenStackGrouping http3TransportConfiguration) {
         this(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO, Uint32.valueOf(10_000), "restconf",
-            MessageEncoding.JSON, transportConfiguration, Uint32.valueOf(262144), Uint32.valueOf(16384),
-            Uint32.valueOf(32768), Uint32.valueOf(65536), "h3=\":8443\"; ma=3600",
-            Uint32.valueOf(3600), http3TransportConfiguration);
+            MessageEncoding.JSON, transportConfiguration, Uint32.valueOf(262144), Uint32.valueOf(32768),
+            Uint32.valueOf(65536), "h3=\":8443\"; ma=3600", Uint32.valueOf(3600), http3TransportConfiguration);
     }
 
     /**
@@ -224,10 +218,10 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     }
 
     /**
-     * {@return max size of HTTP/2 request frame}
+     * {@return limits imposed on inbound requests, as configured in {@link #transportConfiguration()}}
      */
-    public Uint32 frameSize() {
-        return frameSize;
+    public @NonNull HTTPServerLimits limits() {
+        return limits;
     }
 
     /**
@@ -262,7 +256,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     @Override
     public int hashCode() {
         return Objects.hash(errorTagMapping(), prettyPrint(), sseMaximumFragmentLength(), sseHeartbeatIntervalMillis(),
-            apiRootPath, transportConfiguration, defaultEncoding, chunkSize, frameSize, altSvcHeaderValue,
+            apiRootPath, transportConfiguration, defaultEncoding, chunkSize, altSvcHeaderValue,
             http3AltSvcMaxAgeSeconds, http3TransportConfiguration,
             writeBufferLowWaterMark, writeBufferHighWaterMark);
     }
@@ -275,7 +269,6 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             && sseHeartbeatIntervalMillis().equals(other.sseHeartbeatIntervalMillis())
             && apiRootPath.equals(other.apiRootPath) && transportConfiguration.equals(other.transportConfiguration)
             && defaultEncoding.equals(other.defaultEncoding) && chunkSize.equals(other.chunkSize)
-            && frameSize.equals(other.frameSize)
             && Objects.equals(altSvcHeaderValue, other.altSvcHeaderValue)
             && http3AltSvcMaxAgeSeconds.equals(other.http3AltSvcMaxAgeSeconds)
             && Objects.equals(http3TransportConfiguration, other.http3TransportConfiguration)
@@ -294,6 +287,7 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             .add("altSvcHeaderValue", altSvcHeaderValue)
             .add("http3AltSvcMaxAgeSeconds", http3AltSvcMaxAgeSeconds)
             .add("http3TransportConfiguration", http3TransportConfiguration)
+            .add("limits", limits)
             .add("writeBufferLowWaterMark", writeBufferLowWaterMark)
             .add("writeBufferHighWaterMark", writeBufferHighWaterMark);
     }
