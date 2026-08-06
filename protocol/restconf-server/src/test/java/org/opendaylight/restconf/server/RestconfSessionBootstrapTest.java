@@ -27,6 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
+import org.opendaylight.netconf.transport.http.HTTPServerLimits;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,7 +67,7 @@ class RestconfSessionBootstrapTest {
 
         final var root = new EndpointRoot(principalService, new WellKnownResources("/restconf"), Map.of());
         final var bootstrap = new RestconfSessionBootstrap(HTTPScheme.HTTP, root,
-            Uint32.valueOf(262144), Uint32.valueOf(16384),
+            Uint32.valueOf(262144), HTTPServerLimits.DEFAULT,
             new WriteBufferWaterMark(32768, 65536), new AltSvcAdvertiser("h3=\":8443\"; ma=3600"));
 
         // Build the initializer while the codec still reports the pre-SETTINGS default (16384).
