@@ -117,7 +117,6 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
     private static final String PASSWORD = "pa$$w0Rd";
     private static final String RESTCONF = "restconf";
     private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
-    private static final Uint32 FRAME_SIZE = Uint32.valueOf(16 * 1024);
     private static final String ALT_SVC_HEADER = "h3=\":8443\"; ma=3600";
     private static final Uint32 HTTP3_ALT_SVC_MAX_AGE_SECONDS = Uint32.valueOf(3600);
     private static final Uint32 WRITE_BUFFER_LOW_WATER_MARK = Uint32.valueOf(32 * 1024);
@@ -390,7 +389,7 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractDataB
             final HttpServerListenStackGrouping serverStackGrouping) {
         return new NettyEndpointConfiguration(
             ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE, Uint16.ZERO, Uint32.valueOf(1000), RESTCONF,
-            MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, FRAME_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
+            MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
             WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS);
     }
 

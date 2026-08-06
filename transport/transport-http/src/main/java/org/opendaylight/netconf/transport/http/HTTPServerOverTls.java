@@ -14,6 +14,7 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.crypt.hash.rev140806.CryptHash;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.EcPrivateKeyFormat;
@@ -36,6 +37,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev241010.tls.server.grouping.ServerIdentityBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev241010.tls.server.grouping.server.identity.auth.type.certificate.CertificateBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.odl.http.server.listen.stack.grouping.LimitsUnderHttpTlsBuilder;
 import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
@@ -62,7 +64,23 @@ public final class HTTPServerOverTls {
      */
     public static @NonNull HttpOverTls of(final @NonNull String host, final int port,
             final @NonNull Certificate certificate, final @NonNull PrivateKey privateKey) {
-        return of(host, port, certificate, privateKey, null);
+        return of(host, port, certificate, privateKey, null, HTTPServerLimits.DEFAULT);
+    }
+
+    /**
+     * Builds transport configuration for {@link HTTPServer} using TLS transport underlay with no authorization.
+     *
+     * @param host local address
+     * @param port local port
+     * @param certificate server X509 certificate
+     * @param privateKey server private key
+     * @param limits limits to impose on inbound requests
+     * @return transport configuration
+     */
+    @NonNullByDefault
+    public static HttpOverTls of(final String host, final int port, final Certificate certificate,
+            final PrivateKey privateKey, final HTTPServerLimits limits) {
+        return of(host, port, certificate, privateKey, null, limits);
     }
 
     /**
@@ -79,6 +97,26 @@ public final class HTTPServerOverTls {
     public static @NonNull HttpOverTls of(final @NonNull String host, final int port,
             final @NonNull Certificate certificate, final @NonNull PrivateKey privateKey,
             final @Nullable Map<String, String> userCryptHashMap) {
+        return of(host, port, certificate, privateKey, userCryptHashMap, HTTPServerLimits.DEFAULT);
+    }
+
+    /**
+     * Builds transport configuration for {@link HTTPServer} using TLS transport underlay with Basic Authorization.
+     *
+     * @param host local address
+     * @param port local port
+     * @param certificate server X509 certificate
+     * @param privateKey server private key
+     * @param userCryptHashMap user credentials map for Basic Authorization where key is username and value is a
+     *      {@link CryptHash} value for user password
+     * @param limits limits to impose on inbound requests
+     * @return transport configuration
+     */
+    @NonNullByDefault
+    public static HttpOverTls of(final String host, final int port, final Certificate certificate,
+            final PrivateKey privateKey, final @Nullable Map<String, String> userCryptHashMap,
+            final HTTPServerLimits limits) {
+        requireNonNull(limits);
         return of(
             new TcpServerParametersBuilder()
                 .setLocalBind(BindingMap.of(new LocalBindBuilder()
@@ -113,6 +151,10 @@ public final class HTTPServerOverTls {
                 .build(),
             new HttpServerParametersBuilder()
                 .setClientAuthentication(HTTPServerOverTcp.clientAuthentication(userCryptHashMap))
+                .addAugmentation(new LimitsUnderHttpTlsBuilder()
+                    .setServerLimits(HTTPServerOverTcp.serverLimits(limits))
+                    .setOdlServerLimits(HTTPServerOverTcp.odlServerLimits(limits))
+                    .build())
                 .build());
     }
 

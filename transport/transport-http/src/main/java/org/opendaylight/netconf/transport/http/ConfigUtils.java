@@ -54,7 +54,7 @@ public final class ConfigUtils {
      */
     @Deprecated(since = "10.0.3", forRemoval = true)
     public static HttpOverTcp serverTransportTcp(final @NonNull String host, final int port) {
-        return HTTPServerOverTcp.of(host, port, null);
+        return HTTPServerOverTcp.of(host, port);
     }
 
     /**

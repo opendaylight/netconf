@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.transport.http.HTTPServerLimits;
 import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
@@ -32,7 +33,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
     private final EndpointRoot root;
     private final Uint32 chunkSize;
-    private final Uint32 frameSize;
+    private final HTTPServerLimits limits;
     private final WriteBufferWaterMark writeBufferWaterMark;
     private final AltSvcAdvertiser altSvcAdvertiser;
 
@@ -67,7 +68,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
             new SubscriptionsResource(invariants, streamRegistry, heartbeatIntervalMillis, maximumFragmentLength)));
 
         chunkSize = configuration.chunkSize();
-        frameSize = configuration.frameSize();
+        limits = configuration.limits();
         this.writeBufferWaterMark = writeBufferWaterMark;
         altSvcAdvertiser = new AltSvcAdvertiser(configuration.altSvcHeaderValue());
 
@@ -83,7 +84,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     @Override
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
         channel.channel().pipeline().addLast(new RestconfSessionBootstrap(channel.scheme(), root, chunkSize,
-            frameSize, writeBufferWaterMark, altSvcAdvertiser));
+            limits, writeBufferWaterMark, altSvcAdvertiser));
     }
 
     @Override
