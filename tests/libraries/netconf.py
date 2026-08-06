@@ -689,3 +689,45 @@ def deconfigure_device_and_verify(device_name: str, log_response: bool = True):
     """
     deconfigure_device(device_name, log_response=log_response)
     check_device_deconfigured(device_name, log_response=log_response)
+
+
+def get_device_config_data(device_name: str, host: str = ODL_IP) -> str:
+    """Get the configuration data of a device mounted onto a Netconf connector.
+
+    Unlike check_device_data_is_empty, the data is returned rather than
+    asserted on, and the node to ask can be chosen, so a cluster suite can
+    compare what each member sees.
+
+    Args:
+        device_name (str): The name of the device to query.
+        host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
+            the only node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to query a different cluster member.
+
+    Returns:
+        str: The raw XML text representation of the device's configuration data.
+    """
+    uri = (
+        f"{REST_API}/network-topology:network-topology/topology=topology-netconf/"
+        f"node={device_name}/yang-ext:mount?content=config"
+    )
+    headers = {"Accept": "application/yang-data+xml"}
+    return templated_requests.get_from_uri(uri, headers=headers, host=host).text
+
+
+def check_device_config_data(device_name: str, expected: str, host: str = ODL_IP):
+    """Check the configuration data of a mounted device matches expected data.
+
+    Args:
+        device_name (str): The name of the device to query.
+        expected (str): The expected raw XML text of the device's configuration
+            data.
+        host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
+            the only node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to query a different cluster member.
+
+    Returns:
+        None
+    """
+    data = get_device_config_data(device_name, host=host)
+    assert expected == data
