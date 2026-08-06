@@ -20,7 +20,6 @@ import io.netty.handler.codec.http2.Http2FrameCodec;
 import io.netty.util.CharsetUtil;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.yangtools.yang.common.Uint32;
 
 class HTTPSchemePriorKnowledgeTest {
     @Test
@@ -41,7 +40,7 @@ class HTTPSchemePriorKnowledgeTest {
         final var dummy = new ChannelInboundHandlerAdapter();
         final var channel = new EmbeddedChannel(dummy, eventCatcher);
 
-        HTTPScheme.HTTP.initializeServerPipeline(channel.pipeline().context(dummy), Uint32.valueOf(16384));
+        HTTPScheme.HTTP.initializeServerPipeline(channel.pipeline().context(dummy), HTTPServerLimits.DEFAULT);
 
         final var preface = Unpooled.copiedBuffer("PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n", CharsetUtil.US_ASCII);
         channel.writeInbound(preface);

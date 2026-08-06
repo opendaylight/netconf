@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mockConstruction;
 
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
+import org.opendaylight.netconf.transport.http.HTTPServerLimits;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,7 +68,7 @@ class RestconfSessionBootstrapTest {
 
         final var root = new EndpointRoot(principalService, new WellKnownResources("/restconf"), Map.of());
         final var bootstrap = new RestconfSessionBootstrap(HTTPScheme.HTTP, root,
-            Uint32.valueOf(262144), Uint32.valueOf(16384),
+            Uint32.valueOf(262144), HTTPServerLimits.DEFAULT,
             new WriteBufferWaterMark(32768, 65536), new AltSvcAdvertiser("h3=\":8443\"; ma=3600"));
 
         // Build the initializer while the codec still reports the pre-SETTINGS default (16384).
@@ -89,5 +91,25 @@ class RestconfSessionBootstrapTest {
         assertEquals(peerFrameSize, capturedArgs.getFirst().get(CHUNK_SIZE_ARG_INDEX),
             "HTTP/2 session chunk size must equal the peer-negotiated SETTINGS_MAX_FRAME_SIZE read "
                 + "at stream-creation time, not the pre-SETTINGS default captured at pipeline-setup time");
+    }
+
+    /**
+     * Verifies that the configured header limit reaches HTTP/3 as {@code SETTINGS_MAX_FIELD_SECTION_SIZE}. Without
+     * explicit local settings Netty leaves it at the RFC 9114 default of unlimited, so the limit would silently not
+     * apply to HTTP/3 at all.
+     */
+    @Test
+    void http3LocalSettingsAdvertiseTheHeaderLimit() {
+        final var root = new EndpointRoot(principalService, new WellKnownResources("/restconf"), Map.of());
+        final var bootstrap = new RestconfSessionBootstrap(HTTPScheme.HTTPS, root,
+            Uint32.valueOf(262144), new HTTPServerLimits(8192, 2048, 8192, 10485760, 16384),
+            new WriteBufferWaterMark(32768, 65536), new AltSvcAdvertiser("h3=\":8443\"; ma=3600"));
+
+        final var settings = bootstrap.localSettings().settings();
+        assertEquals(Long.valueOf(2048), settings.maxFieldSectionSize());
+        // the rest is deliberately left unset: advertising Http3Settings.defaultSettings() would additionally put
+        // ENABLE_CONNECT_PROTOCOL and H3_DATAGRAM on the wire, which is a separate decision from this limit
+        assertNull(settings.connectProtocolEnabled());
+        assertNull(settings.h3DatagramEnabled());
     }
 }
