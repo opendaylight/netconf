@@ -15,7 +15,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.quic.QuicChannel;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,11 +25,11 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
     private static final Logger LOG = LoggerFactory.getLogger(HTTPServerSessionBootstrap.class);
 
     protected final @NonNull HTTPScheme scheme;
-    protected final @NonNull Uint32 frameSize;
+    protected final @NonNull HTTPServerLimits limits;
 
-    protected HTTPServerSessionBootstrap(final HTTPScheme scheme, final Uint32 frameSize) {
+    protected HTTPServerSessionBootstrap(final HTTPScheme scheme, final HTTPServerLimits limits) {
         this.scheme = requireNonNull(scheme);
-        this.frameSize = frameSize;
+        this.limits = requireNonNull(limits);
     }
 
     @Override
@@ -39,7 +38,7 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
             LOG.debug("{} resolved to HTTP/3 semantics", ctx.channel());
             configureHttp3(ctx);
         } else {
-            scheme.initializeServerPipeline(ctx, frameSize);
+            scheme.initializeServerPipeline(ctx, limits);
         }
     }
 
