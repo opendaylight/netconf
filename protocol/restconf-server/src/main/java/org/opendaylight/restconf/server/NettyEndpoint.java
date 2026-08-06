@@ -48,8 +48,19 @@ public abstract class NettyEndpoint {
         final var listener = new RestconfTransportChannelListener(server, streamRegistry, principalService,
             configuration, writeBufferWaterMark);
         try {
+            final var limits = configuration.limits();
+            final var allocator = limits.allocator();
             final var serverBootstrap = bootstrapFactory.newServerBootstrap()
+                .option(ChannelOption.ALLOCATOR, allocator)
+                .childOption(ChannelOption.ALLOCATOR, allocator)
                 .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, writeBufferWaterMark);
+
+            // zero means 'whatever the operating system picked', which is the Netty default as well
+            final var receiveBufferSize = limits.socketReceiveBufferSize();
+            if (receiveBufferSize != 0) {
+                serverBootstrap.childOption(ChannelOption.SO_RCVBUF, receiveBufferSize);
+            }
+
             httpServer = HTTPServer.listen(listener, serverBootstrap,
                 configuration.transportConfiguration()).get();
         } catch (UnsupportedConfigurationException | ExecutionException | InterruptedException e) {

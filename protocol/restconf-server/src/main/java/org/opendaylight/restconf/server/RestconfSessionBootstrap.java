@@ -29,13 +29,13 @@ import io.netty.util.AttributeKey;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
+import org.opendaylight.netconf.transport.http.HTTPServerLimits;
 import org.opendaylight.netconf.transport.http.HTTPServerSessionBootstrap;
 import org.opendaylight.netconf.transport.http.PipelinedHTTPServerSession;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
 @NonNullByDefault
 final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
-    private static final int MAX_HTTP_CONTENT_LENGTH = 16 * 1024;
     private static final AttributeKey<Uint32> MAX_CHUNK_SIZE = AttributeKey.valueOf(RestconfSessionBootstrap.class,
         "maxChunkSize");
 
@@ -45,9 +45,9 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
     private final AltSvcAdvertiser altSvcAdvertiser;
 
     RestconfSessionBootstrap(final HTTPScheme scheme, final EndpointRoot root,
-            final Uint32 chunkSize, final Uint32 frameSize, final WriteBufferWaterMark writeBufferWaterMark,
+            final Uint32 chunkSize, final HTTPServerLimits limits, final WriteBufferWaterMark writeBufferWaterMark,
             final AltSvcAdvertiser altSvcAdvertiser) {
-        super(scheme, frameSize);
+        super(scheme, limits);
         this.root = requireNonNull(root);
         this.chunkSize = requireNonNull(chunkSize);
         this.writeBufferWaterMark = requireNonNull(writeBufferWaterMark);
@@ -91,7 +91,7 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
                 ch.config().setWriteBufferWaterMark(writeBufferWaterMark);
                 final var pipeline = ch.pipeline();
                 pipeline.addLast(new Http2StreamFrameToHttpObjectCodec(true));
-                pipeline.addLast(new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));
+                pipeline.addLast(new HttpObjectAggregator(limits.maxRequestBodySize()));
                 pipeline.addLast(altSvcAdvertiser);
                 // SETTINGS exchange is complete by stream creation time; read the peer-negotiated value now
                 final var codec = ctx.pipeline().get(Http2FrameCodec.class);
@@ -110,7 +110,7 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
                 final var pipeline = ch.pipeline();
                 pipeline.addLast("h3-stream-log", new LoggingHandler(LogLevel.DEBUG));
                 pipeline.addLast(new Http3FrameToHttpObjectCodec(true));
-                pipeline.addLast(new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));
+                pipeline.addLast(new HttpObjectAggregator(limits.maxRequestBodySize()));
                 pipeline.addLast("restconf-session", new ConcurrentRestconfSession(scheme,
                     ctx.channel().remoteAddress(), root, requireNonNull(ch.parent().attr(MAX_CHUNK_SIZE).get())));
             }

@@ -26,6 +26,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.odl.http.server.listen.stack.grouping.LimitsUnderHttpTcpBuilder;
 import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
@@ -48,7 +49,20 @@ public final class HTTPServerOverTcp {
      * @return transport configuration
      */
     public static @NonNull HttpOverTcp of(final @NonNull String host, final int port) {
-        return of(host, port, null);
+        return of(host, port, (Map<String, String>) null);
+    }
+
+    /**
+     * Builds transport configuration for {@link HTTPServer} using TCP transport underlay with no authorization.
+     *
+     * @param host local address
+     * @param port local port
+     * @param limits limits to impose on inbound requests
+     * @return transport configuration
+     */
+    public static @NonNull HttpOverTcp of(final @NonNull String host, final int port,
+            final @NonNull HTTPServerLimits limits) {
+        return of(host, port, null, limits);
     }
 
     /**
@@ -62,6 +76,21 @@ public final class HTTPServerOverTcp {
      */
     public static @NonNull HttpOverTcp of(final @NonNull String host, final int port,
             final @Nullable Map<String, String> userCryptHashMap) {
+        return of(host, port, userCryptHashMap, HTTPServerLimits.DEFAULT);
+    }
+
+    /**
+     * Builds transport configuration for {@link HTTPServer} using TCP transport underlay with Basic Authorization.
+     *
+     * @param host local address
+     * @param port local port
+     * @param userCryptHashMap user credentials map for Basic Authorization where key is username and value is a
+     *      {@link CryptHash} value for user password
+     * @param limits limits to impose on inbound requests
+     * @return transport configuration
+     */
+    public static @NonNull HttpOverTcp of(final @NonNull String host, final int port,
+            final @Nullable Map<String, String> userCryptHashMap, final @NonNull HTTPServerLimits limits) {
         return of(
             new TcpServerParametersBuilder()
                 .setLocalBind(BindingMap.of(new LocalBindBuilder()
@@ -69,7 +98,13 @@ public final class HTTPServerOverTcp {
                     .setLocalPort(new PortNumber(Uint16.valueOf(port)))
                     .build()))
                 .build(),
-            new HttpServerParametersBuilder().setClientAuthentication(clientAuthentication(userCryptHashMap)).build());
+            new HttpServerParametersBuilder()
+                .setClientAuthentication(clientAuthentication(userCryptHashMap))
+                .addAugmentation(new LimitsUnderHttpTcpBuilder()
+                    .setServerLimits(limits.toServerLimits())
+                    .setOdlServerLimits(limits.toOdlServerLimits())
+                    .build())
+                .build());
     }
 
     /**
