@@ -56,35 +56,6 @@ log = logging.getLogger(__name__)
 @pytest.mark.run(order=SuiteOrder.CLUSTERING_CRUD)
 class TestClusteringCrud:
 
-    def get_config_data(self, host: str) -> str:
-        """Get and return the config data from the device, as seen by one node.
-
-        Args:
-            host (str): Cluster member to query.
-
-        Returns:
-            str: The raw XML text representation of the device's configuration data.
-        """
-        url = (
-            f"{RESTCONF_ROOT}/data/network-topology:network-topology/topology="
-            f"topology-netconf/node={DEVICE_NAME}/yang-ext:mount?content=config"
-        )
-        headers = {"Accept": "application/yang-data+xml"}
-        return templated_requests.get_from_uri(url, headers=headers, host=host).text
-
-    def check_config_data(self, host: str, expected: str):
-        """Validates the mounted device's configuration data as seen by one node.
-
-        Args:
-            host (str): Cluster member to query.
-            expected (str): The expected string to validate against.
-
-        Returns:
-            None
-        """
-        data = self.get_config_data(host)
-        assert expected == data
-
     def verify_single_netconf_connector(self, host: str):
         """Verifies that exactly one Netconf connector exists for the test device.
 
@@ -255,28 +226,27 @@ class TestClusteringCrud:
             "step_check_device_data_is_seen_as_empty_on_configurer"
         ):
             # Get the device data as seen by configurer and make sure it is empty.
-            utils.wait_until_function_pass(
-                DEVICE_CHECK_TIMEOUT,
-                1,
-                self.check_config_data,
-                CONFIGURER_IP,
+            netconf.wait_device_config_data(
+                DEVICE_NAME,
                 EMPTY_DATA,
+                timeout=DEVICE_CHECK_TIMEOUT,
+                host=CONFIGURER_IP,
             )
 
         with allure_step_with_separate_logging(
             "step_check_device_data_is_seen_as_empty_on_checker"
         ):
             # Get the device data as seen by checker and make sure it is empty.
-            utils.wait_until_function_pass(
-                DEVICE_CHECK_TIMEOUT, 1, self.check_config_data, CHECKER_IP, EMPTY_DATA
+            netconf.wait_device_config_data(
+                DEVICE_NAME, EMPTY_DATA, timeout=DEVICE_CHECK_TIMEOUT, host=CHECKER_IP
             )
 
         with allure_step_with_separate_logging(
             "step_check_device_data_is_seen_as_empty_on_setter"
         ):
             # Get the device data as seen by setter and make sure it is empty.
-            utils.wait_until_function_pass(
-                DEVICE_CHECK_TIMEOUT, 1, self.check_config_data, SETTER_IP, EMPTY_DATA
+            netconf.wait_device_config_data(
+                DEVICE_NAME, EMPTY_DATA, timeout=DEVICE_CHECK_TIMEOUT, host=SETTER_IP
             )
 
         with allure_step_with_separate_logging("step_create_device_data_via_setter"):
@@ -293,24 +263,19 @@ class TestClusteringCrud:
             "step_check_new_device_data_is_visible_on_setter"
         ):
             # Get the device data and make sure it contains the created content.
-            utils.wait_until_function_pass(
-                DEVICE_CHECK_TIMEOUT,
-                1,
-                self.check_config_data,
-                SETTER_IP,
-                ORIGINAL_DATA,
+            netconf.wait_device_config_data(
+                DEVICE_NAME, ORIGINAL_DATA, timeout=DEVICE_CHECK_TIMEOUT, host=SETTER_IP
             )
 
         with allure_step_with_separate_logging(
             "step_check_new_device_data_is_visible_on_checker"
         ):
             # Check that the created device data make their way into the checker node.
-            utils.wait_until_function_pass(
-                DEVICE_CHECK_TIMEOUT,
-                1,
-                self.check_config_data,
-                CHECKER_IP,
+            netconf.wait_device_config_data(
+                DEVICE_NAME,
                 ORIGINAL_DATA,
+                timeout=DEVICE_CHECK_TIMEOUT,
+                host=CHECKER_IP,
             )
 
         with allure_step_with_separate_logging(
@@ -318,12 +283,11 @@ class TestClusteringCrud:
         ):
             # Check that the created device data make their way into the configurer
             # node.
-            utils.wait_until_function_pass(
-                DEVICE_CHECK_TIMEOUT,
-                1,
-                self.check_config_data,
-                CONFIGURER_IP,
+            netconf.wait_device_config_data(
+                DEVICE_NAME,
                 ORIGINAL_DATA,
+                timeout=DEVICE_CHECK_TIMEOUT,
+                host=CONFIGURER_IP,
             )
 
         with allure_step_with_separate_logging("step_modify_device_data_via_setter"):
@@ -340,19 +304,20 @@ class TestClusteringCrud:
         with allure_step_with_separate_logging("step_check_device_data_is_modified"):
             # Get the device data and make sure it contains the modified content.
             with utils.report_known_bug_on_failure("4968"):
-                self.check_config_data(SETTER_IP, MODIFIED_DATA)
+                netconf.check_device_config_data(
+                    DEVICE_NAME, MODIFIED_DATA, host=SETTER_IP
+                )
 
         with allure_step_with_separate_logging(
             "step_check_modified_device_data_is_visible_on_checker"
         ):
             # Check that the modified device data make their way into the checker node.
             with utils.report_known_bug_on_failure("4968"):
-                utils.wait_until_function_pass(
-                    DEVICE_CHECK_TIMEOUT,
-                    1,
-                    self.check_config_data,
-                    CHECKER_IP,
+                netconf.wait_device_config_data(
+                    DEVICE_NAME,
                     MODIFIED_DATA,
+                    timeout=DEVICE_CHECK_TIMEOUT,
+                    host=CHECKER_IP,
                 )
 
         with allure_step_with_separate_logging(
@@ -361,12 +326,11 @@ class TestClusteringCrud:
             # Check that the modified device data make their way into the configurer
             # node.
             with utils.report_known_bug_on_failure("4968"):
-                utils.wait_until_function_pass(
-                    DEVICE_CHECK_TIMEOUT,
-                    1,
-                    self.check_config_data,
-                    CONFIGURER_IP,
+                netconf.wait_device_config_data(
+                    DEVICE_NAME,
                     MODIFIED_DATA,
+                    timeout=DEVICE_CHECK_TIMEOUT,
+                    host=CONFIGURER_IP,
                 )
 
         with allure_step_with_separate_logging("step_delete_device_data_via_setter"):
@@ -382,19 +346,20 @@ class TestClusteringCrud:
         with allure_step_with_separate_logging("step_check_device_data_is_deleted"):
             # Get the device data and make sure it is empty again.
             with utils.report_known_bug_on_failure("4968"):
-                self.check_config_data(SETTER_IP, EMPTY_DATA)
+                netconf.check_device_config_data(
+                    DEVICE_NAME, EMPTY_DATA, host=SETTER_IP
+                )
 
         with allure_step_with_separate_logging(
             "step_check_device_data_deletion_is_visible_on_checker"
         ):
             # Check that the device data deletion makes its way into the checker node.
             with utils.report_known_bug_on_failure("4968"):
-                utils.wait_until_function_pass(
-                    DEVICE_CHECK_TIMEOUT,
-                    1,
-                    self.check_config_data,
-                    CHECKER_IP,
+                netconf.wait_device_config_data(
+                    DEVICE_NAME,
                     EMPTY_DATA,
+                    timeout=DEVICE_CHECK_TIMEOUT,
+                    host=CHECKER_IP,
                 )
 
         with allure_step_with_separate_logging(
@@ -403,10 +368,9 @@ class TestClusteringCrud:
             # Check that the device data deletion makes its way into the configurer
             # node.
             with utils.report_known_bug_on_failure("4968"):
-                utils.wait_until_function_pass(
-                    DEVICE_CHECK_TIMEOUT,
-                    1,
-                    self.check_config_data,
-                    CONFIGURER_IP,
+                netconf.wait_device_config_data(
+                    DEVICE_NAME,
                     EMPTY_DATA,
+                    timeout=DEVICE_CHECK_TIMEOUT,
+                    host=CONFIGURER_IP,
                 )
