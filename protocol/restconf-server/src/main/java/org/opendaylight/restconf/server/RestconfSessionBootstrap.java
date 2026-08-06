@@ -18,8 +18,11 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http2.Http2FrameCodec;
 import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
+import io.netty.handler.codec.http3.DefaultHttp3SettingsFrame;
 import io.netty.handler.codec.http3.Http3FrameToHttpObjectCodec;
 import io.netty.handler.codec.http3.Http3ServerConnectionHandler;
+import io.netty.handler.codec.http3.Http3Settings;
+import io.netty.handler.codec.http3.Http3SettingsFrame;
 import io.netty.handler.codec.quic.QuicChannel;
 import io.netty.handler.codec.quic.QuicStreamChannel;
 import io.netty.handler.codec.quic.QuicTransportParameters;
@@ -29,13 +32,13 @@ import io.netty.util.AttributeKey;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
+import org.opendaylight.netconf.transport.http.HTTPServerLimits;
 import org.opendaylight.netconf.transport.http.HTTPServerSessionBootstrap;
 import org.opendaylight.netconf.transport.http.PipelinedHTTPServerSession;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
 @NonNullByDefault
 final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
-    private static final int MAX_HTTP_CONTENT_LENGTH = 16 * 1024;
     private static final AttributeKey<Uint32> MAX_CHUNK_SIZE = AttributeKey.valueOf(RestconfSessionBootstrap.class,
         "maxChunkSize");
 
@@ -45,9 +48,9 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
     private final AltSvcAdvertiser altSvcAdvertiser;
 
     RestconfSessionBootstrap(final HTTPScheme scheme, final EndpointRoot root,
-            final Uint32 chunkSize, final Uint32 frameSize, final WriteBufferWaterMark writeBufferWaterMark,
+            final Uint32 chunkSize, final HTTPServerLimits limits, final WriteBufferWaterMark writeBufferWaterMark,
             final AltSvcAdvertiser altSvcAdvertiser) {
-        super(scheme, frameSize);
+        super(scheme, limits);
         this.root = requireNonNull(root);
         this.chunkSize = requireNonNull(chunkSize);
         this.writeBufferWaterMark = requireNonNull(writeBufferWaterMark);
@@ -80,8 +83,23 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
         }
         final var quicChannel = (QuicChannel) ctx.channel();
         quicChannel.attr(MAX_CHUNK_SIZE).set(maxChunkSize(quicChannel.peerTransportParameters(), chunkSize));
-        ctx.pipeline().addLast("h3-connection", new Http3ServerConnectionHandler(buildHttp3ChildInitializer(ctx)));
+        ctx.pipeline().addLast("h3-connection", new Http3ServerConnectionHandler(buildHttp3ChildInitializer(ctx),
+            null, null, localSettings(), true));
         ctx.pipeline().remove(this);
+    }
+
+    /**
+     * Local HTTP/3 settings advertised on the control stream. These match what Netty would default to, except for
+     * {@code SETTINGS_MAX_FIELD_SECTION_SIZE}, which Netty otherwise leaves at its RFC 9114 default of unlimited.
+     *
+     * @return the settings to advertise
+     */
+    @VisibleForTesting
+    Http3SettingsFrame localSettings() {
+        // note: deliberately not Http3Settings.defaultSettings(), which would additionally put ENABLE_CONNECT_PROTOCOL
+        //       and H3_DATAGRAM on the wire. This is the HTTP/3 counterpart of SETTINGS_MAX_HEADER_LIST_SIZE, and
+        //       counts the same thing: the uncompressed field list plus 32 octets of overhead per field.
+        return new DefaultHttp3SettingsFrame(new Http3Settings().maxFieldSectionSize(limits.maxHeaderSize()));
     }
 
     @VisibleForTesting
@@ -91,7 +109,7 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
                 ch.config().setWriteBufferWaterMark(writeBufferWaterMark);
                 final var pipeline = ch.pipeline();
                 pipeline.addLast(new Http2StreamFrameToHttpObjectCodec(true));
-                pipeline.addLast(new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));
+                pipeline.addLast(new HttpObjectAggregator(limits.maxRequestBodySize()));
                 pipeline.addLast(altSvcAdvertiser);
                 // SETTINGS exchange is complete by stream creation time; read the peer-negotiated value now
                 final var codec = ctx.pipeline().get(Http2FrameCodec.class);
@@ -110,7 +128,7 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
                 final var pipeline = ch.pipeline();
                 pipeline.addLast("h3-stream-log", new LoggingHandler(LogLevel.DEBUG));
                 pipeline.addLast(new Http3FrameToHttpObjectCodec(true));
-                pipeline.addLast(new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));
+                pipeline.addLast(new HttpObjectAggregator(limits.maxRequestBodySize()));
                 pipeline.addLast("restconf-session", new ConcurrentRestconfSession(scheme,
                     ctx.channel().remoteAddress(), root, requireNonNull(ch.parent().attr(MAX_CHUNK_SIZE).get())));
             }
