@@ -426,7 +426,7 @@ def start_member(member: int, timeout: int = 300):
     )
 
 
-def _parse_member_number(node_name: str) -> int:
+def parse_member_number(node_name: str) -> int:
     """Parses a pekko node name like "member-2" into its 1-based number.
 
     Args:
@@ -436,66 +436,3 @@ def _parse_member_number(node_name: str) -> int:
         int: The member number N.
     """
     return int(node_name.replace("member-", ""))
-
-
-# Entity type under which mdsal's cluster singleton service elects the owner of
-# a netconf device. The device's entity name is a long DataObjectIdentifier
-# blob embedding the topology node id (its exact form is codegen- and
-# version-specific), so the entity is located by the node id substring rather
-# than by reconstructing the name.
-_NETCONF_ELECTION_ENTITY_TYPE = "org.opendaylight.mdsal.ServiceEntityType"
-
-
-def _get_entities(host: str) -> list[dict]:
-    """Returns every entity-owner entity as reported by ``host``.
-
-    Args:
-        host (str): Cluster member to send the RPC to.
-
-    Returns:
-        list[dict]: One dict per entity, each carrying "type", "name",
-            "owner-node" and "candidate-nodes".
-    """
-    uri = f"{RESTCONF_ROOT}/operations/odl-entity-owners:get-entities"
-    headers = {"Content-Type": "application/json", "Accept": "application/json"}
-    response = templated_requests.post_to_uri(uri, headers=headers, data="", host=host)
-    return response.json()["odl-entity-owners:output"].get("entities", [])
-
-
-def get_device_entity_owner_and_followers(
-    device_name: str, host: str = ODL_IP
-) -> tuple[int, list[int]]:
-    """Returns the owner and followers of the entity representing a netconf device.
-
-    Calls the odl-entity-owners:get-entities RPC on ``host`` and locates the
-    ClusterSingletonService election entity for ``device_name`` -- the one
-    whose type is the mdsal ServiceEntityType and whose name embeds the
-    device's topology node id. The returned "member-N" node names are mapped to
-    member numbers; followers are all candidates other than the owner, sorted
-    ascending.
-
-    Args:
-        device_name (str): Name of the mounted netconf device.
-        host (str): Cluster member to send the RPC to.
-
-    Returns:
-        tuple[int, list[int]]: (owner member number, follower member numbers).
-    """
-    matches = [
-        entity
-        for entity in _get_entities(host)
-        if entity.get("type") == _NETCONF_ELECTION_ENTITY_TYPE
-        and f"value={device_name}}}" in entity.get("name", "")
-    ]
-    assert len(matches) == 1, (
-        f"expected exactly one {_NETCONF_ELECTION_ENTITY_TYPE} entity for device "
-        f"{device_name}, found {len(matches)}"
-    )
-    entity = matches[0]
-
-    owner = _parse_member_number(entity["owner-node"])
-    candidates = sorted(
-        _parse_member_number(node) for node in entity["candidate-nodes"]
-    )
-    followers = [candidate for candidate in candidates if candidate != owner]
-    return owner, followers
