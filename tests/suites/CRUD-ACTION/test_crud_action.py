@@ -31,7 +31,6 @@ USE_NETCONF_CONNECTOR = variables.USE_NETCONF_CONNECTOR
 DELETE_LOCATION = "delete_location"
 RPC_FILE = "variables/netconf/CRUD/customaction/customaction.xml"
 ODL_NETCONF_NAMESPACE = variables.ODL_NETCONF_NAMESPACE
-REST_API = variables.REST_API
 RESTCONF_ROOT = variables.RESTCONF_ROOT
 
 log = logging.getLogger(__name__)
@@ -46,44 +45,6 @@ log = logging.getLogger(__name__)
 @pytest.mark.usefixtures("odl_standalone")
 @pytest.mark.run(order=SuiteOrder.CRUD_ACTION)
 class TestCrudAction:
-
-    def get_config_data(self) -> str:
-        """Get and return the config data from the device.
-
-        Returns:
-            str: The raw XML text representation of the device's configuration data.
-        """
-        url = (
-            f"{REST_API}/network-topology:network-topology/topology=topology-netconf/"
-            f"node={DEVICE_NAME}/yang-ext:mount?content=config"
-        )
-        headers = {"Accept": "application/yang-data+xml"}
-        data = templated_requests.get_from_uri(url, headers=headers).text
-
-        return data
-
-    def check_config_data(
-        self, expected: str, regex: bool = False, contains: bool = False
-    ):
-        """Validates the mounted device's configuration data against an expected value.
-
-        Args:
-            expected (str): The expected string, regex pattern or substring
-                to validate against.
-            regex (bool): If True, treats `expected` as a regular expression pattern.
-            contains (bool): If True, asserts that `expected` is a substring
-                found anywhere within the config data.
-
-        Returns:
-            None
-        """
-        data = self.get_config_data()
-        if regex:
-            assert re.match(expected, data) is not None
-        elif contains:
-            assert expected in data
-        else:
-            assert expected == data
 
     @pytest.fixture()
     def netconf_testtool(self, allure_step_with_separate_logging):
@@ -203,7 +164,11 @@ class TestCrudAction:
         with allure_step_with_separate_logging("step_check_device_data_is_empty"):
             # Get the device data and make sure it is empty.
             escaped = re.escape(ODL_NETCONF_NAMESPACE)
-            self.check_config_data(rf'<data xmlns="{escaped}"(\/>|><\/data>)', True)
+            netconf.check_device_config_data(
+                DEVICE_NAME,
+                rf'<data xmlns="{escaped}"(\/>|><\/data>)',
+                regex=True,
+            )
 
         with allure_step_with_separate_logging(
             "step_invoke_yang1.1_action_via_xml_post"
