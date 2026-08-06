@@ -2165,9 +2165,16 @@ Netty endpoint related settings are also configurable:
 * ``api-root-path``, which defaults to ``restconf``
 * ``boss-threads``, which defaults to ``0``
 * ``worker-threads``, which defaults to ``0``
-* ``http-chunk-size``, which defaults to ``262144``
+* ``http1-chunk-size``, which defaults to ``262144``
 * ``group-threads``, which defaults to ``0``
 * ``default-encoding``, which defaults to ``json``
+
+Limits imposed on an inbound request are also configurable:
+
+* ``http1-max-initial-line-length``, which defaults to ``8192``
+* ``http1-max-header-size``, which defaults to ``16384``
+* ``http1-max-request-chunk-size``, which defaults to ``8192``
+* ``http-request-body-max-size``, which defaults to ``10485760``
 
 HTTP/2 and HTTP/3 related settings are also configurable:
 
@@ -2211,11 +2218,27 @@ When this is set to true, the server will violate RFC8040 and report "404" inste
 
 *worker-threads* — Number of Netty worker threads. 0 means the Netty default.
 
-*http-chunk-size* — Maximum number of response bytes buffered before switching to chunk streaming.
+*http1-chunk-size* — Maximum number of response bytes buffered before switching to chunk streaming.
 
 *group-threads* — Netty's thread limit. 0 means no limits.
 
 *default-encoding* — Default encoding for outgoing messages. Expected values are 'xml' or 'json' (without quotes).
+
+*http1-max-initial-line-length* — Maximum length in bytes of an inbound HTTP/1.1 request line. A longer request
+line is rejected with '414 URI Too Long'. RFC9112 recommends supporting at least 8000 octets, so the default is
+above Netty's own 4096.
+
+*http1-max-header-size* — Maximum size in bytes of an inbound HTTP/1.1 header section. A larger one is rejected
+with '431 Request Header Fields Too Large'. On HTTP/2 the same value is advertised as
+SETTINGS_MAX_HEADER_LIST_SIZE and on HTTP/3 as SETTINGS_MAX_FIELD_SECTION_SIZE, both of which measure the
+uncompressed field list rather than the octets on the wire.
+
+*http1-max-request-chunk-size* — Maximum size in bytes of a single HTTP object emitted by the request decoder.
+This bounds how much of a request body reaches the pipeline at a time; it does not limit the body itself. Note
+this is the inbound counterpart of *http1-chunk-size*, which sizes outbound response chunks.
+
+*http-request-body-max-size* — Maximum size in bytes of an aggregated request body. A larger request is rejected
+with '413 Content Too Large'. Applies to HTTP/1.1, HTTP/2 and HTTP/3 alike.
 
 *http2-max-frame-size* — Maximum HTTP/2 frame payload size in bytes this server is willing to accept from the client.
 Valid values are 16384-16777215.
@@ -2257,9 +2280,13 @@ file, ``org.opendaylight.restconf.nb.rfc8040.cfg``, for example:
     api-root-path=restconf
     boss-threads=0
     worker-threads=0
-    http-chunk-size=262144
+    http1-chunk-size=262144
     group-threads=0
     default-encoding=json
+    http1-max-initial-line-length=8192
+    http1-max-header-size=16384
+    http1-max-request-chunk-size=8192
+    http-request-body-max-size=10485760
     http2-max-frame-size=16384
     http-write-buffer-low-watermark=32768
     http-write-buffer-high-watermark=65536
@@ -2287,9 +2314,13 @@ Or use Karaf CLI:
     opendaylight-user@root>config:property-set api-root-path "restconf"
     opendaylight-user@root>config:property-set boss-threads 0
     opendaylight-user@root>config:property-set worker-threads 0
-    opendaylight-user@root>config:property-set http-chunk-size 262144
+    opendaylight-user@root>config:property-set http1-chunk-size 262144
     opendaylight-user@root>config:property-set group-threads 0
     opendaylight-user@root>config:property-set default-encoding "json"
+    opendaylight-user@root>config:property-set http1-max-initial-line-length 8192
+    opendaylight-user@root>config:property-set http1-max-header-size 16384
+    opendaylight-user@root>config:property-set http1-max-request-chunk-size 8192
+    opendaylight-user@root>config:property-set http-request-body-max-size 10485760
     opendaylight-user@root>config:property-set http2-max-frame-size 16384
     opendaylight-user@root>config:property-set http-write-buffer-low-watermark 32768
     opendaylight-user@root>config:property-set http-write-buffer-high-watermark 65536
