@@ -27,7 +27,6 @@ DEVICE_NAME = "netconf-test-device"
 DEVICE_TYPE = "full-uri-device"
 USE_NETCONF_CONNECTOR = variables.USE_NETCONF_CONNECTOR
 ODL_NETCONF_NAMESPACE = variables.ODL_NETCONF_NAMESPACE
-REST_API = variables.REST_API
 RESTCONF_ROOT = variables.RESTCONF_ROOT
 
 log = logging.getLogger(__name__)
@@ -42,39 +41,6 @@ log = logging.getLogger(__name__)
 @pytest.mark.usefixtures("odl_standalone")
 @pytest.mark.run(order=SuiteOrder.CRUD)
 class TestCrud:
-
-    def get_config_data(self) -> str:
-        """Get and return the config data from the device.
-
-        Returns:
-            str: The raw XML text representation of the device's configuration data.
-        """
-        url = (
-            f"{REST_API}/network-topology:network-topology/topology=topology-netconf/"
-            f"node={DEVICE_NAME}/yang-ext:mount?content=config"
-        )
-        headers = {"Accept": "application/yang-data+xml"}
-        return templated_requests.get_from_uri(url, headers=headers).text
-
-    def check_config_data(
-        self, expected: str, regex: bool = False, contains: bool = False
-    ):
-        """Validates the mounted device's configuration data against an expected value.
-
-        Args:
-            expected (str): The expected string, regex pattern or substring
-                to validate against.
-            regex (bool): If True, treats `expected` as a regular expression pattern.
-            contains (bool): If True, asserts that `expected` is a substring
-                found anywhere within the config data.
-        """
-        data = self.get_config_data()
-        if regex:
-            assert re.match(expected, data) is not None
-        elif contains:
-            assert expected in data
-        else:
-            assert expected == data
 
     def verify_single_netconf_connector(self):
         """Verifies that exactly one Netconf connector exists for the test device.
@@ -196,8 +162,10 @@ class TestCrud:
         with allure_step_with_separate_logging("step_check_device_data_is_empty"):
             # Get the device data and make sure it is empty.
             escaped = re.escape(ODL_NETCONF_NAMESPACE)
-            self.check_config_data(
-                rf'<data xmlns="{escaped}"(\/>|><\/data>)', regex=True
+            netconf.check_device_config_data(
+                DEVICE_NAME,
+                rf'<data xmlns="{escaped}"(\/>|><\/data>)',
+                regex=True,
             )
 
         with allure_step_with_separate_logging("step_create_device_data_label_via_xml"):
@@ -213,10 +181,11 @@ class TestCrud:
         ):
             # Get the device data label and make sure it contains the created
             # content.
-            self.check_config_data(
+            netconf.check_device_config_data(
+                DEVICE_NAME,
                 f'<data xmlns="{ODL_NETCONF_NAMESPACE}">'
                 f'<cont xmlns="urn:opendaylight:test:netconf:crud">'
-                f"<l>Content</l></cont></data>"
+                f"<l>Content</l></cont></data>",
             )
 
         with allure_step_with_separate_logging("step_modify_device_data_label_via_xml"):
@@ -232,10 +201,11 @@ class TestCrud:
         ):
             # Get the device data label and make sure it contains the modified
             # content.
-            self.check_config_data(
+            netconf.check_device_config_data(
+                DEVICE_NAME,
                 f'<data xmlns="{ODL_NETCONF_NAMESPACE}">'
                 f'<cont xmlns="urn:opendaylight:test:netconf:crud">'
-                f"<l>Modified Content</l></cont></data>"
+                f"<l>Modified Content</l></cont></data>",
             )
 
         with allure_step_with_separate_logging(
@@ -267,7 +237,8 @@ class TestCrud:
             utils.wait_until_function_pass(
                 60,
                 1,
-                self.check_config_data,
+                netconf.check_device_config_data,
+                DEVICE_NAME,
                 f'<data xmlns="{ODL_NETCONF_NAMESPACE}">'
                 f'<cont xmlns="urn:opendaylight:test:netconf:crud">'
                 f"<l>Modified Content</l></cont></data>",
@@ -285,10 +256,11 @@ class TestCrud:
             "step_check_device_data_is_modified_again"
         ):
             # Get the device data and make sure it contains the modified content.
-            self.check_config_data(
+            netconf.check_device_config_data(
+                DEVICE_NAME,
                 f'<data xmlns="{ODL_NETCONF_NAMESPACE}">'
                 f'<cont xmlns="urn:opendaylight:test:netconf:crud">'
-                f"<l>Another Modified Content</l></cont></data>"
+                f"<l>Another Modified Content</l></cont></data>",
             )
 
         with allure_step_with_separate_logging(
@@ -306,10 +278,11 @@ class TestCrud:
         ):
             # Get the device data label as XML and make sure it matches the content
             # posted as JSON.
-            self.check_config_data(
+            netconf.check_device_config_data(
+                DEVICE_NAME,
                 f'<data xmlns="{ODL_NETCONF_NAMESPACE}">'
                 f'<cont xmlns="urn:opendaylight:test:netconf:crud">'
-                f"<l>Content Modified via JSON</l></cont></data>"
+                f"<l>Content Modified via JSON</l></cont></data>",
             )
 
         with allure_step_with_separate_logging("step_create_car_list"):
@@ -322,7 +295,7 @@ class TestCrud:
 
         with allure_step_with_separate_logging("step_check_car_list_created"):
             # Get the device data and make sure the car list was created correctly.
-            data = self.get_config_data()
+            data = netconf.get_device_config_data(DEVICE_NAME)
             assert "<id>KEEP</id>" in data
             assert "<id>SMALL</id>" not in data
             assert "<model>Isetta</model>" not in data
@@ -347,7 +320,7 @@ class TestCrud:
 
         with allure_step_with_separate_logging("step_check_item1_is_created"):
             # Get the device data as XML and make sure item1 was created.
-            data = self.get_config_data()
+            data = netconf.get_device_config_data(DEVICE_NAME)
             assert "<id>SMALL</id>" in data
             assert "<model>Isetta</model>" in data
             assert "<manufacturer>BMW</manufacturer>" in data
@@ -372,7 +345,7 @@ class TestCrud:
         with allure_step_with_separate_logging("step_check_item2_is_created"):
             # Get the device data as XML and make sure item2 matches the content
             # posted as JSON in the previous case.
-            data = self.get_config_data()
+            data = netconf.get_device_config_data(DEVICE_NAME)
             assert "<id>SMALL</id>" in data
             assert "<model>Isetta</model>" in data
             assert "<manufacturer>BMW</manufacturer>" in data
@@ -398,6 +371,8 @@ class TestCrud:
         with allure_step_with_separate_logging("step_check_device_data_is_deleted"):
             # Get the device data and make sure it is empty again.
             escaped = re.escape(ODL_NETCONF_NAMESPACE)
-            self.check_config_data(
-                rf'<data xmlns="{escaped}"(\/>|><\/data>)', regex=True
+            netconf.check_device_config_data(
+                DEVICE_NAME,
+                rf'<data xmlns="{escaped}"(\/>|><\/data>)',
+                regex=True,
             )
