@@ -32,3 +32,4 @@ class SuiteOrder(IntEnum):
     SCALE_MAX_DEVICES = auto()
     CLUSTERING_CRUD = auto()
     CLUSTERING_ENTITY = auto()
+    CLUSTERING_OUTAGES = auto()
