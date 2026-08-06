@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84370936_685aafa5",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-06T13:40:58Z",
+      "side": 0,
+      "message": "getsingle still passes the removed argument.\nthere are (were) 9 start_testtool calls; the change updates 8. With filename gone, the jar string binds to device_count, which is also passed as a keyword:\n```\nTypeError: start_testtool() got multiple values for argument \u0027device_count\u0027\n```\n\nin tests/suites/getsingle/test_getsingle.py:55-60",
+      "revId": "a80014456dc536a5f4cb60fe097764a88364e636",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
