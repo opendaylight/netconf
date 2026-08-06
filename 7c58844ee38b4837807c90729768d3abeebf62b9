@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26025977_3cb7717d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-06T14:00:35Z",
+      "side": 1,
+      "message": "Starting with sshd 2.18.0, mina-sshd\u0027s ML-KEM hybrid key exchanges (mlkem768x25519, mlkem768nistp256, mlkem1024nistp384) moved from BC\u0027s experimental org.bouncycastle.pqc.crypto.mlkem.* package to the stabilized org.bouncycastle.crypto.{params,generators,kems}.MLKEM* API, which only exists from BC 1.84 onward. On BC 1.83 those classes aren\u0027t present, so mina-sshd\u0027s own isSupported() check quietly disables the three algorithms — but KeyExchangePolicy declares them as required/unsuppressed, so AlgoCoverageTest/BuiltinCoverageTest fail with \"Unimplemented algorithms\"/\"Unused SSHD builtins\" for the mlkem entries.\n\nNeeds a bouncycastle.version o(≥1.84) alongside the mina-sshd bump. That has been delivered in odlparent 14.3.6, not adopted yet.",
+      "revId": "7c58844ee38b4837807c90729768d3abeebf62b9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
