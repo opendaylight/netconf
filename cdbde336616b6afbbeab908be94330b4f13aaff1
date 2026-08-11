@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "cdbde336616b6afbbeab908be94330b4f13aaff1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3ac4438_86ef1b0c",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 718,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-11T09:44:04Z",
+      "side": 1,
+      "message": "Could be updated in other places like `netconf/tests/suites/CRUD-RPC/test_crud_rpc.py` where it also uses `get_config_data` and `check_config_data` and could be replace with this function call.",
+      "revId": "cdbde336616b6afbbeab908be94330b4f13aaff1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
