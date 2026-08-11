@@ -38,7 +38,9 @@ ODL_NETCONF_NAMESPACE = variables.ODL_NETCONF_NAMESPACE
 
 # The configuration data a mounted device reports when it holds none, i.e. what
 # a successful delete of all of its data leaves behind.
-EMPTY_DEVICE_DATA = f'<data xmlns="{ODL_NETCONF_NAMESPACE}"></data>'
+EMPTY_DEVICE_DATA_PATTERN = (
+    rf'<data xmlns="{re.escape(ODL_NETCONF_NAMESPACE)}"(\/>|></data>)'
+)
 TESTTOOL_BASE_STARTUP_TIMEOUT = 20
 TESTTOOL_PER_DEVICE_TIMEOUT = 1
 
@@ -586,7 +588,9 @@ def check_device_deconfigured(device_name: str, log_response: bool = True):
     wait_device_fully_removed(device_name, timeout=120, period=0.5)
 
 
-def check_device_data_is_empty(device_name: str, log_response: bool = True):
+def check_device_data_is_empty(
+    device_name: str, log_response: bool = True, host: str = ODL_IP
+):
     """Get the configuration data of a device and check that it is empty.
 
     Per-device operation: requests the configuration data of the device mounted
@@ -597,20 +601,18 @@ def check_device_data_is_empty(device_name: str, log_response: bool = True):
         device_name (str): The name of the device to query.
         log_response (bool): Whether to log the operation's output. Accepted for
             interface compatibility with perform_operation_on_each_device.
+        host (str): Node to query. Defaults to ODL_IP (node 1 / the only
+            node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to check a different cluster member.
 
     Returns:
         None
     """
-    uri = (
-        f"{REST_API}/network-topology:network-topology/topology=topology-netconf/"
-        f"node={device_name}/yang-ext:mount?content=config"
+    data = get_device_config_data(device_name, host=host)
+    assert re.match(EMPTY_DEVICE_DATA_PATTERN, data) is not None, (
+        f"Device {device_name} on host {host} returned unexpected "
+        f"non-empty data: {data}"
     )
-    headers = {"Accept": "application/yang-data+xml"}
-    data = templated_requests.get_from_uri(uri, headers=headers).text
-    escaped = re.escape(ODL_NETCONF_NAMESPACE)
-    assert (
-        re.match(rf'<data xmlns="{escaped}"(\/>|></data>)', data) is not None
-    ), f"Device {device_name} returned unexpected non-empty data: {data}"
 
 
 def get_data_from_devices_concurrently(device_count: int, worker_count: int):
@@ -698,9 +700,9 @@ def deconfigure_device_and_verify(device_name: str, log_response: bool = True):
 def get_device_config_data(device_name: str, host: str = ODL_IP) -> str:
     """Get the configuration data of a device mounted onto a Netconf connector.
 
-    Unlike check_device_data_is_empty, the data is returned rather than
-    asserted on, and the node to ask can be chosen, so a cluster suite can
-    compare what each member sees.
+    Returns the current state of the data, suitable to be used with
+    custom assertions (e.g. checking it's empty, or comparing it to an
+    expected value).
 
     Args:
         device_name (str): The name of the device to query.

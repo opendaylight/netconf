@@ -161,12 +161,7 @@ class TestCrud:
 
         with allure_step_with_separate_logging("step_check_device_data_is_empty"):
             # Get the device data and make sure it is empty.
-            escaped = re.escape(ODL_NETCONF_NAMESPACE)
-            netconf.check_device_config_data(
-                DEVICE_NAME,
-                rf'<data xmlns="{escaped}"(\/>|><\/data>)',
-                regex=True,
-            )
+            netconf.check_device_data_is_empty(DEVICE_NAME)
 
         with allure_step_with_separate_logging("step_create_device_data_label_via_xml"):
             # Send a sample test data label into the device and check that
