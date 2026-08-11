@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6e926f1_8cbbf367",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-11T06:40:48Z",
+      "side": 1,
+      "message": "This line exceeds 72 char per line \nhttps://cbea.ms/git-commit/#wrap-72",
+      "revId": "a1ca606bdd4f8ffc2eef9e5f00c7e42d31cb370f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36bb3890_817d8c81",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-11T06:40:48Z",
+      "side": 1,
+      "message": "I would prefer more to use verb in function names like `get_member_ip`",
+      "revId": "a1ca606bdd4f8ffc2eef9e5f00c7e42d31cb370f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ab12f4a_7e761243",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-11T06:40:48Z",
+      "side": 1,
+      "message": "I would prefer more to use verb in function names like `_get_member_process_pattern`",
+      "revId": "a1ca606bdd4f8ffc2eef9e5f00c7e42d31cb370f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fc01d74_ee6e8e71",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 429,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-11T06:40:48Z",
+      "side": 1,
+      "message": "It might be better to call it something like `_parse_member_number` so the function responsibility would be more obvious from function name.",
+      "revId": "a1ca606bdd4f8ffc2eef9e5f00c7e42d31cb370f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
