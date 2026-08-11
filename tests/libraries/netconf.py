@@ -38,13 +38,32 @@ ODL_NETCONF_NAMESPACE = variables.ODL_NETCONF_NAMESPACE
 
 # The configuration data a mounted device reports when it holds none, i.e. what
 # a successful delete of all of its data leaves behind.
-EMPTY_DEVICE_DATA = f'<data xmlns="{ODL_NETCONF_NAMESPACE}"></data>'
+EMPTY_DEVICE_DATA_PATTERN = re.compile(
+    rf'<data xmlns="{re.escape(ODL_NETCONF_NAMESPACE)}"(\/>|></data>)'
+)
 TESTTOOL_BASE_STARTUP_TIMEOUT = 20
 TESTTOOL_PER_DEVICE_TIMEOUT = 1
 
 NETCONF_MOUNTED_DEVICE_TYPES = dict()
 
 log = logging.getLogger(__name__)
+
+
+def does_device_data_match_expected(data: str, expected: str | re.Pattern) -> bool:
+    """Whether a device's config data matches ``expected``.
+
+    Args:
+        data (str): Raw XML text as returned by get_device_config_data.
+        expected (str | re.Pattern): A literal document to match exactly, or
+            a compiled pattern (e.g. EMPTY_DEVICE_DATA_PATTERN) to match
+            ``data`` against instead.
+
+    Returns:
+        bool: True if ``data`` satisfies ``expected``.
+    """
+    if isinstance(expected, re.Pattern):
+        return expected.match(data) is not None
+    return data == expected
 
 
 def check_device_has_no_netconf_connector(device_name: str, host: str = ODL_IP):
@@ -589,7 +608,9 @@ def check_device_deconfigured(device_name: str, log_response: bool = True):
     wait_device_fully_removed(device_name, timeout=120, period=0.5)
 
 
-def check_device_data_is_empty(device_name: str, log_response: bool = True):
+def check_device_data_is_empty(
+    device_name: str, log_response: bool = True, host: str = ODL_IP
+):
     """Get the configuration data of a device and check that it is empty.
 
     Per-device operation: requests the configuration data of the device mounted
@@ -600,20 +621,18 @@ def check_device_data_is_empty(device_name: str, log_response: bool = True):
         device_name (str): The name of the device to query.
         log_response (bool): Whether to log the operation's output. Accepted for
             interface compatibility with perform_operation_on_each_device.
+        host (str): Node to query. Defaults to ODL_IP (node 1 / the only
+            node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to check a different cluster member.
 
     Returns:
         None
     """
-    uri = (
-        f"{REST_API}/network-topology:network-topology/topology=topology-netconf/"
-        f"node={device_name}/yang-ext:mount?content=config"
+    data = get_device_config_data(device_name, host=host)
+    assert does_device_data_match_expected(data, EMPTY_DEVICE_DATA_PATTERN), (
+        f"Device {device_name} on host {host} returned unexpected "
+        f"non-empty data: {data}"
     )
-    headers = {"Accept": "application/yang-data+xml"}
-    data = templated_requests.get_from_uri(uri, headers=headers).text
-    escaped = re.escape(ODL_NETCONF_NAMESPACE)
-    assert (
-        re.match(rf'<data xmlns="{escaped}"(\/>|></data>)', data) is not None
-    ), f"Device {device_name} returned unexpected non-empty data: {data}"
 
 
 def get_data_from_devices_concurrently(device_count: int, worker_count: int):
@@ -701,9 +720,9 @@ def deconfigure_device_and_verify(device_name: str, log_response: bool = True):
 def get_device_config_data(device_name: str, host: str = ODL_IP) -> str:
     """Get the configuration data of a device mounted onto a Netconf connector.
 
-    Unlike check_device_data_is_empty, the data is returned rather than
-    asserted on, and the node to ask can be chosen, so a cluster suite can
-    compare what each member sees.
+    Returns the current state of the data, suitable to be used with
+    custom assertions (e.g. checking it's empty, or comparing it to an
+    expected value).
 
     Args:
         device_name (str): The name of the device to query.
@@ -724,44 +743,35 @@ def get_device_config_data(device_name: str, host: str = ODL_IP) -> str:
 
 def check_device_config_data(
     device_name: str,
-    expected: str,
+    expected: str | re.Pattern,
     host: str = ODL_IP,
-    regex: bool = False,
-    contains: bool = False,
 ):
     """Check the configuration data of a mounted device against an expected value.
 
     Args:
         device_name (str): The name of the device to query.
-        expected (str): The expected raw XML text, regular expression pattern or
-            substring to validate the device's configuration data against.
+        expected (str | re.Pattern): The expected raw XML text, or a compiled
+            pattern (e.g. EMPTY_DEVICE_DATA_PATTERN) to match the device's
+            configuration data against.
         host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
             the only node); pass another address (e.g. from
             variables.CLUSTER_MEMBER_IPS) to query a different cluster member.
-        regex (bool): If True, treats `expected` as a regular expression pattern.
-        contains (bool): If True, asserts that `expected` is a substring found
-            anywhere within the configuration data.
 
     Returns:
         None
     """
     data = get_device_config_data(device_name, host=host)
-    if regex:
-        assert re.match(expected, data) is not None
-    elif contains:
-        assert expected in data
-    else:
-        assert expected == data
+    assert does_device_data_match_expected(
+        data, expected
+    ), f"Device {device_name} on host {host} returned unexpected data: {data}"
 
 
 def wait_device_config_data(
     device_name: str,
-    expected: str,
+    expected: str | re.Pattern,
     timeout: int = 60,
     period: int = 1,
     host: str = ODL_IP,
-    regex: bool = False,
-    contains: bool = False,
 ):
     """Wait until the configuration data of a mounted device matches expected.
 
@@ -772,8 +782,8 @@ def wait_device_config_data(
 
     Args:
         device_name (str): The name of the device to query.
-        expected (str): The expected raw XML text of the device's configuration
-            data.
+        expected (str | re.Pattern): The expected raw XML text of the device's
+            configuration data, or a compiled pattern to match it against.
         timeout (int): Maximum time in seconds to wait for the data to match.
             Note: If the timeout is not evenly divisible by the period, the total
             allowed wait time will be rounded up to the nearest multiple of the
@@ -782,9 +792,6 @@ def wait_device_config_data(
         host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
             the only node); pass another address (e.g. from
             variables.CLUSTER_MEMBER_IPS) to query a different cluster member.
-        regex (bool): If True, treats `expected` as a regular expression pattern.
-        contains (bool): If True, asserts that `expected` is a substring found
-            anywhere within the configuration data.
 
     Returns:
         None
@@ -796,6 +803,4 @@ def wait_device_config_data(
         device_name,
         expected,
         host=host,
-        regex=regex,
-        contains=contains,
     )

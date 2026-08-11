@@ -10,7 +10,6 @@
 #
 
 import logging
-import re
 import textwrap
 
 import allure
@@ -30,7 +29,6 @@ DEVICE_TYPE_RPC_DELETE = "rpc-delete-device"
 USE_NETCONF_CONNECTOR = variables.USE_NETCONF_CONNECTOR
 DELETE_LOCATION = "delete_location"
 RPC_FILE = "variables/netconf/CRUD/customaction/customaction.xml"
-ODL_NETCONF_NAMESPACE = variables.ODL_NETCONF_NAMESPACE
 RESTCONF_ROOT = variables.RESTCONF_ROOT
 
 log = logging.getLogger(__name__)
@@ -163,12 +161,7 @@ class TestCrudAction:
 
         with allure_step_with_separate_logging("step_check_device_data_is_empty"):
             # Get the device data and make sure it is empty.
-            escaped = re.escape(ODL_NETCONF_NAMESPACE)
-            netconf.check_device_config_data(
-                DEVICE_NAME,
-                rf'<data xmlns="{escaped}"(\/>|><\/data>)',
-                regex=True,
-            )
+            netconf.check_device_data_is_empty(DEVICE_NAME)
 
         with allure_step_with_separate_logging(
             "step_invoke_yang1.1_action_via_xml_post"

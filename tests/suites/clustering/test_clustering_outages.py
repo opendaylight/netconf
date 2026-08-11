@@ -12,6 +12,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 import logging
+import re
 import textwrap
 
 import allure
@@ -73,8 +74,9 @@ class OutageCycle:
             operation.
         template_dir (str): Template folder the operation reads its payload
             (or, for a delete, its location) from.
-        expected_data (str): Config data every member is expected to report
-            once the operation has propagated.
+        expected_data (str | re.Pattern): Config data every member is
+            expected to report once the operation has propagated, or a compiled
+            pattern to match it against.
         operation_bug (str | None): Bug id the operation and the propagation
             check on the surviving members are attributed to, or None when the
             original Robot test case reported no known bug.
@@ -87,7 +89,7 @@ class OutageCycle:
     result: str
     data_operation: Callable
     template_dir: str
-    expected_data: str
+    expected_data: str | re.Pattern
     operation_bug: str | None
     catchup_bug: str
 
@@ -133,7 +135,7 @@ OUTAGE_CYCLES = (
         result="device_data_removal",
         data_operation=netconf_cluster.delete_device_data,
         template_dir=f"{DIRECTORY_WITH_TEMPLATE_FOLDERS}/datamod1",
-        expected_data=netconf.EMPTY_DEVICE_DATA,
+        expected_data=netconf.EMPTY_DEVICE_DATA_PATTERN,
         operation_bug="5762",
         catchup_bug="5761",
     ),
@@ -174,13 +176,17 @@ class TestClusteringOutages:
             log.info(f"{content} topology as seen by {host}:\n{topology}")
 
     def check_device_data_on_nodes(
-        self, hosts: list[str], expected: str, timeout: int = DEVICE_CHECK_TIMEOUT
+        self,
+        hosts: list[str],
+        expected: str | re.Pattern,
+        timeout: int = DEVICE_CHECK_TIMEOUT,
     ):
         """Waits until every given member reports the expected device data.
 
         Args:
             hosts (list[str]): Cluster members to query.
-            expected (str): Config data expected on every member.
+            expected (str | re.Pattern): Config data expected on every
+                member, or a compiled pattern to match it against.
             timeout (int): Seconds to wait per member.
 
         Returns:
@@ -404,7 +410,7 @@ class TestClusteringOutages:
             # Sanity check against possible data left-overs from previous suites.
             # Also causes the suite to wait until the entire cluster sees the
             # device and its data mount.
-            self.check_device_data_on_nodes(NODE_IPS, netconf.EMPTY_DEVICE_DATA)
+            self.check_device_data_on_nodes(NODE_IPS, netconf.EMPTY_DEVICE_DATA_PATTERN)
 
         for cycle in OUTAGE_CYCLES:
             self.run_outage_cycle(cycle, allure_step_with_separate_logging)

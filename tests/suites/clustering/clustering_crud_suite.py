@@ -43,7 +43,7 @@ CHECKER_IP = variables.CLUSTER_MEMBER_IPS[2]
 
 ODL_NETCONF_NAMESPACE = variables.ODL_NETCONF_NAMESPACE
 
-EMPTY_DATA = netconf.EMPTY_DEVICE_DATA
+EMPTY_DATA = netconf.EMPTY_DEVICE_DATA_PATTERN
 ORIGINAL_DATA = (
     f'<data xmlns="{ODL_NETCONF_NAMESPACE}">'
     f'<cont xmlns="urn:opendaylight:test:netconf:crud">'
