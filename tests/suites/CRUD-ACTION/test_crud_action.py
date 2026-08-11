@@ -162,12 +162,7 @@ class TestCrudAction:
 
         with allure_step_with_separate_logging("step_check_device_data_is_empty"):
             # Get the device data and make sure it is empty.
-            escaped = re.escape(ODL_NETCONF_NAMESPACE)
-            netconf.check_device_config_data(
-                DEVICE_NAME,
-                rf'<data xmlns="{escaped}"(\/>|><\/data>)',
-                regex=True,
-            )
+            netconf.check_device_data_is_empty(DEVICE_NAME)
 
         with allure_step_with_separate_logging(
             "step_invoke_yang1.1_action_via_xml_post"
