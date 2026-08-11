@@ -174,10 +174,7 @@ class TestCrudRpc:
     ):
 
         with allure_step_with_separate_logging("step_check_device_data_is_empty"):
-            escaped = re.escape(ODL_NETCONF_NAMESPACE)
-            self.check_config_data(
-                rf'<data xmlns="{escaped}"(\/>|><\/data>)', regex=True
-            )
+            netconf.check_device_data_is_empty(DEVICE_NAME)
 
         with allure_step_with_separate_logging("step_create_device_data_label_via_xml"):
             mapping = {"DEVICE_NAME": DEVICE_NAME, "RESTCONF_ROOT": RESTCONF_ROOT}
