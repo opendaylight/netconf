@@ -13,6 +13,7 @@
 
 from collections.abc import Callable
 import logging
+import re
 
 from libraries import infra
 from libraries import netconf
@@ -548,7 +549,7 @@ def wait_device_ownership_settled(
 
 def _wait_until_device_data_applied(
     device_name: str,
-    expected: str,
+    expected: str | re.Pattern,
     host: str,
     data_operation: Callable[[], None],
     retry_count: int,
@@ -566,7 +567,8 @@ def _wait_until_device_data_applied(
 
     Args:
         device_name (str): Name of the mounted netconf device.
-        expected (str): Config data expected on ``host`` once the write lands.
+        expected (str | re.Pattern): Config data expected on ``host`` once the
+            write lands, as a literal document or a pattern to match.
         host (str): Cluster member the data is read back from.
         data_operation (Callable[[], None]): Sends the data operation to ODL.
         retry_count (int): Maximum number of attempts before failing.
@@ -579,7 +581,8 @@ def _wait_until_device_data_applied(
     def apply_and_verify():
         """Send the data operation, then assert the device reflects it."""
         data_operation()
-        assert netconf.get_device_config_data(device_name, host=host) == expected
+        device_config_data = netconf.get_device_config_data(device_name, host=host)
+        assert netconf.does_device_data_match_expected(device_config_data, expected)
 
     utils.wait_until_function_pass(retry_count, interval, apply_and_verify)
 
@@ -662,7 +665,7 @@ def modify_device_data(
 def delete_device_data(
     device_name: str,
     template_dir: str,
-    expected: str = netconf.EMPTY_DEVICE_DATA,
+    expected: str | re.Pattern = netconf.EMPTY_DEVICE_DATA_PATTERN,
     host: str = ODL_IP,
     retry_count: int = DATA_OPERATION_RETRY_COUNT,
     interval: int = DATA_OPERATION_RETRY_INTERVAL,
@@ -677,10 +680,10 @@ def delete_device_data(
         device_name (str): Name of the mounted netconf device.
         template_dir (str): Template folder whose location.uri points at the
             data to delete.
-        expected (str): Config data ``host`` is expected to report once the
-            delete has landed. Defaults to the empty data document, which is
-            what a device holding no configuration data reports; pass a
-            narrower document when deleting only part of the data.
+        expected (str | re.Pattern): Config data ``host`` is expected to
+            report once the delete has landed. Defaults to the pattern
+            matching a device holding no configuration data; pass a narrower
+            literal document when deleting only part of the data.
         host (str): Cluster member to send the request to.
         retry_count (int): Maximum number of attempts before failing.
         interval (int): Seconds to wait between attempts.
@@ -692,7 +695,8 @@ def delete_device_data(
 
     def delete_when_present():
         """DELETE the data unless the device already reports it as gone."""
-        if netconf.get_device_config_data(device_name, host=host) != expected:
+        device_config_data = netconf.get_device_config_data(device_name, host=host)
+        if not netconf.does_device_data_match_expected(device_config_data, expected):
             templated_requests.delete_templated_request(
                 template_dir, mapping, host=host
             )
