@@ -597,16 +597,12 @@ def check_device_data_is_empty(device_name: str, log_response: bool = True):
     Returns:
         None
     """
-    uri = (
-        f"{REST_API}/network-topology:network-topology/topology=topology-netconf/"
-        f"node={device_name}/yang-ext:mount?content=config"
-    )
-    headers = {"Accept": "application/yang-data+xml"}
-    data = templated_requests.get_from_uri(uri, headers=headers).text
+    data = get_device_config_data(device_name, host=host)
     escaped = re.escape(ODL_NETCONF_NAMESPACE)
-    assert (
-        re.match(rf'<data xmlns="{escaped}"(\/>|></data>)', data) is not None
-    ), f"Device {device_name} returned unexpected non-empty data: {data}"
+    assert re.match(rf'<data xmlns="{escaped}"(\/>|></data>)', data) is not None, (
+        f"Device {device_name} on host {host} returned unexpected "
+        f"non-empty data: {data}"
+    )
 
 
 def get_data_from_devices_concurrently(device_count: int, worker_count: int):
@@ -694,9 +690,9 @@ def deconfigure_device_and_verify(device_name: str, log_response: bool = True):
 def get_device_config_data(device_name: str, host: str = ODL_IP) -> str:
     """Get the configuration data of a device mounted onto a Netconf connector.
 
-    Unlike check_device_data_is_empty, the data is returned rather than
-    asserted on, and the node to ask can be chosen, so a cluster suite can
-    compare what each member sees.
+    Returns the current state of the data, suitable to be used with
+    custom assertions (e.g. checking it's empty, or comparing it to an
+    expected value).
 
     Args:
         device_name (str): The name of the device to query.
