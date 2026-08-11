@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e51ffee2_cf63e534",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-11T06:40:57Z",
+      "side": 1,
+      "message": "Over line limit (should be max 72)",
+      "revId": "0a66a7a9baa42daf34937f14b12f30104efe3fec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78bf55b8_872f15aa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-11T06:40:57Z",
+      "side": 1,
+      "message": "Also here",
+      "revId": "0a66a7a9baa42daf34937f14b12f30104efe3fec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a6754c8_11b46f9a",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-11T06:40:57Z",
+      "side": 1,
+      "message": "I guess it might be more readable if it would be pretty printed, like using `get_pretty_response` function from `templated_requests.py`",
+      "revId": "0a66a7a9baa42daf34937f14b12f30104efe3fec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
