@@ -33,6 +33,24 @@
       "message": "Could be updated in other places like `netconf/tests/suites/CRUD-RPC/test_crud_rpc.py` where it also uses `get_config_data` and `check_config_data` and could be replace with this function call.",
       "revId": "cdbde336616b6afbbeab908be94330b4f13aaff1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36d31ca7_4a2c8dcc",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 718,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-11T10:10:31Z",
+      "side": 1,
+      "message": "Oh right, yea will go look through again and change in other places that I can find.\n\nCurrently checking the Maven Build failure that I am getting.",
+      "parentUuid": "f3ac4438_86ef1b0c",
+      "revId": "cdbde336616b6afbbeab908be94330b4f13aaff1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
