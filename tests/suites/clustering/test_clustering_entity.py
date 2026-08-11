@@ -37,7 +37,7 @@ NODE_IPS = variables.CLUSTER_MEMBER_IPS
 CONFIGURER_IP = NODE_IPS[0]
 SETTER_IP = NODE_IPS[1]
 
-EMPTY_DATA = f'<data xmlns="{ODL_NETCONF_NAMESPACE}"></data>'
+EMPTY_DATA = netconf.EMPTY_DEVICE_DATA_PATTERN
 ORIGINAL_DATA = (
     f'<data xmlns="{ODL_NETCONF_NAMESPACE}">'
     f'<cont xmlns="urn:opendaylight:test:netconf:crud">'

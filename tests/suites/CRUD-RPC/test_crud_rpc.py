@@ -10,7 +10,6 @@
 #
 
 import logging
-import re
 import textwrap
 
 import allure
@@ -138,12 +137,7 @@ class TestCrudRpc:
     ):
 
         with allure_step_with_separate_logging("step_check_device_data_is_empty"):
-            escaped = re.escape(ODL_NETCONF_NAMESPACE)
-            netconf.check_device_config_data(
-                DEVICE_NAME,
-                rf'<data xmlns="{escaped}"(\/>|><\/data>)',
-                regex=True,
-            )
+            netconf.check_device_data_is_empty(DEVICE_NAME)
 
         with allure_step_with_separate_logging("step_create_device_data_label_via_xml"):
             mapping = {"DEVICE_NAME": DEVICE_NAME, "RESTCONF_ROOT": RESTCONF_ROOT}
@@ -317,9 +311,4 @@ class TestCrudRpc:
             )
 
         with allure_step_with_separate_logging("step_check_device_data_is_deleted"):
-            escaped = re.escape(ODL_NETCONF_NAMESPACE)
-            netconf.check_device_config_data(
-                DEVICE_NAME,
-                rf'<data xmlns="{escaped}"(\/>|><\/data>)',
-                regex=True,
-            )
+            netconf.check_device_data_is_empty(DEVICE_NAME)

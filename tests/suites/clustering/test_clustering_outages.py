@@ -13,6 +13,7 @@ from collections.abc import Callable
 import contextlib
 from dataclasses import dataclass
 import logging
+import re
 import textwrap
 
 import allure
@@ -41,7 +42,7 @@ ODL_NETCONF_NAMESPACE = variables.ODL_NETCONF_NAMESPACE
 NODE_IPS = variables.CLUSTER_MEMBER_IPS
 CONFIGURER_IP = NODE_IPS[0]
 
-EMPTY_DATA = f'<data xmlns="{ODL_NETCONF_NAMESPACE}"></data>'
+EMPTY_DATA = netconf.EMPTY_DEVICE_DATA_PATTERN
 ORIGINAL_DATA = (
     f'<data xmlns="{ODL_NETCONF_NAMESPACE}">'
     f'<cont xmlns="urn:opendaylight:test:netconf:crud">'
@@ -73,8 +74,9 @@ class OutageCycle:
             operation.
         template_dir (str): Template folder the operation reads its payload
             (or, for a delete, its location) from.
-        expected_data (str): Config data every member is expected to report
-            once the operation has propagated.
+        expected_data (str | re.Pattern): Config data every member is
+            expected to report once the operation has propagated, or a compiled
+            pattern to match it against.
         operation_bug (str | None): Bug id the operation and the propagation
             check on the surviving members are attributed to, or None when the
             original Robot test case reported no known bug.
@@ -88,7 +90,7 @@ class OutageCycle:
     result: str
     data_operation: Callable
     template_dir: str
-    expected_data: str
+    expected_data: str | re.Pattern
     operation_bug: str | None
     catchup_bug: str
 
@@ -183,13 +185,17 @@ class TestClusteringOutages:
             log.info(f"{content} topology as seen by {host}:\n{topology}")
 
     def check_device_data_on_nodes(
-        self, hosts: list[str], expected: str, timeout: int = DEVICE_CHECK_TIMEOUT
+        self,
+        hosts: list[str],
+        expected: str | re.Pattern,
+        timeout: int = DEVICE_CHECK_TIMEOUT,
     ):
         """Waits until every given member reports the expected device data.
 
         Args:
             hosts (list[str]): Cluster members to query.
-            expected (str): Config data expected on every member.
+            expected (str | re.Pattern): Config data expected on every
+                member, or a compiled pattern to match it against.
             timeout (int): Seconds to wait per member.
 
         Returns:
