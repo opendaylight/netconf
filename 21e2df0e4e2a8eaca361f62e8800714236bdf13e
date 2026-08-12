@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "2ea8cf7d_1ef88406",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-12T11:07:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "03c1bb35_ba80f0c1",
+      "revId": "21e2df0e4e2a8eaca361f62e8800714236bdf13e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "91f58840_74d23c0b",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 8
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d013cbec_73d40d8d",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-12T11:07:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff476fc8_1d9d0a4e",
+      "revId": "21e2df0e4e2a8eaca361f62e8800714236bdf13e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e4af9fcc_ab64c79b",
@@ -65,6 +101,24 @@
       "writtenOn": "2026-08-12T08:02:05Z",
       "side": 1,
       "message": "and this one as well",
+      "revId": "21e2df0e4e2a8eaca361f62e8800714236bdf13e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2316856f_64bfb229",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-12T11:07:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e4af9fcc_ab64c79b",
       "revId": "21e2df0e4e2a8eaca361f62e8800714236bdf13e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
