@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "03c1bb35_ba80f0c1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-12T08:02:58Z",
+      "side": 1,
+      "message": "Changes are made not only in AbstractIT",
+      "revId": "21e2df0e4e2a8eaca361f62e8800714236bdf13e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "91f58840_74d23c0b",
