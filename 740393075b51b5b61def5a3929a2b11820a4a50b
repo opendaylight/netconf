@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ebd7c84_13172dbc",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/BenchmarkOpenApiIT.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-12T11:06:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "34ae1154_a4854c45",
+      "revId": "740393075b51b5b61def5a3929a2b11820a4a50b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "994fef80_c718616d",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6974d367_cf76f279",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/BenchmarkOpenApiIT.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-12T11:06:44Z",
+      "side": 1,
+      "message": "Headers received in channelRead in client below contain only :status and content-type, so there is nothing specific to check, so our check is basically that we use H3 setup and logic in Http3GetClient (geting response from Http3HeadersFrame and Http3DataFrame)",
+      "parentUuid": "994fef80_c718616d",
+      "revId": "740393075b51b5b61def5a3929a2b11820a4a50b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "982d7166_62826566",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-08-12T08:00:01Z",
       "side": 1,
       "message": "Can we reuse AbstractIT\u0027s `QUIC_INITIAL_MAX_*` constants?",
+      "revId": "740393075b51b5b61def5a3929a2b11820a4a50b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6bc54a2_4c39ea23",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/BenchmarkOpenApiIT.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-12T11:06:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "982d7166_62826566",
       "revId": "740393075b51b5b61def5a3929a2b11820a4a50b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
