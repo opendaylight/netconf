@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91f58840_74d23c0b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-12T08:02:05Z",
+      "side": 1,
+      "message": "AbstractE2ETest#invalidClientStackGrouping has no usage, can be removed in this patch",
+      "revId": "21e2df0e4e2a8eaca361f62e8800714236bdf13e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff476fc8_1d9d0a4e",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-12T08:02:05Z",
+      "side": 1,
+      "message": "Would be better to rename it to `invokeRequestHttp1` so the pinning is visible at the call site",
+      "revId": "21e2df0e4e2a8eaca361f62e8800714236bdf13e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4af9fcc_ab64c79b",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/AbstractNotificationSubscriptionTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-12T08:02:05Z",
+      "side": 1,
+      "message": "and this one as well",
+      "revId": "21e2df0e4e2a8eaca361f62e8800714236bdf13e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
