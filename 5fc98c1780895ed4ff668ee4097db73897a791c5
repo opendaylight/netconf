@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e082d5d3_2edc0a0d",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/AbstractIT.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-12T10:48:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9c5fe4df_dc7d64d2",
+      "revId": "5fc98c1780895ed4ff668ee4097db73897a791c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "07516935_6ccedbfd",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-12T07:18:02Z",
       "side": 1,
       "message": "Since this public and has no connection to the AbstractIT I would place it in separate file",
+      "revId": "5fc98c1780895ed4ff668ee4097db73897a791c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ad0f1d2_41c4ed75",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/AbstractIT.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 579,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-12T10:48:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07516935_6ccedbfd",
       "revId": "5fc98c1780895ed4ff668ee4097db73897a791c5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
