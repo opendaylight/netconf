@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "391a7e42_fdfe4d41",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-12T06:43:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25c39fbb_b4d0cf6d",
+      "revId": "a80014456dc536a5f4cb60fe097764a88364e636",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a0e13a7_6aff5aed",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-06T13:47:05Z",
       "side": 1,
       "message": "nitpick: assert data \u003d\u003d EMPTY_DATA has no failure message",
+      "revId": "a80014456dc536a5f4cb60fe097764a88364e636",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc099b8f_872a4586",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-12T06:43:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a0e13a7_6aff5aed",
       "revId": "a80014456dc536a5f4cb60fe097764a88364e636",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c994adc_60e89b63",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-12T06:43:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e84a254_05c953bc",
+      "revId": "a80014456dc536a5f4cb60fe097764a88364e636",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "910bb5a0_8e767be5",
@@ -65,6 +119,30 @@
       "writtenOn": "2026-08-06T13:47:05Z",
       "side": 1,
       "message": "(connected to this line, but it\u0027s more of a general issue I think - but I can\u0027t find a way to leave a general comment that is not connected to anything)\n\nI ran this suite locally against a 3-node cluster twice. It failed both times, at two different steps.\n(Fresh cluster staging, no leftover state from the previous run)\n\n\tRun 1\n - step_create_device_data: 500 from the POST to node 2. From member-2\u0027s\nkaraf.log, the netconf topology singleton was still re-electing when the write\narrived:\n```\n  13:45:14,926  SlaveSalFacade         | Slave mount point registered.\n  13:45:16,509  SlaveSalFacade         | Slave mount point unregistered.\n  13:45:16,965  NetconfTopologyContext | Leader was selected: 127.0.1.0\n  13:45:17,131  NetconfTopologyContext | Follower was selected: 127.0.1.0\n  13:45:17,131  NetconfTopologyContext | Instance is already closed.  (WARN)\n```\nThe POST landed in the ~600ms window after the slave mount was unregistered.\nstep_wait_for_device_data_to_be_seen does not protect against this: it waits for a successful *read* through node 2, which is satisfied at 14,926 while the slave mount is briefly registered, and the state then regresses.\n\n\tRun 2\n - got past that step, ran all 16384 edits, and failed at\nstep_check_for_failed_requests with 20 x \"Status code: 500\". Those map 1:1 onto\nmember-1 (the device master) logging:\n```\n  Can not perform commit when lock is released on device\n  RemoteDeviceId[name\u003d17830-sim-device, address\u003d/127.0.1.0:17830]\n```\n20 errors, 20 failed requests, matching withing few ms, spread across ~73s\nof the run rather than clustered at the start.\n\nAs far as I can tell, both fails seem to come down to writes being routed through a non-owner node reaching the device master while its lock/mount state is still unstable.\n\nI hit exactly this while porting the Entity and Outages suites. At the end I handeled it there with an ownership-settled gate before write (plus a retry that reads the value back).\nhttps://git.opendaylight.org/gerrit/c/netconf/+/124551\n\nThat approach doesn\u0027t map onto this suite cleanly though, so I am not 100% sure what to do.\n\nWhat do you think the best approach here is?",
+      "range": {
+        "startLine": 176,
+        "startChar": 12,
+        "endLine": 176,
+        "endChar": 30
+      },
+      "revId": "a80014456dc536a5f4cb60fe097764a88364e636",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a06d8c63_35d29d42",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-12T06:43:31Z",
+      "side": 1,
+      "message": "Since it worked in https://jenkins.opendaylight.org/releng/view/netconf/job/netconf-csit-3node-clustering-scale-only-titanium/153/ without need to wait once the data was visible, I would expect also this to work. Currently if I run it as it is it shows me \n`\u003c?xml version\u003d\"1.0\" ?\u003e\u003cerrors xmlns\u003d\"urn:ietf:params:xml:ns:yang:ietf-restconf\"\u003e\u003cerror\u003e\u003cerror-type\u003eapplication\u003c/error-type\u003e\u003cerror-message\u003eTransaction(POST) failed\u003c/error-message\u003e\u003cerror-tag\u003eoperation-failed\u003c/error-tag\u003e\u003cerror-info\u003eRemoteDeviceId[name\u003d17830-sim-device, address\u003d/10.30.170.137:17830]: Commit of operation failed\u003c/error-info\u003e\u003c/error\u003e\u003c/errors\u003e ` which is the same as it is reported in https://lf-opendaylight.atlassian.net/browse/NETCONF-1666 and also similar problem is currently present in https://jenkins.opendaylight.org/releng/view/netconf/job/netconf-csit-3node-clustering-scale-only-vanadium/61/\nAfter the fix I would expect it to work again as it was in https://jenkins.opendaylight.org/releng/view/netconf/job/netconf-csit-3node-clustering-scale-only-titanium/153/",
+      "parentUuid": "910bb5a0_8e767be5",
       "range": {
         "startLine": 176,
         "startChar": 12,
