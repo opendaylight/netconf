@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d60abc2_b0a429b2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-12T15:06:37Z",
+      "side": 1,
+      "message": "AbstractE2ETest#invalidClientStackGrouping has no usage, can be removed in this patch",
+      "revId": "4e2fa5a9ece35c7b062c15d06261570c20505355",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
