@@ -68,6 +68,24 @@
       "parentUuid": "f3ac4438_86ef1b0c",
       "revId": "cdbde336616b6afbbeab908be94330b4f13aaff1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "002e057d_80d00ed8",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 718,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-12T05:44:26Z",
+      "side": 1,
+      "message": "Done; CRUD and CRUD-ACTION had the same two helpers, so all three standalone suites now call the library ones, and check_device_config_data got regex/contains to absorb their matching modes. No suite keeps a private copy anymore.\n\nWhile running suites locally to verify it, CRUD-RPC failed; it was still declaring preconditions, which no longer exists since the clustering refactor renamed it to odl_standalone; it\u0027s marked smoke, so the default smoke selection was affected too. It also still declared the two karaf logging fixtures that are autouse now, so the +1/−3 diff is the fix for this. I did it in this commit since it\u0027s what makes the suite this commit rewrites runnable, but obviously I am prepared to split it into separate change if you think that\u0027s the correct approach.\n\n(I added it here since it\u0027s a small fix that was actually needed for me to finish verification of work in here)",
+      "parentUuid": "36d31ca7_4a2c8dcc",
+      "revId": "cdbde336616b6afbbeab908be94330b4f13aaff1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
