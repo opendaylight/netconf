@@ -74,6 +74,6 @@ class NC1252Test {
 
         final var ex = assertThrows(ExecutionException.class, () -> future.get(1, TimeUnit.SECONDS)).getCause();
         assertInstanceOf(ConnectException.class, ex);
-        assertThat(ex.getMessage()).startsWith("Connection refused: ");
+        assertThat(ex.getMessage()).startsWith("Connection refused").contains("/127.0.0.1:");
     }
 }
