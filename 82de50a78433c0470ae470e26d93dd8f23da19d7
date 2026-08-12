@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9731f858_3fddf73c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-12T11:06:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9de15eee_c2ec49cb",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 11
+      },
+      "revId": "82de50a78433c0470ae470e26d93dd8f23da19d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5b944c07_64f4e407",
@@ -37,6 +61,24 @@
       "writtenOn": "2026-08-12T07:40:23Z",
       "side": 1,
       "message": "`private volatile` after private",
+      "revId": "82de50a78433c0470ae470e26d93dd8f23da19d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82b839cb_1e850901",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/AbstractIT.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-12T11:06:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b944c07_64f4e407",
       "revId": "82de50a78433c0470ae470e26d93dd8f23da19d7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -64,6 +106,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "248f7de0_11a025a0",
+        "filename": "apps/restconf-it/src/test/resources/device-sim-notifications.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-12T11:06:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4341904_b3937823",
+      "range": {
+        "startLine": 14,
+        "startChar": 43,
+        "endLine": 14,
+        "endChar": 46
+      },
+      "revId": "82de50a78433c0470ae470e26d93dd8f23da19d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5b42f6e_de5f68d7",
@@ -77,6 +143,24 @@
       "writtenOn": "2026-08-12T07:40:23Z",
       "side": 1,
       "message": "Every test using this fixture now waits 6s regardless of protocol, maybe we can somehow give HTTP/3 its own fixture?",
+      "revId": "82de50a78433c0470ae470e26d93dd8f23da19d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f747d2d4_b1d96666",
+        "filename": "apps/restconf-it/src/test/resources/device-sim-notifications.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-12T11:06:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b5b42f6e_de5f68d7",
       "revId": "82de50a78433c0470ae470e26d93dd8f23da19d7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
