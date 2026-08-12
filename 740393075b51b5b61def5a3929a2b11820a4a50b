@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34ae1154_a4854c45",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/BenchmarkOpenApiIT.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-12T08:00:01Z",
+      "side": 1,
+      "message": "Two separate tests would read better than one @EnumSource that immediately splits",
+      "revId": "740393075b51b5b61def5a3929a2b11820a4a50b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "994fef80_c718616d",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/BenchmarkOpenApiIT.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-12T08:00:01Z",
+      "side": 1,
+      "message": "HTTP/1.1-and-2 path asserts the negotiated version for HTTP/2 and Transfer-Encoding: chunked for HTTP/1.1; the HTTP/3 path asserts nothing protocol-specific   \nbeyond",
+      "revId": "740393075b51b5b61def5a3929a2b11820a4a50b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "982d7166_62826566",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/BenchmarkOpenApiIT.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-12T08:00:01Z",
+      "side": 1,
+      "message": "Can we reuse AbstractIT\u0027s `QUIC_INITIAL_MAX_*` constants?",
+      "revId": "740393075b51b5b61def5a3929a2b11820a4a50b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
