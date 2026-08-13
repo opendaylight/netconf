@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6fb65688_a28a30d0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-13T09:06:39Z",
+      "side": 1,
+      "message": "Try to add some explanation - why you do what you do",
+      "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "751e2562_b98e938f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-13T09:06:39Z",
+      "side": 1,
+      "message": "HTTPServer.connectQuic() or HTTPServer#connectQuic",
+      "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f4c0fa5_688978e0",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ConfigUtils.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-13T09:06:39Z",
+      "side": 1,
+      "message": "is this being used? what about adding some unit tests?",
+      "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e118f66e_5cfec93c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ConfigUtils.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-13T09:06:39Z",
+      "side": 1,
+      "message": "what\u0027s nullability of initialMaxData?",
+      "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27b457e8_6c5105d0",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-13T09:06:39Z",
+      "side": 1,
+      "message": "IMO try to follow the process like with previous two cases:\n\n- we do not know when you deal with AUTH_PROVIDER_FACTORY\n- or transformUnderlay, can you make it more consistent?\n\nEventually we can remove it from switch as its not the same transport option anyway",
+      "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "687e3ea0_827021e2",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-13T09:06:39Z",
+      "side": 1,
+      "message": "Quic quic",
+      "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8eea7b68_34e124df",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/QuicHTTPClient.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-13T09:06:39Z",
+      "side": 1,
+      "message": "can we have more explanation why? is that good place to make changes sin HTTPClient logic?",
+      "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
