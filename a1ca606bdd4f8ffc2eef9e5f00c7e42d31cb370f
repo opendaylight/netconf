@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a729459_c33e44ab",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-13T04:47:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d6e926f1_8cbbf367",
+      "revId": "a1ca606bdd4f8ffc2eef9e5f00c7e42d31cb370f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "36bb3890_817d8c81",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-11T06:40:48Z",
       "side": 1,
       "message": "I would prefer more to use verb in function names like `get_member_ip`",
+      "revId": "a1ca606bdd4f8ffc2eef9e5f00c7e42d31cb370f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74cbcd61_ecfa941e",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-13T04:47:27Z",
+      "side": 1,
+      "message": "Done. It also removes a shadowing problem I hadn\u0027t noticed, basically member_ip is a parameter name in _configure_member_network and _pin_pekko_canonical_hostname (and also a loop variable in conftest.py), so inside those the module-level function was shadowed by local. get_member_ip doesn\u0027t have those issues.\n\nQuick note: this rippls upward \u003e 124594 calls it twice, so that change needed the rename too... which is why the two changes above show new patchsets now.",
+      "parentUuid": "36bb3890_817d8c81",
       "revId": "a1ca606bdd4f8ffc2eef9e5f00c7e42d31cb370f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9c08f13_cf607ac7",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-13T04:47:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ab12f4a_7e761243",
+      "revId": "a1ca606bdd4f8ffc2eef9e5f00c7e42d31cb370f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3fc01d74_ee6e8e71",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-08-11T06:40:48Z",
       "side": 1,
       "message": "It might be better to call it something like `_parse_member_number` so the function responsibility would be more obvious from function name.",
+      "revId": "a1ca606bdd4f8ffc2eef9e5f00c7e42d31cb370f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9e7052e_7ab85fc3",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 429,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-13T04:47:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fc01d74_ee6e8e71",
       "revId": "a1ca606bdd4f8ffc2eef9e5f00c7e42d31cb370f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
