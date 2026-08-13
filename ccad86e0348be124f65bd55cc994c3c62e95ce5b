@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "ccad86e0348be124f65bd55cc994c3c62e95ce5b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5947b2f_498d8efb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-08-13T00:13:55Z",
+      "side": 1,
+      "message": "*sigh*\nso dropping binding-reflect results in binding-spec not being transitively brought in",
+      "revId": "ccad86e0348be124f65bd55cc994c3c62e95ce5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
