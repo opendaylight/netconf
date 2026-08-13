@@ -33,6 +33,9 @@ DEVICE_NAME = "netconf-test-device"
 # a green run.
 DATA_OP_RETRY_COUNT = 10
 DIRECTORY_WITH_TEMPLATE_FOLDERS = "variables/netconf/CRUD"
+# Models the testtool serves, and the source a suite side-loading a schema
+# cache copies them from.
+DEVICE_SCHEMAS_DIRECTORY = "variables/netconf/CRUD/schemas"
 
 CONFIGURER_IP = variables.CLUSTER_MEMBER_IPS[0]
 SETTER_IP = variables.CLUSTER_MEMBER_IPS[1]
@@ -121,7 +124,7 @@ class ClusteringCrudSuite:
             testtool_process = netconf.start_testtool(
                 "build_tools/netconf-testtool.jar",
                 device_count=1,
-                schemas="variables/netconf/CRUD/schemas",
+                schemas=DEVICE_SCHEMAS_DIRECTORY,
             )
         yield testtool_process
         with allure_step_with_separate_logging("step_stop_netconf_testtool"):
