@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebeb4597_2e855b82",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-13T09:16:18Z",
+      "side": 1,
+      "message": "can you provide an analysis of suitability of Http3FrameToHttpObjectCodec, HttpContentDecompressor and HttpObjectAggregator similar way as in https://lf-opendaylight.atlassian.net/browse/NETCONF-1539?",
+      "revId": "2ec14c21b1f205d8529b983181189bf83c13c237",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4678407a_a800ea0b",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-13T09:16:18Z",
+      "side": 1,
+      "message": "what\u0027s the meaning of completed?",
+      "revId": "2ec14c21b1f205d8529b983181189bf83c13c237",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
