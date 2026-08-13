@@ -31,5 +31,6 @@ class SuiteOrder(IntEnum):
     GETSINGLE = auto()
     SCALE_MAX_DEVICES = auto()
     CLUSTERING_CRUD = auto()
+    CLUSTERING_BUG8086 = auto()
     CLUSTERING_ENTITY = auto()
     CLUSTERING_OUTAGES = auto()
