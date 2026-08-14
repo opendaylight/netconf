@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2cab879_6cac430d",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-14T10:26:30Z",
+      "side": 1,
+      "message": "added comment to https://lf-opendaylight.atlassian.net/browse/NETCONF-1637",
+      "parentUuid": "ebeb4597_2e855b82",
+      "revId": "2ec14c21b1f205d8529b983181189bf83c13c237",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4678407a_a800ea0b",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-13T09:16:18Z",
       "side": 1,
       "message": "what\u0027s the meaning of completed?",
+      "revId": "2ec14c21b1f205d8529b983181189bf83c13c237",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6eac122_8ff0b102",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-14T10:26:30Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/124031/comment/67ebd9e4_2555c7a4/",
+      "parentUuid": "4678407a_a800ea0b",
       "revId": "2ec14c21b1f205d8529b983181189bf83c13c237",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
