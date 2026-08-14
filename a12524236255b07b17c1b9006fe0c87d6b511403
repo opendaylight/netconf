@@ -16,6 +16,24 @@
       "message": "Describe in which way its this similar to multiplex handler usage in https://lf-opendaylight.atlassian.net/browse/NETCONF-1497",
       "revId": "a12524236255b07b17c1b9006fe0c87d6b511403",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9d5f6f3_e3276f23",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp3SseService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-14T10:38:56Z",
+      "side": 1,
+      "message": "added comment to \nhttps://lf-opendaylight.atlassian.net/browse/NETCONF-1637\n\nHttp3.newRequestStream() plays exactly the same role as the Http2StreamChannelBootstrap/multiplex pattern from NETCONF-1497 -\u003e both open a fresh, isolated child stream channel per SSE request over a single, already-established parent connection, so many concurrent  request streams can share one connection without blocking each other.",
+      "parentUuid": "a45e8ab6_efeaca91",
+      "revId": "a12524236255b07b17c1b9006fe0c87d6b511403",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
