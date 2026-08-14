@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d686320_dc9e7701",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-14T10:11:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6fb65688_a28a30d0",
+      "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "751e2562_b98e938f",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-13T09:06:39Z",
       "side": 1,
       "message": "HTTPServer.connectQuic() or HTTPServer#connectQuic",
+      "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01500dc7_0d7fc42d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-14T10:11:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "751e2562_b98e938f",
       "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6c588e0_3345fc8b",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ConfigUtils.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-14T10:11:47Z",
+      "side": 1,
+      "message": "It is used later in AbstractIT\nTest added",
+      "parentUuid": "5f4c0fa5_688978e0",
+      "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e118f66e_5cfec93c",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-08-13T09:06:39Z",
       "side": 1,
       "message": "what\u0027s nullability of initialMaxData?",
+      "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59fe1385_b1225f7d",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ConfigUtils.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-14T10:11:47Z",
+      "side": 1,
+      "message": "added annotations to these parameters",
+      "parentUuid": "e118f66e_5cfec93c",
       "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2defa4b_21472497",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-14T10:11:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27b457e8_6c5105d0",
+      "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "687e3ea0_827021e2",
@@ -103,6 +193,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3ed4407_d747e9d6",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-14T10:11:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "687e3ea0_827021e2",
+      "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8eea7b68_34e124df",
@@ -116,6 +224,24 @@
       "writtenOn": "2026-08-13T09:06:39Z",
       "side": 1,
       "message": "can we have more explanation why? is that good place to make changes sin HTTPClient logic?",
+      "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c7d8195_53c651dc",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/QuicHTTPClient.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-14T10:11:47Z",
+      "side": 1,
+      "message": "These two exist only because we have to implement abstract methods, not because that logic belongs to QUIC",
+      "parentUuid": "8eea7b68_34e124df",
       "revId": "4785296156bef6a888d4254488d89b8ab42daf56",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
