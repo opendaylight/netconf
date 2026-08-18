@@ -14,7 +14,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpMessage;
 import io.netty.handler.codec.http.HttpMessage;
-import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpScheme;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
@@ -106,7 +105,8 @@ public enum HTTPScheme {
         private void configureHttp1(final ChannelHandlerContext ctx) {
             LOG.debug("{}: using HTTP/1.1", ctx.channel());
             ctx.pipeline()
-                .addAfter(ctx.name(), null, new HttpObjectAggregator(limits.maxRequestBodySize()))
+                .addAfter(ctx.name(), Http1RequestDispatcher.HANDLER_NAME,
+                    new Http1RequestDispatcher(limits.maxRequestBodySize()))
                 .addAfter(ctx.name(), null, new HttpServerKeepAliveHandler())
                 .replace(this, null, new HttpServerCodec(limits.maxInitialLineLength(), limits.maxHeaderSize(),
                     limits.maxRequestChunkSize()));
@@ -154,7 +154,8 @@ public enum HTTPScheme {
             // configure HTTP/1.1 flow, pass the message further the pipeline, remove self as no longer required
             LOG.debug("{}: continuing with HTTP/1.1", ctx.channel());
             ctx.pipeline()
-                .addAfter(ctx.name(), null, new HttpObjectAggregator(limits.maxRequestBodySize()))
+                .addAfter(ctx.name(), Http1RequestDispatcher.HANDLER_NAME,
+                    new Http1RequestDispatcher(limits.maxRequestBodySize()))
                 .replace(this, null, new HttpServerKeepAliveHandler());
             ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_11);
             ctx.fireChannelRead(request);
