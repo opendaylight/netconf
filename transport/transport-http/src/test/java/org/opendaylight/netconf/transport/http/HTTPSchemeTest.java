@@ -9,7 +9,13 @@ package org.opendaylight.netconf.transport.http;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.util.CharsetUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -17,8 +23,39 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 class HTTPSchemeTest {
+    /**
+     * The {@link Http1RequestDispatcher} decides whether a request is aggregated, hence it has to sit in front of
+     * {@link io.netty.handler.codec.http.HttpObjectAggregator}. Note the handlers are installed via repeated
+     * {@code addAfter()} against the same base name, which inserts in reverse. That is easy to get backwards, and
+     * nothing else in the suite notices, since an aggregated request behaves identically either way.
+     */
+    @Test
+    void cleartextHttp1PipelineHasDispatcherBeforeAggregator() {
+        final var channel = new EmbeddedChannel();
+        channel.pipeline().addLast("anchor", new ChannelInboundHandlerAdapter() {
+            @Override
+            public void handlerAdded(final ChannelHandlerContext ctx) {
+                HTTPScheme.HTTP.initializeServerPipeline(ctx, Uint32.valueOf(16384));
+            }
+        });
+
+        // a plain HTTP/1.1 request makes CleartextUpgradeHandler configure the HTTP/1.1 flow
+        channel.writeInbound(Unpooled.copiedBuffer("GET /restconf/data HTTP/1.1\r\nHost: localhost\r\n\r\n",
+            CharsetUtil.UTF_8));
+
+        final var names = channel.pipeline().names();
+        final var dispatcher = names.indexOf(Http1RequestDispatcher.HANDLER_NAME);
+        final var aggregator = names.indexOf(Http1RequestDispatcher.AGGREGATOR_NAME);
+        assertTrue(dispatcher >= 0, () -> "no dispatcher in " + names);
+        assertTrue(aggregator >= 0, () -> "no aggregator in " + names);
+        assertTrue(dispatcher < aggregator, () -> "dispatcher must precede aggregator in " + names);
+
+        channel.finishAndReleaseAll();
+    }
+
     @ParameterizedTest
     @MethodSource
     void hostUriOfValid(final String expected, final HTTPScheme scheme, final String host) throws Exception {
