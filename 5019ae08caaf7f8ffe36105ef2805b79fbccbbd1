@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "807c6864_dd4dca87",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-18T08:10:52Z",
+      "side": 1,
+      "message": "assuming patch above is dealing with this \"error\" by relying on RESTCONF instead, this one is:\n\n- not needed\n- would need unique ticket and justification",
+      "revId": "5019ae08caaf7f8ffe36105ef2805b79fbccbbd1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
