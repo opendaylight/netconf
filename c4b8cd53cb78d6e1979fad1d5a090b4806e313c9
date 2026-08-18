@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "5803a356_6acce6f6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-18T08:09:54Z",
+      "side": 1,
+      "message": "have those helpers counterpart in original ROBOT?",
+      "revId": "c4b8cd53cb78d6e1979fad1d5a090b4806e313c9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "1cf26b4d_d593ae53",
@@ -14,6 +31,57 @@
       "writtenOn": "2026-08-13T04:47:27Z",
       "side": 1,
       "message": "renames:\nmember_ip → get_member_ip\n_member_process_pattern → _get_member_process_pattern\n_member_number → _parse_member_number\n\nThis is base of a stack so amend reparented 124593 and 124594.\n124593 is unchanged.\n124594 only has it\u0027s two cluster.get_member_ip(...) calls renamed. \nVerified, Entity and Outages each pas.",
+      "revId": "c4b8cd53cb78d6e1979fad1d5a090b4806e313c9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "253e9b92_3f58cbce",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-18T08:09:54Z",
+      "side": 1,
+      "message": "somehow, IMO we would already have members and its IPs ready - we are those who has configured the cluster?",
+      "revId": "c4b8cd53cb78d6e1979fad1d5a090b4806e313c9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c814e444_3715804a",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-18T08:09:54Z",
+      "side": 1,
+      "message": "isn\u0027t there enough killing? can we just stop karaf normally with its client commands? - client, start, stop?",
+      "revId": "c4b8cd53cb78d6e1979fad1d5a090b4806e313c9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b1bd15f_9820c5d5",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-18T08:09:54Z",
+      "side": 1,
+      "message": "this is not more aligned with previous commit, remove previous commit then?",
       "revId": "c4b8cd53cb78d6e1979fad1d5a090b4806e313c9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
