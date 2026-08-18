@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "9318b0248221ff95aeeb318541ab73c8e50f3b6c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25bf2954_ba7604b5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-18T08:21:27Z",
+      "side": 1,
+      "message": "please, try to write less lines for parameters",
+      "revId": "9318b0248221ff95aeeb318541ab73c8e50f3b6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5301da7b_8d814d90",
+        "filename": "tests/suites/clustering/test_clustering_entity.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-18T08:21:27Z",
+      "side": 1,
+      "message": "can we write it one line, if possible?",
+      "revId": "9318b0248221ff95aeeb318541ab73c8e50f3b6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
