@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f98bd14_2c89b695",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-18T08:26:38Z",
+      "side": 1,
+      "message": "what/why not fail?",
+      "revId": "7e5c3049ccc0085a301e059b454c83938c3813ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad36a0b4_dd52c28b",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 665,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-18T08:26:38Z",
+      "side": 1,
+      "message": "what do we expect to see, when we want to delete?",
+      "revId": "7e5c3049ccc0085a301e059b454c83938c3813ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2989879_5e73d97a",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-18T08:26:38Z",
+      "side": 1,
+      "message": "oneline?",
+      "revId": "7e5c3049ccc0085a301e059b454c83938c3813ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc158f02_836a3e20",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-18T08:26:38Z",
+      "side": 1,
+      "message": "empty line before?",
+      "revId": "7e5c3049ccc0085a301e059b454c83938c3813ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
