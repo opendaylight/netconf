@@ -106,7 +106,9 @@ public enum HTTPScheme {
         private void configureHttp1(final ChannelHandlerContext ctx) {
             LOG.debug("{}: using HTTP/1.1", ctx.channel());
             ctx.pipeline()
-                .addAfter(ctx.name(), null, new HttpObjectAggregator(limits.maxRequestBodySize()))
+                .addAfter(ctx.name(), Http1RequestDispatcher.HANDLER_NAME, new Http1RequestDispatcher())
+                .addAfter(Http1RequestDispatcher.HANDLER_NAME, Http1RequestDispatcher.AGGREGATOR_NAME,
+                    new HttpObjectAggregator(limits.maxRequestBodySize()))
                 .addAfter(ctx.name(), null, new HttpServerKeepAliveHandler())
                 .replace(this, null, new HttpServerCodec(limits.maxInitialLineLength(), limits.maxHeaderSize(),
                     limits.maxRequestChunkSize()));
@@ -154,7 +156,9 @@ public enum HTTPScheme {
             // configure HTTP/1.1 flow, pass the message further the pipeline, remove self as no longer required
             LOG.debug("{}: continuing with HTTP/1.1", ctx.channel());
             ctx.pipeline()
-                .addAfter(ctx.name(), null, new HttpObjectAggregator(limits.maxRequestBodySize()))
+                .addAfter(ctx.name(), Http1RequestDispatcher.HANDLER_NAME, new Http1RequestDispatcher())
+                .addAfter(Http1RequestDispatcher.HANDLER_NAME, Http1RequestDispatcher.AGGREGATOR_NAME,
+                    new HttpObjectAggregator(limits.maxRequestBodySize()))
                 .replace(this, null, new HttpServerKeepAliveHandler());
             ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_11);
             ctx.fireChannelRead(request);
