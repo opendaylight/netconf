@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "548ecb52_a2e8a352",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 2168,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-19T11:03:53Z",
+      "side": 1,
+      "message": "yes we did, but before we had not update the docs only, java code, will change it in a separate patch",
+      "parentUuid": "477f1d0c_3a0bb165",
+      "revId": "08238412dfaa6980f8f862119293d5f3b4f80f5a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c42ec0d5_38583f55",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "02f3d654_ee9387c3",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerOverTcp.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-19T11:03:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c42ec0d5_38583f55",
+      "revId": "08238412dfaa6980f8f862119293d5f3b4f80f5a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6bd651f4_b65ded84",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-08-19T10:25:40Z",
       "side": 1,
       "message": "private, visible for testing?",
+      "revId": "08238412dfaa6980f8f862119293d5f3b4f80f5a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffe5f20a_a47e08e2",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerOverTcp.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-19T11:03:53Z",
+      "side": 1,
+      "message": "They can\u0027t be private — HTTPServerOverTls.of() calls both of them. They are not called in tests either. This mirrors clientAuthentication() right below",
+      "parentUuid": "6bd651f4_b65ded84",
       "revId": "08238412dfaa6980f8f862119293d5f3b4f80f5a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
