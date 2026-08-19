@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "477f1d0c_3a0bb165",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 2168,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-19T10:25:40Z",
+      "side": 1,
+      "message": "I am unsure if to rename this - see history we already did it 😊 - at least do not do it i this patch",
+      "revId": "08238412dfaa6980f8f862119293d5f3b4f80f5a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c42ec0d5_38583f55",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerOverTcp.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-19T10:25:40Z",
+      "side": 1,
+      "message": "requirenonnull?",
+      "revId": "08238412dfaa6980f8f862119293d5f3b4f80f5a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6bd651f4_b65ded84",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerOverTcp.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-19T10:25:40Z",
+      "side": 1,
+      "message": "private, visible for testing?",
+      "revId": "08238412dfaa6980f8f862119293d5f3b4f80f5a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
