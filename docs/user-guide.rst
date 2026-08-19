@@ -2165,7 +2165,7 @@ Netty endpoint related settings are also configurable:
 * ``api-root-path``, which defaults to ``restconf``
 * ``boss-threads``, which defaults to ``0``
 * ``worker-threads``, which defaults to ``0``
-* ``http-chunk-size``, which defaults to ``262144``
+* ``http1-chunk-size``, which defaults to ``262144``
 * ``group-threads``, which defaults to ``0``
 * ``default-encoding``, which defaults to ``json``
 
@@ -2218,7 +2218,7 @@ When this is set to true, the server will violate RFC8040 and report "404" inste
 
 *worker-threads* — Number of Netty worker threads. 0 means the Netty default.
 
-*http-chunk-size* — Maximum number of response bytes buffered before switching to chunk streaming.
+*http1-chunk-size* — Maximum number of response bytes buffered before switching to chunk streaming.
 
 *group-threads* — Netty's thread limit. 0 means no limits.
 
@@ -2235,7 +2235,7 @@ uncompressed field list rather than the octets on the wire.
 
 *http1-max-request-chunk-size* — Maximum size in bytes of a single HTTP object emitted by the request decoder.
 This bounds how much of a request body reaches the pipeline at a time; it does not limit the body itself. Note
-this is the inbound counterpart of *http-chunk-size*, which sizes outbound response chunks.
+this is the inbound counterpart of *http1-chunk-size*, which sizes outbound response chunks.
 
 *http-request-body-max-size* — Maximum size in bytes of an aggregated request body. A larger request is rejected
 with '413 Content Too Large'. Applies to HTTP/1.1, HTTP/2 and HTTP/3 alike.
@@ -2280,7 +2280,7 @@ file, ``org.opendaylight.restconf.nb.rfc8040.cfg``, for example:
     api-root-path=restconf
     boss-threads=0
     worker-threads=0
-    http-chunk-size=262144
+    http1-chunk-size=262144
     group-threads=0
     default-encoding=json
     http1-max-initial-line-length=8192
@@ -2314,7 +2314,7 @@ Or use Karaf CLI:
     opendaylight-user@root>config:property-set api-root-path "restconf"
     opendaylight-user@root>config:property-set boss-threads 0
     opendaylight-user@root>config:property-set worker-threads 0
-    opendaylight-user@root>config:property-set http-chunk-size 262144
+    opendaylight-user@root>config:property-set http1-chunk-size 262144
     opendaylight-user@root>config:property-set group-threads 0
     opendaylight-user@root>config:property-set default-encoding "json"
     opendaylight-user@root>config:property-set http1-max-initial-line-length 8192
