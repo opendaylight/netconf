@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f83bb2c_026bf7d5",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 2190,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-19T15:11:09Z",
+      "side": 1,
+      "message": "do we support this at 9.0.x? which patch/task?",
+      "revId": "c20ca834d1a792a0b68021294dd0614af84ff092",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
