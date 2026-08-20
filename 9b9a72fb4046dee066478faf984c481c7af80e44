@@ -33,6 +33,24 @@
       "message": "what are meaning of these two booleans?",
       "revId": "9b9a72fb4046dee066478faf984c481c7af80e44",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bf7334d_eaddb9d5",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp3SseService.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-20T09:01:16Z",
+      "side": 1,
+      "message": "startCallbackFired is to ensure that onStreamStarted/onStartFailure is called only once\nstreamStarted is to check if we already have a running stream to decide how to deal with incoming data",
+      "parentUuid": "a238907a_1de40c2b",
+      "revId": "9b9a72fb4046dee066478faf984c481c7af80e44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
