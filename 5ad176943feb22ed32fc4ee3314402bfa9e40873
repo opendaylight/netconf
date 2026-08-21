@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce3c9e06_f1d74159",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-21T07:12:43Z",
+      "side": 1,
+      "message": "Yes.. AuthHandler observes it, but it cannot reject it. AbstractBasicAuthHandler is a SimpleChannelInboundHandler\u003cHttpRequest\u003e, so on a 401 it drops the headers while the HttpContent chunks that follow are passed straight through to the session. Aggregated requests do not have that gap, because the body is part of the FullHttpRequest. Could the javadoc say so, and could a FIXME record that the streaming work needs a way to suppress a rejected request\u0027s body?",
+      "revId": "5ad176943feb22ed32fc4ee3314402bfa9e40873",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb6516e5_bfce561a",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-21T07:12:43Z",
+      "side": 1,
+      "message": "Logging this at INFO is a bad idea. Especially as the ClientHttp1SseService sets the transfer-encoding: chunked for the GET. This will flood the logs. Secondly.. the message is a bit alarming. It says \"not implemented yet\" while the request is handled perfectly normally.",
+      "revId": "5ad176943feb22ed32fc4ee3314402bfa9e40873",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ea6ca8c_540e8ede",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-21T07:12:43Z",
+      "side": 1,
+      "message": "Routing past the aggregator also routes past the only thing enforcing MAX_HTTP_CONTENT_LENGTH, so once streaming is switched on a chunked request has no size bound and no backpressure. Not reachable today, but a FIXME record about it would be appreciated. Either here, or as part of the existing one above. Saying that a replacement limit is a prerequisite for enabling streaming...",
+      "revId": "5ad176943feb22ed32fc4ee3314402bfa9e40873",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
