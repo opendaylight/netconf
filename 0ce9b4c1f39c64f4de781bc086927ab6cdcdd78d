@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b375496a_cf4fa997",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-08-21T04:26:50Z",
+      "side": 1,
+      "message": "on previous line",
+      "range": {
+        "startLine": 170,
+        "startChar": 12,
+        "endLine": 170,
+        "endChar": 13
+      },
+      "revId": "0ce9b4c1f39c64f4de781bc086927ab6cdcdd78d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c26fd0fe_122519e5",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-08-21T04:26:50Z",
+      "side": 1,
+      "message": ".toJava() is better, as it is an exact conversion",
+      "range": {
+        "startLine": 170,
+        "startChar": 82,
+        "endLine": 170,
+        "endChar": 91
+      },
+      "revId": "0ce9b4c1f39c64f4de781bc086927ab6cdcdd78d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72467f0d_524de406",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/QuicHTTPClient.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-08-21T04:26:50Z",
+      "side": 1,
+      "message": "hmm... QUIC does not really have underlay, perhaps a deeper refactor is needed?",
+      "range": {
+        "startLine": 24,
+        "startChar": 19,
+        "endLine": 24,
+        "endChar": 47
+      },
+      "revId": "0ce9b4c1f39c64f4de781bc086927ab6cdcdd78d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
