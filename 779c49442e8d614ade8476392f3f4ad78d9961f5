@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "862fe5a9_0d6610fd",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-21T13:41:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5dcefcb3_46e1783c",
+      "revId": "779c49442e8d614ade8476392f3f4ad78d9961f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "26e63ac7_f89cfa71",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5402de14_b802ea04",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-21T13:41:45Z",
+      "side": 1,
+      "message": "That didnt work. EmbeddedChannel uses EmbeddedEventLoop that always return true for inEventLoop()  every writeAndFlush() executes synchronously the instant it\u0027s called — nothing is ever deferred into a queue and left pending. So you can never create the scenario where earlier write is still queued, (unrun).\n\nInstead I mocked ChannelHandlerContext/EventExecutor directly instead: doAnswer on executor.execute() lets the test capture the submitted Runnable without running it",
+      "parentUuid": "26e63ac7_f89cfa71",
+      "revId": "779c49442e8d614ade8476392f3f4ad78d9961f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3f5f8d52_ebee42f6",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-08-20T12:30:12Z",
       "side": 1,
       "message": "maybe just document this in method doc",
+      "revId": "779c49442e8d614ade8476392f3f4ad78d9961f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "933381a8_0433bb71",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ResponseWriter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-21T13:41:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f5f8d52_ebee42f6",
       "revId": "779c49442e8d614ade8476392f3f4ad78d9961f5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
