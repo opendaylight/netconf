@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88beeefe_01d9b400",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-08-21T04:30:03Z",
+      "side": 1,
+      "message": "not public: perhaps https://codeberg.org/snakeyaml/snakeyaml/wiki/Changes ?",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 13
+      },
+      "revId": "f129b634bf42ab96d7dc3339d986e2dc3045f192",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
