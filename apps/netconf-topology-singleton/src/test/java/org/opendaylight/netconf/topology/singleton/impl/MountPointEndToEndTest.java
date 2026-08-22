@@ -113,19 +113,20 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.Co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.LoginPwUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.Keystore;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.NetconfKeystoreData;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.NetconfNodeAugment;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.NetconfNodeAugmentBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.NetconfNodeTopologyData;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.GetTopInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.GetTopOutputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.OpendaylightMdsalListTestData;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.PutTopInputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.Top;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.two.level.list.TopLevelList;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.two.level.list.TopLevelListBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.two.level.list.TopLevelListKey;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyData;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -257,9 +258,9 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         resourceManager = new DefaultSchemaResourceManager(PARSER_FACTORY, YangIRSourceModule.provideTextToIR(),
             TEST_ROOT_DIRECTORY, TEST_DEFAULT_SUBDIR);
 
-        topModuleInfo = BindingRuntimeHelpers.getYangModuleInfo(Top.class);
+        topModuleInfo = OpendaylightMdsalListTestData.META.moduleInfo();
 
-        deviceModelContext = BindingRuntimeHelpers.createEffectiveModel(Top.class);
+        deviceModelContext = BindingRuntimeHelpers.createEffectiveModel(List.of(topModuleInfo));
 
         // FIXME: shutdown?
         final var router = new DOMRpcRouter(new FixedDOMSchemaService(deviceModelContext));
@@ -715,9 +716,9 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             @Override
             protected Set<YangModuleInfo> getModuleInfos() {
                 return Set.of(
-                    BindingRuntimeHelpers.getYangModuleInfo(NetconfNode.class),
-                    BindingRuntimeHelpers.getYangModuleInfo(NetworkTopology.class),
-                    BindingRuntimeHelpers.getYangModuleInfo(Keystore.class),
+                    NetconfNodeTopologyData.META.moduleInfo(),
+                    NetworkTopologyData.META.moduleInfo(),
+                    NetconfKeystoreData.META.moduleInfo(),
                     topModuleInfo);
             }
         };
