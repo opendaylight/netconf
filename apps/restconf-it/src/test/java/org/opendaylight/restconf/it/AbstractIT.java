@@ -80,7 +80,7 @@ import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.HttpServerListenStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.listen.stack.grouping.transport.HttpOverTcp;
-import org.opendaylight.yangtools.binding.data.codec.impl.di.DefaultBindingDOMCodecServices;
+import org.opendaylight.yangtools.binding.data.codec.dynamic.dagger.BindingDataCodecFactoryModule;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.model.spi.source.YangTextToIRSourceTransformer;
@@ -195,7 +195,8 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
         final var dataBindProvider = new MdsalDatabindProvider(schemaService);
         domRpcRouter = new DOMRpcRouter(schemaService);
         domMountPointService = new DOMMountPointServiceImpl();
-        adapterContext = new ConstantAdapterContext(new DefaultBindingDOMCodecServices(getRuntimeContext()));
+        adapterContext = new ConstantAdapterContext(
+            BindingDataCodecFactoryModule.provideBindingDOMCodecFactory().createBindingDOMCodec(getRuntimeContext()));
 
         rpcProviderService = new BindingDOMRpcProviderServiceAdapter(adapterContext,
             new RouterDOMRpcProviderService(domRpcRouter));
