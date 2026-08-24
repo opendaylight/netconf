@@ -88,6 +88,57 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "034144ce_54317bd2",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-24T12:55:12Z",
+      "side": 1,
+      "message": "I would avoid mentioning car model since this function (fixture) is written to be general and any model could be used not only car models.",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a474494_22e0317c",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-24T12:55:12Z",
+      "side": 1,
+      "message": "It might be better to put migration details comments to function body using \u0027#\u0027 instead of docstring. Regular user looking at docstring of a function would probably be more interested in what this function does rather then in migration history, which might make it more confusing and would also require going through the older robot tests code.",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c3c87a6_a49f6ea9",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-24T12:55:12Z",
+      "side": 1,
+      "message": "also here mentioning cat model",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d63f2f0e_98488cd9",
         "filename": "tests/suites/clustering/test_clustering_bug8086.py",
         "patchSetId": 1
