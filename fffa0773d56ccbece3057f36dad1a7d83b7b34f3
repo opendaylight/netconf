@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f061c49_5ebc0740",
+        "filename": "tests/suites/restperfclient/test_mdsal.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T13:41:13Z",
+      "side": 1,
+      "message": "This string has no placeholders.. drop the \"f\". Here and in all other places",
+      "revId": "fffa0773d56ccbece3057f36dad1a7d83b7b34f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42ac73bb_6836c15a",
+        "filename": "tests/suites/restperfclient/test_mdsal.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T13:41:13Z",
+      "side": 1,
+      "message": "These new messages name the log path, but this copy runs after the checks, so when a check fails the log never reaches results/ and stays only in tmp/, which the next run wipes. The sibling test_performance.py deliberately collects first for exactly this reason. Could the two collect steps in this file move above their corresponding check steps?",
+      "revId": "fffa0773d56ccbece3057f36dad1a7d83b7b34f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fcbfdcdc_8f948074",
+        "filename": "tests/suites/restperfclient/test_mdsal.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T13:41:13Z",
+      "side": 1,
+      "message": "This twenty-line block is now the fourth copy of itself, and the copies have already drifted in message wording and in whether the log is collected before or after the checks. Would it be worth extracting a check_restperfclient_log_has_no_errors(log_file) helper into rest_perf_client.py and calling it from all four sites?",
+      "revId": "fffa0773d56ccbece3057f36dad1a7d83b7b34f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "084536ce_34811147",
+        "filename": "tests/suites/restperfclient/test_performance.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T13:41:13Z",
+      "side": 1,
+      "message": "grep_restperfclient_log throws its return code away (rest_perf_client.py:97), so \"pattern not found\" (grep exit 1) and \"could not read the log\" (grep exit 2) both come back as \"\" and all three of these checks then pass having verified nothing. Would it be worth asserting rc in (0, 1) inside the helper, so these assertions cannot pass for the wrong reason?",
+      "revId": "fffa0773d56ccbece3057f36dad1a7d83b7b34f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0e7d241_f6781ca3",
+        "filename": "tests/suites/restperfclient/test_performance.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T13:41:13Z",
+      "side": 1,
+      "message": "These 3 assertions run in sequence. If the first fires, it hides the results of the remaining two. Since this is about complete diagnostics, it would be much better to collect all 3 results first and assert them once afterwards. The same, of course, goes for the other paces where this code block has been copied to.",
+      "revId": "fffa0773d56ccbece3057f36dad1a7d83b7b34f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
