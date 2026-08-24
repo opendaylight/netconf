@@ -66,21 +66,21 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
                     getRequest.path(), getRequest.fields());
             sendResult(future, path, sender(), self());
         } else if (message instanceof MergeEditConfigRequest request) {
-            dataStoreService.merge(
+            invokeRpcCall(() -> dataStoreService.merge(
                 request.getNormalizedNodeMessage().getIdentifier(),
-                request.getNormalizedNodeMessage().getNode());
+                request.getNormalizedNodeMessage().getNode()), sender(), self());
         } else if (message instanceof ReplaceEditConfigRequest request) {
-            dataStoreService.replace(
+            invokeRpcCall(() -> dataStoreService.replace(
                 request.getNormalizedNodeMessage().getIdentifier(),
-                request.getNormalizedNodeMessage().getNode());
+                request.getNormalizedNodeMessage().getNode()), sender(), self());
         } else if (message instanceof CreateEditConfigRequest request) {
-            dataStoreService.create(
+            invokeRpcCall(() -> dataStoreService.create(
                 request.getNormalizedNodeMessage().getIdentifier(),
-                request.getNormalizedNodeMessage().getNode());
+                request.getNormalizedNodeMessage().getNode()), sender(), self());
         } else if (message instanceof DeleteEditConfigRequest request) {
-            dataStoreService.delete(request.getPath());
+            invokeRpcCall(() -> dataStoreService.delete(request.getPath()), sender(), self());
         } else if (message instanceof RemoveEditConfigRequest request) {
-            dataStoreService.remove(request.getPath());
+            invokeRpcCall(() -> dataStoreService.remove(request.getPath()), sender(), self());
         } else if (message instanceof CommitRequest) {
             submit(sender(), self());
         } else if (message instanceof CancelChangesRequest) {
