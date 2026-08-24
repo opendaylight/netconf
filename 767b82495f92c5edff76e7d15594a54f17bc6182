@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d8f83e8_8fe093db",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T11:24:19Z",
+      "side": 1,
+      "message": "This (QuicChannel) channel cast is the only place the channel type is checked, so adding a ClientHttp3Session to an HTTP1 or HTTP2 pipeline by mistake succeeds silently and then throws a bare ClassCastException at the first invoke(), far from the actual error. Could we override handlerAdded() to reject a non-QuicChannel with a message naming the session type, the way ClientHttp2Session already overrides it for its bootstrap?",
+      "revId": "767b82495f92c5edff76e7d15594a54f17bc6182",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d840ad72_e2730cf1",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T11:24:19Z",
+      "side": 1,
+      "message": "This will log the same error as the callback.onFailure() below, right? So every failure will show-up as two error statements (one after another).",
+      "revId": "767b82495f92c5edff76e7d15594a54f17bc6182",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e771363_7fec7cee",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T11:24:19Z",
+      "side": 1,
+      "message": "This is a line-for-line copy of ClientHttp2Session.addChannelHandler() apart from the log strings and streamId() vs id(), which makes three protocol variants of the same handler. It also re-states an unwritten rule: SimpleChannelInboundHandler releases the response once channelRead0 returns, so the FullHttpResponse passed to onSuccess is only valid during that call. Could we pull the handler into a shared class, and document the lifetime rule on ClientSession.invoke()?",
+      "revId": "767b82495f92c5edff76e7d15594a54f17bc6182",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
