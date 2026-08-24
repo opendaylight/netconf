@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc59bbec_7f3ed564",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ConfigUtils.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T11:12:17Z",
+      "side": 1,
+      "message": "On a QUIC client, initial_max_streams_bidi caps streams the peer may open, and HTTP/3 servers never open bidirectional streams — so this value does not bound concurrent requests the way the name suggests; the server\u0027s own initial_max_streams_bidi does. Advertising it is harmless, but could the javadoc say what it actually limits so nobody tunes it expecting more in-flight requests?",
+      "revId": "44ee90a510f3386139d634871be5224f21275475",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1bc8f1cd_f057665e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ConfigUtils.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T11:12:17Z",
+      "side": 1,
+      "message": "should be named initialMaxStreamDataBidirectionalRemote",
+      "revId": "44ee90a510f3386139d634871be5224f21275475",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a96a296_d65c1161",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T11:12:17Z",
+      "side": 1,
+      "message": "The http2 flag is ignored on this branch, so connect(..., quicConfig, false) silently returns an HTTP/3 client to a caller who asked for HTTP/1.1. Could we either reject that combination with an UnsupportedConfigurationException here, or update the @param http2 javadoc above to say the flag does not apply to the QUIC transport?",
+      "revId": "44ee90a510f3386139d634871be5224f21275475",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33ad6336_6a6f08bf",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T11:12:17Z",
+      "side": 1,
+      "message": "This disables hostname verification for every HTTP/3 connection while Netty\u0027s client builder has it on by default. Is this the desirable behaviour? If so can you add a comment explaining why the identification has to be off here?",
+      "revId": "44ee90a510f3386139d634871be5224f21275475",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fec8bd1b_efbec387",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T11:12:17Z",
+      "side": 1,
+      "message": "If the caller of connect() cancels the returned future while the handshake is still running, this set() is discarded (it just returns false which we ignore here). Nothing ever holds the QuicUnderlay, and the UDP socket plus QUIC connection stay open for the life of the process - leaked. It might be a good idea to check the returned boolean here and close both channels if it\u0027s false.",
+      "revId": "44ee90a510f3386139d634871be5224f21275475",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fee348a_b561eb53",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/QuicHTTPClient.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T11:12:17Z",
+      "side": 1,
+      "message": "This client does not match the pipeline-oriented HTTPClient parent. The design should be reworked. Such refactor will require a separate patch, but this might be a good place to put a FIXME - stating the mismatch in the shapes for the future.",
+      "revId": "44ee90a510f3386139d634871be5224f21275475",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
