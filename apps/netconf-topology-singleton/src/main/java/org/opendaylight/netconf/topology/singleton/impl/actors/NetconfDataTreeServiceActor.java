@@ -64,7 +64,6 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
             final YangInstanceIdentifier path = getRequest.path();
             final ListenableFuture<Optional<NormalizedNode>> future = dataStoreService.get(getRequest.store(),
                     getRequest.path(), getRequest.fields());
-            context().stop(self());
             sendResult(future, path, sender(), self());
         } else if (message instanceof MergeEditConfigRequest request) {
             dataStoreService.merge(
