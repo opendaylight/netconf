@@ -69,6 +69,24 @@
       "parentUuid": "2bf7334d_eaddb9d5",
       "revId": "9b9a72fb4046dee066478faf984c481c7af80e44",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b72468a_cfa5779e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp3SseService.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-24T05:25:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9da5402_f5ccb132",
+      "revId": "9b9a72fb4046dee066478faf984c481c7af80e44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
