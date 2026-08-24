@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62fb962b_16527ae3",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T12:50:03Z",
+      "side": 1,
+      "message": "An absolute path makes all three members share one cache directory, unlike every other suite here, where a relative name resolves under each member\u0027s own cache/. yangtools writes entries with a plain Files.copy onto the target file, guarded only by Files.exists, so two members writing the same model could leave one reading a truncated .yang. Am I right that nothing stops that?",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fc3f18f_d1cfe7f4",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T12:50:03Z",
+      "side": 1,
+      "message": "Just one model? The original unpacked the whole clustering-it-model set, and car, people and car-people are all already in variables/netconf/CRUD/schemas, so seeding all three costs nothing. As it stands the side-load path is exercised for one model and car-people, which imports the other two, is still fetched from the device. Should this seed the set, or is one model deliberately enough — worth a note in the comment above if so?",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87e25e5b_295a38aa",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T12:50:03Z",
+      "side": 1,
+      "message": "The comment states that this path needs to match the one hard-coded in testtool. But nothing enforces it. So if one changes, they just silently diverge. How about making it a single constant (probably in clustering_crud_suite.py) and have both read that instead?",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c6a95a4_a2a6b00f",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T12:50:03Z",
+      "side": 1,
+      "message": "This line has no observable effect: configure_device_in_netconf already defaults schema_directory to \"/tmp/schema\" (netconf.py:147), the same value, so deleting it leaves the suite passing identically. The device_schema_directory fixture\u0027s yielded path below (line 69) is unread too. Could the directory be given a distinct name, e.g. /tmp/schema-bug8086, so the attribute is actually load-bearing and a broken wire between seeding and configuration would fail the test?",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94b81577_7d751053",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T12:50:03Z",
+      "side": 1,
+      "message": "Also.. I know this will resolve the name correctly and evaluate it to \"/tmp/schema\", but it took me a while. At first glance it looked like typo! Give the module constant a distinct name please, so it\u0027s easier to read.",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d63f2f0e_98488cd9",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T12:50:03Z",
+      "side": 1,
+      "message": "infra.shell() never raises — it catches CalledProcessError and returns (rc, stdout) — and the result is discarded here, so a failed cp leaves /tmp/schema empty. The connector then downloads the models from the device, the mount succeeds and the flow passes, so the suite silently becomes a second copy of test_clustering_crud. Could we assert rc \u003d\u003d 0 and that the seeded file exists?",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54fd6f91_ad75b90c",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T12:50:03Z",
+      "side": 1,
+      "message": "mkdir -p succeeds whether or not the directory already existed, so this rm -rf can delete a pre-existing /tmp/schema and everything in it — and /tmp/schema is also the repo-wide default for schema_directory (netconf.py Line 147), so it is not a name this suite owns. Two framework runs on one machine would also collide. Could the suite use a run-unique directory(maybe under pytest\u0027s tmp_path, or containing the process ID in the name, etc...). Then we know we\u0027re removing only what we created during the test.",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
