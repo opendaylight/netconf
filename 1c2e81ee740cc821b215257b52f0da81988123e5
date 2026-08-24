@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad9a31b2_a2fe9395",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 598,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T13:49:33Z",
+      "side": 1,
+      "message": "The log_response entry was dropped from Args: but the parameter is still in the signature and is still load-bearing. With nothing left documenting it, a later cleanup will delete the parameter and break getsingle with a TypeError at run time.",
+      "revId": "1c2e81ee740cc821b215257b52f0da81988123e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4c31b19_f385bc20",
+        "filename": "tests/suites/CRUD-ACTION/test_crud_action.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T13:49:33Z",
+      "side": 1,
+      "message": "unused now",
+      "revId": "1c2e81ee740cc821b215257b52f0da81988123e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5926ebf8_440bb134",
+        "filename": "tests/suites/CRUD-ACTION/test_crud_action.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T13:49:33Z",
+      "side": 1,
+      "message": "same here",
+      "revId": "1c2e81ee740cc821b215257b52f0da81988123e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
