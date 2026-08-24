@@ -16,6 +16,125 @@
       "message": "recheck",
       "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb8ee6c3_2d9fb379",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T13:27:11Z",
+      "side": 1,
+      "message": "The name is misleading, since it\u0027s actually used as \"retry_count\"",
+      "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24bb3992_05b40a74",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T13:27:11Z",
+      "side": 1,
+      "message": "Unused - when removed the ODL_NETCONF_NAMESPACE will go as well.",
+      "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "519102f3_532cc147",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T13:27:11Z",
+      "side": 1,
+      "message": "unused",
+      "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bde748aa_c4a92c9d",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T13:27:11Z",
+      "side": 1,
+      "message": "Can this be entirely substituted by netconf.check_device_data_is_empty?",
+      "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4272906e_441a20e8",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T13:27:11Z",
+      "side": 1,
+      "message": "The host argument is accepted but never forwarded, so this GET goes to ODL_IP (127.0.0.1), which is CONFIGURER_IP — not the SETTER_IP passed in at line 131. The step therefore re-checks node 1, which line 126 already proved ready, and never waits for the device to propagate to node 2, so the POST to SETTER_IP at line 169 can race the mount point.",
+      "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64db8324_c8735de5",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T13:27:11Z",
+      "side": 1,
+      "message": "Am I right that nothing waits for PERFCLIENT_IP (node 3) before restperfclient aims\n16384 requests at it?",
+      "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "120e6cc8_f5ca74db",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T13:27:11Z",
+      "side": 1,
+      "message": "This copy is inside the test body after step_run_restperfclient, so when restperfclient itself fails or times out the test raises first and the log never reaches results/ — leaving it only in tmp/, which the next run wipes. That is the failure whose log is most worth keeping. Could this move to an unconditional teardown (or a try/finally)? If the placement is deliberate, the comment\u0027s \"always-executed test case\" claim should be softened, since only a check failure is covered.",
+      "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
