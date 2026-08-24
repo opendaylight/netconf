@@ -47,6 +47,54 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a008a87a_071e5c65",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-24T05:15:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b375496a_cf4fa997",
+      "range": {
+        "startLine": 170,
+        "startChar": 12,
+        "endLine": 170,
+        "endChar": 13
+      },
+      "revId": "0ce9b4c1f39c64f4de781bc086927ab6cdcdd78d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55069879_6ab0cee1",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-24T05:15:45Z",
+      "side": 1,
+      "message": "Value here is Uint64 -\u003e .toJava() returns BigInteger value, so I would still need to use .longValue() to put it to config below, or first convert it to Uint32 which returns long value",
+      "parentUuid": "c26fd0fe_122519e5",
+      "range": {
+        "startLine": 170,
+        "startChar": 82,
+        "endLine": 170,
+        "endChar": 91
+      },
+      "revId": "0ce9b4c1f39c64f4de781bc086927ab6cdcdd78d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "72467f0d_524de406",
