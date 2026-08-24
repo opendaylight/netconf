@@ -33,6 +33,125 @@
       "message": "recheck",
       "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7afea41b_e5dbb419",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T12:27:07Z",
+      "side": 1,
+      "message": "This \"timeout\" is only passed to wait_until_function_pass() as a \"retry_count\". Refactor/rename it to make sense.",
+      "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b83df52e_2d10e08f",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T12:27:07Z",
+      "side": 1,
+      "message": "unused - including its import",
+      "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0be0f1b9_f7847487",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T12:27:07Z",
+      "side": 1,
+      "message": "annotate the type as the ones below",
+      "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2018897_dd559075",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T12:27:07Z",
+      "side": 1,
+      "message": "missing ()",
+      "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39a828ba_ee482344",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T12:27:07Z",
+      "side": 1,
+      "message": "Device_schema_directory yields the path it prepared, but this reads self.SCHEMA_DIRECTORY instead, so the directory that gets seeded and the directory the connector is configured with are two independent values. A subclass that overrides only the fixture gets an unseeded cache and still passes, since configure_device_in_netconf defaults schema_directory to /tmp/schema. Could this build the kwargs from the device_schema_directory value and drop the class attribute?",
+      "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b120a49_1083732d",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T12:27:07Z",
+      "side": 1,
+      "message": "This step and the delete at line 410 are the two attributed to bug 4968, and the helper retries the write up to 120 times at 1s intervals. An intermittent 4968 regression now passes green with no tracker link, where before a single failed PUT failed the test. Could we keep the retry on the create only, or pass a small retry_count to both, so a known-bug step still fails fast?",
+      "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e437589_cdf15297",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T12:27:07Z",
+      "side": 1,
+      "message": "modify_device_data above already retries until get_device_config_data on SETTER_IP equals MODIFIED_DATA, and check_device_config_data is that same GET plus the same comparison, so this step can no longer fail and its 4968 attribution is unreachable. Same for step_check_new_device_data_is_visible_on_setter at line 317 and step_check_device_data_is_deleted at line 417. Please consider whether these are needed for anything and drop if they aren\u0027t.",
+      "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
