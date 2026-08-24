@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e144ef13_3568c4d3",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp3SseService.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T11:37:15Z",
+      "side": 1,
+      "message": "SSE is a long-lived stream where the client only receives, and the QUIC codec built at in HTTPClient.connectQuic() sets no maxIdleTimeout, so the underlying QUIC library keeps its default of 0(disabled); HTTPServer.buildQuicCodec() omits it too. If the server host vanishes without a CONNECTION_CLOSE nothing notices: channelInactive never fires, onStreamEnd() is never called, and the subscription\nsilently stops delivering, where HTTP/2 is covered by TCPClient\u0027s keepalives. Could we set maxIdleTimeout from quic-client-parameters?",
+      "revId": "84940f7d9f35554d8b327dcf7a39964ea94f803a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d42fcb6_60bcfa05",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp3SseService.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T11:37:15Z",
+      "side": 1,
+      "message": "Since we\u0027re copying code, YES, this will also log each failure twice. Again.",
+      "revId": "84940f7d9f35554d8b327dcf7a39964ea94f803a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b62ce4e_68db335a",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp3SseService.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T11:37:15Z",
+      "side": 1,
+      "message": "The request is built above with Unpooled.EMPTY_BUFFER - so release() is a no-op",
+      "revId": "84940f7d9f35554d8b327dcf7a39964ea94f803a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52ec86db_9c01d92f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp3SseService.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-24T11:37:15Z",
+      "side": 1,
+      "message": "This handler is a line-for-line copy of ClientHttp2SseService.addChannelHandler() apart from the log strings and streamId() vs id(), giving three copies of the SSE state machine across two packages. Could this move into a shared package-private handler parameterised by the log label?",
+      "revId": "84940f7d9f35554d8b327dcf7a39964ea94f803a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
