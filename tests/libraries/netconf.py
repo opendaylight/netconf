@@ -582,7 +582,9 @@ def check_device_deconfigured(device_name: str, log_response: bool = True):
     wait_device_fully_removed(device_name, timeout=120, period=0.5)
 
 
-def check_device_data_is_empty(device_name: str, log_response: bool = True):
+def check_device_data_is_empty(
+    device_name: str, log_response: bool = True, host: str = ODL_IP
+):
     """Get the configuration data of a device and check that it is empty.
 
     Per-device operation: requests the configuration data of the device mounted
@@ -593,6 +595,9 @@ def check_device_data_is_empty(device_name: str, log_response: bool = True):
         device_name (str): The name of the device to query.
         log_response (bool): Whether to log the operation's output. Accepted for
             interface compatibility with perform_operation_on_each_device.
+        host (str): Node to query. Defaults to ODL_IP (node 1 / the only
+            node); pass another address (e.g. from
+            variables.CLUSTER_MEMBER_IPS) to check a different cluster member.
 
     Returns:
         None
