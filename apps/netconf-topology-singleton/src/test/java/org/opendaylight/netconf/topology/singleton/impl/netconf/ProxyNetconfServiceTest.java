@@ -30,7 +30,9 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.CommitRequest;
@@ -42,6 +44,7 @@ import org.opendaylight.netconf.topology.singleton.messages.netconf.RemoveEditCo
 import org.opendaylight.netconf.topology.singleton.messages.netconf.ReplaceEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -128,46 +131,88 @@ class ProxyNetconfServiceTest {
     }
 
     @Test
-    void testMerge() {
+    void testMerge() throws Exception {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
-        netconf.merge(PATH, node);
+        final var future = netconf.merge(PATH, node);
         final MergeEditConfigRequest mergeRequest = masterActor.expectMsgClass(MergeEditConfigRequest.class);
         assertEquals(PATH, mergeRequest.getNormalizedNodeMessage().getIdentifier());
         assertEquals(node, mergeRequest.getNormalizedNodeMessage().getNode());
+        assertSuccess(future);
     }
 
     @Test
-    void testReplace() {
+    void testReplace() throws Exception {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
-        netconf.replace(PATH, node);
+        final var future = netconf.replace(PATH, node);
         final ReplaceEditConfigRequest replaceRequest = masterActor.expectMsgClass(ReplaceEditConfigRequest.class);
         assertEquals(PATH, replaceRequest.getNormalizedNodeMessage().getIdentifier());
         assertEquals(node, replaceRequest.getNormalizedNodeMessage().getNode());
+        assertSuccess(future);
     }
 
     @Test
-    void testCreate() {
+    void testCreate() throws Exception {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
-        netconf.create(PATH, node);
+        final var future = netconf.create(PATH, node);
         final CreateEditConfigRequest createRequest = masterActor.expectMsgClass(CreateEditConfigRequest.class);
         assertEquals(PATH, createRequest.getNormalizedNodeMessage().getIdentifier());
         assertEquals(node, createRequest.getNormalizedNodeMessage().getNode());
+        assertSuccess(future);
     }
 
     @Test
-    void testDelete() {
+    void testDelete() throws Exception {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
-        netconf.delete(PATH);
+        final var future = netconf.delete(PATH);
         final DeleteEditConfigRequest deleteRequest = masterActor.expectMsgClass(DeleteEditConfigRequest.class);
         assertEquals(PATH, deleteRequest.getPath());
+        assertSuccess(future);
     }
 
     @Test
-    void testRemove() {
+    void testRemove() throws Exception {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
-        netconf.remove(PATH);
+        final var future = netconf.remove(PATH);
         final RemoveEditConfigRequest removeRequest = masterActor.expectMsgClass(RemoveEditConfigRequest.class);
         assertEquals(PATH, removeRequest.getPath());
+        assertSuccess(future);
+    }
+
+    @Test
+    void testEditDeviceFailure() {
+        final var netconf = newSuccessfulProxyNetconfService();
+        final var future = netconf.create(PATH, node);
+        masterActor.expectMsgClass(CreateEditConfigRequest.class);
+        final var deviceError = new NetconfDocumentedException("Lock denied", ErrorType.PROTOCOL, ErrorTag.LOCK_DENIED,
+            ErrorSeverity.ERROR);
+        masterActor.reply(new Status.Failure(deviceError));
+
+        // Passed through as is, so that it is reported with the device's error tag
+        final var cause = assertThrows(ExecutionException.class, () -> future.get(5, TimeUnit.SECONDS)).getCause();
+        assertEquals(deviceError, cause);
+    }
+
+    @Test
+    void testEditFailure() {
+        final var netconf = newSuccessfulProxyNetconfService();
+        final var future = netconf.create(PATH, node);
+        masterActor.expectMsgClass(CreateEditConfigRequest.class);
+        final var failure = new IllegalStateException("fail");
+        masterActor.reply(new Status.Failure(failure));
+
+        final var cause = assertThrows(ExecutionException.class, () -> future.get(5, TimeUnit.SECONDS)).getCause();
+        assertInstanceOf(NetconfServiceFailedException.class, cause, "Unexpected cause " + cause);
+        assertEquals(DEVICE_ID + ": Create operation failed", cause.getMessage());
+        assertEquals(failure, cause.getCause());
+    }
+
+    @Test
+    void testCommitEmptyResult() throws Exception {
+        final var netconf = newSuccessfulProxyNetconfService();
+        final var future = netconf.commit();
+        masterActor.expectMsgClass(CommitRequest.class);
+        masterActor.reply(new EmptyResultResponse());
+        assertEquals(List.of(), future.get(5, TimeUnit.SECONDS).errors());
     }
 
     @Test
@@ -207,6 +252,13 @@ class ProxyNetconfServiceTest {
         masterActor.expectMsgClass(CommitRequest.class);
         masterActor.reply(new InvokeRpcMessageReply(null, List.of()));
         submit.get(5, TimeUnit.SECONDS);
+    }
+
+    private void assertSuccess(final ListenableFuture<? extends DOMRpcResult> future) throws Exception {
+        // Nothing may report success before the master has actually processed the request
+        assertFalse(future.isDone());
+        masterActor.reply(new InvokeRpcMessageReply(null, List.of()));
+        assertEquals(List.of(), future.get(5, TimeUnit.SECONDS).errors());
     }
 
     private static void verifyDocumentedException(final Throwable cause) {
