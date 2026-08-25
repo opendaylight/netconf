@@ -25,6 +25,7 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
@@ -730,7 +731,6 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         // Mock NetconfDataTreeService operations.
         final var emptyPath = YangInstanceIdentifier.of();
-        doReturn(EMPTY_RPC).when(dataStoreService).commit();
         // Return Failure when getConfig is called.
         doReturn(Futures.immediateFuture(Optional.empty())).when(dataStoreService).get(CONFIGURATION, emptyPath,
             List.of());
@@ -754,15 +754,13 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final var mockJsonResource = mock(JsonResourceBody.class);
         doReturn(contNode).when(mockJsonResource).toNormalizedNode(any());
         serverStrategy.dataPUT(serverRequest, mockJsonResource);
-        // FIXME: Thrown exception is suppressed in ActorProxyNetconfServiceFacade class with createResult method.
-        //        See fixme in ActorProxyNetconfServiceFacade class.
-        serverRequest.getResult();
+        assertThrows(RequestException.class, serverRequest::getResult);
 
         // Verify NetconfDataTreeService operations.
         verify(dataStoreService, timeout(1000)).get(CONFIGURATION, emptyPath, List.of());
         verify(dataStoreService, timeout(1000)).replace(emptyPath, contNode);
-        // FIXME: commit should not be called after unsuccessful replace operation.
-        verify(dataStoreService, timeout(1000)).commit();
+        // Commit must not be called after an unsuccessful replace operation.
+        verify(dataStoreService, never()).commit();
     }
 
     private ActorRef registerSlaveMountPoint() {
