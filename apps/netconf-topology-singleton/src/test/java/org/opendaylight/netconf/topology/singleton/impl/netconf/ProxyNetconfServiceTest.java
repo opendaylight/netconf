@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.pekko.actor.ActorSystem;
 import org.apache.pekko.actor.Status;
 import org.apache.pekko.testkit.TestProbe;
@@ -74,12 +75,13 @@ class ProxyNetconfServiceTest {
     }
 
     private ProxyNetconfService newSuccessfulProxyNetconfService() {
-        return new ProxyNetconfService(DEVICE_ID, CompletableFuture.completedStage(masterActor.ref()),
+        return new ProxyNetconfService(DEVICE_ID, () -> CompletableFuture.completedStage(masterActor.ref()),
             Duration.ofSeconds(5));
     }
 
     private ProxyNetconfService newSuccessfulProxyNetconfService(final Duration timeout) {
-        return new ProxyNetconfService(DEVICE_ID, CompletableFuture.completedStage(masterActor.ref()), timeout);
+        return new ProxyNetconfService(DEVICE_ID, () -> CompletableFuture.completedStage(masterActor.ref()),
+            timeout);
     }
 
     @Test
@@ -200,6 +202,28 @@ class ProxyNetconfServiceTest {
             assertThrows(ExecutionException.class, () -> commitFuture.get(5, TimeUnit.SECONDS)).getCause();
         assertInstanceOf(NetconfServiceFailedException.class, commitCause, "Unexpected cause " + commitCause);
         verifyDocumentedException(commitCause.getCause());
+    }
+
+    @Test
+    void testRetryAfterFailedMasterResolution() throws Exception {
+        // The first resolution is only completed once this test says so, so that the first operation
+        // is queued against an as-yet unresolved facade rather than racing the failure callback.
+        final var firstAttempt = new CompletableFuture<Object>();
+        final var attempt = new AtomicInteger();
+        final var netconf = new ProxyNetconfService(DEVICE_ID, () -> attempt.getAndIncrement() == 0 ? firstAttempt
+            : CompletableFuture.<Object>completedStage(masterActor.ref()), Duration.ofSeconds(5));
+
+        // Queued while unresolved, then failed along with the resolution.
+        final var firstCommit = netconf.commit();
+        firstAttempt.completeExceptionally(new RuntimeException("first resolution fails"));
+        final var firstCause =
+            assertThrows(ExecutionException.class, () -> firstCommit.get(5, TimeUnit.SECONDS)).getCause();
+        assertInstanceOf(NetconfServiceFailedException.class, firstCause, "Unexpected cause " + firstCause);
+
+        // A later operation gets a fresh resolution attempt instead of the same stale failure,
+        // and succeeds once the master actor is resolvable again.
+        commit(netconf);
+        assertEquals(2, attempt.get());
     }
 
     private void commit(final ProxyNetconfService netconf) throws Exception {

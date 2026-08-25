@@ -88,6 +88,8 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private SlaveSalFacade slaveSalManager;
     private DOMDataBroker deviceDataBroker;
     private DataStoreService dataStoreService;
+    // Shared by every proxy of this master session, so that their operations are serialized in one place
+    private ActorRef dataTreeServiceActor;
     //readTxActor can be shared
     private ActorRef readTxActor;
     private List<Registration> registeredSchemas;
@@ -116,6 +118,8 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             sourceIdentifiers = masterActorData.getSourceIndentifiers();
             deviceDataBroker = masterActorData.getDeviceDataBroker();
             dataStoreService = masterActorData.getDataStoreService();
+            // A new session comes with a new dataStoreService, the actor backed by the previous one is stale
+            stopDataTreeServiceActor();
             final DOMDataTreeReadTransaction tx = deviceDataBroker.newReadOnlyTransaction();
             readTxActor = context().actorOf(ReadTransactionActor.props(tx));
 
@@ -176,10 +180,18 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             actorResponseWaitTime = refreshSlave.getActorResponseWaitTime();
             id = refreshSlave.getId();
             schemaProvider = refreshSlave.getSetup().getDeviceSchemaProvider();
-        } else if (message instanceof NetconfDataTreeServiceRequest) {
-            final var netconfActor = context().actorOf(NetconfDataTreeServiceActor.props(dataStoreService,
-                writeTxIdleTimeout));
-            sender().tell(new Success(netconfActor), self());
+        } else if (message instanceof NetconfDataTreeServiceRequest) { // master
+            // The actor is kept for the whole session, so never create one without a dataStoreService behind it
+            if (dataStoreService == null) {
+                LOG.warn("{}: Received {} but we don't appear to be the master", id, message);
+                sender().tell(new Failure(new NotMasterException(self())), self());
+            } else {
+                if (dataTreeServiceActor == null) {
+                    dataTreeServiceActor = context().actorOf(NetconfDataTreeServiceActor.props(dataStoreService,
+                        writeTxIdleTimeout));
+                }
+                sender().tell(new Success(dataTreeServiceActor), self());
+            }
         }
     }
 
@@ -189,6 +201,13 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             super.postStop();
         } finally {
             unregisterSlaveMountPoint();
+        }
+    }
+
+    private void stopDataTreeServiceActor() {
+        if (dataTreeServiceActor != null) {
+            context().stop(dataTreeServiceActor);
+            dataTreeServiceActor = null;
         }
     }
 
