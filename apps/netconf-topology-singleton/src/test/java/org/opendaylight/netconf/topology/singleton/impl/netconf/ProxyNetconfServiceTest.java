@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.pekko.actor.ActorSystem;
 import org.apache.pekko.actor.Status;
 import org.apache.pekko.dispatch.Futures;
@@ -74,12 +75,12 @@ class ProxyNetconfServiceTest {
     }
 
     private ProxyNetconfService newSuccessfulProxyNetconfService() {
-        return new ProxyNetconfService(DEVICE_ID, Futures.successful(masterActor.ref()),
+        return new ProxyNetconfService(DEVICE_ID, () -> Futures.successful(masterActor.ref()),
             SYSTEM.dispatcher(), Timeout.apply(5, TimeUnit.SECONDS));
     }
 
     private ProxyNetconfService newSuccessfulProxyNetconfService(final Timeout timeout) {
-        return new ProxyNetconfService(DEVICE_ID, Futures.successful(masterActor.ref()),
+        return new ProxyNetconfService(DEVICE_ID, () -> Futures.successful(masterActor.ref()),
             SYSTEM.dispatcher(), timeout);
     }
 
@@ -201,6 +202,26 @@ class ProxyNetconfServiceTest {
             assertThrows(ExecutionException.class, () -> commitFuture.get(5, TimeUnit.SECONDS)).getCause();
         assertInstanceOf(NetconfServiceFailedException.class, commitCause, "Unexpected cause " + commitCause);
         verifyDocumentedException(commitCause.getCause());
+    }
+
+    @Test
+    void testRetryAfterFailedMasterResolution() throws Exception {
+        final var attempt = new AtomicInteger();
+        final var netconf = new ProxyNetconfService(DEVICE_ID, () -> attempt.getAndIncrement() == 0
+            ? Futures.<Object>failed(new RuntimeException("first resolution fails"))
+            : Futures.successful(masterActor.ref()),
+            SYSTEM.dispatcher(), Timeout.apply(5, TimeUnit.SECONDS));
+
+        // The first operation hits the failed resolution and fails immediately.
+        final var firstCommit = netconf.commit();
+        final var firstCause =
+            assertThrows(ExecutionException.class, () -> firstCommit.get(5, TimeUnit.SECONDS)).getCause();
+        assertInstanceOf(NetconfServiceFailedException.class, firstCause, "Unexpected cause " + firstCause);
+
+        // A later operation gets a fresh resolution attempt instead of the same stale failure,
+        // and succeeds once the master actor is resolvable again.
+        commit(netconf);
+        assertEquals(2, attempt.get());
     }
 
     private void commit(final ProxyNetconfService netconf) throws Exception {
