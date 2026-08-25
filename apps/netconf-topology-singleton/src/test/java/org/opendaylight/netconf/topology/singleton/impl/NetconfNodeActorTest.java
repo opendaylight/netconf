@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -95,6 +96,7 @@ import org.opendaylight.netconf.topology.singleton.messages.NotMasterException;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.RegisterMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.UnregisterSlaveMountPoint;
+import org.opendaylight.netconf.topology.singleton.messages.netconf.NetconfDataTreeServiceRequest;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.DepthParam;
@@ -760,6 +762,29 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         verify(dataStoreService, timeout(1000)).replace(emptyPath, contNode);
         // FIXME: commit should not be called after unsuccessful replace operation.
         verify(dataStoreService, timeout(1000)).commit();
+    }
+
+    @Test
+    void testNetconfDataTreeServiceActorReused() {
+        // Without master data there is no dataStoreService to back the actor with.
+        masterRef.tell(new NetconfDataTreeServiceRequest(), testKit.getRef());
+        final var notMaster = testKit.expectMsgClass(Failure.class);
+        assertInstanceOf(NotMasterException.class, notMaster.cause());
+
+        // Every request within one master session gets the same actor.
+        initializeMaster(List.of());
+        masterRef.tell(new NetconfDataTreeServiceRequest(), testKit.getRef());
+        final var first = (ActorRef) testKit.expectMsgClass(Success.class).status();
+        masterRef.tell(new NetconfDataTreeServiceRequest(), testKit.getRef());
+        assertEquals(first, testKit.expectMsgClass(Success.class).status());
+
+        // A new master session stops the actor backed by the previous dataStoreService and creates a new one.
+        final var watcher = new TestKit(system);
+        watcher.watch(first);
+        initializeMaster(List.of());
+        watcher.expectTerminated(first);
+        masterRef.tell(new NetconfDataTreeServiceRequest(), testKit.getRef());
+        assertNotEquals(first, testKit.expectMsgClass(Success.class).status());
     }
 
     private ActorRef registerSlaveMountPoint() {

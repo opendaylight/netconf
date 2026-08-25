@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.netconf;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.errorprone.annotations.concurrent.GuardedBy;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import org.apache.pekko.actor.ActorRef;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -35,15 +38,23 @@ public class ProxyNetconfService implements DataStoreService {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyNetconfService.class);
 
     private final RemoteDeviceId id;
+    private final Supplier<CompletionStage<Object>> masterActorResolver;
+    private final Duration askTimeout;
     @GuardedBy("queuedOperations")
     private final ArrayList<Consumer<ProxyNetconfServiceFacade>> queuedOperations = new ArrayList<>();
 
     private volatile ProxyNetconfServiceFacade netconfFacade;
 
-    public ProxyNetconfService(final RemoteDeviceId id, final CompletionStage<Object> masterActorFuture,
+    public ProxyNetconfService(final RemoteDeviceId id, final Supplier<CompletionStage<Object>> masterActorResolver,
             final Duration askTimeout) {
-        this.id = id;
-        masterActorFuture.whenComplete((success, failure) -> {
+        this.id = requireNonNull(id);
+        this.masterActorResolver = requireNonNull(masterActorResolver);
+        this.askTimeout = requireNonNull(askTimeout);
+        resolveMasterActor();
+    }
+
+    private void resolveMasterActor() {
+        masterActorResolver.get().whenComplete((success, failure) -> {
             final ProxyNetconfServiceFacade newNetconfFacade;
             if (failure != null) {
                 LOG.debug("{}: Failed to obtain master actor", id, failure);
@@ -127,17 +138,34 @@ public class ProxyNetconfService implements DataStoreService {
 
     private void processNetconfOperation(final Consumer<ProxyNetconfServiceFacade> operation) {
         final ProxyNetconfServiceFacade facadeOnEntry;
+        // When set, the operation has been queued and a fresh master actor resolution is started
+        // after the lock is released, replacing the facade for everyone once it completes.
+        var retry = false;
         synchronized (queuedOperations) {
-            if (netconfFacade == null) {
-                LOG.debug("{}: Queuing netconf operation", id);
+            switch (netconfFacade) {
+                case null -> {
+                    LOG.debug("{}: Queuing netconf operation", id);
 
-                queuedOperations.add(operation);
-                facadeOnEntry = null;
-            } else {
-                facadeOnEntry = netconfFacade;
+                    queuedOperations.add(operation);
+                    facadeOnEntry = null;
+                }
+                case FailedProxyNetconfServiceFacade unused -> {
+                    LOG.debug("{}: Retrying netconf operation after a prior resolution failure", id);
+
+                    queuedOperations.add(operation);
+                    netconfFacade = null;
+                    facadeOnEntry = null;
+                    // An ask timeout is a routine transient failure, so retry rather than failing
+                    // every later operation on this mount the same way.
+                    retry = true;
+                }
+                default -> facadeOnEntry = netconfFacade;
             }
         }
 
+        if (retry) {
+            resolveMasterActor();
+        }
         if (facadeOnEntry != null) {
             operation.accept(facadeOnEntry);
         }
