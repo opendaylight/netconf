@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4afb1205_09f78bcb",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp3SseService.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-25T10:49:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e144ef13_3568c4d3",
+      "revId": "84940f7d9f35554d8b327dcf7a39964ea94f803a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6d42fcb6_60bcfa05",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-24T11:37:15Z",
       "side": 1,
       "message": "Since we\u0027re copying code, YES, this will also log each failure twice. Again.",
+      "revId": "84940f7d9f35554d8b327dcf7a39964ea94f803a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bc79787_ebb89baf",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp3SseService.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-25T10:49:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d42fcb6_60bcfa05",
       "revId": "84940f7d9f35554d8b327dcf7a39964ea94f803a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "13cb5d1f_b7f0fbd4",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp3SseService.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-25T10:49:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b62ce4e_68db335a",
+      "revId": "84940f7d9f35554d8b327dcf7a39964ea94f803a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "52ec86db_9c01d92f",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-08-24T11:37:15Z",
       "side": 1,
       "message": "This handler is a line-for-line copy of ClientHttp2SseService.addChannelHandler() apart from the log strings and streamId() vs id(), giving three copies of the SSE state machine across two packages. Could this move into a shared package-private handler parameterised by the log label?",
+      "revId": "84940f7d9f35554d8b327dcf7a39964ea94f803a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1c1df80_0374f22d",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp3SseService.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-25T10:49:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52ec86db_9c01d92f",
       "revId": "84940f7d9f35554d8b327dcf7a39964ea94f803a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
