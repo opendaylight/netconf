@@ -104,12 +104,14 @@ def truncate_long_text(text: str, max_size: int) -> str:
 
 
 @contextmanager
-def report_known_bug_on_failure(bug_id: str):
+def report_known_bug_on_failure(bug_id: str | None):
     """If the wrapped code fails, it enriches the failure report with the bug URL
     and fails the test normally. If it passes, it does nothing.
 
     Args:
-        bug_id (str): Known bug identifier from opendaylight jira or bugzilla
+        bug_id (str | None): Known bug identifier from opendaylight jira or
+            bugzilla, or None when the step has no bug to attribute a failure
+            to, in which case the failure is reported as-is.
 
     Yields:
         None
@@ -117,6 +119,8 @@ def report_known_bug_on_failure(bug_id: str):
     try:
         yield
     except AssertionError as e:
+        if bug_id is None:
+            raise
         url = f"https://lf-opendaylight.atlassian.net/issues/?jql=%22External%20issue%20ID%22~%22{bug_id}%22"
         allure.dynamic.issue(url, name=f"This test fails due to {bug_id}")
         error_msg = (
