@@ -6,7 +6,7 @@
 # and is available at http://www.eclipse.org/legal/epl-v10.html
 #
 
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from collections.abc import Callable
 import logging
 import os
@@ -125,6 +125,25 @@ def report_known_bug_on_failure(bug_id: str):
         )
 
         raise AssertionError(error_msg) from e
+
+
+def report_known_bug(bug_id: str | None):
+    """Attributes a failure to a known bug, when the step has one.
+
+    Wraps report_known_bug_on_failure so that callers holding an optional bug
+    id can use one `with` statement instead of branching on None themselves.
+
+    Args:
+        bug_id (str | None): Bug id to attribute a failure to, or None to let
+            the failure be reported as-is.
+
+    Returns:
+        The report_known_bug_on_failure context manager for a bug id, a null
+        context otherwise.
+    """
+    if bug_id is None:
+        return nullcontext()
+    return report_known_bug_on_failure(bug_id)
 
 
 def verify_jsons_match(

@@ -10,7 +10,6 @@
 #
 
 from collections.abc import Callable
-import contextlib
 from dataclasses import dataclass
 import logging
 import textwrap
@@ -148,21 +147,6 @@ OUTAGE_CYCLES = (
 @pytest.mark.usefixtures("odl_three_node_cluster")
 @pytest.mark.run(order=SuiteOrder.CLUSTERING_OUTAGES)
 class TestClusteringOutages:
-
-    def report_known_bug(self, bug_id: str | None):
-        """Attributes a failure to a known bug, when the step has one.
-
-        Args:
-            bug_id (str | None): Bug id to attribute a failure to, or None to
-                let the failure be reported as-is.
-
-        Returns:
-            The utils.report_known_bug_on_failure context manager for a bug id,
-            a null context otherwise.
-        """
-        if bug_id is None:
-            return contextlib.nullcontext()
-        return utils.report_known_bug_on_failure(bug_id)
 
     def dump_topology(self, host: str):
         """Logs both views of the netconf topology as seen by one member.
@@ -340,7 +324,7 @@ class TestClusteringOutages:
             # Check that the requests work when the node is down. As ODL may be in
             # the process of connecting a possible new master to the device, the
             # operation is retried until the device reflects it.
-            with self.report_known_bug(cycle.operation_bug):
+            with utils.report_known_bug(cycle.operation_bug):
                 cycle.data_operation(
                     DEVICE_NAME,
                     cycle.template_dir,
@@ -353,7 +337,7 @@ class TestClusteringOutages:
         ):
             # Check that the change is propagated in the cluster even when the
             # node is down.
-            with self.report_known_bug(cycle.operation_bug):
+            with utils.report_known_bug(cycle.operation_bug):
                 self.check_device_data_on_nodes(surviving_ips, cycle.expected_data)
 
         with allure_step_with_separate_logging(
