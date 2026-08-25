@@ -187,6 +187,10 @@ def configure_device_in_netconf(
         "SCHEMA_DIRECTORY": schema_directory,
         "RESTCONF_ROOT": RESTCONF_ROOT,
     }
+    # Recorded before the request is sent, not after it returns: a request that
+    # reaches ODL but raises on the way back leaves the device mounted, and the
+    # caller's cleanup needs the type to build the delete.
+    NETCONF_MOUNTED_DEVICE_TYPES[device_name] = device_type
     if http_method == "post":
         templated_requests.post_templated_request(
             f"{DIRECTORY_WITH_DEVICE_TEMPLATES}/{device_type}",
@@ -203,7 +207,6 @@ def configure_device_in_netconf(
             json=False,
             host=host,
         )
-        NETCONF_MOUNTED_DEVICE_TYPES[device_name] = device_type
 
 
 def wait_device_connected(
