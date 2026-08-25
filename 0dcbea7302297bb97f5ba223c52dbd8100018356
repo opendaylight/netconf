@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee86f740_b42f95cd",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 2238,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-25T19:49:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e3e8643_ed3499e2",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ab2c321_187de72a",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-25T14:05:52Z",
       "side": 1,
       "message": "use DEFAULT instead?",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f709ff1_15476f63",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/RestconfSessionTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-25T19:49:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ab2c321_187de72a",
       "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "17222b51_314d6d2f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerLimits.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-25T19:49:00Z",
+      "side": 1,
+      "message": "The generated binding getters return null for absent leaves even when the YANG model declares a default, the corresponding requireMax...() methods throw instead of applying that default. The parameter is needed because each leaf has a different fallback value",
+      "parentUuid": "a5b03a5f_07b18004",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6703b5bd_f602f53d",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-08-25T14:05:52Z",
       "side": 1,
       "message": "`null, HTTPServerLimits.DEFAULT ` and we do not need a cast, see also HTTPServerOverTls class",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddafcee9_3f4c86c4",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerOverTcp.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-25T19:49:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6703b5bd_f602f53d",
       "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30a82e82_ccd82017",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerOverTcp.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-25T19:49:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbad2bee_0c2f0e6c",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7302e682_5bcd5270",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-08-25T14:05:52Z",
       "side": 1,
       "message": "why not private?",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "758876cd_5cadd743",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerOverTcp.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-25T19:49:00Z",
+      "side": 1,
+      "message": "It is package-private because HTTPServerOverTls reuses it when building the TLS limits augmentation. Making it private would duplicate the same limits projection in the TLS factory.",
+      "parentUuid": "7302e682_5bcd5270",
       "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a22a2f65_836460c8",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerOverTls.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-25T19:49:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35b091bb_48c588d8",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "98488526_28051398",
@@ -137,6 +263,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7e6a63c_038f35ac",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerOverTls.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-25T19:49:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98488526_28051398",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a3c7f003_9a925cd1",
@@ -150,6 +294,24 @@
       "writtenOn": "2026-08-25T14:05:52Z",
       "side": 1,
       "message": "how is this related to this patch?",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b96000d9_b6786f90",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-25T19:49:00Z",
+      "side": 1,
+      "message": "This is required by the configured maxInitialLineLength and maxHeaderSize introduced in this patch. Netty reports violations of either limit by forwarding a partially decoded request with a failed decoderResult(), rather than propagating an exception through the pipeline. The session must reject the request before reading its incomplete URI or headers, returning 414 or 431 for these limit violations and 400 for other decoding failures. This prevents RESTCONF from processing a partially decoded request.",
+      "parentUuid": "a3c7f003_9a925cd1",
       "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
