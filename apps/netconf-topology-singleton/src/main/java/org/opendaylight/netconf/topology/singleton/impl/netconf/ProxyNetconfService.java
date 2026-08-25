@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.dispatch.OnComplete;
 import org.apache.pekko.util.Timeout;
@@ -37,15 +38,25 @@ public class ProxyNetconfService implements DataStoreService {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyNetconfService.class);
 
     private final RemoteDeviceId id;
+    private final Supplier<Future<Object>> masterActorResolver;
+    private final ExecutionContext executionContext;
+    private final Timeout askTimeout;
     @GuardedBy("queuedOperations")
     private final ArrayList<Consumer<ProxyNetconfServiceFacade>> queuedOperations = new ArrayList<>();
 
     private volatile ProxyNetconfServiceFacade netconfFacade;
 
-    public ProxyNetconfService(final RemoteDeviceId id, final Future<Object> masterActorFuture,
+    public ProxyNetconfService(final RemoteDeviceId id, final Supplier<Future<Object>> masterActorResolver,
                                final ExecutionContext executionContext, final Timeout askTimeout) {
         this.id = id;
-        masterActorFuture.onComplete(new OnComplete<>() {
+        this.masterActorResolver = masterActorResolver;
+        this.executionContext = executionContext;
+        this.askTimeout = askTimeout;
+        resolveMasterActor();
+    }
+
+    private void resolveMasterActor() {
+        masterActorResolver.get().onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object masterActor) {
                 final ProxyNetconfServiceFacade newNetconfFacade;
@@ -133,17 +144,31 @@ public class ProxyNetconfService implements DataStoreService {
 
     private void processNetconfOperation(final Consumer<ProxyNetconfServiceFacade> operation) {
         final ProxyNetconfServiceFacade facadeOnEntry;
+        boolean retry = false;
         synchronized (queuedOperations) {
             if (netconfFacade == null) {
                 LOG.debug("{}: Queuing netconf operation", id);
 
                 queuedOperations.add(operation);
                 facadeOnEntry = null;
+            } else if (netconfFacade instanceof FailedProxyNetconfServiceFacade) {
+                // A prior master actor resolution failed. An ask timeout is a routine transient
+                // failure; give this operation a fresh attempt instead of repeating the same
+                // stale failure for the lifetime of the mount.
+                LOG.debug("{}: Retrying netconf operation after a prior resolution failure", id);
+
+                queuedOperations.add(operation);
+                netconfFacade = null;
+                facadeOnEntry = null;
+                retry = true;
             } else {
                 facadeOnEntry = netconfFacade;
             }
         }
 
+        if (retry) {
+            resolveMasterActor();
+        }
         if (facadeOnEntry != null) {
             operation.accept(facadeOnEntry);
         }
