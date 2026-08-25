@@ -657,3 +657,46 @@ def modify_device_data(
     _wait_until_device_data_applied(
         device_name, expected, host, put_data, retry_count, interval
     )
+
+
+def delete_device_data(
+    device_name: str,
+    template_dir: str,
+    expected: str = netconf.EMPTY_DEVICE_DATA,
+    host: str = ODL_IP,
+    retry_count: int = DATA_OPERATION_RETRY_COUNT,
+    interval: int = DATA_OPERATION_RETRY_INTERVAL,
+):
+    """DELETEs data of a device via one member and confirms it is gone.
+
+    The DELETE is only sent while the device still reports something other than
+    ``expected``, because reissuing it once the data is gone would answer with
+    "data missing" instead of retrying the intended operation.
+
+    Args:
+        device_name (str): Name of the mounted netconf device.
+        template_dir (str): Template folder whose location.uri points at the
+            data to delete.
+        expected (str): Config data ``host`` is expected to report once the
+            delete has landed. Defaults to the empty data document, which is
+            what a device holding no configuration data reports; pass a
+            narrower document when deleting only part of the data.
+        host (str): Cluster member to send the request to.
+        retry_count (int): Maximum number of attempts before failing.
+        interval (int): Seconds to wait between attempts.
+
+    Returns:
+        None
+    """
+    mapping = {"DEVICE_NAME": device_name, "RESTCONF_ROOT": RESTCONF_ROOT}
+
+    def delete_when_present():
+        """DELETE the data unless the device already reports it as gone."""
+        if netconf.get_device_config_data(device_name, host=host) != expected:
+            templated_requests.delete_templated_request(
+                template_dir, mapping, host=host
+            )
+
+    _wait_until_device_data_applied(
+        device_name, expected, host, delete_when_present, retry_count, interval
+    )
