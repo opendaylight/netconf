@@ -32,6 +32,7 @@ def invoke_restperfclient(
     asynchronous: bool = False,
     user: str = ODL_USER,
     password: str = ODL_PASSWORD,
+    log_file: str | None = None,
 ) -> str:
     """Invoke RestPerfClient on the specified URL with the specified timeout.
 
@@ -49,12 +50,14 @@ def invoke_restperfclient(
             processing response for the previous request.
         user (str): RESTCONF username.
         password (str): RESTCONF password.
+        log_file (str | None): Path to write the RestPerfClient log to. If not
+            given, a unique path under tmp/ is generated.
 
     Returns:
         str: Path to the generated RestPerfClient logs file.
     """
-    log_file_name = utils.get_log_file_name("restperfclient", testcase)
-    log_file = "tmp/" + log_file_name
+    if log_file is None:
+        log_file = "tmp/" + utils.get_log_file_name("restperfclient", testcase)
     timeout_in_minutes = math.ceil(timeout / 60)
     command = (
         f"java -Xmx4G -jar build_tools/rest-perf-client.jar"
@@ -80,6 +83,52 @@ def invoke_restperfclient(
     finally:
         infra.shell("pkill -f 'rest-perf-client.jar' || true")
     return log_file
+
+
+def run_restperfclient_and_collect_results(
+    edits: int,
+    url: str,
+    timeout: float,
+    testcase: str = "",
+    ip: str = ODL_IP,
+    port: int = RESTCONF_PORT,
+    asynchronous: bool = False,
+    user: str = ODL_USER,
+    password: str = ODL_PASSWORD,
+) -> str:
+    """Invoke RestPerfClient and copy its log into results/, even on failure.
+
+    Args:
+        edits (int): Number of edit requests to be sent.
+        url (str): RESTCONF URL used for update requests.
+        timeout (float): Maximum time in seconds to wait for restperfclient to finish.
+        testcase (str): Name of the executed test case (used in log file name).
+        ip (str): Target server IP address.
+        port (int): Target server port number.
+        asynchronous (bool): Flag indicating if next request should be sent before
+            processing response for the previous request.
+        user (str): RESTCONF username.
+        password (str): RESTCONF password.
+
+    Returns:
+        str: Path to the generated RestPerfClient log file, copied into results/.
+    """
+    log_file = "tmp/" + utils.get_log_file_name("restperfclient", testcase)
+    try:
+        return invoke_restperfclient(
+            edits,
+            url,
+            timeout,
+            testcase,
+            ip,
+            port,
+            asynchronous,
+            user,
+            password,
+            log_file=log_file,
+        )
+    finally:
+        infra.shell(f"cp '{log_file}' results/")
 
 
 def grep_restperfclient_log(log_file: str, pattern: str) -> str:
