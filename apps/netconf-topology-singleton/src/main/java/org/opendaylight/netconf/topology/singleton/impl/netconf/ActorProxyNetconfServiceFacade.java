@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.netconf;
 
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.ArrayList;
@@ -37,6 +36,7 @@ import org.opendaylight.netconf.topology.singleton.messages.netconf.RemoveEditCo
 import org.opendaylight.netconf.topology.singleton.messages.netconf.ReplaceEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -65,41 +65,33 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     public ListenableFuture<? extends DOMRpcResult> create(final YangInstanceIdentifier path,
             final NormalizedNode data) {
         LOG.debug("{}: Create {} via actor {}", id, path, masterActor);
-        masterActor.tell(new CreateEditConfigRequest(
-            new NormalizedNodeMessage(path, data)), ActorRef.noSender());
-        return createResult();
+        return invokeRpc(new CreateEditConfigRequest(new NormalizedNodeMessage(path, data)), Operation.CREATE);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> delete(final YangInstanceIdentifier path) {
         LOG.debug("{}: Delete {} via actor {}", id, path, masterActor);
-        masterActor.tell(new DeleteEditConfigRequest(path), ActorRef.noSender());
-        return createResult();
+        return invokeRpc(new DeleteEditConfigRequest(path), Operation.DELETE);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> remove(final YangInstanceIdentifier path) {
         LOG.debug("{}: Remove {} via actor {}", id, path, masterActor);
-        masterActor.tell(new RemoveEditConfigRequest(path), ActorRef.noSender());
-        return createResult();
+        return invokeRpc(new RemoveEditConfigRequest(path), Operation.REMOVE);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> merge(final YangInstanceIdentifier path,
             final NormalizedNode data) {
         LOG.debug("{}: Merge {} via actor {}", id, path, masterActor);
-        masterActor.tell(new MergeEditConfigRequest(
-            new NormalizedNodeMessage(path, data)), ActorRef.noSender());
-        return createResult();
+        return invokeRpc(new MergeEditConfigRequest(new NormalizedNodeMessage(path, data)), Operation.MERGE);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> replace(final YangInstanceIdentifier path,
             final NormalizedNode data) {
         LOG.debug("{}: Replace {} via actor {}", id, path, masterActor);
-        masterActor.tell(new ReplaceEditConfigRequest(new NormalizedNodeMessage(path, data)),
-            ActorRef.noSender());
-        return createResult();
+        return invokeRpc(new ReplaceEditConfigRequest(new NormalizedNodeMessage(path, data)), Operation.REPLACE);
     }
 
     @Override
@@ -113,28 +105,30 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     @Override
     public ListenableFuture<? extends DOMRpcResult> commit() {
         LOG.debug("{}: Commit via actor {}", id, masterActor);
+        return invokeRpc(new CommitRequest(), Operation.COMMIT);
+    }
 
-        final Future<Object> future = Patterns.ask(masterActor, new CommitRequest(), askTimeout);
+    private ListenableFuture<? extends DOMRpcResult> invokeRpc(final Object request, final Operation operation) {
+        final Future<Object> future = Patterns.ask(masterActor, request, askTimeout);
         final SettableFuture<DOMRpcResult> settableFuture = SettableFuture.create();
         future.onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object response) {
                 if (failure != null) {
-                    LOG.debug("{}: Commit failed", id, failure);
-                    settableFuture.setException(newNetconfServiceFailedException(processFailure(failure)));
-                } else if (response instanceof InvokeRpcMessageReply) {
-                    LOG.debug("{}: Commit succeeded", id);
-                    settableFuture.set(mapInvokeRpcMessageReplyToDOMRpcResult((InvokeRpcMessageReply) response));
+                    LOG.debug("{}: {} failed", id, operation, failure);
+                    settableFuture.setException(new NetconfServiceFailedException(
+                        String.format("%s: %s of operation failed", id, operation), processFailure(failure)));
+                } else if (response instanceof InvokeRpcMessageReply reply) {
+                    LOG.debug("{}: {} succeeded", id, operation);
+                    settableFuture.set(mapInvokeRpcMessageReplyToDOMRpcResult(reply));
+                } else if (response instanceof EmptyResultResponse) {
+                    LOG.debug("{}: {} succeeded with no result", id, operation);
+                    settableFuture.set(new DefaultDOMRpcResult());
                 } else {
                     settableFuture.setException(
-                        new ClusteringRpcException("Commit operation returned unexpected type"));
-                    LOG.error("{}: Commit via actor {} returned unexpected type", id, masterActor);
+                        new ClusteringRpcException(operation + " operation returned unexpected type"));
+                    LOG.error("{}: {} via actor {} returned unexpected type", id, operation, masterActor);
                 }
-            }
-
-            private NetconfServiceFailedException newNetconfServiceFailedException(final Throwable failure) {
-                return new NetconfServiceFailedException(String.format("%s: Commit of operation failed",
-                    id), failure);
             }
         }, executionContext);
         return settableFuture;
@@ -143,23 +137,7 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
     @Override
     public ListenableFuture<? extends DOMRpcResult> cancel() {
         LOG.debug("{}: Discard changes via actor {}", id, masterActor);
-        final SettableFuture<DOMRpcResult> cancelRequest = SettableFuture.create();
-        final Future<Object> future = Patterns.ask(masterActor, new CancelChangesRequest(), askTimeout);
-        future.onComplete(new OnComplete<>() {
-            @Override
-            public void onComplete(final Throwable failure, final Object response) {
-                if (failure != null) {
-                    cancelRequest.setException(failure);
-                } else if (response instanceof InvokeRpcMessageReply) {
-                    cancelRequest.set(mapInvokeRpcMessageReplyToDOMRpcResult((InvokeRpcMessageReply) response));
-                } else {
-                    cancelRequest.setException(
-                        new ClusteringRpcException("Discard changes operation returned unexpected type"));
-                    LOG.error("{}: Discard changes  via actor {} returned unexpected type", id, masterActor);
-                }
-            }
-        }, executionContext);
-        return cancelRequest;
+        return invokeRpc(new CancelChangesRequest(), Operation.CANCEL);
     }
 
 
@@ -203,18 +181,37 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
             ? NetconfTopologyUtils.createMasterIsDownException(id, (Exception) failure) : failure;
     }
 
-    // FIXME: this is being used in contexts where we should be waiting for a reply.
-    //        If editConfig fails, this override it reply with empty success future.
-    private static ListenableFuture<? extends DOMRpcResult> createResult() {
-        return Futures.immediateFuture(new DefaultDOMRpcResult());
-    }
-
     private static DOMRpcResult mapInvokeRpcMessageReplyToDOMRpcResult(final InvokeRpcMessageReply reply) {
         if (reply.getNormalizedNodeMessage() == null) {
             return new DefaultDOMRpcResult(new ArrayList<>(reply.getRpcErrors()));
         } else {
             return new DefaultDOMRpcResult((ContainerNode) reply.getNormalizedNodeMessage().getNode(),
                 reply.getRpcErrors());
+        }
+    }
+
+    /**
+     * Operations dispatched through {@link #invokeRpc(Object, Operation)}, each carrying the human-readable
+     * label used in log messages and exception text.
+     */
+    private enum Operation {
+        CREATE("Create"),
+        DELETE("Delete"),
+        REMOVE("Remove"),
+        MERGE("Merge"),
+        REPLACE("Replace"),
+        COMMIT("Commit"),
+        CANCEL("Discard changes");
+
+        private final String label;
+
+        Operation(final String label) {
+            this.label = label;
+        }
+
+        @Override
+        public String toString() {
+            return label;
         }
     }
 }
