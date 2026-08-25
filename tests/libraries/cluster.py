@@ -426,6 +426,30 @@ def start_member(member: int, timeout: int = 300):
     )
 
 
+def get_any_reachable_member() -> str:
+    """Address of the first cluster member that answers RESTCONF.
+
+    Teardown still has to reach the cluster after a test left a member down,
+    so it asks for a member that is actually up instead of assuming a fixed
+    one. Members are tried in order, so on a healthy cluster this is member 1
+    and the usual path is unchanged.
+
+    Args:
+        None
+
+    Returns:
+        str: Address of the first member answering RESTCONF.
+    """
+    for member in range(1, len(CLUSTER_MEMBER_IPS) + 1):
+        try:
+            _verify_restconf_available(member)
+        except Exception:
+            log.warning(f"Cluster member-{member} does not answer RESTCONF")
+            continue
+        return get_member_ip(member)
+    raise AssertionError("No cluster member answers RESTCONF")
+
+
 def parse_member_number(node_name: str) -> int:
     """Parses a pekko node name like "member-2" into its 1-based number.
 
