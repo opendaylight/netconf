@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import java.net.InetSocketAddress;
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.apache.pekko.actor.ActorSystem;
 import org.apache.pekko.actor.Status;
 import org.apache.pekko.testkit.TestProbe;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
+import org.opendaylight.netconf.topology.singleton.messages.netconf.CancelChangesRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.CommitRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.CreateEditConfigRequest;
 import org.opendaylight.netconf.topology.singleton.messages.netconf.DeleteEditConfigRequest;
@@ -31,6 +33,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import scala.concurrent.duration.FiniteDuration;
 
 class ProxyNetconfDataTreeServiceTest {
     private static final RemoteDeviceId DEVICE_ID =
@@ -39,6 +42,8 @@ class ProxyNetconfDataTreeServiceTest {
     private static final ContainerNode NODE = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(new NodeIdentifier(QName.create("", "cont")))
         .build();
+    private static final Duration SHORT_TIMEOUT = Duration.ofMillis(300);
+    private static final FiniteDuration NO_MESSAGE_WAIT = FiniteDuration.apply(1, TimeUnit.SECONDS);
 
     private static ActorSystem system = ActorSystem.apply();
 
@@ -113,5 +118,46 @@ class ProxyNetconfDataTreeServiceTest {
         masterActor.expectMsgClass(NetconfDataTreeServiceRequest.class);
         masterActor.reply(new Status.Success(masterActor.ref()));
         masterActor.expectMsgClass(CommitRequest.class);
+    }
+
+    @Test
+    void testCancelAfterEditTimeout() {
+        final var shortProxy = new ProxyNetconfDataTreeService(DEVICE_ID, masterActor.ref(), SHORT_TIMEOUT);
+        final var editActor = new TestProbe(system);
+        shortProxy.merge(PATH, NODE);
+        masterActor.expectMsgClass(NetconfDataTreeServiceRequest.class);
+        masterActor.reply(new Status.Success(editActor.ref()));
+
+        // The edit reply never arrives, but the master may still apply the edit
+        editActor.expectMsgClass(MergeEditConfigRequest.class);
+
+        // So the changes are discarded through a fresh actor
+        final var cancelActor = new TestProbe(system);
+        masterActor.expectMsgClass(NetconfDataTreeServiceRequest.class);
+        masterActor.reply(new Status.Success(cancelActor.ref()));
+        cancelActor.expectMsgClass(CancelChangesRequest.class);
+    }
+
+    @Test
+    void testNoCancelWhenActorAskTimesOut() {
+        final var shortProxy = new ProxyNetconfDataTreeService(DEVICE_ID, masterActor.ref(), SHORT_TIMEOUT);
+        shortProxy.merge(PATH, NODE);
+
+        // No actor is handed out in time, so the edit is never issued and there is nothing to discard
+        masterActor.expectMsgClass(NetconfDataTreeServiceRequest.class);
+        masterActor.expectNoMessage(NO_MESSAGE_WAIT);
+    }
+
+    @Test
+    void testNoCancelAfterEditFailure() {
+        final var editActor = new TestProbe(system);
+        proxy.merge(PATH, NODE);
+        masterActor.expectMsgClass(NetconfDataTreeServiceRequest.class);
+        masterActor.reply(new Status.Success(editActor.ref()));
+
+        // The master has already cancelled a failed edit itself
+        editActor.expectMsgClass(MergeEditConfigRequest.class);
+        editActor.reply(new Status.Failure(new IllegalStateException("edit failed")));
+        masterActor.expectNoMessage(NO_MESSAGE_WAIT);
     }
 }
