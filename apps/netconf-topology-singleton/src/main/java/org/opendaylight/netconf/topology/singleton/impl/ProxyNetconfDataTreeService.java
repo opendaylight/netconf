@@ -25,10 +25,7 @@ import scala.concurrent.ExecutionContext;
 
 public class ProxyNetconfDataTreeService implements DataStoreService {
 
-    private final Timeout askTimeout;
-    private final RemoteDeviceId id;
-    private final ActorRef masterNode;
-    private final ExecutionContext executionContext;
+    private final ProxyNetconfService netconfService;
 
     /**
      * Constructor for {@code ProxyNetconfDataTreeService}.
@@ -40,69 +37,51 @@ public class ProxyNetconfDataTreeService implements DataStoreService {
      */
     public ProxyNetconfDataTreeService(final RemoteDeviceId id, final ActorRef masterNode,
                                        final ExecutionContext executionContext, final Timeout askTimeout) {
-        this.id = id;
-        this.masterNode = masterNode;
-        this.executionContext = executionContext;
-        this.askTimeout = askTimeout;
+        final var masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
+        netconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> create(final YangInstanceIdentifier path,
             final NormalizedNode data) {
-        final var masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
-        final var netconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
         return netconfService.create(path, data);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> delete(final YangInstanceIdentifier path) {
-        final var masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
-        final var netconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
         return netconfService.delete(path);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> remove(final YangInstanceIdentifier path) {
-        final var masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
-        final var netconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
         return netconfService.remove(path);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> merge(final YangInstanceIdentifier path,
             final NormalizedNode data) {
-        final var masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
-        final var netconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
         return netconfService.merge(path, data);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> replace(final YangInstanceIdentifier path,
             final NormalizedNode data) {
-        final var masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
-        final var netconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
         return netconfService.replace(path, data);
     }
 
     @Override
     public ListenableFuture<Optional<NormalizedNode>> get(final LogicalDatastoreType store,
             final YangInstanceIdentifier path, final List<YangInstanceIdentifier> fields) {
-        final var masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
-        final var netconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
         return netconfService.get(store, path, fields);
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> commit() {
-        final var masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
-        final var netconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
         return netconfService.commit();
     }
 
     @Override
     public ListenableFuture<? extends DOMRpcResult> cancel() {
-        final var masterActor = Patterns.ask(masterNode, new NetconfDataTreeServiceRequest(), askTimeout);
-        final var netconfService = new ProxyNetconfService(id, masterActor, executionContext, askTimeout);
         return netconfService.cancel();
     }
 }
