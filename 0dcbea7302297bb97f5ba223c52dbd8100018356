@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e3e8643_ed3499e2",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 2238,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-25T14:05:52Z",
+      "side": 1,
+      "message": "http1-chunk-size",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ab2c321_187de72a",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/RestconfSessionTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-25T14:05:52Z",
+      "side": 1,
+      "message": "use DEFAULT instead?",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5b03a5f_07b18004",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerLimits.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-25T14:05:52Z",
+      "side": 1,
+      "message": "IMO we do not need default as parameter",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6703b5bd_f602f53d",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerOverTcp.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-25T14:05:52Z",
+      "side": 1,
+      "message": "`null, HTTPServerLimits.DEFAULT ` and we do not need a cast, see also HTTPServerOverTls class",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbad2bee_0c2f0e6c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerOverTcp.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-25T14:05:52Z",
+      "side": 1,
+      "message": "@NonnullByDefault, you can leave other as they are..",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7302e682_5bcd5270",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerOverTcp.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-25T14:05:52Z",
+      "side": 1,
+      "message": "why not private?",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35b091bb_48c588d8",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerOverTls.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-25T14:05:52Z",
+      "side": 1,
+      "message": "@NonNullByDefault",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98488526_28051398",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerOverTls.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-25T14:05:52Z",
+      "side": 1,
+      "message": "@NonNullByDefault",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3c7f003_9a925cd1",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-25T14:05:52Z",
+      "side": 1,
+      "message": "how is this related to this patch?",
+      "revId": "0dcbea7302297bb97f5ba223c52dbd8100018356",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
