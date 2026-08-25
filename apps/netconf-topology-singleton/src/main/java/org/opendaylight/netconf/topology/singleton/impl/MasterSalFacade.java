@@ -112,13 +112,19 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
         LOG.info("Device {} connected - registering master mount point", id);
 
-        registerMasterMountPoint();
+        initializeDeviceServices();
 
         sendInitialDataToActor().whenComplete((success, failure) -> {
             if (failure != null) {
                 LOG.error("{}: CreateInitialMasterActorData to {} failed", id, masterActorRef, failure);
                 return;
             }
+            // Only construct ProxyNetconfDataTreeService (and thus ask masterActorRef for its
+            // NetconfDataTreeServiceActor) once CreateInitialMasterActorData has actually been
+            // processed. Otherwise that ask can race ahead of it, land at masterActorRef while
+            // its dataStoreService field is still null, and permanently stick this mount with a
+            // null-backed actor since it is now resolved once and reused for the mount's lifetime.
+            registerMasterMountPoint();
             updateDeviceData(deviceSchema, sessionPreferences, negotiatedSshAlg);
         });
     }
@@ -156,7 +162,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         }
     }
 
-    private void registerMasterMountPoint() {
+    private void initializeDeviceServices() {
         requireNonNull(id);
 
         final var databind = requireNonNull(currentSchema,
@@ -167,9 +173,11 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
         deviceDataBroker = newDeviceDataBroker(databind, preferences);
         dataStoreService = newDataStoreService(databind, preferences);
+    }
 
+    private void registerMasterMountPoint() {
         final var proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef, actorResponseWaitTime);
-        mount.onDeviceConnected(databind.modelContext(),
+        mount.onDeviceConnected(currentSchema.databind().modelContext(),
             new NetconfDataOperations(new DataOperationsServiceImpl(proxyNetconfService)),
             deviceServices,
             // We need to create ProxyDOMDataBroker so accessing mountpoint

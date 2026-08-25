@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -21,14 +22,13 @@ import com.google.common.util.concurrent.FluentFuture;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.actor.ActorSystem;
 import org.apache.pekko.actor.Status;
 import org.apache.pekko.testkit.TestActorRef;
 import org.apache.pekko.testkit.TestProbe;
 import org.apache.pekko.testkit.javadsl.TestKit;
-import org.apache.pekko.util.Timeout;
+import org.apache.pekko.util.JavaDurationConverters;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,7 +64,6 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 @ExtendWith(MockitoExtension.class)
 class NetconfDataTreeServiceActorTest {
     static final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
-    static final Timeout TIMEOUT = Timeout.apply(5, TimeUnit.SECONDS);
     static final ContainerNode NODE = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(new NodeIdentifier(QName.create("", "cont")))
         .build();
@@ -216,8 +215,26 @@ class NetconfDataTreeServiceActorTest {
     void testIdleTimeout() {
         final TestProbe testProbe = new TestProbe(system);
         testProbe.watch(actorRef);
+
+        // Idle timeout only cancels a transaction that was actually abandoned: activity must
+        // happen first, or there is nothing to clean up.
+        doReturn(immediateFluentFuture(Optional.empty())).when(dataStoreService).get(OPERATIONAL, PATH, List.of());
+        actorRef.tell(new GetRequest(OPERATIONAL, PATH, List.of()), probe.ref());
+        probe.expectMsgClass(EmptyReadResponse.class);
+
         doReturn(EMPTY_RPC).when(dataStoreService).cancel();
         verify(dataStoreService, timeout(3000)).cancel();
-        testProbe.expectTerminated(actorRef, TIMEOUT.duration());
+
+        // Actor is shared for the mount whole lifetime and must stay alive.
+        testProbe.expectNoMessage(JavaDurationConverters.asFiniteDuration(Duration.ofMillis(500)));
+
+        // ReceiveTimeout keeps firing every idle period - without new activity in between,
+        // it must not keep re-cancelling forever.
+        verify(dataStoreService, after(3000).times(1)).cancel();
+
+        doReturn(EMPTY_RPC).when(dataStoreService).commit();
+        actorRef.tell(new CommitRequest(), probe.ref());
+        verify(dataStoreService).commit();
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
     }
 }
