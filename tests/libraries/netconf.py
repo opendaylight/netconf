@@ -35,6 +35,12 @@ REST_API = variables.REST_API
 TOOLS_IP = variables.TOOLS_IP
 ODL_IP = variables.ODL_IP
 ODL_NETCONF_NAMESPACE = variables.ODL_NETCONF_NAMESPACE
+
+# The configuration data a mounted device reports when it holds none, i.e. what
+# a successful delete of all of its data leaves behind. This is the literal
+# response body; the self-closed '<data .../>' seen in the logs is minidom
+# pretty-printing it, not a second form ODL ever sends.
+EMPTY_DEVICE_DATA = f'<data xmlns="{ODL_NETCONF_NAMESPACE}"></data>'
 TESTTOOL_BASE_STARTUP_TIMEOUT = 20
 TESTTOOL_PER_DEVICE_TIMEOUT = 1
 

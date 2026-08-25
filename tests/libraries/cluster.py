@@ -426,6 +426,51 @@ def start_member(member: int, timeout: int = 300):
     )
 
 
+def get_reachable_members() -> list[str]:
+    """Addresses of the cluster members that answer RESTCONF.
+
+    A test that left a member down still has to be torn down, and a check
+    run against that member reports a refused connection rather than the
+    failure that caused it. Asking which members are up keeps the two
+    apart.
+
+    Args:
+        None
+
+    Returns:
+        list[str]: Addresses of the members answering RESTCONF, in member
+            order.
+    """
+    reachable = []
+    for member in range(1, len(CLUSTER_MEMBER_IPS) + 1):
+        try:
+            _verify_restconf_available(member)
+        except Exception:
+            log.warning(f"Cluster member-{member} does not answer RESTCONF")
+            continue
+        reachable.append(get_member_ip(member))
+    return reachable
+
+
+def get_any_reachable_member() -> str:
+    """Address of the first cluster member that answers RESTCONF.
+
+    Teardown still has to reach the cluster after a test left a member down,
+    so it asks for a member that is actually up instead of assuming a fixed
+    one. Members are tried in order, so on a healthy cluster this is member 1
+    and the usual path is unchanged.
+
+    Args:
+        None
+
+    Returns:
+        str: Address of the first member answering RESTCONF.
+    """
+    reachable = get_reachable_members()
+    assert reachable, "No cluster member answers RESTCONF"
+    return reachable[0]
+
+
 def parse_member_number(node_name: str) -> int:
     """Parses a pekko node name like "member-2" into its 1-based number.
 
