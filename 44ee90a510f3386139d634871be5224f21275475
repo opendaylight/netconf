@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cbecd67a_5173f018",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ConfigUtils.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-25T08:43:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc59bbec_7f3ed564",
+      "revId": "44ee90a510f3386139d634871be5224f21275475",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1bc8f1cd_f057665e",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-24T11:12:17Z",
       "side": 1,
       "message": "should be named initialMaxStreamDataBidirectionalRemote",
+      "revId": "44ee90a510f3386139d634871be5224f21275475",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "31ecbcf6_1e7d0a89",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ConfigUtils.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-25T08:43:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1bc8f1cd_f057665e",
       "revId": "44ee90a510f3386139d634871be5224f21275475",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "102a796c_26ac7e3a",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-25T08:43:20Z",
+      "side": 1,
+      "message": "added description to javadoc",
+      "parentUuid": "5a96a296_d65c1161",
+      "revId": "44ee90a510f3386139d634871be5224f21275475",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "33ad6336_6a6f08bf",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-08-24T11:12:17Z",
       "side": 1,
       "message": "This disables hostname verification for every HTTP/3 connection while Netty\u0027s client builder has it on by default. Is this the desirable behaviour? If so can you add a comment explaining why the identification has to be off here?",
+      "revId": "44ee90a510f3386139d634871be5224f21275475",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "edcc883f_5ff5b8ca",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-25T08:43:20Z",
+      "side": 1,
+      "message": "added some explanation and also this is done same way in SslHandlerFactory where there is FIXME for this, so added it also here",
+      "parentUuid": "33ad6336_6a6f08bf",
       "revId": "44ee90a510f3386139d634871be5224f21275475",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7669902_8a21701b",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-25T08:43:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fec8bd1b_efbec387",
+      "revId": "44ee90a510f3386139d634871be5224f21275475",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2fee348a_b561eb53",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-08-24T11:12:17Z",
       "side": 1,
       "message": "This client does not match the pipeline-oriented HTTPClient parent. The design should be reworked. Such refactor will require a separate patch, but this might be a good place to put a FIXME - stating the mismatch in the shapes for the future.",
+      "revId": "44ee90a510f3386139d634871be5224f21275475",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ad542de_6bb0f06c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/QuicHTTPClient.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-25T08:43:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2fee348a_b561eb53",
       "revId": "44ee90a510f3386139d634871be5224f21275475",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
