@@ -196,30 +196,4 @@ class TestPerformance:
             # to test performance of ODL rejecting our requests. If this step fails,
             # then the duration of step_run_restperfclient cannot be trusted to show
             # the real performance of the cluster.
-
-            # Check for 'thread timed out'
-            timed_out_logs = rest_perf_client.grep_restperfclient_log(
-                perf_log, "thread timed out"
-            )
-            assert not timed_out_logs, (
-                f"restperfclient log contains thread timeout errors ({perf_log}):\n"
-                f"{timed_out_logs}"
-            )
-
-            # Check for 'Request failed'
-            failed_request_logs = rest_perf_client.grep_restperfclient_log(
-                perf_log, "Request failed"
-            )
-            assert not failed_request_logs, (
-                f"restperfclient log contains failed requests ({perf_log}):\n"
-                f"{failed_request_logs}"
-            )
-
-            # Check for 'Status code'
-            status_code_logs = rest_perf_client.grep_restperfclient_log(
-                perf_log, "Status code"
-            )
-            assert not status_code_logs, (
-                "restperfclient log contains unexpected status code entries "
-                f"({perf_log}):\n{status_code_logs}"
-            )
+            rest_perf_client.check_restperfclient_log_has_no_errors(perf_log)
