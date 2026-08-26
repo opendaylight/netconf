@@ -8,11 +8,13 @@
 package org.opendaylight.netconf.codec;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class ChunkedFrameDecoderTest {
@@ -43,11 +45,7 @@ class ChunkedFrameDecoderTest {
             ##
             """.getBytes(StandardCharsets.UTF_8));
         decoder.decode(null, input, output);
-
-        assertEquals(1, output.size());
-        final var chunk = (ByteBuf) output.get(0);
-
-        assertEquals(EXPECTED_MESSAGE, chunk.toString(StandardCharsets.UTF_8));
+        assertChunk(output);
     }
 
     @Test
@@ -55,10 +53,16 @@ class ChunkedFrameDecoderTest {
         final var output = new ArrayList<>();
         final var input = Unpooled.copiedBuffer(CHUNKED_MESSAGE_ONE.getBytes(StandardCharsets.UTF_8));
         decoder.decode(null, input, output);
+        assertChunk(output);
+    }
 
+    private static void assertChunk(final List<Object> output) {
         assertEquals(1, output.size());
-        final ByteBuf chunk = (ByteBuf) output.get(0);
-
-        assertEquals(EXPECTED_MESSAGE, chunk.toString(StandardCharsets.UTF_8));
+        final var chunk = assertInstanceOf(ByteBuf.class, output.getFirst());
+        try {
+            assertEquals(EXPECTED_MESSAGE, chunk.toString(StandardCharsets.UTF_8));
+        } finally {
+            chunk.release();
+        }
     }
 }
