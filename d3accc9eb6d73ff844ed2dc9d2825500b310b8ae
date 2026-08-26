@@ -16,6 +16,24 @@
       "message": "what about \n\nAbstractIT.assertContentJson(final String getRequestUri, final String expectedContent)\nAbstractIT.assertContentXml(final String getRequestUri, final String expectedContent)\n\nalso some overloads of \nAbstractIT.invokeRequest()\ncould be removed too",
       "revId": "d3accc9eb6d73ff844ed2dc9d2825500b310b8ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "656408c1_f1b02f6c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 23
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-26T12:34:35Z",
+      "side": 1,
+      "message": "Thanks, I messed up rebase and this was lost since PS 19",
+      "parentUuid": "21d38e94_ad4edb5d",
+      "revId": "d3accc9eb6d73ff844ed2dc9d2825500b310b8ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
