@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,9 +74,9 @@ class NetconfDeviceTest extends AbstractTestModelTest {
     private static final String TEST_REVISION = "2013-07-22";
     private static final SourceIdentifier TEST_SID = new SourceIdentifier(TEST_MODULE, TEST_REVISION);
     private static final String TEST_CAPABILITY =
-            TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION;
-    private static final RemoteDeviceId REMOTE_DEVICE_ID = new RemoteDeviceId("test", new InetSocketAddress(
-        "localhost", 22));
+        TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION;
+    private static final RemoteDeviceId REMOTE_DEVICE_ID = new RemoteDeviceId("test",
+        new InetSocketAddress("localhost", 22));
 
     private static NetconfMessage NOTIFICATION;
 
@@ -93,6 +94,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
     private DeviceNetconfSchemaProvider deviceSchemaProvider;
 
     private RpcsTimeoutAndRecoveryHandler recoveryHandler;
+    private DefaultNetconfTimer timer;
 
     @BeforeAll
     static void setupNotification() throws Exception {
@@ -101,8 +103,14 @@ class NetconfDeviceTest extends AbstractTestModelTest {
     }
 
     @BeforeEach
-    public void before() {
-        recoveryHandler = new RpcsTimeoutAndRecoveryHandler(REMOTE_DEVICE_ID, new DefaultNetconfTimer(), 1L);
+    void beforeEach() {
+        timer = new DefaultNetconfTimer();
+        recoveryHandler = new RpcsTimeoutAndRecoveryHandler(REMOTE_DEVICE_ID, timer, 1L);
+    }
+
+    @AfterEach
+    void afterEach() {
+        timer.close();
     }
 
     @Test
