@@ -16,6 +16,57 @@
       "message": "recheck",
       "revId": "a7ad92fcea6f2cec9fa196fa4c0d0713737c5f55",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dce047af_765b661c",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/BenchmarkOpenApiIT.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-08-26T12:47:45Z",
+      "side": 1,
+      "message": "private?",
+      "revId": "a7ad92fcea6f2cec9fa196fa4c0d0713737c5f55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2159763c_517b6e85",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/BenchmarkOpenApiIT.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-08-26T12:47:45Z",
+      "side": 1,
+      "message": "private?",
+      "revId": "a7ad92fcea6f2cec9fa196fa4c0d0713737c5f55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9642c97d_402fff55",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/BenchmarkOpenApiIT.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-08-26T12:47:45Z",
+      "side": 1,
+      "message": "private?",
+      "revId": "a7ad92fcea6f2cec9fa196fa4c0d0713737c5f55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
