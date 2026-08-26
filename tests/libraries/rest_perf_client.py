@@ -143,5 +143,38 @@ def grep_restperfclient_log(log_file: str, pattern: str) -> str:
     Returns:
         str: Found lines containing provided pattern.
     """
-    _, result = infra.shell(f"grep '{pattern}' '{log_file}'")
+    rc, result = infra.shell(f"grep '{pattern}' '{log_file}'")
+    # rc 0 = pattern found, rc 1 = pattern not found; anything else (e.g. rc 2,
+    # the log file could not be read) means the check below didn't actually run.
+    assert rc in (0, 1), f"Failed to grep {log_file} for {pattern!r} (rc={rc})"
     return result.strip()
+
+
+RESTPERFCLIENT_ERROR_PATTERNS = (
+    "thread timed out",
+    "Request failed",
+    "Status code",
+)
+
+
+def check_restperfclient_log_has_no_errors(log_file: str) -> None:
+    """Check a RestPerfClient log for known failure patterns.
+
+    Failed requests are rejected because we don't want to test performance of
+    ODL rejecting our requests.
+
+    Args:
+        log_file (str): RestPerfClient log file location.
+
+    Returns:
+        None
+    """
+    matches = {
+        pattern: grep_restperfclient_log(log_file, pattern)
+        for pattern in RESTPERFCLIENT_ERROR_PATTERNS
+    }
+    failures = {pattern: lines for pattern, lines in matches.items() if lines}
+    assert not failures, (
+        f"restperfclient log contains errors ({log_file}):\n"
+        + "\n".join(f"{pattern!r}: {lines}" for pattern, lines in failures.items())
+    )
