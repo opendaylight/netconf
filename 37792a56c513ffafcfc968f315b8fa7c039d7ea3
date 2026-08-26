@@ -16,6 +16,91 @@
       "message": "recheck",
       "revId": "37792a56c513ffafcfc968f315b8fa7c039d7ea3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9487c28_f3e0ae8a",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-26T12:32:28Z",
+      "side": 1,
+      "message": "Just import the HttpServerUpgradeHandler and use a short instead of this fqn",
+      "revId": "37792a56c513ffafcfc968f315b8fa7c039d7ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6662fbee_1338f17e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-26T12:32:28Z",
+      "side": 1,
+      "message": "unnecessary \u0027;\u0027",
+      "revId": "37792a56c513ffafcfc968f315b8fa7c039d7ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9517393a_b06b3743",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-26T12:32:28Z",
+      "side": 1,
+      "message": "Chunked means \"length unknown\", not \"body too large\". So once streaming is on, a large upload sent with Content-Length filled still gets 413 while the same upload sent chunked goes through. Additionaly a bodyless chunked SSE GET takes the streaming path for nothing. Is the intent to stream only unknown-length bodies? If so the class javadoc should say that. If not, the condition may want to include an oversized Content-Length.",
+      "revId": "37792a56c513ffafcfc968f315b8fa7c039d7ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eae10f78_16981855",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-26T12:32:28Z",
+      "side": 1,
+      "message": "With the LOG.info gone this branch is now just a duplicate of the first one, which reads like a forgotten case. This can now be collapsed into a single ternary assignment, right?",
+      "revId": "37792a56c513ffafcfc968f315b8fa7c039d7ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1fda296_2aaab7c2",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-26T12:32:28Z",
+      "side": 1,
+      "message": "This can get into an endless recursion ending in stack overflow. This checks that the aggregator exists but not that it follows us. If it was ever installed\nahead of the dispatcher, fireChannelRead from its context would deliver back into this handler, which would forward again. That\u0027s an unbounded recursion rather than the \"well-defined fallback\" the comment below promises.",
+      "revId": "37792a56c513ffafcfc968f315b8fa7c039d7ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
