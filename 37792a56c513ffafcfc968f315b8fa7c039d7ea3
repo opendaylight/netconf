@@ -105,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "141d0644_dd3378b2",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-26T16:51:26Z",
+      "side": 1,
+      "message": "Yes, the intent is to stream only requests whose body length is unknown from the initial headers. RFC 9112 does not allow a sender to include Content-Length in a message containing Transfer-Encoding, so a chunked request cannot provide a valid declared body length for this decision.\nRequests declaring Content-Length remain on the aggregated path, allowing HttpObjectAggregator to reject an oversized declaration immediately. Before streaming is enabled, the chunked path will enforce the same configured limit by\n  counting decoded body bytes and returning 413 once it is exceeded.\nA bodyless chunked SSE GET is indistinguishable from a chunked request carrying a body until LastHttpContent arrives, so it remains eligible for streaming. I have updated the class Javadoc to make this framing-based selection explicit.",
+      "parentUuid": "9517393a_b06b3743",
+      "revId": "37792a56c513ffafcfc968f315b8fa7c039d7ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eae10f78_16981855",
