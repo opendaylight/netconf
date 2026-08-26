@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21d38e94_ad4edb5d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 23
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-08-26T12:22:39Z",
+      "side": 1,
+      "message": "what about \n\nAbstractIT.assertContentJson(final String getRequestUri, final String expectedContent)\nAbstractIT.assertContentXml(final String getRequestUri, final String expectedContent)\n\nalso some overloads of \nAbstractIT.invokeRequest()\ncould be removed too",
+      "revId": "d3accc9eb6d73ff844ed2dc9d2825500b310b8ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
