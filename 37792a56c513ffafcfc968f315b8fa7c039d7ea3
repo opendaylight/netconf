@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e42f07a_9719e23e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-26T16:40:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9487c28_f3e0ae8a",
+      "revId": "37792a56c513ffafcfc968f315b8fa7c039d7ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6662fbee_1338f17e",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-08-26T12:32:28Z",
       "side": 1,
       "message": "unnecessary \u0027;\u0027",
+      "revId": "37792a56c513ffafcfc968f315b8fa7c039d7ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80810f03_5796b1e0",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-26T16:40:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6662fbee_1338f17e",
       "revId": "37792a56c513ffafcfc968f315b8fa7c039d7ea3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +122,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "46b4f8ad_393572e2",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-26T16:40:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eae10f78_16981855",
+      "revId": "37792a56c513ffafcfc968f315b8fa7c039d7ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1fda296_2aaab7c2",
@@ -99,6 +153,24 @@
       "writtenOn": "2026-08-26T12:32:28Z",
       "side": 1,
       "message": "This can get into an endless recursion ending in stack overflow. This checks that the aggregator exists but not that it follows us. If it was ever installed\nahead of the dispatcher, fireChannelRead from its context would deliver back into this handler, which would forward again. That\u0027s an unbounded recursion rather than the \"well-defined fallback\" the comment below promises.",
+      "revId": "37792a56c513ffafcfc968f315b8fa7c039d7ea3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2becdda_2f082381",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-26T16:40:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1fda296_2aaab7c2",
       "revId": "37792a56c513ffafcfc968f315b8fa7c039d7ea3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
