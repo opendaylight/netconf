@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a7c4dbc_8ab56eb9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-26T07:51:02Z",
+      "side": 1,
+      "message": "Reworded, it now says why: \"deleting data that is already gone answers 409 data-missing, so an unguarded retry after a delete that did land would report a failure even though the delete had worked.\"",
+      "parentUuid": "5f98bd14_2c89b695",
+      "revId": "7e5c3049ccc0085a301e059b454c83938c3813ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ad36a0b4_dd52c28b",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-18T08:26:38Z",
       "side": 1,
       "message": "what do we expect to see, when we want to delete?",
+      "revId": "7e5c3049ccc0085a301e059b454c83938c3813ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0dbe99c9_128d6608",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 665,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-26T07:51:02Z",
+      "side": 1,
+      "message": "expected now defaults to netconf.EMPTY_DEVICE_DATA, the data a device reports when it holds none, so the answer is \"nothing\". Call sites can omit it; the docstring notes you\u0027d pass a narrower document when deleting only part of the data.",
+      "parentUuid": "ad36a0b4_dd52c28b",
       "revId": "7e5c3049ccc0085a301e059b454c83938c3813ce",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0c651e3_32545acd",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-26T07:51:02Z",
+      "side": 1,
+      "message": "Rewrapped",
+      "parentUuid": "a2989879_5e73d97a",
+      "revId": "7e5c3049ccc0085a301e059b454c83938c3813ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cc158f02_836a3e20",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-08-18T08:26:38Z",
       "side": 1,
       "message": "empty line before?",
+      "revId": "7e5c3049ccc0085a301e059b454c83938c3813ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a0a4967_a7f31b63",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-26T07:51:02Z",
+      "side": 1,
+      "message": "rewritten to add the blank line. Although I checked some other files and codebase seems to be somewhat split between whether there should be a blank line or not.\n\nblank line after the signature (10): test_crud.py, test_crud_action.py, test_crud_rpc.py, test_getmulti.py, test_getsingle.py, test_mdsal.py, test_performance.py, test_keyauth.py, test_northbound.py, + Outages now\n\nno blank line (18): test_callhome.py (×8), test_netconf_ready.py (×4), test_apidocs.py, test_notifications.py, test_max_devices.py, and the other three clustering suites\n\n(Since outages is the closest to the first group, I added the blank)",
+      "parentUuid": "cc158f02_836a3e20",
       "revId": "7e5c3049ccc0085a301e059b454c83938c3813ce",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
