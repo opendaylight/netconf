@@ -174,6 +174,12 @@
                     </instructions>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>@{argLine} -javaagent:${org.mockito:mockito-core:jar} --enable-native-access=ALL-UNNAMED -Dio.netty.leakDetection.level=paranoid -Dio.netty.leakDetection.targetRecords=2000</argLine>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
