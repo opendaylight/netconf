@@ -28,11 +28,12 @@ class NetconfClientSessionNegotiatorFactoryTest {
     private Promise<NetconfClientSession> promise;
 
     @Test
-    void testGetSessionNegotiator() throws Exception {
-        final var timer = new DefaultNetconfTimer();
-        final var negotiatorFactory = new NetconfClientSessionNegotiatorFactory(timer, Optional.empty(), 200L);
+    void testGetSessionNegotiator() {
+        try (var timer = new DefaultNetconfTimer()) {
+            final var negotiatorFactory = new NetconfClientSessionNegotiatorFactory(timer, Optional.empty(), 200L);
 
-        final var sessionNegotiator = negotiatorFactory.getSessionNegotiator(sessionListener, channel, promise);
-        assertNotNull(sessionNegotiator);
+            final var sessionNegotiator = negotiatorFactory.getSessionNegotiator(sessionListener, channel, promise);
+            assertNotNull(sessionNegotiator);
+        }
     }
 }
