@@ -157,14 +157,4 @@ class TestPerformance:
             # This is a separate step to distinguish between restperfclient failure
             # and failed requests. Failed requests are rejected because we don't want
             # to test performance of ODL rejecting our requests.
-            assert (
-                rest_perf_client.grep_restperfclient_log(perf_log, "thread timed out")
-                == ""
-            )
-            assert (
-                rest_perf_client.grep_restperfclient_log(perf_log, "Request failed")
-                == ""
-            )
-            assert (
-                rest_perf_client.grep_restperfclient_log(perf_log, "Status code") == ""
-            )
+            rest_perf_client.check_restperfclient_log_has_no_errors(perf_log)
