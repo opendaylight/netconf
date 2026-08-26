@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b4a990f_8a2f98d5",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 662,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-26T13:46:45Z",
+      "side": 1,
+      "message": "as in previous patch to seperate netconf functionality and cluster management functions.",
+      "revId": "42dade310cae5cdb34bb54bfc41fca3f0477ab70",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
