@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f135b970_7abe092c",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-26T08:37:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fb8ee6c3_2d9fb379",
+      "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "24bb3992_05b40a74",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-08-24T13:27:11Z",
       "side": 1,
       "message": "Unused - when removed the ODL_NETCONF_NAMESPACE will go as well.",
+      "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0eae2ba_fe63ea02",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-26T08:37:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "24bb3992_05b40a74",
       "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9eb939d7_6315d7d9",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-26T08:37:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "519102f3_532cc147",
+      "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bde748aa_c4a92c9d",
@@ -82,6 +136,24 @@
       "writtenOn": "2026-08-24T13:27:11Z",
       "side": 1,
       "message": "Can this be entirely substituted by netconf.check_device_data_is_empty?",
+      "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7f3a1ba_027c6013",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-26T08:37:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bde748aa_c4a92c9d",
       "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -103,6 +175,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "890f2f5c_480240ba",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-26T08:37:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4272906e_441a20e8",
+      "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "64db8324_c8735de5",
@@ -120,6 +210,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3042f62f_4a455c27",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-26T08:37:30Z",
+      "side": 1,
+      "message": "Added `step_wait_for_device_data_to_be_seen_on_perfclient`",
+      "parentUuid": "64db8324_c8735de5",
+      "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "120e6cc8_f5ca74db",
@@ -133,6 +241,24 @@
       "writtenOn": "2026-08-24T13:27:11Z",
       "side": 1,
       "message": "This copy is inside the test body after step_run_restperfclient, so when restperfclient itself fails or times out the test raises first and the log never reaches results/ — leaving it only in tmp/, which the next run wipes. That is the failure whose log is most worth keeping. Could this move to an unconditional teardown (or a try/finally)? If the placement is deliberate, the comment\u0027s \"always-executed test case\" claim should be softened, since only a check failure is covered.",
+      "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3bcfcd3_51e9be5e",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-26T08:37:30Z",
+      "side": 1,
+      "message": "created separate function `run_restperfclient_and_collect_results` which address this issue",
+      "parentUuid": "120e6cc8_f5ca74db",
       "revId": "34df7e6dff3d016dd8e19f72f8c89cb5f1775bcd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

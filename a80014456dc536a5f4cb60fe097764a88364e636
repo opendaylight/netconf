@@ -151,6 +151,30 @@
       },
       "revId": "a80014456dc536a5f4cb60fe097764a88364e636",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d9d8e87_cae5d707",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-26T08:37:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a06d8c63_35d29d42",
+      "range": {
+        "startLine": 176,
+        "startChar": 12,
+        "endLine": 176,
+        "endChar": 30
+      },
+      "revId": "a80014456dc536a5f4cb60fe097764a88364e636",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
