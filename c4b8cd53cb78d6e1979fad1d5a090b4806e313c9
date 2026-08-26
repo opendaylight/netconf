@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "f4919966_a351d5e2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-26T07:50:52Z",
+      "side": 1,
+      "message": "Yes, one-for-one.\n\nkill_member ↔ ClusterManagement.Kill_Single_Member (entity.robot:159)\nstart_member ↔ Start_Single_Member (:211)\nget_device_entity_owner_and_followers ↔ Get_Owner_And_Successors_For_Device (:143)\n    (just followers and successors are fliped)\nget_member_ip ↔ Return_Member_IP\n\nThe only difference is that start_member waits on RESTCONF instead of the log, because the pre-kill \"System ready\" line survives the restart and would match immediately.",
+      "parentUuid": "5803a356_6acce6f6",
+      "revId": "c4b8cd53cb78d6e1979fad1d5a090b4806e313c9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "1cf26b4d_d593ae53",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f753e79_315b52fb",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-26T07:50:52Z",
+      "side": 1,
+      "message": "We do have the addresses, specifically in `variables.CLUSTER_MEMBER_IPS`.\nIf I understand things correctly, what we don\u0027t have is mapping from what ODL reports to those addresses (get-entities names the owner as member-2, and kill_member/start_member take member numbers).\n\nInlining it means writing CLUSTER_MEMBER_IPS[owner - 1] at every call site and repeating the off-by-one. The original Robot solves it in the same way with Return_Member_IP over an index→IP dict.\nObviously, happy to inline it if you\u0027d rather.",
+      "parentUuid": "253e9b92_3f58cbce",
+      "revId": "c4b8cd53cb78d6e1979fad1d5a090b4806e313c9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c814e444_3715804a",
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6330859_4ec700eb",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-26T07:50:52Z",
+      "side": 1,
+      "message": "This was a deliberate decision since it matches the original.\n\nThe case is Find_And_Shutdown_Device_Entity_Owner -\u003e the owner failing. A \"graceful\" bin/stop lets ODL give up the entity ownership and close the device session while doing so; so the re-election path wouldn\u0027t be exercised in the same way. \n\nObviously, I am happy to add a stop_member next to it when some suite needs a graceful shutdown.",
+      "parentUuid": "c814e444_3715804a",
+      "revId": "c4b8cd53cb78d6e1979fad1d5a090b4806e313c9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b1bd15f_9820c5d5",
@@ -82,6 +136,24 @@
       "writtenOn": "2026-08-18T08:09:54Z",
       "side": 1,
       "message": "this is not more aligned with previous commit, remove previous commit then?",
+      "revId": "c4b8cd53cb78d6e1979fad1d5a090b4806e313c9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba42aff8_bd5b112e",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-26T07:50:52Z",
+      "side": 1,
+      "message": "Well, the docstring explains why start_member can\u0027t use the log; on a restart the member\u0027s existing karaf.log still contains \"System ready\" from before the kill, so a grep matches instantly. \nAnd the precious cmmit is about staging - mv command nesting the fresh distro inside a leftover one -\u003e so member 1 boots the previous run\u0027s build. (Same 124550)",
+      "parentUuid": "6b1bd15f_9820c5d5",
       "revId": "c4b8cd53cb78d6e1979fad1d5a090b4806e313c9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
