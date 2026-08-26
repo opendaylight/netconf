@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "860e436a_068b5b94",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ConfigUtils.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-26T14:29:28Z",
+      "side": 1,
+      "message": "This parameter list is already quite long. And worse - three of these parameters are Uint64. Constructing the instance with these 3 arguments in wrong order will still succeed, but will lead to buggy behaviour. Maybe it\u0027t time to consider a builder instead.",
+      "revId": "deb858c2ced56845c3a616d8c47f1bda82694eaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42c0cf37_5a11f7bc",
+        "filename": "transport/transport-http/src/main/yang/odl-quic-common.yang",
+        "patchSetId": 15
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-26T14:29:28Z",
+      "side": 1,
+      "message": "An SSE stream is silent by nature, and the only thing keeping the QUIC\nconnection under this default 30s timeout is the server\u0027s \"ping\" heartbeat (EventStreamResponse) - which is configured by \"heartbeat-interval\" and defaults to  10000(0 disables it). With pings off, a healthy but quiet subscription now\nends by itself and the listener just sees onStreamEnd(). Could the yang description mention that dependency between these config values?",
+      "revId": "deb858c2ced56845c3a616d8c47f1bda82694eaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0c92621_59d25d14",
+        "filename": "transport/transport-http/src/main/yang/odl-quic-common.yang",
+        "patchSetId": 15
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-26T14:29:28Z",
+      "side": 1,
+      "message": "This probably requires a new revision as well.",
+      "revId": "deb858c2ced56845c3a616d8c47f1bda82694eaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cae6dd9a_38dfe9a8",
+        "filename": "transport/transport-http/src/main/yang/odl-quic-common.yang",
+        "patchSetId": 15
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-26T14:29:28Z",
+      "side": 1,
+      "message": "Also.. since this is part of the transport-params-grouping it gets used by quic-server-parameters. But this parameter is ignored by HTTPServer. So setting max-idle-timeout on the server is silently inert, and looks like it works because the client\u0027s advertised value is what closes the connection. Could we apply it there as well (and add it to requireQuicServerParameters), or say in the commit message that the server side comes later?",
+      "revId": "deb858c2ced56845c3a616d8c47f1bda82694eaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
