@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "81e1e463_57a41b0d",
+        "filename": "tests/suites/restperfclient/test_mdsal.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-26T08:40:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f061c49_5ebc0740",
+      "revId": "fffa0773d56ccbece3057f36dad1a7d83b7b34f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "42ac73bb_6836c15a",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-24T13:41:13Z",
       "side": 1,
       "message": "These new messages name the log path, but this copy runs after the checks, so when a check fails the log never reaches results/ and stays only in tmp/, which the next run wipes. The sibling test_performance.py deliberately collects first for exactly this reason. Could the two collect steps in this file move above their corresponding check steps?",
+      "revId": "fffa0773d56ccbece3057f36dad1a7d83b7b34f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fde2da8a_27640515",
+        "filename": "tests/suites/restperfclient/test_mdsal.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-26T08:40:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "42ac73bb_6836c15a",
       "revId": "fffa0773d56ccbece3057f36dad1a7d83b7b34f3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e5267f0_4eb558c8",
+        "filename": "tests/suites/restperfclient/test_mdsal.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-26T08:40:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fcbfdcdc_8f948074",
+      "revId": "fffa0773d56ccbece3057f36dad1a7d83b7b34f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "084536ce_34811147",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "53f6fd8a_b95c92c6",
+        "filename": "tests/suites/restperfclient/test_performance.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-26T08:40:45Z",
+      "side": 1,
+      "message": "fixed within `rest_perf_client.grep_restperfclient_log`",
+      "parentUuid": "084536ce_34811147",
+      "revId": "fffa0773d56ccbece3057f36dad1a7d83b7b34f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f0e7d241_f6781ca3",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-08-24T13:41:13Z",
       "side": 1,
       "message": "These 3 assertions run in sequence. If the first fires, it hides the results of the remaining two. Since this is about complete diagnostics, it would be much better to collect all 3 results first and assert them once afterwards. The same, of course, goes for the other paces where this code block has been copied to.",
+      "revId": "fffa0773d56ccbece3057f36dad1a7d83b7b34f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05d5c091_eb2f9c1e",
+        "filename": "tests/suites/restperfclient/test_performance.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-26T08:40:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0e7d241_f6781ca3",
       "revId": "fffa0773d56ccbece3057f36dad1a7d83b7b34f3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
