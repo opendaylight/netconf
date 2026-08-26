@@ -156,6 +156,24 @@
       "message": "these comments seem to get lost in the last patchset",
       "revId": "84940f7d9f35554d8b327dcf7a39964ea94f803a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7ef27d3_653f8635",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp3SseService.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-08-26T09:34:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d6d5451c_19a8c054",
+      "revId": "84940f7d9f35554d8b327dcf7a39964ea94f803a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
