@@ -293,9 +293,9 @@ class HttpClientServerTest {
 
     private void integrationTest(final boolean http2, final AuthHandlerFactory authHandlerFactory) throws Exception {
         // capture the channel
-        final var clientChannelRef = new AtomicReference<TransportChannel>();
+        final var clientChannelRef = new AtomicReference<HTTPTransportChannel>();
         doAnswer(inv -> {
-            clientChannelRef.set(inv.getArgument(0));
+            clientChannelRef.set(inv.getArgument(0, HTTPTransportChannel.class));
             return null;
         }).when(clientTransportListener).onTransportChannelEstablished(any());
 
@@ -310,8 +310,7 @@ class HttpClientServerTest {
 
                 final var transportChannel = clientChannelRef.get();
                 assertNotNull(transportChannel);
-                final var httpChannel = (HTTPTransportChannel) transportChannel;
-                final var scheme = httpChannel.scheme().name().toLowerCase();
+                final var scheme = transportChannel.scheme().name().toLowerCase();
 
                 for (var method : METHODS) {
                     final var uri = nextValue("/URI");
