@@ -16,6 +16,23 @@
       "message": "Why did this became a separate patch instead of just adding it into the \"PyTest: Reuse check empty data logic\" directly? It\u0027s weird.",
       "revId": "ee4e97a3d7abd82632b54104f956c8fed1cd256c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7c6db14_3df7a202",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T08:10:43Z",
+      "side": 1,
+      "message": "Why did this became a separate patch instead of just adding it into the \"PyTest: Reuse check empty data logic\" directly? It\u0027s weird.",
+      "revId": "ee4e97a3d7abd82632b54104f956c8fed1cd256c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
