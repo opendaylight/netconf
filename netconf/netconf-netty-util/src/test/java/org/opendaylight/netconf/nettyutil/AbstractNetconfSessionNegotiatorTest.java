@@ -93,14 +93,18 @@ class AbstractNetconfSessionNegotiatorTest {
         negotiator.startNegotiation();
 
         final var buf = assertInstanceOf(ByteBuf.class, channel.readOutbound());
-        assertEquals("""
-            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-            <hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
-                <capabilities>
-                    <capability>urn:ietf:params:netconf:base:1.1</capability>
-                </capabilities>
-            </hello>
-            ]]>]]>""", new String(ByteBufUtil.getBytes(buf), StandardCharsets.UTF_8));
+        try {
+            assertEquals("""
+                <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                <hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                    <capabilities>
+                        <capability>urn:ietf:params:netconf:base:1.1</capability>
+                    </capabilities>
+                </hello>
+                ]]>]]>""", new String(ByteBufUtil.getBytes(buf), StandardCharsets.UTF_8));
+        } finally {
+            buf.release();
+        }
     }
 
     @Test
