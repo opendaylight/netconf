@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
+import io.netty.buffer.UnpooledByteBufAllocator;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class SseUtilsTest {
-
     @Mock
     private EventStreamListener eventStreamListener;
 
@@ -36,11 +36,11 @@ class SseUtilsTest {
         // no split
         assertSameContent(
             List.of(byteBuf("field: 0123456789ABCDEF\r\n")),
-            SseUtils.chunksOf("field", longMessage, 0, Unpooled.buffer().alloc()));
+            SseUtils.chunksOf("field", longMessage, 0, UnpooledByteBufAllocator.DEFAULT));
         // split
         assertSameContent(
             List.of(byteBuf("field: 0123456\r\n"), byteBuf("field: 789ABCD\r\n"), byteBuf("field: EF\r\n")),
-            SseUtils.chunksOf("field", longMessage, 7, Unpooled.buffer().alloc()));
+            SseUtils.chunksOf("field", longMessage, 7, UnpooledByteBufAllocator.DEFAULT));
     }
 
     @Test
