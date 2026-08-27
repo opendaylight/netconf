@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36006580_52ffdd14",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T11:38:07Z",
+      "side": 1,
+      "message": "\"m not in listing\" looks for the name anywhere inside the whole ls output, treated as one long string. The text \"people@2014-08-18.yang\" appears inside \"car-people@2014-08-18.yang\", so a folder holding only car and car-people would look complete. The single cp above means this cannot go wrong today. Could we compare against set(listing.split()), so it stays right if the copy is ever split up?",
+      "revId": "fac8c8abd246c9ab71829fa07a3459e43b275451",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd22a8d2_2f85efb3",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T11:38:07Z",
+      "side": 1,
+      "message": "The suite has exactly one reason to exist beyond the CRUD suite it subclasses,and that reason is currently unverified. The checks above only prove the files landed in the folder this fixture picked. They do not prove ODL reads that folder. As the comment at line 81 says, if it does not, the models are simply downloaded from the device again and this suite becomes a copy of the CRUD one, still passing. Could we also check afterwards that the folder gained a model we never put there? That should be enough to verify we actually used the folder.",
+      "revId": "fac8c8abd246c9ab71829fa07a3459e43b275451",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "651c42b4_51431960",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T11:38:07Z",
+      "side": 1,
+      "message": "Running with the configured_device shared fixture here shines a light at an issue with that fixture. In it the device is mounted, four more setup steps follow, and only the code after its \"yield\" unmounts it. If one of those steps fails the device stays mounted, and this suite then fails on its very first check for an unrelated reason. Can you fix the fixture so that this kind of problem does not leak to other tests such as this one?",
+      "revId": "fac8c8abd246c9ab71829fa07a3459e43b275451",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
