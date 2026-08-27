@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "18ee0959_73042b0d",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:43Z",
+      "side": 1,
+      "message": "responding to comment 1 (this one), 5 and 7, since all three come down to the absolute path, so they\u0027re fixed together: \n\nthe directory is now the relative name bug8086-schema. DefaultSchemaResourceManager resolves the configured name against \"cache\" via Path.resolve, which returns the argument unchanged when it\u0027s absolute.. so /tmp/schema did exactly what you said, while a relative name lands under each member\u0027s own cache. After a run:\n```tests/opendaylight-member-{1,2,3}/cache/bug8086-schema/``` - one per member\nNetconf connector for device netconf-test-device will use schema cache directory bug8086-schema instead of schema.\nSo the three members no longer share a directory (no concurrent writes of the same file), the value is load-bearing rather than equal to the library default, and nothing lives in /tmp, which also removes the rm -rf of a path this suite doesn\u0027t own. The directories sit inside the member distributions that staging recreates each run, so there\u0027s no cleanup step at all now. Each member\u0027s cache also accumulates the models it fetched from the device, which is further proof it\u0027s per-member.",
+      "parentUuid": "62fb962b_16527ae3",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7fc3f18f_d1cfe7f4",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb73cd40_3cba73a7",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:43Z",
+      "side": 1,
+      "message": "seeds car, people and car-people (car-people imports the other two)",
+      "parentUuid": "7fc3f18f_d1cfe7f4",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "87e25e5b_295a38aa",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-08-24T12:50:03Z",
       "side": 1,
       "message": "The comment states that this path needs to match the one hard-coded in testtool. But nothing enforces it. So if one changes, they just silently diverge. How about making it a single constant (probably in clustering_crud_suite.py) and have both read that instead?",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb8a3aa7_06eb9b01",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:43Z",
+      "side": 1,
+      "message": "DEVICE_SCHEMAS_DIRECTORY moved to clustering_crud_suite.py and both the testtool start and the seeding read it; which is why this commit touches the shared module",
+      "parentUuid": "87e25e5b_295a38aa",
       "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +140,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a974c3e_21b9c794",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:43Z",
+      "side": 1,
+      "message": "renamed to SCHEMA_CACHE_DIRECTORY",
+      "parentUuid": "94b81577_7d751053",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "814519d1_619cd22d",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:43Z",
+      "side": 1,
+      "message": "Fixed together with the absolute-path thread above (comment on SCHEMA_DIRECTORY) (the directory is now the relative bug8086-schema, which is not the library default, so the attribute is load-bearing)",
+      "parentUuid": "9c6a95a4_a2a6b00f",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "034144ce_54317bd2",
@@ -103,6 +193,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "42b95ede_9d91fd8e",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "034144ce_54317bd2",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8a474494_22e0317c",
@@ -116,6 +224,24 @@
       "writtenOn": "2026-08-24T12:55:12Z",
       "side": 1,
       "message": "It might be better to put migration details comments to function body using \u0027#\u0027 instead of docstring. Regular user looking at docstring of a function would probably be more interested in what this function does rather then in migration history, which might make it more confusing and would also require going through the older robot tests code.",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb2a9ce6_3121d98b",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:43Z",
+      "side": 1,
+      "message": "migration note moved to a # comment in the body",
+      "parentUuid": "8a474494_22e0317c",
       "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -155,6 +281,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "af224235_57a4be3a",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "117ac49a_56fe9f9e",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d63f2f0e_98488cd9",
@@ -172,6 +316,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6039276_bd8da9f3",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:43Z",
+      "side": 1,
+      "message": "asserts on the return code and that each model landed;\n\n(\n`infra.shell(check_rc\u003dTrue)` looks like it would do this, but it can\u0027t\n`subprocess.run(check\u003dTrue)` raises first so the branch is dead, and it returns an `AssertionError` rather than raising it... might be worth its own ticket?\n)",
+      "parentUuid": "d63f2f0e_98488cd9",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "54fd6f91_ad75b90c",
@@ -185,6 +347,24 @@
       "writtenOn": "2026-08-24T12:50:03Z",
       "side": 1,
       "message": "mkdir -p succeeds whether or not the directory already existed, so this rm -rf can delete a pre-existing /tmp/schema and everything in it — and /tmp/schema is also the repo-wide default for schema_directory (netconf.py Line 147), so it is not a name this suite owns. Two framework runs on one machine would also collide. Could the suite use a run-unique directory(maybe under pytest\u0027s tmp_path, or containing the process ID in the name, etc...). Then we know we\u0027re removing only what we created during the test.",
+      "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "816d2c7a_ee01acbe",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:43Z",
+      "side": 1,
+      "message": "Fixed together with the absolute-path thread above (comment on SCHEMA_DIRECTORY) (nothing is created in or removed from /tmp any more; the per-member directories live inside the distributions that staging recreates each run, so there\u0027s no cleanup step at all)",
+      "parentUuid": "54fd6f91_ad75b90c",
       "revId": "ebccbc89ffc35e59168ed70887944fc98647aeee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
