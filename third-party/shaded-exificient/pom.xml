@@ -102,6 +102,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <Automatic-Module-Name>org.opendaylight.netconf.shaded.exificient</Automatic-Module-Name>
                         <Import-Package>
                             sun.io;resolution:=optional,
                             *
