@@ -52,6 +52,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d525150f_81b9d4be",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:38Z",
+      "side": 1,
+      "message": "fixed in the previous patchset. It\u0027s no longer a retry count, it now goes to `wait_device_connected(timeout\u003d)` and to `netconf.wait_device_config_data(timeout\u003d)`, both of which divide by the polling period.",
+      "parentUuid": "7afea41b_e5dbb419",
+      "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b83df52e_2d10e08f",
@@ -65,6 +83,24 @@
       "writtenOn": "2026-08-24T12:27:07Z",
       "side": 1,
       "message": "unused - including its import",
+      "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12a23705_03429bda",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b83df52e_2d10e08f",
       "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +122,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1fcbf04f_5c550c3d",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0be0f1b9_f7847487",
+      "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2018897_dd559075",
@@ -99,6 +153,24 @@
       "writtenOn": "2026-08-24T12:27:07Z",
       "side": 1,
       "message": "missing ()",
+      "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f36bf935_6a284ce2",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2018897_dd559075",
       "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +192,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4cbb0245_438e4f25",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:38Z",
+      "side": 1,
+      "message": "the kwargs are built from the value device_schema_directory yields, and the SCHEMA_DIRECTORY class attribute is gone, so there is only one value and seeding can no longer diverge from configuration.",
+      "parentUuid": "39a828ba_ee482344",
+      "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b120a49_1083732d",
@@ -137,6 +227,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "96193ccf_3493a9a2",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:38Z",
+      "side": 1,
+      "message": "Added DATA_OP_RETRY_COUNT \u003d 10 in the shared module and passed it to create/modify/delete. The transient cleared in two or three attempts when measured, so ten is enough for it while a genuine 4968 regression now fails in about ten seconds instead of two minutes.\n(The library default of 120 stays for the outage suites, where a write after a member kill genuinely needed minutes.)",
+      "parentUuid": "6b120a49_1083732d",
+      "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7e437589_cdf15297",
@@ -150,6 +258,24 @@
       "writtenOn": "2026-08-24T12:27:07Z",
       "side": 1,
       "message": "modify_device_data above already retries until get_device_config_data on SETTER_IP equals MODIFIED_DATA, and check_device_config_data is that same GET plus the same comparison, so this step can no longer fail and its 4968 attribution is unreachable. Same for step_check_new_device_data_is_visible_on_setter at line 317 and step_check_device_data_is_deleted at line 417. Please consider whether these are needed for anything and drop if they aren\u0027t.",
+      "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "86e885f5_4816ce5e",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-08-27T07:48:38Z",
+      "side": 1,
+      "message": "Agreed and dropped",
+      "parentUuid": "7e437589_cdf15297",
       "revId": "69e49b04b0b54243937ff8d5cba876c2e025fa57",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
