@@ -33,6 +33,29 @@
       "message": "recheck",
       "revId": "9d72f0f15de589ed2db4c2a15323dc7dd5820508",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8572824_5d9be411",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-08-27T13:09:23Z",
+      "side": 1,
+      "message": "move this into a top-level class, having it buried here makes it rather hard to find",
+      "range": {
+        "startLine": 355,
+        "startChar": 19,
+        "endLine": 355,
+        "endChar": 31
+      },
+      "revId": "9d72f0f15de589ed2db4c2a15323dc7dd5820508",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
