@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d8e6ed8_0bb38fe4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-27T08:57:17Z",
+      "side": 1,
+      "message": "why do you refer to it?",
+      "parentUuid": "a65df5b2_fcab8811",
+      "revId": "e07b8331d5f50627960b1cacfa97066b83f32bc6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2e2edde6_6d60525b",
