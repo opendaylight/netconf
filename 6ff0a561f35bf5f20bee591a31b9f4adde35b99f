@@ -16,6 +16,193 @@
       "message": "recheck",
       "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b99466a6_2c63a821",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T14:59:39Z",
+      "side": 1,
+      "message": "Since the streaming is currently off the commit message needs a bit of a rewrite. Because right now it seems like this is the patch which turned it ON (describing the selection in the present tense)",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f5fa054_983e1440",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T14:59:39Z",
+      "side": 1,
+      "message": "The dispatcher declares this name but HTTPScheme installs the handler, in two addAfter() chains, so the \"aggregator sits right after me\" invariant is maintained by hand elsewhere and a mistake degrades to one LOG.error per message with the aggregated path still green. Would it be cleaner for the dispatcher to take maxRequestBodySize and install the aggregator itself in handlerAdded? That makes AGGREGATOR_NAME private and retires isDownstreamOf, the error branch, and the new ordering test.",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a5c80de_f2f4c239",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T14:59:39Z",
+      "side": 1,
+      "message": "If this exists just so tests can reach the disabled path, then add @VisibleForTesting",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d84f767_e1074951",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T14:59:39Z",
+      "side": 1,
+      "message": "msg.getClass().getSimpleName() will be more readable. Here and bellow",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "359f8079_e1b51f29",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T14:59:39Z",
+      "side": 1,
+      "message": "This reads Transfer-Encoding off a request the decoder may already have rejected. A POST carrying both Content-Length and Transfer-Encoding: chunked keeps the chunked header but arrives with a failed DecoderResult, so it is selected as STREAMING and routed past the aggregator. The HTTPServerSession (the only handler that turns a failure into a 400) accepts FullHttpRequest ONLY, so the client gets no response at all. Could we add request.decoderResult().isSuccess() to the condition? Or at least a FIXME if that\u0027s problematic for some reason.",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2bf16da7_33d5782c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T14:59:39Z",
+      "side": 1,
+      "message": "Since we\u0027re only switching between 2 cases, this can be easily replaced with a simple If-else and the suppression can be dropped.",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68644b7d_4c2f015f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T14:59:39Z",
+      "side": 1,
+      "message": "This resolves the aggregator per message, and isDownstreamOf then allocates the full pipeline name list and scans it twice. So a 100 MB chunked upload pays roughly three pipeline traversals and one throwaway list per 8 KB chunk on the event loop, to re-derive something that CANNOT CHANGE during a request. Right? \n\nCould startRequest() resolve the context once, do the ordering check there, and keep it in a field beside mode for forward to use?",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b054e309_3cf49c16",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T14:59:39Z",
+      "side": 1,
+      "message": "This identical log will be logged for every chunk of a misconfigured chunked upload. Move it to startRequest() or add some boolean latch so it fires just once per request, not once per chunk.",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b947ede_80b5dc7c",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPSchemeTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T14:59:39Z",
+      "side": 1,
+      "message": "This covers HTTPScheme.HTTP only, but AlpnUpgradeHandler.configureHttp1 at HTTPScheme.configureHttp1() is the one with three addAfter calls, two against the same base - exactly the reverse-insertion trap this test\u0027s javadoc describes. Could this become a @ParameterizedTest over both schemes, matching the @MethodSource tests below, and assert the whole expected order (codec, keep-alive, dispatcher, aggregator) rather than just dispatcher \u003c aggregator?",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e543b4ff_24f4b535",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcherTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T14:59:39Z",
+      "side": 1,
+      "message": "Do we need this as a field? Can it be a simple variable like wireProbe below?",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f308987_7c86d1a3",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcherTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T14:59:39Z",
+      "side": 1,
+      "message": "We\u0027re only clearing channel? How about the channels from streamingChannel() and wireChannel? Those are released at the end of each test body. So an assertion failure mid-test can leak them and the buffer-leak detector will point at a wrong test. Collecting all of them and releasing them all here would solve that.",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
