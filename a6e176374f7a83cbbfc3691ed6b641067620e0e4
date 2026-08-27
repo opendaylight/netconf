@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4ca4f74_0f5975db",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T08:53:55Z",
+      "side": 1,
+      "message": "Should we mark this suite as \"single_device\" as well? Since we run one simulated device in it.",
+      "revId": "a6e176374f7a83cbbfc3691ed6b641067620e0e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf268df3_d7d8b4b0",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T08:53:55Z",
+      "side": 1,
+      "message": "We\u0027re only passing schemas here - no rpc_config. Is this just a forgotten copy-pasta error?",
+      "revId": "a6e176374f7a83cbbfc3691ed6b641067620e0e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e559e1a_be61dc07",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T08:53:55Z",
+      "side": 1,
+      "message": "60 retries at 1 s only bounds this at 60s if every attempt returns, but each attempt ends in requests.get with timeout\u003dNone (get_device_config_data does not pass http_timeout), so a member that accepts the connection and never answers blocks the first attempt forever and hangs the job instead of failing it. Could http_timeout be threaded through check_device_data_is_empty and set here — the single-node suite passes http_timeout\u003d2 for its mount call for what looks like the same reason.",
+      "revId": "a6e176374f7a83cbbfc3691ed6b641067620e0e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
