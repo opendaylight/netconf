@@ -161,17 +161,19 @@ public enum HTTPScheme {
             // if there was an upgrade to HTTP/2, the incoming message is propagated as an UpgradeEvent;
             // just pass the request down on the dedicated HTTP/2 stream. Since we are restoring that magic, there is no
             // need for downstream handlers to see this event.
-            if (event instanceof HttpServerUpgradeHandler.UpgradeEvent) {
-                LOG.debug("{}: upgraded to HTTP/2", ctx.channel());
-                ctx.pipeline().remove(this);
-                ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
-            } else if (event instanceof PriorKnowledgeUpgradeEvent) {
-                // Prior-knowledge h2: CleartextHttp2ServerUpgradeHandler has already installed Http2FrameCodec,
-                LOG.debug("{}: using HTTP/2 prior knowledge", ctx.channel());
-                ctx.pipeline().remove(this);
-                ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
-            } else {
-                super.userEventTriggered(ctx, event);
+            switch (event) {
+                case HttpServerUpgradeHandler.UpgradeEvent unused -> {
+                    LOG.debug("{}: upgraded to HTTP/2", ctx.channel());
+                    ctx.pipeline().remove(this);
+                    ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
+                }
+                case PriorKnowledgeUpgradeEvent unused -> {
+                    // Prior-knowledge h2: CleartextHttp2ServerUpgradeHandler has already installed Http2FrameCodec,
+                    LOG.debug("{}: using HTTP/2 prior knowledge", ctx.channel());
+                    ctx.pipeline().remove(this);
+                    ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
+                }
+                case null, default -> super.userEventTriggered(ctx, event);
             }
         }
     }
