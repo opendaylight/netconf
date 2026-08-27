@@ -87,6 +87,24 @@
       "parentUuid": "2e2edde6_6d60525b",
       "revId": "e07b8331d5f50627960b1cacfa97066b83f32bc6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1149ecc0_5fc5d7c2",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ActorProxyNetconfServiceFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-27T08:59:11Z",
+      "side": 1,
+      "message": "Can we do better, enumeration for example, are they YANG defined?",
+      "parentUuid": "4f2d989d_f608a472",
+      "revId": "e07b8331d5f50627960b1cacfa97066b83f32bc6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
