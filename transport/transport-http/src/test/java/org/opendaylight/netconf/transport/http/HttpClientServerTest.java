@@ -21,6 +21,7 @@ import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -308,10 +309,8 @@ class HttpClientServerTest {
                 verify(clientTransportListener, timeout(2000)).onTransportChannelEstablished(any());
                 verify(serverTransportListener, timeout(2000)).onTransportChannelEstablished(any());
 
-                final var transportChannel = clientChannelRef.get();
-                assertNotNull(transportChannel);
-                final var httpChannel = (HTTPTransportChannel) transportChannel;
-                final var scheme = httpChannel.scheme().name().toLowerCase();
+                final var transportChannel = assertInstanceOf(HTTPTransportChannel.class, clientChannelRef.get());
+                final var scheme = transportChannel.scheme().name().toLowerCase();
 
                 for (var method : METHODS) {
                     final var uri = nextValue("/URI");
