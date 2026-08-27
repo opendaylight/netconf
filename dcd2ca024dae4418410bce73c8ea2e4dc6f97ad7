@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f76f00ca_14e462a1",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 604,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-27T14:47:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e14f204a_789d89ca",
+      "revId": "dcd2ca024dae4418410bce73c8ea2e4dc6f97ad7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "36ecbcb9_9836d73a",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-27T08:12:03Z",
       "side": 1,
       "message": "Why do we define the regex inline, when we already have EMPTY_DEVICE_DATA?",
+      "revId": "dcd2ca024dae4418410bce73c8ea2e4dc6f97ad7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c13f9cb1_5924ae29",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 606,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-08-27T14:47:53Z",
+      "side": 1,
+      "message": "Updated global var `EMPTY_DEVICE_DATA` to `EMPTY_DEVICE_DATA_PATTERN` and used it in this function",
+      "parentUuid": "36ecbcb9_9836d73a",
       "revId": "dcd2ca024dae4418410bce73c8ea2e4dc6f97ad7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
