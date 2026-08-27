@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6bc821f9_2e7fbc24",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T10:58:32Z",
+      "side": 1,
+      "message": "\"configure-via-topology\" gives the base a working default. A subclass that forgets to set it silently gets the CRUD device type and quietly becomes a duplicate of the CRUD suite instead of failing. Declare it as an annotation with no value so a subclass that omits it raises AttributeError.",
+      "revId": "e49b0c171610ebb7c3d48eec15a94fa535077571",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb7ec991_a83224e7",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T10:58:32Z",
+      "side": 1,
+      "message": "This can be either static, or module function, since we\u0027re not using self.",
+      "revId": "e49b0c171610ebb7c3d48eec15a94fa535077571",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c916754e_515b8c13",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T10:58:32Z",
+      "side": 1,
+      "message": "The create step above already wrote data through the setter and read it back, so the slow start-up problem these retries exist for has passed by the time we get here. Retrying modify ten times (and delete at line 382) means that if bug 4968 comes back we quietly resend the write until it works, instead of failing and reporting it. How about using just one attempt (DATA_OP_NO_RETRY_COUNT)?",
+      "revId": "e49b0c171610ebb7c3d48eec15a94fa535077571",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ba28708_94bf3969",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T10:58:32Z",
+      "side": 1,
+      "message": "Since we\u0027re not defining what the data should look like once the delete has gone through, this falls back to delete_device_data\u0027s default - netconf.EMPTY_DEVICE_DATA. The two checks below compare against this file\u0027s EMPTY_DATA instead. Both strings match today, but they live in different files and nothing keeps them in step. Can we pass EMPTY_DATA here as well?",
+      "revId": "e49b0c171610ebb7c3d48eec15a94fa535077571",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
