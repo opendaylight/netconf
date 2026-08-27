@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "731e0847_a1f07b44",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T08:41:48Z",
+      "side": 1,
+      "message": "The git message mentions \"invoke_restperfclient itself is unchanged except for\nattaching the log path to any exception it raises\". The assertion already carried the log path before this change. Did you mean \"log-file\" instead?",
+      "revId": "cd10af43357cea5d20185457a9689e73f1f04d07",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "548c4c1c_1faaa12f",
+        "filename": "tests/libraries/rest_perf_client.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T08:41:48Z",
+      "side": 1,
+      "message": "After this change invoke_restperfclient is called from nowhere but this wrapper, yet it stays public with the more obvious name — so the next suite is likely to call it and quietly lose its log on failure, which is the bug this change fixes. Could the try/finally copy move into invoke_restperfclient itself (dropping this wrapper), or invoke_restperfclient become _invoke_restperfclient?",
+      "revId": "cd10af43357cea5d20185457a9689e73f1f04d07",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "952c76db_a336ba19",
+        "filename": "tests/libraries/rest_perf_client.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T08:41:48Z",
+      "side": 1,
+      "message": "These nine arguments are forwarded by position, so if a parameter is ever inserted into invoke_restperfclient\u0027s signature every later argument shifts silently — user would land in asynchronous and so on, with no error, just wrong numbers from a performance run. Could they be passed by keyword instead?",
+      "revId": "cd10af43357cea5d20185457a9689e73f1f04d07",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
