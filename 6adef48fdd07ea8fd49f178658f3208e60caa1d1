@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9296aec6_07eef00a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T08:45:55Z",
+      "side": 1,
+      "message": "The commit message says \"Four call sites each carried their own copy\", but at this commit there are three (two here, one in test_performance.py) — the fourth is the clustering-scale suite, which lands in the next commit already using this helper. Could the message say three, so nobody goes looking for a copy that was left behind?",
+      "revId": "6adef48fdd07ea8fd49f178658f3208e60caa1d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20a8bb37_d799fbed",
+        "filename": "tests/libraries/rest_perf_client.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T08:45:55Z",
+      "side": 1,
+      "message": "Please move this up to join the rest of the constants",
+      "revId": "6adef48fdd07ea8fd49f178658f3208e60caa1d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
