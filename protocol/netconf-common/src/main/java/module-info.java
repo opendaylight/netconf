@@ -17,10 +17,10 @@ module org.opendaylight.netconf.common {
     requires com.google.common;
     requires io.netty.handler;
     requires org.opendaylight.netconf.codec;
+    requires org.opendaylight.netconf.shaded.exificient;
     requires org.opendaylight.odlparent.logging.markers;
     requires org.opendaylight.yangtools.util;
     requires org.slf4j;
-    requires shaded.exificient;
 
     // Annotation-only dependencies
     requires static transitive java.annotation;
