@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "080d8e91_92e8bf1a",
+        "filename": "transport/transport-http/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-08-27T14:26:23Z",
+      "side": 1,
+      "message": "IMO: revert this file",
+      "revId": "9cdd6b35217bb60226e215b093684f96ca27cfc9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
