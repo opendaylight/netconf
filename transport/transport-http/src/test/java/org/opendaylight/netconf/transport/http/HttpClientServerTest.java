@@ -170,7 +170,7 @@ class HttpClientServerTest {
     void beforeEach() {
         // TODO: this looks like a spy() on a real implementation
         doAnswer(inv -> {
-            final var channel = inv.<HTTPTransportChannel>getArgument(0);
+            final var channel = inv.getArgument(0, HTTPTransportChannel.class);
             channel.channel().pipeline().addLast(new HTTPServerSessionBootstrap(channel.scheme(),
                     HTTPServerLimits.DEFAULT) {
                 @Override
