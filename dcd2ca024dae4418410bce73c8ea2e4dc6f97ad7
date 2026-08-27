@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e14f204a_789d89ca",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 604,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T08:12:03Z",
+      "side": 1,
+      "message": "This throws NameError - no variable called host. Please consider moving the fix here instead of having a separate change just for it.",
+      "revId": "dcd2ca024dae4418410bce73c8ea2e4dc6f97ad7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36ecbcb9_9836d73a",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 606,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-08-27T08:12:03Z",
+      "side": 1,
+      "message": "Why do we define the regex inline, when we already have EMPTY_DEVICE_DATA?",
+      "revId": "dcd2ca024dae4418410bce73c8ea2e4dc6f97ad7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
