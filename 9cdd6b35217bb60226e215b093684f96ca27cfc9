@@ -16,6 +16,24 @@
       "message": "IMO: revert this file",
       "revId": "9cdd6b35217bb60226e215b093684f96ca27cfc9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3cc6e1d_95a31384",
+        "filename": "transport/transport-http/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-08-27T15:00:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "080d8e91_92e8bf1a",
+      "revId": "9cdd6b35217bb60226e215b093684f96ca27cfc9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
