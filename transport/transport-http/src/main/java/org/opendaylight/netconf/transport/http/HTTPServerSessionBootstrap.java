@@ -42,12 +42,12 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
         }
     }
 
-    @SuppressWarnings("checkstyle:MissingSwitchDefault")
     @Override
     public final void userEventTriggered(final ChannelHandlerContext ctx, final Object event) throws Exception {
         if (event instanceof HTTPServerPipelineSetup setup) {
             LOG.debug("{} resolved to {} semantics", ctx.channel(), setup);
             switch (setup) {
+                case null -> throw new NullPointerException();
                 case HTTP_11 -> ctx.pipeline().replace(this, null, configureHttp1(ctx));
                 case HTTP_2 -> configureHttp2(ctx);
             }
