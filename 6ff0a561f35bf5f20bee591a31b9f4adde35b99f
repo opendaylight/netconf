@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a779bb7c_70436285",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-28T14:16:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b99466a6_2c63a821",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4f5fa054_983e1440",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-08-27T14:59:39Z",
       "side": 1,
       "message": "The dispatcher declares this name but HTTPScheme installs the handler, in two addAfter() chains, so the \"aggregator sits right after me\" invariant is maintained by hand elsewhere and a mistake degrades to one LOG.error per message with the aggregated path still green. Would it be cleaner for the dispatcher to take maxRequestBodySize and install the aggregator itself in handlerAdded? That makes AGGREGATOR_NAME private and retires isDownstreamOf, the error branch, and the new ordering test.",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3f099ef_e2571454",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-28T14:16:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f5fa054_983e1440",
       "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab3c652b_1523614d",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-28T14:16:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a5c80de_f2f4c239",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8d84f767_e1074951",
@@ -82,6 +136,24 @@
       "writtenOn": "2026-08-27T14:59:39Z",
       "side": 1,
       "message": "msg.getClass().getSimpleName() will be more readable. Here and bellow",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a37916bb_f468da39",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-28T14:16:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d84f767_e1074951",
       "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -103,6 +175,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffc6419c_49266fe8",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-28T14:16:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "359f8079_e1b51f29",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2bf16da7_33d5782c",
@@ -116,6 +206,24 @@
       "writtenOn": "2026-08-27T14:59:39Z",
       "side": 1,
       "message": "Since we\u0027re only switching between 2 cases, this can be easily replaced with a simple If-else and the suppression can be dropped.",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b5dd3b6_91ebb818",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-28T14:16:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2bf16da7_33d5782c",
       "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -137,6 +245,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "85da5738_25843e05",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-28T14:16:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "68644b7d_4c2f015f",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b054e309_3cf49c16",
@@ -150,6 +276,24 @@
       "writtenOn": "2026-08-27T14:59:39Z",
       "side": 1,
       "message": "This identical log will be logged for every chunk of a misconfigured chunked upload. Move it to startRequest() or add some boolean latch so it fires just once per request, not once per chunk.",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c49c8df8_41c75bdc",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-28T14:16:46Z",
+      "side": 1,
+      "message": "Resolved by the ownership change above. The dispatcher now installs its aggregator itself in handlerAdded(), so the misconfiguration fallback and its per-message error log have been removed",
+      "parentUuid": "b054e309_3cf49c16",
       "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -171,6 +315,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eca035c2_b8dc9a2f",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPSchemeTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-28T14:16:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b947ede_80b5dc7c",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e543b4ff_24f4b535",
@@ -188,6 +350,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e11c8fe8_4f0e216f",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcherTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-28T14:16:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e543b4ff_24f4b535",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6f308987_7c86d1a3",
@@ -201,6 +381,24 @@
       "writtenOn": "2026-08-27T14:59:39Z",
       "side": 1,
       "message": "We\u0027re only clearing channel? How about the channels from streamingChannel() and wireChannel? Those are released at the end of each test body. So an assertion failure mid-test can leak them and the buffer-leak detector will point at a wrong test. Collecting all of them and releasing them all here would solve that.",
+      "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a041572_f183d663",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcherTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-08-28T14:16:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f308987_7c86d1a3",
       "revId": "6ff0a561f35bf5f20bee591a31b9f4adde35b99f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
