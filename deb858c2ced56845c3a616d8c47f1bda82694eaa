@@ -67,6 +67,60 @@
       "message": "Also.. since this is part of the transport-params-grouping it gets used by quic-server-parameters. But this parameter is ignored by HTTPServer. So setting max-idle-timeout on the server is silently inert, and looks like it works because the client\u0027s advertised value is what closes the connection. Could we apply it there as well (and add it to requireQuicServerParameters), or say in the commit message that the server side comes later?",
       "revId": "deb858c2ced56845c3a616d8c47f1bda82694eaa",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "efaa1901_bc56e318",
+        "filename": "transport/transport-http/src/main/yang/odl-quic-common.yang",
+        "patchSetId": 15
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-01T08:47:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cae6dd9a_38dfe9a8",
+      "revId": "deb858c2ced56845c3a616d8c47f1bda82694eaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e266748_49d43cba",
+        "filename": "transport/transport-http/src/main/yang/odl-quic-common.yang",
+        "patchSetId": 15
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-01T08:47:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0c92621_59d25d14",
+      "revId": "deb858c2ced56845c3a616d8c47f1bda82694eaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a018bf07_5f1ecdfd",
+        "filename": "transport/transport-http/src/main/yang/odl-quic-common.yang",
+        "patchSetId": 15
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-01T08:47:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "42c0cf37_5a11f7bc",
+      "revId": "deb858c2ced56845c3a616d8c47f1bda82694eaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
