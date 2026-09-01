@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae4bf830_913a8667",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/SingleResponseHandler.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-01T08:47:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4c5ca64b_de5a3664",
+      "revId": "a72e62457c588142c189d34df3c66a9818f60b57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1166c39e_942abdf9",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-26T14:02:25Z",
       "side": 1,
       "message": "SimpleChannelInboundHandler releases the response once channelRead0 returns, so the FullHttpResponse given to onSuccess is only valid during that call. Today that is documented only in TestRequestCallback. Could we state it on  ClientSession.invoke()\u0027s @param callback, and perhaps in this class\u0027s javadoc, so a new caller does not have to derive it? Because if a called doesn\u0027t know this, they might end-up reading data which do not belong to them: A caller thread calls invoke(request, callback) -\u003e netty thread calls callback.onSuccess(response) -\u003e SimpleChannelInboundHandler (still netty thread) releases the response and it\u0027s buffer returns to the allocator\u0027s pool -\u003e caller thread reads response.content() and get\u0027s WHATEVER now occupies that memory.",
+      "revId": "a72e62457c588142c189d34df3c66a9818f60b57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f14646d_2c365b6b",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/SingleResponseHandler.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-01T08:47:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1166c39e_942abdf9",
       "revId": "a72e62457c588142c189d34df3c66a9818f60b57",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
