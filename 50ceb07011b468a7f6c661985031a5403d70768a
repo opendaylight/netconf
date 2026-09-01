@@ -33,6 +33,24 @@
       "message": "does this ever end up being used?\n\nlooks unused in the last patch",
       "revId": "50ceb07011b468a7f6c661985031a5403d70768a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a15a461_ede03798",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/AbstractIT.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-01T09:39:26Z",
+      "side": 1,
+      "message": "removed",
+      "parentUuid": "8039245e_946658bf",
+      "revId": "50ceb07011b468a7f6c661985031a5403d70768a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
