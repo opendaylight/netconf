@@ -56,6 +56,30 @@
       },
       "revId": "9d72f0f15de589ed2db4c2a15323dc7dd5820508",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6286a894_69743e6b",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-01T08:46:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8572824_5d9be411",
+      "range": {
+        "startLine": 355,
+        "startChar": 19,
+        "endLine": 355,
+        "endChar": 31
+      },
+      "revId": "9d72f0f15de589ed2db4c2a15323dc7dd5820508",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
