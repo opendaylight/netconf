@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "592873ac_9a134fb4",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ConfigUtils.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-01T08:57:08Z",
+      "side": 1,
+      "message": "I made it accept QuicClientParameters which has a builder instead of separate parameters",
+      "parentUuid": "860e436a_068b5b94",
+      "revId": "deb858c2ced56845c3a616d8c47f1bda82694eaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "42c0cf37_5a11f7bc",
