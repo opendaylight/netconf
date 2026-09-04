@@ -14,13 +14,12 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import io.netty.util.Timeout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
-import org.checkerframework.checker.lock.qual.GuardedBy;
-import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
@@ -136,13 +135,18 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private final double backoffMultiplier;
     private final double jitter;
 
-    private @GuardedBy("this") NetconfClientConfiguration clientConfig;
-    private @GuardedBy("this") long attempts;
-    private @GuardedBy("this") long lastMultipliedBackoff;
-    private @GuardedBy("this") Task currentTask;
+    @GuardedBy("this")
+    private NetconfClientConfiguration clientConfig;
+    @GuardedBy("this")
+    private long attempts;
+    @GuardedBy("this")
+    private long lastMultipliedBackoff;
+    @GuardedBy("this")
+    private Task currentTask;
     // SSH algorithms negotiated for the current connection attempt: reset to callHomeSshAlg at the start of each
     // attempt (lockedConnect) and updated by the SSHNegotiatedAlgListener during key establishment.
-    private @GuardedBy("this") @Nullable NegotiatedSshAlg negotiatedSshAlg;
+    @GuardedBy("this")
+    private @Nullable NegotiatedSshAlg negotiatedSshAlg;
 
     public NetconfNodeHandler(final NetconfClientFactory clientFactory, final NetconfTimer timer,
             final BaseNetconfSchemaProvider baseSchemaProvider, final SchemaResourceManager schemaManager,
@@ -235,7 +239,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         return nodeId;
     }
 
-    @Holding("this")
+    @GuardedBy("this")
     private void lockedConnect() {
         // Reset to the per-attempt baseline; the SSHNegotiatedAlgListener will refill it during key establishment for
         // regular SSH connections.
@@ -292,7 +296,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         reconnectOrFail();
     }
 
-    @Holding("this")
+    @GuardedBy("this")
     private boolean completeTask(final ConnectingTask task) {
         // A quick sanity check
         if (task.equals(currentTask)) {

@@ -10,16 +10,15 @@ package org.opendaylight.netconf.topology.singleton.impl.tx;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.SettableFuture;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.dispatch.OnComplete;
 import org.apache.pekko.util.Timeout;
-import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -40,8 +39,8 @@ import scala.concurrent.Future;
 public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransaction {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyReadWriteTransaction.class);
 
-    private final @GuardedBy("queuedTxOperations") List<Consumer<ProxyTransactionFacade>> queuedTxOperations =
-        new ArrayList<>();
+    @GuardedBy("queuedTxOperations")
+    private final ArrayList<Consumer<ProxyTransactionFacade>> queuedTxOperations = new ArrayList<>();
     private final SettableFuture<CommitInfo> settableFuture = SettableFuture.create();
     private final @NonNull FluentFuture<CommitInfo> completionFuture = FluentFuture.from(settableFuture);
     private final AtomicBoolean opened = new AtomicBoolean(true);

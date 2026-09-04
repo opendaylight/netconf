@@ -13,7 +13,6 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.Optional;
-import org.checkerframework.checker.index.qual.NonNegative;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -34,7 +33,7 @@ public final class NetconfClientConfiguration {
     private final NetconfHelloMessageAdditionalHeader additionalHeader;
     private final NetconfClientSessionListener sessionListener;
     private final List<Uri> odlHelloCapabilities;
-    private final @NonNegative int maximumIncomingChunkSize;
+    private final int maximumIncomingChunkSize;
     private final String name;
 
     private final TcpClientGrouping tcpParameters;
@@ -52,7 +51,7 @@ public final class NetconfClientConfiguration {
             final NetconfClientSessionListener sessionListener,
             final List<Uri> odlHelloCapabilities,
             final Long connectionTimeoutMillis,
-            final @NonNegative int maximumIncomingChunkSize,
+            final int maximumIncomingChunkSize,
             final NetconfHelloMessageAdditionalHeader additionalHeader,
             final String name) {
         clientProtocol = requireNonNull(protocol);
@@ -66,6 +65,10 @@ public final class NetconfClientConfiguration {
         this.odlHelloCapabilities = odlHelloCapabilities;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.maximumIncomingChunkSize = maximumIncomingChunkSize;
+        if (maximumIncomingChunkSize < 0) {
+            throw new IllegalArgumentException("negative maximumIncomingChunkSize");
+        }
+
         this.additionalHeader = additionalHeader;
         // validate
         if (NetconfClientProtocol.TLS.equals(protocol)) {
@@ -104,7 +107,7 @@ public final class NetconfClientConfiguration {
         return odlHelloCapabilities;
     }
 
-    public @NonNegative int getMaximumIncomingChunkSize() {
+    public int getMaximumIncomingChunkSize() {
         return maximumIncomingChunkSize;
     }
 

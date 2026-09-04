@@ -17,7 +17,6 @@ import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
 import java.util.HashSet;
 import java.util.Set;
-import org.checkerframework.checker.index.qual.NonNegative;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.messages.HelloMessage;
@@ -39,7 +38,7 @@ public class NetconfServerSessionNegotiatorFactory {
         CapabilityURN.INTERLEAVE,
         CapabilityURN.NOTIFICATION);
 
-    private final @NonNegative int maximumIncomingChunkSize;
+    private final int maximumIncomingChunkSize;
     private final NetconfTimer timer;
     private final SessionIdProvider idProvider;
     private final NetconfOperationServiceFactory aggregatedOpService;
@@ -58,7 +57,7 @@ public class NetconfServerSessionNegotiatorFactory {
     private NetconfServerSessionNegotiatorFactory(final NetconfTimer timer,
             final NetconfOperationServiceFactory netconfOperationProvider, final SessionIdProvider idProvider,
             final long connectionTimeoutMillis, final NetconfMonitoringService monitoringService,
-            final Set<String> baseCapabilities, final @NonNegative int maximumIncomingChunkSize) {
+            final Set<String> baseCapabilities, final int maximumIncomingChunkSize) {
         this.timer = requireNonNull(timer);
         aggregatedOpService = netconfOperationProvider;
         this.idProvider = idProvider;
@@ -123,8 +122,7 @@ public class NetconfServerSessionNegotiatorFactory {
     }
 
     public static final class Builder {
-        private @NonNegative int maximumIncomingChunkSize =
-            NetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
+        private int maximumIncomingChunkSize = NetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
         private NetconfTimer timer;
         private SessionIdProvider idProvider;
         private NetconfOperationServiceFactory aggregatedOpService;
@@ -168,7 +166,7 @@ public class NetconfServerSessionNegotiatorFactory {
             return this;
         }
 
-        public Builder setMaximumIncomingChunkSize(final @NonNegative int maximumIncomingChunkSize) {
+        public Builder setMaximumIncomingChunkSize(final int maximumIncomingChunkSize) {
             checkArgument(maximumIncomingChunkSize > 0);
             this.maximumIncomingChunkSize = maximumIncomingChunkSize;
             return this;

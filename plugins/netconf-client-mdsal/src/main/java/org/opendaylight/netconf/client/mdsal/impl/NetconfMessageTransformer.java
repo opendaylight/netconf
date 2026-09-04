@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Streams;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayDeque;
@@ -36,7 +37,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
-import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -184,7 +184,7 @@ public class NetconfMessageTransformer
             toNotification(nestedInfo.type, nestedInfo.element), stripped.getKey());
     }
 
-    @Holding("this")
+    @GuardedBy("this")
     @NonNullByDefault
     private ContainerNode toNotification(final Absolute notificationPath, final Element element) {
         final var resultHolder = new NormalizationResultHolder();

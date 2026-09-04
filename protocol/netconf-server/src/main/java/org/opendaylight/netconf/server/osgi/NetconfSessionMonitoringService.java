@@ -10,13 +10,13 @@ package org.opendaylight.netconf.server.osgi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import org.checkerframework.checker.lock.qual.Holding;
 import org.opendaylight.netconf.server.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.SessionEvent;
@@ -144,10 +144,10 @@ abstract sealed class NetconfSessionMonitoringService implements SessionListener
         sessions.clear();
     }
 
-    @Holding("this")
+    @GuardedBy("this")
     abstract void startTask();
 
-    @Holding("this")
+    @GuardedBy("this")
     abstract void stopTask();
 
     final synchronized void updateSessionStats() {

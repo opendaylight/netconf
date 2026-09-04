@@ -17,6 +17,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.Principal;
@@ -37,7 +38,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
-import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -507,7 +507,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     private volatile @Nullable Uint32 nextSubscriptionToStop;
     private volatile @Nullable Instant nextStopTime;
 
-    private final @GuardedBy("filterLock") HashMap<String, ChoiceNode> filterSpecs = new HashMap<>();
+    @GuardedBy("filterLock")
+    private final HashMap<String, ChoiceNode> filterSpecs = new HashMap<>();
 
     protected AbstractRestconfStreamRegistry(final EffectiveModelContext ctx) {
         modelContext = requireNonNull(ctx);

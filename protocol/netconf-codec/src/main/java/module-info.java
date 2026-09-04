@@ -20,7 +20,6 @@ module org.opendaylight.netconf.codec {
     requires org.slf4j;
 
     // Annotation-only dependencies
-    requires static transitive org.checkerframework.checker.qual;
     requires static transitive org.eclipse.jdt.annotation;
     requires static org.osgi.annotation.bundle;
 }
