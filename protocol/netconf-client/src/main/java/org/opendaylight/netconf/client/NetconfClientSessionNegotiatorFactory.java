@@ -14,7 +14,6 @@ import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.Set;
-import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
@@ -62,7 +61,7 @@ public final class NetconfClientSessionNegotiatorFactory {
     }
 
     private final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader;
-    private final @NonNegative int maximumIncomingChunkSize;
+    private final int maximumIncomingChunkSize;
     private final Set<String> clientCapabilities;
     private final long connectionTimeoutMillis;
     private final NetconfTimer timer;
@@ -77,7 +76,7 @@ public final class NetconfClientSessionNegotiatorFactory {
     public NetconfClientSessionNegotiatorFactory(final NetconfTimer timer,
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
                                                  final long connectionTimeoutMillis,
-                                                 final @NonNegative int maximumIncomingChunkSize) {
+                                                 final int maximumIncomingChunkSize) {
         this(timer, additionalHeader, connectionTimeoutMillis, DEFAULT_OPTIONS, EXI_CLIENT_CAPABILITIES,
             maximumIncomingChunkSize);
     }
@@ -107,7 +106,7 @@ public final class NetconfClientSessionNegotiatorFactory {
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
                                                  final long connectionTimeoutMillis, final EXIParameters exiOptions,
                                                  final Set<String> capabilities,
-                                                 final @NonNegative int maximumIncomingChunkSize) {
+                                                 final int maximumIncomingChunkSize) {
         this.timer = requireNonNull(timer);
         this.additionalHeader = additionalHeader;
         this.connectionTimeoutMillis = connectionTimeoutMillis;

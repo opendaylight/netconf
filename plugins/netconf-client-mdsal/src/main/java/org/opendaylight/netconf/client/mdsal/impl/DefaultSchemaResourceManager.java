@@ -11,11 +11,11 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.Strings;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.nio.file.Path;
 import java.util.HashMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
@@ -46,7 +46,8 @@ import org.slf4j.LoggerFactory;
 public final class DefaultSchemaResourceManager implements SchemaResourceManager {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultSchemaResourceManager.class);
 
-    private final @GuardedBy("this") HashMap<String, DeviceNetconfSchemaProvider> resources = new HashMap<>();
+    @GuardedBy("this")
+    private final HashMap<String, DeviceNetconfSchemaProvider> resources = new HashMap<>();
     private final @NonNull DeviceNetconfSchemaProvider defaultResources;
     private final @NonNull YangTextToIRSourceTransformer textToIR;
     private final @NonNull YangParserFactory parserFactory;

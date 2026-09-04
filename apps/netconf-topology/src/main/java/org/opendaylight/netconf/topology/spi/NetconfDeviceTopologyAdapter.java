@@ -14,7 +14,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import org.checkerframework.checker.lock.qual.GuardedBy;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
@@ -60,8 +60,10 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
     private final @NonNull RemoteDeviceId id;
     private final @NonNull Credentials credentials;
 
-    private @GuardedBy("this") SettableFuture<Empty> closeFuture;
-    private @GuardedBy("this") TransactionChain txChain;
+    @GuardedBy("this")
+    private SettableFuture<Empty> closeFuture;
+    @GuardedBy("this")
+    private TransactionChain txChain;
 
     /**
      * NetconfDeviceTopologyAdapter is responsible for managing the state of a NETCONF device

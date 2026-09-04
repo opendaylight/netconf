@@ -20,7 +20,6 @@ import java.util.Set;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-import org.checkerframework.checker.index.qual.NonNegative;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.messages.HelloMessage;
@@ -58,7 +57,7 @@ class NetconfClientSessionNegotiator
     NetconfClientSessionNegotiator(final HelloMessage hello, final RpcMessage startExi,
             final Promise<NetconfClientSession> promise, final Channel channel, final NetconfTimer timer,
             final NetconfClientSessionListener sessionListener, final long connectionTimeoutMillis,
-            final @NonNegative int maximumIncomingChunkSize) {
+            final int maximumIncomingChunkSize) {
         super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis, maximumIncomingChunkSize);
         this.startExi = startExi;
     }

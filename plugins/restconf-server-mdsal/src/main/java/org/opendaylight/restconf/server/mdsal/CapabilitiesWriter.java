@@ -13,10 +13,10 @@ import static org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.rest
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -109,7 +109,7 @@ public final class CapabilitiesWriter implements AutoCloseable, FutureCallback<E
         }
     }
 
-    @Holding("this")
+    @GuardedBy("this")
     private void deleteRestconfState() {
         if (!written) {
             LOG.debug("No state recorded as written, not attempting removal");
@@ -137,7 +137,7 @@ public final class CapabilitiesWriter implements AutoCloseable, FutureCallback<E
         }, MoreExecutors.directExecutor());
     }
 
-    @Holding("this")
+    @GuardedBy("this")
     private void writeRestconfState() {
         if (written) {
             LOG.debug("State recorded as written, not updating it");

@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,9 +22,6 @@ import io.netty.util.Timeout;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
 import java.util.concurrent.TimeUnit;
-import org.checkerframework.checker.index.qual.NonNegative;
-import org.checkerframework.checker.lock.qual.GuardedBy;
-import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.CapabilityURN;
@@ -74,7 +72,7 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
      * {@value #DEFAULT_MAXIMUM_CHUNK_SIZE_DEFAULT} bytes.
      */
     @Beta
-    public static final @NonNegative int DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
+    public static final int DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
 
     static {
         final int propValue = Integer.getInteger(DEFAULT_MAXIMUM_CHUNK_SIZE_PROP, DEFAULT_MAXIMUM_CHUNK_SIZE_DEFAULT);
@@ -90,18 +88,20 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
     private final @NonNull HelloMessage localHello;
     protected final @NonNull Channel channel;
 
-    private final @NonNegative int maximumIncomingChunkSize;
+    private final int maximumIncomingChunkSize;
     private final long connectionTimeoutMillis;
     private final @NonNull Promise<S> promise;
     private final @NonNull L sessionListener;
     private final @NonNull NetconfTimer timer;
 
-    private @GuardedBy("this") Timeout timeoutTask;
-    private @GuardedBy("this") State state = State.IDLE;
+    @GuardedBy("this")
+    private Timeout timeoutTask;
+    @GuardedBy("this")
+    private State state = State.IDLE;
 
     protected NetconfSessionNegotiator(final HelloMessage hello, final Promise<S> promise, final Channel channel,
             final NetconfTimer timer, final L sessionListener, final long connectionTimeoutMillis,
-            final @NonNegative int maximumIncomingChunkSize) {
+            final int maximumIncomingChunkSize) {
         localHello = requireNonNull(hello);
         this.promise = requireNonNull(promise);
         this.channel = requireNonNull(channel);
@@ -307,7 +307,7 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
         lockedChangeState(newState);
     }
 
-    @Holding("this")
+    @GuardedBy("this")
     private void lockedChangeState(final State newState) {
         LOG.debug("Changing state from : {} to : {} for channel: {}", state, newState, channel);
         checkState(isStateChangePermitted(state, newState),

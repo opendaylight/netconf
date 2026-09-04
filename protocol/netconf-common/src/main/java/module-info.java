@@ -27,6 +27,7 @@ module org.opendaylight.netconf.common {
     requires static transitive javax.inject;
     requires static transitive org.eclipse.jdt.annotation;
     requires static com.github.spotbugs.annotations;
+    requires static com.google.errorprone.annotations;
     requires static org.osgi.annotation.bundle;
     requires static org.osgi.service.component.annotations;
     requires static org.osgi.service.metatype.annotations;

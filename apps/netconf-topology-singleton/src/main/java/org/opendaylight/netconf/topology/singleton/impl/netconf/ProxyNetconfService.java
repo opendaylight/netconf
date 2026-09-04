@@ -9,6 +9,7 @@ package org.opendaylight.netconf.topology.singleton.impl.netconf;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +18,6 @@ import java.util.function.Consumer;
 import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.dispatch.OnComplete;
 import org.apache.pekko.util.Timeout;
-import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -37,8 +37,8 @@ public class ProxyNetconfService implements DataStoreService {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyNetconfService.class);
 
     private final RemoteDeviceId id;
-    private final @GuardedBy("queuedOperations") List<Consumer<ProxyNetconfServiceFacade>> queuedOperations =
-        new ArrayList<>();
+    @GuardedBy("queuedOperations")
+    private final ArrayList<Consumer<ProxyNetconfServiceFacade>> queuedOperations = new ArrayList<>();
 
     private volatile ProxyNetconfServiceFacade netconfFacade;
 

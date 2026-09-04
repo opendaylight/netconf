@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.util.List;
 import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.actor.ActorSelection;
@@ -15,8 +16,6 @@ import org.apache.pekko.dispatch.OnComplete;
 import org.apache.pekko.pattern.AskTimeoutException;
 import org.apache.pekko.pattern.Patterns;
 import org.apache.pekko.util.Timeout;
-import org.checkerframework.checker.lock.qual.GuardedBy;
-import org.checkerframework.checker.lock.qual.Holding;
 import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataObjectModified;
@@ -54,9 +53,12 @@ class NetconfNodeManager implements DataTreeChangeListener<Node>, AutoCloseable 
     private volatile Registration dataChangeListenerRegistration;
     private volatile RemoteDeviceId id;
 
-    private @GuardedBy("this") ActorRef slaveActorRef;
-    private @GuardedBy("this") int lastUpdateCount;
-    private @GuardedBy("this") boolean closed;
+    @GuardedBy("this")
+    private ActorRef slaveActorRef;
+    @GuardedBy("this")
+    private int lastUpdateCount;
+    @GuardedBy("this")
+    private boolean closed;
 
     NetconfNodeManager(final NetconfTopologySetup setup, final RemoteDeviceId id, final Timeout actorResponseWaitTime,
                        final DOMMountPointService mountPointService) {
@@ -108,7 +110,7 @@ class NetconfNodeManager implements DataTreeChangeListener<Node>, AutoCloseable 
         }
     }
 
-    @Holding("this")
+    @GuardedBy("this")
     private void closeActor() {
         if (slaveActorRef != null) {
             LOG.debug("{}: Sending poison pill to {}", id, slaveActorRef);
@@ -159,7 +161,7 @@ class NetconfNodeManager implements DataTreeChangeListener<Node>, AutoCloseable 
         }
     }
 
-    @Holding("this")
+    @GuardedBy("this")
     private void sendAskForMasterMountPointWithRetries(final AskForMasterMountPoint askForMasterMountPoint,
             final ActorSelection masterActor, final int tries, final int updateCount) {
         Patterns.ask(masterActor, askForMasterMountPoint, actorResponseWaitTime).onComplete(new OnComplete<>() {
@@ -188,7 +190,7 @@ class NetconfNodeManager implements DataTreeChangeListener<Node>, AutoCloseable 
         }, setup.getActorSystem().dispatcher());
     }
 
-    @Holding("this")
+    @GuardedBy("this")
     private void createOrUpdateActorRef() {
         if (slaveActorRef == null) {
             slaveActorRef = setup.getActorSystem().actorOf(NetconfNodeActor.props(setup, id, actorResponseWaitTime,

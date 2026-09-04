@@ -16,7 +16,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map;
-import org.checkerframework.checker.index.qual.NonNegative;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.messages.HelloMessage;
@@ -37,9 +36,8 @@ public final class NetconfServerSessionNegotiator
     NetconfServerSessionNegotiator(final HelloMessage hello, final SessionIdType sessionId,
             final Promise<NetconfServerSession> promise, final Channel channel, final NetconfTimer timer,
             final NetconfServerSessionListener sessionListener, final long connectionTimeoutMillis,
-            final @NonNegative int maximumIncomingChunkSize) {
-        super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis,
-            maximumIncomingChunkSize);
+            final int maximumIncomingChunkSize) {
+        super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis, maximumIncomingChunkSize);
         this.sessionId = requireNonNull(sessionId);
     }
 
@@ -76,10 +74,10 @@ public final class NetconfServerSessionNegotiator
         if (socketAddress instanceof InetSocketAddress inetSocketAddress) {
             return new SimpleImmutableEntry<>(Integer.toString(inetSocketAddress.getPort()),
                     inetSocketAddress.getHostString());
-        } else if (socketAddress instanceof LocalAddress localAddress) {
-            return Map.entry(UNKNOWN, localAddress.id());
-        } else {
-            return Map.entry(UNKNOWN, UNKNOWN);
         }
+        if (socketAddress instanceof LocalAddress localAddress) {
+            return Map.entry(UNKNOWN, localAddress.id());
+        }
+        return Map.entry(UNKNOWN, UNKNOWN);
     }
 }

@@ -14,9 +14,9 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Executor;
-import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -72,8 +72,10 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private final NotificationHandler notificationHandler;
     private final boolean reconnectOnSchemasChange;
 
-    private @GuardedBy("this") ListenableFuture<?> schemaFuture;
-    private @GuardedBy("this") boolean connected = false;
+    @GuardedBy("this")
+    private ListenableFuture<?> schemaFuture;
+    @GuardedBy("this")
+    private boolean connected = false;
 
     public NetconfDevice(final RemoteDeviceId id,final BaseNetconfSchemaProvider baseSchemaProvider,
             final DeviceNetconfSchemaProvider deviceSchemaProvider, final RemoteDeviceHandler salFacade,
