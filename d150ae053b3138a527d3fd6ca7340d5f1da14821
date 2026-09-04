@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f57964c_2da24cdb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-04T08:11:06Z",
+      "side": 1,
+      "message": "I recommend to wait with merging till next steps are done, that way we can avoid premature cherry-picking to Titanium and having FIXMEs in the codebase.",
+      "revId": "d150ae053b3138a527d3fd6ca7340d5f1da14821",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
