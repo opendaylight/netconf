@@ -13,6 +13,7 @@ import org.kohsuke.MetaInfServices;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.common.rev241010.IetfTcpCommonData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.common.rev241010.KeepalivesSupported;
 import org.opendaylight.yangtools.binding.YangFeature;
+import org.opendaylight.yangtools.binding.meta.RootMeta;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
@@ -22,8 +23,8 @@ import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 @NonNullByDefault
 public final class IetfTcpCommonFeatureProvider implements YangFeatureProvider<IetfTcpCommonData> {
     @Override
-    public Class<IetfTcpCommonData> boundModule() {
-        return IetfTcpCommonData.class;
+    public RootMeta<IetfTcpCommonData> boundModule() {
+        return IetfTcpCommonData.META;
     }
 
     @Override
