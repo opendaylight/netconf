@@ -231,7 +231,7 @@ class NetconfDeviceCommunicatorTest {
         for (int i = 1; i <= RPC_MESSAGE_LIMIT; i++) {
             final var resultFuture = communicator.sendRequest(message);
             assertInstanceOf(UncancellableFuture.class, resultFuture,
-                String.format("The resultFuture has an incorrect type: %s", resultFuture));
+                "The resultFuture has an incorrect type: " + resultFuture);
             verify(spySession, times(i)).sendMessage(same(message));
             communicator.disconnect();
             communicator.onSessionUp(spySession);
@@ -240,7 +240,7 @@ class NetconfDeviceCommunicatorTest {
         // Verify that more requests can be sent because the semaphore counter is not 0.
         final var resultFuture = communicator.sendRequest(message);
         assertInstanceOf(UncancellableFuture.class, resultFuture,
-            String.format("The resultFuture has an incorrect type: %s", resultFuture));
+            "The resultFuture has an incorrect type: " + resultFuture);
         verify(spySession, times(RPC_MESSAGE_LIMIT + 1)).sendMessage(same(message));
         verify(mockChannelFuture, times(RPC_MESSAGE_LIMIT + 1)).addListener(futureListener.capture());
     }
@@ -394,7 +394,7 @@ class NetconfDeviceCommunicatorTest {
                 + "for interface [ae0]is lesser than the required minimum [2].";
         final var errMsg2 = "configuration check-out failed";
         assertTrue(errorInfoMessages.contains(errMsg1) && errorInfoMessages.contains(errMsg2),
-            String.format("Error info contains \"%s\" or \"%s\'", errMsg1, errMsg2));
+            "Error info contains \"%s\" or \"%s\'".formatted(errMsg1, errMsg2));
     }
 
     @Test
