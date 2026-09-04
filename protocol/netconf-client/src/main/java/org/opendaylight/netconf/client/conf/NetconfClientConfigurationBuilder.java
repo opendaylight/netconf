@@ -10,7 +10,6 @@ package org.opendaylight.netconf.client.conf;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.List;
-import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.common.NetconfSessionNegotiator;
@@ -30,8 +29,7 @@ public final class NetconfClientConfigurationBuilder {
         NetconfClientConfiguration.NetconfClientProtocol.TCP;
 
     private long connectionTimeoutMillis = DEFAULT_CONNECTION_TIMEOUT_MILLIS;
-    private @NonNegative int maximumIncomingChunkSize =
-        NetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
+    private int maximumIncomingChunkSize = NetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
     private NetconfHelloMessageAdditionalHeader additionalHeader;
     private NetconfClientSessionListener sessionListener;
     private NetconfClientConfiguration.NetconfClientProtocol clientProtocol = DEFAULT_CLIENT_PROTOCOL;
@@ -133,8 +131,7 @@ public final class NetconfClientConfigurationBuilder {
      * @throws IllegalArgumentException if value zero or less
      */
     @SuppressWarnings("checkstyle:hiddenField")
-    public NetconfClientConfigurationBuilder withMaximumIncomingChunkSize(
-            final @NonNegative int maximumIncomingChunkSize) {
+    public NetconfClientConfigurationBuilder withMaximumIncomingChunkSize(final int maximumIncomingChunkSize) {
         checkArgument(maximumIncomingChunkSize > 0);
         this.maximumIncomingChunkSize = maximumIncomingChunkSize;
         return this;

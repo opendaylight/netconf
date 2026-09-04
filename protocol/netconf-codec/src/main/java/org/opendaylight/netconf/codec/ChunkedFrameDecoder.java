@@ -14,7 +14,6 @@ import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import java.util.List;
-import org.checkerframework.checker.index.qual.NonNegative;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +47,7 @@ public final class ChunkedFrameDecoder extends FrameDecoder {
      * @param maxChunkSize maximum chunk size
      * @throws IllegalArgumentException if {@code maxChunkSize} is negative
      */
-    public ChunkedFrameDecoder(final @NonNegative int maxChunkSize) {
+    public ChunkedFrameDecoder(final int maxChunkSize) {
         this.maxChunkSize = maxChunkSize;
         checkArgument(maxChunkSize > 0, "Negative maximum chunk size %s", maxChunkSize);
     }

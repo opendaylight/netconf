@@ -14,13 +14,13 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Maps;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
@@ -79,12 +79,16 @@ public final class NetconfNotificationManager implements NetconfNotificationColl
     // And also calling callbacks from a synchronized block is dangerous
     // since the listeners/publishers can block the whole notification processing
 
-    private final @GuardedBy("this") HashMultimap<StreamNameType, ListenerReg> notificationListeners =
-        HashMultimap.create();
-    private final @GuardedBy("this") HashSet<StreamListenerReg> streamListeners = new HashSet<>();
-    private final @GuardedBy("this") HashMap<StreamNameType, Stream> streamMetadata = new HashMap<>();
-    private final @GuardedBy("this") HashMultiset<StreamNameType> availableStreams = HashMultiset.create();
-    private final @GuardedBy("this") HashSet<PublisherReg> notificationPublishers = new HashSet<>();
+    @GuardedBy("this")
+    private final HashMultimap<StreamNameType, ListenerReg> notificationListeners = HashMultimap.create();
+    @GuardedBy("this")
+    private final HashSet<StreamListenerReg> streamListeners = new HashSet<>();
+    @GuardedBy("this")
+    private final HashMap<StreamNameType, Stream> streamMetadata = new HashMap<>();
+    @GuardedBy("this")
+    private final HashMultiset<StreamNameType> availableStreams = HashMultiset.create();
+    @GuardedBy("this")
+    private final HashSet<PublisherReg> notificationPublishers = new HashSet<>();
     private final NotificationsTransformUtil transformUtil;
 
     @Inject
