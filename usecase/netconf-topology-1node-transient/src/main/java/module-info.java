@@ -54,11 +54,11 @@ module org.opendaylight.netconf.dagger {
     requires java.net.http;
     requires java.validation;
     requires javax.servlet.api;
-    requires mdsal.dom.inmemory.datastore;
     requires netconf.client;
     requires netconf.client.mdsal;
     requires netconf.topology;
     requires netconf.topology.impl;
+    requires org.opendaylight.mdsal.dom.store.inmemory;
     requires org.opendaylight.mdsal.eos.dom.api;
     requires org.opendaylight.mdsal.eos.dom.simple;
     requires org.opendaylight.mdsal.singleton.impl;

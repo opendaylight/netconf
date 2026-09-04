@@ -18,7 +18,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.store.DOMStore;
-import org.opendaylight.mdsal.dom.store.inmemory.InMemoryDOMDataStore;
 import org.opendaylight.netconf.dagger.springboot.config.ConfigLoader;
 import org.opendaylight.odlparent.dagger.ResourceSupport;
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;

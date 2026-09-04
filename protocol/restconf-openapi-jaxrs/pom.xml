@@ -20,7 +20,8 @@
     <packaging>bundle</packaging>
 
     <properties>
-        <odlparent.dependency.enforce>true</odlparent.dependency.enforce>
+        <!-- FIXME: not binding-parent -->
+        <odlparent.dependency.enforce>false</odlparent.dependency.enforce>
     </properties>
 
     <dependencies>

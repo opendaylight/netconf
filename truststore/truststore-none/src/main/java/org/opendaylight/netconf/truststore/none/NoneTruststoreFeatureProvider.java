@@ -13,6 +13,7 @@ import org.kohsuke.MetaInfServices;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.IetfTruststoreData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineDefinitionsSupported;
 import org.opendaylight.yangtools.binding.YangFeature;
+import org.opendaylight.yangtools.binding.meta.RootMeta;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
@@ -22,8 +23,8 @@ import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 @NonNullByDefault
 public final class NoneTruststoreFeatureProvider implements YangFeatureProvider<IetfTruststoreData> {
     @Override
-    public Class<IetfTruststoreData> boundModule() {
-        return IetfTruststoreData.class;
+    public RootMeta<IetfTruststoreData> boundModule() {
+        return IetfTruststoreData.META;
     }
 
     @Override
