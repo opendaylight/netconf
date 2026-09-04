@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d730f059_1337cee9",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformer.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-04T13:53:21Z",
+      "side": 1,
+      "message": "we would need to agree what to use in exceptions: `+` like here or `formatted` like in next file?",
+      "revId": "110bf7fa3503f85ba70e726e578ece9f4922590f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
