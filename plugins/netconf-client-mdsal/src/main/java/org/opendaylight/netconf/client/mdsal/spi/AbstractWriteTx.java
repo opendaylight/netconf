@@ -164,7 +164,7 @@ abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
             public void onSuccess(final RpcResult<Void> result) {
                 if (!result.isSuccessful()) {
                     resultFuture.setException(new TransactionCommitFailedException(
-                        String.format("Commit of transaction %s failed", getIdentifier()),
+                        "Commit of transaction %s failed".formatted(getIdentifier()),
                         result.getErrors().toArray(new RpcError[0])));
                     return;
                 }
@@ -175,7 +175,7 @@ abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
             @Override
             public void onFailure(final Throwable failure) {
                 resultFuture.setException(new TransactionCommitFailedException(
-                        String.format("Commit of transaction %s failed", getIdentifier()), failure));
+                    "Commit of transaction %s failed".formatted(getIdentifier()), failure));
             }
         }, MoreExecutors.directExecutor());
 

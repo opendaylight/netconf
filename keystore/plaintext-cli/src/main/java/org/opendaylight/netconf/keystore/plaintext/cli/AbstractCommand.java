@@ -38,6 +38,6 @@ abstract class AbstractCommand implements Action {
     }
 
     protected static String notFound(final String key) {
-        return String.format("Storage has no property with name %s", key);
+        return "Storage has no property with name " + key;
     }
 }

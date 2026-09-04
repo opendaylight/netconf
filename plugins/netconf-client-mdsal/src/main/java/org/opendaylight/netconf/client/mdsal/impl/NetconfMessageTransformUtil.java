@@ -175,8 +175,8 @@ public final class NetconfMessageTransformUtil {
             try {
                 NormalizedDataUtil.writeFilter(filter.path(), new DOMResult(element), ctx, null, filter.fields());
             } catch (IOException | XMLStreamException e) {
-                throw new IllegalStateException(String.format(
-                        "Unable to serialize filter element for path %s with fields: %s",
+                throw new IllegalStateException(
+                    "Unable to serialize filter element for path %s with fields: %s".formatted(
                         filter.path(), filter.fields()), e);
             }
         }

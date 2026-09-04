@@ -229,7 +229,7 @@ public final class ScaleUtil {
                     }
                 })
                 .build();
-        final HttpRequest request = HttpRequest.newBuilder(URI.create(String.format(RESTCONF_URL, params.controllerIp,
+        final HttpRequest request = HttpRequest.newBuilder(URI.create(RESTCONF_URL.formatted(params.controllerIp,
                         params.controllerPort)))
                 .GET()
                 .header("Content-Type", "application/json")
@@ -265,7 +265,7 @@ public final class ScaleUtil {
                         }
                     })
                     .build();
-            request = HttpRequest.newBuilder(URI.create(String.format(RESTCONF_URL, params.controllerIp,
+            request = HttpRequest.newBuilder(URI.create(RESTCONF_URL.formatted(params.controllerIp,
                             params.controllerPort)))
                     .GET()
                     .header("Content-Type", "application/xml")

@@ -204,7 +204,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         if (!nodeType.getNamespace().toString().equals(dataNode.getNamespaceURI())
                 || !nodeType.getLocalName().equals(dataElement.getName())) {
             throw new IllegalStateException(
-                    String.format("Can't write data '%s' to path %s", dataNode.getTagName(), dataPath));
+                "Can't write data '%s' to path %s".formatted(dataNode.getTagName(), dataPath));
         }
         if (lastPathArgument instanceof NodeIdentifierWithPredicates) {
             checkKeyValuesValidForPath(dataElement, lastPathArgument);

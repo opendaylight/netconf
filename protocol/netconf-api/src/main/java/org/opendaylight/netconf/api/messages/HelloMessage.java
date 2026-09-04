@@ -50,9 +50,9 @@ public final class HelloMessage extends NetconfMessage {
 
     private static void checkHelloMessage(final Document doc) {
         if (!isHelloMessage(doc)) {
-            throw new IllegalArgumentException(String.format(
-                "Hello message invalid format, should contain %s tag from namespace %s, but is: %s", ELEMENT_NAME,
-                NamespaceURN.BASE, XmlUtil.toString(doc)));
+            throw new IllegalArgumentException(
+                "Hello message invalid format, should contain %s tag from namespace %s, but is: %s".formatted(
+                    ELEMENT_NAME, NamespaceURN.BASE, XmlUtil.toString(doc)));
         }
     }
 

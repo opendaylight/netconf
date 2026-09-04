@@ -80,8 +80,8 @@ abstract class AbstractReadOnlyTx implements DOMDataTreeReadTransaction {
             case OPERATIONAL -> readOperationalData(path);
             default -> {
                 LOG.info("Unknown datastore type: {}.", store);
-                throw new IllegalArgumentException(String.format(
-                    "%s, Cannot read data %s for %s datastore, unknown datastore type", id, path, store));
+                throw new IllegalArgumentException(
+                    "%s, Cannot read data %s for %s datastore, unknown datastore type".formatted(id, path, store));
             }
         };
     }

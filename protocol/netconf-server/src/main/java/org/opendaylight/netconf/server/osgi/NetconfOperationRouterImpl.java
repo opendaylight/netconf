@@ -75,7 +75,7 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter, AutoC
                 : ErrorTag.OPERATION_FAILED;
 
             throw new DocumentedException(
-                    String.format("Unable to handle rpc %s on session %s", messageAsString, session), e,
+                    "Unable to handle rpc %s on session %s".formatted(messageAsString, session), e,
                     ErrorType.APPLICATION, tag, ErrorSeverity.ERROR,
                     // FIXME: i.e. in what namespace are we providing these tags? why is this not just:
                     //
@@ -138,7 +138,7 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter, AutoC
                 message, session);
 
         if (sortedByPriority.isEmpty()) {
-            throw new IllegalArgumentException(String.format("No %s available to handle message %s",
+            throw new IllegalArgumentException("No %s available to handle message %s".formatted(
                     NetconfOperation.class.getName(), XmlUtil.toString(message)));
         }
 
