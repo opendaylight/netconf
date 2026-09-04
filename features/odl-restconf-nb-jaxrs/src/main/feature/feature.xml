@@ -8,6 +8,6 @@
   -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-restconf-nb-jaxrs-${project.version}">
     <feature name="odl-restconf-nb-jaxrs" version="${project.version}">
-        <feature version="[14,15)">odl-karaf-feat-jetty</feature>
+        <feature version="[15,16)">odl-karaf-feat-jetty</feature>
     </feature>
 </features>
