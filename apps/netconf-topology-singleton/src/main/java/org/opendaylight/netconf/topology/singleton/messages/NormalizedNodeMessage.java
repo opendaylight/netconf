@@ -12,16 +12,16 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.io.Serial;
-import org.opendaylight.controller.cluster.datastore.node.utils.stream.SerializationUtils;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.codec.binfmt.NormalizedNodeDataInput;
+import org.opendaylight.yangtools.yang.data.codec.binfmt.NormalizedNodeStreamVersion;
 
 /**
  * Message which holds node data, prepared to sending between remote hosts with serialization.
  */
 public class NormalizedNodeMessage implements Externalizable {
-    @Serial
+    @java.io.Serial
     private static final long serialVersionUID = 1L;
 
     private YangInstanceIdentifier identifier;
@@ -46,21 +46,21 @@ public class NormalizedNodeMessage implements Externalizable {
 
     @Override
     public void writeExternal(final ObjectOutput out) throws IOException {
-        SerializationUtils.writeNodeAndPath(out, getIdentifier(), node);
+        try (var stream = NormalizedNodeStreamVersion.POTASSIUM.newDataOutput(out)) {
+            stream.writeNormalizedNode(node);
+            stream.writeYangInstanceIdentifier(getIdentifier());
+        }
     }
 
     @Override
     public void readExternal(final ObjectInput in) throws IOException {
-        SerializationUtils.readNodeAndPath(in, this, APPLIER);
+        final var stream = NormalizedNodeDataInput.newDataInput(in);
+        node = stream.readNormalizedNode();
+        identifier = stream.readYangInstanceIdentifier();
     }
 
     @Override
     public String toString() {
         return "NormalizedNodeMessage [identifier=" + identifier + ", node=" + node + "]";
     }
-
-    private static final SerializationUtils.Applier<NormalizedNodeMessage> APPLIER = (instance, path, node) -> {
-        instance.identifier = path;
-        instance.node = node;
-    };
 }

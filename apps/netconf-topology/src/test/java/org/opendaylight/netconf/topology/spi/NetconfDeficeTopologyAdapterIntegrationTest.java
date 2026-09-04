@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.spi;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
@@ -29,8 +30,8 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.Co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.LoginPwUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.NetconfNodeAugment;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.augment.test.rev160808.Node1;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.NetconfNodeTopologyData;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.augment.test.rev160808.NetworkTopologyNetworkTopologyAugmentTestData;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
@@ -63,7 +64,9 @@ class NetconfDeficeTopologyAdapterIntegrationTest {
 
     @BeforeAll
     static void beforeClass() {
-        RUNTIME_CONTEXT = BindingRuntimeHelpers.createRuntimeContext(NetconfNode.class, Node1.class);
+        RUNTIME_CONTEXT = BindingRuntimeHelpers.createRuntimeContext(List.of(
+            NetconfNodeTopologyData.META.moduleInfo(),
+            NetworkTopologyNetworkTopologyAugmentTestData.META.moduleInfo()));
     }
 
     @AfterAll
