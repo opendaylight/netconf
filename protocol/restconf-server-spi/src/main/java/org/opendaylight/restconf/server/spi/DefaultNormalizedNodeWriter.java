@@ -168,6 +168,7 @@ final class DefaultNormalizedNodeWriter extends NormalizedNodeWriter {
     /**
      * Check if node should be written according to parameters fields and depth.
      * See <a href="https://tools.ietf.org/html/draft-ietf-netconf-restconf-18#page-49">Restconf draft</a>.
+     *
      * @param node Node to be written
      * @param mixinParent {@code true} if parent is mixin, {@code false} otherwise
      * @return {@code true} if node will be written, {@code false} otherwise

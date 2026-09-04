@@ -113,7 +113,7 @@ abstract sealed class AbstractGet extends AbstractSingletonNetconfOperation perm
      *
      * @param operationElement operation element
      * @return if filter is present and not empty returns Optional of the InstanceIdentifier to the read location
-     *      in datastore. Empty filter returns Optional.absent() which should equal an empty &lt;data/&gt;
+     *      in datastore. Empty filter returns Optional.absent() which should equal an empty {@code <data/>}
      *      container in the response. If filter is not present we want to read the entire datastore - return ROOT.
      * @throws DocumentedException if not possible to get identifier from filter
      */

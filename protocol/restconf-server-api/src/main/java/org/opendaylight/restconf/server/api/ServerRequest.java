@@ -44,9 +44,7 @@ public sealed interface ServerRequest<R> extends Request<R> permits AbstractServ
     @Nullable TransportSession session();
 
     /**
-     * Returns the request's {@link QueryParameters}
-     * .
-     * @return the request's {@link QueryParameters}
+     * {@return the request's {@link QueryParameters}}
      */
     QueryParameters queryParameters();
 
