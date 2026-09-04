@@ -14,6 +14,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev241010.IetfTlsClientData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev241010.ServerAuthX509Cert;
 import org.opendaylight.yangtools.binding.YangFeature;
+import org.opendaylight.yangtools.binding.meta.RootMeta;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
@@ -23,8 +24,8 @@ import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 @NonNullByDefault
 public final class IetfTlsClientFeatureProvider implements YangFeatureProvider<IetfTlsClientData> {
     @Override
-    public Class<IetfTlsClientData> boundModule() {
-        return IetfTlsClientData.class;
+    public RootMeta<IetfTlsClientData> boundModule() {
+        return IetfTlsClientData.META;
     }
 
     @Override
