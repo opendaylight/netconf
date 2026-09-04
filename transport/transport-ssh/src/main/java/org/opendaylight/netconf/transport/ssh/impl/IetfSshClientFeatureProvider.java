@@ -16,6 +16,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.IetfSshClientData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.SshClientKeepalives;
 import org.opendaylight.yangtools.binding.YangFeature;
+import org.opendaylight.yangtools.binding.meta.RootMeta;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
@@ -25,8 +26,8 @@ import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 @NonNullByDefault
 public final class IetfSshClientFeatureProvider implements YangFeatureProvider<IetfSshClientData> {
     @Override
-    public Class<IetfSshClientData> boundModule() {
-        return IetfSshClientData.class;
+    public RootMeta<IetfSshClientData> boundModule() {
+        return IetfSshClientData.META;
     }
 
     @Override

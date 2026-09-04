@@ -13,16 +13,16 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.io.Serial;
-import org.opendaylight.controller.cluster.datastore.node.utils.stream.SerializationUtils;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.codec.binfmt.NormalizedNodeDataInput;
+import org.opendaylight.yangtools.yang.data.codec.binfmt.NormalizedNodeStreamVersion;
 
 /**
  * Message container which holds node data {@link ContainerNode}, prepared to send between remote hosts with
  * serialization when remote action is invoked.
  */
 public class ContainerNodeMessage implements Externalizable {
-    @Serial
+    @java.io.Serial
     private static final long serialVersionUID = 1L;
 
     private ContainerNode node;
@@ -46,12 +46,23 @@ public class ContainerNodeMessage implements Externalizable {
 
     @Override
     public void writeExternal(final ObjectOutput out) throws IOException {
-        SerializationUtils.writeNormalizedNode(out, node);
+        if (node != null) {
+            out.writeBoolean(true);
+
+            try (var stream = NormalizedNodeStreamVersion.POTASSIUM.newDataOutput(out)) {
+                stream.writeNormalizedNode(node);
+            }
+        } else {
+            out.writeBoolean(false);
+        }
     }
 
     @Override
     public void readExternal(final ObjectInput in) throws IOException {
-        node = (ContainerNode) SerializationUtils.readNormalizedNode(in).orElseThrow();
+        if (!in.readBoolean()) {
+            throw new IOException("Missing node");
+        }
+        node = ContainerNode.class.cast(NormalizedNodeDataInput.newDataInput(in).readNormalizedNode());
     }
 
     @Override

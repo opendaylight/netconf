@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.2.0" name="odl-netconf-common-${project.version}">
     <feature name="odl-netconf-common" version="${project.version}">
-        <feature version="[14,15)">odl-netty-4</feature>
-        <feature version="[15,16)">odl-yangtools-parser-api</feature>
+        <feature version="[15,16)">odl-netty-4</feature>
+        <feature version="[16,17)">odl-yangtools-parser-api</feature>
     </feature>
 </features>
