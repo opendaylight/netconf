@@ -23,7 +23,7 @@ import org.apache.pekko.actor.ActorSystem;
 import org.apache.pekko.util.Timeout;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
-import org.opendaylight.controller.cluster.ActorSystemProvider;
+import org.opendaylight.controller.pekko.support.ActorSystemInstance;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
 import org.opendaylight.mdsal.binding.api.DataObjectModification.WithDataAfter;
@@ -127,7 +127,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
             @Reference final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
             @Reference final NetconfTimer timer,
             @Reference final NetconfTopologySchemaAssembler schemaAssembler,
-            @Reference final ActorSystemProvider actorSystemProvider,
+            @Reference final ActorSystemInstance actorSystemInstance,
             @Reference final NetconfClientFactory clientFactory,
             @Reference final DOMMountPointService mountPointService,
             @Reference final AAAEncryptionService encryptionService,
@@ -137,7 +137,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
             @Reference final NetconfClientConfigurationBuilderFactory builderFactory,
             final Configuration configuration) {
         this(baseSchemaProvider, dataBroker, clusterSingletonServiceProvider, timer, schemaAssembler,
-            actorSystemProvider.getActorSystem(), clientFactory, mountPointService, encryptionService,
+            actorSystemInstance.actorSystem(), clientFactory, mountPointService, encryptionService,
             rpcProviderService, deviceActionFactory, resourceManager, builderFactory, configuration.topology$_$id(),
             Uint16.valueOf(configuration.write$_$transaction$_$idle$_$timeout()));
     }
@@ -145,13 +145,13 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
     @Inject
     public NetconfTopologyManager(final BaseNetconfSchemaProvider baseSchemaProvider, final DataBroker dataBroker,
             final ClusterSingletonServiceProvider clusterSingletonServiceProvider, final NetconfTimer timer,
-            final NetconfTopologySchemaAssembler schemaAssembler, final ActorSystemProvider actorSystemProvider,
+            final NetconfTopologySchemaAssembler schemaAssembler, final ActorSystemInstance actorSystemInstance,
             final NetconfClientFactory clientFactory, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService, final RpcProviderService rpcProviderService,
             final DeviceActionFactory deviceActionFactory, final SchemaResourceManager resourceManager,
             final NetconfClientConfigurationBuilderFactory builderFactory) {
         this(baseSchemaProvider, dataBroker, clusterSingletonServiceProvider, timer, schemaAssembler,
-            actorSystemProvider.getActorSystem(), clientFactory, mountPointService, encryptionService,
+            actorSystemInstance.actorSystem(), clientFactory, mountPointService, encryptionService,
             rpcProviderService, deviceActionFactory, resourceManager, builderFactory,
             NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, Uint16.ZERO);
     }

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -20,7 +21,8 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.broker.SerializedDOMDataBroker;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
-import org.opendaylight.mdsal.dom.store.inmemory.InMemoryDOMDataStoreFactory;
+import org.opendaylight.mdsal.dom.store.inmemory.InMemoryDOMStoreFactory;
+import org.opendaylight.mdsal.dom.store.inmemory.dagger.InMemoryDOMStoreFactoryModule;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
@@ -49,6 +51,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeConfiguration;
+import org.opendaylight.yangtools.yang.data.tree.dagger.ReferenceDataTreeFactoryModule;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +86,10 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
     }
 
     static class MdsalOperationService implements NetconfOperationService {
+        private static final @NonNull InMemoryDOMStoreFactory DOM_STORE_FACTORY =
+            InMemoryDOMStoreFactoryModule.provideInMemoryDOMStoreFactory(
+                ReferenceDataTreeFactoryModule.provideDataTreeFactory());
+
         private final SessionIdType currentSessionId;
         private final DOMSchemaService schemaService;
         private final Set<Capability> caps;
@@ -187,8 +195,10 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             //          - pass down 'runnable -> manager.submitNotification(listener, runnable)
             //        That way we get thread sharing across all devices, while still guaranteeing single-threaded
             //        view of things.
-            final var configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
-            final var operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
+            final var configStore = DOM_STORE_FACTORY.create("DOM-CFG", DataTreeConfiguration.DEFAULT_CONFIGURATION,
+                schemaService);
+            final var operStore = DOM_STORE_FACTORY.create("DOM-OPER", DataTreeConfiguration.DEFAULT_OPERATIONAL,
+                schemaService);
             final var listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(16, 16,
                 "CommitFutures", MdsalOperationProvider.class);
 

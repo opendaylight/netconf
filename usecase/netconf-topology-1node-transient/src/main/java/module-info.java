@@ -22,6 +22,7 @@ module org.opendaylight.netconf.dagger {
     requires transitive org.opendaylight.mdsal.binding.dom.adapter;
     requires transitive org.opendaylight.mdsal.dom.api;
     requires transitive org.opendaylight.mdsal.dom.broker;
+    requires transitive org.opendaylight.mdsal.dom.store.inmemory;
     requires transitive org.opendaylight.mdsal.eos.binding.dom.adapter;
     requires transitive org.opendaylight.mdsal.singleton.api;
     requires transitive org.opendaylight.odlparent.dagger;
@@ -54,11 +55,11 @@ module org.opendaylight.netconf.dagger {
     requires java.net.http;
     requires java.validation;
     requires javax.servlet.api;
-    requires mdsal.dom.inmemory.datastore;
     requires netconf.client;
     requires netconf.client.mdsal;
     requires netconf.topology;
     requires netconf.topology.impl;
+    requires org.opendaylight.aaa.web.api;
     requires org.opendaylight.mdsal.eos.dom.api;
     requires org.opendaylight.mdsal.eos.dom.simple;
     requires org.opendaylight.mdsal.singleton.impl;
@@ -69,6 +70,7 @@ module org.opendaylight.netconf.dagger {
     requires org.opendaylight.restconf.server.api;
     requires org.opendaylight.restconf.server.mdsal;
     requires org.opendaylight.restconf.server.spi;
+    requires org.opendaylight.yangtools.yang.data.tree;
     requires repackaged.shiro;
     requires restconf.server;
     requires sal.distributed.datastore;
@@ -77,7 +79,6 @@ module org.opendaylight.netconf.dagger {
     requires spring.beans;
     requires spring.context;
     requires spring.core;
-    requires web.api;
 
     requires static transitive com.google.errorprone.annotations;
     requires static jakarta.inject;
