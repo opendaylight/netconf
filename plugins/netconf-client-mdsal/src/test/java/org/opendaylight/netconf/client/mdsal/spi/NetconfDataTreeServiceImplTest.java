@@ -45,7 +45,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Lock;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Unlock;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.IetfNetconfMonitoringData;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.databind.DatabindContext;
 import org.opendaylight.yangtools.databind.RequestException;
@@ -66,7 +66,8 @@ class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     void setUp() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(rpcService).invokeNetconf(any(), any());
         dataStoreService = getDataStoreService();
-        final var model = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class, NetconfState.class);
+        final var model = BindingRuntimeHelpers.createEffectiveModel(
+            List.of(IetfNetconfData.META.moduleInfo(), IetfNetconfMonitoringData.META.moduleInfo()));
         netconfMessageTransformer = new NetconfMessageTransformer(DatabindContext.ofModel(model), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
     }

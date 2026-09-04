@@ -15,6 +15,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev241010.LocalBindingSupported;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev241010.TcpClientKeepalives;
 import org.opendaylight.yangtools.binding.YangFeature;
+import org.opendaylight.yangtools.binding.meta.RootMeta;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
@@ -24,8 +25,8 @@ import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 @NonNullByDefault
 public final class IetfTcpClientFeatureProvider implements YangFeatureProvider<IetfTcpClientData> {
     @Override
-    public Class<IetfTcpClientData> boundModule() {
-        return IetfTcpClientData.class;
+    public RootMeta<IetfTcpClientData> boundModule() {
+        return IetfTcpClientData.META;
     }
 
     @Override

@@ -20,6 +20,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.rev241010.Tls13$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.common.rev241010.TlsVersionBase;
 import org.opendaylight.yangtools.binding.YangFeature;
+import org.opendaylight.yangtools.binding.meta.RootMeta;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
@@ -32,8 +33,8 @@ public final class IetfTlsCommonFeatureProvider implements YangFeatureProvider<I
         Map.of(Tls12$I.VALUE, "TLSv1.2", Tls13$I.VALUE, "TLSv1.3");
 
     @Override
-    public Class<IetfTlsCommonData> boundModule() {
-        return IetfTlsCommonData.class;
+    public RootMeta<IetfTlsCommonData> boundModule() {
+        return IetfTlsCommonData.META;
     }
 
     @Override

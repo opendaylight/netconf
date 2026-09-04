@@ -15,6 +15,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,7 +69,7 @@ class MountInstanceTest {
 
     @BeforeAll
     static void suiteSetUp() {
-        SCHEMA_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class);
+        SCHEMA_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(List.of(IetfNetconfData.META.moduleInfo()));
     }
 
     @BeforeEach

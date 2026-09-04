@@ -20,6 +20,11 @@
     <name>${project.artifactId}</name>
     <description>MD-SAL integration RESTCONF server SPI</description>
 
+  <properties>
+    <!-- FIXME: explicit exclusion -->
+    <odlparent.dependency.enforce>false</odlparent.dependency.enforce>
+  </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.github.spotbugs</groupId>

@@ -13,6 +13,7 @@ import org.kohsuke.MetaInfServices;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.udp.client.rev251216.IetfUdpClientData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.udp.client.rev251216.LocalBinding;
 import org.opendaylight.yangtools.binding.YangFeature;
+import org.opendaylight.yangtools.binding.meta.RootMeta;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
@@ -22,8 +23,8 @@ import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 @NonNullByDefault
 public final class IetfUdpClientFeatureProvider implements YangFeatureProvider<IetfUdpClientData> {
     @Override
-    public Class<IetfUdpClientData> boundModule() {
-        return IetfUdpClientData.class;
+    public RootMeta<IetfUdpClientData> boundModule() {
+        return IetfUdpClientData.META;
     }
 
     @Override
