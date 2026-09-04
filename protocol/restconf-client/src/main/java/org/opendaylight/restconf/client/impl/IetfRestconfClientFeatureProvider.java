@@ -12,6 +12,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.kohsuke.MetaInfServices;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.client.rev240814.IetfRestconfClientData;
 import org.opendaylight.yangtools.binding.YangFeature;
+import org.opendaylight.yangtools.binding.meta.RootMeta;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
@@ -21,8 +22,8 @@ import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 @NonNullByDefault
 public final class IetfRestconfClientFeatureProvider implements YangFeatureProvider<IetfRestconfClientData> {
     @Override
-    public Class<IetfRestconfClientData> boundModule() {
-        return IetfRestconfClientData.class;
+    public RootMeta<IetfRestconfClientData> boundModule() {
+        return IetfRestconfClientData.META;
     }
 
     @Override
