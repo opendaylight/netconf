@@ -7,13 +7,14 @@
  */
 package org.opendaylight.netconf.client.mdsal.api;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 
 /**
  * Handle RPCs, adding required logic to RPCs such a request time-out.
  */
+@NonNullByDefault
 public sealed interface RpcsDecorator permits RpcsTimeoutAndRecoveryHandler {
-
     /**
      * Wrap the given Rpcs service with the required logic.
      *
