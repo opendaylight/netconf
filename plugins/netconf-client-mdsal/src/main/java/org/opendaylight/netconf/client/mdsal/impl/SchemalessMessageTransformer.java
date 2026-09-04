@@ -66,7 +66,8 @@ public class SchemalessMessageTransformer implements NotificationTransformer, Rp
 
     /**
      * Transforms reply message to anyXml node.
-     * In case, that rpc-reply doesn't contain data and contains only &lt;ok/&gt; element, returns null.
+     * In case, that rpc-reply doesn't contain data and contains only {@code <ok/>} element, returns null.
+     *
      * @param resultPayload reply message
      * @return anyxml
      */

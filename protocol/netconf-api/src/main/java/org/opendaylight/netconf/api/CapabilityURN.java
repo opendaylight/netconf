@@ -26,6 +26,7 @@ public final class CapabilityURN {
     /**
      * The base NETCONF capability, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc4741.html#section-8.1">RFC4741, section 8.1</a>.
+     *
      * @deprecated This capability identifies legacy NETCONF devices and has been superseded by {@link #BASE_1_1}, just
      *             as RFC6241 obsoletes RFC4741.
      */
@@ -44,6 +45,7 @@ public final class CapabilityURN {
     /**
      * The Candidate Configuration Capability, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc4741.html#section-8.3">RFC4741, section 8.3</a>.
+     *
      * @deprecated This capability is superseded by {@link #CONFIRMED_COMMIT_1_1}.
      */
     @Deprecated
@@ -99,6 +101,7 @@ public final class CapabilityURN {
     /**
      * The Validate Capability, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc4741.html#section-8.6">RFC4741, section 8.6</a>.
+     *
      * @deprecated This capability is superseded by {@link #VALIDATE_1_1}.
      */
     @Deprecated

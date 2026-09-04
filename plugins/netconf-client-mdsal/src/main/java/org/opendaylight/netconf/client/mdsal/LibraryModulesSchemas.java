@@ -230,6 +230,7 @@ public final class LibraryModulesSchemas {
 
     /**
      * Resolves URLs with YANG schema resources from modules-state.
+     *
      * @param url URL pointing to yang library
      * @return Resolved URLs with YANG schema resources for all yang modules from yang library
      */

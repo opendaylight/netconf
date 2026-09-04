@@ -59,7 +59,7 @@ public final class DefaultDeviceNetconfSchemaProvider implements DeviceNetconfSc
     /**
      * The QName of {@code ietf-netconf.yang} as revision used by libnetconf2/sysrepon/IOS-XR and perhaps others.
      * The delta is just addition of NACM extension instantiations. The data semantics remains the same.
-    */
+     */
     private static final @NonNull QName RFC6536_IETF_NETCONF = RFC6241_IETF_NETCONF.unbind()
         .bindTo(QNameModule.of(RFC6241_IETF_NETCONF.getNamespace(), Revision.of("2013-09-29")))
         .intern();

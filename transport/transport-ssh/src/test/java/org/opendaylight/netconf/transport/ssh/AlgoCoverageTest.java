@@ -40,7 +40,7 @@ import org.opendaylight.yangtools.binding.TypeObject;
  * implement them.
  *
  * <p>Note that there are two-way assertions to suppressions, so that we are forced to keep them consistent.
-*/
+ */
 class AlgoCoverageTest {
     @Test
     void coveredSshEncryptionAlgorithm() {

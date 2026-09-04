@@ -134,7 +134,8 @@ public class FilterContentValidator {
      *
      * @param tree          QName tree
      * @param filterContent filter element
-     * @param builder       builder  @return YangInstanceIdentifier
+     * @param builder       builder
+     * @return YangInstanceIdentifier
      */
     private YangInstanceIdentifier getFilterDataRoot(final FilterTree tree, final XmlElement filterContent,
                                                      final InstanceIdentifierBuilder builder) {

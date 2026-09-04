@@ -10,6 +10,7 @@ package org.opendaylight.netconf.client.mdsal.spi;
 interface TxListener {
     /**
      * Invoked, when transaction completes successfully.
+     *
      * @param transaction transaction
      */
     void onTransactionSuccessful(AbstractWriteTx transaction);
@@ -24,12 +25,14 @@ interface TxListener {
 
     /**
      * Invoked, when transaction is cancelled.
+     *
      * @param transaction transaction
      */
     void onTransactionCancelled(AbstractWriteTx transaction);
 
     /**
      * Invoked, when transaction is submitted.
+     *
      * @param transaction transaction
      */
     void onTransactionSubmitted(AbstractWriteTx transaction);
