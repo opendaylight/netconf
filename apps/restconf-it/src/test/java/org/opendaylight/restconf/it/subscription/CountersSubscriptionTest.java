@@ -89,11 +89,11 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
         publishService().putNotification(new DOMNotificationEvent.Rfc6020(toasterRestockedNotification, Instant.now()));
 
         // modify
-        final var modifyInput = String.format("""
+        final var modifyInput = """
              <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
                <id>%s</id>
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
-             </input>""", id);
+             </input>""".formatted(id);
         final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON, modifyInput);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
@@ -131,11 +131,11 @@ class CountersSubscriptionTest extends AbstractNotificationSubscriptionTest {
             Instant.now()));
 
         // modify
-        final var modifyInput = String.format("""
+        final var modifyInput = """
              <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
                <id>%s</id>
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
-             </input>""", id);
+             </input>""".formatted(id);
         final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON, modifyInput);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());

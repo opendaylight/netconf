@@ -51,7 +51,7 @@ public class Get extends AbstractNetconfOperation {
     public Document handle(final Document requestMessage, final NetconfOperationChainedExecution subsequentOperation)
             throws DocumentedException {
         if (subsequentOperation == null) {
-            throw new DocumentedException(String.format("Subsequent netconf operation expected by %s", this),
+            throw new DocumentedException("Subsequent netconf operation expected by " + this,
                 ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
 

@@ -191,7 +191,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
             try {
                 childOp = getChild(childPath);
             } catch (final RuntimeException e) {
-                throw new IllegalArgumentException(String.format("Failed to process child node %s", childPath), e);
+                throw new IllegalArgumentException("Failed to process child node " + childPath, e);
             }
             checkArgument(childOp != null, "Node %s is not allowed inside %s", childPath, getIdentifier());
             return childOp;

@@ -142,7 +142,7 @@ class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
         final int key2 = responseAsString.indexOf("key2");
 
         assertTrue(key3 < key1 && key1 < key2,
-            String.format("Key ordering invalid, should be key3(%d) < key1(%d) < key2(%d)", key3, key1, key2));
+            "Key ordering invalid, should be key3(%d) < key1(%d) < key2(%d)".formatted(key3, key1, key2));
 
         deleteDatastore();
     }

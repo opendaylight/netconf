@@ -133,8 +133,7 @@ public class ActorProxyNetconfServiceFacade implements ProxyNetconfServiceFacade
             }
 
             private NetconfServiceFailedException newNetconfServiceFailedException(final Throwable failure) {
-                return new NetconfServiceFailedException(String.format("%s: Commit of operation failed",
-                    id), failure);
+                return new NetconfServiceFailedException("%s: Commit of operation failed".formatted(id), failure);
             }
         }, executionContext);
         return settableFuture;

@@ -27,7 +27,7 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 class HelloXMLMessageDecoderTest {
     @Test
     void testDecodeWithHeader() throws Exception {
-        final ByteBuf src = Unpooled.wrappedBuffer(String.format("%s\n%s",
+        final ByteBuf src = Unpooled.wrappedBuffer("%s\n%s".formatted(
                 "[tomas;10.0.0.0:10000;tcp;client;]",
                 "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>").getBytes());
         final List<Object> out = new ArrayList<>();

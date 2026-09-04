@@ -28,6 +28,6 @@ public class Put extends AbstractCommand {
     void executeCommand() throws IOException {
         final var result = storage.putEntry(toBytes(key), toBytes(value));
         System.out.println(result == null ? "Property added" :
-            String.format("Property value updated. Previous value: %s", toString(result)));
+            "Property value updated. Previous value: " + toString(result));
     }
 }

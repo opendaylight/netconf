@@ -203,7 +203,7 @@ class NetconfDataTreeServiceActorTest {
         final RpcError rpcError = RpcResultBuilder.newError(ErrorType.APPLICATION, new ErrorTag("fail"), "fail");
         final TransactionCommitFailedException failure = new TransactionCommitFailedException("fail", rpcError);
         final NetconfServiceFailedException cause = new NetconfServiceFailedException(
-            String.format("%s: Commit of operation failed", 1), failure);
+            "%s: Commit of operation failed".formatted(1), failure);
         when(dataStoreService.commit()).thenReturn(FluentFutures.immediateFailedFluentFuture(cause));
         actorRef.tell(new CommitRequest(), probe.ref());
 

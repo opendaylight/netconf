@@ -231,13 +231,13 @@ public abstract class AbstractNotificationSubscriptionTest extends AbstractIT {
      * Utility method to establish a subscription.
      */
     FullHttpResponse establishFilteredSubscription(final String filter) {
-        final var input = String.format("""
+        final var input = """
              <establish-subscription xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
                <stream>NETCONF</stream>
                <encoding>encode-json</encoding>
                <stream-subtree-filter>%s</stream-subtree-filter>
              </establish-subscription>
-             """, filter);
+             """.formatted(filter);
 
         return invokeRequestKeepClient(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON, input);

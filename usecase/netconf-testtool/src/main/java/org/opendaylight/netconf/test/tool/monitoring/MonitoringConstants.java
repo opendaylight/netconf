@@ -21,7 +21,7 @@ public final class MonitoringConstants {
 
     public static final String EXTENSION_NAMESPACE_PREFIX = "ncme";
 
-    public static final String URI = String.format("%s?module=%s&revision=%s", NAMESPACE, MODULE_NAME, MODULE_REVISION);
+    public static final String URI = "%s?module=%s&revision=%s".formatted(NAMESPACE, MODULE_NAME, MODULE_REVISION);
 
     public static final String NETCONF_MONITORING_XML_ROOT_ELEMENT = "netconf-state";
 }

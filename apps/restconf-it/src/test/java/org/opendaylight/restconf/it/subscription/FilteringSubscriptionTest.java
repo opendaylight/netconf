@@ -65,7 +65,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
         publishService().putNotification(new DOMNotificationEvent.Rfc6020(TOASTER_RESTOCKED_NOTIFICATION, EVENT_TIME));
 
         // verify ToasterRestocked notification is received
-        JSONAssert.assertEquals(String.format("""
+        JSONAssert.assertEquals("""
             {
               "ietf-restconf:notification": {
                 "event-time": "%s",
@@ -73,19 +73,19 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                   "amountOfBread": 1
                 }
               }
-            }""", FORMATTED_EVENT_TIME), eventListener.readNext(), JSONCompareMode.LENIENT);
+            }""".formatted(FORMATTED_EVENT_TIME), eventListener.readNext(), JSONCompareMode.LENIENT);
 
-        final var modifyInput = String.format("""
+        final var modifyInput = """
              <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
                <id>%s</id>
                <stream-subtree-filter><toasterOutOfBread xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
-             </input>""", id);
+             </input>""".formatted(id);
         final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
             MediaTypes.APPLICATION_YANG_DATA_XML, MediaTypes.APPLICATION_YANG_DATA_JSON, modifyInput);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
         // verify subscription-modified notification is not filtered out
-        JSONAssert.assertEquals(String.format("""
+        JSONAssert.assertEquals("""
             {
                 "ietf-restconf:notification": {
                     "ietf-subscribed-notifications:subscription-modified" : {
@@ -94,7 +94,7 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
                         "encoding" : "ietf-subscribed-notifications:encode-json"
                     }
                 }
-            }""", id), eventListener.readNext(), JSONCompareMode.LENIENT);
+            }""".formatted(id), eventListener.readNext(), JSONCompareMode.LENIENT);
     }
 
     @Test
@@ -185,12 +185,12 @@ class FilteringSubscriptionTest extends AbstractNotificationSubscriptionTest {
         publishService().putNotification(new DOMNotificationEvent.Rfc6020(toasterOutOfBreadNotification, EVENT_TIME));
 
         // verify notification toasterOutOfBread is not filtered out
-        JSONAssert.assertEquals(String.format("""
+        JSONAssert.assertEquals("""
             {
               "ietf-restconf:notification": {
                 "event-time": "%s",
                 "toaster:toasterOutOfBread": {}
               }
-            }""", FORMATTED_EVENT_TIME), eventListener.readNext(), JSONCompareMode.LENIENT);
+            }""".formatted(FORMATTED_EVENT_TIME), eventListener.readNext(), JSONCompareMode.LENIENT);
     }
 }

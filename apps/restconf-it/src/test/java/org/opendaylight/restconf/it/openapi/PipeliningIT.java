@@ -65,15 +65,15 @@ class PipeliningIT extends AbstractOpenApiTest {
         try (var socket = new Socket("127.0.0.1", port())) {
             socket.setSoTimeout(3000);
             // Prepare requests
-            final var req1 = String.format("""
+            final var req1 = """
                 GET /openapi/api/v3/mounts/1 HTTP/1.1\r
                 Host: %s\r
-                Authorization: Basic dXNlcm5hbWU6cGEkJHcwUmQ=\r\n\r\n""", host());
+                Authorization: Basic dXNlcm5hbWU6cGEkJHcwUmQ=\r\n\r\n""".formatted(host());
 
-            final var req2 = String.format("""
+            final var req2 = """
                 GET /openapi/api/v3/mounts/1?depth=1&width=1 HTTP/1.1\r
                 Host: %s\r
-                Authorization: Basic dXNlcm5hbWU6cGEkJHcwUmQ=\r\n\r\n""", host());
+                Authorization: Basic dXNlcm5hbWU6cGEkJHcwUmQ=\r\n\r\n""".formatted(host());
 
             // Send requests
             final var out = socket.getOutputStream();

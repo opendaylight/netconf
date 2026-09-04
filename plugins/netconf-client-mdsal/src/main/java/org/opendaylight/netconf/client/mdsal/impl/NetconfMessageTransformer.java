@@ -194,7 +194,7 @@ public class NetconfMessageTransformer
                 SchemaInferenceStack.of(databind.modelContext(), notificationPath).toInference(), strictParsing);
             xmlParser.traverse(new DOMSource(element));
         } catch (XMLStreamException | IOException | UnsupportedOperationException e) {
-            throw new IllegalArgumentException(String.format("Failed to parse notification %s", element), e);
+            throw new IllegalArgumentException("Failed to parse notification " + element, e);
         }
         return (ContainerNode) resultHolder.getResult().data();
     }
@@ -451,7 +451,7 @@ public class NetconfMessageTransformer
             final var xmlParser = XmlParserStream.create(writer, databind.xmlCodecs(), outputPath, strictParsing);
             xmlParser.traverse(new DOMSource(element));
         } catch (XMLStreamException | IOException e) {
-            throw new IllegalArgumentException(String.format("Failed to parse RPC response %s", element), e);
+            throw new IllegalArgumentException("Failed to parse RPC response " + element, e);
         }
         return (ContainerNode) resultHolder.getResult().data();
     }

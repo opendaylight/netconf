@@ -79,7 +79,7 @@ public final class PostEntity extends OperationEntity {
             if (!output.getChildNodes().isEmpty()) {
                 final var ref = processOperationsRef(rpc, operationName, "_output");
                 generator.writeObjectFieldStart(String.valueOf(OK.getStatusCode()));
-                generator.writeStringField(DESCRIPTION, String.format("RPC %s success", operationName));
+                generator.writeStringField(DESCRIPTION, "RPC " + operationName + " success");
 
                 generator.writeObjectFieldStart(CONTENT);
                 generateMediaTypeSchemaRef(generator, MediaType.APPLICATION_JSON, ref);
@@ -90,7 +90,7 @@ public final class PostEntity extends OperationEntity {
 
             } else {
                 generator.writeObjectFieldStart(String.valueOf(NO_CONTENT.getStatusCode()));
-                generator.writeStringField(DESCRIPTION, String.format("RPC %s success", operationName));
+                generator.writeStringField(DESCRIPTION, "RPC " + operationName + " success");
                 generator.writeEndObject();
 
             }

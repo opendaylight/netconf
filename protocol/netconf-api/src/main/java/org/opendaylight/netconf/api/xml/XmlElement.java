@@ -75,8 +75,8 @@ public final class XmlElement {
     public void checkName(final String expectedName) throws UnexpectedElementException {
         if (!getName().equals(expectedName)) {
             throw new UnexpectedElementException(
-                    String.format("Expected %s xml element but was %s", expectedName, getName()),
-                    ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
+                "Expected %s xml element but was %s".formatted(expectedName, getName()),
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
     }
 
@@ -84,8 +84,8 @@ public final class XmlElement {
             throws UnexpectedNamespaceException, MissingNameSpaceException {
         if (!getNamespaceAttribute().equals(expectedNamespace)) {
             throw new UnexpectedNamespaceException(
-                    String.format("Unexpected namespace %s should be %s", getNamespaceAttribute(), expectedNamespace),
-                    ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
+                "Unexpected namespace %s should be %s".formatted(getNamespaceAttribute(), expectedNamespace),
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
     }
 
@@ -93,8 +93,8 @@ public final class XmlElement {
             throws UnexpectedNamespaceException, MissingNameSpaceException {
         if (!getNamespace().equals(expectedNamespace)) {
             throw new UnexpectedNamespaceException(
-                    String.format("Unexpected namespace %s should be %s", getNamespace(), expectedNamespace),
-                    ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
+                "Unexpected namespace %s should be %s".formatted(getNamespace(), expectedNamespace),
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
     }
 
@@ -243,7 +243,7 @@ public final class XmlElement {
         final var children = getChildElements();
         if (children.size() != 1) {
             throw new DocumentedException(
-                    String.format("One element expected in %s but was %s", toString(), children.size()),
+                    "One element expected in %s but was %s".formatted(toString(), children.size()),
                     ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
         }
         return children.get(0);

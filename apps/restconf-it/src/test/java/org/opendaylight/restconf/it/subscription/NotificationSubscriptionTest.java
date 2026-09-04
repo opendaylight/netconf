@@ -225,13 +225,13 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
      * Utility method to establish a subscription.
      */
     private FullHttpResponse establishSubscription(final String stream) throws Exception {
-        final var input = String.format("""
+        final var input = """
             {
               "input": {
                 "stream": "%s",
                 "encoding": "%s"
               }
-            }""", stream, JSON_ENCODING);
+            }""".formatted(stream, JSON_ENCODING);
         return invokeRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_JSON, APPLICATION_JSON, input);
     }
 
@@ -240,24 +240,24 @@ class NotificationSubscriptionTest extends AbstractNotificationSubscriptionTest 
      */
     private FullHttpResponse establishSubscriptionWithFilter(final String stream, final String filter)
             throws Exception {
-        final var input = String.format("""
+        final var input = """
             <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
               <stream>%s</stream>
               <stream-subtree-filter>
                 %s
                </stream-subtree-filter>
-            </input>""", stream, filter);
+            </input>""".formatted(stream, filter);
         return invokeRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_XML, APPLICATION_JSON, input);
     }
 
     private FullHttpRequest prepareEstablishRPCRequest() {
-        final var input = String.format("""
+        final var input = """
             {
               "input": {
                 "stream": "%s",
                 "encoding": "%s"
               }
-            }""", NETCONF_STREAM, JSON_ENCODING);
+            }""".formatted(NETCONF_STREAM, JSON_ENCODING);
         return buildRequest(HttpMethod.POST, ESTABLISH_SUBSCRIPTION_URI, APPLICATION_JSON, APPLICATION_JSON, input);
     }
 }

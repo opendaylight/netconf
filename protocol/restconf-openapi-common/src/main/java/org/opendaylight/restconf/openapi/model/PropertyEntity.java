@@ -755,7 +755,7 @@ public class PropertyEntity {
                 .filter(ContainerSchemaNode.class::isInstance)
                 .findFirst();
             if (container.isPresent()) {
-                def.setExample(String.format("/%s:%s", module.orElseThrow().getPrefix(),
+                def.setExample("/%s:%s".formatted(module.orElseThrow().getPrefix(),
                     container.orElseThrow().getQName().getLocalName()));
             }
         }

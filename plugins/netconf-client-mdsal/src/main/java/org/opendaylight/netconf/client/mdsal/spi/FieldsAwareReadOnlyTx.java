@@ -36,8 +36,8 @@ final class FieldsAwareReadOnlyTx extends AbstractReadOnlyTx implements NetconfD
             case OPERATIONAL -> readOperationalData(path, fields);
             default -> {
                 LOG.warn("Unknown datastore type: {}.", store);
-                throw new IllegalArgumentException(String.format(
-                        "%s, Cannot read data %s with fields %s for %s datastore, unknown datastore type",
+                throw new IllegalArgumentException(
+                    "%s, Cannot read data %s with fields %s for %s datastore, unknown datastore type".formatted(
                         id, path, fields, store));
             }
         };
