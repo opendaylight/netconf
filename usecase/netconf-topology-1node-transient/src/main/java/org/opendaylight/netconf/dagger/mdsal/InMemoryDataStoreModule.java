@@ -18,10 +18,11 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.store.DOMStore;
-import org.opendaylight.mdsal.dom.store.inmemory.InMemoryDOMDataStore;
+import org.opendaylight.mdsal.dom.store.inmemory.InMemoryDOMStoreConfigProperties;
+import org.opendaylight.mdsal.dom.store.inmemory.InMemoryDOMStoreFactory;
 import org.opendaylight.netconf.dagger.springboot.config.ConfigLoader;
 import org.opendaylight.odlparent.dagger.ResourceSupport;
-import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
@@ -32,29 +33,24 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 @DoNotMock
 @NonNullByDefault
 public interface InMemoryDataStoreModule {
-
     @Provides
     @Singleton
     @IntoMap
     @DatastoreTypeKey(LogicalDatastoreType.CONFIGURATION)
     static DOMStore configDatastore(final DOMSchemaService domSchemaService, final ConfigLoader configLoader,
-            final ResourceSupport resourceSupport) {
-        final var DataStoreConfig = configLoader.getConfig(InMemoryDatastoreProperties.class,
+            final ResourceSupport resourceSupport, final InMemoryDOMStoreFactory storeFactory) {
+        final var config = configLoader.getConfig(InMemoryDatastoreProperties.class,
             "odl.netconf.prototype.in-memory-datastore", Path.of("application.yaml")).configuration();
+        final var domStore = storeFactory.create(LogicalDatastoreType.CONFIGURATION.name(),
+            DataTreeConfiguration.DEFAULT_CONFIGURATION, InMemoryDOMStoreConfigProperties.builder()
+            .debugTransactions(config.debugTransaction)
+            .maxDataChangeExecutorPoolSize(config.maxDataChangeExecutorPoolSize)
+            .maxDataChangeExecutorQueueSize(config.maxDataChangeExecutorQueueSize)
+            .maxDataChangeListenerQueueSize(config.maxDataChangeListenerQueueSize)
+            .build(), domSchemaService);
+        resourceSupport.register(domStore);
 
-        final var configName = LogicalDatastoreType.CONFIGURATION.name();
-        final var executorService = SpecialExecutors.newBlockingBoundedFastThreadPool(
-            DataStoreConfig.maxDataChangeExecutorPoolSize, DataStoreConfig.maxDataChangeExecutorQueueSize,
-            configName + "-DCL", InMemoryDOMDataStore.class);
-        final var inMemoryDOMDataStore = new InMemoryDOMDataStore(configName, LogicalDatastoreType.CONFIGURATION,
-            executorService, DataStoreConfig.maxDataChangeListenerQueueSize, DataStoreConfig.debugTransaction);
-
-        resourceSupport.register(executorService);
-        resourceSupport.register(domSchemaService.registerSchemaContextListener(
-            inMemoryDOMDataStore::onModelContextUpdated));
-        resourceSupport.register(inMemoryDOMDataStore);
-
-        return inMemoryDOMDataStore;
+        return domStore;
     }
 
     @Provides
@@ -62,23 +58,19 @@ public interface InMemoryDataStoreModule {
     @IntoMap
     @DatastoreTypeKey(LogicalDatastoreType.OPERATIONAL)
     static DOMStore operationalDatastore(final DOMSchemaService domSchemaService, final ConfigLoader configLoader,
-            final ResourceSupport resourceSupport) {
-        final var DataStoreOper = configLoader.getConfig(InMemoryDatastoreProperties.class,
+            final ResourceSupport resourceSupport, final InMemoryDOMStoreFactory storeFactory) {
+        final var config = configLoader.getConfig(InMemoryDatastoreProperties.class,
             "odl.netconf.prototype.in-memory-datastore", Path.of("application.yaml")).operational();
+        final var domStore = storeFactory.create(LogicalDatastoreType.OPERATIONAL.name(),
+            DataTreeConfiguration.DEFAULT_OPERATIONAL, InMemoryDOMStoreConfigProperties.builder()
+            .debugTransactions(config.debugTransaction)
+            .maxDataChangeExecutorPoolSize(config.maxDataChangeExecutorPoolSize)
+            .maxDataChangeExecutorQueueSize(config.maxDataChangeExecutorQueueSize)
+            .maxDataChangeListenerQueueSize(config.maxDataChangeListenerQueueSize)
+            .build(), domSchemaService);
+        resourceSupport.register(domStore);
 
-        final var operName = LogicalDatastoreType.OPERATIONAL.name();
-        final var executorService = SpecialExecutors.newBlockingBoundedFastThreadPool(
-            DataStoreOper.maxDataChangeExecutorPoolSize, DataStoreOper.maxDataChangeExecutorQueueSize,
-            operName + "-DCL", InMemoryDOMDataStore.class);
-        final var inMemoryDOMDataStore = new InMemoryDOMDataStore(operName, LogicalDatastoreType.OPERATIONAL,
-            executorService, DataStoreOper.maxDataChangeListenerQueueSize, DataStoreOper.debugTransaction);
-
-        resourceSupport.register(executorService);
-        resourceSupport.register(domSchemaService.registerSchemaContextListener(
-            inMemoryDOMDataStore::onModelContextUpdated));
-        resourceSupport.register(inMemoryDOMDataStore);
-
-        return inMemoryDOMDataStore;
+        return domStore;
     }
 
     /**
