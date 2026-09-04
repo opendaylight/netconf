@@ -441,8 +441,9 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final var proxyYangProvider = new ProxyYangTextSourceProvider(actor, TIMEOUT);
 
         final var resolvedSchemaFuture = proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
-        final var ex = assertThrows(MissingSchemaSourceException.class,
-            () -> Await.result(resolvedSchemaFuture, DurationConverters.toScala(TIMEOUT)));
+        final var ee = assertThrows(ExecutionException.class,
+            () -> resolvedSchemaFuture.toCompletableFuture().get(5, TimeUnit.SECONDS));
+        final var ex = assertInstanceOf(MissingSchemaSourceException.class, ee.getCause());
         assertEquals("No providers registered for source SourceIdentifier [testID]", ex.getMessage());
     }
 
@@ -461,9 +462,8 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         try (var schemaSourceReg = masterSchemaRepository.registerSchemaSource(
                 id -> Futures.immediateFuture(yangTextSchemaSource),
                 PotentialSchemaSource.create(sourceIdentifier, YangTextSource.class, 1))) {
-            final var resolvedSchemaFuture = proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
-            final var success = Await.result(resolvedSchemaFuture, DurationConverters.toScala(TIMEOUT));
-
+            final var success = proxyYangProvider.getYangTextSchemaSource(sourceIdentifier)
+                .toCompletableFuture().get(5, TimeUnit.SECONDS);
             assertEquals(sourceIdentifier, success.getRepresentation().sourceId());
             assertEquals("YANG", success.getRepresentation().read());
         }
@@ -471,8 +471,9 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         // Test missing source failure.
 
         final var failedSchemaFuture = proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
-        final var ex = assertThrows(MissingSchemaSourceException.class,
-            () -> Await.result(failedSchemaFuture, DurationConverters.toScala(TIMEOUT)));
+        final var ee = assertThrows(ExecutionException.class,
+            () -> failedSchemaFuture.toCompletableFuture().get(5, TimeUnit.SECONDS));
+        final var ex = assertInstanceOf(MissingSchemaSourceException.class, ee.getCause());
         assertThat(ex.getMessage(), startsWith("No providers registered for source"));
         assertThat(ex.getMessage(), containsString(sourceIdentifier.toString()));
     }

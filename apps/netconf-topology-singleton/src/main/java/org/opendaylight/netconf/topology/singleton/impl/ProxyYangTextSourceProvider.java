@@ -9,14 +9,14 @@ package org.opendaylight.netconf.topology.singleton.impl;
 
 import java.time.Duration;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import org.apache.pekko.actor.ActorRef;
-import org.apache.pekko.dispatch.Futures;
 import org.apache.pekko.pattern.Patterns;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
 import org.opendaylight.netconf.topology.singleton.messages.YangTextSchemaSourceRequest;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
-import scala.concurrent.Future;
 
 public class ProxyYangTextSourceProvider implements RemoteYangTextSourceProvider {
     private final ActorRef masterRef;
@@ -28,23 +28,15 @@ public class ProxyYangTextSourceProvider implements RemoteYangTextSourceProvider
     }
 
     @Override
-    public Future<Set<SourceIdentifier>> getProvidedSources() {
+    public CompletionStage<Set<SourceIdentifier>> getProvidedSources() {
         // NOOP
-        return Futures.successful(Set.of());
+        return CompletableFuture.completedStage(Set.of());
     }
 
     @Override
-    public Future<YangTextSchemaSourceSerializationProxy> getYangTextSchemaSource(
+    public CompletionStage<YangTextSchemaSourceSerializationProxy> getYangTextSchemaSource(
             final SourceIdentifier sourceIdentifier) {
-        final var promise = Futures.<YangTextSchemaSourceSerializationProxy>promise();
-        Patterns.ask(masterRef, new YangTextSchemaSourceRequest(sourceIdentifier), actorResponseWaitTime).whenComplete(
-            (success, failure) -> {
-                if (failure == null) {
-                    promise.success((YangTextSchemaSourceSerializationProxy) success);
-                } else {
-                    promise.failure(failure);
-                }
-            });
-        return promise.future();
+        return Patterns.ask(masterRef, new YangTextSchemaSourceRequest(sourceIdentifier), actorResponseWaitTime)
+            .thenApply(YangTextSchemaSourceSerializationProxy.class::cast);
     }
 }

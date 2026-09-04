@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.Futures;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.AfterAll;
@@ -69,7 +70,7 @@ class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
 
     @BeforeAll
     static void beforeClass() {
-        SCHEMA_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class);
+        SCHEMA_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(List.of(IetfNetconfData.META.moduleInfo()));
     }
 
     @AfterAll
