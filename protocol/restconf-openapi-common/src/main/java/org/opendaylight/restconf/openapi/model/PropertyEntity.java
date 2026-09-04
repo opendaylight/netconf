@@ -178,7 +178,7 @@ public class PropertyEntity {
         final var parentNamespace = stack.toSchemaNodeIdentifier().lastNodeIdentifier().getNamespace();
         if (!childNode.getQName().getNamespace().equals(parentNamespace)) {
             // Getting module name from augmentation
-            return stack.modelContext().getModuleStatement(childNode.getQName().getModule()).getDeclared()
+            return stack.modelContext().getModuleStatement(childNode.getQName().getModule()).requireDeclared()
                 .argument().getLocalName() + ":";
         }
         return "";

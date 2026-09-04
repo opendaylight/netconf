@@ -10,6 +10,7 @@ package org.opendaylight.netconf.dagger;
 import dagger.Component;
 import jakarta.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.mdsal.dom.store.inmemory.dagger.InMemoryDOMStoreFactoryModule;
 import org.opendaylight.netconf.dagger.aaa.InsecureAAAModule;
 import org.opendaylight.netconf.dagger.controller.DOMDataBrokerModule;
 import org.opendaylight.netconf.dagger.mdsal.InMemoryDataStoreModule;
@@ -25,6 +26,7 @@ import org.opendaylight.netconf.topology.impl.NetconfTopologyImpl;
 import org.opendaylight.odlparent.dagger.AutoCloseableComponent;
 import org.opendaylight.odlparent.dagger.ResourceSupportModule;
 import org.opendaylight.restconf.server.NettyEndpoint;
+import org.opendaylight.yangtools.yang.data.tree.dagger.ReferenceDataTreeFactoryModule;
 
 @Singleton
 @NonNullByDefault
@@ -36,9 +38,11 @@ import org.opendaylight.restconf.server.NettyEndpoint;
     MdsalSingletonImplModule.class,
     DOMDataBrokerModule.class,
     InMemoryDataStoreModule.class,
+    InMemoryDOMStoreFactoryModule.class,
     InsecureAAAModule.class,
-    RestconfNettyEndpointModule.class,
     NetconfTopologyModule.class,
+    ReferenceDataTreeFactoryModule.class,
+    RestconfNettyEndpointModule.class,
     SpringbootConfigLoaderModule.class,
     ResourceSupportModule.class
 })

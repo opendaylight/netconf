@@ -16,10 +16,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XMLSupport;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfConfigChange;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChange;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdate;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.NcNotificationsData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.IetfNetconfNotificationsData;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.IetfYangLibraryData;
 import org.opendaylight.yangtools.binding.EventInstantAware;
 import org.opendaylight.yangtools.binding.Notification;
 import org.opendaylight.yangtools.binding.data.codec.api.BindingNormalizedNodeSerializer;
@@ -41,7 +40,7 @@ final class NotificationsTransformUtil {
     NotificationsTransformUtil(final YangParserFactory parserFactory, final BindingRuntimeGenerator generator,
             final BindingDataCodecFactory codecFactory) throws YangParserException {
         final var ctx = BindingRuntimeHelpers.createRuntimeContext(parserFactory, generator,
-            Netconf.class, NetconfConfigChange.class, YangLibraryChange.class, YangLibraryUpdate.class);
+            NcNotificationsData.META, IetfNetconfNotificationsData.META, IetfYangLibraryData.META);
         modelContext = ctx.modelContext();
         verify(modelContext.getOperations().stream()
                 .filter(input -> input.getQName().getLocalName().equals(CreateSubscription.CREATE_SUBSCRIPTION))
