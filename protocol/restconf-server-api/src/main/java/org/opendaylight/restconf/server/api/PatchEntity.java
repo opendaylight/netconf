@@ -23,6 +23,7 @@ public class PatchEntity {
 
     /**
      * Constructor to create PatchEntity for Patch operations which require value leaf representing data to be present.
+     *
      * @param editId Id of Patch edit
      * @param operation Patch edit operation
      * @param dataPath Target node for Patch edit operation
@@ -39,6 +40,7 @@ public class PatchEntity {
     /**
      * Constructor to create PatchEntity for Patch operations which do not allow value leaf representing data to be
      * present. <code>node</code> is set to <code>null</code> meaning that data are not allowed for edit operation.
+     *
      * @param editId Id of Patch edit
      * @param operation Patch edit operation
      * @param dataPath Target node for Patch edit operation
