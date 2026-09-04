@@ -39,7 +39,7 @@ import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadWriteTransaction;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Get;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfData;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.monitoring.rev220718.NetconfTcp;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.monitoring.rev220718.OdlNetconfMonitoringData;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -55,7 +55,8 @@ class NetconfDeviceDataBrokerTest {
 
     @BeforeAll
     static void beforeClass() {
-        SCHEMA_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class, NetconfTcp.class);
+        SCHEMA_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(List.of(
+            IetfNetconfData.META.moduleInfo(), OdlNetconfMonitoringData.META.moduleInfo()));
     }
 
     @AfterAll

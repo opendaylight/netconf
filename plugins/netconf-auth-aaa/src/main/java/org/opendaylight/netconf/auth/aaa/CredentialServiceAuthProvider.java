@@ -38,7 +38,7 @@ public final class CredentialServiceAuthProvider implements AuthProvider {
     }
 
     /**
-     * Authenticate user. This implementation tracks CredentialAuth&lt;PasswordCredentials&gt;
+     * Authenticate user. This implementation tracks {@code CredentialAuth<PasswordCredentials>}
      * and delegates the decision to it.
      */
     @Override
