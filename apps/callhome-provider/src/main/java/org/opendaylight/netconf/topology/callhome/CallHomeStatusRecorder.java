@@ -15,14 +15,14 @@ import java.security.PublicKey;
  */
 public interface CallHomeStatusRecorder {
 
-     /**
+    /**
      * Records netconf connection established successfully.
      *
      * @param id unique client identifier
      */
     void reportSuccess(String id);
 
-     /**
+    /**
      * Records client disconnected .
      *
      * @param id unique client identifier
@@ -36,7 +36,7 @@ public interface CallHomeStatusRecorder {
      */
     void reportFailedAuth(String id);
 
-     /**
+    /**
      * Records NETCONF layer initialization failure for configured client (device).
      *
      * @param id unique client identifier

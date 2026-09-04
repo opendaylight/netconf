@@ -17,6 +17,7 @@ public class NetconfTerminationReason {
 
     /**
      * Get cause of session termination.
+     *
      * @return human-readable cause.
      */
     public String getErrorMessage() {

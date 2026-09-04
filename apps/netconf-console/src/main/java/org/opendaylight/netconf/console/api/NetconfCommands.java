@@ -15,6 +15,7 @@ public interface NetconfCommands {
     /**
      * Returns a Hashmap with NETCONF ID as outer key and
      * inner keys representing attributes of a NETCONF device.
+     *
      * @return :Hashmap with two keys for all NETCONF devices in topology
      */
     Map<String, Map<String, String>> listDevices();
@@ -23,6 +24,7 @@ public interface NetconfCommands {
      * Returns a Hashmap with NETCONF ID as outer key and inner keys representing
      * attributes of a NETCONF device for the requested IP and Port. If port is not
      * specified, all NETCONF devices with requested IP address are returned.
+     *
      * @param deviceIp :IP address of NETCONF device
      * @param devicePort :Port of the NETCONF device
      * @return :Hashmap with two keys for the requested device IP and/or Port
@@ -32,6 +34,7 @@ public interface NetconfCommands {
     /**
      * Returns a Hashmap with NETCONF ID as outer key and inner keys representing
      * attributes of a NETCONF device for the requested netconf device ID.
+     *
      * @param deviceId :Node id of NETCONF device
      * @return :Hashmap with two keys for the requested device Id
      */
@@ -39,6 +42,7 @@ public interface NetconfCommands {
 
     /**
      * Add a NETCONF connector.
+     *
      * @param netconfNode :An instance of {@link NetconfNode} containing
      *     all required information
      * @param deviceId :NETCONF node ID
@@ -47,6 +51,7 @@ public interface NetconfCommands {
 
     /**
      * Disconnect a NETCONF connector.
+     *
      * @param deviceIp :IP address of NETCONF device
      * @param devicePort :Port of NETCONF device
      * @return :Status of disconnect NETCONF connector
@@ -55,6 +60,7 @@ public interface NetconfCommands {
 
     /**
      * Disconnect a NETCONF connector.
+     *
      * @param deviceId :Node id of NETCONF device
      * @return :Status of disconnect NETCONF connector
      */
@@ -62,6 +68,7 @@ public interface NetconfCommands {
 
     /**
      * Update the NETCONF device for requested values.
+     *
      * @param deviceId :NETCONF node ID
      * @param username :Username for NETCONF device
      * @param password :Password for NETCONF device

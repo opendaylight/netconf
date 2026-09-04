@@ -399,6 +399,7 @@ class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
      * Test for put with insert=after option for last element of the list. Here we're trying to insert new element of
      * the ordered list after last existing element. Test uses list with two items and add third one at the end. After
      * this we check how many times replace transaction was called to know how many items was inserted.
+     *
      * @throws ParseException if ApiPath string cannot be parsed
      */
     @Test
@@ -466,6 +467,7 @@ class NetconfDataOperationsTest extends AbstractServerDataOperationsTest {
      * Test for post with insert=after option for last element of the list. Here we're trying to insert new element of
      * the ordered list after last existing element. Test uses list with two items and add third one at the end. After
      * this we check how many times replace transaction was called to know how many items was inserted.
+     *
      * @throws ParseException if ApiPath string cannot be parsed
      */
     @Test

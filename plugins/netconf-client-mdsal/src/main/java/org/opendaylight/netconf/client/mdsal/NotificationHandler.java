@@ -53,6 +53,7 @@ final class NotificationHandler {
 
     /**
      * Forward all cached notifications and pass all notifications from this point directly to sal facade.
+     *
      * @param transformer Message transformer
      */
     synchronized void onRemoteSchemaUp(final NotificationTransformer transformer) {

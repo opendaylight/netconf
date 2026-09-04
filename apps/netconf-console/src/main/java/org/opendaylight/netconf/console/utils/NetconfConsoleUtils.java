@@ -32,6 +32,7 @@ public final class NetconfConsoleUtils {
 
     /**
      * Returns the NETCONF node associated with the given nodeId.
+     *
      * @param nodeId :Id of the NETCONF device
      * @param db :An instance of the {@link DataBroker}
      * @return A node, or null if it is not present
@@ -42,6 +43,7 @@ public final class NetconfConsoleUtils {
 
     /**
      * Returns a list with one NETCONF node for the IP and Port.
+     *
      * @param deviceIp :IP address of NETCONF device
      * @param devicePort :Port of NETCONF device
      * @param db :An instance of the {@link DataBroker}
@@ -63,6 +65,7 @@ public final class NetconfConsoleUtils {
 
     /**
      * Checks if the NETCONF topology contains nodes.
+     *
      * @param topology :NETCONF topology instance
      * @return :<code>true</code> if not empty, else, <code>false</code>
      */
@@ -72,6 +75,7 @@ public final class NetconfConsoleUtils {
 
     /**
      * Blocking read transaction.
+     *
      * @param store :DatastoreType
      * @param path :InstanceIdentifier
      * @param db :An instance of the {@link DataBroker}

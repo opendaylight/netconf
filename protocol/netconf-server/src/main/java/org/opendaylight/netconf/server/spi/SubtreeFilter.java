@@ -61,6 +61,7 @@ public final class SubtreeFilter {
     /**
      * Filters notification content. If filter type isn't of type "subtree", returns unchanged notification content.
      * If no match is found, absent is returned.
+     *
      * @param filter filter
      * @param notification notification
      * @return document containing filtered notification content

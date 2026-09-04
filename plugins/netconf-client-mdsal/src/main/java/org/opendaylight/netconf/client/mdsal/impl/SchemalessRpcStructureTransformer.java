@@ -45,6 +45,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
     /**
      * Selects elements in anyxml data node, which matches path arguments QNames. Since class in not context aware,
      * method searches for all elements as they are named in path.
+     *
      * @param data data, must be of type {@link DOMSourceAnyxmlNode}
      * @param path path to select
      * @return selected data
@@ -70,6 +71,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
 
     /**
      * This class in not context aware. All elements are present in resulting structure, which are present in data path.
+     *
      * @see RpcStructureTransformer#createEditConfigStructure(Optional, YangInstanceIdentifier, Optional)
      * @param data data
      * @param dataPath path, where data will be written
@@ -155,6 +157,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
 
     /**
      * This class in not context aware. All elements are present in resulting structure, which are present in data path.
+     *
      * @see RpcStructureTransformer#toFilterStructure(YangInstanceIdentifier)
      * @param path path
      * @return filter structure
