@@ -15,6 +15,7 @@ import org.opendaylight.mdsal.binding.api.NotificationPublishService;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
+import org.opendaylight.mdsal.dom.store.inmemory.dagger.InMemoryDOMStoreFactoryModule;
 import org.opendaylight.mdsal.eos.binding.api.EntityOwnershipService;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.dagger.controller.DOMDataBrokerModule;
@@ -22,6 +23,7 @@ import org.opendaylight.netconf.dagger.mdsal.MdsalQualifiers.SchemaServiceContex
 import org.opendaylight.netconf.dagger.springboot.config.SpringbootConfigLoaderModule;
 import org.opendaylight.odlparent.dagger.AutoCloseableComponent;
 import org.opendaylight.odlparent.dagger.ResourceSupportModule;
+import org.opendaylight.yangtools.yang.data.tree.dagger.ReferenceDataTreeFactoryModule;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @Singleton
@@ -34,6 +36,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
     MdsalSingletonImplModule.class,
     DOMDataBrokerModule.class,
     InMemoryDataStoreModule.class,
+    InMemoryDOMStoreFactoryModule.class,
+    ReferenceDataTreeFactoryModule.class,
     SpringbootConfigLoaderModule.class,
     ResourceSupportModule.class
 })

@@ -8,14 +8,18 @@
 package org.opendaylight.netconf.topology.callhome;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.testutils.DataBrokerTestModule;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
@@ -106,8 +110,16 @@ class CallHomeListenEndpointsTest {
     @Test
     void readSshBindNullWhenNoLocalBind() throws Exception {
         // SSH endpoint present but without tcp-server-parameters
-        writeEndpoints(endpoints(sshEndpoint(null, null)));
-        assertNull(CallHomeListenEndpoints.readSshBind(dataBroker));
+        final var ee = assertThrows(ExecutionException.class, () -> writeEndpoints(endpoints(sshEndpoint(null, null))));
+        final var tcfe = assertInstanceOf(TransactionCommitFailedException.class, ee.getCause());
+        assertEquals("canCommit execution failed", tcfe.getMessage());
+        final var errors = tcfe.getErrorList();
+        assertEquals(1, errors.size());
+        final var cause = assertInstanceOf(IllegalArgumentException.class, tcfe.getCause());
+        assertEquals("""
+            Node (urn:opendaylight:params:xml:ns:yang:netconf-callhome-server?revision=2026-06-05)transport is missing \
+            mandatory descendant /(urn:opendaylight:params:xml:ns:yang:netconf-callhome-server?revision=2026-06-05)ssh/\
+            tcp-server-parameters/local-bind""", cause.getMessage());
     }
 
     /**
