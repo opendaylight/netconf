@@ -14,6 +14,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.IetfKeystoreData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineDefinitionsSupported;
 import org.opendaylight.yangtools.binding.YangFeature;
+import org.opendaylight.yangtools.binding.meta.RootMeta;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
@@ -23,8 +24,8 @@ import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 @NonNullByDefault
 public final class NoneKeystoreFeatureProvider implements YangFeatureProvider<IetfKeystoreData> {
     @Override
-    public Class<IetfKeystoreData> boundModule() {
-        return IetfKeystoreData.class;
+    public RootMeta<IetfKeystoreData> boundModule() {
+        return IetfKeystoreData.META;
     }
 
     @Override

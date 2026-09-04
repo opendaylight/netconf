@@ -14,6 +14,7 @@ import org.opendaylight.netconf.transport.spi.NettyTransportSupport;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.IetfTcpServerData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerKeepalives;
 import org.opendaylight.yangtools.binding.YangFeature;
+import org.opendaylight.yangtools.binding.meta.RootMeta;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
@@ -23,8 +24,8 @@ import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 @NonNullByDefault
 public final class IetfTcpServerFeatureProvider implements YangFeatureProvider<IetfTcpServerData> {
     @Override
-    public Class<IetfTcpServerData> boundModule() {
-        return IetfTcpServerData.class;
+    public RootMeta<IetfTcpServerData> boundModule() {
+        return IetfTcpServerData.META;
     }
 
     @Override

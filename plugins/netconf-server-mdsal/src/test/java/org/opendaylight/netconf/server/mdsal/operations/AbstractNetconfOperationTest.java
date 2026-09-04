@@ -37,7 +37,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.broker.SerializedDOMDataBroker;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.store.DOMStore;
-import org.opendaylight.mdsal.dom.store.inmemory.InMemoryDOMDataStoreFactory;
+import org.opendaylight.mdsal.dom.store.inmemory.testlib.TestDOMStoreFactory;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.api.operations.NetconfOperation;
 import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
@@ -47,6 +47,8 @@ import org.opendaylight.netconf.test.util.XmlFileLoader;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeConfiguration;
+import org.opendaylight.yangtools.yang.data.tree.dagger.ReferenceDataTreeFactoryModule;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.spi.source.DelegatedYangTextSource;
 import org.slf4j.Logger;
@@ -65,6 +67,7 @@ abstract class AbstractNetconfOperationTest {
     protected static final Document RPC_REPLY_OK = getReplyOk();
 
     private static EffectiveModelContext SCHEMA_CONTEXT;
+    private static TestDOMStoreFactory DOM_STORE_FACTORY;
 
     private CurrentSchemaContext currentSchemaContext;
     private TransactionProvider transactionProvider;
@@ -73,10 +76,13 @@ abstract class AbstractNetconfOperationTest {
     static void beforeClass() {
         SCHEMA_CONTEXT = parseYangResources(AbstractNetconfOperationTest.class,
             "/yang/mdsal-netconf-mapping-test.yang");
+        DOM_STORE_FACTORY = TestDOMStoreFactory.builder(ReferenceDataTreeFactoryModule.provideDataTreeFactory())
+            .build();
     }
 
     @AfterAll
     static void afterClass() {
+        DOM_STORE_FACTORY = null;
         SCHEMA_CONTEXT = null;
     }
 
@@ -88,8 +94,10 @@ abstract class AbstractNetconfOperationTest {
         final var schemaService = new FixedDOMSchemaService(() -> SCHEMA_CONTEXT,
             sourceIdentifier -> Futures.immediateFuture(new DelegatedYangTextSource(sourceIdentifier,
                 CharSource.wrap("module test"))));
-        final var operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
-        final var configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
+        final var operStore = DOM_STORE_FACTORY.newDirectDOMStore("DOM-OPER",
+            DataTreeConfiguration.DEFAULT_OPERATIONAL, schemaService);
+        final var configStore = DOM_STORE_FACTORY.newDirectDOMStore("DOM-CFG",
+            DataTreeConfiguration.DEFAULT_OPERATIONAL, schemaService);
 
         currentSchemaContext = new CurrentSchemaContext(schemaService);
 

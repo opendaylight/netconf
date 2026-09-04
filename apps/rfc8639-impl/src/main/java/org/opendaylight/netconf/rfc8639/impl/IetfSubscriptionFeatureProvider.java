@@ -15,6 +15,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.IetfSubscribedNotificationsData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subtree;
 import org.opendaylight.yangtools.binding.YangFeature;
+import org.opendaylight.yangtools.binding.meta.RootMeta;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
@@ -24,8 +25,8 @@ import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 @NonNullByDefault
 public final class IetfSubscriptionFeatureProvider implements YangFeatureProvider<IetfSubscribedNotificationsData> {
     @Override
-    public Class<IetfSubscribedNotificationsData> boundModule() {
-        return IetfSubscribedNotificationsData.class;
+    public RootMeta<IetfSubscribedNotificationsData> boundModule() {
+        return IetfSubscribedNotificationsData.META;
     }
 
     @Override

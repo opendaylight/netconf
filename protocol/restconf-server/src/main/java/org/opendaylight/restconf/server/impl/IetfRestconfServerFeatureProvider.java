@@ -16,6 +16,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.se
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.server.rev251204.TcpListen;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.server.rev251204.TlsListen;
 import org.opendaylight.yangtools.binding.YangFeature;
+import org.opendaylight.yangtools.binding.meta.RootMeta;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
@@ -25,8 +26,8 @@ import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 @NonNullByDefault
 public final class IetfRestconfServerFeatureProvider implements YangFeatureProvider<IetfRestconfServerData> {
     @Override
-    public Class<IetfRestconfServerData> boundModule() {
-        return IetfRestconfServerData.class;
+    public RootMeta<IetfRestconfServerData> boundModule() {
+        return IetfRestconfServerData.META;
     }
 
     @Override
