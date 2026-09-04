@@ -204,6 +204,7 @@ public final class JsonPatchBody extends PatchBody {
 
     /**
      * Parse data defined in value node and saves it to buffer.
+     *
      * @param sb Buffer to read value node
      * @param in JsonReader reader
      * @throws IOException if operation fails
@@ -244,6 +245,7 @@ public final class JsonPatchBody extends PatchBody {
 
     /**
      * Parse one value object of data and saves it to buffer.
+     *
      * @param sb Buffer to read value object
      * @param in JsonReader reader
      * @throws IOException if operation fails
@@ -297,6 +299,7 @@ public final class JsonPatchBody extends PatchBody {
 
     /**
      * Read patch edit data defined in value node to NormalizedNode.
+     *
      * @param in reader JsonReader reader
      * @return NormalizedNode representing data
      * @throws RequestException if parsing of {@link JsonReader} fails due to invalid data.
@@ -323,6 +326,7 @@ public final class JsonPatchBody extends PatchBody {
 
     /**
      * Prepare PatchEntity from PatchEdit instance when it satisfies conditions, otherwise throws exception.
+     *
      * @param edit Instance of PatchEdit
      * @return PatchEntity Patch entity
      * @throws RequestException if the {@link PatchEdit} is not consistent
