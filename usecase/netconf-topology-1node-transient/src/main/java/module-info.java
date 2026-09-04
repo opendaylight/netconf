@@ -22,6 +22,7 @@ module org.opendaylight.netconf.dagger {
     requires transitive org.opendaylight.mdsal.binding.dom.adapter;
     requires transitive org.opendaylight.mdsal.dom.api;
     requires transitive org.opendaylight.mdsal.dom.broker;
+    requires transitive org.opendaylight.mdsal.dom.store.inmemory;
     requires transitive org.opendaylight.mdsal.eos.binding.dom.adapter;
     requires transitive org.opendaylight.mdsal.singleton.api;
     requires transitive org.opendaylight.odlparent.dagger;
@@ -44,21 +45,22 @@ module org.opendaylight.netconf.dagger {
     requires transitive org.opendaylight.yangtools.yang.xpath.impl;
     requires transitive org.opendaylight.yangtools.yin.source.dom;
     requires transitive spring.boot;
-    requires aaa.authn.api;
-    requires aaa.cert;
-    requires aaa.encrypt.service;
-    requires aaa.password.service.api;
-    requires aaa.password.service.impl;
-    requires aaa.shiro;
-    requires aaa.tokenauthrealm;
+    requires org.opendaylight.aaa.authn.api;
+    requires org.opendaylight.aaa.authn.tokenrealm;
+    requires org.opendaylight.aaa.cert;
+    requires org.opendaylight.aaa.encrypt.service.api;
+    requires org.opendaylight.aaa.password.service.api;
+    requires org.opendaylight.aaa.password.service.impl;
+    requires org.opendaylight.aaa.repackaged.shiro;
+    requires org.opendaylight.aaa.shiro.impl;
     requires java.net.http;
     requires java.validation;
     requires javax.servlet.api;
-    requires mdsal.dom.inmemory.datastore;
     requires netconf.client;
     requires netconf.client.mdsal;
     requires netconf.topology;
     requires netconf.topology.impl;
+    requires org.opendaylight.aaa.web.api;
     requires org.opendaylight.mdsal.eos.dom.api;
     requires org.opendaylight.mdsal.eos.dom.simple;
     requires org.opendaylight.mdsal.singleton.impl;
@@ -69,7 +71,7 @@ module org.opendaylight.netconf.dagger {
     requires org.opendaylight.restconf.server.api;
     requires org.opendaylight.restconf.server.mdsal;
     requires org.opendaylight.restconf.server.spi;
-    requires repackaged.shiro;
+    requires org.opendaylight.yangtools.yang.data.tree;
     requires restconf.server;
     requires sal.distributed.datastore;
     requires servlet.api;
@@ -77,7 +79,6 @@ module org.opendaylight.netconf.dagger {
     requires spring.beans;
     requires spring.context;
     requires spring.core;
-    requires web.api;
 
     requires static transitive com.google.errorprone.annotations;
     requires static jakarta.inject;
