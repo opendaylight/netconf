@@ -194,7 +194,7 @@ public class NetconfMessageTransformer
                 SchemaInferenceStack.of(databind.modelContext(), notificationPath).toInference(), strictParsing);
             xmlParser.traverse(new DOMSource(element));
         } catch (XMLStreamException | IOException | UnsupportedOperationException e) {
-            throw new IllegalArgumentException(String.format("Failed to parse notification %s", element), e);
+            throw new IllegalArgumentException("Failed to parse notification " + element, e);
         }
         return (ContainerNode) resultHolder.getResult().data();
     }
