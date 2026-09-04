@@ -38,7 +38,7 @@ final class EXIMessageDecoder extends MessageDecoder {
         final var f = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
         if (!f.getFeature(SAXTransformerFactory.FEATURE)) {
             throw new TransformerFactoryConfigurationError(
-                    String.format("Factory %s is not a SAXTransformerFactory", f));
+                "Factory %s is not a SAXTransformerFactory".formatted(f));
         }
 
         FACTORY = f;
