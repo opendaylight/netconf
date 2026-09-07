@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc46f051_bd60548f",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/AbstractIT.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T13:02:27Z",
+      "side": 1,
+      "message": "when certificate is added here, why its not removed from AbstractHttp3E2ETest#beforeEach?",
+      "revId": "5096ad2307f57c5cc69b540925ddb1b5fae5f351",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea540bb6_34dd16cf",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/ProtocolVersion.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T13:02:27Z",
+      "side": 1,
+      "message": "which we support, since there are other classes, for example io.netty.handler.ssl.ApplicationProtocolNames",
+      "revId": "5096ad2307f57c5cc69b540925ddb1b5fae5f351",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb671e11_292ae984",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/UiTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T13:02:27Z",
+      "side": 1,
+      "message": "here, we do not have a content, why to add TEXT_HTML?",
+      "revId": "5096ad2307f57c5cc69b540925ddb1b5fae5f351",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
