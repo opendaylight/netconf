@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "369cd260_5d73d129",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T13:18:45Z",
+      "side": 1,
+      "message": "its suspicious why this is hardcoded.. how did it wok before?",
+      "revId": "947ff8c426c1f59a9b2933a70031f15e603d5c03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d9826a1_73a757db",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/AbstractOpenApiTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T13:18:45Z",
+      "side": 1,
+      "message": "maybe, we can enhance our enumeration to provide tuple of\nHttp1/http\nHttp2/http\nHttp3/https\n\ninstead of ProtocolVersion.java?",
+      "revId": "947ff8c426c1f59a9b2933a70031f15e603d5c03",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
