@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "902d66ab_1e22dcf3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 27
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T13:42:14Z",
+      "side": 1,
+      "message": "what\u0027s your goal and why in this patch?",
+      "revId": "b847e396fede9c266fd3293d82c8641c6d003434",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ad60f0f_2f009a3a",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/BenchmarkOpenApiIT.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T13:42:14Z",
+      "side": 1,
+      "message": "always QUIC, even for HTTP/1.1?",
+      "revId": "b847e396fede9c266fd3293d82c8641c6d003434",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6314fe8c_42365355",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/BenchmarkOpenApiIT.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T13:42:14Z",
+      "side": 1,
+      "message": "can we use org.opendaylight.netconf.transport.http.Response and its implementations?",
+      "revId": "b847e396fede9c266fd3293d82c8641c6d003434",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
