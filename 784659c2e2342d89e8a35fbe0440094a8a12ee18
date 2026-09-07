@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "766c7e1a_d21961ee",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T11:22:30Z",
+      "side": 1,
+      "message": "IMO unrelated changes without explanations/reasons",
+      "revId": "784659c2e2342d89e8a35fbe0440094a8a12ee18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe419b30_2f87af49",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T11:22:30Z",
+      "side": 1,
+      "message": "how?",
+      "revId": "784659c2e2342d89e8a35fbe0440094a8a12ee18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e03aeb1_e325d1c8",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T11:22:30Z",
+      "side": 1,
+      "message": "where?",
+      "revId": "784659c2e2342d89e8a35fbe0440094a8a12ee18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09158471_6d0902a0",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/SingleResponseHandler.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T11:22:30Z",
+      "side": 1,
+      "message": "why do we need it? seems completely suspicious - completing exactly once, what\u0027s the issue?",
+      "revId": "784659c2e2342d89e8a35fbe0440094a8a12ee18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
