@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69814a2b_641d6f17",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/AbstractIT.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 592,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T13:19:01Z",
+      "side": 1,
+      "message": "caw we move this logic to above switch?",
+      "revId": "f0c65dc670637966e3348ba02a2fd8c11e176eae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c110279_a7c8d9dc",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/DataE2ETest.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T13:19:01Z",
+      "side": 1,
+      "message": "why hardcoded http/1.1?",
+      "revId": "f0c65dc670637966e3348ba02a2fd8c11e176eae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7eca581c_46fe824a",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/MountPointE2ETest.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T13:19:01Z",
+      "side": 1,
+      "message": "why hardcoded?",
+      "revId": "f0c65dc670637966e3348ba02a2fd8c11e176eae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74e90f8a_9bdc8092",
+        "filename": "apps/restconf-it/src/test/resources/device-sim-notifications-h3.xml",
+        "patchSetId": 28
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T13:19:01Z",
+      "side": 1,
+      "message": "2026",
+      "revId": "f0c65dc670637966e3348ba02a2fd8c11e176eae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
