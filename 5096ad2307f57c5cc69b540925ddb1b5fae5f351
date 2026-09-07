@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "29c4dc35_fef653e2",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/AbstractIT.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T13:15:51Z",
+      "side": 1,
+      "message": "@link does not work, do you mean @code?",
+      "revId": "5096ad2307f57c5cc69b540925ddb1b5fae5f351",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ea540bb6_34dd16cf",
         "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/ProtocolVersion.java",
         "patchSetId": 21
