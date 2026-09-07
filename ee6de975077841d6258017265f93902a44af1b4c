@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bda43cab_9de94660",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T11:22:35Z",
+      "side": 1,
+      "message": "should not we need to shutdown group on failure?",
+      "revId": "ee6de975077841d6258017265f93902a44af1b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e097ede_42af38f9",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T11:22:35Z",
+      "side": 1,
+      "message": "seems to be unclear how union type is being read, can we have null option, can we use Java\u0027s switch?",
+      "revId": "ee6de975077841d6258017265f93902a44af1b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d72da57_e9cf6435",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T11:22:35Z",
+      "side": 1,
+      "message": "can we use TlsUtils.java?",
+      "revId": "ee6de975077841d6258017265f93902a44af1b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbd82cc3_5cfcd5a9",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T11:22:35Z",
+      "side": 1,
+      "message": "why not to use: `nonnullQuicClientParameters` and use defaults as defined by YANG model?",
+      "revId": "ee6de975077841d6258017265f93902a44af1b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b00c080_03a45dc3",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/QuicHTTPClient.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T11:22:35Z",
+      "side": 1,
+      "message": "where is this resolved?",
+      "revId": "ee6de975077841d6258017265f93902a44af1b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7e1ec5f_cb7daf47",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/QuicUnderlay.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T11:22:35Z",
+      "side": 1,
+      "message": "Is this a duplicate of HTTPServer.QuicUnderlay?",
+      "revId": "ee6de975077841d6258017265f93902a44af1b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5e758b5_941330fa",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/ConfigUtilsTest.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T11:22:35Z",
+      "side": 1,
+      "message": "maybe, QuicClientTest?",
+      "revId": "ee6de975077841d6258017265f93902a44af1b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9ccedb2_f212a957",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/ConfigUtilsTest.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T11:22:35Z",
+      "side": 1,
+      "message": "why?",
+      "revId": "ee6de975077841d6258017265f93902a44af1b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
