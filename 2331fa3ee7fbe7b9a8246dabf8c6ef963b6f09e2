@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3684f25a_7e152eeb",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseStreamHandler.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T11:22:25Z",
+      "side": 1,
+      "message": "@NonnullByDefault?",
+      "revId": "2331fa3ee7fbe7b9a8246dabf8c6ef963b6f09e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c5881d0_9af9fe56",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseStreamHandler.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T11:22:25Z",
+      "side": 1,
+      "message": "Why do we suddenly need SSE stream handler? Just for H/3?",
+      "revId": "2331fa3ee7fbe7b9a8246dabf8c6ef963b6f09e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a75fc74f_8a2b437e",
+        "filename": "transport/transport-http/src/main/yang/odl-quic-common.yang",
+        "patchSetId": 19
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T11:22:25Z",
+      "side": 1,
+      "message": "should be separate patch?",
+      "revId": "2331fa3ee7fbe7b9a8246dabf8c6ef963b6f09e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
