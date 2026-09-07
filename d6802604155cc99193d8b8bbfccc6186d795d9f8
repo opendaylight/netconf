@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "daded222_dfc73d90",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 28
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T13:27:37Z",
+      "side": 1,
+      "message": "separate (what)?",
+      "revId": "d6802604155cc99193d8b8bbfccc6186d795d9f8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "d3a1ebc8_af2eb23d",
@@ -14,6 +31,23 @@
       "writtenOn": "2026-09-01T09:58:06Z",
       "side": 1,
       "message": "recheck",
+      "revId": "d6802604155cc99193d8b8bbfccc6186d795d9f8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "574068ae_98254626",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/subscription/NotificationSubscriptionListeningTest.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-07T13:27:37Z",
+      "side": 1,
+      "message": "why do we change the logic of test?",
       "revId": "d6802604155cc99193d8b8bbfccc6186d795d9f8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
