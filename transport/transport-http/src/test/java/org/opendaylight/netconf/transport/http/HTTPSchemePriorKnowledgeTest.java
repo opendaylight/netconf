@@ -7,9 +7,11 @@
  */
 package org.opendaylight.netconf.transport.http;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opendaylight.netconf.transport.http.HTTPServerSessionBootstrap.DEFAULT_MAX_REQUEST_BODY_SIZE;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -41,7 +43,9 @@ class HTTPSchemePriorKnowledgeTest {
         final var dummy = new ChannelInboundHandlerAdapter();
         final var channel = new EmbeddedChannel(dummy, eventCatcher);
 
-        HTTPScheme.HTTP.initializeServerPipeline(channel.pipeline().context(dummy), Uint32.valueOf(16384));
+        HTTPScheme.HTTP.initializeServerPipeline(channel.pipeline().context(dummy), Uint32.valueOf(16384),
+            new HttpRequestLimits(Uint32.valueOf(8192), Uint32.valueOf(16384), Uint32.valueOf(8192),
+                Uint32.valueOf(DEFAULT_MAX_REQUEST_BODY_SIZE)));
 
         final var preface = Unpooled.copiedBuffer("PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n", CharsetUtil.US_ASCII);
         channel.writeInbound(preface);
@@ -49,7 +53,11 @@ class HTTPSchemePriorKnowledgeTest {
 
         assertTrue(events.contains(HTTPServerPipelineSetup.HTTP_2),
             "Expected HTTP/2 setup event for prior-knowledge preface");
-        assertNotNull(channel.pipeline().context(Http2FrameCodec.class));
+        final var frameCodec = channel.pipeline().get(Http2FrameCodec.class);
+        assertNotNull(frameCodec);
+        final var settings = frameCodec.decoder().localSettings();
+        assertEquals(16384L, settings.maxHeaderListSize());
+        assertEquals(100L, settings.maxConcurrentStreams());
         assertNull(channel.pipeline().get("h2-multiplexer"));
         channel.finishAndReleaseAll();
     }
