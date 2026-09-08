@@ -23,18 +23,46 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(HTTPServerSessionBootstrap.class);
+    /** Default HTTP/1.1 request line length, in bytes. */
+    public static final int DEFAULT_MAX_INITIAL_LINE_LENGTH = 8192;
+    /** Default HTTP header size, in bytes. */
+    public static final int DEFAULT_MAX_HEADER_SIZE = 16384;
+    /** Default HTTP/1.1 request decoder chunk size, in bytes. */
+    public static final int DEFAULT_MAX_REQUEST_CHUNK_SIZE = 8192;
+    /** Default HTTP request body size, in bytes. */
+    public static final int DEFAULT_MAX_REQUEST_BODY_SIZE = 10485760;
+
 
     protected final @NonNull HTTPScheme scheme;
     protected final @NonNull Uint32 frameSize;
+    protected final @NonNull Uint32 maxRequestBodySize;
+    private final @NonNull HttpRequestLimits requestLimits;
 
     protected HTTPServerSessionBootstrap(final HTTPScheme scheme, final Uint32 frameSize) {
+        this(scheme, frameSize, Uint32.valueOf(DEFAULT_MAX_INITIAL_LINE_LENGTH),
+            Uint32.valueOf(DEFAULT_MAX_HEADER_SIZE), Uint32.valueOf(DEFAULT_MAX_REQUEST_CHUNK_SIZE),
+            Uint32.valueOf(DEFAULT_MAX_REQUEST_BODY_SIZE));
+    }
+
+    protected HTTPServerSessionBootstrap(final HTTPScheme scheme, final Uint32 frameSize,
+            final Uint32 maxInitialLineLength, final Uint32 maxHeaderSize, final Uint32 maxRequestChunkSize,
+            final Uint32 maxRequestBodySize) {
+        this(scheme, frameSize,
+            new HttpRequestLimits(maxInitialLineLength, maxHeaderSize, maxRequestChunkSize, maxRequestBodySize));
+    }
+
+    protected HTTPServerSessionBootstrap(final HTTPScheme scheme, final Uint32 frameSize,
+            final HttpRequestLimits requestLimits) {
         this.scheme = requireNonNull(scheme);
-        this.frameSize = frameSize;
+        this.frameSize = requireNonNull(frameSize);
+        this.requestLimits = requireNonNull(requestLimits);
+        maxRequestBodySize = requestLimits.maxRequestBodySize();
     }
 
     @Override
     public final void handlerAdded(final ChannelHandlerContext ctx) {
-        scheme.initializeServerPipeline(ctx, frameSize);
+        scheme.initializeServerPipeline(ctx, frameSize, requestLimits.maxInitialLineLength(),
+            requestLimits.maxHeaderSize(), requestLimits.maxRequestChunkSize(), maxRequestBodySize);
     }
 
     @SuppressWarnings("checkstyle:MissingSwitchDefault")

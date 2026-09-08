@@ -21,20 +21,20 @@ import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.netconf.transport.http.HTTPServerSessionBootstrap;
+import org.opendaylight.netconf.transport.http.HttpRequestLimits;
 import org.opendaylight.netconf.transport.http.PipelinedHTTPServerSession;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
 @NonNullByDefault
 final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
-    private static final int MAX_HTTP2_CONTENT_LENGTH = 16 * 1024;
-
     private final EndpointRoot root;
     private final Uint32 chunkSize;
     private final WriteBufferWaterMark writeBufferWaterMark;
 
     RestconfSessionBootstrap(final HTTPScheme scheme, final EndpointRoot root,
-            final Uint32 chunkSize, final Uint32 frameSize, final WriteBufferWaterMark writeBufferWaterMark) {
-        super(scheme, frameSize);
+            final Uint32 chunkSize, final Uint32 frameSize, final HttpRequestLimits requestLimits,
+            final WriteBufferWaterMark writeBufferWaterMark) {
+        super(scheme, frameSize, requestLimits);
         this.root = requireNonNull(root);
         this.chunkSize = requireNonNull(chunkSize);
         this.writeBufferWaterMark = requireNonNull(writeBufferWaterMark);
@@ -65,7 +65,7 @@ final class RestconfSessionBootstrap extends HTTPServerSessionBootstrap {
                 ch.config().setWriteBufferWaterMark(writeBufferWaterMark);
                 final var pipeline = ch.pipeline();
                 pipeline.addLast(new Http2StreamFrameToHttpObjectCodec(true));
-                pipeline.addLast(new HttpObjectAggregator(MAX_HTTP2_CONTENT_LENGTH));
+                pipeline.addLast(new HttpObjectAggregator(maxRequestBodySize.intValue()));
                 // SETTINGS exchange is complete by stream creation time; read the peer-negotiated value now
                 final var codec = ctx.pipeline().get(Http2FrameCodec.class);
                 final var frameSize = Uint32.valueOf(codec.encoder().configuration().frameSizePolicy().maxFrameSize());
