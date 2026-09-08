@@ -8,16 +8,23 @@
 package org.opendaylight.restconf.server;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mockConstruction;
 
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.WriteBufferWaterMark;
 import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http2.DefaultHttp2DataFrame;
+import io.netty.handler.codec.http2.DefaultHttp2Headers;
+import io.netty.handler.codec.http2.DefaultHttp2HeadersFrame;
 import io.netty.handler.codec.http2.Http2FrameCodec;
 import io.netty.handler.codec.http2.Http2FrameCodecBuilder;
+import io.netty.handler.codec.http2.Http2HeadersFrame;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +73,8 @@ class RestconfSessionBootstrapTest {
 
         final var root = new EndpointRoot(principalService, new WellKnownResources("/restconf"), Map.of());
         final var bootstrap = new RestconfSessionBootstrap(HTTPScheme.HTTP, root,
-            Uint32.valueOf(262144), Uint32.valueOf(16384),
+            Uint32.valueOf(262144), Uint32.valueOf(16384), Uint32.valueOf(8192), Uint32.valueOf(16384),
+            Uint32.valueOf(8192), Uint32.valueOf(10485760),
             new WriteBufferWaterMark(32768, 65536));
 
         // Build the initializer while the codec still reports the pre-SETTINGS default (16384).
@@ -83,11 +91,41 @@ class RestconfSessionBootstrapTest {
         try (var mocked = mockConstruction(ConcurrentRestconfSession.class,
                 (mock, mockCtx) -> capturedArgs.add(mockCtx.arguments()))) {
             new EmbeddedChannel(initializer);
+            assertEquals(1, mocked.constructed().size());
         }
 
         assertEquals(1, capturedArgs.size(), "expected exactly one ConcurrentRestconfSession to be constructed");
         assertEquals(peerFrameSize, capturedArgs.getFirst().get(CHUNK_SIZE_ARG_INDEX),
             "HTTP/2 session chunk size must equal the peer-negotiated SETTINGS_MAX_FRAME_SIZE read "
                 + "at stream-creation time, not the pre-SETTINGS default captured at pipeline-setup time");
+    }
+
+    @Test
+    void http2ChildInitializerRejectsOversizedRequestBody() throws Exception {
+        final var codec = Http2FrameCodecBuilder.forServer().build();
+        doReturn(parentPipeline).when(ctx).pipeline();
+        doReturn(codec).when(parentPipeline).get(Http2FrameCodec.class);
+        doReturn(parentChannel).when(ctx).channel();
+        doReturn(new InetSocketAddress(0)).when(parentChannel).remoteAddress();
+
+        final var root = new EndpointRoot(principalService, new WellKnownResources("/restconf"), Map.of());
+        final var bootstrap = new RestconfSessionBootstrap(HTTPScheme.HTTP, root, Uint32.valueOf(262144),
+            Uint32.valueOf(16384), Uint32.valueOf(8192), Uint32.valueOf(16384), Uint32.valueOf(8192),
+            Uint32.valueOf(1024), new WriteBufferWaterMark(32768, 65536));
+
+        try (var mocked = mockConstruction(ConcurrentRestconfSession.class)) {
+            final var channel = new EmbeddedChannel(bootstrap.buildHttp2ChildInitializer(ctx));
+            assertEquals(1, mocked.constructed().size());
+            assertEquals(1024, channel.pipeline().get(HttpObjectAggregator.class).maxContentLength());
+
+            channel.writeInbound(new DefaultHttp2HeadersFrame(new DefaultHttp2Headers()
+                .method("POST").scheme("http").authority("localhost").path("/restconf/data"), false));
+            channel.writeInbound(new DefaultHttp2DataFrame(Unpooled.buffer(1025).writeZero(1025), true));
+            channel.runPendingTasks();
+
+            final var response = assertInstanceOf(Http2HeadersFrame.class, channel.readOutbound());
+            assertEquals("413", response.headers().status().toString());
+            channel.finishAndReleaseAll();
+        }
     }
 }

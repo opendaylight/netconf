@@ -26,15 +26,32 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
 
     protected final @NonNull HTTPScheme scheme;
     protected final @NonNull Uint32 frameSize;
+    protected final @NonNull Uint32 maxRequestBodySize;
+    private final @NonNull Uint32 maxInitialLineLength;
+    private final @NonNull Uint32 maxHeaderSize;
+    private final @NonNull Uint32 maxRequestChunkSize;
 
     protected HTTPServerSessionBootstrap(final HTTPScheme scheme, final Uint32 frameSize) {
+        // Defaults from odl-http-server's server-limits and odl-server-limits containers.
+        this(scheme, frameSize, Uint32.valueOf(8192), Uint32.valueOf(16384), Uint32.valueOf(8192),
+            Uint32.valueOf(10485760));
+    }
+
+    protected HTTPServerSessionBootstrap(final HTTPScheme scheme, final Uint32 frameSize,
+            final Uint32 maxInitialLineLength, final Uint32 maxHeaderSize, final Uint32 maxRequestChunkSize,
+            final Uint32 maxRequestBodySize) {
         this.scheme = requireNonNull(scheme);
-        this.frameSize = frameSize;
+        this.frameSize = requireNonNull(frameSize);
+        this.maxInitialLineLength = requireNonNull(maxInitialLineLength);
+        this.maxHeaderSize = requireNonNull(maxHeaderSize);
+        this.maxRequestChunkSize = requireNonNull(maxRequestChunkSize);
+        this.maxRequestBodySize = requireNonNull(maxRequestBodySize);
     }
 
     @Override
     public final void handlerAdded(final ChannelHandlerContext ctx) {
-        scheme.initializeServerPipeline(ctx, frameSize);
+        scheme.initializeServerPipeline(ctx, frameSize, maxInitialLineLength, maxHeaderSize, maxRequestChunkSize,
+            maxRequestBodySize);
     }
 
     @SuppressWarnings("checkstyle:MissingSwitchDefault")

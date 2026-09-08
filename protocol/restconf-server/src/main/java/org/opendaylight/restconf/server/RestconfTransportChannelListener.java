@@ -33,6 +33,10 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     private final EndpointRoot root;
     private final Uint32 chunkSize;
     private final Uint32 frameSize;
+    private final Uint32 maxInitialLineLength;
+    private final Uint32 maxHeaderSize;
+    private final Uint32 maxRequestChunkSize;
+    private final Uint32 maxRequestBodySize;
     private final WriteBufferWaterMark writeBufferWaterMark;
 
     RestconfTransportChannelListener(final RestconfServer server, final RestconfStream.Registry streamRegistry,
@@ -67,6 +71,10 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
         chunkSize = configuration.chunkSize();
         frameSize = configuration.frameSize();
+        maxInitialLineLength = configuration.maxInitialLineLength();
+        maxHeaderSize = configuration.maxHeaderSize();
+        maxRequestChunkSize = configuration.maxRequestChunkSize();
+        maxRequestBodySize = configuration.maxRequestBodySize();
         this.writeBufferWaterMark = writeBufferWaterMark;
 
         LOG.info("Initialized with service {}", server.getClass());
@@ -81,7 +89,8 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     @Override
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
         channel.channel().pipeline().addLast(new RestconfSessionBootstrap(channel.scheme(), root, chunkSize,
-            frameSize, writeBufferWaterMark));
+            frameSize, maxInitialLineLength, maxHeaderSize, maxRequestChunkSize, maxRequestBodySize,
+            writeBufferWaterMark));
     }
 
     @Override

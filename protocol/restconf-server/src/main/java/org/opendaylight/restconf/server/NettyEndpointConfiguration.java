@@ -53,6 +53,10 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     private final @NonNull MessageEncoding defaultEncoding;
     private final @NonNull Uint32 chunkSize;
     private final @NonNull Uint32 frameSize;
+    private final @NonNull Uint32 maxInitialLineLength;
+    private final @NonNull Uint32 maxHeaderSize;
+    private final @NonNull Uint32 maxRequestChunkSize;
+    private final @NonNull Uint32 maxRequestBodySize;
     private final @NonNull Uint32 writeBufferLowWaterMark;
     private final @NonNull Uint32 writeBufferHighWaterMark;
 
@@ -61,6 +65,19 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             final List<String> apiRootPath, final MessageEncoding defaultEncoding,
             final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize, final Uint32 frameSize,
             final Uint32 writeBufferLowWaterMark, final Uint32 writeBufferHighWaterMark) {
+        this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis, apiRootPath,
+            defaultEncoding, transportConfiguration, chunkSize, frameSize, Uint32.valueOf(8192),
+            Uint32.valueOf(16384), Uint32.valueOf(8192), Uint32.valueOf(10485760),
+            writeBufferLowWaterMark, writeBufferHighWaterMark);
+    }
+
+    public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
+            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis,
+            final List<String> apiRootPath, final MessageEncoding defaultEncoding,
+            final HttpServerStackGrouping transportConfiguration, final Uint32 chunkSize,
+            final Uint32 frameSize, final Uint32 maxInitialLineLength, final Uint32 maxHeaderSize,
+            final Uint32 maxRequestChunkSize, final Uint32 maxRequestBodySize, final Uint32 writeBufferLowWaterMark,
+            final Uint32 writeBufferHighWaterMark) {
         super(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis);
         this.transportConfiguration = requireNonNull(transportConfiguration);
         this.defaultEncoding = requireNonNull(defaultEncoding);
@@ -70,11 +87,43 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         }
         this.chunkSize = chunkSize;
 
-        if (frameSize.intValue() < 16384 || frameSize.intValue() > 16777215) {
+        if (requireNonNull(frameSize).longValue() < 16384 || frameSize.longValue() > 16777215) {
             throw new IllegalArgumentException(
                 "HTTP/2 frame size must be between 16384 bytes (16 KiB) and 16777215 bytes (16 MiB)");
         }
         this.frameSize = frameSize;
+
+        if (requireNonNull(maxInitialLineLength).longValue() < 1) {
+            throw new IllegalArgumentException("HTTP/1.1 request line length must be at least one byte");
+        }
+        if (maxInitialLineLength.longValue() > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("HTTP/1.1 request line length must not exceed " + Integer.MAX_VALUE);
+        }
+        this.maxInitialLineLength = maxInitialLineLength;
+
+        if (requireNonNull(maxHeaderSize).longValue() < 1) {
+            throw new IllegalArgumentException("HTTP header size must be at least one byte");
+        }
+        if (maxHeaderSize.longValue() > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("HTTP header size must not exceed " + Integer.MAX_VALUE);
+        }
+        this.maxHeaderSize = maxHeaderSize;
+
+        if (requireNonNull(maxRequestChunkSize).longValue() < 1) {
+            throw new IllegalArgumentException("HTTP/1.1 request decoder chunk must have at least one byte");
+        }
+        if (maxRequestChunkSize.longValue() > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("HTTP/1.1 request decoder chunk must not exceed " + Integer.MAX_VALUE);
+        }
+        this.maxRequestChunkSize = maxRequestChunkSize;
+
+        if (requireNonNull(maxRequestBodySize).longValue() < 1) {
+            throw new IllegalArgumentException("HTTP request body size must be at least one byte");
+        }
+        if (maxRequestBodySize.longValue() > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("HTTP request body size must not exceed " + Integer.MAX_VALUE);
+        }
+        this.maxRequestBodySize = maxRequestBodySize;
 
         final var lowWaterMark = requireNonNull(writeBufferLowWaterMark);
         if (lowWaterMark.longValue() > Integer.MAX_VALUE) {
@@ -109,6 +158,18 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
         this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
             parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize,
             writeBufferLowWaterMark, writeBufferHighWaterMark);
+    }
+
+    public NettyEndpointConfiguration(final ErrorTagMapping errorTagMapping, final PrettyPrintParam prettyPrint,
+            final Uint16 sseMaximumFragmentLength, final Uint32 sseHeartbeatIntervalMillis, final String apiRootPath,
+            final MessageEncoding defaultEncoding, final HttpServerStackGrouping transportConfiguration,
+            final Uint32 chunkSize, final Uint32 frameSize, final Uint32 maxInitialLineLength,
+            final Uint32 maxHeaderSize, final Uint32 maxRequestChunkSize, final Uint32 maxRequestBodySize,
+            final Uint32 writeBufferLowWaterMark, final Uint32 writeBufferHighWaterMark) {
+        this(errorTagMapping, prettyPrint, sseMaximumFragmentLength, sseHeartbeatIntervalMillis,
+            parsePathRootless(apiRootPath), defaultEncoding, transportConfiguration, chunkSize, frameSize,
+            maxInitialLineLength, maxHeaderSize, maxRequestChunkSize, maxRequestBodySize, writeBufferLowWaterMark,
+            writeBufferHighWaterMark);
     }
 
     @Beta
@@ -208,6 +269,34 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     }
 
     /**
+     * {@return maximum HTTP/1.1 request line length}
+     */
+    public @NonNull Uint32 maxInitialLineLength() {
+        return maxInitialLineLength;
+    }
+
+    /**
+     * {@return maximum HTTP request header size}
+     */
+    public @NonNull Uint32 maxHeaderSize() {
+        return maxHeaderSize;
+    }
+
+    /**
+     * {@return maximum HTTP/1.1 request decoder chunk size}
+     */
+    public @NonNull Uint32 maxRequestChunkSize() {
+        return maxRequestChunkSize;
+    }
+
+    /**
+     * {@return maximum aggregated HTTP request body size}
+     */
+    public @NonNull Uint32 maxRequestBodySize() {
+        return maxRequestBodySize;
+    }
+
+    /**
      * {@return low watermark for queued outbound bytes}
      */
     public Uint32 writeBufferLowWaterMark() {
@@ -224,7 +313,8 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
     @Override
     public int hashCode() {
         return Objects.hash(errorTagMapping(), prettyPrint(), sseMaximumFragmentLength(), sseHeartbeatIntervalMillis(),
-            apiRootPath, transportConfiguration, defaultEncoding, writeBufferLowWaterMark, writeBufferHighWaterMark);
+            apiRootPath, transportConfiguration, defaultEncoding, maxInitialLineLength, maxHeaderSize,
+            maxRequestChunkSize, maxRequestBodySize, writeBufferLowWaterMark, writeBufferHighWaterMark);
     }
 
     @Override
@@ -234,7 +324,9 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
             && sseMaximumFragmentLength().equals(other.sseMaximumFragmentLength())
             && sseHeartbeatIntervalMillis().equals(other.sseHeartbeatIntervalMillis())
             && apiRootPath.equals(other.apiRootPath) && transportConfiguration.equals(other.transportConfiguration)
-            && defaultEncoding.equals(other.defaultEncoding)
+            && defaultEncoding.equals(other.defaultEncoding) && maxInitialLineLength.equals(other.maxInitialLineLength)
+            && maxHeaderSize.equals(other.maxHeaderSize) && maxRequestChunkSize.equals(other.maxRequestChunkSize)
+            && maxRequestBodySize.equals(other.maxRequestBodySize)
             && writeBufferLowWaterMark.equals(other.writeBufferLowWaterMark)
             && writeBufferHighWaterMark.equals(other.writeBufferHighWaterMark);
     }
@@ -247,6 +339,10 @@ public final class NettyEndpointConfiguration extends EndpointConfiguration {
                 .collect(Collectors.joining("/")))
             .add("defaultEncoding", defaultEncoding)
             .add("transportConfiguration", transportConfiguration)
+            .add("maxInitialLineLength", maxInitialLineLength)
+            .add("maxHeaderSize", maxHeaderSize)
+            .add("maxRequestChunkSize", maxRequestChunkSize)
+            .add("maxRequestBodySize", maxRequestBodySize)
             .add("writeBufferLowWaterMark", writeBufferLowWaterMark)
             .add("writeBufferHighWaterMark", writeBufferHighWaterMark);
     }
