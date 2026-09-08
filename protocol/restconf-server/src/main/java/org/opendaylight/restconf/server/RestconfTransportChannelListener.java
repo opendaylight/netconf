@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.http.HTTPTransportChannel;
+import org.opendaylight.netconf.transport.http.HttpRequestLimits;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.impl.EndpointInvariants;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -33,6 +34,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     private final EndpointRoot root;
     private final Uint32 chunkSize;
     private final Uint32 frameSize;
+    private final HttpRequestLimits requestLimits;
     private final WriteBufferWaterMark writeBufferWaterMark;
 
     RestconfTransportChannelListener(final RestconfServer server, final RestconfStream.Registry streamRegistry,
@@ -67,6 +69,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
 
         chunkSize = configuration.chunkSize();
         frameSize = configuration.frameSize();
+        requestLimits = configuration.requestLimits();
         this.writeBufferWaterMark = writeBufferWaterMark;
 
         LOG.info("Initialized with service {}", server.getClass());
@@ -81,7 +84,7 @@ final class RestconfTransportChannelListener implements TransportChannelListener
     @Override
     public void onTransportChannelEstablished(final HTTPTransportChannel channel) {
         channel.channel().pipeline().addLast(new RestconfSessionBootstrap(channel.scheme(), root, chunkSize,
-            frameSize, writeBufferWaterMark));
+            frameSize, requestLimits, writeBufferWaterMark));
     }
 
     @Override
