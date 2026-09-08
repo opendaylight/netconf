@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -20,6 +21,7 @@ import io.netty.handler.codec.http.HttpMessage;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.ReferenceCountUtil;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -31,6 +33,7 @@ import org.slf4j.LoggerFactory;
  * Partial implementation of {@link AuthHandler} for Basic Authorization. Handles username and password extraction
  * from Authorization header. Builds response messages for UNAUTHORIZED and FORBIDDEN cases when request is not
  * authenticated or not authorized (accordingly).
+ * Requests with decoder failures are rejected before authentication and are never forwarded to downstream handlers.
  *
  * @param <T> authentication data carrier type
  */
@@ -44,6 +47,14 @@ public abstract class AbstractBasicAuthHandler<T> extends SimpleChannelInboundHa
 
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final HttpRequest request) throws Exception {
+        if (request.decoderResult().isFailure()) {
+            // Do not trust the version or headers of a partially decoded request, including its HTTP/2 stream id.
+            final var status = HTTPServerSession.statusOf(request, request.decoderResult().cause());
+            ctx.writeAndFlush(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status))
+                .addListener(ChannelFutureListener.CLOSE);
+            return;
+        }
+
         final var authn = authenticate(request);
         if (authn == null) {
             final var response = errorResponse(request, HttpResponseStatus.UNAUTHORIZED);
