@@ -32,6 +32,10 @@ import org.slf4j.LoggerFactory;
  * from Authorization header. Builds response messages for UNAUTHORIZED and FORBIDDEN cases when request is not
  * authenticated or not authorized (accordingly).
  *
+ * <p>Requests with decoder failures are forwarded without authentication so the downstream session can reject them
+ * in HTTP/1.1 response order. Downstream handlers must check {@link HttpRequest#decoderResult()} and reject failed
+ * requests before processing their method, URI or headers. {@link HTTPServerSession} performs this check.
+ *
  * @param <T> authentication data carrier type
  */
 public abstract class AbstractBasicAuthHandler<T> extends SimpleChannelInboundHandler<HttpRequest>
@@ -44,6 +48,12 @@ public abstract class AbstractBasicAuthHandler<T> extends SimpleChannelInboundHa
 
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final HttpRequest request) throws Exception {
+        if (request.decoderResult().isFailure()) {
+            // Let the session reject this request in order, without trusting incomplete headers for authentication.
+            ctx.fireChannelRead(ReferenceCountUtil.retain(request));
+            return;
+        }
+
         final var authn = authenticate(request);
         if (authn == null) {
             final var response = errorResponse(request, HttpResponseStatus.UNAUTHORIZED);

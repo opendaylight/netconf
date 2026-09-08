@@ -26,15 +26,22 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
 
     protected final @NonNull HTTPScheme scheme;
     protected final @NonNull Uint32 frameSize;
+    protected final @NonNull HttpRequestLimits requestLimits;
 
     protected HTTPServerSessionBootstrap(final HTTPScheme scheme, final Uint32 frameSize) {
+        this(scheme, frameSize, HttpRequestLimits.DEFAULT);
+    }
+
+    protected HTTPServerSessionBootstrap(final HTTPScheme scheme, final Uint32 frameSize,
+            final HttpRequestLimits requestLimits) {
         this.scheme = requireNonNull(scheme);
-        this.frameSize = frameSize;
+        this.frameSize = requireNonNull(frameSize);
+        this.requestLimits = requireNonNull(requestLimits);
     }
 
     @Override
     public final void handlerAdded(final ChannelHandlerContext ctx) {
-        scheme.initializeServerPipeline(ctx, frameSize);
+        scheme.initializeServerPipeline(ctx, frameSize, requestLimits);
     }
 
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
