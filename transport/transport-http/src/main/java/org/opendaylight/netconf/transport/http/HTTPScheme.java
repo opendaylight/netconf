@@ -49,10 +49,12 @@ public enum HTTPScheme {
         private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.DEBUG, "Clear2To1");
 
         @Override
-        void initializeServerPipeline(final ChannelHandlerContext ctx, final Uint32 frameSize) {
+        void initializeServerPipeline(final ChannelHandlerContext ctx, final Uint32 frameSize,
+                final int maxInitialLineLength, final int maxHeaderSize, final int maxRequestChunkSize,
+                final int maxRequestBodySize) {
             // Cleartext upgrade flow
-            final var sourceCodec = new HttpServerCodec();
-            final var http2FrameCodec = newHttp2FrameCodec(FRAME_LOGGER, frameSize);
+            final var sourceCodec = new HttpServerCodec(maxInitialLineLength, maxHeaderSize, maxRequestChunkSize);
+            final var http2FrameCodec = newHttp2FrameCodec(FRAME_LOGGER, frameSize, maxHeaderSize);
             ctx.pipeline()
                 .addBefore(ctx.name(), null, new CleartextHttp2ServerUpgradeHandler(
                     sourceCodec,
@@ -64,9 +66,9 @@ public enum HTTPScheme {
                             }
                             return null;
                         },
-                        HTTPServer.MAX_HTTP_CONTENT_LENGTH),
+                        maxRequestBodySize),
                     http2FrameCodec))
-                .addBefore(ctx.name(), null, new CleartextUpgradeHandler());
+                .addBefore(ctx.name(), null, new CleartextUpgradeHandler(maxRequestBodySize));
         }
     },
     /**
@@ -74,8 +76,11 @@ public enum HTTPScheme {
      */
     HTTPS(HttpScheme.HTTPS) {
         @Override
-        void initializeServerPipeline(final ChannelHandlerContext ctx, final Uint32 frameSize) {
-            ctx.pipeline().addBefore(ctx.name(), null, new AlpnUpgradeHandler(frameSize));
+        void initializeServerPipeline(final ChannelHandlerContext ctx, final Uint32 frameSize,
+                final int maxInitialLineLength, final int maxHeaderSize, final int maxRequestChunkSize,
+                final int maxRequestBodySize) {
+            ctx.pipeline().addBefore(ctx.name(), null, new AlpnUpgradeHandler(frameSize, maxInitialLineLength,
+                maxHeaderSize, maxRequestChunkSize, maxRequestBodySize));
         }
     };
 
@@ -87,10 +92,19 @@ public enum HTTPScheme {
         private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.INFO, "Alpn2To1");
 
         private final Uint32 frameSize;
+        private final int maxInitialLineLength;
+        private final int maxHeaderSize;
+        private final int maxRequestChunkSize;
+        private final int maxRequestBodySize;
 
-        AlpnUpgradeHandler(final Uint32 frameSize) {
+        AlpnUpgradeHandler(final Uint32 frameSize, final int maxInitialLineLength, final int maxHeaderSize,
+                final int maxRequestChunkSize, final int maxRequestBodySize) {
             super(ApplicationProtocolNames.HTTP_1_1);
-            this.frameSize = frameSize;
+            this.frameSize = requireNonNull(frameSize);
+            this.maxInitialLineLength = maxInitialLineLength;
+            this.maxHeaderSize = maxHeaderSize;
+            this.maxRequestChunkSize = maxRequestChunkSize;
+            this.maxRequestBodySize = maxRequestBodySize;
         }
 
         @Override
@@ -106,15 +120,15 @@ public enum HTTPScheme {
         private void configureHttp1(final ChannelHandlerContext ctx) {
             LOG.debug("{}: using HTTP/1.1", ctx.channel());
             ctx.pipeline()
-                .addAfter(ctx.name(), null, new HttpObjectAggregator(HTTPServer.MAX_HTTP_CONTENT_LENGTH))
+                .addAfter(ctx.name(), null, new HttpObjectAggregator(maxRequestBodySize))
                 .addAfter(ctx.name(), null, new HttpServerKeepAliveHandler())
-                .replace(this, null, new HttpServerCodec());
+                .replace(this, null, new HttpServerCodec(maxInitialLineLength, maxHeaderSize, maxRequestChunkSize));
             ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_11);
         }
 
         private void configureHttp2(final ChannelHandlerContext ctx) {
             LOG.debug("{}: using HTTP/2", ctx.channel());
-            ctx.pipeline().replace(this, "h2-frame-codec", newHttp2FrameCodec(FRAME_LOGGER, frameSize));
+            ctx.pipeline().replace(this, "h2-frame-codec", newHttp2FrameCodec(FRAME_LOGGER, frameSize, maxHeaderSize));
             ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
         }
     }
@@ -140,8 +154,11 @@ public enum HTTPScheme {
     private static final class CleartextUpgradeHandler extends SimpleChannelInboundHandler<HttpMessage> {
         private static final Logger LOG = LoggerFactory.getLogger(CleartextUpgradeHandler.class);
 
-        CleartextUpgradeHandler() {
+        private final int maxRequestBodySize;
+
+        CleartextUpgradeHandler(final int maxRequestBodySize) {
             super(HttpMessage.class, false);
+            this.maxRequestBodySize = maxRequestBodySize;
         }
 
         @Override
@@ -150,7 +167,7 @@ public enum HTTPScheme {
             // configure HTTP/1.1 flow, pass the message further the pipeline, remove self as no longer required
             LOG.debug("{}: continuing with HTTP/1.1", ctx.channel());
             ctx.pipeline()
-                .addAfter(ctx.name(), null, new HttpObjectAggregator(HTTPServer.MAX_HTTP_CONTENT_LENGTH))
+                .addAfter(ctx.name(), null, new HttpObjectAggregator(maxRequestBodySize))
                 .replace(this, null, new HttpServerKeepAliveHandler());
             ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_11);
             ctx.fireChannelRead(request);
@@ -213,16 +230,24 @@ public enum HTTPScheme {
      * Initialize a pipeline so that specified {@link ChannelHandlerContext} observes {@link FullHttpMessage}s.
      *
      * @param ctx reference {@link ChannelHandlerContext}
+     * @param frameSize maximum HTTP/2 frame size
+     * @param maxInitialLineLength maximum HTTP/1.1 request line length
+     * @param maxHeaderSize maximum HTTP request header size
+     * @param maxRequestChunkSize maximum HTTP/1.1 decoder chunk size
+     * @param maxRequestBodySize maximum aggregated request body size
      */
-    abstract void initializeServerPipeline(ChannelHandlerContext ctx, Uint32 frameSize);
+    abstract void initializeServerPipeline(ChannelHandlerContext ctx, Uint32 frameSize, int maxInitialLineLength,
+            int maxHeaderSize, int maxRequestChunkSize, int maxRequestBodySize);
 
     @Override
     public String toString() {
         return netty.toString();
     }
 
-    private static Http2FrameCodec newHttp2FrameCodec(final Http2FrameLogger frameLogger, final Uint32 frameSize) {
-        final var settings = Http2Settings.defaultSettings().maxFrameSize(frameSize.intValue());
+    private static Http2FrameCodec newHttp2FrameCodec(final Http2FrameLogger frameLogger, final Uint32 frameSize,
+            final int maxHeaderSize) {
+        final var settings = Http2Settings.defaultSettings().maxHeaderListSize(maxHeaderSize)
+            .maxFrameSize(frameSize.intValue());
         return Http2FrameCodecBuilder.forServer()
             .initialSettings(settings)
             .frameLogger(frameLogger)

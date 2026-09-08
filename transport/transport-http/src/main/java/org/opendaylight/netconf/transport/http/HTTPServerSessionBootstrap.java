@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.HttpObjectDecoder;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -26,15 +27,32 @@ public abstract class HTTPServerSessionBootstrap extends ChannelInboundHandlerAd
 
     protected final @NonNull HTTPScheme scheme;
     protected final @NonNull Uint32 frameSize;
+    protected final int maxRequestBodySize;
+    private final int maxInitialLineLength;
+    private final int maxHeaderSize;
+    private final int maxRequestChunkSize;
 
     protected HTTPServerSessionBootstrap(final HTTPScheme scheme, final Uint32 frameSize) {
+        this(scheme, frameSize, HttpObjectDecoder.DEFAULT_MAX_INITIAL_LINE_LENGTH,
+            HttpObjectDecoder.DEFAULT_MAX_HEADER_SIZE, HttpObjectDecoder.DEFAULT_MAX_CHUNK_SIZE,
+            HTTPTransportStack.MAX_HTTP_CONTENT_LENGTH);
+    }
+
+    protected HTTPServerSessionBootstrap(final HTTPScheme scheme, final Uint32 frameSize,
+            final int maxInitialLineLength, final int maxHeaderSize, final int maxRequestChunkSize,
+            final int maxRequestBodySize) {
         this.scheme = requireNonNull(scheme);
-        this.frameSize = frameSize;
+        this.frameSize = requireNonNull(frameSize);
+        this.maxInitialLineLength = maxInitialLineLength;
+        this.maxHeaderSize = maxHeaderSize;
+        this.maxRequestChunkSize = maxRequestChunkSize;
+        this.maxRequestBodySize = maxRequestBodySize;
     }
 
     @Override
     public final void handlerAdded(final ChannelHandlerContext ctx) {
-        scheme.initializeServerPipeline(ctx, frameSize);
+        scheme.initializeServerPipeline(ctx, frameSize, maxInitialLineLength, maxHeaderSize, maxRequestChunkSize,
+            maxRequestBodySize);
     }
 
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
