@@ -44,6 +44,12 @@ public abstract class AbstractBasicAuthHandler<T> extends SimpleChannelInboundHa
 
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final HttpRequest request) throws Exception {
+        // Let the session report decoder failures without trusting incomplete headers.
+        if (request.decoderResult().isFailure()) {
+            ctx.fireChannelRead(ReferenceCountUtil.retain(request));
+            return;
+        }
+
         final var authn = authenticate(request);
         if (authn == null) {
             final var response = errorResponse(request, HttpResponseStatus.UNAUTHORIZED);
