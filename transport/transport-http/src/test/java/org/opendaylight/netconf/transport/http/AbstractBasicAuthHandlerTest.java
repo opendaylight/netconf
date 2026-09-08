@@ -10,20 +10,31 @@ package org.opendaylight.netconf.transport.http;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opendaylight.netconf.transport.http.AbstractBasicAuthHandler.WWW_AUTHENTICATE_BASIC;
 import static org.opendaylight.netconf.transport.http.TestUtils.basicAuthHeader;
 import static org.opendaylight.netconf.transport.http.TestUtils.httpRequest;
 
 import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.handler.codec.DecoderResult;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.TooLongHttpHeaderException;
+import io.netty.handler.codec.http.TooLongHttpLineException;
 import java.util.List;
+import java.util.stream.Stream;
 import org.eclipse.jdt.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class AbstractBasicAuthHandlerTest {
@@ -75,5 +86,40 @@ class AbstractBasicAuthHandlerTest {
         channel.writeInbound(httpRequest(GRANTED_URI, VALID_AUTH_HEADER));
         // non-null readInbound() means message passed auth handler
         assertNotNull(channel.readInbound());
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void forwardsDecoderFailure(final Exception cause, final boolean hasHeaders) {
+        final var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_0, HttpMethod.POST, GRANTED_URI);
+        if (hasHeaders) {
+            request.headers().set(HttpHeaderNames.HOST, "localhost");
+            // Incomplete headers must not be interpreted by the authentication handler.
+            request.headers().set("x-http2-stream-id", "invalid");
+        }
+        request.setDecoderResult(DecoderResult.failure(cause));
+        try {
+            assertTrue(channel.writeInbound(request));
+            assertNull(channel.readOutbound());
+            assertTrue(channel.isOpen());
+            final var forwarded = channel.readInbound();
+            try {
+                assertSame(request, forwarded);
+                assertEquals(1, request.refCnt());
+                assertSame(cause, request.decoderResult().cause());
+            } finally {
+                request.release();
+            }
+        } finally {
+            channel.finishAndReleaseAll();
+        }
+    }
+
+    static Stream<Arguments> forwardsDecoderFailure() {
+        return Stream.of(
+            Arguments.of(new IllegalArgumentException("Malformed request"), true),
+            Arguments.of(new TooLongHttpLineException(), false),
+            Arguments.of(new TooLongHttpLineException(), true),
+            Arguments.of(new TooLongHttpHeaderException(), true));
     }
 }
