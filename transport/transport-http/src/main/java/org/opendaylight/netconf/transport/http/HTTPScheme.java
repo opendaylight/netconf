@@ -9,6 +9,8 @@ package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -19,6 +21,7 @@ import io.netty.handler.codec.http.HttpScheme;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
 import io.netty.handler.codec.http.HttpServerUpgradeHandler;
+import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http2.CleartextHttp2ServerUpgradeHandler;
 import io.netty.handler.codec.http2.CleartextHttp2ServerUpgradeHandler.PriorKnowledgeUpgradeEvent;
 import io.netty.handler.codec.http2.Http2CodecUtil;
@@ -34,6 +37,7 @@ import io.netty.util.AsciiString;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,10 +53,12 @@ public enum HTTPScheme {
         private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.DEBUG, "Clear2To1");
 
         @Override
-        void initializeServerPipeline(final ChannelHandlerContext ctx, final Uint32 frameSize) {
+        void initializeServerPipeline(final ChannelHandlerContext ctx, final Uint32 frameSize,
+                final HttpRequestLimits requestLimits) {
             // Cleartext upgrade flow
-            final var sourceCodec = new HttpServerCodec();
-            final var http2FrameCodec = newHttp2FrameCodec(FRAME_LOGGER, frameSize);
+            final var sourceCodec = new HttpServerCodec(requestLimits.maxInitialLineLength().intValue(),
+                requestLimits.maxHeaderSize().intValue(), requestLimits.maxRequestChunkSize().intValue());
+            final var http2FrameCodec = newHttp2FrameCodec(FRAME_LOGGER, frameSize, requestLimits.maxHeaderSize());
             ctx.pipeline()
                 .addBefore(ctx.name(), null, new CleartextHttp2ServerUpgradeHandler(
                     sourceCodec,
@@ -64,9 +70,9 @@ public enum HTTPScheme {
                             }
                             return null;
                         },
-                        HTTPServer.MAX_HTTP_CONTENT_LENGTH),
+                        requestLimits.maxRequestBodySize().intValue()),
                     http2FrameCodec))
-                .addBefore(ctx.name(), null, new CleartextUpgradeHandler());
+                .addBefore(ctx.name(), null, new CleartextUpgradeHandler(requestLimits.maxRequestBodySize()));
         }
     },
     /**
@@ -74,23 +80,28 @@ public enum HTTPScheme {
      */
     HTTPS(HttpScheme.HTTPS) {
         @Override
-        void initializeServerPipeline(final ChannelHandlerContext ctx, final Uint32 frameSize) {
-            ctx.pipeline().addBefore(ctx.name(), null, new AlpnUpgradeHandler(frameSize));
+        void initializeServerPipeline(final ChannelHandlerContext ctx, final Uint32 frameSize,
+                final HttpRequestLimits requestLimits) {
+            ctx.pipeline().addBefore(ctx.name(), null, new AlpnUpgradeHandler(frameSize, requestLimits));
         }
     };
 
     /**
      * Application-Level Protocol Negotiation-based channel pipeline configurator.
      */
-    private static final class AlpnUpgradeHandler extends ApplicationProtocolNegotiationHandler {
+    @VisibleForTesting
+    @NonNullByDefault
+    static final class AlpnUpgradeHandler extends ApplicationProtocolNegotiationHandler {
         private static final Logger LOG = LoggerFactory.getLogger(AlpnUpgradeHandler.class);
         private static final Http2FrameLogger FRAME_LOGGER = new Http2FrameLogger(LogLevel.INFO, "Alpn2To1");
 
         private final Uint32 frameSize;
+        private final HttpRequestLimits requestLimits;
 
-        AlpnUpgradeHandler(final Uint32 frameSize) {
+        AlpnUpgradeHandler(final Uint32 frameSize, final HttpRequestLimits requestLimits) {
             super(ApplicationProtocolNames.HTTP_1_1);
-            this.frameSize = frameSize;
+            this.frameSize = requireNonNull(frameSize);
+            this.requestLimits = requireNonNull(requestLimits);
         }
 
         @Override
@@ -106,15 +117,17 @@ public enum HTTPScheme {
         private void configureHttp1(final ChannelHandlerContext ctx) {
             LOG.debug("{}: using HTTP/1.1", ctx.channel());
             ctx.pipeline()
-                .addAfter(ctx.name(), null, new HttpObjectAggregator(HTTPServer.MAX_HTTP_CONTENT_LENGTH))
+                .addAfter(ctx.name(), null, new Http1RequestAggregator(requestLimits.maxRequestBodySize().intValue()))
                 .addAfter(ctx.name(), null, new HttpServerKeepAliveHandler())
-                .replace(this, null, new HttpServerCodec());
+                .replace(this, null, new HttpServerCodec(requestLimits.maxInitialLineLength().intValue(),
+                    requestLimits.maxHeaderSize().intValue(), requestLimits.maxRequestChunkSize().intValue()));
             ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_11);
         }
 
         private void configureHttp2(final ChannelHandlerContext ctx) {
             LOG.debug("{}: using HTTP/2", ctx.channel());
-            ctx.pipeline().replace(this, "h2-frame-codec", newHttp2FrameCodec(FRAME_LOGGER, frameSize));
+            ctx.pipeline().replace(this, "h2-frame-codec",
+                newHttp2FrameCodec(FRAME_LOGGER, frameSize, requestLimits.maxHeaderSize()));
             ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
         }
     }
@@ -140,8 +153,11 @@ public enum HTTPScheme {
     private static final class CleartextUpgradeHandler extends SimpleChannelInboundHandler<HttpMessage> {
         private static final Logger LOG = LoggerFactory.getLogger(CleartextUpgradeHandler.class);
 
-        CleartextUpgradeHandler() {
+        private final Uint32 maxRequestBodySize;
+
+        CleartextUpgradeHandler(final Uint32 maxRequestBodySize) {
             super(HttpMessage.class, false);
+            this.maxRequestBodySize = requireNonNull(maxRequestBodySize);
         }
 
         @Override
@@ -150,7 +166,7 @@ public enum HTTPScheme {
             // configure HTTP/1.1 flow, pass the message further the pipeline, remove self as no longer required
             LOG.debug("{}: continuing with HTTP/1.1", ctx.channel());
             ctx.pipeline()
-                .addAfter(ctx.name(), null, new HttpObjectAggregator(HTTPServer.MAX_HTTP_CONTENT_LENGTH))
+                .addAfter(ctx.name(), null, new Http1RequestAggregator(maxRequestBodySize.intValue()))
                 .replace(this, null, new HttpServerKeepAliveHandler());
             ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_11);
             ctx.fireChannelRead(request);
@@ -174,6 +190,30 @@ public enum HTTPScheme {
                     ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
                 }
                 case null, default -> super.userEventTriggered(ctx, event);
+            }
+        }
+    }
+
+    private static final class Http1RequestAggregator extends HttpObjectAggregator {
+        private boolean chunked;
+
+        Http1RequestAggregator(final int maxContentLength) {
+            super(maxContentLength);
+        }
+
+        @Override
+        protected FullHttpMessage beginAggregation(final HttpMessage start, final ByteBuf content) throws Exception {
+            chunked = HttpUtil.isTransferEncodingChunked(start);
+            return super.beginAggregation(start, content);
+        }
+
+        @Override
+        protected void finishAggregation(final FullHttpMessage aggregated) throws Exception {
+            super.finishAggregation(aggregated);
+            if (chunked && aggregated.decoderResult().isFailure()) {
+                // Preserve the original framing on failed requests so the session can distinguish an oversized
+                // chunk-size line from an oversized request line. Successful requests remain dechunked.
+                HttpUtil.setTransferEncodingChunked(aggregated, true);
             }
         }
     }
@@ -213,16 +253,21 @@ public enum HTTPScheme {
      * Initialize a pipeline so that specified {@link ChannelHandlerContext} observes {@link FullHttpMessage}s.
      *
      * @param ctx reference {@link ChannelHandlerContext}
+     * @param frameSize maximum HTTP/2 frame size
+     * @param requestLimits limits on inbound HTTP requests
      */
-    abstract void initializeServerPipeline(ChannelHandlerContext ctx, Uint32 frameSize);
+    abstract void initializeServerPipeline(ChannelHandlerContext ctx, Uint32 frameSize,
+        HttpRequestLimits requestLimits);
 
     @Override
     public String toString() {
         return netty.toString();
     }
 
-    private static Http2FrameCodec newHttp2FrameCodec(final Http2FrameLogger frameLogger, final Uint32 frameSize) {
-        final var settings = Http2Settings.defaultSettings().maxFrameSize(frameSize.intValue());
+    private static Http2FrameCodec newHttp2FrameCodec(final Http2FrameLogger frameLogger, final Uint32 frameSize,
+            final Uint32 maxHeaderSize) {
+        final var settings = Http2Settings.defaultSettings().maxHeaderListSize(maxHeaderSize.toJava())
+            .maxFrameSize(frameSize.intValue());
         return Http2FrameCodecBuilder.forServer()
             .initialSettings(settings)
             .frameLogger(frameLogger)
