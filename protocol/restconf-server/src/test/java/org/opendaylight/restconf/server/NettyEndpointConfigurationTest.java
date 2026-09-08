@@ -9,10 +9,17 @@ package org.opendaylight.restconf.server;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.server.spi.ErrorTagMapping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
+import org.opendaylight.yangtools.yang.common.Uint16;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 class NettyEndpointConfigurationTest {
     @Test
@@ -50,5 +57,68 @@ class NettyEndpointConfigurationTest {
         assertEquals("Cannot decode segment '%5X' at offset 2", ex.getMessage());
         final var cause = assertInstanceOf(IllegalArgumentException.class, ex.getCause());
         assertEquals("invalid hex byte '5X' at index 1 of '%5X'", cause.getMessage());
+    }
+
+    @Test
+    void testInvalidRequestLimits() {
+        assertInvalidLimit("HTTP/1.1 request line length must be at least one byte", 0, 1, 1, 1);
+        assertInvalidLimit("HTTP header size must be at least one byte", 1, 0, 1, 1);
+        assertInvalidLimit("HTTP/1.1 request decoder chunk size must be at least one byte", 1, 1, 0, 1);
+        assertInvalidLimit("HTTP request body size must be at least one byte", 1, 1, 1, 0);
+    }
+
+    @Test
+    void testRequestLimitsAffectEquality() {
+        final var transport = mock(HttpServerStackGrouping.class);
+        final var configuration = newConfiguration(transport, 1, 1, 1, 1);
+
+        assertEquals(configuration, newConfiguration(transport, 1, 1, 1, 1));
+        assertNotEquals(configuration, newConfiguration(transport, 2, 1, 1, 1));
+        assertNotEquals(configuration, newConfiguration(transport, 1, 2, 1, 1));
+        assertNotEquals(configuration, newConfiguration(transport, 1, 1, 2, 1));
+        assertNotEquals(configuration, newConfiguration(transport, 1, 1, 1, 2));
+    }
+
+    @Test
+    void responseChunkAndFrameSizesAffectEquality() {
+        final var transport = mock(HttpServerStackGrouping.class);
+        final var original = newConfiguration(transport, 1, 16384);
+        final var same = newConfiguration(transport, 1, 16384);
+        assertEquals(original, same);
+        assertEquals(original.hashCode(), same.hashCode());
+        assertNotEquals(original, newConfiguration(transport, 2, 16384));
+        assertNotEquals(original, newConfiguration(transport, 1, 32768));
+    }
+
+    @Test
+    void responseChunkSizeUsesUnsignedRange() {
+        final var transport = mock(HttpServerStackGrouping.class);
+        assertThrows(IllegalArgumentException.class, () -> newConfiguration(transport, 0, 16384));
+        assertEquals(Uint32.MAX_VALUE, newConfiguration(transport, 4294967295L, 16384).chunkSize());
+    }
+
+    private static void assertInvalidLimit(final String message, final int maxInitialLineLength,
+            final int maxHeaderSize, final int maxRequestChunkSize, final int maxRequestBodySize) {
+        final var ex = assertThrows(IllegalArgumentException.class,
+            () -> newConfiguration(mock(HttpServerStackGrouping.class), maxInitialLineLength, maxHeaderSize,
+                maxRequestChunkSize, maxRequestBodySize));
+        assertEquals(message, ex.getMessage());
+    }
+
+    private static NettyEndpointConfiguration newConfiguration(final HttpServerStackGrouping transport,
+            final long chunkSize, final int frameSize) {
+        return new NettyEndpointConfiguration(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO,
+            Uint32.valueOf(10_000), "restconf", MessageEncoding.JSON, transport, Uint32.valueOf(chunkSize),
+            Uint32.valueOf(frameSize), Uint32.ZERO, Uint32.ZERO);
+    }
+
+    private static NettyEndpointConfiguration newConfiguration(final HttpServerStackGrouping transport,
+            final int maxInitialLineLength, final int maxHeaderSize, final int maxRequestChunkSize,
+            final int maxRequestBodySize) {
+        return new NettyEndpointConfiguration(ErrorTagMapping.RFC8040, PrettyPrintParam.TRUE, Uint16.ZERO,
+            Uint32.valueOf(10_000), "restconf", MessageEncoding.JSON, transport, Uint32.ONE,
+            Uint32.valueOf(16384), Uint32.valueOf(maxInitialLineLength), Uint32.valueOf(maxHeaderSize),
+            Uint32.valueOf(maxRequestChunkSize), Uint32.valueOf(maxRequestBodySize),
+            Uint32.ZERO, Uint32.ZERO);
     }
 }

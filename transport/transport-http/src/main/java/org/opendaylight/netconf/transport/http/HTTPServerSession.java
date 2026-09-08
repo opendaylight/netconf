@@ -25,6 +25,8 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.TooLongHttpHeaderException;
+import io.netty.handler.codec.http.TooLongHttpLineException;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.util.AsciiString;
 import java.net.URI;
@@ -126,6 +128,18 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
 
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
+        // The decoder can give up and pass on a partial request. Do not trust its URI or headers in that case.
+        final var decoderResult = msg.decoderResult();
+        if (decoderResult.isFailure()) {
+            final var cause = decoderResult.cause();
+            LOG.debug("Cannot decode request {}", msg, cause);
+            msg.release();
+            // An unparseable request line is reported as HTTP/1.0 by the decoder. Always answer the HTTP/1.1 decoder
+            // failure using HTTP/1.1 instead of reflecting that placeholder version.
+            respond(ctx, null, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, statusOf(cause)));
+            return;
+        }
+
         final var headers = msg.headers();
         // non-null indicates HTTP/2 request, which we need to propagate to any response
         final var streamId = headers.getInt(STREAM_ID);
@@ -225,6 +239,16 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
                 executor.executeRequest(ctx, version, streamId, pending, msg.content());
             }
         }
+    }
+
+    private static @NonNull HttpResponseStatus statusOf(final @Nullable Throwable cause) {
+        if (cause instanceof TooLongHttpLineException) {
+            return HttpResponseStatus.REQUEST_URI_TOO_LONG;
+        }
+        if (cause instanceof TooLongHttpHeaderException) {
+            return HttpResponseStatus.REQUEST_HEADER_FIELDS_TOO_LARGE;
+        }
+        return HttpResponseStatus.BAD_REQUEST;
     }
 
     @NonNullByDefault

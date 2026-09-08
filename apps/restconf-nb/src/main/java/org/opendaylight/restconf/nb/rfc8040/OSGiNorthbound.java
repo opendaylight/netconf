@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.http.ConfigUtils;
+import org.opendaylight.netconf.transport.http.HTTPServerSessionBootstrap;
 import org.opendaylight.netconf.transport.http.HttpServerStackConfiguration;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -145,6 +146,50 @@ public final class OSGiNorthbound {
         int http2$_$max$_$frame$_$size() default 16384; // 16 KiB
 
         @AttributeDefinition(
+            name = "HTTP/1.1 max request line length (bytes)",
+            description = """
+                Maximum length of an inbound HTTP/1.1 request line. A request exceeding it is rejected
+                with '414 URI Too Long'. RFC9112 recommends supporting at least 8000 octets, so the
+                default is above Netty's own 4096.
+                """,
+            min = "1", max = "2147483647")
+        int http1$_$max$_$initial$_$line$_$length() default HTTPServerSessionBootstrap.DEFAULT_MAX_INITIAL_LINE_LENGTH;
+
+        @AttributeDefinition(
+            name = "HTTP max header section size (bytes)",
+            description = """
+                Maximum size of the inbound HTTP/1.1 header section. A request exceeding it is rejected
+                with '431 Request Header Fields Too Large'. On HTTP/2 the same value is advertised as
+                SETTINGS_MAX_HEADER_LIST_SIZE, which counts the uncompressed field list plus 32 bytes of
+                overhead per field. HTTP/2 enforces it through the codec rather than an HTTP status code.
+                """,
+            min = "1", max = "2147483647")
+        int http$_$max$_$header$_$size() default HTTPServerSessionBootstrap.DEFAULT_MAX_HEADER_SIZE;
+
+        @AttributeDefinition(
+            name = "HTTP/1.1 request decoder chunk size (bytes)",
+            description = """
+                Maximum size of a single HTTP object emitted by the HTTP/1.1 request decoder. This bounds how
+                much of a request body reaches the pipeline at a time; it is not a limit on the body itself.
+
+                Not to be confused with 'http1-chunk-size', which sizes outbound response chunks.
+                """,
+            min = "1", max = "2147483647")
+        int http1$_$max$_$request$_$chunk$_$size() default HTTPServerSessionBootstrap.DEFAULT_MAX_REQUEST_CHUNK_SIZE;
+
+        @AttributeDefinition(
+            name = "HTTP max request body size (bytes)",
+            description = """
+                Maximum size of an inbound request body after transfer coding is decoded. A request exceeding
+                it is rejected with '413 Content Too Large'. Applies to HTTP/1.1 and HTTP/2 alike.
+                On HTTP/2 this limit applies per stream. With 100 advertised concurrent streams, the
+                default 10 MiB permits about 1 GiB of aggregated bodies per connection, plus overhead.
+                Aggregation occurs before authentication, so unauthenticated clients can consume this memory.
+                """,
+            min = "1", max = "2147483647")
+        int http$_$max$_$request$_$body$_$size() default HTTPServerSessionBootstrap.DEFAULT_MAX_REQUEST_BODY_SIZE;
+
+        @AttributeDefinition(
             name = "HTTP write buffer low watermark (bytes)",
             description = """
                 Netty channel write buffer low watermark used for outbound backpressure.
@@ -275,6 +320,10 @@ public final class OSGiNorthbound {
             parseDefaultEncoding(configuration.default$_$encoding()), new HttpServerStackConfiguration(transport),
             Uint32.valueOf(configuration.http1$_$chunk$_$size()),
             Uint32.valueOf(configuration.http2$_$max$_$frame$_$size()),
+            Uint32.valueOf(configuration.http1$_$max$_$initial$_$line$_$length()),
+            Uint32.valueOf(configuration.http$_$max$_$header$_$size()),
+            Uint32.valueOf(configuration.http1$_$max$_$request$_$chunk$_$size()),
+            Uint32.valueOf(configuration.http$_$max$_$request$_$body$_$size()),
             Uint32.valueOf(configuration.http$_$write$_$buffer$_$low$_$watermark()),
             Uint32.valueOf(configuration.http$_$write$_$buffer$_$high$_$watermark()))
         );
