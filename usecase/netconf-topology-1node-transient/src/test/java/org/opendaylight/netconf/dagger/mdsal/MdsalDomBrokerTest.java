@@ -161,7 +161,7 @@ class MdsalDomBrokerTest {
                 "odl-codegen-extensions@2024-06-27.yang",
                 "odl-http-server@2026-07-31.yang",
                 "odl-http-client@2026-07-17.yang",
-                "odl-quic-common@2026-04-15.yang",
+                "odl-quic-common@2026-09-01.yang",
                 "iana-ssh-encryption-algs@2024-10-16.yang",
                 "iana-ssh-key-exchange-algs@2024-10-16.yang",
                 "iana-ssh-mac-algs@2024-10-16.yang",
