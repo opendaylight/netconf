@@ -46,6 +46,7 @@ abstract class AbstractNotificationSubscriptionHttp3Test extends AbstractNotific
     private static final Uint64 HTTP3_INITIAL_MAX_DATA = Uint64.valueOf(4L * 1024 * 1024);
     private static final Uint64 HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE = Uint64.valueOf(256L * 1024);
     private static final Uint32 HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL = Uint32.valueOf(100);
+    private static final Uint64 HTTP3_MAX_IDLE_TIMEOUT = Uint64.valueOf(30000);
     private static final Uint32 WRITE_BUFFER_LOW_WATER_MARK = Uint32.valueOf(32 * 1024);
     private static final Uint32 WRITE_BUFFER_HIGH_WATER_MARK = Uint32.valueOf(64 * 1024);
 
@@ -90,7 +91,7 @@ abstract class AbstractNotificationSubscriptionHttp3Test extends AbstractNotific
             WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS,
             new HttpServerStackConfiguration(HTTPServerOverQuic.of(localAddress(), port(), certificate, privateKey,
                 HTTP3_INITIAL_MAX_DATA, HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE,
-                HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL)));
+                HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL, HTTP3_MAX_IDLE_TIMEOUT)));
     }
 
     @Override

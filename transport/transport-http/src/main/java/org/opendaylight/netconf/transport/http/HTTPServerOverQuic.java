@@ -31,7 +31,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.udp.server.rev251216.udp.server.LocalBindBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.http3.server.grouping.QuicUnderHttpBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.http3.server.grouping.quic.under.http.QuicServerParametersBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.quic.common.rev260415.Varint;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.quic.common.rev260901.Varint;
 import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -57,11 +57,13 @@ public final class HTTPServerOverQuic {
      * @param initialMaxData QUIC {@code initial_max_data}
      * @param initialMaxStreamDataBidirectionalRemote QUIC {@code initial_max_stream_data_bidi_remote}
      * @param initialMaxStreamsBidirectional QUIC {@code initial_max_streams_bidi}
+     * @param maxIdleTimeout QUIC {@code max_idle_timeout}, in milliseconds; zero disables the check
      * @return {@link HttpOverQuic} transport configuration
      */
     public static HttpOverQuic of(final String host, final int port, final Certificate certificate,
             final PrivateKey privateKey, final Uint64 initialMaxData,
-            final Uint64 initialMaxStreamDataBidirectionalRemote, final Uint32 initialMaxStreamsBidirectional) {
+            final Uint64 initialMaxStreamDataBidirectionalRemote, final Uint32 initialMaxStreamsBidirectional,
+            final Uint64 maxIdleTimeout) {
         return new HttpOverQuicBuilder()
             .setHttpOverQuic(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204
                 .http.server.listen.stack.grouping.transport.http.over.quic.HttpOverQuicBuilder()
@@ -102,6 +104,7 @@ public final class HTTPServerOverQuic {
                     .setInitialMaxData(new Varint(initialMaxData))
                     .setInitialMaxStreamDataBidiRemote(new Varint(initialMaxStreamDataBidirectionalRemote))
                     .setInitialMaxStreamsBidi(initialMaxStreamsBidirectional)
+                    .setMaxIdleTimeout(new Varint(maxIdleTimeout))
                     .build())
                 .build())
             .build();

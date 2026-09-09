@@ -56,7 +56,7 @@ class HTTPServerQuicBindFailureTest {
             final var certData = generateX509CertData("RSA");
             final var quicCase = HTTPServerOverQuic.of(loopback.getHostAddress(), port, certData.certificate(),
                 certData.privateKey(), Uint64.valueOf(65535), Uint64.valueOf(65535),
-                Uint32.valueOf(100));
+                Uint32.valueOf(100), Uint64.valueOf(30000));
 
             final var future = HTTPServer.listen(listener, quicCase);
             final var failure = assertThrows(ExecutionException.class, () -> future.get(5, TimeUnit.SECONDS));
@@ -80,7 +80,8 @@ class HTTPServerQuicBindFailureTest {
 
         final var certData = generateX509CertData("RSA");
         final var quicCase = HTTPServerOverQuic.of(loopback.getHostAddress(), 0, certData.certificate(),
-            certData.privateKey(), Uint64.valueOf(65535), Uint64.valueOf(65535), Uint32.valueOf(100));
+            certData.privateKey(), Uint64.valueOf(65535), Uint64.valueOf(65535), Uint32.valueOf(100),
+            Uint64.valueOf(30000));
 
         final var server = HTTPServer.listen(listener, quicCase).get(5, TimeUnit.SECONDS);
         try {
