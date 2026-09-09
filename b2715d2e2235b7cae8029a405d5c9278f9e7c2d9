@@ -16,6 +16,24 @@
       "message": "the link would be something like: https://nexus.opendaylight.org/#nexus-search;gav~org.opendaylight.netconf~netconf-testtool",
       "revId": "b2715d2e2235b7cae8029a405d5c9278f9e7c2d9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ab46edf_d8c0244d",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-09T10:46:44Z",
+      "side": 1,
+      "message": "additionally, you can join zulip discussion on why https://nexus.opendaylight.org/service/local/repositories/opendaylight.release/content/org/opendaylight/netconf/netconf-testtool is not browseable.",
+      "parentUuid": "63d708af_100f3396",
+      "revId": "b2715d2e2235b7cae8029a405d5c9278f9e7c2d9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
