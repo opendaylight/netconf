@@ -16,6 +16,8 @@ import org.opendaylight.netconf.transport.api.TransportChannelListener;
 public abstract sealed class HTTPTransportStack extends AbstractOverlayTransportStack<HTTPTransportChannel>
         permits HTTPClient, HTTPServer {
     public static final int MAX_HTTP_CONTENT_LENGTH = 16 * 1024;
+    // odl-quic-common max-idle-timeout default, applied when the leaf is not set
+    static final long DEFAULT_MAX_IDLE_TIMEOUT_MILLIS = 120000;
 
     private final @NonNull HTTPScheme scheme;
 

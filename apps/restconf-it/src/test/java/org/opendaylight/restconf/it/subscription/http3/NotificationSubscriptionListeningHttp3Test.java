@@ -12,10 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import org.awaitility.core.ConditionTimeoutException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
 import org.opendaylight.restconf.api.MediaTypes;
@@ -138,24 +136,5 @@ class NotificationSubscriptionListeningHttp3Test extends AbstractNotificationSub
                 }
               }
             }""", eventListener2.readNext(), JSONCompareMode.LENIENT);
-    }
-
-    private String startSubscription() {
-        final var uri = "/rests/operations/ietf-subscribed-notifications:establish-subscription";
-        final var response = invokeRequestKeepClient(HttpMethod.POST, uri,
-            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON,
-            """
-                {
-                  "input": {
-                    "stream": "NETCONF",
-                    "encoding": "encode-json"
-                  }
-                }""");
-        assertEquals(HttpResponseStatus.OK, response.status());
-
-        // Extract subscription ID from response
-        final var jsonContent = new JSONObject(response.content().toString(StandardCharsets.UTF_8),
-            jsonParserConfiguration());
-        return String.valueOf(jsonContent.getJSONObject("ietf-subscribed-notifications:output").getLong("id"));
     }
 }
