@@ -26,6 +26,11 @@ import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.http.client.identity.grouping.client.identity.auth.type.Basic;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.inline.or.truststore.certs.grouping.inline.or.truststore.Inline;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.client.rev260717.http3.client.grouping.quic.under.http.Quic;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.client.rev260717.http3.client.grouping.quic.under.http.quic.quic.QuicClientParameters;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.client.rev260717.http3.client.grouping.quic.under.http.quic.quic.QuicClientParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.http3.server.grouping.quic.under.http.QuicServerParameters;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.http3.server.grouping.quic.under.http.QuicServerParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.quic.common.rev260901.Varint;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.common.Uint64;
 
@@ -35,6 +40,19 @@ class QuicClientTest {
     private static final Uint64 INITIAL_MAX_DATA = Uint64.valueOf(4L * 1024 * 1024);
     private static final Uint64 INITIAL_MAX_STREAM_DATA_BIDI = Uint64.valueOf(256L * 1024);
     private static final Uint32 INITIAL_MAX_STREAMS_BIDI = Uint32.valueOf(100);
+    private static final Uint64 MAX_IDLE_TIMEOUT = Uint64.valueOf(30000);
+    private static final QuicClientParameters QUIC_CLIENT_PARAMETERS = new QuicClientParametersBuilder()
+        .setInitialMaxData(new Varint(INITIAL_MAX_DATA))
+        .setInitialMaxStreamDataBidiRemote(new Varint(INITIAL_MAX_STREAM_DATA_BIDI))
+        .setInitialMaxStreamsBidi(INITIAL_MAX_STREAMS_BIDI)
+        .setMaxIdleTimeout(new Varint(MAX_IDLE_TIMEOUT))
+        .build();
+    private static final QuicServerParameters QUIC_SERVER_PARAMETERS = new QuicServerParametersBuilder()
+        .setInitialMaxData(new Varint(INITIAL_MAX_DATA))
+        .setInitialMaxStreamDataBidiRemote(new Varint(INITIAL_MAX_STREAM_DATA_BIDI))
+        .setInitialMaxStreamsBidi(INITIAL_MAX_STREAMS_BIDI)
+        .setMaxIdleTimeout(new Varint(MAX_IDLE_TIMEOUT))
+        .build();
 
     private static BootstrapFactory bootstrapFactory;
 
@@ -52,8 +70,8 @@ class QuicClientTest {
     void clientTransportQuicWithAuth() throws Exception {
         final var cert = TestUtils.generateX509CertData("RSA").certificate();
 
-        final var transport = ConfigUtils.clientTransportQuic(HOST, PORT, cert, INITIAL_MAX_DATA,
-            INITIAL_MAX_STREAM_DATA_BIDI, INITIAL_MAX_STREAMS_BIDI, "user", "pass");
+        final var transport = ConfigUtils.clientTransportQuic(HOST, PORT, cert, QUIC_CLIENT_PARAMETERS,
+            "user", "pass");
 
         final var quic = assertInstanceOf(Quic.class, transport).getQuic();
 
@@ -65,6 +83,7 @@ class QuicClientTest {
         assertEquals(INITIAL_MAX_DATA, quicParams.getInitialMaxData().getValue());
         assertEquals(INITIAL_MAX_STREAM_DATA_BIDI, quicParams.getInitialMaxStreamDataBidiRemote().getValue());
         assertEquals(INITIAL_MAX_STREAMS_BIDI, quicParams.getInitialMaxStreamsBidi());
+        assertEquals(MAX_IDLE_TIMEOUT, quicParams.getMaxIdleTimeout().getValue());
 
         // Follows the same nested inline-or-truststore shape as HTTPClient.collectTrustCertificates() reads on the
         // production side, to verify clientTransportQuic() actually wrote the certificate where a real client
@@ -83,8 +102,8 @@ class QuicClientTest {
     @Test
     void clientTransportQuicWithoutAuth() throws Exception {
         final var cert = TestUtils.generateX509CertData("RSA");
-        final var transport = ConfigUtils.clientTransportQuic(HOST, PORT, cert.certificate(), INITIAL_MAX_DATA,
-            INITIAL_MAX_STREAM_DATA_BIDI, INITIAL_MAX_STREAMS_BIDI, null, null);
+        final var transport = ConfigUtils.clientTransportQuic(HOST, PORT, cert.certificate(),
+            QUIC_CLIENT_PARAMETERS, null, null);
 
         final var quic = assertInstanceOf(Quic.class, transport).getQuic();
         assertNull(quic.getHttpClientParameters().getClientIdentity());
@@ -107,14 +126,14 @@ class QuicClientTest {
 
         final var certData = TestUtils.generateX509CertData("RSA");
         final var serverCase = HTTPServerOverQuic.of(loopback.getHostAddress(), port, certData.certificate(),
-            certData.privateKey(), INITIAL_MAX_DATA, INITIAL_MAX_STREAM_DATA_BIDI, INITIAL_MAX_STREAMS_BIDI);
+            certData.privateKey(), QUIC_SERVER_PARAMETERS);
 
         final var serverListener = new CapturingListener();
         final var server = HTTPServer.listen(serverListener, serverCase).get(5, TimeUnit.SECONDS);
         try {
             final var clientConfig = new HttpClientStackConfiguration(
                 ConfigUtils.clientTransportQuic(loopback.getHostAddress(), port, certData.certificate(),
-                    INITIAL_MAX_DATA, INITIAL_MAX_STREAM_DATA_BIDI, INITIAL_MAX_STREAMS_BIDI, null, null));
+                    QUIC_CLIENT_PARAMETERS, null, null));
 
             final var clientListener = new CapturingListener();
             final var client = HTTPClient.connect(clientListener, bootstrapFactory.newBootstrap(), clientConfig,
