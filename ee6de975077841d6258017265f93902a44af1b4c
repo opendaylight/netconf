@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "869f76de_c305819d",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-09T10:27:39Z",
+      "side": 1,
+      "message": "It is a long lasting shared group, we should not IMO",
+      "parentUuid": "bda43cab_9de94660",
+      "revId": "ee6de975077841d6258017265f93902a44af1b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3e097ede_42af38f9",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-09-07T11:22:35Z",
       "side": 1,
       "message": "seems to be unclear how union type is being read, can we have null option, can we use Java\u0027s switch?",
+      "revId": "ee6de975077841d6258017265f93902a44af1b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "272dffb0_a2cde046",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-09T10:27:39Z",
+      "side": 1,
+      "message": "Not exactly suitable for switch, it\u0027s just one class with two fields inside it — ipAddress and domainName\nUsed explicit if/else branches and if neither ipAddress or domainName is set, it throws UnsupportedConfigurationException",
+      "parentUuid": "3e097ede_42af38f9",
       "revId": "ee6de975077841d6258017265f93902a44af1b4c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc213135_537d9f83",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-09T10:27:39Z",
+      "side": 1,
+      "message": "That would causse circular dependency.",
+      "parentUuid": "1d72da57_e9cf6435",
+      "revId": "ee6de975077841d6258017265f93902a44af1b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bbd82cc3_5cfcd5a9",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-09-07T11:22:35Z",
       "side": 1,
       "message": "why not to use: `nonnullQuicClientParameters` and use defaults as defined by YANG model?",
+      "revId": "ee6de975077841d6258017265f93902a44af1b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "870de616_71164218",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-09T10:27:39Z",
+      "side": 1,
+      "message": "yang defaults only get filled in automatically when data comes from parsed config (an actual RESTCONF/NETCONF request). Here, it is built directly in Java code by hand, so nothing fills a default.",
+      "parentUuid": "bbd82cc3_5cfcd5a9",
       "revId": "ee6de975077841d6258017265f93902a44af1b4c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc002f2d_2e55118c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/QuicHTTPClient.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-09T10:27:39Z",
+      "side": 1,
+      "message": "Added JIRA link",
+      "parentUuid": "7b00c080_03a45dc3",
+      "revId": "ee6de975077841d6258017265f93902a44af1b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a7e1ec5f_cb7daf47",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-09-07T11:22:35Z",
       "side": 1,
       "message": "Is this a duplicate of HTTPServer.QuicUnderlay?",
+      "revId": "ee6de975077841d6258017265f93902a44af1b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f766072_e6e4a96b",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/QuicUnderlay.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-09T10:27:39Z",
+      "side": 1,
+      "message": "Client (Channel datagramChannel, QuicChannel quicChannel) — closes two channels.                                                                                                                                                                                                                                                                                                       \nServer (Channel channel, EventLoopGroup quicGroup) — closes a channel and shuts down an EventLoopGroup, not a second channel.\nMoved to top level class after: https://git.opendaylight.org/gerrit/c/netconf/+/124022/comment/e8572824_5d9be411/\nI renamed it to ClientQuicUnderlay to mark that it belongs to client side",
+      "parentUuid": "a7e1ec5f_cb7daf47",
       "revId": "ee6de975077841d6258017265f93902a44af1b4c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "588708ee_7cb1dd04",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/ConfigUtilsTest.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-09T10:27:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b5e758b5_941330fa",
+      "revId": "ee6de975077841d6258017265f93902a44af1b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e9ccedb2_f212a957",
@@ -133,6 +259,24 @@
       "writtenOn": "2026-09-07T11:22:35Z",
       "side": 1,
       "message": "why?",
+      "revId": "ee6de975077841d6258017265f93902a44af1b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2c825e3_c8ba30a0",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/ConfigUtilsTest.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-09T10:27:39Z",
+      "side": 1,
+      "message": "Added more detailed comment",
+      "parentUuid": "e9ccedb2_f212a957",
       "revId": "ee6de975077841d6258017265f93902a44af1b4c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
