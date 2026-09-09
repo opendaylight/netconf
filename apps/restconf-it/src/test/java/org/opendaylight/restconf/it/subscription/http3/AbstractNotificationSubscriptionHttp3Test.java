@@ -33,6 +33,9 @@ import org.opendaylight.restconf.server.MessageEncoding;
 import org.opendaylight.restconf.server.NettyEndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.HttpServerListenStackGrouping;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.http3.server.grouping.quic.under.http.QuicServerParameters;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.http3.server.grouping.quic.under.http.QuicServerParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.quic.common.rev260901.Varint;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.common.Uint64;
@@ -43,9 +46,12 @@ abstract class AbstractNotificationSubscriptionHttp3Test extends AbstractNotific
     private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
     private static final String ALT_SVC_HEADER = "h3=\":8443\"; ma=3600";
     private static final Uint32 HTTP3_ALT_SVC_MAX_AGE_SECONDS = Uint32.valueOf(3600);
-    private static final Uint64 HTTP3_INITIAL_MAX_DATA = Uint64.valueOf(4L * 1024 * 1024);
-    private static final Uint64 HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE = Uint64.valueOf(256L * 1024);
-    private static final Uint32 HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL = Uint32.valueOf(100);
+    private static final QuicServerParameters QUIC_SERVER_PARAMETERS = new QuicServerParametersBuilder()
+        .setInitialMaxData(new Varint(Uint64.valueOf(4L * 1024 * 1024)))
+        .setInitialMaxStreamDataBidiRemote(new Varint(Uint64.valueOf(256L * 1024)))
+        .setInitialMaxStreamsBidi(Uint32.valueOf(100))
+        .setMaxIdleTimeout(new Varint(Uint64.valueOf(30000)))
+        .build();
     private static final Uint32 WRITE_BUFFER_LOW_WATER_MARK = Uint32.valueOf(32 * 1024);
     private static final Uint32 WRITE_BUFFER_HIGH_WATER_MARK = Uint32.valueOf(64 * 1024);
 
@@ -89,8 +95,7 @@ abstract class AbstractNotificationSubscriptionHttp3Test extends AbstractNotific
             MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
             WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS,
             new HttpServerStackConfiguration(HTTPServerOverQuic.of(localAddress(), port(), certificate, privateKey,
-                HTTP3_INITIAL_MAX_DATA, HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE,
-                HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL)));
+                QUIC_SERVER_PARAMETERS)));
     }
 
     @Override
