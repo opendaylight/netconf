@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63d708af_100f3396",
+        "filename": "docs/testtool.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-09T10:46:11Z",
+      "side": 1,
+      "message": "the link would be something like: https://nexus.opendaylight.org/#nexus-search;gav~org.opendaylight.netconf~netconf-testtool",
+      "revId": "b2715d2e2235b7cae8029a405d5c9278f9e7c2d9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
