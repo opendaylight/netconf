@@ -30,12 +30,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev241010.tls.server.grouping.server.identity.auth.type.certificate.CertificateBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.udp.server.rev251216.udp.server.LocalBindBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.http3.server.grouping.QuicUnderHttpBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.http3.server.grouping.quic.under.http.QuicServerParametersBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.quic.common.rev260415.Varint;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.http3.server.grouping.quic.under.http.QuicServerParameters;
 import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint16;
-import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.common.Uint64;
 
 /**
  * Utility class for creating {@link HttpOverQuic} configurations for {@link HTTPServer}.
@@ -54,14 +51,15 @@ public final class HTTPServerOverQuic {
      * @param port local bind port
      * @param certificate server certificate
      * @param privateKey server private key
-     * @param initialMaxData QUIC {@code initial_max_data}
-     * @param initialMaxStreamDataBidirectionalRemote QUIC {@code initial_max_stream_data_bidi_remote}
-     * @param initialMaxStreamsBidirectional QUIC {@code initial_max_streams_bidi}
+     * @param quicServerParameters QUIC transport tuning, e.g. built via {@code new QuicServerParametersBuilder()
+     *        .setInitialMaxData(...).setInitialMaxStreamDataBidiRemote(...).setInitialMaxStreamsBidi(...)
+     *        .setMaxIdleTimeout(...).build()}; a builder is used instead of individual parameters here since
+     *        several of them share the same {@code Varint}/{@code Uint32} types, so passing them positionally
+     *        risks silently swapping two of them
      * @return {@link HttpOverQuic} transport configuration
      */
     public static HttpOverQuic of(final String host, final int port, final Certificate certificate,
-            final PrivateKey privateKey, final Uint64 initialMaxData,
-            final Uint64 initialMaxStreamDataBidirectionalRemote, final Uint32 initialMaxStreamsBidirectional) {
+            final PrivateKey privateKey, final QuicServerParameters quicServerParameters) {
         return new HttpOverQuicBuilder()
             .setHttpOverQuic(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204
                 .http.server.listen.stack.grouping.transport.http.over.quic.HttpOverQuicBuilder()
@@ -98,11 +96,7 @@ public final class HTTPServerOverQuic {
                     .build())
                 .build())
             .addAugmentation(new QuicUnderHttpBuilder()
-                .setQuicServerParameters(new QuicServerParametersBuilder()
-                    .setInitialMaxData(new Varint(initialMaxData))
-                    .setInitialMaxStreamDataBidiRemote(new Varint(initialMaxStreamDataBidirectionalRemote))
-                    .setInitialMaxStreamsBidi(initialMaxStreamsBidirectional)
-                    .build())
+                .setQuicServerParameters(requireNonNull(quicServerParameters))
                 .build())
             .build();
     }
