@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2cf3c74b_98daa98e",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-09T11:32:21Z",
+      "side": 1,
+      "message": "unrelated, reverted",
+      "parentUuid": "766c7e1a_d21961ee",
+      "revId": "784659c2e2342d89e8a35fbe0440094a8a12ee18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fe419b30_2f87af49",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-09-07T11:22:30Z",
       "side": 1,
       "message": "how?",
+      "revId": "784659c2e2342d89e8a35fbe0440094a8a12ee18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7548192e_d2fe2495",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-09T11:32:21Z",
+      "side": 1,
+      "message": "Added better explanation",
+      "parentUuid": "fe419b30_2f87af49",
       "revId": "784659c2e2342d89e8a35fbe0440094a8a12ee18",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7c2e513_f534e25b",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-09T11:32:21Z",
+      "side": 1,
+      "message": "Added more details",
+      "parentUuid": "9e03aeb1_e325d1c8",
+      "revId": "784659c2e2342d89e8a35fbe0440094a8a12ee18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "09158471_6d0902a0",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-09-07T11:22:30Z",
       "side": 1,
       "message": "why do we need it? seems completely suspicious - completing exactly once, what\u0027s the issue?",
+      "revId": "784659c2e2342d89e8a35fbe0440094a8a12ee18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57cacdb6_2a5e1447",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/SingleResponseHandler.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-09T11:32:21Z",
+      "side": 1,
+      "message": "A per-request stream channel doesn\u0027t just fire one of these three callbacks and stop; successful request still ends with the stream closing afterward. So the real sequence for an ordinary successful request is:\n\n1 - channelRead0(response) - callback.onSuccess(response).\n2 - The stream then closes - channelInactive() fires too.\n\nWithout the completed guard, step 2 would also call callback.onFailure(new ClosedChannelException()) — turning every single successful request into a second, failure completion right after the real success.\nSame approach is used in TestRequestCallback:",
+      "parentUuid": "09158471_6d0902a0",
       "revId": "784659c2e2342d89e8a35fbe0440094a8a12ee18",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
