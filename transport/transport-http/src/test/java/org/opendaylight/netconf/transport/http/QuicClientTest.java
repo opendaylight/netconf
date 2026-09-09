@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -24,6 +25,8 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.crypto.CMSCertificateParser;
@@ -38,7 +41,9 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.client.rev260717.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.client.rev260717.http3.client.grouping.quic.under.http.quic.quic.QuicClientParameters;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.client.rev260717.http3.client.grouping.quic.under.http.quic.quic.QuicClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.client.rev260717.http3.client.grouping.quic.under.http.quic.quic.TlsClientParametersBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.quic.common.rev260415.Varint;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.http3.server.grouping.quic.under.http.QuicServerParameters;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.http3.server.grouping.quic.under.http.QuicServerParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.quic.common.rev260901.Varint;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.common.Uint64;
 
@@ -48,10 +53,18 @@ class QuicClientTest {
     private static final Uint64 INITIAL_MAX_DATA = Uint64.valueOf(4L * 1024 * 1024);
     private static final Uint64 INITIAL_MAX_STREAM_DATA_BIDI = Uint64.valueOf(256L * 1024);
     private static final Uint32 INITIAL_MAX_STREAMS_BIDI = Uint32.valueOf(100);
+    private static final Uint64 MAX_IDLE_TIMEOUT = Uint64.valueOf(30000);
     private static final QuicClientParameters QUIC_CLIENT_PARAMETERS = new QuicClientParametersBuilder()
         .setInitialMaxData(new Varint(INITIAL_MAX_DATA))
         .setInitialMaxStreamDataBidiRemote(new Varint(INITIAL_MAX_STREAM_DATA_BIDI))
         .setInitialMaxStreamsBidi(INITIAL_MAX_STREAMS_BIDI)
+        .setMaxIdleTimeout(new Varint(MAX_IDLE_TIMEOUT))
+        .build();
+    private static final QuicServerParameters QUIC_SERVER_PARAMETERS = new QuicServerParametersBuilder()
+        .setInitialMaxData(new Varint(INITIAL_MAX_DATA))
+        .setInitialMaxStreamDataBidiRemote(new Varint(INITIAL_MAX_STREAM_DATA_BIDI))
+        .setInitialMaxStreamsBidi(INITIAL_MAX_STREAMS_BIDI)
+        .setMaxIdleTimeout(new Varint(MAX_IDLE_TIMEOUT))
         .build();
 
     private static BootstrapFactory bootstrapFactory;
@@ -82,6 +95,7 @@ class QuicClientTest {
         assertEquals(INITIAL_MAX_DATA, quicParams.getInitialMaxData().getValue());
         assertEquals(INITIAL_MAX_STREAM_DATA_BIDI, quicParams.getInitialMaxStreamDataBidiRemote().getValue());
         assertEquals(INITIAL_MAX_STREAMS_BIDI, quicParams.getInitialMaxStreamsBidi());
+        assertEquals(MAX_IDLE_TIMEOUT, quicParams.getMaxIdleTimeout().getValue());
 
         // Follows the same nested inline-or-truststore shape as HTTPClient.collectTrustCertificates() reads on the
         // production side, to verify clientTransportQuic() actually wrote the certificate where a real client
@@ -124,7 +138,7 @@ class QuicClientTest {
 
         final var certData = TestUtils.generateX509CertData("RSA");
         final var serverCase = HTTPServerOverQuic.of(loopback.getHostAddress(), port, certData.certificate(),
-            certData.privateKey(), INITIAL_MAX_DATA, INITIAL_MAX_STREAM_DATA_BIDI, INITIAL_MAX_STREAMS_BIDI);
+            certData.privateKey(), QUIC_SERVER_PARAMETERS);
 
         final var serverListener = new CapturingListener();
         final var server = HTTPServer.listen(serverListener, serverCase).get(5, TimeUnit.SECONDS);
@@ -162,7 +176,7 @@ class QuicClientTest {
 
         final var serverCertData = TestUtils.generateX509CertData("RSA");
         final var serverCase = HTTPServerOverQuic.of(loopback.getHostAddress(), port, serverCertData.certificate(),
-            serverCertData.privateKey(), INITIAL_MAX_DATA, INITIAL_MAX_STREAM_DATA_BIDI, INITIAL_MAX_STREAMS_BIDI);
+            serverCertData.privateKey(), QUIC_SERVER_PARAMETERS);
 
         final var server = HTTPServer.listen(new CapturingListener(), serverCase).get(5, TimeUnit.SECONDS);
         try {
@@ -212,6 +226,47 @@ class QuicClientTest {
         final var ex = assertThrows(UnsupportedConfigurationException.class,
             () -> HTTPClient.connect(new CapturingListener(), bootstrapFactory.newBootstrap(), clientConfig, false));
         assertEquals(expectedMessage, ex.getMessage());
+    }
+
+    /**
+     * Verifies that max-idle-timeout reaches the QUIC codec of each side. Only one side sets a short timeout and the
+     * other imposes no limit, so the idle connection is closed only if that side's value is applied.
+     */
+    @ParameterizedTest(name = "client idle timeout {0} ms, server idle timeout {1} ms")
+    @CsvSource({ "500, 0", "0, 500" })
+    void connectQuicIdleTimeout(final long clientIdleTimeout, final long serverIdleTimeout) throws Exception {
+        final var loopback = InetAddress.getLoopbackAddress();
+        final int port;
+        try (var probe = new DatagramSocket(new InetSocketAddress(loopback, 0))) {
+            port = probe.getLocalPort();
+        }
+
+        final var certData = TestUtils.generateX509CertData("RSA");
+        final var serverCase = HTTPServerOverQuic.of(loopback.getHostAddress(), port, certData.certificate(),
+            certData.privateKey(), new QuicServerParametersBuilder(QUIC_SERVER_PARAMETERS)
+                .setMaxIdleTimeout(new Varint(Uint64.valueOf(serverIdleTimeout)))
+                .build());
+
+        final var server = HTTPServer.listen(new CapturingListener(), serverCase).get(5, TimeUnit.SECONDS);
+        try {
+            final var clientConfig = new HttpClientStackConfiguration(
+                ConfigUtils.clientTransportQuic(loopback.getHostAddress(), port, certData.certificate(),
+                    new QuicClientParametersBuilder(QUIC_CLIENT_PARAMETERS)
+                        .setMaxIdleTimeout(new Varint(Uint64.valueOf(clientIdleTimeout)))
+                        .build(), null, null));
+
+            final var clientListener = new CapturingListener();
+            final var client = HTTPClient.connect(clientListener, bootstrapFactory.newBootstrap(), clientConfig,
+                false).get(5, TimeUnit.SECONDS);
+            try {
+                final var channel = clientListener.established.get(5, TimeUnit.SECONDS).channel();
+                assertTrue(channel.closeFuture().await(5, TimeUnit.SECONDS), "Idle QUIC connection was not closed");
+            } finally {
+                client.shutdown().get(5, TimeUnit.SECONDS);
+            }
+        } finally {
+            server.shutdown().get(5, TimeUnit.SECONDS);
+        }
     }
 
     /** Captures the {@link HTTPTransportChannel} reported by a successful connect/listen, if any. */

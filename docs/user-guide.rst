@@ -2185,6 +2185,7 @@ HTTP/2 and HTTP/3 related settings are also configurable:
 * ``http3-initial-max-data``, which defaults to ``4194304``
 * ``http3-initial-max-stream-data-bidirectional-remote``, which defaults to ``262144``
 * ``http3-initial-max-streams-bidirectional``, which defaults to ``100``
+* ``http3-max-idle-timeout``, which defaults to ``30000``
 
 Netty Tls transport configuration. Both certificate and private key are required in order to enable.
 
@@ -2259,6 +2260,10 @@ remotely-initiated bidirectional streams.
 
 *http3-initial-max-streams-bidirectional* — Initial HTTP/3 maximum number of bidirectional streams.
 
+*http3-max-idle-timeout* — HTTP/3 (QUIC) max idle timeout in milliseconds. A connection idle for longer than this is
+closed. 0 imposes no limit on the server side, the client's own limit still applies. It should stay well above
+*heartbeat-interval*, as only the SSE heartbeat keeps a quiet subscription from looking idle.
+
 *tls-certificate* — Path to the X509 certificate file in PEM format.
 
 *tls-private-key* — Path to the private key file in PEM format.
@@ -2294,6 +2299,7 @@ file, ``org.opendaylight.restconf.nb.rfc8040.cfg``, for example:
     http3-initial-max-data=4194304
     http3-initial-max-stream-data-bidirectional-remote=262144
     http3-initial-max-streams-bidirectional=100
+    http3-max-idle-timeout=30000
     tls-certificate=etc/tls/cert.pem
     tls-private-key=etc/tls/key.pem
 
@@ -2328,6 +2334,7 @@ Or use Karaf CLI:
     opendaylight-user@root>config:property-set http3-initial-max-data 4194304
     opendaylight-user@root>config:property-set http3-initial-max-stream-data-bidirectional-remote 262144
     opendaylight-user@root>config:property-set http3-initial-max-streams-bidirectional 100
+    opendaylight-user@root>config:property-set http3-max-idle-timeout 30000
     opendaylight-user@root>config:property-set tls-certificate "etc/tls/cert.pem"
     opendaylight-user@root>config:property-set tls-private-key "etc/tls/key.pem"
     opendaylight-user@root>config:update
