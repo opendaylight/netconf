@@ -50,6 +50,24 @@
       "message": "should be separate patch?",
       "revId": "2331fa3ee7fbe7b9a8246dabf8c6ef963b6f09e2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12c30906_094cba52",
+        "filename": "transport/transport-http/src/main/yang/odl-quic-common.yang",
+        "patchSetId": 19
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-09T13:31:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a75fc74f_8a2b437e",
+      "revId": "2331fa3ee7fbe7b9a8246dabf8c6ef963b6f09e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
