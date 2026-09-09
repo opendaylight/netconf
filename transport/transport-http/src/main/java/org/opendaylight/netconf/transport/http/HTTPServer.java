@@ -26,6 +26,7 @@ import java.net.InetSocketAddress;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.api.TransportChannel;
@@ -249,12 +250,16 @@ public final class HTTPServer extends HTTPTransportStack {
                 tlsIdentity.certificate())
             .applicationProtocols(Http3.supportedApplicationProtocols())
             .build();
+        final var maxIdleTimeout = quicServerParameters.getMaxIdleTimeout();
+        final var maxIdleTimeoutMillis = maxIdleTimeout == null ? DEFAULT_MAX_IDLE_TIMEOUT_MILLIS
+            : maxIdleTimeout.getValue().longValue();
         return Http3.newQuicServerCodecBuilder()
             .sslContext(sslContext)
             .initialMaxData(quicServerParameters.requireInitialMaxData().getValue().longValue())
             .initialMaxStreamDataBidirectionalRemote(
                 quicServerParameters.requireInitialMaxStreamDataBidiRemote().getValue().longValue())
             .initialMaxStreamsBidirectional(quicServerParameters.requireInitialMaxStreamsBidi().longValue())
+            .maxIdleTimeout(maxIdleTimeoutMillis, TimeUnit.MILLISECONDS)
             .handler(new ChannelInitializer<QuicChannel>() {
                 @Override
                 protected void initChannel(final QuicChannel ch) {

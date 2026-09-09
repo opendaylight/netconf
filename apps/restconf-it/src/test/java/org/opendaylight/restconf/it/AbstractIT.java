@@ -80,9 +80,13 @@ import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.HttpServerListenStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.listen.stack.grouping.transport.HttpOverTcp;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.http3.server.grouping.quic.under.http.QuicServerParameters;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.http3.server.grouping.quic.under.http.QuicServerParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.quic.common.rev260901.Varint;
 import org.opendaylight.yangtools.binding.data.codec.dynamic.dagger.BindingDataCodecFactoryModule;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.common.Uint64;
 import org.opendaylight.yangtools.yang.model.spi.source.YangTextToIRSourceTransformer;
 import org.opendaylight.yangtools.yang.source.ir.dagger.YangIRSourceModule;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -110,6 +114,13 @@ import org.xmlunit.diff.ElementSelectors;
  * </ul>
  */
 public abstract class AbstractIT extends AbstractDataBrokerTest {
+    // QUIC transport parameters shared by the HTTP/3 tests, max-idle-timeout is left to its default
+    protected static final QuicServerParameters QUIC_SERVER_PARAMETERS = new QuicServerParametersBuilder()
+        .setInitialMaxData(new Varint(Uint64.valueOf(4L * 1024 * 1024)))
+        .setInitialMaxStreamDataBidiRemote(new Varint(Uint64.valueOf(256L * 1024)))
+        .setInitialMaxStreamsBidi(Uint32.valueOf(100))
+        .build();
+
     private static final JSONParserConfiguration JSON_PARSER_CONFIGURATION =
         new JSONParserConfiguration().withStrictMode();
     private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);

@@ -34,6 +34,7 @@ import java.net.InetSocketAddress;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -174,16 +175,21 @@ public abstract sealed class HTTPClient extends HTTPTransportStack
         final var maxData = quicClientParams.getInitialMaxData();
         final var maxStreamData = quicClientParams.getInitialMaxStreamDataBidiRemote();
         final var maxStreams = quicClientParams.getInitialMaxStreamsBidi();
+        final var maxIdleTimeout = quicClientParams.getMaxIdleTimeout();
         final var initialMaxStreamData = maxStreamData == null ? DEFAULT_INITIAL_MAX_STREAM_DATA_BIDI_REMOTE
             : maxStreamData.getValue().longValue();
+        final var maxIdleTimeoutMillis = maxIdleTimeout == null ? DEFAULT_MAX_IDLE_TIMEOUT_MILLIS
+            : maxIdleTimeout.getValue().longValue();
         final var codec = Http3.newQuicClientCodecBuilder()
             .sslContext(sslContext)
             .initialMaxData(maxData == null ? DEFAULT_INITIAL_MAX_DATA : maxData.getValue().longValue())
             // the model only carries a single bidirectional stream flow-control value, apply it in both directions
+            // FIXME: NETCONF-1710: revisit once odl-quic-common separates client and server transport parameters
             .initialMaxStreamDataBidirectionalLocal(initialMaxStreamData)
             .initialMaxStreamDataBidirectionalRemote(initialMaxStreamData)
             .initialMaxStreamsBidirectional(
                 maxStreams == null ? DEFAULT_INITIAL_MAX_STREAMS_BIDI : maxStreams.longValue())
+            .maxIdleTimeout(maxIdleTimeoutMillis, TimeUnit.MILLISECONDS)
             .build();
 
         final var client = new QuicHTTPClient(listener);
