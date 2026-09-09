@@ -18,3 +18,7 @@ linkcheck_ignore = [
     # https://wiki-archive.opendaylight.org is usually slow to respond
     '^https://wiki-archive.opendaylight.org/.*',
 ]
+
+linkcheck_anchors_ignore_for_url = [
+    r'https://nexus\.opendaylight\.org/$',
+]
