@@ -16,6 +16,24 @@
       "message": "Previously each call issued its own Patterns.ask, so an ask timeout failed only that one call and the next call resolved a fresh actor. Now the actor is resolved once in the constructor and ProxyNetconfService caches the result permanently, so a single timeout installs a FailedProxyNetconfServiceFacade that fails every later operation on this mount until it is re-registered. An ask timeout is a routine transient failure and should not take the whole mount down.",
       "revId": "d8fadb018f954edaa44dabd1c716f881fa91748a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64d18f66_a9bda3cd",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyNetconfDataTreeService.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-09T15:25:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89185b3c_91eb3a26",
+      "revId": "d8fadb018f954edaa44dabd1c716f881fa91748a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
