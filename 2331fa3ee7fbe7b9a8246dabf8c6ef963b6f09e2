@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2af2406_b44163ee",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseStreamHandler.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-09T15:01:55Z",
+      "side": 1,
+      "message": "anotated constructor, after anotating whole class I would need to suppuress warning for @Nullable HttpResponseStatus errorStatus",
+      "parentUuid": "3684f25a_7e152eeb",
+      "revId": "2331fa3ee7fbe7b9a8246dabf8c6ef963b6f09e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8c5881d0_9af9fe56",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-09-07T11:22:25Z",
       "side": 1,
       "message": "Why do we suddenly need SSE stream handler? Just for H/3?",
+      "revId": "2331fa3ee7fbe7b9a8246dabf8c6ef963b6f09e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5456c27_5c34c556",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseStreamHandler.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-09T15:01:55Z",
+      "side": 1,
+      "message": "It is not suddenly, this is shared for h2 and h3, before it was in method in ClientHttp2SseService.java, this is done to minimize code duplicity",
+      "parentUuid": "8c5881d0_9af9fe56",
       "revId": "2331fa3ee7fbe7b9a8246dabf8c6ef963b6f09e2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
