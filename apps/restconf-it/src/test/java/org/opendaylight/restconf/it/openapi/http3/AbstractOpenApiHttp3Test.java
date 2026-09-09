@@ -38,7 +38,6 @@ import org.opendaylight.restconf.server.NettyEndpointConfiguration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.HttpServerListenStackGrouping;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.common.Uint64;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
@@ -51,9 +50,6 @@ public class AbstractOpenApiHttp3Test extends AbstractOpenApiTest {
     private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
     private static final String ALT_SVC_HEADER = "h3=\":8443\"; ma=3600";
     private static final Uint32 HTTP3_ALT_SVC_MAX_AGE_SECONDS = Uint32.valueOf(3600);
-    private static final Uint64 HTTP3_INITIAL_MAX_DATA = Uint64.valueOf(4L * 1024 * 1024);
-    private static final Uint64 HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE = Uint64.valueOf(256L * 1024);
-    private static final Uint32 HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL = Uint32.valueOf(100);
     private static final Uint32 WRITE_BUFFER_LOW_WATER_MARK = Uint32.valueOf(32 * 1024);
     private static final Uint32 WRITE_BUFFER_HIGH_WATER_MARK = Uint32.valueOf(64 * 1024);
 
@@ -101,8 +97,7 @@ public class AbstractOpenApiHttp3Test extends AbstractOpenApiTest {
             MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
             WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS,
             new HttpServerStackConfiguration(HTTPServerOverQuic.of(
-                localAddress(), port(), certificate, privateKey, HTTP3_INITIAL_MAX_DATA,
-                HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE, HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL)));
+                localAddress(), port(), certificate, privateKey, quicServerParameters())));
     }
 
     protected URI createApiUri(final String path) throws URISyntaxException {

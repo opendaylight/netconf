@@ -80,9 +80,13 @@ import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.HttpServerListenStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.listen.stack.grouping.transport.HttpOverTcp;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.http3.server.grouping.quic.under.http.QuicServerParameters;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.http3.server.grouping.quic.under.http.QuicServerParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.quic.common.rev260901.Varint;
 import org.opendaylight.yangtools.binding.data.codec.dynamic.dagger.BindingDataCodecFactoryModule;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.common.Uint64;
 import org.opendaylight.yangtools.yang.model.spi.source.YangTextToIRSourceTransformer;
 import org.opendaylight.yangtools.yang.source.ir.dagger.YangIRSourceModule;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -117,6 +121,11 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
     private static final Uint32 HTTP3_ALT_SVC_MAX_AGE_SECONDS = Uint32.valueOf(3600);
     private static final Uint32 WRITE_BUFFER_LOW_WATER_MARK = Uint32.valueOf(32 * 1024);
     private static final Uint32 WRITE_BUFFER_HIGH_WATER_MARK = Uint32.valueOf(64 * 1024);
+    private static final QuicServerParameters QUIC_SERVER_PARAMETERS = new QuicServerParametersBuilder()
+        .setInitialMaxData(new Varint(Uint64.valueOf(4L * 1024 * 1024)))
+        .setInitialMaxStreamDataBidiRemote(new Varint(Uint64.valueOf(256L * 1024)))
+        .setInitialMaxStreamsBidi(Uint32.valueOf(100))
+        .build();
 
     private static String localAddress;
     private static BootstrapFactory bootstrapFactory;
@@ -349,6 +358,13 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
     protected List<RpcImplementation> rpcImplementations(final DOMDataBroker domDataBroker,
             final MdsalDatabindProvider dataBindProvider) {
         return List.of();
+    }
+
+    /**
+     * {@return the QUIC transport parameters of the HTTP/3 server, with max-idle-timeout left to its default}
+     */
+    protected QuicServerParameters quicServerParameters() {
+        return QUIC_SERVER_PARAMETERS;
     }
 
     /**

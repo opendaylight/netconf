@@ -8,10 +8,14 @@
 package org.opendaylight.restconf.it.subscription.http3;
 
 import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -22,9 +26,11 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.opendaylight.netconf.transport.http.HTTPServerOverQuic;
 import org.opendaylight.netconf.transport.http.HttpServerStackConfiguration;
+import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.it.openapi.http3.Http3NettyTestClient;
 import org.opendaylight.restconf.it.server.TestEventStreamListener;
@@ -35,7 +41,6 @@ import org.opendaylight.restconf.server.spi.ErrorTagMapping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.HttpServerListenStackGrouping;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.common.Uint64;
 
 abstract class AbstractNotificationSubscriptionHttp3Test extends AbstractNotificationSubscriptionTest {
     private static final String USERNAME = "username";
@@ -43,9 +48,6 @@ abstract class AbstractNotificationSubscriptionHttp3Test extends AbstractNotific
     private static final Uint32 CHUNK_SIZE = Uint32.valueOf(256 * 1024);
     private static final String ALT_SVC_HEADER = "h3=\":8443\"; ma=3600";
     private static final Uint32 HTTP3_ALT_SVC_MAX_AGE_SECONDS = Uint32.valueOf(3600);
-    private static final Uint64 HTTP3_INITIAL_MAX_DATA = Uint64.valueOf(4L * 1024 * 1024);
-    private static final Uint64 HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE = Uint64.valueOf(256L * 1024);
-    private static final Uint32 HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL = Uint32.valueOf(100);
     private static final Uint32 WRITE_BUFFER_LOW_WATER_MARK = Uint32.valueOf(32 * 1024);
     private static final Uint32 WRITE_BUFFER_HIGH_WATER_MARK = Uint32.valueOf(64 * 1024);
 
@@ -89,8 +91,26 @@ abstract class AbstractNotificationSubscriptionHttp3Test extends AbstractNotific
             MessageEncoding.JSON, serverStackGrouping, CHUNK_SIZE, WRITE_BUFFER_LOW_WATER_MARK,
             WRITE_BUFFER_HIGH_WATER_MARK, ALT_SVC_HEADER, HTTP3_ALT_SVC_MAX_AGE_SECONDS,
             new HttpServerStackConfiguration(HTTPServerOverQuic.of(localAddress(), port(), certificate, privateKey,
-                HTTP3_INITIAL_MAX_DATA, HTTP3_INITIAL_MAX_STREAM_DATA_BIDIRECTIONAL_REMOTE,
-                HTTP3_INITIAL_MAX_STREAMS_BIDIRECTIONAL)));
+                quicServerParameters())));
+    }
+
+    protected String startSubscription() {
+        final var uri = "/rests/operations/ietf-subscribed-notifications:establish-subscription";
+        final var response = invokeRequestKeepClient(HttpMethod.POST, uri,
+            MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_JSON,
+            """
+                {
+                  "input": {
+                    "stream": "NETCONF",
+                    "encoding": "encode-json"
+                  }
+                }""");
+        assertEquals(HttpResponseStatus.OK, response.status());
+
+        // Extract subscription ID from response
+        final var jsonContent = new JSONObject(response.content().toString(StandardCharsets.UTF_8),
+            jsonParserConfiguration());
+        return String.valueOf(jsonContent.getJSONObject("ietf-subscribed-notifications:output").getLong("id"));
     }
 
     @Override
