@@ -26,6 +26,7 @@ import java.net.InetSocketAddress;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.api.TransportChannel;
@@ -237,7 +238,7 @@ public final class HTTPServer extends HTTPTransportStack {
 
         final var parameters = quic.getQuicServerParameters();
         if (parameters.getInitialMaxData() == null || parameters.getInitialMaxStreamDataBidiRemote() == null
-                || parameters.getInitialMaxStreamsBidi() == null) {
+                || parameters.getInitialMaxStreamsBidi() == null || parameters.getMaxIdleTimeout() == null) {
             throw new UnsupportedConfigurationException("Incomplete quic-server-parameters augmentation");
         }
         return parameters;
@@ -255,6 +256,7 @@ public final class HTTPServer extends HTTPTransportStack {
             .initialMaxStreamDataBidirectionalRemote(
                 quicServerParameters.requireInitialMaxStreamDataBidiRemote().getValue().longValue())
             .initialMaxStreamsBidirectional(quicServerParameters.requireInitialMaxStreamsBidi().longValue())
+            .maxIdleTimeout(quicServerParameters.requireMaxIdleTimeout().getValue().longValue(), TimeUnit.MILLISECONDS)
             .handler(new ChannelInitializer<QuicChannel>() {
                 @Override
                 protected void initChannel(final QuicChannel ch) {
