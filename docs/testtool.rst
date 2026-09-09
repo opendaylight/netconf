@@ -68,10 +68,10 @@ Building testtool
 Downloading testtool
 ^^^^^^^^^^^^^^^^^^^^
 
-Netconf-testtool is now part of default maven build profile for
-controller and can be also downloaded from nexus. The executable jars for
-testtool can be found by release at this parent directory:
-`nexus-artifacts <https://nexus.opendaylight.org/content/repositories/public/org/opendaylight/netconf/netconf-testtool/>`__
+Netconf-testtool is part of the default Maven build profile and can
+also be downloaded from Nexus. Search for netconf-testtool in the
+Nexus repository to find the available releases and executable JAR files:
+`nexus-artifacts <https://nexus.opendaylight.org/>`__
 
 Running testtool
 ^^^^^^^^^^^^^^^^
