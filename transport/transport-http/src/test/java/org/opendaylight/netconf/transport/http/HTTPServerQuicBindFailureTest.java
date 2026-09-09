@@ -28,12 +28,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.http3.server.grouping.quic.under.http.QuicServerParameters;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.http3.server.grouping.quic.under.http.QuicServerParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.quic.common.rev260901.Varint;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.common.Uint64;
 
 @ExtendWith(MockitoExtension.class)
 class HTTPServerQuicBindFailureTest {
     private static final String HTTP3_THREAD_PREFIX = "transport-http3-";
+    private static final QuicServerParameters QUIC_SERVER_PARAMETERS = new QuicServerParametersBuilder()
+        .setInitialMaxData(new Varint(Uint64.valueOf(65535)))
+        .setInitialMaxStreamDataBidiRemote(new Varint(Uint64.valueOf(65535)))
+        .setInitialMaxStreamsBidi(Uint32.valueOf(100))
+        .setMaxIdleTimeout(new Varint(Uint64.valueOf(30000)))
+        .build();
 
     @Mock
     private TransportChannelListener<HTTPTransportChannel> listener;
@@ -55,8 +64,7 @@ class HTTPServerQuicBindFailureTest {
 
             final var certData = generateX509CertData("RSA");
             final var quicCase = HTTPServerOverQuic.of(loopback.getHostAddress(), port, certData.certificate(),
-                certData.privateKey(), Uint64.valueOf(65535), Uint64.valueOf(65535),
-                Uint32.valueOf(100));
+                certData.privateKey(), QUIC_SERVER_PARAMETERS);
 
             final var future = HTTPServer.listen(listener, quicCase);
             final var failure = assertThrows(ExecutionException.class, () -> future.get(5, TimeUnit.SECONDS));
@@ -80,7 +88,7 @@ class HTTPServerQuicBindFailureTest {
 
         final var certData = generateX509CertData("RSA");
         final var quicCase = HTTPServerOverQuic.of(loopback.getHostAddress(), 0, certData.certificate(),
-            certData.privateKey(), Uint64.valueOf(65535), Uint64.valueOf(65535), Uint32.valueOf(100));
+            certData.privateKey(), QUIC_SERVER_PARAMETERS);
 
         final var server = HTTPServer.listen(listener, quicCase).get(5, TimeUnit.SECONDS);
         try {
