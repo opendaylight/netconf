@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f11a405_71b1473c",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/AbstractIT.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-10T06:28:27Z",
+      "side": 1,
+      "message": "It could be removed from all 3 sub-packages, by making this accessible, but all of that 3 classes will be removed in next 4 patches",
+      "parentUuid": "fc46f051_bd60548f",
+      "revId": "5096ad2307f57c5cc69b540925ddb1b5fae5f351",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "29c4dc35_fef653e2",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-09-07T13:15:51Z",
       "side": 1,
       "message": "@link does not work, do you mean @code?",
+      "revId": "5096ad2307f57c5cc69b540925ddb1b5fae5f351",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67eadda3_b36a1f73",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/AbstractIT.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-10T06:28:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "29c4dc35_fef653e2",
       "revId": "5096ad2307f57c5cc69b540925ddb1b5fae5f351",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "480758ef_54518422",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/ProtocolVersion.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-10T06:28:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ea540bb6_34dd16cf",
+      "revId": "5096ad2307f57c5cc69b540925ddb1b5fae5f351",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bb671e11_292ae984",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-09-07T13:02:27Z",
       "side": 1,
       "message": "here, we do not have a content, why to add TEXT_HTML?",
+      "revId": "5096ad2307f57c5cc69b540925ddb1b5fae5f351",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6613c763_396f6124",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/UiTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-10T06:28:27Z",
+      "side": 1,
+      "message": "it fits both:\n  invokeRequest(HttpMethod, String, String mediaType, String acceptType, String content)                                                                                                                                     \n  invokeRequest(HttpMethod, String, ProtocolVersion version, String mediaType, String content)\n\ninstead used method without conent",
+      "parentUuid": "bb671e11_292ae984",
       "revId": "5096ad2307f57c5cc69b540925ddb1b5fae5f351",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
