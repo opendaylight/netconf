@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.test.tool.monitoring;
 
-import com.google.common.base.Joiner;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -42,9 +41,8 @@ final class MonitoringSession {
         final IpAddress ipAddress = managementSession.getSourceHost().getIpAddress();
         if (ipAddress.getIpv4Address() != null) {
             return ipAddress.getIpv4Address().getValue();
-        } else {
-            return ipAddress.getIpv6Address().getValue();
         }
+        return ipAddress.getIpv6Address().getValue();
     }
 
     @XmlElement(name = "login-time")
@@ -79,11 +77,9 @@ final class MonitoringSession {
                 .getField(Naming.QNAME_STATIC_FIELD_NAME).get(null);
             // Add extension prefix if transport type is from extension yang module
             if (qualifiedName.getNamespace().toString().equals(MonitoringConstants.EXTENSION_NAMESPACE)) {
-                return Joiner.on(':').join(MonitoringConstants.EXTENSION_NAMESPACE_PREFIX,
-                        qualifiedName.getLocalName());
-            } else {
-                return qualifiedName.getLocalName();
+                return MonitoringConstants.EXTENSION_NAMESPACE_PREFIX + ":" + qualifiedName.getLocalName();
             }
+            return qualifiedName.getLocalName();
         } catch (final NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
             throw new IllegalArgumentException("Unknown transport type " + managementSession.getTransport(), e);
         }
