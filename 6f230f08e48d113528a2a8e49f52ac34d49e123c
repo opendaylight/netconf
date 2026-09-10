@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "66715712_40317dc8",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-10T10:57:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9624d708_2b035795",
+      "revId": "6f230f08e48d113528a2a8e49f52ac34d49e123c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d9a23612_187800d8",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-09-10T07:41:39Z",
       "side": 1,
       "message": "static?",
+      "revId": "6f230f08e48d113528a2a8e49f52ac34d49e123c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b77c7c0e_b7b9a79b",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPSchemeTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-10T10:57:09Z",
+      "side": 1,
+      "message": "cannot be static since it uses non static field",
+      "parentUuid": "d9a23612_187800d8",
       "revId": "6f230f08e48d113528a2a8e49f52ac34d49e123c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
