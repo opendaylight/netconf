@@ -16,6 +16,24 @@
       "message": "Maybe these netconf related functions could be put elsewhere like for example in `netcont.py` or create another file. `cluster.py` file could contain only cluster management functions, so it would be netconf agnostic. Netconf related functions which could be run in a clustered environment could be put elsewhere.",
       "revId": "ce3601fd7821364f1c143e1280c461ce09a23fef",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e97692b_4f28ca6e",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 587,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-09-11T08:21:49Z",
+      "side": 1,
+      "message": "moved to a new libraries/netconf_cluster.py. cluster.py no longer references netconf at all.",
+      "parentUuid": "19a35e8a_78bc634d",
+      "revId": "ce3601fd7821364f1c143e1280c461ce09a23fef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
