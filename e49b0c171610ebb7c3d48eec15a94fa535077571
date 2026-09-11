@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c091e59_8e0cb005",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-09-11T08:21:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6bc821f9_2e7fbc24",
+      "revId": "e49b0c171610ebb7c3d48eec15a94fa535077571",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb7ec991_a83224e7",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-27T10:58:32Z",
       "side": 1,
       "message": "This can be either static, or module function, since we\u0027re not using self.",
+      "revId": "e49b0c171610ebb7c3d48eec15a94fa535077571",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d15fe46b_b825505b",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-09-11T08:21:41Z",
+      "side": 1,
+      "message": "module function now.",
+      "parentUuid": "fb7ec991_a83224e7",
       "revId": "e49b0c171610ebb7c3d48eec15a94fa535077571",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "95170a03_32407b64",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-09-11T08:21:41Z",
+      "side": 1,
+      "message": "Tried it, fails both ways. \nWith one attempt the PUT returned 204 but the read-back 14 ms later still showed the old value; sending once and then waiting failed on the write instead, 500 Commit of operation failed. The settling window hasn\u0027t passed by modify time, so I kept the ten attempts. A 4968 recurrence wouldn\u0027t be masked anyway.. that one is persistent (write once and modify only \"very rarely\" succeeds), so ten attempts would still fail it.",
+      "parentUuid": "c916754e_515b8c13",
+      "revId": "e49b0c171610ebb7c3d48eec15a94fa535077571",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ba28708_94bf3969",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-08-27T10:58:32Z",
       "side": 1,
       "message": "Since we\u0027re not defining what the data should look like once the delete has gone through, this falls back to delete_device_data\u0027s default - netconf.EMPTY_DEVICE_DATA. The two checks below compare against this file\u0027s EMPTY_DATA instead. Both strings match today, but they live in different files and nothing keeps them in step. Can we pass EMPTY_DATA here as well?",
+      "revId": "e49b0c171610ebb7c3d48eec15a94fa535077571",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "797d5759_2c3f7b17",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-09-11T08:21:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ba28708_94bf3969",
       "revId": "e49b0c171610ebb7c3d48eec15a94fa535077571",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
