@@ -16,6 +16,24 @@
       "message": "as in previous patch to seperate netconf functionality and cluster management functions.",
       "revId": "42dade310cae5cdb34bb54bfc41fca3f0477ab70",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7513d52c_72708535",
+        "filename": "tests/libraries/cluster.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 662,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-09-11T08:21:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4b4a990f_8a2f98d5",
+      "revId": "42dade310cae5cdb34bb54bfc41fca3f0477ab70",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
