@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f49bdee6_66df07ad",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-09-11T08:21:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "36006580_52ffdd14",
+      "revId": "fac8c8abd246c9ab71829fa07a3459e43b275451",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd22a8d2_2f85efb3",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cdd6bafe_2b4ea8a8",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-09-11T08:21:44Z",
+      "side": 1,
+      "message": "Confirmed in a run: all three members log will use schema cache directory bug8086-schema instead of schema, and each cache ends up with models we never seeded.",
+      "parentUuid": "fd22a8d2_2f85efb3",
+      "revId": "fac8c8abd246c9ab71829fa07a3459e43b275451",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "651c42b4_51431960",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-08-27T11:38:07Z",
       "side": 1,
       "message": "Running with the configured_device shared fixture here shines a light at an issue with that fixture. In it the device is mounted, four more setup steps follow, and only the code after its \"yield\" unmounts it. If one of those steps fails the device stays mounted, and this suite then fails on its very first check for an unrelated reason. Can you fix the fixture so that this kind of problem does not leak to other tests such as this one?",
+      "revId": "fac8c8abd246c9ab71829fa07a3459e43b275451",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "524a0da1_ff9e8d50",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-09-11T08:21:44Z",
+      "side": 1,
+      "message": "Fixed in 124595, where the fixture lives. everything after the mount is in a try, unmount in finally.",
+      "parentUuid": "651c42b4_51431960",
       "revId": "fac8c8abd246c9ab71829fa07a3459e43b275451",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
