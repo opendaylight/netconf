@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3299ee8_6de1db1e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 27
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-14T08:17:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "902d66ab_1e22dcf3",
+      "revId": "b847e396fede9c266fd3293d82c8641c6d003434",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6ad60f0f_2f009a3a",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "56953b98_224e436a",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/BenchmarkOpenApiIT.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-14T08:17:34Z",
+      "side": 1,
+      "message": "no this is only for HTTP/3,  1.1/2 are supported by java.net.http.HttpClient and are separated",
+      "parentUuid": "6ad60f0f_2f009a3a",
+      "revId": "b847e396fede9c266fd3293d82c8641c6d003434",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6314fe8c_42365355",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-09-07T13:42:14Z",
       "side": 1,
       "message": "can we use org.opendaylight.netconf.transport.http.Response and its implementations?",
+      "revId": "b847e396fede9c266fd3293d82c8641c6d003434",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85d381fc_065d3141",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/openapi/BenchmarkOpenApiIT.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-14T08:17:34Z",
+      "side": 1,
+      "message": "Response is a sealed interface\nwith only a single status() accessor — no body/content accessor at all.",
+      "parentUuid": "6314fe8c_42365355",
       "revId": "b847e396fede9c266fd3293d82c8641c6d003434",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
