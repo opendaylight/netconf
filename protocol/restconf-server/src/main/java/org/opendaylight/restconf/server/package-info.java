@@ -9,4 +9,5 @@
  * Netty based RESTCONF server endpoint. {@link org.opendaylight.restconf.server.NettyEndpoint} and it's components.
  */
 @org.osgi.annotation.bundle.Export
+@org.osgi.annotation.bundle.Header(name = "Automatic-Module-Name", value = "org.opendaylight.restconf.server")
 package org.opendaylight.restconf.server;
