@@ -7,8 +7,10 @@
  */
 package org.opendaylight.netconf.console.impl;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -39,9 +41,9 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev25
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.network.topology.topology.topology.types.TopologyNetconf;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yangtools.binding.runtime.api.BindingRuntimeContext;
 import org.opendaylight.yangtools.binding.runtime.spi.BindingRuntimeHelpers;
@@ -69,8 +71,8 @@ class NetconfCommandsImplTest {
     }
 
     @Test
-    void testListDevice() throws Exception {
-        createTopology(LogicalDatastoreType.OPERATIONAL);
+    void testListDevice() {
+        putOperTopology();
 
         final var map = netconfCommands.listDevices();
         // FIXME: WHAT?!
@@ -82,8 +84,8 @@ class NetconfCommandsImplTest {
     }
 
     @Test
-    void testShowDevice() throws Exception {
-        createTopology(LogicalDatastoreType.OPERATIONAL);
+    void testShowDevice() {
+        putOperTopology();
 
         final var mapCorrect = netconfCommands.showDevice(IP, String.valueOf(PORT));
         // FIXME: WHAT?!
@@ -104,7 +106,7 @@ class NetconfCommandsImplTest {
     }
 
     @Test
-    void testConnectDisconnectDevice() throws Exception {
+    void testConnectDisconnectDevice() {
         final var netconfNode = new NetconfNodeBuilder()
             .setPort(new PortNumber(Uint16.valueOf(7777)))
             .setHost(new Host(new IpAddress(new Ipv4Address("10.10.1.1"))))
@@ -116,111 +118,124 @@ class NetconfCommandsImplTest {
                 .build())
             .build();
 
-        createTopology(LogicalDatastoreType.CONFIGURATION);
+        putConfigTopology();
         netconfCommands.connectDevice(netconfNode, "netconf-ID");
 
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
             final var topology = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
                     NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
             final var nodes = topology.nonnullNode().values();
-            if (nodes.size() != 2) {
-                return false;
-            }
+            assertEquals(2, nodes.size());
 
-            final var storedNode = nodes.stream()
+            final var storedAugment = nodes.stream()
                 .filter(node -> node.key().getNodeId().getValue().equals("netconf-ID"))
-                .findFirst();
+                .findFirst()
+                .orElseThrow()
+                .augmentation(NetconfNodeAugment.class);
+            assertNotNull(storedAugment);
 
-            assertTrue(storedNode.isPresent());
-
-            final var storedNetconfNode = storedNode.orElseThrow()
-                .augmentation(NetconfNodeAugment.class).getNetconfNode();
-            assertEquals(7777, storedNetconfNode.getPort().getValue().longValue());
-            assertEquals("10.10.1.1", storedNetconfNode.getHost().getIpAddress().getIpv4Address().getValue());
-            return true;
+            final var storedNetconfNode = storedAugment.getNetconfNode();
+            assertEquals(Uint16.valueOf(7777), storedNetconfNode.getPort().getValue());
+            assertEquals(new Ipv4Address("10.10.1.1"), storedNetconfNode.getHost().getIpAddress().getIpv4Address());
         });
 
         netconfCommands.disconnectDevice("netconf-ID");
 
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
             final var topologyDeleted = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
                     NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
             final var nodesDeleted = topologyDeleted.nonnullNode().values();
-            if (nodesDeleted.size() != 1) {
-                return false;
-            }
-
+            assertEquals(1, nodesDeleted.size());
             assertEquals(Optional.empty(), nodesDeleted.stream()
                 .filter(node -> node.key().getNodeId().getValue().equals("netconf-ID"))
                 .findFirst());
-            return true;
         });
     }
 
     @Test
-    void testUpdateDevice() throws Exception {
+    void testUpdateDevice() {
         //We need both, read data from OPERATIONAL DS and update data in CONFIGURATIONAL DS
-        createTopology(LogicalDatastoreType.OPERATIONAL);
-        createTopology(LogicalDatastoreType.CONFIGURATION);
+        putConfigTopology();
+        putOperTopology();
 
         netconfCommands.updateDevice(NODE_ID, "admin", "admin", Map.of(
             NetconfConsoleConstants.NETCONF_IP, "7.7.7.7",
             NetconfConsoleConstants.TCP_ONLY, "true",
             NetconfConsoleConstants.SCHEMALESS, "true"));
 
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
             final var topology = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
                     NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
             final var nodes = topology.nonnullNode().values();
-            if (nodes.size() != 1) {
-                return false;
-            }
+            assertEquals(1, nodes.size());
 
-            final var storedNode = nodes.stream()
+            final var storedAugment = nodes.stream()
                 .filter(node -> node.key().getNodeId().getValue().equals(NODE_ID))
-                .findFirst();
-            assertTrue(storedNode.isPresent());
+                .findFirst()
+                .orElseThrow()
+                .augmentation(NetconfNodeAugment.class);
+            assertNotNull(storedAugment);
 
-            final var storedNetconfNode = storedNode.orElseThrow()
-                .augmentation(NetconfNodeAugment.class).getNetconfNode();
-            assertEquals("7.7.7.7", storedNetconfNode.getHost().getIpAddress().getIpv4Address().getValue());
-            return true;
+            final var storedNetconfNode = storedAugment.getNetconfNode();
+            assertEquals(new Ipv4Address("7.7.7.7"), storedNetconfNode.getHost().getIpAddress().getIpv4Address());
         });
     }
 
-    private void createTopology(final LogicalDatastoreType dataStoreType) throws Exception {
-        final var node = getNetconfNode(NODE_ID, IP, PORT, CONN_STATUS, CAP_PREFIX);
-        final var topology = new TopologyBuilder()
+    private void putConfigTopology() {
+        putTopology(LogicalDatastoreType.CONFIGURATION, new TopologyBuilder()
             .withKey(new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())))
             .setTopologyId(new TopologyId(TopologyNetconf.QNAME.getLocalName()))
-            .setNode(BindingMap.of(node))
-            .build();
-
-        final var writeTransaction = dataBroker.newWriteOnlyTransaction();
-        writeTransaction.put(dataStoreType, NetconfIidFactory.NETCONF_TOPOLOGY_IID, topology);
-        writeTransaction.commit().get(2, TimeUnit.SECONDS);
-    }
-
-    private static Node getNetconfNode(final String nodeIdent, final String ip, final int portNumber,
-            final ConnectionStatus cs, final String notificationCapabilityPrefix) {
-        return new NodeBuilder()
-            .setNodeId(new NodeId(nodeIdent))
-            .addAugmentation(new NetconfNodeAugmentBuilder()
-                .setNetconfNode(new NetconfNodeBuilder()
-                    .setConnectionStatus(cs)
-                    .setHost(new Host(new IpAddress(new Ipv4Address(ip))))
-                    .setPort(new PortNumber(Uint16.valueOf(portNumber)))
-                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder()
-                        .setAvailableCapability(List.of(new AvailableCapabilityBuilder()
-                            .setCapabilityOrigin(AvailableCapability.CapabilityOrigin.UserDefined)
-                            .setCapability(notificationCapabilityPrefix + "_availableCapabilityString1")
-                            .build()))
+            .setNode(BindingMap.of(new NodeBuilder()
+                .setNodeId(new NodeId(NODE_ID))
+                .addAugmentation(new NetconfNodeAugmentBuilder()
+                    .setNetconfNode(new NetconfNodeBuilder()
+                        .setHost(new Host(new IpAddress(new Ipv4Address(IP))))
+                        .setPort(new PortNumber(Uint16.valueOf(PORT)))
+                        .setCredentials(new LoginPwUnencryptedBuilder()
+                            .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
+                                .setUsername("test")
+                                .setPassword("test")
+                                .build())
+                            .build())
                         .build())
                     .build())
-                .build())
-            .build();
+                .build()))
+            .build());
     }
 
+    private void putOperTopology() {
+        putTopology(LogicalDatastoreType.OPERATIONAL, new TopologyBuilder()
+            .withKey(new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())))
+            .setTopologyId(new TopologyId(TopologyNetconf.QNAME.getLocalName()))
+            .setNode(BindingMap.of(new NodeBuilder()
+                .setNodeId(new NodeId(NODE_ID))
+                .addAugmentation(new NetconfNodeAugmentBuilder()
+                    .setNetconfNode(new NetconfNodeBuilder()
+                        .setConnectionStatus(CONN_STATUS)
+                        .setHost(new Host(new IpAddress(new Ipv4Address(IP))))
+                        .setPort(new PortNumber(Uint16.valueOf(PORT)))
+                        .setAvailableCapabilities(new AvailableCapabilitiesBuilder()
+                            .setAvailableCapability(List.of(new AvailableCapabilityBuilder()
+                                .setCapabilityOrigin(AvailableCapability.CapabilityOrigin.UserDefined)
+                                .setCapability(CAP_PREFIX + "_availableCapabilityString1")
+                                .build()))
+                            .build())
+                        .build())
+                    .build())
+                .build()))
+            .build());
+    }
+
+    private void putTopology(final LogicalDatastoreType datastore, final Topology topology) {
+        final var commitInfo = assertDoesNotThrow(() -> {
+            final var tx = dataBroker.newWriteOnlyTransaction();
+            tx.put(datastore, NetconfIidFactory.NETCONF_TOPOLOGY_IID, topology);
+            return tx.commit().get(2, TimeUnit.SECONDS);
+        });
+        assertNotNull(commitInfo);
+    }
+
+    // FIXME: use AssertJ instead
     private static void assertBaseNodeAttributes(final Map<?, ?> mapNode) {
         assertTrue(mapNode.containsKey(NetconfConsoleConstants.NETCONF_ID));
         assertTrue(mapNode.containsKey(NetconfConsoleConstants.NETCONF_IP));
