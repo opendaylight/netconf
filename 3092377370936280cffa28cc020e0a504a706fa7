@@ -16,6 +16,24 @@
       "message": "This proxy can request a child actor before the master receives its dataStoreService. The child then stores null, and initializing the master later does not fix it. Subsequent GET requests fail with NullPointerException and time out.\nProbably we can initialize the master and wait for MasterActorDataInitialized before creating the proxy. \nAnd we also need a startup test to verify that GET works after registration.",
       "revId": "3092377370936280cffa28cc020e0a504a706fa7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c69fda1b_7c7f6768",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyNetconfDataTreeService.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-16T06:46:11Z",
+      "side": 1,
+      "message": "I split registerMasterMountPoint() into initializeDeviceServices() (computes deviceDataBroker/dataStoreService, needed before sending CreateInitialMasterActorData) and registerMasterMountPoint() (constructs ProxyNetconfDataTreeService + registers the mount), deferring the latter until after CreateInitialMasterActorData is acknowledged.",
+      "parentUuid": "7ead85fb_5fd658ed",
+      "revId": "3092377370936280cffa28cc020e0a504a706fa7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
