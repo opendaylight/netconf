@@ -295,6 +295,20 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Automatic-Module-Name>org.opendaylight.netconf.client.mdsal</Automatic-Module-Name>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <scm>
         <connection>scm:git:ssh://git.opendaylight.org:29418/netconf.git</connection>
         <developerConnection>scm:git:ssh://git.opendaylight.org:29418/netconf.git</developerConnection>
