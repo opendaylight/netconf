@@ -18,9 +18,17 @@
     <artifactId>netconf-topology-1node-transient</artifactId>
 
     <properties>
+<<<<<<< HEAD   (846d3f Add Maven Central testtool download link)
         <spring-boot-version>4.0.2</spring-boot-version>
+=======
+        <spring-boot-version>4.1.1</spring-boot-version>
+>>>>>>> CHANGE (c9f289 Bump spring-boot to 4.1.1)
         <!-- Keep this version synchronized with spring-boot version -->
+<<<<<<< HEAD   (846d3f Add Maven Central testtool download link)
         <springframework-version>7.0.3</springframework-version>
+=======
+        <springframework-version>7.0.9</springframework-version>
+>>>>>>> CHANGE (c9f289 Bump spring-boot to 4.1.1)
         <!-- Dagger-generated code triggers a SpotBugs warning (URF_UNREAD_FIELD in DaggerRestconfNetconfFactory.java).
              Excludes the generated Dagger inner implementation class from analysis.-->
         <spotbugs.onlyAnalyze>
