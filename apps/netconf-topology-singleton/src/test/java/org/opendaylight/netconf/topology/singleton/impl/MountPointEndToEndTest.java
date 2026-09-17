@@ -330,7 +330,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         resources.registry().registerSchemaSource(
             id -> Futures.immediateFuture(new DelegatedYangTextSource(id, topModuleInfo.getYangTextCharSource())),
             PotentialSchemaSource.create(new SourceIdentifier(TOP_MODULE_NAME,
-                    topModuleInfo.getName().getRevision().map(Revision::toString).orElse(null)),
+                    topModuleInfo.name().getRevision().map(Revision::toString).orElse(null)),
                 YangTextSource.class, 1));
 
         masterNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, masterDataBroker,
@@ -756,7 +756,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     }
 
     private RpcDefinition findRpcDefinition(final String rpc) {
-        Module topModule = deviceModelContext.findModule(TOP_MODULE_NAME, topModuleInfo.getName().getRevision())
+        Module topModule = deviceModelContext.findModule(TOP_MODULE_NAME, topModuleInfo.name().getRevision())
             .orElseThrow();
         RpcDefinition rpcDefinition = null;
         for (RpcDefinition def: topModule.getRpcs()) {

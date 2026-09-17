@@ -55,7 +55,7 @@ public final class SchemaSourceCache<T extends SourceRepresentation> extends Abs
             .collect(Collectors.toSet()));
 
         // creation of source identifiers for all yang module info
-        cachedSchemas = Maps.uniqueIndex(allModulesInfo, info -> SourceIdentifier.ofQName(info.getName()));
+        cachedSchemas = Maps.uniqueIndex(allModulesInfo, info -> SourceIdentifier.ofQName(info.name()));
         cachedSchemas.keySet().forEach(this::register);
     }
 
