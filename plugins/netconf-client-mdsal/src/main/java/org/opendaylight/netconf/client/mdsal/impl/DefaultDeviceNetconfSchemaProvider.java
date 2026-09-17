@@ -55,7 +55,7 @@ public final class DefaultDeviceNetconfSchemaProvider implements DeviceNetconfSc
     /**
      * The RFC6241-standard QName of {@code ietf-netconf-yang}.
      */
-    private static final @NonNull QName RFC6241_IETF_NETCONF = IetfNetconfData.META.moduleInfo().getName();
+    private static final @NonNull QName RFC6241_IETF_NETCONF = IetfNetconfData.META.moduleInfo().name();
     /**
      * The QName of {@code ietf-netconf.yang} as revision used by libnetconf2/sysrepon/IOS-XR and perhaps others.
      * The delta is just addition of NACM extension instantiations. The data semantics remains the same.
@@ -124,8 +124,8 @@ public final class DefaultDeviceNetconfSchemaProvider implements DeviceNetconfSc
         // If device supports notifications and does not contain necessary modules, add them automatically
         if (sessionPreferences.containsNonModuleCapability(CapabilityURN.NOTIFICATION)) {
             requiredSources = new HashSet<>(requiredSources);
-            requiredSources.add(NotificationsData.META.moduleInfo().getName());
-            requiredSources.add(IetfYangTypesData.META.moduleInfo().getName());
+            requiredSources.add(NotificationsData.META.moduleInfo().name());
+            requiredSources.add(IetfYangTypesData.META.moduleInfo().name());
         }
 
         // Register all sources with repository and start resolution
