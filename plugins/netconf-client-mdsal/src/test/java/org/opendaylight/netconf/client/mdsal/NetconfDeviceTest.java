@@ -361,8 +361,8 @@ class NetconfDeviceTest extends AbstractTestModelTest {
             .build());
 
         netconfSpy.onRemoteSessionUp(getSessionCaps(false).replaceModuleCaps(Map.of(
-            NotificationsData.META.moduleInfo().getName(), CapabilityOrigin.DeviceAdvertised,
-            IetfYangTypesData.META.moduleInfo().getName(), CapabilityOrigin.DeviceAdvertised)), listener);
+            NotificationsData.META.moduleInfo().name(), CapabilityOrigin.DeviceAdvertised,
+            IetfYangTypesData.META.moduleInfo().name(), CapabilityOrigin.DeviceAdvertised)), listener);
 
         final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
@@ -395,8 +395,8 @@ class NetconfDeviceTest extends AbstractTestModelTest {
 
         // Invoke onRemoteSessionUp on the prepared NetconfDevice instance.
         netconfDevice.onRemoteSessionUp(getSessionCaps(false).replaceModuleCaps(Map.of(
-            NotificationsData.META.moduleInfo().getName(), CapabilityOrigin.DeviceAdvertised,
-            IetfYangTypesData.META.moduleInfo().getName(), CapabilityOrigin.DeviceAdvertised)), listener);
+            NotificationsData.META.moduleInfo().name(), CapabilityOrigin.DeviceAdvertised,
+            IetfYangTypesData.META.moduleInfo().name(), CapabilityOrigin.DeviceAdvertised)), listener);
 
         // Verify the invocation of the onDeviceConnected method on the KeepaliveSalFacade instance and capture
         // the device schema and RPC service.

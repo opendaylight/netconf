@@ -163,7 +163,7 @@ public record NetconfSessionPreferences(
 
     public boolean isNotificationsSupported() {
         return containsPartialNonModuleCapability(CapabilityURN.NOTIFICATION)
-            || containsModuleCapability(IetfNetconfNotificationsData.META.moduleInfo().getName());
+            || containsModuleCapability(IetfNetconfNotificationsData.META.moduleInfo().name());
     }
 
     public boolean isMonitoringSupported() {
