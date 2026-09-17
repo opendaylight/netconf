@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
+import static org.opendaylight.mdsal.common.api.FluentFutures.immediateFluentFuture;
 
 import java.util.Optional;
 import javax.ws.rs.core.MultivaluedHashMap;
