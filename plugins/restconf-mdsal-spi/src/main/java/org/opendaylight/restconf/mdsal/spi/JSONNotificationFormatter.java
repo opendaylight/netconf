@@ -22,7 +22,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 final class JSONNotificationFormatter extends NotificationFormatter {
     private static final @NonNull String NOTIFICATION_NAME =
-        IetfRestconfData.META.moduleInfo().getName().getLocalName() + ":notification";
+        IetfRestconfData.META.moduleInfo().name().getLocalName() + ":notification";
     @VisibleForTesting
     static final JSONNotificationFormatter EMPTY = new JSONNotificationFormatter(TextParameters.EMPTY);
 
