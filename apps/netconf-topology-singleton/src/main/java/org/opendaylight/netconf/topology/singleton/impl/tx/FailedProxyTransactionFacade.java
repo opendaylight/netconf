@@ -12,11 +12,11 @@ import java.util.Objects;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.FluentFutures;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
@@ -31,8 +31,8 @@ class FailedProxyTransactionFacade implements ProxyTransactionFacade {
     private static final Logger LOG = LoggerFactory.getLogger(FailedProxyTransactionFacade.class);
 
     private final @NonNull FluentFuture<CommitInfo> completionFuture;
-    private final RemoteDeviceId id;
-    private final Throwable failure;
+    private final @NonNull RemoteDeviceId id;
+    private final @NonNull Throwable failure;
 
     FailedProxyTransactionFacade(final RemoteDeviceId id, final Throwable failure) {
         this.id = Objects.requireNonNull(id);
@@ -62,7 +62,7 @@ class FailedProxyTransactionFacade implements ProxyTransactionFacade {
             final YangInstanceIdentifier path) {
         LOG.debug("{}: Read {} {} - failure", id, store, path, failure);
         return FluentFutures.immediateFailedFluentFuture(ReadFailedException.MAPPER.apply(
-                failure instanceof Exception ? (Exception)failure : new ReadFailedException("read", failure)));
+                failure instanceof Exception e ? e : new ReadFailedException("read", failure)));
     }
 
     @Override
@@ -70,7 +70,7 @@ class FailedProxyTransactionFacade implements ProxyTransactionFacade {
             final YangInstanceIdentifier path) {
         LOG.debug("{}: Exists {} {} - failure", id, store, path, failure);
         return FluentFutures.immediateFailedFluentFuture(ReadFailedException.MAPPER.apply(
-                failure instanceof Exception ? (Exception)failure : new ReadFailedException("read", failure)));
+                failure instanceof Exception e ? e : new ReadFailedException("read", failure)));
     }
 
     @Override

@@ -23,6 +23,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static org.opendaylight.mdsal.common.api.FluentFutures.immediateFailedFluentFuture;
+import static org.opendaylight.mdsal.common.api.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.OPERATIONAL;
 import static org.opendaylight.netconf.api.EffectiveOperation.CREATE;
@@ -30,8 +32,6 @@ import static org.opendaylight.netconf.api.EffectiveOperation.DELETE;
 import static org.opendaylight.netconf.api.EffectiveOperation.MERGE;
 import static org.opendaylight.netconf.api.EffectiveOperation.REMOVE;
 import static org.opendaylight.netconf.api.EffectiveOperation.REPLACE;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
