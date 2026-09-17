@@ -10,9 +10,9 @@ package org.opendaylight.restconf.mdsal.spi.data;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.doReturn;
+import static org.opendaylight.mdsal.common.api.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.OPERATIONAL;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.parseYang;
 
 import java.util.Optional;

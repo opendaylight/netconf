@@ -23,10 +23,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
+import static org.opendaylight.mdsal.common.api.FluentFutures.immediateFailedFluentFuture;
+import static org.opendaylight.mdsal.common.api.FluentFutures.immediateFalseFluentFuture;
+import static org.opendaylight.mdsal.common.api.FluentFutures.immediateFluentFuture;
+import static org.opendaylight.mdsal.common.api.FluentFutures.immediateTrueFluentFuture;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
