@@ -24,6 +24,7 @@ import org.apache.pekko.actor.Status.Failure;
 import org.apache.pekko.actor.Status.Success;
 import org.apache.pekko.testkit.TestProbe;
 import org.junit.jupiter.api.Test;
+import org.opendaylight.mdsal.common.api.FluentFutures;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
@@ -32,7 +33,6 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteR
 import org.opendaylight.netconf.topology.singleton.messages.transactions.MergeRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.PutRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitRequest;
-import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;

@@ -14,9 +14,9 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
+import static org.opendaylight.mdsal.common.api.FluentFutures.immediateFalseFluentFuture;
+import static org.opendaylight.mdsal.common.api.FluentFutures.immediateFluentFuture;
+import static org.opendaylight.mdsal.common.api.FluentFutures.immediateTrueFluentFuture;
 
 import java.net.URI;
 import java.util.List;
