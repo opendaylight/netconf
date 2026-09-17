@@ -53,10 +53,11 @@ def parse_arguments():
 
 
 def main():
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(get_events())
-    loop.run_until_complete(asyncio.sleep(0))
-    loop.close()
+    # asyncio.run() manages the event loop itself; asyncio.get_event_loop()
+    # relied on a fallback (auto-creating a loop for the main thread) that
+    # newer Python versions no longer provide, raising RuntimeError before
+    # a single connection attempt is even made.
+    asyncio.run(get_events())
 
 
 if __name__ == "__main__":
