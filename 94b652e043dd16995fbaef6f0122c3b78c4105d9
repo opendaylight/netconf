@@ -16,6 +16,24 @@
       "message": "should GetRequest also set hasPendingActivity \u003d true;?\nas previously it stopped the actor",
       "revId": "94b652e043dd16995fbaef6f0122c3b78c4105d9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8913cb13_04f16c5b",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActor.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-17T10:52:58Z",
+      "side": 1,
+      "message": "hasPendingActivity \u003d true; runs before the if (message instanceof GetRequest ...) chain even starts, so it applies unconditionally to every message that isn\u0027t ReceiveTimeout \nNetconfDataTreeServiceActorTest.testIdleTimeout deliberately sends a GetRequest first, then waits for the idle timeout and asserts cancel() fires. If GetRequest didn\u0027t set hasPendingActivity \u003d true, this test would fail",
+      "parentUuid": "cac32948_40edbe97",
+      "revId": "94b652e043dd16995fbaef6f0122c3b78c4105d9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

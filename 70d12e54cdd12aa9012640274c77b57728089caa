@@ -16,6 +16,24 @@
       "message": "Is it ok to loose these?",
       "revId": "70d12e54cdd12aa9012640274c77b57728089caa",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01c22747_2be697b5",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActor.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-17T10:52:58Z",
+      "side": 0,
+      "message": "invokeRpcCall() we still call\ncontext().stop() - yes, it\u0027s fine to lose it - even necessary, actor changed from disposable per call to mount-shared, it gets cleaned up when the mount tears down",
+      "parentUuid": "cfbfb1db_e49f17b3",
+      "revId": "70d12e54cdd12aa9012640274c77b57728089caa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
