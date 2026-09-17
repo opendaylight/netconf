@@ -65,7 +65,7 @@ def register_keys_and_certificates_in_odl_cotroller():
     """
 
     # Registere client key
-    pem_client_key = infra.get_file_content("/tmp/configuration-files/certs/client.key")
+    pem_client_key = get_certificate_file_content("client.key")
     template = infra.get_file_content(ADD_KEYSTORE_ENTRY_REQ)
     body = template.replace("{pem-client-key}", pem_client_key)
     templated_requests.post_to_uri(
