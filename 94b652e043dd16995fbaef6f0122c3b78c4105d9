@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cac32948_40edbe97",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActor.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-09-17T08:20:38Z",
+      "side": 1,
+      "message": "should GetRequest also set hasPendingActivity \u003d true;?\nas previously it stopped the actor",
+      "revId": "94b652e043dd16995fbaef6f0122c3b78c4105d9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
