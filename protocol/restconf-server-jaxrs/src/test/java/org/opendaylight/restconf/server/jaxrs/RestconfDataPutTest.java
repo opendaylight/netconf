@@ -12,9 +12,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
-import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
+import static org.opendaylight.mdsal.common.api.FluentFutures.immediateFalseFluentFuture;
+import static org.opendaylight.mdsal.common.api.FluentFutures.immediateFluentFuture;
+import static org.opendaylight.mdsal.common.api.FluentFutures.immediateTrueFluentFuture;
 
 import java.util.List;
 import java.util.Optional;
