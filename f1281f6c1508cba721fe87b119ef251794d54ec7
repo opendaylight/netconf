@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e26ca98_2ec68d38",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-18T10:33:10Z",
+      "side": 1,
+      "message": "should be referenced from the main project README",
+      "revId": "f1281f6c1508cba721fe87b119ef251794d54ec7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1512794d_8e3a2426",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-18T10:33:10Z",
+      "side": 1,
+      "message": "align all |s",
+      "revId": "f1281f6c1508cba721fe87b119ef251794d54ec7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
