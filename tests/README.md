@@ -27,8 +27,27 @@ The main directory structure is as following:
 | `results`              | Directory used for storing test results (e.g., logs, performance metrics).                                            |
 | `suites`               | Directory containing test suites.                                                                                      |
 | `tmp`                  | Directory containing temporary files used during test execution, but are cleared at the start of the test run.        |
-| `tools`                | Directory containing custom test tools, such as scripts for starting the netopeer2 device simulator or websocket/SSE receivers used to verify notification streams. |
+| `tools`                | Directory containing custom test tools, such as `start_netopeer.sh` for starting the netopeer2 device simulator (with call-home and key-auth support) or websocket/SSE receivers used to verify notification streams. |
 | `variables`            | Directory containing test data (mostly templates used for NETCONF/RESTCONF calls).                                    |
+
+## Netopeer2 Simulator
+
+The suites marked with the `netopeer2` pytest marker (`callhome` and `KeyAuth`) exercise the
+NETCONF Call Home and Key Auth features against a real NETCONF device, simulated with a
+[sysrepo/sysrepo-netopeer2](https://hub.docker.com/r/sysrepo/sysrepo-netopeer2) Docker container.
+This container is **not** started automatically by the test run, so it must be started once
+beforehand and left running for the duration of the test session:
+
+```sh
+tools/start_netopeer.sh
+```
+
+The script builds a scratch directory under `/tmp/pytest-netopeer/`, generates the SSH host/client
+keys and TLS certificates the container needs, stages the Key Auth public key, and brings the
+container up in the background via `docker compose`. Requirements: `docker`, `ssh-keygen` and
+`openssl` available on `PATH`. Once the container is up, the `callhome` and `KeyAuth` suites can be
+run as usual; the container can be left running across multiple test invocations and only needs to
+be re-run if the generated keys/certs need to be regenerated.
 
 ## Test Execution
 
