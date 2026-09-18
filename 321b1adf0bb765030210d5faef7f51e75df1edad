@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5c926cf_fa37759c",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-09-18T11:55:46Z",
+      "side": 1,
+      "message": "This can be directly referenced from `netconf.EMPTY_DEVICE_DATA`",
+      "revId": "321b1adf0bb765030210d5faef7f51e75df1edad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90b2eb31_b4695a47",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-09-18T11:55:46Z",
+      "side": 1,
+      "message": "The name of this attribute might be descriptive to make it more obvious like `down_node`, `outage_node`, etc.",
+      "revId": "321b1adf0bb765030210d5faef7f51e75df1edad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8fafc05d_cc17000b",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-09-18T11:55:46Z",
+      "side": 1,
+      "message": "the writer node could be just computed from the outage node as\n`node % len(NODE_IPS) + 1`",
+      "revId": "321b1adf0bb765030210d5faef7f51e75df1edad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
