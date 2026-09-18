@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2aa6cd6_6859e87c",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-09-18T12:56:02Z",
+      "side": 1,
+      "message": "It can be moved to shared libraries like `utils` and reused it from there might be better. As we would already have the same function/method in https://git.opendaylight.org/gerrit/c/netconf/+/124594/9/tests/suites/clustering/test_clustering_outages.py#145",
+      "revId": "9ea8fc25553c2d60da641a8e910c2691e14f689a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
