@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e97f4975_5f4ae661",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 783,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-09-18T11:55:37Z",
+      "side": 1,
+      "message": "It might be good to also allow params from `check_device_config_data`\n`regex: bool \u003d False`\n`contains: bool \u003d False`\nto be able to pass these params.",
+      "revId": "9e25b3ec32cbc2a366a762e1b6019cb17512b34e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
