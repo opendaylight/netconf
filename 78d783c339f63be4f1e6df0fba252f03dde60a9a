@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5a40f43_0d29c90f",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ProxyNetconfService.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-09-21T18:22:20Z",
+      "side": 1,
+      "message": "requireNonNull, right?",
+      "range": {
+        "startLine": 52,
+        "startChar": 31,
+        "endLine": 52,
+        "endChar": 35
+      },
+      "revId": "78d783c339f63be4f1e6df0fba252f03dde60a9a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91cf5f51_3b77b651",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ProxyNetconfService.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-09-21T18:22:20Z",
+      "side": 1,
+      "message": "enhanced switch, please",
+      "range": {
+        "startLine": 154,
+        "startChar": 14,
+        "endLine": 154,
+        "endChar": 47
+      },
+      "revId": "78d783c339f63be4f1e6df0fba252f03dde60a9a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3940b191_6ad599e3",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ProxyNetconfService.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-09-21T18:22:20Z",
+      "side": 1,
+      "message": "the comment above should be split to the \u0027retry \u003d false\u0027 declaration, i.e. defining what a retry does and separately explaining why we want \u0027retry \u003d true\u0027 here",
+      "range": {
+        "startLine": 163,
+        "startChar": 16,
+        "endLine": 163,
+        "endChar": 29
+      },
+      "revId": "78d783c339f63be4f1e6df0fba252f03dde60a9a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
