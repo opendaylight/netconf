@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41defeef_9d57c72b",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-09-21T12:07:08Z",
+      "side": 1,
+      "message": "This constraint between heartbeat-interval and http3-max-idle-timeout is documented here, in the YANG leaf and in restconf8040.cfg, but nothing enforces or even warns about it. The defaults are safe (10s vs 30s), but an operator who raises heartbeat-interval past 30s or sets it to 0 gets every quiet HTTP3 subscription torn down every 30s, with nothing in the logs pointing at the cause. Could we log a warning at activation when idleTimeout !\u003d 0 and heartbeat is either 0 or \u003e\u003d idleTimeout?",
+      "revId": "1ade1c0188f45dc544f29f594d492faa4d932e08",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86ca09d6_e0ed457c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerOverQuic.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-09-21T12:07:08Z",
+      "side": 1,
+      "message": "This could use the same treatment as ConfigUtils.clientTransportQuick(), since here we\u0027re running into the same issue with miss-ordered parameters. Can we use the same QuicServerParameters object instead?",
+      "revId": "1ade1c0188f45dc544f29f594d492faa4d932e08",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
