@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "afcf4006_84a9f92f",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-09-21T08:05:29Z",
+      "side": 1,
+      "message": "It might be good to keep the original 60 seconds value for `DEVICE_CHECK_TIMEOUT`, as it was in the original tests https://github.com/opendaylight/integration-test/blob/master/csit/suites/netconf/clustering/bug8086.robot#L186",
+      "revId": "c01ddddfe86d22474c371fe5c31a86372935f043",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
