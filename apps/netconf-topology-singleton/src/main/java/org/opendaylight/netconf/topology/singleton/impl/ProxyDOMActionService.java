@@ -12,12 +12,10 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.SettableFuture;
-import java.util.Collection;
+import java.time.Duration;
 import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.actor.ActorSystem;
-import org.apache.pekko.dispatch.OnComplete;
 import org.apache.pekko.pattern.Patterns;
-import org.apache.pekko.util.Timeout;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -30,12 +28,10 @@ import org.opendaylight.netconf.topology.singleton.messages.SchemaPathMessage;
 import org.opendaylight.netconf.topology.singleton.messages.action.InvokeActionMessage;
 import org.opendaylight.netconf.topology.singleton.messages.action.InvokeActionMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
-import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.Future;
 
 /**
  * Implementation of {@link DOMActionService} provided by device in Odl-Cluster environment to invoke action.
@@ -47,21 +43,18 @@ public class ProxyDOMActionService implements Actions.Normalized {
 
     private final RemoteDeviceId id;
     private final ActorRef masterActorRef;
-    private final ActorSystem actorSystem;
-    private final Timeout actorResponseWaitTime;
+    private final Duration actorResponseWaitTime;
 
     /**
      * Constructor for {@code ProxyDOMActionService}.
      *
-     * @param actorSystem ActorSystem
      * @param masterActorRef ActorRef
      * @param remoteDeviceId {@link RemoteDeviceId} ref
      * @param actorResponseWaitTime Timeout
      */
-    public ProxyDOMActionService(final ActorSystem actorSystem, final ActorRef masterActorRef,
-        final RemoteDeviceId remoteDeviceId, final Timeout actorResponseWaitTime) {
+    public ProxyDOMActionService(final ActorRef masterActorRef, final RemoteDeviceId remoteDeviceId,
+            final Duration actorResponseWaitTime) {
         id = remoteDeviceId;
-        this.actorSystem = requireNonNull(actorSystem);
         this.masterActorRef = requireNonNull(masterActorRef);
         this.actorResponseWaitTime = requireNonNull(actorResponseWaitTime);
     }
@@ -74,44 +67,34 @@ public class ProxyDOMActionService implements Actions.Normalized {
         requireNonNull(domDataTreeIdentifier);
 
         LOG.info("{}: Action Operation invoked with schema type: {} and node: {}.", id, type, input);
-        final ContainerNodeMessage containerNodeMessage = new ContainerNodeMessage(input);
-
-        final Future<Object> scalaFuture = Patterns.ask(masterActorRef, new InvokeActionMessage(
+        final var containerNodeMessage = new ContainerNodeMessage(input);
+        final var scalaFuture = Patterns.ask(masterActorRef, new InvokeActionMessage(
             new SchemaPathMessage(type), containerNodeMessage, domDataTreeIdentifier), actorResponseWaitTime);
 
-        final SettableFuture<DOMRpcResult> settableFuture = SettableFuture.create();
+        final var settableFuture = SettableFuture.<DOMRpcResult>create();
 
-        scalaFuture.onComplete(new OnComplete<>() {
-            @Override
-            public void onComplete(final Throwable failure, final Object response) {
-                if (failure != null) {
-                    if (failure instanceof ClusteringActionException) {
-                        settableFuture.setException(failure);
-                    } else {
-                        settableFuture.setException(new ClusteringActionException(
-                            id + ": Exception during remote Action invocation.", failure));
-                    }
-                    return;
-                }
-
-                if (response instanceof EmptyResultResponse) {
-                    settableFuture.set(null);
-                    return;
-                }
-                final Collection<? extends RpcError> errors = ((InvokeActionMessageReply) response).getRpcErrors();
-
-                final ContainerNodeMessage containerNodeMessage =
-                    ((InvokeActionMessageReply) response).getContainerNodeMessage();
-
-                final DOMRpcResult result;
-                if (containerNodeMessage == null) {
-                    result = new DefaultDOMRpcResult(ImmutableList.copyOf(errors));
-                } else {
-                    result = new DefaultDOMRpcResult(containerNodeMessage.getNode(), ImmutableList.copyOf(errors));
-                }
-                settableFuture.set(result);
+        scalaFuture.whenComplete((response, failure) -> {
+            if (failure != null) {
+                settableFuture.setException(switch (failure) {
+                    case ClusteringActionException ex -> ex;
+                    default -> new ClusteringActionException(
+                        "%s: Exception during remote Action invocation.".formatted(id), failure);
+                });
+                return;
             }
-        }, actorSystem.dispatcher());
+
+            switch (response) {
+                case EmptyResultResponse unused -> settableFuture.set(null);
+                case InvokeActionMessageReply reply -> {
+                    final var errors = reply.getRpcErrors();
+                    final var responseMessage = reply.getContainerNodeMessage();
+                    settableFuture.set(responseMessage == null ? new DefaultDOMRpcResult(ImmutableList.copyOf(errors))
+                        : new DefaultDOMRpcResult(responseMessage.getNode(), ImmutableList.copyOf(errors)));
+                }
+                case null, default ->
+                    settableFuture.setException(new IllegalStateException("Unexpected response " + response));
+            }
+        });
 
         return FluentFuture.from(settableFuture);
     }

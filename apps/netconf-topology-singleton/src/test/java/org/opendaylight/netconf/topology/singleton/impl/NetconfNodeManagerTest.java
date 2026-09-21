@@ -23,8 +23,8 @@ import com.google.common.io.CharSource;
 import com.google.common.util.concurrent.Futures;
 import com.typesafe.config.ConfigFactory;
 import java.net.InetSocketAddress;
+import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -35,7 +35,6 @@ import org.apache.pekko.cluster.Cluster;
 import org.apache.pekko.dispatch.Dispatchers;
 import org.apache.pekko.testkit.TestActorRef;
 import org.apache.pekko.testkit.javadsl.TestKit;
-import org.apache.pekko.util.Timeout;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -131,11 +130,8 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
     @BeforeEach
     void setup() {
-        final Timeout responseTimeout = Timeout.apply(1, TimeUnit.SECONDS);
-
         slaveSystem = ActorSystem.create(ACTOR_SYSTEM_NAME, ConfigFactory.load().getConfig("Slave"));
         masterSystem = ActorSystem.create(ACTOR_SYSTEM_NAME, ConfigFactory.load().getConfig("Master"));
-
         masterAddress = Cluster.get(masterSystem).selfAddress().toString();
 
         SharedSchemaRepository masterSchemaRepository = new SharedSchemaRepository(PARSER_FACTORY, "master");
@@ -161,6 +157,8 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
                 .setBaseSchemaProvider(BASE_SCHEMAS)
                 .setDeviceSchemaProvider(createDeviceSchemaProvider(masterSchemaRepository))
                 .build();
+
+        final var responseTimeout = Duration.ofSeconds(1);
 
         testMasterActorRef = TestActorRef.create(masterSystem, Props.create(TestMasterActor.class, masterSetup,
                 DEVICE_ID, responseTimeout, mockMountPointService).withDispatcher(Dispatchers.DefaultDispatcherId()),
@@ -379,10 +377,11 @@ class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
     }
 
     private static class TestMasterActor extends NetconfNodeActor {
-        final Map<Class<?>, CompletableFuture<? extends Object>> messagesToDrop = new ConcurrentHashMap<>();
+        final ConcurrentHashMap<Class<?>, CompletableFuture<? extends Object>> messagesToDrop =
+            new ConcurrentHashMap<>();
 
         TestMasterActor(final NetconfTopologySetup setup, final RemoteDeviceId deviceId,
-                final Timeout actorResponseWaitTime, final DOMMountPointService mountPointService) {
+                final Duration actorResponseWaitTime, final DOMMountPointService mountPointService) {
             super(setup, deviceId, actorResponseWaitTime, mountPointService);
         }
 

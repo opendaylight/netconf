@@ -7,10 +7,9 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.pekko.actor.ActorRef;
-import org.apache.pekko.actor.ActorSystem;
-import org.apache.pekko.util.Timeout;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
@@ -28,15 +27,11 @@ public class SlaveSalFacade {
     private final AtomicBoolean registered = new AtomicBoolean(false);
     private final RemoteDeviceId id;
     private final NetconfDeviceMount mount;
-    private final ActorSystem actorSystem;
-    private final Timeout actorResponseWaitTime;
+    private final Duration actorResponseWaitTime;
 
-    public SlaveSalFacade(final RemoteDeviceId id,
-                          final ActorSystem actorSystem,
-                          final Timeout actorResponseWaitTime,
-                          final DOMMountPointService mountPointService) {
+    public SlaveSalFacade(final RemoteDeviceId id, final Duration actorResponseWaitTime,
+            final DOMMountPointService mountPointService) {
         this.id = id;
-        this.actorSystem = actorSystem;
         this.actorResponseWaitTime = actorResponseWaitTime;
         mount = new NetconfDeviceMount(id, mountPointService, NetconfNodeUtils.defaultTopologyMountPath(id));
     }
@@ -48,10 +43,8 @@ public class SlaveSalFacade {
             return;
         }
 
-        final var netconfDeviceDataBroker = new ProxyDOMDataBroker(id, masterActorRef,
-            actorSystem.dispatcher(), actorResponseWaitTime);
-        final var proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef,
-            actorSystem.dispatcher(), actorResponseWaitTime);
+        final var netconfDeviceDataBroker = new ProxyDOMDataBroker(id, masterActorRef, actorResponseWaitTime);
+        final var proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef, actorResponseWaitTime);
         mount.onDeviceConnected(remoteSchemaContext, new NetconfDataOperations(
             new DataOperationsServiceImpl(proxyNetconfService)), services, netconfDeviceDataBroker);
         LOG.info("{}: Slave mount point registered.", id);

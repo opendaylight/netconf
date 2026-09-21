@@ -11,14 +11,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.errorprone.annotations.concurrent.GuardedBy;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import org.apache.pekko.actor.ActorRef;
-import org.apache.pekko.dispatch.OnComplete;
-import org.apache.pekko.util.Timeout;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -29,8 +29,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.ExecutionContext;
-import scala.concurrent.Future;
 
 /**
  * ProxyReadWriteTransaction uses provided {@link ActorRef} to delegate method calls to master
@@ -48,26 +46,22 @@ public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransactio
 
     private volatile ProxyTransactionFacade transactionFacade;
 
-    public ProxyReadWriteTransaction(final RemoteDeviceId id, final Future<Object> masterTxActorFuture,
-            final ExecutionContext executionContext, final Timeout askTimeout) {
+    public ProxyReadWriteTransaction(final RemoteDeviceId id, final CompletionStage<Object> masterTxActorFuture,
+            final Duration askTimeout) {
         this.id = id;
 
-        masterTxActorFuture.onComplete(new OnComplete<>() {
-            @Override
-            public void onComplete(final Throwable failure, final Object masterTxActor) {
-                final ProxyTransactionFacade newTransactionFacade;
-                if (failure != null) {
-                    LOG.debug("{}: Failed to obtain master actor", id, failure);
-                    newTransactionFacade = new FailedProxyTransactionFacade(id, failure);
-                } else {
-                    LOG.debug("{}: Obtained master actor {}", id, masterTxActor);
-                    newTransactionFacade = new ActorProxyTransactionFacade((ActorRef)masterTxActor, id,
-                            executionContext, askTimeout);
-                }
-
-                executePriorTransactionOperations(newTransactionFacade);
+        masterTxActorFuture.whenComplete((masterTxActor, failure) -> {
+            final ProxyTransactionFacade newTransactionFacade;
+            if (failure != null) {
+                LOG.debug("{}: Failed to obtain master actor", id, failure);
+                newTransactionFacade = new FailedProxyTransactionFacade(id, failure);
+            } else {
+                LOG.debug("{}: Obtained master actor {}", id, masterTxActor);
+                newTransactionFacade = new ActorProxyTransactionFacade((ActorRef)masterTxActor, id, askTimeout);
             }
-        }, executionContext);
+
+            executePriorTransactionOperations(newTransactionFacade);
+        });
     }
 
     @Override
@@ -90,7 +84,7 @@ public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransactio
             final YangInstanceIdentifier path) {
         LOG.debug("{}: Read {} {}", id, store, path);
 
-        final SettableFuture<Optional<NormalizedNode>> returnFuture = SettableFuture.create();
+        final var returnFuture = SettableFuture.<Optional<NormalizedNode>>create();
         processTransactionOperation(facade -> returnFuture.setFuture(facade.read(store, path)));
         return FluentFuture.from(returnFuture);
     }
@@ -100,7 +94,7 @@ public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransactio
             final YangInstanceIdentifier path) {
         LOG.debug("{}: Exists {} {}", id, store, path);
 
-        final SettableFuture<Boolean> returnFuture = SettableFuture.create();
+        final var returnFuture = SettableFuture.<Boolean>create();
         processTransactionOperation(facade -> returnFuture.setFuture(facade.exists(store, path)));
         return FluentFuture.from(returnFuture);
     }
@@ -128,7 +122,9 @@ public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransactio
 
     @Override
     public FluentFuture<CommitInfo> commit() {
-        Preconditions.checkState(opened.compareAndSet(true, false), "%s: Transaction is already closed", id);
+        if (!opened.compareAndSet(true, false)) {
+            throw new IllegalStateException("%s: Transaction is already closed".formatted(id));
+        }
         LOG.debug("{}: Commit", id);
 
         processTransactionOperation(facade -> settableFuture.setFuture(facade.commit()));

@@ -32,6 +32,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.typesafe.config.ConfigFactory;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FileUtils;
 import org.apache.pekko.actor.ActorSystem;
 import org.apache.pekko.testkit.javadsl.TestKit;
-import org.apache.pekko.util.Timeout;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -339,7 +339,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 deviceActionFactory, resourceManager, builderFactory, TOPOLOGY_ID, Uint16.ZERO) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
-                    final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
+                    final ServiceGroupIdentifier serviceGroupIdent, final Duration actorResponseWaitTime,
                     final DeviceActionFactory deviceActionFact) {
                 final var context = super.newNetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime,
                     deviceActionFact);
@@ -376,7 +376,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 deviceActionFactory, resourceManager, builderFactory, TOPOLOGY_ID, Uint16.ZERO) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
-                final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
+                final ServiceGroupIdentifier serviceGroupIdent, final Duration actorResponseWaitTime,
                 final DeviceActionFactory actionFactory) {
                 NetconfTopologyContext spiedContext = spy(super.newNetconfTopologyContext(setup, serviceGroupIdent,
                     actorResponseWaitTime, actionFactory));

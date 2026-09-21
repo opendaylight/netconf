@@ -56,7 +56,6 @@ import org.apache.pekko.pattern.AskTimeoutException;
 import org.apache.pekko.pattern.Patterns;
 import org.apache.pekko.testkit.TestActorRef;
 import org.apache.pekko.testkit.javadsl.TestKit;
-import org.apache.pekko.util.Timeout;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -134,12 +133,11 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SourceInfoSchemaSourceTran
 import org.opendaylight.yangtools.yang.model.spi.source.DelegatedYangTextSource;
 import org.opendaylight.yangtools.yang.source.ir.dagger.YangIRSourceModule;
 import scala.concurrent.Await;
-import scala.concurrent.Future;
+import scala.jdk.javaapi.DurationConverters;
 
 @ExtendWith(MockitoExtension.class)
 class NetconfNodeActorTest extends AbstractBaseSchemasTest {
-
-    private static final Timeout TIMEOUT = Timeout.create(Duration.ofSeconds(5));
+    private static final Duration TIMEOUT = Duration.ofSeconds(5);
     private static final SourceIdentifier SOURCE_IDENTIFIER1 = new SourceIdentifier("yang1");
     private static final SourceIdentifier SOURCE_IDENTIFIER2 = new SourceIdentifier("yang2");
     private static final ListenableFuture<DefaultDOMRpcResult> EMPTY_RPC =
@@ -326,9 +324,8 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         verifyNoMoreInteractions(mockMountPointBuilder, newMockSchemaSourceReg);
 
         // Stop the slave actor and verify schema source registrations are closed.
-
-        final Future<Boolean> stopFuture = Patterns.gracefulStop(slaveRef, TIMEOUT.duration());
-        Await.result(stopFuture, TIMEOUT.duration());
+        final var scalaDuration = DurationConverters.toScala(TIMEOUT);
+        Await.result(Patterns.gracefulStop(slaveRef, scalaDuration), scalaDuration);
 
         verify(mockMountPointReg).close();
         verify(newMockSchemaSourceReg).close();
@@ -441,11 +438,11 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         final var sourceIdentifier = new SourceIdentifier("testID");
 
-        final var proxyYangProvider = new ProxyYangTextSourceProvider(actor, system.dispatcher(), TIMEOUT);
+        final var proxyYangProvider = new ProxyYangTextSourceProvider(actor, TIMEOUT);
 
         final var resolvedSchemaFuture = proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
         final var ex = assertThrows(MissingSchemaSourceException.class,
-            () -> Await.result(resolvedSchemaFuture, TIMEOUT.duration()));
+            () -> Await.result(resolvedSchemaFuture, DurationConverters.toScala(TIMEOUT)));
         assertEquals("No providers registered for source SourceIdentifier [testID]", ex.getMessage());
     }
 
@@ -455,7 +452,7 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         final var sourceIdentifier = new SourceIdentifier("testID");
 
-        final var proxyYangProvider = new ProxyYangTextSourceProvider(masterRef, system.dispatcher(), TIMEOUT);
+        final var proxyYangProvider = new ProxyYangTextSourceProvider(masterRef, TIMEOUT);
 
         final var yangTextSchemaSource = new DelegatedYangTextSource(sourceIdentifier, CharSource.wrap("YANG"));
 
@@ -465,7 +462,7 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
                 id -> Futures.immediateFuture(yangTextSchemaSource),
                 PotentialSchemaSource.create(sourceIdentifier, YangTextSource.class, 1))) {
             final var resolvedSchemaFuture = proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
-            final var success = Await.result(resolvedSchemaFuture, TIMEOUT.duration());
+            final var success = Await.result(resolvedSchemaFuture, DurationConverters.toScala(TIMEOUT));
 
             assertEquals(sourceIdentifier, success.getRepresentation().sourceId());
             assertEquals("YANG", success.getRepresentation().read());
@@ -475,7 +472,7 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         final var failedSchemaFuture = proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
         final var ex = assertThrows(MissingSchemaSourceException.class,
-            () -> Await.result(failedSchemaFuture, TIMEOUT.duration()));
+            () -> Await.result(failedSchemaFuture, DurationConverters.toScala(TIMEOUT)));
         assertThat(ex.getMessage(), startsWith("No providers registered for source"));
         assertThat(ex.getMessage(), containsString(sourceIdentifier.toString()));
     }

@@ -8,13 +8,12 @@
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import java.net.InetSocketAddress;
+import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import org.apache.pekko.actor.ActorSystem;
 import org.apache.pekko.actor.Status;
 import org.apache.pekko.testkit.TestProbe;
 import org.apache.pekko.testkit.javadsl.TestKit;
-import org.apache.pekko.util.Timeout;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -45,7 +44,7 @@ class ProxyNetconfDataTreeServiceTest {
 
     private final TestProbe masterActor = new TestProbe(system);
     private final ProxyNetconfDataTreeService proxy = new ProxyNetconfDataTreeService(DEVICE_ID, masterActor.ref(),
-        system.dispatcher(), Timeout.apply(5, TimeUnit.SECONDS));
+        Duration.ofSeconds(5));
 
     @AfterAll
     static void staticTearDown() {

@@ -10,16 +10,16 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.actor.ActorSystem;
 import org.apache.pekko.cluster.Cluster;
-import org.apache.pekko.dispatch.OnComplete;
 import org.apache.pekko.pattern.Patterns;
-import org.apache.pekko.util.Timeout;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -47,13 +47,12 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.Future;
 
 class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(MasterSalFacade.class);
 
     private final RemoteDeviceId id;
-    private final Timeout actorResponseWaitTime;
+    private final Duration actorResponseWaitTime;
     private final ActorRef masterActorRef;
     private final ActorSystem actorSystem;
     private final NetconfDeviceTopologyAdapter datastoreAdapter;
@@ -84,7 +83,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
                     final Credentials credentials,
                     final ActorSystem actorSystem,
                     final ActorRef masterActorRef,
-                    final Timeout actorResponseWaitTime,
+                    final Duration actorResponseWaitTime,
                     final DOMMountPointService mountService,
                     final DataBroker dataBroker,
                     final boolean lockDatastore) {
@@ -115,17 +114,13 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
         registerMasterMountPoint();
 
-        sendInitialDataToActor().onComplete(new OnComplete<>() {
-            @Override
-            public void onComplete(final Throwable failure, final Object success) {
-                if (failure == null) {
-                    updateDeviceData(deviceSchema, sessionPreferences, negotiatedSshAlg);
-                    return;
-                }
-
+        sendInitialDataToActor().whenComplete((success, failure) -> {
+            if (failure != null) {
                 LOG.error("{}: CreateInitialMasterActorData to {} failed", id, masterActorRef, failure);
+                return;
             }
-        }, actorSystem.dispatcher());
+            updateDeviceData(deviceSchema, sessionPreferences, negotiatedSshAlg);
+        });
     }
 
     @Override
@@ -173,14 +168,13 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         deviceDataBroker = newDeviceDataBroker(databind, preferences);
         dataStoreService = newDataStoreService(databind, preferences);
 
-        final var proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef, actorSystem.dispatcher(),
-            actorResponseWaitTime);
+        final var proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef, actorResponseWaitTime);
         mount.onDeviceConnected(databind.modelContext(),
             new NetconfDataOperations(new DataOperationsServiceImpl(proxyNetconfService)),
             deviceServices,
             // We need to create ProxyDOMDataBroker so accessing mountpoint
             // on leader node would be same as on follower node
-            new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(), actorResponseWaitTime));
+            new ProxyDOMDataBroker(id, masterActorRef, actorResponseWaitTime));
     }
 
     protected DOMDataBroker newDeviceDataBroker(final DatabindContext databind,
@@ -193,7 +187,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         return AbstractDataStore.of(id, databind, deviceServices.rpcs(), preferences, lockDatastore);
     }
 
-    private Future<Object> sendInitialDataToActor() {
+    private CompletionStage<Object> sendInitialDataToActor() {
         final var sourceIdentifiers = List.copyOf(getConstituentModuleIdentifiers(
             currentSchema.databind().modelContext()));
 

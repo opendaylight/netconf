@@ -15,17 +15,17 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
+import java.time.Duration;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import org.apache.pekko.actor.ActorSystem;
 import org.apache.pekko.actor.Status.Failure;
 import org.apache.pekko.actor.Status.Success;
-import org.apache.pekko.dispatch.Futures;
 import org.apache.pekko.pattern.AskTimeoutException;
 import org.apache.pekko.testkit.TestProbe;
 import org.apache.pekko.testkit.javadsl.TestKit;
-import org.apache.pekko.util.Timeout;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,12 +51,10 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
-import scala.concurrent.Promise;
-import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
 class ProxyReadWriteTransactionTest {
-    private static final FiniteDuration EXP_NO_MESSAGE_TIMEOUT = Duration.apply(300, TimeUnit.MILLISECONDS);
+    private static final FiniteDuration EXP_NO_MESSAGE_TIMEOUT = FiniteDuration.create(300, TimeUnit.MILLISECONDS);
     private static final RemoteDeviceId DEVICE_ID =
             new RemoteDeviceId("dev1", InetSocketAddress.createUnresolved("localhost", 17830));
     private static final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
@@ -80,12 +78,11 @@ class ProxyReadWriteTransactionTest {
     }
 
     private ProxyReadWriteTransaction newSuccessfulProxyTx() {
-        return newSuccessfulProxyTx(Timeout.apply(5, TimeUnit.SECONDS));
+        return newSuccessfulProxyTx(Duration.ofSeconds(5));
     }
 
-    private ProxyReadWriteTransaction newSuccessfulProxyTx(final Timeout timeout) {
-        return new ProxyReadWriteTransaction(DEVICE_ID, Futures.successful(masterActor.ref()),
-                system.dispatcher(), timeout);
+    private ProxyReadWriteTransaction newSuccessfulProxyTx(final Duration timeout) {
+        return new ProxyReadWriteTransaction(DEVICE_ID, CompletableFuture.completedStage(masterActor.ref()), timeout);
     }
 
     @Test
@@ -279,7 +276,7 @@ class ProxyReadWriteTransactionTest {
 
     @Test
     void testFutureOperationsWithMasterDown() throws Exception {
-        ProxyReadWriteTransaction tx = newSuccessfulProxyTx(Timeout.apply(500, TimeUnit.MILLISECONDS));
+        ProxyReadWriteTransaction tx = newSuccessfulProxyTx(Duration.ofMillis(500));
 
         ListenableFuture<?> future = tx.read(STORE, PATH);
         masterActor.expectMsgClass(ReadRequest.class);
@@ -323,9 +320,9 @@ class ProxyReadWriteTransactionTest {
 
     @Test
     void testDelayedMasterActorFuture() throws Exception {
-        final Promise<Object> promise = Futures.promise();
-        ProxyReadWriteTransaction tx = new ProxyReadWriteTransaction(DEVICE_ID, promise.future(),
-                system.dispatcher(), Timeout.apply(5, TimeUnit.SECONDS));
+        final var promise = new CompletableFuture<>();
+        ProxyReadWriteTransaction tx = new ProxyReadWriteTransaction(DEVICE_ID, promise.minimalCompletionStage(),
+                Duration.ofSeconds(5));
 
         final ListenableFuture<Optional<NormalizedNode>> read = tx.read(STORE, PATH);
         final ListenableFuture<Boolean> exists = tx.exists(STORE, PATH);
@@ -334,9 +331,9 @@ class ProxyReadWriteTransactionTest {
         tx.merge(STORE, PATH, node);
         tx.delete(STORE, PATH);
 
-        final ListenableFuture<?> commit = tx.commit();
+        final var commit = tx.commit();
 
-        promise.success(masterActor.ref());
+        promise.complete(masterActor.ref());
 
         masterActor.expectMsgClass(ReadRequest.class);
         masterActor.reply(new NormalizedNodeMessage(PATH, node));
@@ -359,8 +356,8 @@ class ProxyReadWriteTransactionTest {
     @Test
     void testFailedMasterActorFuture() throws Exception {
         final AskTimeoutException mockEx = new AskTimeoutException("mock");
-        ProxyReadWriteTransaction tx = new ProxyReadWriteTransaction(DEVICE_ID, Futures.failed(mockEx),
-                system.dispatcher(), Timeout.apply(5, TimeUnit.SECONDS));
+        ProxyReadWriteTransaction tx = new ProxyReadWriteTransaction(DEVICE_ID, CompletableFuture.failedStage(mockEx),
+            Duration.ofSeconds(5));
 
         ListenableFuture<?> future = tx.read(STORE, PATH);
         try {
@@ -398,8 +395,7 @@ class ProxyReadWriteTransactionTest {
     }
 
     private static void verifyDocumentedException(final Throwable cause) {
-        assertInstanceOf(DocumentedException.class, cause, "Unexpected cause " + cause);
-        final DocumentedException de = (DocumentedException) cause;
+        final var de = assertInstanceOf(DocumentedException.class, cause);
         assertEquals(ErrorSeverity.WARNING, de.getErrorSeverity());
         assertEquals(ErrorTag.OPERATION_FAILED, de.getErrorTag());
         assertEquals(ErrorType.APPLICATION, de.getErrorType());

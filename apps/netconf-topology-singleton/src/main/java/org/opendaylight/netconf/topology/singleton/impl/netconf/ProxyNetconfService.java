@@ -10,14 +10,14 @@ package org.opendaylight.netconf.topology.singleton.impl.netconf;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.errorprone.annotations.concurrent.GuardedBy;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletionStage;
 import java.util.function.Consumer;
 import org.apache.pekko.actor.ActorRef;
-import org.apache.pekko.dispatch.OnComplete;
-import org.apache.pekko.util.Timeout;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -26,8 +26,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.ExecutionContext;
-import scala.concurrent.Future;
 
 /**
  * ProxyNetconfService uses provided {@link ActorRef} to delegate method calls to master
@@ -42,24 +40,20 @@ public class ProxyNetconfService implements DataStoreService {
 
     private volatile ProxyNetconfServiceFacade netconfFacade;
 
-    public ProxyNetconfService(final RemoteDeviceId id, final Future<Object> masterActorFuture,
-                               final ExecutionContext executionContext, final Timeout askTimeout) {
+    public ProxyNetconfService(final RemoteDeviceId id, final CompletionStage<Object> masterActorFuture,
+            final Duration askTimeout) {
         this.id = id;
-        masterActorFuture.onComplete(new OnComplete<>() {
-            @Override
-            public void onComplete(final Throwable failure, final Object masterActor) {
-                final ProxyNetconfServiceFacade newNetconfFacade;
-                if (failure != null) {
-                    LOG.debug("{}: Failed to obtain master actor", id, failure);
-                    newNetconfFacade = new FailedProxyNetconfServiceFacade(id, failure);
-                } else {
-                    LOG.debug("{}: Obtained master actor {}", id, masterActor);
-                    newNetconfFacade = new ActorProxyNetconfServiceFacade((ActorRef) masterActor, id,
-                        executionContext, askTimeout);
-                }
-                executePriorNetconfOperations(newNetconfFacade);
+        masterActorFuture.whenComplete((success, failure) -> {
+            final ProxyNetconfServiceFacade newNetconfFacade;
+            if (failure != null) {
+                LOG.debug("{}: Failed to obtain master actor", id, failure);
+                newNetconfFacade = new FailedProxyNetconfServiceFacade(id, failure);
+            } else {
+                LOG.debug("{}: Obtained master actor {}", id, success);
+                newNetconfFacade = new ActorProxyNetconfServiceFacade((ActorRef) success, id, askTimeout);
             }
-        }, executionContext);
+            executePriorNetconfOperations(newNetconfFacade);
+        });
     }
 
     @Override

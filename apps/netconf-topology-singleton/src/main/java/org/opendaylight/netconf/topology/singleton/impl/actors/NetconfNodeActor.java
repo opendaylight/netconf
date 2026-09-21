@@ -21,7 +21,6 @@ import org.apache.pekko.actor.Props;
 import org.apache.pekko.actor.Status.Failure;
 import org.apache.pekko.actor.Status.Success;
 import org.apache.pekko.pattern.AskTimeoutException;
-import org.apache.pekko.util.Timeout;
 import org.opendaylight.controller.cluster.common.actor.AbstractUntypedActor;
 import org.opendaylight.controller.cluster.schema.provider.impl.RemoteSchemaProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
@@ -81,7 +80,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private final DOMMountPointService mountPointService;
 
     private DeviceNetconfSchemaProvider schemaProvider;
-    private Timeout actorResponseWaitTime;
+    private Duration actorResponseWaitTime;
     private RemoteDeviceId id;
     private List<SourceIdentifier> sourceIdentifiers = null;
     private DOMRpcService deviceRpc = null;
@@ -94,7 +93,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private List<Registration> registeredSchemas;
 
     protected NetconfNodeActor(final NetconfTopologySetup setup, final RemoteDeviceId id,
-            final Timeout actorResponseWaitTime, final DOMMountPointService mountPointService) {
+            final Duration actorResponseWaitTime, final DOMMountPointService mountPointService) {
         this.id = id;
         schemaProvider = setup.getDeviceSchemaProvider();
         this.actorResponseWaitTime = actorResponseWaitTime;
@@ -103,7 +102,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     }
 
     public static Props props(final NetconfTopologySetup setup, final RemoteDeviceId id,
-            final Timeout actorResponseWaitTime, final DOMMountPointService mountPointService) {
+            final Duration actorResponseWaitTime, final DOMMountPointService mountPointService) {
         return Props.create(NetconfNodeActor.class, () ->
                 new NetconfNodeActor(setup, id, actorResponseWaitTime, mountPointService));
     }
@@ -295,14 +294,14 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private void registerSlaveMountPoint(final ActorRef masterReference) {
         unregisterSlaveMountPoint();
 
-        slaveSalManager = new SlaveSalFacade(id, context().system(), actorResponseWaitTime, mountPointService);
+        slaveSalManager = new SlaveSalFacade(id, actorResponseWaitTime, mountPointService);
 
         resolveSchemaContext(createSchemaContextFactory(masterReference), slaveSalManager, masterReference, 1);
     }
 
     private EffectiveModelContextFactory createSchemaContextFactory(final ActorRef masterReference) {
         final var dispatcher = getContext().dispatcher();
-        final var remoteYangTextSourceProvider = new ProxyYangTextSourceProvider(masterReference, dispatcher,
+        final var remoteYangTextSourceProvider = new ProxyYangTextSourceProvider(masterReference,
             actorResponseWaitTime);
         final var remoteProvider = new RemoteSchemaProvider(remoteYangTextSourceProvider, dispatcher);
         final var schemaRegistry = schemaProvider.registry();
@@ -328,8 +327,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                         LOG.info("{}: Schema context resolved: {} - registering slave mount point", id,
                             result.getModules());
                         final var actorSystem = context().system();
-                        final var rpcProxy = new ProxyDOMRpcService(actorSystem, masterReference, id,
-                            actorResponseWaitTime);
+                        final var rpcProxy = new ProxyDOMRpcService(masterReference, id, actorResponseWaitTime);
                         slaveSalManager.registerSlaveMountPoint(result, masterReference, new RemoteDeviceServices(
                             new Rpcs.Normalized() {
                                 @Override
@@ -343,7 +341,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                                     return rpcProxy;
                                 }
                             },
-                            new ProxyDOMActionService(actorSystem, masterReference, id, actorResponseWaitTime)));
+                            new ProxyDOMActionService(masterReference, id, actorResponseWaitTime)));
                     }
                 });
             }

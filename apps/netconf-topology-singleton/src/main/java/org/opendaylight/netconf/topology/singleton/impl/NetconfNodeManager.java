@@ -8,14 +8,13 @@
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import com.google.errorprone.annotations.concurrent.GuardedBy;
+import java.time.Duration;
 import java.util.List;
 import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.actor.ActorSelection;
 import org.apache.pekko.actor.PoisonPill;
-import org.apache.pekko.dispatch.OnComplete;
 import org.apache.pekko.pattern.AskTimeoutException;
 import org.apache.pekko.pattern.Patterns;
-import org.apache.pekko.util.Timeout;
 import org.opendaylight.mdsal.binding.api.DataObjectDeleted;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataObjectModified;
@@ -46,7 +45,7 @@ import org.slf4j.LoggerFactory;
 class NetconfNodeManager implements DataTreeChangeListener<Node>, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeManager.class);
 
-    private final Timeout actorResponseWaitTime;
+    private final Duration actorResponseWaitTime;
     private final DOMMountPointService mountPointService;
 
     private volatile NetconfTopologySetup setup;
@@ -60,7 +59,7 @@ class NetconfNodeManager implements DataTreeChangeListener<Node>, AutoCloseable 
     @GuardedBy("this")
     private boolean closed;
 
-    NetconfNodeManager(final NetconfTopologySetup setup, final RemoteDeviceId id, final Timeout actorResponseWaitTime,
+    NetconfNodeManager(final NetconfTopologySetup setup, final RemoteDeviceId id, final Duration actorResponseWaitTime,
                        final DOMMountPointService mountPointService) {
         this.setup = setup;
         this.id = id;
@@ -164,30 +163,26 @@ class NetconfNodeManager implements DataTreeChangeListener<Node>, AutoCloseable 
     @GuardedBy("this")
     private void sendAskForMasterMountPointWithRetries(final AskForMasterMountPoint askForMasterMountPoint,
             final ActorSelection masterActor, final int tries, final int updateCount) {
-        Patterns.ask(masterActor, askForMasterMountPoint, actorResponseWaitTime).onComplete(new OnComplete<>() {
-            @Override
-            public void onComplete(final Throwable failure, final Object response) {
-                synchronized (this) {
-                    // Ignore the response if we were since closed or another notification update occurred.
-                    if (closed || updateCount != lastUpdateCount) {
-                        return;
-                    }
+        Patterns.ask(masterActor, askForMasterMountPoint, actorResponseWaitTime).whenComplete((response, failure) -> {
+            synchronized (this) {
+                // Ignore the response if we were since closed or another notification update occurred.
+                if (closed || updateCount != lastUpdateCount) {
+                    return;
+                }
 
-                    if (failure instanceof AskTimeoutException) {
-                        if (tries <= 5 || tries % 10 == 0) {
-                            LOG.warn("{}: Failed to send message to {} - retrying...", id, masterActor, failure);
-                        }
-                        sendAskForMasterMountPointWithRetries(askForMasterMountPoint, masterActor, tries + 1,
-                            updateCount);
-                    } else if (failure != null) {
-                        LOG.error("{}: Failed to send message {} to {}. Slave mount point could not be created",
-                            id, askForMasterMountPoint, masterActor, failure);
-                    } else {
-                        LOG.debug("{}: {} message to {} succeeded", id, askForMasterMountPoint, masterActor);
+                if (failure instanceof AskTimeoutException) {
+                    if (tries <= 5 || tries % 10 == 0) {
+                        LOG.warn("{}: Failed to send message to {} - retrying...", id, masterActor, failure);
                     }
+                    sendAskForMasterMountPointWithRetries(askForMasterMountPoint, masterActor, tries + 1, updateCount);
+                } else if (failure != null) {
+                    LOG.error("{}: Failed to send message {} to {}. Slave mount point could not be created",
+                        id, askForMasterMountPoint, masterActor, failure);
+                } else {
+                    LOG.debug("{}: {} message to {} succeeded", id, askForMasterMountPoint, masterActor);
                 }
             }
-        }, setup.getActorSystem().dispatcher());
+        });
     }
 
     @GuardedBy("this")

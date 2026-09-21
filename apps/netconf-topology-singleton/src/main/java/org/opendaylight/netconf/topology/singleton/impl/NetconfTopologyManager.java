@@ -20,7 +20,6 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.pekko.actor.ActorSystem;
-import org.apache.pekko.util.Timeout;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
@@ -179,7 +178,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
         this.resourceManager = requireNonNull(resourceManager);
         this.builderFactory = requireNonNull(builderFactory);
-        this.sshParams = AbstractNetconfTopology.defaultSshParams();
+        sshParams = AbstractNetconfTopology.defaultSshParams();
 
         dataChangeListenerRegistration = registerDataTreeChangeListener();
         rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, topologyId);
@@ -225,15 +224,14 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
     @SuppressWarnings("checkstyle:IllegalCatch")
     private void startNetconfDeviceContext(final DataObjectIdentifier<Node> instanceIdentifier, final Node node) {
         final var netconfNodeAugment = requireNonNull(node.augmentation(NetconfNodeAugment.class));
-        final NetconfNode netconfNode = requireNonNull(netconfNodeAugment.getNetconfNode());
+        final var netconfNode = requireNonNull(netconfNodeAugment.getNetconfNode());
 
-        final Timeout actorResponseWaitTime = Timeout.create(
-                Duration.ofSeconds(netconfNode.getActorResponseWaitTime().toJava()));
+        final var actorResponseWaitTime = Duration.ofSeconds(netconfNode.getActorResponseWaitTime().toJava());
 
-        final ServiceGroupIdentifier serviceGroupIdent = new ServiceGroupIdentifier(instanceIdentifier.toString());
+        final var serviceGroupIdent = new ServiceGroupIdentifier(instanceIdentifier.toString());
 
-        final NetconfTopologyContext newNetconfTopologyContext = newNetconfTopologyContext(
-            createSetup(instanceIdentifier, node), serviceGroupIdent, actorResponseWaitTime, deviceActionFactory);
+        final var newNetconfTopologyContext = newNetconfTopologyContext(createSetup(instanceIdentifier, node),
+            serviceGroupIdent, actorResponseWaitTime, deviceActionFactory);
 
         int tries = 3;
         while (true) {
@@ -266,7 +264,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
 
     @VisibleForTesting
     protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
-            final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
+            final ServiceGroupIdentifier serviceGroupIdent, final Duration actorResponseWaitTime,
             final DeviceActionFactory deviceActionFact) {
         return new NetconfTopologyContext(resourceManager, mountPointService, builderFactory, deviceActionFactory,
             actorResponseWaitTime, serviceGroupIdent, setup);

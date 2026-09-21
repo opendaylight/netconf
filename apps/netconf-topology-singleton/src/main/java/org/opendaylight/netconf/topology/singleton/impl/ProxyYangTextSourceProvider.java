@@ -7,29 +7,23 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
+import java.time.Duration;
 import java.util.Set;
 import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.dispatch.Futures;
-import org.apache.pekko.dispatch.OnComplete;
 import org.apache.pekko.pattern.Patterns;
-import org.apache.pekko.util.Timeout;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
 import org.opendaylight.netconf.topology.singleton.messages.YangTextSchemaSourceRequest;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
-import scala.concurrent.ExecutionContext;
 import scala.concurrent.Future;
 
 public class ProxyYangTextSourceProvider implements RemoteYangTextSourceProvider {
-
     private final ActorRef masterRef;
-    private final ExecutionContext executionContext;
-    private final Timeout actorResponseWaitTime;
+    private final Duration actorResponseWaitTime;
 
-    public ProxyYangTextSourceProvider(final ActorRef masterRef, final ExecutionContext executionContext,
-                                       final Timeout actorResponseWaitTime) {
+    public ProxyYangTextSourceProvider(final ActorRef masterRef, final Duration actorResponseWaitTime) {
         this.masterRef = masterRef;
-        this.executionContext = executionContext;
         this.actorResponseWaitTime = actorResponseWaitTime;
     }
 
@@ -43,17 +37,14 @@ public class ProxyYangTextSourceProvider implements RemoteYangTextSourceProvider
     public Future<YangTextSchemaSourceSerializationProxy> getYangTextSchemaSource(
             final SourceIdentifier sourceIdentifier) {
         final var promise = Futures.<YangTextSchemaSourceSerializationProxy>promise();
-        Patterns.ask(masterRef, new YangTextSchemaSourceRequest(sourceIdentifier), actorResponseWaitTime).onComplete(
-            new OnComplete<>() {
-                @Override
-                public void onComplete(final Throwable failure, final Object success) {
-                    if (failure == null) {
-                        promise.success((YangTextSchemaSourceSerializationProxy) success);
-                    } else {
-                        promise.failure(failure);
-                    }
+        Patterns.ask(masterRef, new YangTextSchemaSourceRequest(sourceIdentifier), actorResponseWaitTime).whenComplete(
+            (success, failure) -> {
+                if (failure == null) {
+                    promise.success((YangTextSchemaSourceSerializationProxy) success);
+                } else {
+                    promise.failure(failure);
                 }
-            }, executionContext);
+            });
         return promise.future();
     }
 }

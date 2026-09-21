@@ -22,7 +22,6 @@ import java.time.Duration;
 import java.util.Optional;
 import org.apache.pekko.actor.ActorSystem;
 import org.apache.pekko.testkit.javadsl.TestKit;
-import org.apache.pekko.util.Timeout;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -134,7 +133,7 @@ class NC1558Test {
         final var node  = createNode(netconfNode);
         final var setup = createSetup(node);
         final var context = new NetconfTopologyContext(schemaManager, mountPointService, builderFactory,
-            deviceActionFactory, Timeout.create(Duration.ofSeconds(5)), serviceGroupIdent, setup);
+            deviceActionFactory, Duration.ofSeconds(5), serviceGroupIdent, setup);
 
         // instantiate context as leader, handler for node is created
         doReturn(NetconfClientConfigurationBuilder.create()

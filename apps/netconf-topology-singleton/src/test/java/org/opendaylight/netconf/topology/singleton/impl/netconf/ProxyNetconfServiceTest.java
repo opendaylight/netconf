@@ -16,16 +16,16 @@ import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.OPERATIONAL
 
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import org.apache.pekko.actor.ActorSystem;
 import org.apache.pekko.actor.Status;
-import org.apache.pekko.dispatch.Futures;
 import org.apache.pekko.testkit.TestProbe;
 import org.apache.pekko.testkit.javadsl.TestKit;
-import org.apache.pekko.util.Timeout;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -74,13 +74,12 @@ class ProxyNetconfServiceTest {
     }
 
     private ProxyNetconfService newSuccessfulProxyNetconfService() {
-        return new ProxyNetconfService(DEVICE_ID, Futures.successful(masterActor.ref()),
-            SYSTEM.dispatcher(), Timeout.apply(5, TimeUnit.SECONDS));
+        return new ProxyNetconfService(DEVICE_ID, CompletableFuture.completedStage(masterActor.ref()),
+            Duration.ofSeconds(5));
     }
 
-    private ProxyNetconfService newSuccessfulProxyNetconfService(final Timeout timeout) {
-        return new ProxyNetconfService(DEVICE_ID, Futures.successful(masterActor.ref()),
-            SYSTEM.dispatcher(), timeout);
+    private ProxyNetconfService newSuccessfulProxyNetconfService(final Duration timeout) {
+        return new ProxyNetconfService(DEVICE_ID, CompletableFuture.completedStage(masterActor.ref()), timeout);
     }
 
     @Test
@@ -179,7 +178,7 @@ class ProxyNetconfServiceTest {
 
     @Test
     void testFutureOperationsWithMasterDown() {
-        final var netconf = newSuccessfulProxyNetconfService(Timeout.apply(500, TimeUnit.MILLISECONDS));
+        final var netconf = newSuccessfulProxyNetconfService(Duration.ofMillis(500));
 
         final var future = netconf.get(OPERATIONAL, PATH, List.of());
         masterActor.expectMsgClass(GetRequest.class);

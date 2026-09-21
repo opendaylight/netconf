@@ -10,11 +10,10 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.time.Duration;
 import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.cluster.Cluster;
-import org.apache.pekko.dispatch.OnComplete;
 import org.apache.pekko.pattern.Patterns;
-import org.apache.pekko.util.Timeout;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -42,7 +41,7 @@ final class NetconfNodeContext implements AutoCloseable {
     private final @NonNull SchemaResourceManager schemaManager;
     private final @NonNull NetconfClientConfigurationBuilderFactory builderFactory;
     private final @NonNull DOMMountPointService mountPointService;
-    private final @NonNull Timeout actorResponseWaitTime;
+    private final @NonNull Duration actorResponseWaitTime;
 
     private @NonNull NetconfTopologySetup setup;
     private @Nullable ActorRef masterActorRef;
@@ -54,7 +53,7 @@ final class NetconfNodeContext implements AutoCloseable {
     NetconfNodeContext(final NetconfTopologySetup setup, final SchemaResourceManager schemaManager,
             final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final RemoteDeviceId remoteDeviceId,
-            final Timeout actorResponseWaitTime) {
+            final Duration actorResponseWaitTime) {
         this.setup = requireNonNull(setup);
         this.schemaManager = requireNonNull(schemaManager);
         this.mountPointService = requireNonNull(mountPointService);
@@ -95,18 +94,14 @@ final class NetconfNodeContext implements AutoCloseable {
         dropNode();
 
         Patterns.ask(masterActorRef, new RefreshSetupMasterActorData(netconfTopologyDeviceSetup, remoteDeviceId),
-            actorResponseWaitTime).onComplete(
-                new OnComplete<>() {
-                    @Override
-                    public void onComplete(final Throwable failure, final Object success) {
-                        if (failure != null) {
-                            LOG.error("Failed to refresh master actor data", failure);
-                            return;
-                        }
-                        LOG.debug("Succeed to refresh Master Action data. Creating Connector...");
-                        connectNode(remoteDeviceId);
-                    }
-                }, netconfTopologyDeviceSetup.getActorSystem().dispatcher());
+            actorResponseWaitTime).whenComplete((success, failure) -> {
+                if (failure != null) {
+                    LOG.error("Failed to refresh master actor data", failure);
+                    return;
+                }
+                LOG.debug("Succeed to refresh Master Action data. Creating Connector...");
+                connectNode(remoteDeviceId);
+            });
     }
 
     /**

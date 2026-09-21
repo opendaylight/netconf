@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
+import java.time.Duration;
 import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.pattern.Patterns;
-import org.apache.pekko.util.Timeout;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -21,51 +21,44 @@ import org.opendaylight.netconf.topology.singleton.impl.tx.ProxyReadWriteTransac
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadTransactionRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadWriteTransactionRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionRequest;
-import scala.concurrent.ExecutionContext;
-import scala.concurrent.Future;
 
 public class ProxyDOMDataBroker implements PingPongMergingDOMDataBroker {
-
-    private final Timeout askTimeout;
+    private final Duration askTimeout;
     private final RemoteDeviceId id;
     private final ActorRef masterNode;
-    private final ExecutionContext executionContext;
 
     /**
      * Constructor for {@code ProxyDOMDataBroker}.
      *
      * @param id          id
      * @param masterNode  {@link org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor} ref
-     * @param executionContext ExecutionContext
      * @param askTimeout  ask timeout
      */
-    public ProxyDOMDataBroker(final RemoteDeviceId id, final ActorRef masterNode,
-            final ExecutionContext executionContext, final Timeout askTimeout) {
+    public ProxyDOMDataBroker(final RemoteDeviceId id, final ActorRef masterNode, final Duration askTimeout) {
         this.id = id;
         this.masterNode = masterNode;
-        this.executionContext = executionContext;
         this.askTimeout = askTimeout;
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public DOMDataTreeReadTransaction newReadOnlyTransaction() {
-        final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewReadTransactionRequest(), askTimeout);
-        return new ProxyReadTransaction(id, txActorFuture, executionContext, askTimeout);
+        return new ProxyReadTransaction(id, Patterns.ask(masterNode, new NewReadTransactionRequest(), askTimeout),
+            askTimeout);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public DOMDataTreeReadWriteTransaction newReadWriteTransaction() {
-        final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewReadWriteTransactionRequest(), askTimeout);
-        return new ProxyReadWriteTransaction(id, txActorFuture, executionContext, askTimeout);
+        return new ProxyReadWriteTransaction(id,
+            Patterns.ask(masterNode, new NewReadWriteTransactionRequest(), askTimeout), askTimeout);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public DOMDataTreeWriteTransaction newWriteOnlyTransaction() {
-        final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewWriteTransactionRequest(), askTimeout);
-        return new ProxyReadWriteTransaction(id, txActorFuture, executionContext, askTimeout);
+        return new ProxyReadWriteTransaction(id, Patterns.ask(masterNode, new NewWriteTransactionRequest(), askTimeout),
+            askTimeout);
     }
 
     @Override

@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ListenableFuture;
-import org.apache.pekko.util.Timeout;
+import java.time.Duration;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonService;
@@ -41,7 +41,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
     NetconfTopologyContext(final SchemaResourceManager schemaManager,
             final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
-            final DeviceActionFactory deviceActionFactory, final Timeout actorResponseWaitTime,
+            final DeviceActionFactory deviceActionFactory, final Duration actorResponseWaitTime,
             final ServiceGroupIdentifier serviceGroupIdent, final NetconfTopologySetup setup) {
         this.serviceGroupIdent = requireNonNull(serviceGroupIdent);
         remoteDeviceId = NetconfNodeUtils.toRemoteDeviceId(setup.getNode().getNodeId(),

@@ -9,23 +9,23 @@ package org.opendaylight.netconf.topology.singleton.messages;
 
 import static java.util.Objects.requireNonNull;
 
-import org.apache.pekko.util.Timeout;
+import java.time.Duration;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 
 public class RefreshSlaveActor {
     private final RemoteDeviceId id;
     private final NetconfTopologySetup setup;
-    private final Timeout actorResponseWaitTime;
+    private final Duration actorResponseWaitTime;
 
     public RefreshSlaveActor(final NetconfTopologySetup setup, final RemoteDeviceId id,
-            final Timeout actorResponseWaitTime) {
+            final Duration actorResponseWaitTime) {
         this.setup = requireNonNull(setup);
         this.id = requireNonNull(id);
         this.actorResponseWaitTime = actorResponseWaitTime;
     }
 
-    public Timeout getActorResponseWaitTime() {
+    public Duration getActorResponseWaitTime() {
         return actorResponseWaitTime;
     }
 
