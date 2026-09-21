@@ -1,0 +1,62 @@
+module odl-network-netconf {
+  namespace urn:opendaylight:yang:network:netconf;
+  prefix onc;
+
+  import ietf-netconf-client {
+    prefix ncc;
+  }
+
+  import ietf-network {
+    prefix nw;
+  }
+
+  // FIXME: a revision when reasonably complete
+
+  augment /nw:networks/nw:network/nw:network-types {
+    container netconf {
+      presence "Indicates a topology of NETCONF devices";
+
+      container initiate {
+        // FIXME: default things for nodes
+        // uses ncc:netconf-client-initiate-stack-grouping;
+      }
+
+      container listen {
+        presence "Indicates a topology containing RFC8071 call home devices";
+
+        // FIXME: default things for nodes
+        // uses ncc:netconf-client-listen-stack-grouping;
+      }
+    }
+
+    container restconf {
+      presence "Indicates a topology of RESTCONF devices";
+
+      container initiate {
+        // FIXME: default things for nodes
+        // uses rcc:restconf-client-initiate-stack-grouping;
+      }
+
+      container listen {
+        presence "Indicates a topology containing RFC8071 call home devices";
+
+        // FIXME: default things for nodes
+        // uses rcc:restconf-client-listen-stack-grouping;
+      }
+    }
+  }
+
+  augment "/nw:networks/nw:network/nw:node" {
+    when "../nw:network-types/l3t:l3-unicast-topology" {
+      description
+        "Augmentation parameters apply only for networks with
+         L3 Unicast topology";
+    }
+    description "L3 Unicast node-level attributes ";
+
+    // FIXME: configuration attributes
+    // FIXME: operational attribues
+    // FIXME: mount point container
+  }
+}
+

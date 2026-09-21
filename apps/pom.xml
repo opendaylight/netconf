@@ -46,6 +46,9 @@
         <!-- RESTCONF integration tests -->
         <module>restconf-it</module>
 
+        <!-- ietf-network integration -->
+        <module>ietf-netconf-impl</module>
+
         <!-- legacy ietf-topology implementations -->
         <module>netconf-topology</module>
         <module>netconf-topology-impl</module>
