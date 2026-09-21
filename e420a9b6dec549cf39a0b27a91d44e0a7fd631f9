@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3db6f35b_f0c082db",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-09-21T13:48:30Z",
+      "side": 1,
+      "message": "These literals are coppied at HTTPServerSessionBootstrap and again as `@AttributeDefinition` defaults at `OSGiNorthbound.java. Consider replacing these with actual constants in HTTPServerSessionBootstrap. And ideally referencing them in the OSGiNorthbound.java",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3be93dff_1bc2bf2b",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-09-21T13:48:30Z",
+      "side": 1,
+      "message": "You converted this guard from intValue() to longValue(), which is right, but the chunkSize guard three lines above still uses intValue(). A Uint32 above Integer.MAX_VALUE wraps negative there and is rejected with \"Chunks have to have at least one byte\", which is misleading. Could we convert that one too while we are here?",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3841053a_8f90d693",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-09-21T13:48:30Z",
+      "side": 1,
+      "message": "These validation blocks can be replaced by a single helper method like \n\"Uint32 requireIntRange(String what, Uint32 value)\"",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7a0f1e0_0196d2b8",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-09-21T13:48:30Z",
+      "side": 1,
+      "message": "\"chunkSize\" and \"frameSize\" are still absent from both hashCode and equals here. OSGiNorthbound.modified restarts the endpoint only when the configuration compares unequal, so http1-chunk-size and http2-max-frame-size are silently ignored on a live reconfiguration while the four limits added here now apply. Since you are already editing both methods, could we add those two as well?",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1292b7af_f304ece3",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-09-21T13:48:30Z",
+      "side": 1,
+      "message": "The parameter list grows quite long here - 9 with six of them being Uint32. That is a miss-ordering disaster incoming. Please consider introducing a simple Record carrying these limits to make this safer. Something like \"HttpRequestLimits\"",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4495613_044afd8a",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-09-21T13:48:30Z",
+      "side": 1,
+      "message": "This limit is per HTTP/2 stream, and newHttp2FrameCodec builds on Http2Settings.defaultSettings(), which advertises SETTINGS_MAX_CONCURRENT_STREAMS\u003d100, so the new 10 MiB default allows roughly 1 GiB of buffering per connection against the previous 1.6 MiB - and the aggregator fills before EndpointRoot\u0027s acquirePrincipal runs, so it is reachable unauthenticated. Could we either lower the advertised stream count or document the multiplication on the http-max-request-body-size attribute?",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5f8e6f8_e50f6a47",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-09-21T13:48:30Z",
+      "side": 1,
+      "message": "This ALPN branch is the one a TLS RESTCONF connection takes, and none of the new tests reach it - they all go through HTTPScheme.HTTP. Swapping maxInitialLineLength and maxHeaderSize two lines below would keep the whole suite green. Could we add one test that drives configurePipeline with \"http/1.1\" and asserts the aggregator\u0027s maxContentLength and the codec\u0027s limits?",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08a64ec3_8f51fe60",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-09-21T13:48:30Z",
+      "side": 1,
+      "message": "I cannot find \"server-limits\" or \"odl-server-limits\" containers anywhere in the current codebase. Can we fix these references?",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0471ae3b_03e30b8f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-09-21T13:48:30Z",
+      "side": 1,
+      "message": "The commit message says this constructor preserves the existing transport defaults, but these values change them: request line 4096 -\u003e 8192, header section 8192 -\u003e 16384, request body 16 KiB -\u003e 10 MiB, and h2 SETTINGS_MAX_HEADER_LIST_SIZE 8192 -\u003e 16384. Since the class is exported API, could we either pass the pre-patch values here or reword the message so the raise is visible in history?",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac21a66d_2e543a5b",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-09-21T13:48:30Z",
+      "side": 1,
+      "message": "These four Uint32 values are only range-checked in NettyEndpointConfiguration. A direct user of this exported class can pass a Uint32 above Integer.MAX_VALUE. intValue() then wraps negative and every inbound connection dies inside handlerAdded when HTTPScheme builds the codec. Could we check 1..Integer.MAX_VALUE here so the failure lands at construction time instead of per connection?",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
