@@ -29,8 +29,9 @@
     </properties>
 
     <modules>
-        <module>rfc5277</module>
+        <module>draft-ietf-netconf-client</module>
         <module>draft-ietf-restconf-server</module>
+        <module>rfc5277</module>
         <module>sal-remote</module>
 
         <module>test-models</module>

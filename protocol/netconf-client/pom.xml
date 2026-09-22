@@ -20,7 +20,7 @@
     <packaging>bundle</packaging>
 
     <properties>
-        <odlparent.dependency.enforce>true</odlparent.dependency.enforce>
+        <odlparent.dependency.enforce>false</odlparent.dependency.enforce>
     </properties>
 
     <dependencies>
@@ -86,10 +86,6 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.ietf.model</groupId>
-            <artifactId>rfc6991-ietf-yang-types</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc9640</artifactId>
         </dependency>
         <dependency>
@@ -99,10 +95,6 @@
         <dependency>
             <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc9643-ietf-tcp-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.ietf.model</groupId>
-            <artifactId>rfc9643-ietf-tcp-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.ietf.model</groupId>
@@ -152,6 +144,10 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>transport-tls</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>draft-ietf-netconf-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>

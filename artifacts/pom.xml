@@ -182,6 +182,13 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- draft-ietf-netconf-netconf-client-server -->
+            <dependency>
+                <groupId>org.opendaylight.netconf.model</groupId>
+                <artifactId>draft-ietf-netconf-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- draft-ietf-netconf-restconf-client-server -->
             <dependency>
                 <groupId>org.opendaylight.netconf.model</groupId>
