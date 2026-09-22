@@ -120,6 +120,10 @@
             <artifactId>netconf-server-mdsal</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>draft-ietf-netconf-server</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>dagger-yang-parser</artifactId>
         </dependency>

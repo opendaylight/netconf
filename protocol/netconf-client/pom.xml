@@ -20,7 +20,8 @@
     <packaging>bundle</packaging>
 
     <properties>
-        <odlparent.dependency.enforce>true</odlparent.dependency.enforce>
+        <!-- FIXME: not binding-parent -->
+        <odlparent.dependency.enforce>false</odlparent.dependency.enforce>
     </properties>
 
     <dependencies>
@@ -86,10 +87,6 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.ietf.model</groupId>
-            <artifactId>rfc6991-ietf-yang-types</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc9640</artifactId>
         </dependency>
         <dependency>
@@ -99,14 +96,6 @@
         <dependency>
             <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc9643-ietf-tcp-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.ietf.model</groupId>
-            <artifactId>rfc9643-ietf-tcp-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.ietf.model</groupId>
-            <artifactId>rfc9643-ietf-tcp-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.ietf.model</groupId>
@@ -180,6 +169,11 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc9643-ietf-tcp-server</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc9644-ietf-ssh-server</artifactId>
             <scope>test</scope>
         </dependency>
@@ -190,6 +184,11 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>shaded-sshd</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>draft-ietf-netconf-client</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

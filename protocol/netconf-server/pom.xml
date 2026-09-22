@@ -75,39 +75,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.ietf.model</groupId>
-            <artifactId>rfc7407-ietf-x509-cert-to-name</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc8525</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.ietf.model</groupId>
-            <artifactId>rfc9643-ietf-tcp-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.ietf.model</groupId>
-            <artifactId>rfc9643-ietf-tcp-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.ietf.model</groupId>
-            <artifactId>rfc9643-ietf-tcp-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.ietf.model</groupId>
-            <artifactId>rfc9644-ietf-ssh-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.ietf.model</groupId>
-            <artifactId>rfc9644-ietf-ssh-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.ietf.model</groupId>
-            <artifactId>rfc9645-ietf-tls-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf.model</groupId>
-            <artifactId>rfc5277</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
@@ -126,6 +94,14 @@
             <artifactId>transport-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>odl-netconf-monitoring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>rfc5277</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.service.component.annotations</artifactId>
         </dependency>
@@ -137,8 +113,14 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>mockito-configuration</artifactId>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc9643-ietf-tcp-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc9643-ietf-tcp-server</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
@@ -163,6 +145,20 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-test-util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>draft-ietf-netconf-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>draft-ietf-netconf-server</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>mockito-configuration</artifactId>
         </dependency>
         <dependency>
             <groupId>org.xmlunit</groupId>
