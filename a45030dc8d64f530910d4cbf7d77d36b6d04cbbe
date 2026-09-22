@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2602c8c_75d8490d",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfTransportChannelListener.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-22T16:15:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7e8e43d_092a9b01",
+      "revId": "a45030dc8d64f530910d4cbf7d77d36b6d04cbbe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2a385d9_e70c8b1d",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-09-22T12:49:48Z",
       "side": 1,
       "message": "2026?",
+      "revId": "a45030dc8d64f530910d4cbf7d77d36b6d04cbbe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c568328c_e74452ca",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HttpRequestLimits.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-22T16:15:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2a385d9_e70c8b1d",
       "revId": "a45030dc8d64f530910d4cbf7d77d36b6d04cbbe",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3c33d91_ab835730",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HttpRequestLimits.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-22T16:15:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a3dd9637_41abb1f0",
+      "revId": "a45030dc8d64f530910d4cbf7d77d36b6d04cbbe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "df709442_6db15309",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-09-22T12:49:48Z",
       "side": 1,
       "message": "make static or keep static methods together",
+      "revId": "a45030dc8d64f530910d4cbf7d77d36b6d04cbbe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "191ce4b8_ff763122",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPSchemeTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-22T16:15:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df709442_6db15309",
       "revId": "a45030dc8d64f530910d4cbf7d77d36b6d04cbbe",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -92,6 +164,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce7adfec_49a2c1af",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPSchemeTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-22T16:15:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e38575a7_3b28b2b2",
+      "range": {
+        "startLine": 227,
+        "startChar": 57,
+        "endLine": 227,
+        "endChar": 72
+      },
+      "revId": "a45030dc8d64f530910d4cbf7d77d36b6d04cbbe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d305dde_2a8c3d34",
@@ -105,6 +201,24 @@
       "writtenOn": "2026-09-22T12:49:48Z",
       "side": 1,
       "message": "2026?",
+      "revId": "a45030dc8d64f530910d4cbf7d77d36b6d04cbbe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0be39cf_583f719a",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrapTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-22T16:15:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d305dde_2a8c3d34",
       "revId": "a45030dc8d64f530910d4cbf7d77d36b6d04cbbe",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
