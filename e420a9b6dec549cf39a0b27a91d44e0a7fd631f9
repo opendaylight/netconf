@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3cb3b873_4096dc7a",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-22T08:15:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3db6f35b_f0c082db",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3be93dff_1bc2bf2b",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-09-21T13:48:30Z",
       "side": 1,
       "message": "You converted this guard from intValue() to longValue(), which is right, but the chunkSize guard three lines above still uses intValue(). A Uint32 above Integer.MAX_VALUE wraps negative there and is rejected with \"Chunks have to have at least one byte\", which is misleading. Could we convert that one too while we are here?",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5429bb20_40f7582b",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-22T08:15:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3be93dff_1bc2bf2b",
       "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "93cfc025_cd0f2f2a",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-22T08:15:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3841053a_8f90d693",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e7a0f1e0_0196d2b8",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-09-21T13:48:30Z",
       "side": 1,
       "message": "\"chunkSize\" and \"frameSize\" are still absent from both hashCode and equals here. OSGiNorthbound.modified restarts the endpoint only when the configuration compares unequal, so http1-chunk-size and http2-max-frame-size are silently ignored on a live reconfiguration while the four limits added here now apply. Since you are already editing both methods, could we add those two as well?",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8cbc75f_e0cd36f8",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-22T08:15:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7a0f1e0_0196d2b8",
       "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84868ef7_3764b33b",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-22T08:15:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1292b7af_f304ece3",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c4495613_044afd8a",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-09-21T13:48:30Z",
       "side": 1,
       "message": "This limit is per HTTP/2 stream, and newHttp2FrameCodec builds on Http2Settings.defaultSettings(), which advertises SETTINGS_MAX_CONCURRENT_STREAMS\u003d100, so the new 10 MiB default allows roughly 1 GiB of buffering per connection against the previous 1.6 MiB - and the aggregator fills before EndpointRoot\u0027s acquirePrincipal runs, so it is reachable unauthenticated. Could we either lower the advertised stream count or document the multiplication on the http-max-request-body-size attribute?",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "593c48e3_51802673",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-22T08:15:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c4495613_044afd8a",
       "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ddc6e32_ba165d79",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-22T08:15:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b5f8e6f8_e50f6a47",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "08a64ec3_8f51fe60",
@@ -133,6 +259,24 @@
       "writtenOn": "2026-09-21T13:48:30Z",
       "side": 1,
       "message": "I cannot find \"server-limits\" or \"odl-server-limits\" containers anywhere in the current codebase. Can we fix these references?",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bc7dd97_29a0bc4a",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-22T08:15:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08a64ec3_8f51fe60",
       "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -154,6 +298,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35582748_c5eec4fc",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-22T08:15:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0471ae3b_03e30b8f",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ac21a66d_2e543a5b",
@@ -167,6 +329,24 @@
       "writtenOn": "2026-09-21T13:48:30Z",
       "side": 1,
       "message": "These four Uint32 values are only range-checked in NettyEndpointConfiguration. A direct user of this exported class can pass a Uint32 above Integer.MAX_VALUE. intValue() then wraps negative and every inbound connection dies inside handlerAdded when HTTPScheme builds the codec. Could we check 1..Integer.MAX_VALUE here so the failure lands at construction time instead of per connection?",
+      "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed464a47_63c62f03",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-09-22T08:15:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ac21a66d_2e543a5b",
       "revId": "e420a9b6dec549cf39a0b27a91d44e0a7fd631f9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
