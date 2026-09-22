@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7e8e43d_092a9b01",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfTransportChannelListener.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-09-22T12:49:48Z",
+      "side": 1,
+      "message": "same line",
+      "revId": "a45030dc8d64f530910d4cbf7d77d36b6d04cbbe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2a385d9_e70c8b1d",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HttpRequestLimits.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-09-22T12:49:48Z",
+      "side": 1,
+      "message": "2026?",
+      "revId": "a45030dc8d64f530910d4cbf7d77d36b6d04cbbe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3dd9637_41abb1f0",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HttpRequestLimits.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-09-22T12:49:48Z",
+      "side": 1,
+      "message": "better name?",
+      "revId": "a45030dc8d64f530910d4cbf7d77d36b6d04cbbe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df709442_6db15309",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPSchemeTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-09-22T12:49:48Z",
+      "side": 1,
+      "message": "make static or keep static methods together",
+      "revId": "a45030dc8d64f530910d4cbf7d77d36b6d04cbbe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e38575a7_3b28b2b2",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPSchemeTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-09-22T12:49:48Z",
+      "side": 1,
+      "message": "Explicit type argument FullHttpRequest can be replaced with \u003c\u003e",
+      "range": {
+        "startLine": 227,
+        "startChar": 57,
+        "endLine": 227,
+        "endChar": 72
+      },
+      "revId": "a45030dc8d64f530910d4cbf7d77d36b6d04cbbe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d305dde_2a8c3d34",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrapTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-09-22T12:49:48Z",
+      "side": 1,
+      "message": "2026?",
+      "revId": "a45030dc8d64f530910d4cbf7d77d36b6d04cbbe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
