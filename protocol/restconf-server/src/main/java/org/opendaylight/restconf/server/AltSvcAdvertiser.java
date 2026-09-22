@@ -26,7 +26,7 @@ final class AltSvcAdvertiser extends ChannelOutboundHandlerAdapter {
     private static final @NonNull String ALT_SVC = "Alt-Svc";
 
     @NonNullByDefault
-    private final @NonNull CharSequence altSvcValue;
+    private final CharSequence altSvcValue;
 
     AltSvcAdvertiser(final CharSequence altSvcValue) {
         this.altSvcValue = requireNonNull(altSvcValue);
