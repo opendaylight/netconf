@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "606725b3ae95595840b2f40b0804a9a17d30bf59",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2e1466e_bfb447f8",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-09-23T13:21:59Z",
+      "side": 1,
+      "message": "This callback runs a full ask round-trip after onDeviceConnected() and nothing re-checks the state it was scheduled under. If the device disconnects meanwhile, onDeviceDisconnected() unregisters nothing because the mount is not registered yet, and this callback then registers it and writes the device back as connected.",
+      "revId": "606725b3ae95595840b2f40b0804a9a17d30bf59",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d72f8e20_41a051c5",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ProxyNetconfService.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-09-23T13:21:59Z",
+      "side": 1,
+      "message": "Every execution of this line makes NetconfNodeActor:180 create a new NetconfDataTreeServiceActor. Since context().stop(self()) was removed from NetconfDataTreeServiceActor, nothing stops the previous child. They are stopped only when NetconfNodeActor stops, which is once per device lifetime. Please fix NetconfNodeActor to reuse one child instead of creating one per request.",
+      "revId": "606725b3ae95595840b2f40b0804a9a17d30bf59",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
