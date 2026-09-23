@@ -15,6 +15,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceInstance;
 import org.opendaylight.netconf.transport.http.rfc6415.WebHostResourceProvider;
 import org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl;
+import org.osgi.annotation.bundle.Header;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -31,6 +32,7 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 @Component(immediate = true, service = WebHostResourceProvider.class,
     configurationPid = "org.opendaylight.restconf.nb.rfc8040")
 @Designate(ocd = OpenApiResourceProvider.Configuration.class)
+@Header(name = "Automatic-Module-Name", value = "org.opendaylight.restconf.openapi")
 public final class OpenApiResourceProvider implements WebHostResourceProvider, AutoCloseable {
     @ObjectClassDefinition
     public @interface Configuration {
