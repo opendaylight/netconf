@@ -127,7 +127,7 @@ public final class NetconfClientSessionNegotiatorFactory {
      * @param promise Promise to be notified
      * @return new negotiator instance
      */
-    public NetconfClientSessionNegotiator getSessionNegotiator(final NetconfClientSessionListener sessionListener,
+    NetconfClientSessionNegotiator getSessionNegotiator(final NetconfClientSessionListener sessionListener,
             final Channel channel, final Promise<NetconfClientSession> promise) {
         return new NetconfClientSessionNegotiator(
             HelloMessage.createClientHello(clientCapabilities, additionalHeader),
