@@ -10,4 +10,5 @@
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.8">RESTCONF query parameter</a>. This package hosts support
  * for {@link RestconfQueryParam} and its specializations.
  */
+@org.osgi.annotation.bundle.Export
 package org.opendaylight.restconf.api.query;

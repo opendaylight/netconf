@@ -8,4 +8,5 @@
 /**
  * RESTCONF protocol constructs, as specified by <a href="https://www.rfc-editor.org/rfc/rfc8040">RFC8040</a>.
  */
+@org.osgi.annotation.bundle.Export
 package org.opendaylight.restconf.api;
