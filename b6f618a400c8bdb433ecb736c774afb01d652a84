@@ -51,6 +51,24 @@
       "parentUuid": "e75ef335_1fab877e",
       "revId": "b6f618a400c8bdb433ecb736c774afb01d652a84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "526a6657_9afd25dd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-09-24T07:25:33Z",
+      "side": 1,
+      "message": "I have marked this test as expect to fail (in the previous commit) until it is fixed \n` @pytest.mark.xfail(`\n`        reason\u003d\"Known failure, reported in NETCONF-1666\",`",
+      "parentUuid": "c60b4652_1f314613",
+      "revId": "b6f618a400c8bdb433ecb736c774afb01d652a84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
