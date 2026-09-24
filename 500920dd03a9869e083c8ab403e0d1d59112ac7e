@@ -16,6 +16,24 @@
       "message": "Is there any reason to not test this with HTTPClient.connect() and testing  connectQuic()?",
       "revId": "500920dd03a9869e083c8ab403e0d1d59112ac7e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5893868a_8361e8fa",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ConfigUtils.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-24T08:30:11Z",
+      "side": 1,
+      "message": "Added test",
+      "parentUuid": "5dac2d87_8f62dfb5",
+      "revId": "500920dd03a9869e083c8ab403e0d1d59112ac7e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
