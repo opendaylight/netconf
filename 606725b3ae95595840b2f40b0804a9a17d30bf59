@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "011eb8b9_b795bb49",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-24T12:15:34Z",
+      "side": 1,
+      "message": "Added a connection generation counter. It is bumped on connect, disconnect, failure and close, all under the facade lock. The callback checks it under the same lock and skips registration and the connected status update if the connection it was scheduled for has been superseded.",
+      "parentUuid": "a2e1466e_bfb447f8",
+      "revId": "606725b3ae95595840b2f40b0804a9a17d30bf59",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d72f8e20_41a051c5",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-09-23T13:21:59Z",
       "side": 1,
       "message": "Every execution of this line makes NetconfNodeActor:180 create a new NetconfDataTreeServiceActor. Since context().stop(self()) was removed from NetconfDataTreeServiceActor, nothing stops the previous child. They are stopped only when NetconfNodeActor stops, which is once per device lifetime. Please fix NetconfNodeActor to reuse one child instead of creating one per request.",
+      "revId": "606725b3ae95595840b2f40b0804a9a17d30bf59",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09f18d80_915703bf",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ProxyNetconfService.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-09-24T12:15:34Z",
+      "side": 1,
+      "message": "NetconfNodeActor now creates one NetconfDataTreeServiceActor per master session and hands the same ref to every request. The old child is stopped on a new CreateInitialMasterActorData. It now refuses the request with NotMasterException while dataStoreService is still null, so a child without a data store behind it is never cached.",
+      "parentUuid": "d72f8e20_41a051c5",
       "revId": "606725b3ae95595840b2f40b0804a9a17d30bf59",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
