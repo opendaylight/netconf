@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2a62a65_cbcb1cb9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-25T10:29:31Z",
+      "side": 1,
+      "message": "too long lines",
+      "revId": "0f8d6137d379d7fb9fae75f8250a970c19fed95b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b065018_c7803929",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-09-25T10:29:31Z",
+      "side": 1,
+      "message": "Signed-off-by should be grouped at the end",
+      "revId": "0f8d6137d379d7fb9fae75f8250a970c19fed95b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
