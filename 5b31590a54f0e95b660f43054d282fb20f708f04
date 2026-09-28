@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75c75d6d_1c6ef283",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-09-28T14:02:24Z",
+      "side": 1,
+      "message": "Pleas fix Jira ticket to \"NETCONF-1679\"\nhttps://lf-opendaylight.atlassian.net/browse/NETCONF-1679",
+      "revId": "5b31590a54f0e95b660f43054d282fb20f708f04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d210c20_24101da8",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-09-28T14:02:24Z",
+      "side": 1,
+      "message": "Probably missing public and javadoc, to be consistent with frameSize() and chunkSize(), which are called from the same place in RestconfTransportChannelListener. If package-private is intended, please move it below the public methods.",
+      "revId": "5b31590a54f0e95b660f43054d282fb20f708f04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68bbd109_c20dba4e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-09-28T14:02:24Z",
+      "side": 1,
+      "message": "Extra empty line here.",
+      "revId": "5b31590a54f0e95b660f43054d282fb20f708f04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3355f6f_e70e4f60",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-09-28T14:02:24Z",
+      "side": 1,
+      "message": "Split private from protected attributes by one empty line.",
+      "revId": "5b31590a54f0e95b660f43054d282fb20f708f04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
