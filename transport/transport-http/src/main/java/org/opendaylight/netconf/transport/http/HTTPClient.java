@@ -143,7 +143,10 @@ public abstract sealed class HTTPClient extends HTTPTransportStack permits Plain
                 pipeline.addLast(authProvider);
             }
         }
+        signalTransportReady(underlayChannel);
+    }
 
+    final void signalTransportReady(final TransportChannel underlayChannel) {
         // signal client transport is ready to send requests
         // NB. while server signals readiness on exit from initChannel(),
         // client needs additional confirmation for upgrade completion in case of HTTP/2 cleartext flow
