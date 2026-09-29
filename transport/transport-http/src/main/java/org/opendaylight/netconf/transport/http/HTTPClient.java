@@ -137,13 +137,18 @@ public abstract sealed class HTTPClient extends HTTPTransportStack permits Plain
 
     final void configureEndOfPipeline(final TransportChannel underlayChannel, final ChannelPipeline pipeline) {
         if (http2) {
+            // Only reached with TLS (ALPN). The cleartext upgrade flow has PlainHTTPClient install the multiplexer
+            // through Http2ClientUpgradeCodec, as it has to be present before the upgrade stream is activated.
             pipeline.addLast("h2-multiplexer", new Http2MultiplexHandler(new ChannelInboundHandlerAdapter()));
         } else {
             if (authProvider != null) {
                 pipeline.addLast(authProvider);
             }
         }
+        signalTransportReady(underlayChannel);
+    }
 
+    final void signalTransportReady(final TransportChannel underlayChannel) {
         // signal client transport is ready to send requests
         // NB. while server signals readiness on exit from initChannel(),
         // client needs additional confirmation for upgrade completion in case of HTTP/2 cleartext flow
