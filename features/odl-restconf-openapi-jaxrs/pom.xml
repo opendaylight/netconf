@@ -17,7 +17,8 @@
 
     <artifactId>odl-restconf-openapi-jaxrs</artifactId>
     <packaging>feature</packaging>
-    <name>OpenDaylight :: RESTCONF :: OPENAPI JAX-RS</name>
+    <name>(Deprecated) OpenDaylight :: RESTCONF :: OPENAPI JAX-RS</name>
+    <description>Deprecated JAX-RS/Jetty RESTCONF openapi. Use odl-restconf-openapi (Netty) instead.</description>
 
     <dependencies>
         <dependency>

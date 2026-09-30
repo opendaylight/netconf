@@ -17,7 +17,8 @@
 
     <artifactId>odl-restconf-nb-jaxrs</artifactId>
     <packaging>feature</packaging>
-    <name>OpenDaylight :: RESTCONF :: Northbound JAX-RS</name>
+    <name>(Deprecated) OpenDaylight :: RESTCONF :: Northbound JAX-RS</name>
+    <description>Deprecated JAX-RS/Jetty RESTCONF northbound. Use odl-restconf-nb (Netty) instead.</description>
 
     <dependencies>
         <dependency>
