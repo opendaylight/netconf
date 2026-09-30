@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7d157bc_87a039c1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-09-30T11:45:26Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "a2a62a65_cbcb1cb9",
+      "revId": "0f8d6137d379d7fb9fae75f8250a970c19fed95b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7b065018_c7803929",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-09-25T10:29:31Z",
       "side": 1,
       "message": "Signed-off-by should be grouped at the end",
+      "revId": "0f8d6137d379d7fb9fae75f8250a970c19fed95b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eadb3e0c_9034a252",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-09-30T11:45:26Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "7b065018_c7803929",
       "revId": "0f8d6137d379d7fb9fae75f8250a970c19fed95b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
