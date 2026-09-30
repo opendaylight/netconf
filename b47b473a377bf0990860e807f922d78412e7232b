@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d43e19e_c0db8017",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/ChunkedFrameDecoder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-09-30T15:25:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "084213ec_22e6df47",
+      "range": {
+        "startLine": 82,
+        "startChar": 36,
+        "endLine": 82,
+        "endChar": 38
+      },
+      "revId": "b47b473a377bf0990860e807f922d78412e7232b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4cf1ce78_8f32ca27",
@@ -54,6 +78,30 @@
       "writtenOn": "2026-09-30T09:42:07Z",
       "side": 1,
       "message": "where is this ISE coming from?",
+      "range": {
+        "startLine": 156,
+        "startChar": 23,
+        "endLine": 156,
+        "endChar": 44
+      },
+      "revId": "b47b473a377bf0990860e807f922d78412e7232b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7508aa2_79231c73",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/ChunkedFrameDecoder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-09-30T15:25:36Z",
+      "side": 1,
+      "message": "IllegalStateException is thrown whenever the input does not match RFC 6242 chunked framing. Wrong header byte, an invalid or too large chunk size, or a wrong footer byte.\n\nAccording to RFC 6242 section 4.2, the session should be closed when this happens. Today it is not closed. The decoder is shared by the client and the server. On the client side (netconf-topology) the error is only logged, and on the server side only an rpc-error is sent. This patch only fixes the leak.\n\nhttps://www.rfc-editor.org/info/rfc6242/#section-4.2\n```\nIf the chunk-size and the chunk-size value respectively are invalid\n   or if an error occurs during the decoding process, the peer MUST\n   terminate the NETCONF session by closing the corresponding SSH\n   channel.  Implementations MUST ensure they are not vulnerable for a\n   buffer overrun.\n```\n\nI Prepared for this new ticket:\nhttps://lf-opendaylight.atlassian.net/browse/NETCONF-1694",
+      "parentUuid": "4cf1ce78_8f32ca27",
       "range": {
         "startLine": 156,
         "startChar": 23,
