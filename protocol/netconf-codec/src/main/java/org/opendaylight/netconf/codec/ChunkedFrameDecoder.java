@@ -79,85 +79,76 @@ public final class ChunkedFrameDecoder extends FrameDecoder {
         try {
             while (in.isReadable()) {
                 switch (state) {
-                case HEADER_ONE: {
-                    final byte b = in.readByte();
-                    checkNewLine(b, "Malformed chunk header encountered (byte 0)");
-                    state = State.HEADER_TWO;
-                    initChunk();
-                    break;
-                }
-                case HEADER_TWO: {
-                    final byte b = in.readByte();
-                    checkHash(b, "Malformed chunk header encountered (byte 1)");
-                    state = State.HEADER_LENGTH_FIRST;
-                    break;
-                }
-                case HEADER_LENGTH_FIRST: {
-                    final byte b = in.readByte();
-                    chunkSize = processHeaderLengthFirst(b);
-                    state = State.HEADER_LENGTH_OTHER;
-                    break;
-                }
-                case HEADER_LENGTH_OTHER: {
-                    final byte b = in.readByte();
-                    if (b == '\n') {
-                        state = State.DATA;
-                        break;
+                    case HEADER_ONE -> {
+                        final var b = in.readByte();
+                        checkNewLine(b, "Malformed chunk header encountered (byte 0)");
+                        state = State.HEADER_TWO;
+                        initChunk();
                     }
-                    if (b < '0' || b > '9') {
-                        LOG.debug(GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM, b, (byte)'0', (byte)'9');
-                        throw new IllegalStateException("Invalid chunk size encountered");
+                    case HEADER_TWO -> {
+                        final var b = in.readByte();
+                        checkHash(b, "Malformed chunk header encountered (byte 1)");
+                        state = State.HEADER_LENGTH_FIRST;
                     }
-                    chunkSize *= 10;
-                    chunkSize += b - '0';
-                    checkChunkSize();
-                    break;
-                }
-                case DATA:
-                    /*
-                     * FIXME: this gathers all data into one big chunk before passing
-                     *        it on. Make sure the pipeline can work with partial data
-                     *        and then change this piece to pass the data on as it
-                     *        comes through.
-                     */
-                    if (in.readableBytes() < chunkSize) {
-                        LOG.debug("Buffer has {} bytes, need {} to complete chunk", in.readableBytes(), chunkSize);
-                        in.discardReadBytes();
-                        return;
+                    case HEADER_LENGTH_FIRST -> {
+                        final var b = in.readByte();
+                        chunkSize = processHeaderLengthFirst(b);
+                        state = State.HEADER_LENGTH_OTHER;
                     }
-                    aggregateChunks(in.readBytes((int) chunkSize));
-                    state = State.FOOTER_ONE;
-                    break;
-                case FOOTER_ONE: {
-                    final byte b = in.readByte();
-                    checkNewLine(b,"Malformed chunk footer encountered (byte 0)");
-                    state = State.FOOTER_TWO;
-                    chunkSize = 0;
-                    break;
-                }
-                case FOOTER_TWO: {
-                    final byte b = in.readByte();
-                    checkHash(b,"Malformed chunk footer encountered (byte 1)");
-                    state = State.FOOTER_THREE;
-                    break;
-                }
-                case FOOTER_THREE: {
-                    final byte b = in.readByte();
-                    // In this state, either header-of-new-chunk or message-end is expected
-                    // Depends on the next character
-                    extractNewChunkOrMessageEnd(b);
-                    break;
-                }
-                case FOOTER_FOUR: {
-                    final byte b = in.readByte();
-                    checkNewLine(b,"Malformed chunk footer encountered (byte 3)");
-                    state = State.HEADER_ONE;
-                    out.add(chunk);
-                    chunk = null;
-                    break;
-                }
-                default:
-                    LOG.info("Unknown state.");
+                    case HEADER_LENGTH_OTHER -> {
+                        final var b = in.readByte();
+                        if (b == '\n') {
+                            state = State.DATA;
+                            break;
+                        }
+                        if (b < '0' || b > '9') {
+                            LOG.debug(GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM, b, (byte)'0', (byte)'9');
+                            throw new IllegalStateException("Invalid chunk size encountered");
+                        }
+                        chunkSize *= 10;
+                        chunkSize += b - '0';
+                        checkChunkSize();
+                    }
+                    case DATA -> {
+                        /*
+                         * FIXME: this gathers all data into one big chunk before passing
+                         *        it on. Make sure the pipeline can work with partial data
+                         *        and then change this piece to pass the data on as it
+                         *        comes through.
+                         */
+                        if (in.readableBytes() < chunkSize) {
+                            LOG.debug("Buffer has {} bytes, need {} to complete chunk", in.readableBytes(), chunkSize);
+                            in.discardReadBytes();
+                            return;
+                        }
+                        aggregateChunks(in.readBytes((int) chunkSize));
+                        state = State.FOOTER_ONE;
+                    }
+                    case FOOTER_ONE -> {
+                        final var b = in.readByte();
+                        checkNewLine(b,"Malformed chunk footer encountered (byte 0)");
+                        state = State.FOOTER_TWO;
+                        chunkSize = 0;
+                    }
+                    case FOOTER_TWO -> {
+                        final var b = in.readByte();
+                        checkHash(b,"Malformed chunk footer encountered (byte 1)");
+                        state = State.FOOTER_THREE;
+                    }
+                    case FOOTER_THREE -> {
+                        final var b = in.readByte();
+                        // In this state, either header-of-new-chunk or message-end is expected
+                        // Depends on the next character
+                        extractNewChunkOrMessageEnd(b);
+                    }
+                    case FOOTER_FOUR -> {
+                        final var b = in.readByte();
+                        checkNewLine(b,"Malformed chunk footer encountered (byte 3)");
+                        state = State.HEADER_ONE;
+                        out.add(chunk);
+                        chunk = null;
+                    }
+                    default -> LOG.info("Unknown state.");
                 }
             }
 
