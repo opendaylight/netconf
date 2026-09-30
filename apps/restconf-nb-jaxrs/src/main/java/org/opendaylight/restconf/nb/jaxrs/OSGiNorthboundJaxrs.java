@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 @Component(service = { }, configurationPid = "org.opendaylight.restconf.nb.rfc8040")
 @Designate(ocd = OSGiNorthboundJaxrs.Configuration.class)
+@Deprecated(since = "12.0.0", forRemoval = true)
 public final class OSGiNorthboundJaxrs {
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthboundJaxrs.class);
 
@@ -81,7 +82,7 @@ public final class OSGiNorthboundJaxrs {
 
         jaxrsProps = newJaxrsProps(configuration);
         jaxrs = jaxrsFactory.newInstance(FrameworkUtil.asDictionary(jaxrsProps));
-        LOG.info("Deprecated JAX-RS RESTCONF Northbound started");
+        LOG.warn("Deprecated JAX-RS RESTCONF Northbound started");
     }
 
     @Modified
