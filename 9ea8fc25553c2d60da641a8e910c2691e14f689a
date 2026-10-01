@@ -16,6 +16,24 @@
       "message": "It can be moved to shared libraries like `utils` and reused it from there might be better. As we would already have the same function/method in https://git.opendaylight.org/gerrit/c/netconf/+/124594/9/tests/suites/clustering/test_clustering_outages.py#145",
       "revId": "9ea8fc25553c2d60da641a8e910c2691e14f689a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bc5b753_419b9730",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-01T08:12:48Z",
+      "side": 1,
+      "message": "Alright, moved to `utils.report_known_bug`. Both the CRUD base and the Outages suite now call it instead of keeping their own copy. \n\nAlthough this means that 124595 touches test_clustering_outages.py: the duplicate only exists once this change adds the second copy... so the dedup belongs here rather than in 124594.",
+      "parentUuid": "d2aa6cd6_6859e87c",
+      "revId": "9ea8fc25553c2d60da641a8e910c2691e14f689a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
