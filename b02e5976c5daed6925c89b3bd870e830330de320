@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9afc62e6_1ea6e7a5",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/ChunkedFrameDecoder.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-10-01T19:23:23Z",
+      "side": 1,
+      "message": "this try/catch is fugly -- you have to scroll through like 80 lines to find the catch\n\nit is also hard to review due to the whitespace change across those lines\n\ndecode() should contain the try/catch, tryDecode() should contain the logic",
+      "range": {
+        "startLine": 79,
+        "startChar": 8,
+        "endLine": 79,
+        "endChar": 13
+      },
+      "revId": "b02e5976c5daed6925c89b3bd870e830330de320",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "94c8ef3c_c5a8b488",
         "filename": "protocol/netconf-codec/src/test/java/org/opendaylight/netconf/codec/ChunkedFrameDecoderTest.java",
         "patchSetId": 3
