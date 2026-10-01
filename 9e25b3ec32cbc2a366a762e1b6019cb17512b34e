@@ -16,6 +16,24 @@
       "message": "It might be good to also allow params from `check_device_config_data`\n`regex: bool \u003d False`\n`contains: bool \u003d False`\nto be able to pass these params.",
       "revId": "9e25b3ec32cbc2a366a762e1b6019cb17512b34e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd6e11c1_fefc17d4",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 783,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-01T08:11:16Z",
+      "side": 1,
+      "message": "wait_device_config_data now takes regex and contains and forwards both to check_device_config_data.\n\nAlso: your 124806 removes the last regex\u003d/contains\u003d callers in the tree, so once that lands these two become unused here too. Keep them for symmetry or drop them along with the ones on check_device_config_data?",
+      "parentUuid": "e97f4975_5f4ae661",
+      "revId": "9e25b3ec32cbc2a366a762e1b6019cb17512b34e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
