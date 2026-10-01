@@ -16,6 +16,24 @@
       "message": "It might be good to keep the original 60 seconds value for `DEVICE_CHECK_TIMEOUT`, as it was in the original tests https://github.com/opendaylight/integration-test/blob/master/csit/suites/netconf/clustering/bug8086.robot#L186",
       "revId": "c01ddddfe86d22474c371fe5c31a86372935f043",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "806a619d_42bf2782",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-01T08:12:58Z",
+      "side": 1,
+      "message": "Oh right.. and it turned out to be two values instead of one. The Robot suites used `${DEVICE_CHECK_TIMEOUT} \u003d 10s` for the connector and pre-write data checks, and `60s` only for the four checks that wait for a write to reach another member (the L186 is one of those). The port had collapsed both into a single 20.\n\nSo the split:\n- `DATA_PROPAGATION_TIMEOUT \u003d 60` for those four steps\n- `DEVICE_CHECK_TIMEOUT \u003d 20` for the rest. \nNothing now gets less time than the original. \n\n(note) the fix lands in 124595 since the constant is in the shared base and it fixes the same shortfall for the clustering CRUD suite, whose Robot original used the same 60s.",
+      "parentUuid": "afcf4006_84a9f92f",
+      "revId": "c01ddddfe86d22474c371fe5c31a86372935f043",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
