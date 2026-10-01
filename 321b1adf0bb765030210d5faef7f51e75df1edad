@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3ad6751_3e5e0497",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-01T08:11:23Z",
+      "side": 1,
+      "message": "both now reference netconf.EMPTY_DEVICE_DATA",
+      "parentUuid": "f5c926cf_fa37759c",
+      "revId": "321b1adf0bb765030210d5faef7f51e75df1edad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90b2eb31_b4695a47",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "97b6b0dc_62155e55",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-01T08:11:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "90b2eb31_b4695a47",
+      "revId": "321b1adf0bb765030210d5faef7f51e75df1edad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8fafc05d_cc17000b",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-09-18T11:55:46Z",
       "side": 1,
       "message": "the writer node could be just computed from the outage node as\n`node % len(NODE_IPS) + 1`",
+      "revId": "321b1adf0bb765030210d5faef7f51e75df1edad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0b224e2_4dd30eb2",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-01T08:11:23Z",
+      "side": 1,
+      "message": "made writer_node into a computed property: `self.down_node % len(NODE_IPS) + 1`",
+      "parentUuid": "8fafc05d_cc17000b",
       "revId": "321b1adf0bb765030210d5faef7f51e75df1edad",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
