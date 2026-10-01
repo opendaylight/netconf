@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94c8ef3c_c5a8b488",
+        "filename": "protocol/netconf-codec/src/test/java/org/opendaylight/netconf/codec/ChunkedFrameDecoderTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-01T09:04:00Z",
+      "side": 1,
+      "message": "Can we add coverage for closing during incomplete DATA, explicit handler removal, and an oversized subsequent chunk after data has already accumulated cases?",
+      "revId": "b02e5976c5daed6925c89b3bd870e830330de320",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
