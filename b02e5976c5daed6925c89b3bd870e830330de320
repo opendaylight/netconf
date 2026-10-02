@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b235bca4_fb7c3abc",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/ChunkedFrameDecoder.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-02T10:38:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9afc62e6_1ea6e7a5",
+      "range": {
+        "startLine": 79,
+        "startChar": 8,
+        "endLine": 79,
+        "endChar": 13
+      },
+      "revId": "b02e5976c5daed6925c89b3bd870e830330de320",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "94c8ef3c_c5a8b488",
@@ -37,6 +61,24 @@
       "writtenOn": "2026-10-01T09:04:00Z",
       "side": 1,
       "message": "Can we add coverage for closing during incomplete DATA, explicit handler removal, and an oversized subsequent chunk after data has already accumulated cases?",
+      "revId": "b02e5976c5daed6925c89b3bd870e830330de320",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e8a3a8d_ca426ff3",
+        "filename": "protocol/netconf-codec/src/test/java/org/opendaylight/netconf/codec/ChunkedFrameDecoderTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-02T10:38:45Z",
+      "side": 1,
+      "message": "I have added tests for explicit handler removal (testHandlerRemovalReleasesChunk) and for an oversized next chunk after data has already accumulated (testOversizedNextChunkReleasesChunk).\n\nA test for closing during incomplete DATA would be the same as testChannelCloseReleasesIncompleteChunk with the additional bytes \"\\n#10\\n mess\". decode() only waits in the DATA state and does not touch the chunk buffer, and the release on close goes through the same handlerRemoved0() call. So it would test the same code. That\u0027s why I have not added it.",
+      "parentUuid": "94c8ef3c_c5a8b488",
       "revId": "b02e5976c5daed6925c89b3bd870e830330de320",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
