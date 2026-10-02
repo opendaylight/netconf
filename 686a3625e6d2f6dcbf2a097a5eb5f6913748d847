@@ -16,6 +16,24 @@
       "message": "please reorder the two patches",
       "revId": "686a3625e6d2f6dcbf2a097a5eb5f6913748d847",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df91839a_a777a653",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-02T10:26:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e63fd9a_9d0b2692",
+      "revId": "686a3625e6d2f6dcbf2a097a5eb5f6913748d847",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
