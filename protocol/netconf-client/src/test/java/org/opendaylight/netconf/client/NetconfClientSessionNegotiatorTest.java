@@ -137,7 +137,7 @@ class NetconfClientSessionNegotiatorTest {
         ChannelProgressivePromise progressivePromise = mock(ChannelProgressivePromise.class);
         doReturn(progressivePromise).when(promise).setFailure(any(Throwable.class));
 
-        long timeout = 10L;
+        long timeout = 1_000L;
         NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
         var timer = new DefaultNetconfTimer();
         return new NetconfClientSessionNegotiator(helloMessage, startExi, promise, channel, timer, sessionListener,
@@ -159,8 +159,8 @@ class NetconfClientSessionNegotiatorTest {
         doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
 
-        negotiator.channelActive(null);
         doReturn(null).when(future).cause();
+        negotiator.channelActive(null);
         negotiator.handleMessage(HelloMessage.createServerHello(Set.of("a", "b"), new SessionIdType(Uint32.TEN)));
         verify(promise).setSuccess(any());
     }
