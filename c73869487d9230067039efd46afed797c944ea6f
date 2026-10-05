@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e15cf206_960fdf5f",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-05T10:57:22Z",
+      "side": 1,
+      "message": "Shouldn\u0027t try/finally be used here? (Like it is done in next patch in clustering_crud_suite.py)",
+      "range": {
+        "startLine": 291,
+        "startChar": 0,
+        "endLine": 302,
+        "endChar": 73
+      },
+      "revId": "c73869487d9230067039efd46afed797c944ea6f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
