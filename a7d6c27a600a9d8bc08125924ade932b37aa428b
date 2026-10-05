@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "86f2eaa1_9dc1d197",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-05T11:02:14Z",
+      "side": 1,
+      "message": "Is this necessary here? in parent ClusteringCrudSuite same thing is done",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 34
+      },
+      "revId": "a7d6c27a600a9d8bc08125924ade932b37aa428b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
