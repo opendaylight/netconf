@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2989a389_98eb574b",
+        "filename": "tests/suites/CRUD-RPC/test_crud_rpc.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-05T10:44:30Z",
+      "side": 1,
+      "message": "other test with this also use @pytest.mark.standalone\nshould that be here too?",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 42
+      },
+      "revId": "779e92491e24078edac18a3275ec42e7b6c1e67a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
