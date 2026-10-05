@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebe5a0c3_979d25bb",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-05T10:16:22Z",
+      "side": 1,
+      "message": "Probably this is mistake in docs and instead of 10s it should be 20s.\nDEVICE_CHECK_TIMEOUT \u003d 20",
+      "range": {
+        "startLine": 24,
+        "startChar": 7,
+        "endLine": 24,
+        "endChar": 10
+      },
+      "revId": "f630b44243bb4501be1731346a632f9916449367",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41e0d3b1_b4941915",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-05T10:16:22Z",
+      "side": 1,
+      "message": "This seems as duplicate of netconf.EMPTY_DEVICE_DATA. Can we use this instead?",
+      "revId": "f630b44243bb4501be1731346a632f9916449367",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
