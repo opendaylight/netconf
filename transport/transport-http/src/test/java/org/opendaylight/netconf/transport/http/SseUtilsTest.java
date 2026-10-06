@@ -34,13 +34,14 @@ class SseUtilsTest {
     void chunksOf() {
         final var longMessage = "0123456789ABCDEF\r\n";
         // no split
-        assertSameContent(
-            List.of(byteBuf("field: 0123456789ABCDEF\r\n")),
-            SseUtils.chunksOf("field", longMessage, 0, UnpooledByteBufAllocator.DEFAULT));
+        final var single = SseUtils.chunksOf("field", longMessage, 0, UnpooledByteBufAllocator.DEFAULT);
+        assertSameContent(List.of(byteBuf("field: 0123456789ABCDEF\r\n")), single);
+        single.forEach(ByteBuf::release);
         // split
+        final var split = SseUtils.chunksOf("field", longMessage, 7, UnpooledByteBufAllocator.DEFAULT);
         assertSameContent(
-            List.of(byteBuf("field: 0123456\r\n"), byteBuf("field: 789ABCD\r\n"), byteBuf("field: EF\r\n")),
-            SseUtils.chunksOf("field", longMessage, 7, UnpooledByteBufAllocator.DEFAULT));
+            List.of(byteBuf("field: 0123456\r\n"), byteBuf("field: 789ABCD\r\n"), byteBuf("field: EF\r\n")), split);
+        split.forEach(ByteBuf::release);
     }
 
     @Test
