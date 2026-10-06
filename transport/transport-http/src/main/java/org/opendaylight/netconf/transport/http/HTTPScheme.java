@@ -166,8 +166,10 @@ public enum HTTPScheme {
             // just pass the request down on the dedicated HTTP/2 stream. Since we are restoring that magic, there is no
             // need for downstream handlers to see this event.
             switch (event) {
-                case HttpServerUpgradeHandler.UpgradeEvent unused -> {
+                case HttpServerUpgradeHandler.UpgradeEvent upgrade -> {
                     LOG.debug("{}: upgraded to HTTP/2", ctx.channel());
+                    // Http2FrameCodec retains the event before passing it on. It is not passed further, so release it.
+                    upgrade.release();
                     ctx.pipeline().remove(this);
                     ctx.fireUserEventTriggered(HTTPServerPipelineSetup.HTTP_2);
                 }
