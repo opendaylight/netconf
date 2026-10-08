@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "92bd3fc3_1a53b767",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-08T06:12:06Z",
+      "side": 1,
+      "message": "Not a typo, just a badly worded comment. Reworded \u0026 Done\n\n(the 10s and 60s are the Robot values, the 20 is what the port has always used for the shorter check. Reworded so it reads that way)",
+      "parentUuid": "ebe5a0c3_979d25bb",
+      "range": {
+        "startLine": 24,
+        "startChar": 7,
+        "endLine": 24,
+        "endChar": 10
+      },
+      "revId": "f630b44243bb4501be1731346a632f9916449367",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "41e0d3b1_b4941915",
@@ -37,6 +61,24 @@
       "writtenOn": "2026-10-05T10:16:22Z",
       "side": 1,
       "message": "This seems as duplicate of netconf.EMPTY_DEVICE_DATA. Can we use this instead?",
+      "revId": "f630b44243bb4501be1731346a632f9916449367",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37ea64f4_9e555f83",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-08T06:12:06Z",
+      "side": 1,
+      "message": "Done. EMPTY_DATA is now an alias of netconf.EMPTY_DEVICE_DATA, so there is one definition.",
+      "parentUuid": "41e0d3b1_b4941915",
       "revId": "f630b44243bb4501be1731346a632f9916449367",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
