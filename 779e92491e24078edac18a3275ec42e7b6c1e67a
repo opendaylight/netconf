@@ -22,6 +22,30 @@
       },
       "revId": "779e92491e24078edac18a3275ec42e7b6c1e67a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce5cd939_a2c95593",
+        "filename": "tests/suites/CRUD-RPC/test_crud_rpc.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-08T06:13:03Z",
+      "side": 1,
+      "message": "Done.\n\n(ended up being an issue beyond consistency, without this marker a run of just CRUD-RPC plus the clustering suites would have let both run in the same session)",
+      "parentUuid": "2989a389_98eb574b",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 42
+      },
+      "revId": "779e92491e24078edac18a3275ec42e7b6c1e67a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
