@@ -16,6 +16,23 @@
       "message": "Could you maybe rename it to something like `BaseClusteringCrudSuite` or some other name which would more emphasize that this is not a standalone test suite but only base class to be inherited by a concrete test suites?",
       "revId": "331721ea4bfc54873a07afb329543cf6a60942e4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c2c8e95_7720c90c",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-10-08T09:33:21Z",
+      "side": 1,
+      "message": "Also it might be good to also include this in try block. Since it might pass the PUT request to configure it but still fail on https://git.opendaylight.org/gerrit/c/netconf/+/124594/14/tests/libraries/netconf.py#b200 or some other reason when it might be half configured.",
+      "revId": "331721ea4bfc54873a07afb329543cf6a60942e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
