@@ -22,6 +22,30 @@
       },
       "revId": "c73869487d9230067039efd46afed797c944ea6f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e22884f_a4e9132c",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-08T06:03:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e15cf206_960fdf5f",
+      "range": {
+        "startLine": 291,
+        "startChar": 0,
+        "endLine": 302,
+        "endChar": 73
+      },
+      "revId": "c73869487d9230067039efd46afed797c944ea6f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
