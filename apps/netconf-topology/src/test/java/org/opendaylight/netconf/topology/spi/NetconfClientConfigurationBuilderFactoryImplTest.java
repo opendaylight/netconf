@@ -8,7 +8,9 @@
 package org.opendaylight.netconf.topology.spi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,15 +30,17 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslContextFactory;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.CentralKeystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.ProtocolBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.KeyAuthBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.key.auth.KeyBasedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNodeBuilder;
@@ -55,8 +59,6 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
     private NetconfClientSessionListener sessionListener;
     @Mock
     private AAAEncryptionService encryptionService;
-    @Mock
-    private CredentialProvider credentialProvider;
     @Mock
     private SslContextFactoryProvider sslContextFactoryProvider;
     @Mock
@@ -84,8 +86,7 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
             .setMaxConnectionAttempts(Uint32.ZERO)
             .setBackoffMultiplier(Decimal64.valueOf("1.5"))
             .setConnectionTimeoutMillis(Uint32.valueOf(20000));
-        factory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
-            sslContextFactoryProvider);
+        factory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, sslContextFactoryProvider);
     }
 
     private void assertConfig(final NetconfClientConfiguration config) {
@@ -111,6 +112,27 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
         assertConfig(config);
         assertEquals(NetconfClientProtocol.SSH, config.getProtocol());
         assertNotNull(config.getSshParameters());
+    }
+
+    @Test
+    void testSshKeyBased() {
+        final var config = createConfig(nodeBuilder.setTcpOnly(false)
+            .setCredentials(new KeyAuthBuilder()
+                .setKeyBased(new KeyBasedBuilder()
+                    .setUsername("test-user")
+                    .setKeyId("test-key")
+                    .build())
+                .build())
+            .build());
+        assertConfig(config);
+        assertEquals(NetconfClientProtocol.SSH, config.getProtocol());
+
+        final var clientIdentity = config.getSshParameters().getClientIdentity();
+        assertEquals("test-user", clientIdentity.getUsername());
+        assertNull(clientIdentity.getPassword());
+        final var centralKeystore = assertInstanceOf(CentralKeystore.class, clientIdentity.getPublicKey()
+            .getInlineOrKeystore());
+        assertEquals("test-key", centralKeystore.getCentralKeystoreReference());
     }
 
     @Test
