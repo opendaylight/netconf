@@ -11,26 +11,34 @@ import static java.util.Objects.requireNonNull;
 
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
-import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
-import org.opendaylight.netconf.shaded.sshd.client.auth.pubkey.UserAuthPublicKeyFactory;
-import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyIdentityProvider;
-import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
 import org.opendaylight.netconf.transport.tls.FixedSslHandlerFactory;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.EcPrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.RsaPrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SubjectPublicKeyInfoFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010._private.key.grouping._private.key.type.CleartextPrivateKeyBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.password.grouping.password.type.CleartextPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.CentralKeystoreBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.Inline;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.InlineBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.inline.InlineDefinitionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev251204.netconf.client.initiate.stack.grouping.transport.ssh.ssh.SshClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev251204.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentity;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentityBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.TransportParamsBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.client.identity.PasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.client.identity.PublicKeyBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.protocol.specification.SshCase;
@@ -53,17 +61,37 @@ import org.osgi.service.component.annotations.Reference;
 public final class NetconfClientConfigurationBuilderFactoryImpl implements NetconfClientConfigurationBuilderFactory {
     private final SslContextFactoryProvider sslContextFactoryProvider;
     private final AAAEncryptionService encryptionService;
-    private final CredentialProvider credentialProvider;
+    // Set only by the deprecated constructor. It resolves the keys for key-based authentication instead of the central
+    // keystore.
+    @Deprecated(since = "12.0.3", forRemoval = true)
+    private final @Nullable CredentialProvider credentialProvider;
 
     @Inject
     @Activate
-    public NetconfClientConfigurationBuilderFactoryImpl(
-            @Reference final AAAEncryptionService encryptionService,
-            @Reference final CredentialProvider credentialProvider,
+    public NetconfClientConfigurationBuilderFactoryImpl(@Reference final AAAEncryptionService encryptionService,
             @Reference final SslContextFactoryProvider sslHandlerContextProvider) {
         this.encryptionService = requireNonNull(encryptionService);
-        this.credentialProvider = requireNonNull(credentialProvider);
         sslContextFactoryProvider = requireNonNull(sslHandlerContextProvider);
+        credentialProvider = null;
+    }
+
+    /**
+     * Construct an instance which resolves the keys for key-based authentication through a deprecated
+     * {@link CredentialProvider}. The key is passed to the NETCONF client inline, so it works without a central
+     * keystore. Only RSA and EC keys are supported.
+     *
+     * @param encryptionService the encryption service
+     * @param credentialProvider the provider of the keys for key-based authentication
+     * @param sslHandlerContextProvider the SSL context factory provider
+     * @deprecated Use {@link #NetconfClientConfigurationBuilderFactoryImpl(AAAEncryptionService,
+     *             SslContextFactoryProvider)} instead, with the keys in the central keystore.
+     */
+    @Deprecated(since = "12.0.3", forRemoval = true)
+    public NetconfClientConfigurationBuilderFactoryImpl(final AAAEncryptionService encryptionService,
+            final CredentialProvider credentialProvider, final SslContextFactoryProvider sslHandlerContextProvider) {
+        this.encryptionService = requireNonNull(encryptionService);
+        sslContextFactoryProvider = requireNonNull(sslHandlerContextProvider);
+        this.credentialProvider = requireNonNull(credentialProvider);
     }
 
     @Override
@@ -123,24 +151,19 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
                 new String(plainBytes, StandardCharsets.UTF_8)));
         } else if (credentials instanceof KeyAuth keyAuth) {
             final var keyBased = keyAuth.getKeyBased();
+            // key-id is optional in the model, without it there is no key to authenticate with
             final var keyId = keyBased.getKeyId();
-            final var keyPair = credentialProvider.credentialForId(keyId);
-            if (keyPair == null) {
-                throw new IllegalArgumentException("No keypair found with keyId=" + keyId);
+            if (keyId == null) {
+                throw new IllegalArgumentException("Key-based credentials are missing key-id");
             }
-
-            // FIXME: NETCONF-1190: this should work via
-            // keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.inline.InlineDefinition
-            // representation of keypair
-            sshParamsBuilder.setClientIdentity(new ClientIdentityBuilder().setUsername(keyBased.getUsername()).build());
-            confBuilder.withSshConfigurator(new ClientFactoryManagerConfigurator() {
-                @Override
-                protected void configureClientFactoryManager(final ClientFactoryManager factoryManager) {
-                    factoryManager.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPair));
-                    factoryManager.setUserAuthFactories(
-                        List.of(new UserAuthPublicKeyFactory(factoryManager.getSignatureFactories())));
-                }
-            });
+            sshParamsBuilder.setClientIdentity(new ClientIdentityBuilder()
+                .setUsername(keyBased.getUsername())
+                .setPublicKey(new PublicKeyBuilder()
+                    .setInlineOrKeystore(credentialProvider == null
+                        ? new CentralKeystoreBuilder().setCentralKeystoreReference(keyId).build()
+                        : inlineKeyPair(credentialProvider, keyId))
+                    .build())
+                .build());
         } else {
             throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
         }
@@ -172,6 +195,43 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         sshParamsBuilder.setTransportParams(transportParamBuilder.build());
 
         confBuilder.withSshParameters(sshParamsBuilder.build());
+    }
+
+    /**
+     * Resolve the key pair for key-based authentication through a {@link CredentialProvider} and return it as an
+     * inline key, so it works without a central keystore. The key is encoded in the formats transport-ssh parses: the
+     * public key as SubjectPublicKeyInfo and the private key as PKCS#8, which supports only RSA and EC keys.
+     *
+     * @param credentialProvider the provider of the keys
+     * @param keyId the identifier of the key
+     * @return the inline key pair
+     * @throws IllegalArgumentException if there is no key with this identifier, or if it is neither an RSA nor an EC
+     *                                  key
+     * @deprecated Used only by the deprecated constructor, to be removed together with it.
+     */
+    @Deprecated(since = "12.0.3", forRemoval = true)
+    private static Inline inlineKeyPair(final CredentialProvider credentialProvider, final String keyId) {
+        final var keyPair = credentialProvider.credentialForId(keyId);
+        if (keyPair == null) {
+            throw new IllegalArgumentException("No keypair found with keyId=" + keyId);
+        }
+        final var privateKey = keyPair.getPrivate();
+        final var privateKeyFormat = switch (privateKey) {
+            case RSAPrivateKey ignored -> RsaPrivateKeyFormat.VALUE;
+            case ECPrivateKey ignored -> EcPrivateKeyFormat.VALUE;
+            default -> throw new IllegalArgumentException("Unsupported %s key with keyId=%s".formatted(
+                privateKey.getAlgorithm(), keyId));
+        };
+        return new InlineBuilder()
+            .setInlineDefinition(new InlineDefinitionBuilder()
+                .setPublicKeyFormat(SubjectPublicKeyInfoFormat.VALUE)
+                .setPublicKey(keyPair.getPublic().getEncoded())
+                .setPrivateKeyFormat(privateKeyFormat)
+                .setPrivateKeyType(new CleartextPrivateKeyBuilder()
+                    .setCleartextPrivateKey(privateKey.getEncoded())
+                    .build())
+                .build())
+            .build();
     }
 
     private static ClientIdentity loginPasswordIdentity(final String username, final String password) {

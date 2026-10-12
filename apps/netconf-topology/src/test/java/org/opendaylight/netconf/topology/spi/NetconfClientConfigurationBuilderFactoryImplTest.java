@@ -7,8 +7,11 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,6 +19,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 
 import io.netty.handler.ssl.SslContext;
+import java.security.KeyPairGenerator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,13 +34,21 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
+import org.opendaylight.netconf.transport.crypto.KeyPairParser;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.RsaPrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SubjectPublicKeyInfoFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010._private.key.grouping._private.key.type.CleartextPrivateKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.CentralKeystore;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.Inline;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.ProtocolBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.KeyAuthBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.key.auth.KeyBasedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNodeBuilder;
@@ -56,13 +68,13 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
     @Mock
     private AAAEncryptionService encryptionService;
     @Mock
-    private CredentialProvider credentialProvider;
-    @Mock
     private SslContextFactoryProvider sslContextFactoryProvider;
     @Mock
     private SslContextFactory sslContextFactory;
     @Mock
     private SslContext sslContext;
+    @Mock
+    private CredentialProvider credentialProvider;
 
     private NetconfNodeBuilder nodeBuilder;
     private NetconfClientConfigurationBuilderFactoryImpl factory;
@@ -84,8 +96,7 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
             .setMaxConnectionAttempts(Uint32.ZERO)
             .setBackoffMultiplier(Decimal64.valueOf("1.5"))
             .setConnectionTimeoutMillis(Uint32.valueOf(20000));
-        factory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
-            sslContextFactoryProvider);
+        factory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, sslContextFactoryProvider);
     }
 
     private void assertConfig(final NetconfClientConfiguration config) {
@@ -111,6 +122,108 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
         assertConfig(config);
         assertEquals(NetconfClientProtocol.SSH, config.getProtocol());
         assertNotNull(config.getSshParameters());
+    }
+
+    @Test
+    void testSshKeyBased() {
+        final var config = createConfig(nodeBuilder.setTcpOnly(false)
+            .setCredentials(new KeyAuthBuilder()
+                .setKeyBased(new KeyBasedBuilder()
+                    .setUsername("test-user")
+                    .setKeyId("test-key")
+                    .build())
+                .build())
+            .build());
+        assertConfig(config);
+        assertEquals(NetconfClientProtocol.SSH, config.getProtocol());
+
+        final var clientIdentity = config.getSshParameters().getClientIdentity();
+        assertEquals("test-user", clientIdentity.getUsername());
+        assertNull(clientIdentity.getPassword());
+        final var centralKeystore = assertInstanceOf(CentralKeystore.class, clientIdentity.getPublicKey()
+            .getInlineOrKeystore());
+        assertEquals("test-key", centralKeystore.getCentralKeystoreReference());
+    }
+
+    @Test
+    void testSshKeyBasedWithoutKeyId() {
+        // NetconfNodeHandler reports an IllegalArgumentException from the factory as a device failure
+        final var node = nodeBuilder.setTcpOnly(false)
+            .setCredentials(new KeyAuthBuilder()
+                .setKeyBased(new KeyBasedBuilder()
+                    .setUsername("test-user")
+                    .build())
+                .build())
+            .build();
+        final var ex = assertThrows(IllegalArgumentException.class, () -> createConfig(node));
+        assertEquals("Key-based credentials are missing key-id", ex.getMessage());
+    }
+
+    // The tests of the deprecated CredentialProvider path are removed together with the deprecated constructor
+    @Test
+    @Deprecated(since = "12.0.3", forRemoval = true)
+    void testSshKeyBasedWithCredentialProvider() throws Exception {
+        final var generator = KeyPairGenerator.getInstance("RSA");
+        generator.initialize(2048);
+        final var keyPair = generator.generateKeyPair();
+        doReturn(keyPair).when(credentialProvider).credentialForId("test-key");
+
+        // The deprecated constructor resolves the key through the CredentialProvider and passes it inline, so it works
+        // without a central keystore
+        factory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
+            sslContextFactoryProvider);
+        final var clientIdentity = createConfig(keyBasedNode()).getSshParameters().getClientIdentity();
+        assertEquals("test-user", clientIdentity.getUsername());
+        final var inline = assertInstanceOf(Inline.class, clientIdentity.getPublicKey().getInlineOrKeystore());
+        final var definition = inline.getInlineDefinition();
+        assertEquals(SubjectPublicKeyInfoFormat.VALUE, definition.getPublicKeyFormat());
+        assertArrayEquals(keyPair.getPublic().getEncoded(), definition.getPublicKey());
+        assertEquals(RsaPrivateKeyFormat.VALUE, definition.getPrivateKeyFormat());
+        final var privateKey = assertInstanceOf(CleartextPrivateKey.class, definition.getPrivateKeyType());
+        assertArrayEquals(keyPair.getPrivate().getEncoded(), privateKey.getCleartextPrivateKey());
+
+        // transport-ssh reads the inline key with KeyPairParser, which also checks that the two keys belong together
+        final var parsedKeyPair = KeyPairParser.parseKeyPair(definition);
+        assertArrayEquals(keyPair.getPublic().getEncoded(), parsedKeyPair.getPublic().getEncoded());
+    }
+
+    @Test
+    @Deprecated(since = "12.0.3", forRemoval = true)
+    void testSshKeyBasedWithCredentialProviderMissingKey() {
+        doReturn(null).when(credentialProvider).credentialForId("test-key");
+
+        factory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
+            sslContextFactoryProvider);
+        final var node = keyBasedNode();
+        final var ex = assertThrows(IllegalArgumentException.class, () -> createConfig(node));
+        assertEquals("No keypair found with keyId=test-key", ex.getMessage());
+    }
+
+    @Test
+    @Deprecated(since = "12.0.3", forRemoval = true)
+    void testSshKeyBasedWithCredentialProviderUnsupportedKey() throws Exception {
+        // transport-ssh parses only RSA and EC keys
+        final var generator = KeyPairGenerator.getInstance("DSA");
+        generator.initialize(2048);
+        doReturn(generator.generateKeyPair()).when(credentialProvider).credentialForId("test-key");
+
+        factory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
+            sslContextFactoryProvider);
+        final var node = keyBasedNode();
+        final var ex = assertThrows(IllegalArgumentException.class, () -> createConfig(node));
+        assertEquals("Unsupported DSA key with keyId=test-key", ex.getMessage());
+    }
+
+    @Deprecated(since = "12.0.3", forRemoval = true)
+    private NetconfNode keyBasedNode() {
+        return nodeBuilder.setTcpOnly(false)
+            .setCredentials(new KeyAuthBuilder()
+                .setKeyBased(new KeyBasedBuilder()
+                    .setUsername("test-user")
+                    .setKeyId("test-key")
+                    .build())
+                .build())
+            .build();
     }
 
     @Test
