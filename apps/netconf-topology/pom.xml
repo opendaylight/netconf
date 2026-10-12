@@ -186,6 +186,11 @@
             <artifactId>test-models</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>keystore-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>binding-runtime-api</artifactId>
             <scope>test</scope>

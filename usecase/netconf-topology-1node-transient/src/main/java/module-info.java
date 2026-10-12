@@ -63,6 +63,7 @@ module org.opendaylight.netconf.dagger {
     requires org.opendaylight.netconf.client;
     requires org.opendaylight.netconf.client.mdsal;
     requires org.opendaylight.netconf.common;
+    requires org.opendaylight.netconf.keystore.api;
     requires org.opendaylight.netconf.keystore.legacy;
     requires org.opendaylight.netconf.topology.impl;
     requires org.opendaylight.netconf.topology.spi;

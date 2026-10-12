@@ -34,6 +34,7 @@ import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.topology.impl.NetconfTopologyImpl;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactoryImpl;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
@@ -154,7 +155,8 @@ public class AbstractOpenApiTest extends AbstractIT {
         final var encryptionService = new NullAAAEncryptionService();
         final var netconfClientConfBuilderFactory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService,
             id -> null, sslContextFactoryProvider());
-        final var netconfClientFactory = new NetconfClientFactoryImpl(netconfTimer, sshTransportStackFactory());
+        final var netconfClientFactory = new NetconfClientFactoryImpl(netconfTimer, KeystoreAccess.empty(),
+            sshTransportStackFactory());
         final var topologySchemaAssembler = new NetconfTopologySchemaAssembler(4);
         final var schemaSourceMgr =
             new DefaultSchemaResourceManager(PARSER_FACTORY, TEXT_TO_IR, tmpDir.getAbsolutePath(), "schema");
