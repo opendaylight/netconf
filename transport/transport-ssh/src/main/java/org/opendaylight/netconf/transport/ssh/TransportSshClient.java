@@ -82,12 +82,6 @@ final class TransportSshClient extends SshClient {
         private Keepalives keepAlives;
         private ClientIdentity clientIdentity;
 
-        // FIXME: NETCONF-1695: remove this constructor
-        @NonNullByDefault
-        Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final ScheduledExecutorService executorService) {
-            this(ioServiceFactory, executorService, KeystoreSupport.inlineOnly());
-        }
-
         @NonNullByDefault
         Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final ScheduledExecutorService executorService,
                 final KeystoreSupport keystoreSupport) {

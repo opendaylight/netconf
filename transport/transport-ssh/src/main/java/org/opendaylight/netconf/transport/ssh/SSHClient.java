@@ -27,6 +27,7 @@ import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.SshClientGrouping;
@@ -59,12 +60,12 @@ public final class SSHClient extends SSHTransportStack {
     }
 
     static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory,
-            final ScheduledExecutorService executorService, final String subsystem,
-            final TransportChannelListener<? super SSHTransportChannel> listener,
+            final ScheduledExecutorService executorService, final KeystoreSupport keystoreSupport,
+            final String subsystem, final TransportChannelListener<? super SSHTransportChannel> listener,
             final SSHNegotiatedAlgListener algListener, final SshClientGrouping clientParams,
             final ClientFactoryManagerConfigurator configurator) throws UnsupportedConfigurationException {
         return new SSHClient(subsystem, listener, algListener,
-            new TransportSshClient.Builder(ioServiceFactory, executorService)
+            new TransportSshClient.Builder(ioServiceFactory, executorService, keystoreSupport)
                 .transportParams(clientParams.getTransportParams())
                 .keepAlives(clientParams.getKeepalives())
                 .clientIdentity(clientParams.getClientIdentity())
@@ -74,11 +75,12 @@ public final class SSHClient extends SSHTransportStack {
     }
 
     static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory,
-            final ScheduledExecutorService executorService, final String subsystem,
-            final TransportChannelListener<? super SSHTransportChannel> listener,
+            final ScheduledExecutorService executorService, final KeystoreSupport keystoreSupport,
+            final String subsystem, final TransportChannelListener<? super SSHTransportChannel> listener,
             final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
             throws UnsupportedConfigurationException {
-        return of(ioServiceFactory, executorService, subsystem, listener, NOOP, clientParams, configurator);
+        return of(ioServiceFactory, executorService, keystoreSupport, subsystem, listener, NOOP, clientParams,
+            configurator);
     }
 
     @VisibleForTesting

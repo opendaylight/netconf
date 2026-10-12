@@ -37,6 +37,7 @@ import org.opendaylight.netconf.shaded.sshd.common.signature.BuiltinSignatures;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshEncryptionAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm;
@@ -75,7 +76,7 @@ class NC1594Test {
     @BeforeEach
     void beforeEach() throws Exception {
         final var clientIdentity = buildClientIdentityWithPassword(USER, AbstractClientServerTest.PASSWORD);
-        transportSsh = new TransportSshClient.Builder(serviceFactory, group)
+        transportSsh = new TransportSshClient.Builder(serviceFactory, group, KeystoreSupport.inlineOnly())
             .clientIdentity(clientIdentity)
             .buildChecked();
         doReturn(ioSession).when(transportClientSession).getIoSession();

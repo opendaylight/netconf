@@ -122,6 +122,10 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>keystore-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>shaded-sshd</artifactId>
         </dependency>
         <dependency>
@@ -176,6 +180,7 @@
                 <configuration>
                     <ignoredNonTestScopedDependencies>
                         <ignoredNonTestScopedDependencies>org.bouncycastle:bcprov-jdk18on</ignoredNonTestScopedDependencies>
+                        <ignoredNonTestScopedDependencies>org.opendaylight.netconf:keystore-api</ignoredNonTestScopedDependencies>
                     </ignoredNonTestScopedDependencies>
                 </configuration>
             </plugin>

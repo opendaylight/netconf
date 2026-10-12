@@ -66,7 +66,8 @@ class NC1423Test extends AbstractClientServerTest {
         when(sshServerConfig.getServerIdentity()).thenReturn(serverIdentity);
         when(sshServerConfig.getClientAuthentication()).thenReturn(clientAuth);
 
-        final var transportSshClient = new TransportSshClient.Builder(serviceFactory, group)
+        final var transportSshClient = new TransportSshClient.Builder(serviceFactory, group,
+                KeystoreSupport.inlineOnly())
             .transportParams(sshClientConfig.getTransportParams())
             .keepAlives(sshClientConfig.getKeepalives())
             .clientIdentity(sshClientConfig.getClientIdentity())
