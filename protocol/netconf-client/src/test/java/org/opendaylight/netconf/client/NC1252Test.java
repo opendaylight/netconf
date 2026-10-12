@@ -25,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
@@ -45,7 +46,7 @@ class NC1252Test {
     @BeforeAll
     static void beforeAll() {
         TIMER = new DefaultNetconfTimer();
-        FACTORY = new NetconfClientFactoryImpl(TIMER);
+        FACTORY = new NetconfClientFactoryImpl(TIMER, KeystoreAccess.empty());
     }
 
     @AfterAll

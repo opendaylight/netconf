@@ -31,6 +31,7 @@ import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.test.tool.TestToolUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.password.grouping.password.type.CleartextPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -161,7 +162,7 @@ public final class StressClient {
         }
 
         try (var timer = new DefaultNetconfTimer()) {
-            try (var netconfClientFactory = new NetconfClientFactoryImpl(timer)) {
+            try (var netconfClientFactory = new NetconfClientFactoryImpl(timer, KeystoreAccess.empty())) {
 
                 final var callables = new ArrayList<StressClientCallable>(threadAmount);
                 for (var messages : allPreparedMessages) {
