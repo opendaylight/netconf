@@ -19,6 +19,7 @@ import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -49,11 +50,13 @@ public final class SSHServer extends SSHTransportStack {
     static SSHServer of(final NettyIoServiceFactoryFactory ioServiceFactory,
             final ScheduledExecutorService executorService, final String subsystem,
             final TransportChannelListener<? super SSHTransportChannel> listener, final SshServerGrouping serverParams,
-            final ServerFactoryManagerConfigurator configurator) throws UnsupportedConfigurationException {
+            final ServerFactoryManagerConfigurator configurator, final KeystoreAccess keystoreAccess)
+            throws UnsupportedConfigurationException {
         return new SSHServer(subsystem, listener,
             new TransportSshServer.Builder(ioServiceFactory, executorService)
                 .serverParams(serverParams)
                 .configurator(configurator)
+                .keystoreAccess(keystoreAccess)
                 .buildChecked());
     }
 

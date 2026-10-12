@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -40,8 +41,8 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
             final TransportChannelListener<? super SSHTransportChannel> listener,
             final SSHNegotiatedAlgListener algListener, final TcpClientGrouping connectParams,
             final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, subsystem, listener, algListener, clientParams, null)
-            .connect(newBootstrap(), connectParams);
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, algListener, clientParams, null,
+            KeystoreAccess.empty()).connect(newBootstrap(), connectParams);
     }
 
     /** Builds the SSH Client and initiates connection.
@@ -61,16 +62,40 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
             final SSHNegotiatedAlgListener algListener, final TcpClientGrouping connectParams,
             final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
             throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, subsystem, listener, algListener, clientParams, configurator)
-            .connect(newBootstrap(), connectParams);
+        return connectClient(subsystem, listener, algListener, connectParams, clientParams, configurator,
+            KeystoreAccess.empty());
+    }
+
+    /**
+     * Builds the SSH Client and initiates connection. Keys configured as a central keystore reference are resolved
+     * through the supplied {@link KeystoreAccess}.
+     *
+     * @param subsystem bound subsystem name
+     * @param listener client channel listener, required
+     * @param algListener listener for negotiated transport parameters
+     * @param connectParams TCP transport configuration addressing server to connect, required
+     * @param clientParams SSH overlay configuration, required, should contain username
+     * @param configurator client factory manager configurator, optional
+     * @param keystoreAccess access to the central keystore, {@link KeystoreAccess#empty()} if there is none
+     * @return a future producing {@link SSHClient}
+     * @throws UnsupportedConfigurationException if any of configurations is invalid or incomplete
+     * @throws NullPointerException if any of required parameters is null
+     */
+    public @NonNull ListenableFuture<SSHClient> connectClient(final String subsystem,
+            final TransportChannelListener<? super SSHTransportChannel> listener,
+            final SSHNegotiatedAlgListener algListener, final TcpClientGrouping connectParams,
+            final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator,
+            final KeystoreAccess keystoreAccess) throws UnsupportedConfigurationException {
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, algListener, clientParams, configurator,
+            keystoreAccess).connect(newBootstrap(), connectParams);
     }
 
     public @NonNull ListenableFuture<SSHClient> listenClient(final String subsystem,
             final TransportChannelListener<? super SSHTransportChannel> listener,
             final SSHNegotiatedAlgListener algListener, final TcpServerGrouping listenParams,
             final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, subsystem, listener, algListener, clientParams, null)
-            .listen(newServerBootstrap(), listenParams);
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, algListener, clientParams, null,
+            KeystoreAccess.empty()).listen(newServerBootstrap(), listenParams);
     }
 
     /**
@@ -91,8 +116,8 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
             final SSHNegotiatedAlgListener algListener, final TcpServerGrouping listenParams,
             final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
             throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, subsystem, listener, algListener, clientParams, configurator)
-            .listen(newServerBootstrap(), listenParams);
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, algListener, clientParams, configurator,
+            KeystoreAccess.empty()).listen(newServerBootstrap(), listenParams);
     }
 
     /**
@@ -111,15 +136,15 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
             final TransportChannelListener<? super SSHTransportChannel> listener, final TcpServerGrouping listenParams,
             final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
             throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, configurator)
-            .listen(newServerBootstrap(), listenParams);
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, configurator,
+            KeystoreAccess.empty()).listen(newServerBootstrap(), listenParams);
     }
 
     public @NonNull ListenableFuture<SSHServer> connectServer(final String subsystem,
             final TransportChannelListener<? super SSHTransportChannel> listener, final TcpClientGrouping connectParams,
             final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
-        return SSHServer.of(ioServiceFactory, group, subsystem, listener, requireNonNull(serverParams), null)
-            .connect(newBootstrap(), connectParams);
+        return SSHServer.of(ioServiceFactory, group, subsystem, listener, requireNonNull(serverParams), null,
+            KeystoreAccess.empty()).connect(newBootstrap(), connectParams);
     }
 
     /**
@@ -141,14 +166,36 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
             throws UnsupportedConfigurationException {
         checkArgument(serverParams != null || configurator != null,
             "Neither server parameters nor factory configurator is defined");
-        return SSHServer.of(ioServiceFactory, group, subsystem, listener, serverParams, configurator)
-            .connect(newBootstrap(), connectParams);
+        return SSHServer.of(ioServiceFactory, group, subsystem, listener, serverParams, configurator,
+            KeystoreAccess.empty()).connect(newBootstrap(), connectParams);
     }
 
     public @NonNull ListenableFuture<SSHServer> listenServer(final String subsystem,
             final TransportChannelListener<? super SSHTransportChannel> listener, final TcpServerGrouping connectParams,
             final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
-        return listenServer(subsystem, listener, connectParams, requireNonNull(serverParams), null);
+        return SSHServer.of(ioServiceFactory, group, subsystem, listener, requireNonNull(serverParams), null,
+            KeystoreAccess.empty()).listen(newServerBootstrap(), connectParams);
+    }
+
+    /**
+     * Builds and starts SSH Server. Keys configured as a central keystore reference, such as the server host key, are
+     * resolved through the supplied {@link KeystoreAccess}.
+     *
+     * @param subsystem bound subsystem name
+     * @param listener server channel listener, required
+     * @param listenParams TCP transport configuration, required
+     * @param serverParams SSH overlay configuration, required
+     * @param keystoreAccess access to the central keystore, {@link KeystoreAccess#empty()} if there is none
+     * @return a future producing {@link SSHServer}
+     * @throws UnsupportedConfigurationException if any of configurations is invalid or incomplete
+     * @throws NullPointerException if any of required parameters is null
+     */
+    public @NonNull ListenableFuture<SSHServer> listenServer(final String subsystem,
+            final TransportChannelListener<? super SSHTransportChannel> listener, final TcpServerGrouping listenParams,
+            final SshServerGrouping serverParams, final KeystoreAccess keystoreAccess)
+            throws UnsupportedConfigurationException {
+        return SSHServer.of(ioServiceFactory, group, subsystem, listener, requireNonNull(serverParams), null,
+            keystoreAccess).listen(newServerBootstrap(), listenParams);
     }
 
     /**
@@ -170,7 +217,7 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
                 throws UnsupportedConfigurationException {
         checkArgument(serverParams != null || configurator != null,
             "Neither server parameters nor factory configurator is defined");
-        return SSHServer.of(ioServiceFactory, group, subsystem, listener, serverParams, configurator)
-            .listen(newServerBootstrap(), listenParams);
+        return SSHServer.of(ioServiceFactory, group, subsystem, listener, serverParams, configurator,
+            KeystoreAccess.empty()).listen(newServerBootstrap(), listenParams);
     }
 }
