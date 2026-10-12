@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatController;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -25,6 +26,7 @@ import org.opendaylight.netconf.transport.crypto.KeyPairWithCertificate;
 import org.opendaylight.netconf.transport.crypto.PublicKeyParser;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.CentralKeystore;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststoreCertsGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.inline.or.truststore._public.keys.grouping.InlineOrTruststore;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -47,14 +49,29 @@ final class ConfigUtils {
         factoryMgr.setSessionHeartbeat(SessionHeartbeatController.HeartbeatType.IGNORE, Duration.ofSeconds(maxWait));
     }
 
-    static KeyPair extractKeyPair(final InlineOrKeystore input) throws UnsupportedConfigurationException {
-        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
-                .inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.Inline.class, input);
-        final var inlineDef = inline.getInlineDefinition();
-        if (inlineDef == null) {
-            throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
+    static KeyPair extractKeyPair(final KeystoreAccess keystoreAccess, final InlineOrKeystore input)
+            throws UnsupportedConfigurationException {
+        return switch (input) {
+            case CentralKeystore central -> extractKeyPair(keystoreAccess, central.requireCentralKeystoreReference());
+            case org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore
+                    .asymmetric.key.grouping.inline.or.keystore.Inline inline -> {
+                final var inlineDef = inline.getInlineDefinition();
+                if (inlineDef == null) {
+                    throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
+                }
+                yield KeyPairParser.parseKeyPair(inlineDef);
+            }
+            default -> throw new UnsupportedConfigurationException("Unhandled definition in " + input);
+        };
+    }
+
+    private static KeyPair extractKeyPair(final KeystoreAccess keystoreAccess, final String keyName)
+            throws UnsupportedConfigurationException {
+        final var key = keystoreAccess.lookupAsymmetric(keyName);
+        if (key == null) {
+            throw new UnsupportedConfigurationException("Cannot resolve key " + keyName);
         }
-        return KeyPairParser.parseKeyPair(inlineDef);
+        return key;
     }
 
     static List<Certificate> extractCertificates(final @Nullable InlineOrTruststoreCertsGrouping input)

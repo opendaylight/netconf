@@ -9,7 +9,9 @@ package org.opendaylight.netconf.transport.ssh;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -19,7 +21,9 @@ import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAKeyGenParameterSpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -42,6 +46,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.type
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.TrustAnchorCertCms;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010._private.key.grouping._private.key.type.CleartextPrivateKeyBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.password.grouping.password.type.CleartextPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.CentralKeystoreBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentity;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentityBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ServerAuthentication;
@@ -79,6 +84,23 @@ public final class TestUtils {
 
     public static ServerIdentity buildServerIdentityWithKeyPair(final KeyData keyData) {
         return new ServerIdentityBuilder().setHostKey(List.of(buildServerHostKeyWithKeyPair(keyData))).build();
+    }
+
+    public static ServerIdentity buildServerIdentityWithCentralKeystore(final String keyName) {
+        return new ServerIdentityBuilder()
+            .setHostKey(List.of(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010
+                .ssh.server.grouping.server.identity.HostKeyBuilder()
+                .setName(HOST_KEY_NAME)
+                .setHostKeyType(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010
+                    .ssh.server.grouping.server.identity.host.key.host.key.type.PublicKeyBuilder()
+                    .setPublicKey(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server
+                        .rev241010.ssh.server.grouping.server.identity.host.key.host.key.type._public.key
+                        .PublicKeyBuilder()
+                        .setInlineOrKeystore(buildAsymmetricKeyCentral(keyName))
+                        .build())
+                    .build())
+                .build()))
+            .build();
     }
 
     public static ServerIdentity buildServerIdentityWithCertificate(final KeyData keyData) {
@@ -183,6 +205,12 @@ public final class TestUtils {
                 .setPrivateKeyType(new CleartextPrivateKeyBuilder().setCleartextPrivateKey(privateKeyBytes).build())
                 .build())
             .build();
+    }
+
+    public static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
+            .inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore buildAsymmetricKeyCentral(
+            final String keyName) {
+        return new CentralKeystoreBuilder().setCentralKeystoreReference(keyName).build();
     }
 
     public static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
@@ -292,6 +320,33 @@ public final class TestUtils {
                 .setInlineOrKeystore(buildAsymmetricKeyLocal(data))
                 .build())
             .build();
+    }
+
+    public static ClientIdentity buildClientIdentityHostBasedCentral(final String username, final String keyName) {
+        return new ClientIdentityBuilder()
+            .setUsername(username)
+            .setHostbased(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010
+                .ssh.client.grouping.client.identity.HostbasedBuilder()
+                .setInlineOrKeystore(buildAsymmetricKeyCentral(keyName))
+                .build())
+            .build();
+    }
+
+    public static ClientIdentity buildClientIdentityWithPublicKeyCentral(final String username,
+            final String keyName) {
+        return new ClientIdentityBuilder()
+            .setUsername(username)
+            .setPublicKey(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010
+                .ssh.client.grouping.client.identity.PublicKeyBuilder()
+                .setInlineOrKeystore(buildAsymmetricKeyCentral(keyName))
+                .build())
+            .build();
+    }
+
+    public static KeyPair toKeyPair(final KeyData keyData) throws GeneralSecurityException {
+        final var keyFactory = KeyFactory.getInstance(keyData.algorithm(), BC);
+        return new KeyPair(keyFactory.generatePublic(new X509EncodedKeySpec(keyData.publicKeyBytes())),
+            keyFactory.generatePrivate(new PKCS8EncodedKeySpec(keyData.privateKeyBytes())));
     }
 
     private static PrivateKeyFormat getPrivateKeyFormat(final String algorithm) {
