@@ -89,7 +89,6 @@ import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -203,8 +202,6 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     @Mock
     private DeviceActionFactory deviceActionFactory;
     @Mock
-    private CredentialProvider credentialProvider;
-    @Mock
     private SslContextFactoryProvider sslHandlerFactoryProvider;
     @Mock
     private DOMMountPointListener masterMountPointListener;
@@ -287,7 +284,7 @@ class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             }
         };
 
-        builderFactory = new NetconfClientConfigurationBuilderFactoryImpl(mockEncryptionService, credentialProvider,
+        builderFactory = new NetconfClientConfigurationBuilderFactoryImpl(mockEncryptionService,
             sslHandlerFactoryProvider);
 
         doReturn(mockRpcReg).when(mockRpcProviderService).registerRpcImplementations(any(Rpc[].class));

@@ -39,7 +39,6 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
@@ -87,8 +86,6 @@ class AbstractNetconfTopologyTest {
     private SslContextFactoryProvider sslContextFactoryProvider;
     @Mock
     private AAAEncryptionService encryptionService;
-    @Mock
-    private CredentialProvider credentialProvider;
     @Mock
     private NetconfClientFactory clientFactory;
     @Mock
@@ -160,8 +157,8 @@ class AbstractNetconfTopologyTest {
         final var schemaAssembler = new NetconfTopologySchemaAssembler(1);
         final var topology = new TestingNetconfTopologyImpl("id", clientFactory, timer, schemaAssembler,
             schemaManager, dataBroker, mountPointService,
-            new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
-                sslContextFactoryProvider), deviceActionFactory,
+            new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, sslContextFactoryProvider),
+            deviceActionFactory,
             new DefaultBaseNetconfSchemaProvider(DaggerDefaultYangParserComponent.create().parserFactory()));
 
         final var netconfNode = new NetconfNodeAugmentBuilder()
