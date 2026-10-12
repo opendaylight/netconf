@@ -59,6 +59,7 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -327,7 +328,7 @@ class NetconfNodeHandlerTest {
 
     @Test
     void failToConnectOnUnsupportedConfiguration() {
-        final var factory = new NetconfClientFactoryImpl(netconfTimer);
+        final var factory = new NetconfClientFactoryImpl(netconfTimer, KeystoreAccess.empty());
 
         final var keyId = "keyId";
         var keyAuthHandler = new NetconfNodeHandler(factory, netconfTimer, BASE_SCHEMAS, schemaManager, schemaAssembler,
