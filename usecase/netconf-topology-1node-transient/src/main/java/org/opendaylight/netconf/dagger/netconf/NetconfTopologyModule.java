@@ -21,12 +21,10 @@ import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
 import org.opendaylight.netconf.client.mdsal.DeviceActionFactoryImpl;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
-import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
-import org.opendaylight.netconf.client.mdsal.impl.DefaultCredentialProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSslContextFactoryProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
@@ -84,15 +82,6 @@ public interface NetconfTopologyModule {
 
     @Provides
     @Singleton
-    static CredentialProvider credentialProvider(final NetconfKeystoreService keystoreService,
-            final ResourceSupport resourceSupport) {
-        final var defaultCredentialProvider = new DefaultCredentialProvider(keystoreService);
-        resourceSupport.register(defaultCredentialProvider);
-        return defaultCredentialProvider;
-    }
-
-    @Provides
-    @Singleton
     static SslContextFactoryProvider sslContextFactoryProvider(final NetconfKeystoreService keystoreService,
             final ResourceSupport resourceSupport) {
         final var defaultSslContextFactoryProvider = new DefaultSslContextFactoryProvider(keystoreService);
@@ -103,9 +92,8 @@ public interface NetconfTopologyModule {
     @Provides
     @Singleton
     static NetconfClientConfigurationBuilderFactory netconfClientConfigurationBuilderFactory(
-            final AAAEncryptionService encryptionService, final CredentialProvider credentialProvider,
-            final SslContextFactoryProvider factoryProvider) {
-        return new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider, factoryProvider);
+            final AAAEncryptionService encryptionService, final SslContextFactoryProvider factoryProvider) {
+        return new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, factoryProvider);
     }
 
     @Provides
