@@ -77,7 +77,7 @@ class MountPointHttp2E2ETest extends AbstractHttp2E2ETest {
         final var netconfTimer = new DefaultNetconfTimer();
         final var encryptionService = new NullAAAEncryptionService();
         final var netconfClientConfBuilderFactory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService,
-            id -> null, sslContextFactoryProvider());
+            sslContextFactoryProvider());
         final var netconfClientFactory = new NetconfClientFactoryImpl(netconfTimer, sshTransportStackFactory());
         final var topologySchemaAssembler = new NetconfTopologySchemaAssembler(4);
         final var schemaSourceMgr =
