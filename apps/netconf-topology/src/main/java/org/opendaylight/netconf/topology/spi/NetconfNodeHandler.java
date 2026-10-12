@@ -269,6 +269,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         try {
             connectFuture = clientFactory.createClient(clientConfig, algListener);
         } catch (UnsupportedConfigurationException e) {
+            LOG.warn("Cannot connect {}", deviceId, e);
             onDeviceFailed(e);
             return;
         }
