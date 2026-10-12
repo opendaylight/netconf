@@ -37,6 +37,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.shaded.sshd.common.SshException;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoSession;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
@@ -126,7 +127,8 @@ class NC1423Test extends AbstractClientServerTest {
         }).when(transportSshSpy).addSessionListener(any());
 
         sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
-        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
+        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null,
+            KeystoreAccess.empty());
 
         // Execute connect.
         sshServer.listen(serverBootstrap, tcpServerConfig).get(2, TimeUnit.SECONDS);
@@ -176,7 +178,8 @@ class NC1423Test extends AbstractClientServerTest {
         }).when(transportSshSpy).addSessionListener(any());
 
         sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
-        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
+        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null,
+            KeystoreAccess.empty());
 
         // Execute connect.
         sshServer.listen(serverBootstrap, tcpServerConfig).get(2, TimeUnit.SECONDS);
@@ -212,7 +215,8 @@ class NC1423Test extends AbstractClientServerTest {
         }).when(transportSshSpy).addSessionListener(any());
 
         sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
-        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
+        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null,
+            KeystoreAccess.empty());
 
         // Execute connect.
         sshServer.listen(serverBootstrap, tcpServerConfig).get(2, TimeUnit.SECONDS);
@@ -248,7 +252,8 @@ class NC1423Test extends AbstractClientServerTest {
         }).when(transportSshSpy).addSessionListener(any());
 
         sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
-        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
+        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null,
+            KeystoreAccess.empty());
 
         // Execute connect.
         sshServer.listen(serverBootstrap, tcpServerConfig).get(2, TimeUnit.SECONDS);
@@ -282,7 +287,8 @@ class NC1423Test extends AbstractClientServerTest {
         }).when(transportSshSpy).addSessionListener(any());
 
         sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
-        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
+        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null,
+            KeystoreAccess.empty());
 
         // Execute connect.
         sshServer.listen(serverBootstrap, tcpServerConfig).get(2, TimeUnit.SECONDS);
