@@ -17,9 +17,11 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
@@ -32,6 +34,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 @Singleton
 @Component(service = NetconfClientFactory.class)
@@ -39,16 +43,39 @@ public final class NetconfClientFactoryImpl implements NetconfClientFactory {
     private final SSHTransportStackFactory factory;
     private final NetconfTimer timer;
 
-    public NetconfClientFactoryImpl(final NetconfTimer timer, final SSHTransportStackFactory factory) {
+    /**
+     * Construct an instance with its own SSH transport stack factory.
+     *
+     * <p>A key configured as a reference to the central keystore is resolved through the supplied
+     * {@link KeystoreAccess}. Without it, only inline keys are supported and such a key is rejected.
+     *
+     * @param timer the timer
+     * @param keystoreAccess access to the central keystore. OSGi passes {@code null} when there is no
+     *        {@link KeystoreAccess} service. Java callers without a keystore pass {@link KeystoreAccess#empty()}
+     */
+    @Inject
+    @Activate
+    public NetconfClientFactoryImpl(@Reference final NetconfTimer timer,
+            @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY)
+            final @Nullable KeystoreAccess keystoreAccess) {
+        // FIXME: make factory component configurable for OSGi
+        this(timer, new SSHTransportStackFactory(keystoreAccess == null ? KeystoreSupport.inlineOnly()
+            : KeystoreSupport.inlineAndCentral(keystoreAccess), "odl-netconf-client", 0));
+    }
+
+    public NetconfClientFactoryImpl(final NetconfTimer timer, final @NonNull SSHTransportStackFactory factory) {
         this.timer = requireNonNull(timer);
         this.factory = requireNonNull(factory);
     }
 
-    @Inject
-    @Activate
-    public NetconfClientFactoryImpl(@Reference final NetconfTimer timer) {
-        // FIXME: make factory component configurable for OSGi
-        // FIXME: inject KeystoreSupport
+    /**
+     * Construct an instance with its own SSH transport stack factory, which supports only inline keys.
+     *
+     * <p>A key configured as a reference to the central keystore is rejected.
+     *
+     * @param timer the timer
+     */
+    public NetconfClientFactoryImpl(final NetconfTimer timer) {
         this(timer, new SSHTransportStackFactory(KeystoreSupport.inlineOnly(), "odl-netconf-client", 0));
     }
 
