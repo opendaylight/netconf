@@ -52,6 +52,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.common.di.DefaultNetconfTimer;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.client.auth.password.PasswordIdentityProvider;
 import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
@@ -137,7 +138,7 @@ class NetconfClientFactoryImplTest {
 
     @BeforeEach
     void beforeEach() throws Exception {
-        factory = new NetconfClientFactoryImpl(TIMER);
+        factory = new NetconfClientFactoryImpl(TIMER, KeystoreAccess.empty());
         doNothing().when(serverTransportListener).onTransportChannelEstablished(any());
 
         // create temp socket to get available port for test
