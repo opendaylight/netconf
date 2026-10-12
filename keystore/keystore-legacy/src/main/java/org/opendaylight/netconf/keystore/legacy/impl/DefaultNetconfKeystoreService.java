@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import javax.annotation.PreDestroy;
+import javax.crypto.SecretKey;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
@@ -30,6 +31,7 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
+import org.opendaylight.netconf.keystore.api.KeystoreAccess;
 import org.opendaylight.netconf.keystore.legacy.CertifiedPrivateKey;
 import org.opendaylight.netconf.keystore.legacy.NetconfKeystore;
 import org.opendaylight.netconf.keystore.legacy.NetconfKeystoreService;
@@ -54,8 +56,8 @@ import org.slf4j.LoggerFactory;
  * Abstract substrate for implementing security services based on the contents of {@link Keystore}.
  */
 @Singleton
-@Component(service = NetconfKeystoreService.class)
-public final class DefaultNetconfKeystoreService implements NetconfKeystoreService, AutoCloseable {
+@Component(service = { KeystoreAccess.class, NetconfKeystoreService.class })
+public final class DefaultNetconfKeystoreService implements NetconfKeystoreService, KeystoreAccess, AutoCloseable {
     @NonNullByDefault
     private record ConfigState(
             Map<String, PrivateKey> privateKeys,
@@ -116,6 +118,21 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
         rpcSingleton.close();
         configListener.close();
         LOG.info("NETCONF keystore service stopped");
+    }
+
+    @Override
+    public KeyPair lookupAsymmetric(final String name) {
+        requireNonNull(name);
+        // The keystore is not loaded until the first valid configuration arrives.
+        final var ks = keystore.getAcquire();
+        return ks == null ? null : ks.credentials().get(name);
+    }
+
+    @Override
+    public SecretKey lookupSymmetric(final String name) {
+        // TODO: Symmetric keys are not implemented. The legacy netconf-keystore model has no symmetric keys.
+        //       Implement symmetric keys that can be configured in the netconf-keystore YANG model.
+        return null;
     }
 
     @Override
