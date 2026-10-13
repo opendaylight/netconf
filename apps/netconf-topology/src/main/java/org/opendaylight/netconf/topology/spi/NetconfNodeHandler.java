@@ -294,7 +294,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         }
 
         // We are invoking callbacks, do not hold locks
-        reconnectOrFail();
+        reconnectOrFail(failureReason(cause), cause);
     }
 
     @GuardedBy("this")
@@ -345,14 +345,14 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             return;
         }
         delegate.onDeviceDisconnected();
-        reconnectOrFail();
+        reconnectOrFail("Device disconnected", null);
     }
 
     @Override
     public void onDeviceFailed(final Throwable throwable) {
         // We have not reported onDeviceConnected(), so from the view of delete we are still connecting
         LOG.debug("Connection attempt failed", throwable);
-        reconnectOrFail();
+        reconnectOrFail(failureReason(throwable), throwable);
     }
 
     @Override
@@ -360,14 +360,19 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         delegate.onNotification(domNotification);
     }
 
-    private void reconnectOrFail() {
-        final var ex = scheduleReconnect();
+    private static String failureReason(final Throwable cause) {
+        final var message = cause.getMessage();
+        return message != null ? message : cause.toString();
+    }
+
+    private void reconnectOrFail(final String reason, final @Nullable Throwable cause) {
+        final var ex = scheduleReconnect(reason, cause);
         if (ex != null) {
             delegate.onDeviceFailed(ex);
         }
     }
 
-    private synchronized Exception scheduleReconnect() {
+    private synchronized Exception scheduleReconnect(final String reason, final @Nullable Throwable cause) {
         if (isClosed()) {
             return null;
         }
@@ -375,7 +380,8 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         // We have exceeded the number of connection attempts
         if (maxAttempts > 0 && attempts >= maxAttempts) {
             LOG.info("Failed to connect {} after {} attempts, not attempting", deviceId, attempts);
-            return new ConnectGivenUpException("Given up connecting " + deviceId + " after " + attempts + " attempts");
+            final var message = "Given up connecting %s after %d attempts: %s".formatted(deviceId, attempts, reason);
+            return cause == null ? new ConnectGivenUpException(message) : new ConnectGivenUpException(message, cause);
         }
 
         // First connection attempt gets initialized to minimum backoff, each subsequent is exponentially backed off

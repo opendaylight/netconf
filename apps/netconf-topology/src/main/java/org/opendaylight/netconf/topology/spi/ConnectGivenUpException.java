@@ -22,4 +22,8 @@ public final class ConnectGivenUpException extends Exception {
     public ConnectGivenUpException(final String message) {
         super(requireNonNull(message));
     }
+
+    public ConnectGivenUpException(final String message, final Throwable cause) {
+        super(requireNonNull(message), requireNonNull(cause));
+    }
 }
