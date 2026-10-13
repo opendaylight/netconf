@@ -286,7 +286,8 @@ class NetconfNodeHandlerTest {
         final var throwableCaptor = ArgumentCaptor.forClass(Throwable.class);
         doNothing().when(delegate).onDeviceFailed(throwableCaptor.capture());
         secondFuture.setException(new AssertionError("second"));
-        assertInstanceOf(ConnectGivenUpException.class, throwableCaptor.getValue());
+        final var ex = assertInstanceOf(ConnectGivenUpException.class, throwableCaptor.getValue());
+        assertEquals("Given up connecting " + DEVICE_ID + " after 2 attempts: second", ex.getMessage());
 
         // but nothing else happens
         assertEquals(2, handler.attempts());
@@ -367,7 +368,8 @@ class NetconfNodeHandlerTest {
         final var captor = ArgumentCaptor.forClass(Throwable.class);
         verify(delegate).onDeviceFailed(captor.capture());
         final var deviceException = assertInstanceOf(ConnectGivenUpException.class, captor.getValue());
-        assertEquals("Given up connecting " + DEVICE_ID + " after 1 attempts", deviceException.getMessage());
+        assertEquals("Given up connecting " + DEVICE_ID + " after 1 attempts: Cannot resolve key keyId",
+            deviceException.getMessage());
         assertEquals(1, keyAuthHandler.attempts());
     }
 
