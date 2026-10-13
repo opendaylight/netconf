@@ -16,6 +16,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -44,6 +45,7 @@ import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
 import org.opendaylight.netconf.client.NetconfClientSession;
+import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
@@ -59,6 +61,7 @@ import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.keystore.api.KeystoreAccess;
+import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -286,10 +289,39 @@ class NetconfNodeHandlerTest {
         final var throwableCaptor = ArgumentCaptor.forClass(Throwable.class);
         doNothing().when(delegate).onDeviceFailed(throwableCaptor.capture());
         secondFuture.setException(new AssertionError("second"));
-        assertInstanceOf(ConnectGivenUpException.class, throwableCaptor.getValue());
+        final var ex = assertInstanceOf(ConnectGivenUpException.class, throwableCaptor.getValue());
+        assertEquals("Given up connecting " + DEVICE_ID + " after 2 attempts: second", ex.getMessage());
 
         // but nothing else happens
         assertEquals(2, handler.attempts());
+    }
+
+    @Test
+    void lastFailureIsResetOnEachAttempt() throws Exception {
+        // the first attempt fails because the key cannot be resolved, the second one connects
+        doThrow(new UnsupportedConfigurationException("Cannot resolve key keyId"))
+            .doReturn(Futures.immediateFuture(clientSession))
+            .when(clientFactory)
+            .createClient(any(NetconfClientConfiguration.class), any(SSHNegotiatedAlgListener.class));
+        doReturn(timeout).when(timer).newTimeout(timerCaptor.capture(), eq(150L), eq(TimeUnit.MILLISECONDS));
+
+        // the key failure uses up the first attempt and a reconnect is scheduled
+        handler.connect();
+        assertEquals(2, handler.attempts());
+
+        // the second attempt connects
+        timerCaptor.getValue().run(timeout);
+        verify(clientFactory, times(2)).createClient(any(NetconfClientConfiguration.class),
+            any(SSHNegotiatedAlgListener.class));
+
+        // the session drops before the device is set up, which uses up the last attempt. The handler gives up with
+        // the reason of the second attempt, not with the key failure of the first one.
+        final var throwableCaptor = ArgumentCaptor.forClass(Throwable.class);
+        doNothing().when(delegate).onDeviceDisconnected();
+        doNothing().when(delegate).onDeviceFailed(throwableCaptor.capture());
+        handler.onDeviceDisconnected();
+        final var ex = assertInstanceOf(ConnectGivenUpException.class, throwableCaptor.getValue());
+        assertEquals("Given up connecting " + DEVICE_ID + " after 2 attempts: Device disconnected", ex.getMessage());
     }
 
     // Initiate connect() which results in immediate clientDispatcher report. No interactions with delegate may occur,
@@ -367,7 +399,8 @@ class NetconfNodeHandlerTest {
         final var captor = ArgumentCaptor.forClass(Throwable.class);
         verify(delegate).onDeviceFailed(captor.capture());
         final var deviceException = assertInstanceOf(ConnectGivenUpException.class, captor.getValue());
-        assertEquals("Given up connecting " + DEVICE_ID + " after 1 attempts", deviceException.getMessage());
+        assertEquals("Given up connecting " + DEVICE_ID + " after 1 attempts: Cannot resolve key keyId",
+            deviceException.getMessage());
         assertEquals(1, keyAuthHandler.attempts());
     }
 
