@@ -1,0 +1,232 @@
+/*
+ * Copyright (c) 2026 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+package org.opendaylight.netconf.topology.spi;
+
+import static java.util.Objects.requireNonNull;
+
+import com.google.errorprone.annotations.concurrent.GuardedBy;
+import java.util.ArrayList;
+import java.util.List;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.netconf.client.mdsal.LibraryModulesSchemas;
+import org.opendaylight.netconf.client.mdsal.LibrarySchemaSourceProvider;
+import org.opendaylight.netconf.client.mdsal.NetconfDeviceBuilder;
+import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
+import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
+import org.opendaylight.netconf.client.mdsal.SchemalessNetconfDevice;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
+import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
+import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
+import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
+import org.opendaylight.netconf.client.mdsal.api.RpcsTimeoutAndRecoveryHandler;
+import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
+import org.opendaylight.netconf.client.mdsal.spi.KeepaliveSalFacade;
+import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yangtools.concepts.AbstractRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+abstract class AbstractNodeHandler extends AbstractRegistration implements RemoteDeviceHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeHandler.class);
+
+    private final @NonNull List<Registration> yanglibRegistrations;
+    //private final @NonNull NetconfClientFactory clientFactory;
+    final @NonNull NetconfTimer timer;
+    final @NonNull NetconfNode node;
+    final @NonNull NodeId nodeId;
+    //private final @NonNull NetconfClientConfigurationBuilderFactory builderFactory;
+    final @NonNull SshTransportTopologyParameters sshParams;
+
+    final @NonNull NetconfDeviceCommunicator communicator;
+    final @NonNull RemoteDeviceHandler delegate;
+    final @NonNull RemoteDeviceId deviceId;
+
+    // SSH algorithms known up-front for call-home connections (null for regular connections); used as the per-attempt
+    // baseline for negotiatedSshAlg.
+    private final @Nullable NegotiatedSshAlg callHomeSshAlg;
+    // SSH algorithms negotiated for the current connection attempt: reset to callHomeSshAlg at the start of each
+    // attempt (lockedConnect) and updated by the SSHNegotiatedAlgListener during key establishment.
+    @GuardedBy("this")
+    @Nullable NegotiatedSshAlg negotiatedSshAlg;
+
+    public AbstractNodeHandler(final NetconfTimer timer,
+            final BaseNetconfSchemaProvider baseSchemaProvider, final SchemaResourceManager schemaManager,
+            final NetconfTopologySchemaAssembler schemaAssembler,
+            final DeviceActionFactory deviceActionFactory, final RemoteDeviceHandler delegate,
+            final RemoteDeviceId deviceId, final NodeId nodeId, final NetconfNode node,
+            final NetconfNodeAugmentedOptional nodeOptional, final SshTransportTopologyParameters sshParams,
+            final @Nullable NegotiatedSshAlg callHomeSshAlg) {
+        this.timer = requireNonNull(timer);
+        this.delegate = requireNonNull(delegate);
+        this.deviceId = requireNonNull(deviceId);
+        this.node = requireNonNull(node);
+        this.nodeId = requireNonNull(nodeId);
+        this.sshParams = requireNonNull(sshParams);
+        this.callHomeSshAlg = callHomeSshAlg;
+
+        // Setup reconnection on empty context, if so configured
+        // FIXME: NETCONF-925: implement this
+        if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources().getAllowed()) {
+            LOG.warn("Ignoring missing schema sources is not currently implemented for {}", deviceId);
+        }
+
+        // The facade we are going it present to NetconfDevice
+        RemoteDeviceHandler salFacade;
+        final KeepaliveSalFacade keepAliveFacade;
+        final long keepaliveDelay = node.requireKeepaliveDelay().toJava();
+        if (keepaliveDelay > 0) {
+            LOG.info("Adding keepalive facade, for device {}", nodeId);
+            salFacade = keepAliveFacade = new KeepaliveSalFacade(deviceId, this, timer, keepaliveDelay);
+        } else {
+            salFacade = this;
+            keepAliveFacade = null;
+        }
+
+        final var defaultRequestTimeout = node.requireDefaultRequestTimeoutMillis().toJava();
+        final var rpcsDecorator = new RpcsTimeoutAndRecoveryHandler(deviceId, timer, defaultRequestTimeout);
+        final RemoteDevice<NetconfDeviceCommunicator> device;
+        if (node.requireSchemaless()) {
+            device = new SchemalessNetconfDevice(baseSchemaProvider, deviceId, salFacade);
+            yanglibRegistrations = List.of();
+        } else {
+            final var resources = schemaManager.getSchemaResources(node.getSchemaCacheDirectory(), nodeId.getValue());
+            device = new NetconfDeviceBuilder()
+                .setReconnectOnSchemasChange(node.requireReconnectOnChangedSchema())
+                .setBaseSchemaProvider(baseSchemaProvider)
+                .setDeviceSchemaProvider(resources)
+                .setProcessingExecutor(schemaAssembler.executor())
+                .setId(deviceId)
+                .setSalFacade(salFacade)
+                .setRpcsDecorator(rpcsDecorator)
+                .setDeviceActionFactory(deviceActionFactory)
+                .build();
+            yanglibRegistrations = registerDeviceSchemaSources(deviceId, node, resources);
+        }
+
+        final int rpcMessageLimit = node.requireConcurrentRpcLimit().toJava();
+        if (rpcMessageLimit < 1) {
+            LOG.info("Concurrent rpc limit is smaller than 1, no limit will be enforced for device {}", deviceId);
+        }
+
+        communicator = new NetconfDeviceCommunicator(deviceId, device, rpcMessageLimit,
+            NetconfNodeUtils.extractUserCapabilities(node));
+        rpcsDecorator.setListener(communicator);
+        if (keepAliveFacade != null) {
+            keepAliveFacade.setListener(communicator);
+        }
+    }
+
+    public abstract void connect();
+
+    abstract void reconnectOrFail();
+
+    abstract void closeSession();
+
+    @NonNull NetconfNode netconfNode() {
+        return node;
+    }
+
+    @NonNull NodeId nodeId() {
+        return nodeId;
+    }
+
+    @Override
+    protected synchronized void removeRegistration() {
+        closeSession();
+
+        communicator.close();
+        delegate.close();
+        yanglibRegistrations.forEach(Registration::close);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The {@code ignoredSshAlg} argument is disregarded: this handler tracks the algorithms negotiated for the
+     * current connection attempt itself (via its {@link SSHNegotiatedAlgListener}, or seeded from a call-home
+     * baseline) and substitutes that value when forwarding to its delegate.
+     */
+    @Override
+    public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
+            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services,
+            final @Nullable NegotiatedSshAlg ignoredSshAlg) {
+        final NegotiatedSshAlg sshAlg;
+        synchronized (this) {
+            // attempts = 0; TODO: propagate to NetconfNodeHandler
+            sshAlg = negotiatedSshAlg;
+        }
+        delegate.onDeviceConnected(deviceSchema, sessionPreferences, services, sshAlg);
+    }
+
+    @Override
+    public void onDeviceDisconnected() {
+        if (isClosed()) {
+            return;
+        }
+        delegate.onDeviceDisconnected();
+        reconnectOrFail();
+    }
+
+    @Override
+    public void onDeviceFailed(final Throwable throwable) {
+        // We have not reported onDeviceConnected(), so from the view of delete we are still connecting
+        LOG.debug("Connection attempt failed", throwable);
+        reconnectOrFail();
+    }
+
+    @Override
+    public void onNotification(final DOMNotification domNotification) {
+        delegate.onNotification(domNotification);
+    }
+
+    private static List<Registration> registerDeviceSchemaSources(final RemoteDeviceId remoteDeviceId,
+            final NetconfNode node, final DeviceNetconfSchemaProvider resources) {
+        final var yangLibrary = node.getYangLibrary();
+        if (yangLibrary != null) {
+            final Uri uri = yangLibrary.getYangLibraryUrl();
+            if (uri != null) {
+                final var registrations = new ArrayList<Registration>();
+                final var yangLibURL = uri.getValue();
+
+                // pre register yang library sources as fallback schemas to schema registry
+                final var yangLibUsername = yangLibrary.getUsername();
+                final var yangLigPassword = yangLibrary.getPassword();
+                final var schemas = yangLibUsername != null && yangLigPassword != null
+                    ? LibraryModulesSchemas.create(yangLibURL, yangLibUsername, yangLigPassword)
+                    : LibraryModulesSchemas.create(yangLibURL);
+
+                final var registry = resources.registry();
+                for (var entry : schemas.getAvailableModels().entrySet()) {
+                    registrations.add(registry.registerSchemaSource(new LibrarySchemaSourceProvider(
+                            schemas.getAvailableModels()),
+                        PotentialSchemaSource.create(entry.getKey(), YangTextSource.class,
+                            PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
+                }
+                return List.copyOf(registrations);
+            }
+        }
+
+        return List.of();
+    }
+}
