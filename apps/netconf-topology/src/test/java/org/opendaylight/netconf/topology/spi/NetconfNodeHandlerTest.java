@@ -44,6 +44,7 @@ import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
 import org.opendaylight.netconf.client.NetconfClientSession;
+import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
@@ -286,10 +287,35 @@ class NetconfNodeHandlerTest {
         final var throwableCaptor = ArgumentCaptor.forClass(Throwable.class);
         doNothing().when(delegate).onDeviceFailed(throwableCaptor.capture());
         secondFuture.setException(new AssertionError("second"));
-        assertInstanceOf(ConnectGivenUpException.class, throwableCaptor.getValue());
+        final var ex = assertInstanceOf(ConnectGivenUpException.class, throwableCaptor.getValue());
+        assertEquals("Given up connecting " + DEVICE_ID + " after 2 attempts: second", ex.getMessage());
 
         // but nothing else happens
         assertEquals(2, handler.attempts());
+    }
+
+    @Test
+    void disconnectBeforeSetupIsReportedWhenGivingUp() throws Exception {
+        doReturn(Futures.immediateFuture(clientSession)).when(clientFactory)
+            .createClient(any(NetconfClientConfiguration.class), any(SSHNegotiatedAlgListener.class));
+        handler.connect();
+
+        // the session drops before the device is set up, which uses up the first attempt
+        doNothing().when(delegate).onDeviceDisconnected();
+        doReturn(timeout).when(timer).newTimeout(timerCaptor.capture(), eq(150L), eq(TimeUnit.MILLISECONDS));
+        handler.onDeviceDisconnected();
+        assertEquals(2, handler.attempts());
+
+        timerCaptor.getValue().run(timeout);
+        verify(clientFactory, times(2)).createClient(any(NetconfClientConfiguration.class),
+            any(SSHNegotiatedAlgListener.class));
+
+        // the second session drops too, which uses up the last attempt
+        final var throwableCaptor = ArgumentCaptor.forClass(Throwable.class);
+        doNothing().when(delegate).onDeviceFailed(throwableCaptor.capture());
+        handler.onDeviceDisconnected();
+        final var ex = assertInstanceOf(ConnectGivenUpException.class, throwableCaptor.getValue());
+        assertEquals("Given up connecting " + DEVICE_ID + " after 2 attempts: Device disconnected", ex.getMessage());
     }
 
     // Initiate connect() which results in immediate clientDispatcher report. No interactions with delegate may occur,
@@ -367,7 +393,8 @@ class NetconfNodeHandlerTest {
         final var captor = ArgumentCaptor.forClass(Throwable.class);
         verify(delegate).onDeviceFailed(captor.capture());
         final var deviceException = assertInstanceOf(ConnectGivenUpException.class, captor.getValue());
-        assertEquals("Given up connecting " + DEVICE_ID + " after 1 attempts", deviceException.getMessage());
+        assertEquals("Given up connecting " + DEVICE_ID + " after 1 attempts: Cannot resolve key keyId",
+            deviceException.getMessage());
         assertEquals(1, keyAuthHandler.attempts());
     }
 
