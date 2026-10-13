@@ -367,7 +367,8 @@ class NetconfNodeHandlerTest {
         final var captor = ArgumentCaptor.forClass(Throwable.class);
         verify(delegate).onDeviceFailed(captor.capture());
         final var deviceException = assertInstanceOf(ConnectGivenUpException.class, captor.getValue());
-        assertEquals("Given up connecting " + DEVICE_ID + " after 1 attempts", deviceException.getMessage());
+        assertEquals("Given up connecting " + DEVICE_ID + " after 1 attempts: Cannot resolve key keyId",
+            deviceException.getMessage());
         assertEquals(1, keyAuthHandler.attempts());
     }
 
