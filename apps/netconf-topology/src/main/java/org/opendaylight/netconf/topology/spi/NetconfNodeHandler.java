@@ -143,6 +143,9 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private long lastMultipliedBackoff;
     @GuardedBy("this")
     private Task currentTask;
+    // The reason the last connection attempt failed, reported when we give up connecting
+    @GuardedBy("this")
+    private @Nullable String lastFailure;
     // SSH algorithms negotiated for the current connection attempt: reset to callHomeSshAlg at the start of each
     // attempt (lockedConnect) and updated by the SSHNegotiatedAlgListener during key establishment.
     @GuardedBy("this")
@@ -244,6 +247,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         // Reset to the per-attempt baseline; the SSHNegotiatedAlgListener will refill it during key establishment for
         // regular SSH connections.
         negotiatedSshAlg = callHomeSshAlg;
+        lastFailure = null;
         if (clientConfig == null) {
             try {
                 clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node, sshParams)
@@ -294,6 +298,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
                 return;
             }
             LOG.debug("Connection attempt {} to {} failed", attempts, deviceId, cause);
+            lastFailure = cause.getMessage() != null ? cause.getMessage() : cause.toString();
         }
 
         // We are invoking callbacks, do not hold locks
@@ -337,6 +342,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         final NegotiatedSshAlg sshAlg;
         synchronized (this) {
             attempts = 0;
+            lastFailure = null;
             sshAlg = negotiatedSshAlg;
         }
         delegate.onDeviceConnected(deviceSchema, sessionPreferences, services, sshAlg);
@@ -348,6 +354,9 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             return;
         }
         delegate.onDeviceDisconnected();
+        synchronized (this) {
+            lastFailure = "Device disconnected";
+        }
         reconnectOrFail();
     }
 
@@ -355,6 +364,9 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     public void onDeviceFailed(final Throwable throwable) {
         // We have not reported onDeviceConnected(), so from the view of delete we are still connecting
         LOG.debug("Connection attempt failed", throwable);
+        synchronized (this) {
+            lastFailure = throwable.getMessage() != null ? throwable.getMessage() : throwable.toString();
+        }
         reconnectOrFail();
     }
 
@@ -378,7 +390,8 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         // We have exceeded the number of connection attempts
         if (maxAttempts > 0 && attempts >= maxAttempts) {
             LOG.info("Failed to connect {} after {} attempts, not attempting", deviceId, attempts);
-            return new ConnectGivenUpException("Given up connecting " + deviceId + " after " + attempts + " attempts");
+            final var message = "Given up connecting %s after %d attempts".formatted(deviceId, attempts);
+            return new ConnectGivenUpException(lastFailure == null ? message : message + ": " + lastFailure);
         }
 
         // First connection attempt gets initialized to minimum backoff, each subsequent is exponentially backed off
