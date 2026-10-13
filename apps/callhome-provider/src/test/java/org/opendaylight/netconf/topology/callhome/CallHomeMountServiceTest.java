@@ -41,8 +41,7 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
-import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
-import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.topology.spi.CallHomeSessionInitializer;
 import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.protocol.specification.SshCase;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.protocol.specification.ssh._case.SshTransportParameters;
@@ -113,11 +112,11 @@ class CallHomeMountServiceTest {
         assertNull(sshSessionContextManager.createContext(ID2, sshSession, sshAlg));
 
         // verify that node is enabled with SSH
-        verify(topology, times(1)).enableNode(node1, sshAlg);
+        verify(topology, times(1)).enableCallHomeNode(eq(node1), eq(sshAlg), any());
 
         // remove context
         sshSessionContextManager.remove(ID1);
-        verify(topology, times(1)).disableNode(eq(NODE_ID1));
+        verify(topology, times(1)).disableCallHomeNode(eq(NODE_ID1));
     }
 
     @Test
@@ -138,11 +137,11 @@ class CallHomeMountServiceTest {
         assertNull(tlsSessionContextManager.createContext(ID2, nettyChannel));
 
         // verify that node is enabled with TLS
-        verify(topology, times(1)).enableNode(node1, null);
+        verify(topology, times(1)).enableCallHomeNode(eq(node1), eq(null), any());
 
         // remove context
         tlsSessionContextManager.remove(ID1);
-        verify(topology, times(1)).disableNode(eq(NODE_ID1));
+        verify(topology, times(1)).disableCallHomeNode(eq(NODE_ID1));
     }
 
     @Test
@@ -154,14 +153,14 @@ class CallHomeMountServiceTest {
         when(mockObjectWritten.dataBefore()).thenReturn(mockDeviceBeforeAddition);
         service.onAllowedDevicesChanged(List.of(new CustomTreeModification(LogicalDatastoreType.CONFIGURATION,
             IDENTIFIER, mockObjectWritten)));
-        verify(topology, times(1)).disableNode(NODE_ID1);
+        verify(topology, times(1)).disableCallHomeNode(NODE_ID1);
 
         // modification of deleting device from 'allowed-devices' container
         final DataObjectDeleted<Device> mockObjectDeleted = mock();
         when(mockObjectDeleted.dataBefore()).thenReturn(mockDeviceBeforeAddition);
         service.onAllowedDevicesChanged(List.of(
             new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, IDENTIFIER, mockObjectDeleted)));
-        verify(topology, times(2)).disableNode(NODE_ID1);
+        verify(topology, times(2)).disableCallHomeNode(NODE_ID1);
     }
 
     @Test
@@ -182,8 +181,8 @@ class CallHomeMountServiceTest {
             new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, IDENTIFIER, mockModification2)
         ));
 
-        verify(topology, times(1)).disableNode(new NodeId(ID1));
-        verify(topology, times(1)).disableNode(new NodeId(ID2));
+        verify(topology, times(1)).disableCallHomeNode(new NodeId(ID1));
+        verify(topology, times(1)).disableCallHomeNode(new NodeId(ID2));
     }
 
     @Test
@@ -228,22 +227,13 @@ class CallHomeMountServiceTest {
         doAnswer(invocation -> {
             node1 = (Node) invocation.getArguments()[0];
             if (ID1.equals(node1.requireNodeId().getValue())) {
-                final var configBuilderFactory = service.createClientConfigurationBuilderFactory();
-                final var config = configBuilderFactory
-                    .createClientConfigurationBuilder(node1.requireNodeId(),
-                        node1.augmentation(NetconfNodeAugment.class).getNetconfNode(),
-                        AbstractNetconfTopology.defaultSshParams())
-                    .withSessionListener(sessionListener).build();
-                try {
-                    netconfSessionFuture = service.createClientFactory().createClient(config, algListener);
-                } catch (UnsupportedConfigurationException e) {
-                    netconfSessionFuture = null;
-                }
+                final var init = (CallHomeSessionInitializer) invocation.getArguments()[2];
+                netconfSessionFuture = init.initialize(sessionListener);
             } else {
                 netconfSessionFuture = null;
             }
             return null;
-        }).when(topology).enableNode(any(Node.class), any());
+        }).when(topology).enableCallHomeNode(any(Node.class), any(), any(CallHomeSessionInitializer.class));
     }
 
     private static Device createMockDevice(final String deviceId) {

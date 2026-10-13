@@ -140,7 +140,7 @@ public abstract class AbstractNetconfTopology {
             new SshPublicKeyAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
                 .iana.ssh._public.key.algs.rev241016.SshPublicKeyAlgorithm.SshRsa));
 
-    private final HashMap<NodeId, NetconfNodeHandler> activeConnectors = new HashMap<>();
+    private final HashMap<NodeId, AbstractNodeHandler> activeConnectors = new HashMap<>();
     private final NetconfClientFactory clientFactory;
     private final DeviceActionFactory deviceActionFactory;
     private final SchemaResourceManager schemaManager;
@@ -229,12 +229,44 @@ public abstract class AbstractNetconfTopology {
         connectNode(netconfNode, nodeId, nodeOptional, sshAlg);
     }
 
+    protected synchronized void lockedEnsureCallHomeNode(final Node node, final NegotiatedSshAlg sshAlg,
+            final CallHomeSessionInitializer initializer) {
+        final var nodeId = node.requireNodeId();
+        final var prev = activeConnectors.get(nodeId);
+        if (prev instanceof NetconfNodeHandler) {
+            LOG.warn("RemoteDevice{{}} is configured in topology {}, rejecting call-home connection", nodeId,
+                topologyId);
+            return;
+        }
+        if (prev != null) {
+            LOG.info("Call-home RemoteDevice{{}} was already connected, disconnecting", nodeId);
+            activeConnectors.remove(nodeId);
+            prev.close();
+        }
+
+        final var netconfNodeAugment = node.augmentation(NetconfNodeAugment.class);
+        final var netconfNode = netconfNodeAugment != null ? netconfNodeAugment.getNetconfNode() : null;
+        if (netconfNode == null) {
+            return;
+        }
+        final var deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode);
+        final var deviceSalFacade = createSalFacade(deviceId, netconfNode.getCredentials(),
+            netconfNode.requireLockDatastore());
+
+        LOG.info("Connecting call-home RemoteDevice{{}}", nodeId);
+        final var nodeHandler = new CallHomeNodeHandler(timer, baseSchemaProvider, schemaManager, schemaAssembler,
+            deviceActionFactory, deviceSalFacade, deviceId, nodeId, netconfNode,
+            node.augmentation(NetconfNodeAugmentedOptional.class), sshParams, initializer);
+        activeConnectors.put(nodeId, nodeHandler);
+        nodeHandler.connect();
+    }
+
     /**
      * Reconnect node based on existing NetconfNodeHandler.
      *
      * @param oldHandler existing {@link NetconfNodeHandler} of node to be reconnected
      */
-    private synchronized void reconnectNode(final NetconfNodeHandler oldHandler) {
+    private synchronized void reconnectNode(final AbstractNodeHandler oldHandler) {
         final var nodeId = oldHandler.nodeId();
         final var netconfNode = oldHandler.netconfNode();
         LOG.info("RemoteDevice{{}} disconnecting", nodeId);
@@ -264,7 +296,7 @@ public abstract class AbstractNetconfTopology {
 
         final NetconfNodeHandler nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemaProvider,
             schemaManager, schemaAssembler, builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId,
-            netconfNode, nodeOptional, sshParams, sshAlg);
+            netconfNode, nodeOptional, sshParams);
 
         // ... record it ...
         activeConnectors.put(nodeId, nodeHandler);
@@ -289,7 +321,7 @@ public abstract class AbstractNetconfTopology {
     }
 
     protected final synchronized void deleteAllNodes() {
-        activeConnectors.values().forEach(NetconfNodeHandler::close);
+        activeConnectors.values().forEach(AbstractNodeHandler::close);
         activeConnectors.clear();
     }
 
@@ -313,9 +345,12 @@ public abstract class AbstractNetconfTopology {
                 LOG.debug("Topology ssh parameters updated successfully");
                 sshParams = rootNode;
 
-                //recreate all nodes so new topology config comes in to effect
+                // recreate all nodes so new topology config comes in to effect. Call-home nodes cannot be reconnected
+                // by us and their SSH parameters are not driven by topology configuration, hence they are skipped.
                 for (var node : activeConnectors.values()) {
-                    reconnectNode(node);
+                    if (node instanceof NetconfNodeHandler handler) {
+                        reconnectNode(handler);
+                    }
                 }
             }
 
