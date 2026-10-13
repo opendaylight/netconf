@@ -16,13 +16,15 @@ import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
+import org.opendaylight.netconf.topology.spi.CallHomeSessionInitializer;
+import org.opendaylight.netconf.topology.spi.CallHomeTopologyService;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
 // Non-final for mocking
-class CallHomeTopology extends AbstractNetconfTopology {
+class CallHomeTopology extends AbstractNetconfTopology implements CallHomeTopologyService {
     CallHomeTopology(final String topologyId, final NetconfClientFactory clientFactory, final NetconfTimer timer,
             final NetconfTopologySchemaAssembler schemaAssembler, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
@@ -38,5 +40,15 @@ class CallHomeTopology extends AbstractNetconfTopology {
 
     void enableNode(final Node node, final NegotiatedSshAlg sshAlg) {
         ensureNode(node, sshAlg);
+    }
+
+    @Override
+    public void enableCallHomeNode(Node node, NegotiatedSshAlg sshAlg, final CallHomeSessionInitializer initializer) {
+
+    }
+
+    @Override
+    public void disableCallHomeNode(NodeId nodeId) {
+        deleteNode(nodeId);
     }
 }

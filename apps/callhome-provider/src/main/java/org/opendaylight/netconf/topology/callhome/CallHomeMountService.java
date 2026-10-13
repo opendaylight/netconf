@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.topology.callhome;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
@@ -42,6 +44,8 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
+import org.opendaylight.netconf.topology.spi.CallHomeSessionInitializer;
+import org.opendaylight.netconf.topology.spi.CallHomeTopologyService;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
@@ -233,7 +237,7 @@ public final class CallHomeMountService implements AutoCloseable {
         .builder(NetconfCallhomeServer.class).child(Global.class).child(Endpoints.class).build();
 
     private final Map<String, NetconfLayer> netconfLayerMapping = new ConcurrentHashMap<>();
-    private final CallHomeTopology topology;
+    private final CallHomeTopologyService topology;
     private final Configuration config;
     private final Registration allowedDevicesReg;
     private final Registration endpointsReg;
@@ -244,21 +248,23 @@ public final class CallHomeMountService implements AutoCloseable {
     @Activate
     @Inject
     public CallHomeMountService(
-            @Reference final NetconfTimer timer,
-            @Reference final NetconfTopologySchemaAssembler schemaAssembler,
-            @Reference final SchemaResourceManager schemaRepositoryProvider,
-            @Reference final BaseNetconfSchemaProvider baseSchemaProvider,
-            @Reference final DataBroker dataBroker,
-            @Reference final DOMMountPointService mountService,
-            @Reference final DeviceActionFactory deviceActionFactory, final Configuration config) {
+        @Reference final NetconfTimer timer,
+        @Reference final NetconfTopologySchemaAssembler schemaAssembler,
+        @Reference final SchemaResourceManager schemaRepositoryProvider,
+        @Reference final BaseNetconfSchemaProvider baseSchemaProvider,
+        @Reference final DataBroker dataBroker,
+        @Reference final CallHomeTopologyService topologyService,
+        @Reference final DOMMountPointService mountService,
+        @Reference final DeviceActionFactory deviceActionFactory, final Configuration config) {
         this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, timer, schemaAssembler, schemaRepositoryProvider,
-            baseSchemaProvider, dataBroker, mountService, deviceActionFactory, config);
+            baseSchemaProvider, dataBroker, mountService, topologyService, deviceActionFactory, config);
     }
 
     public CallHomeMountService(final String topologyId, final NetconfTimer timer,
             final NetconfTopologySchemaAssembler schemaAssembler, final SchemaResourceManager schemaRepositoryProvider,
             final BaseNetconfSchemaProvider baseSchemaProvider, final DataBroker dataBroker,
-            final DOMMountPointService mountService, final DeviceActionFactory deviceActionFactory,
+            final DOMMountPointService mountService, final CallHomeTopologyService topologyService,
+            final DeviceActionFactory deviceActionFactory,
             final Configuration config) {
         this.config = config;
         sshTransportParameters = buildSshTransportParameters(CallHomeListenEndpoints.readSshTransportParams(dataBroker),
@@ -267,11 +273,7 @@ public final class CallHomeMountService implements AutoCloseable {
             this::onAllowedDevicesChanged);
         endpointsReg = dataBroker.registerTreeChangeListener(LogicalDatastoreType.CONFIGURATION, ENDPOINTS_IDENTIFIER,
             this::onEndpointsChanged);
-        final var clientConfBuilderFactory = createClientConfigurationBuilderFactory();
-        final var clientFactory = createClientFactory();
-        topology = new CallHomeTopology(topologyId, clientFactory, timer, schemaAssembler,
-            schemaRepositoryProvider, dataBroker, mountService, clientConfBuilderFactory,
-            baseSchemaProvider, deviceActionFactory);
+        topology = topologyService;
     }
 
     @VisibleForTesting
@@ -289,6 +291,7 @@ public final class CallHomeMountService implements AutoCloseable {
 
     @VisibleForTesting
     NetconfClientConfigurationBuilderFactory createClientConfigurationBuilderFactory() {
+        // TODO: remove
         // use minimal configuration, only id and session listener are used
         return (nodeId, node, unused) -> NetconfClientConfigurationBuilder.create()
             .withName(nodeId.getValue())
@@ -301,14 +304,14 @@ public final class CallHomeMountService implements AutoCloseable {
 
     @VisibleForTesting
     NetconfClientFactory createClientFactory() {
+        // TODO: remove
         return new NetconfClientFactory() {
             @Override
             public ListenableFuture<NetconfClientSession> createClient(
                     final NetconfClientConfiguration clientConfiguration, final SSHNegotiatedAlgListener algListener) {
                 final var future = SettableFuture.<NetconfClientSession>create();
-                final var pending = new NetconfLayer(clientConfiguration.getName(),
-                    clientConfiguration.getSessionListener(), future);
-                netconfLayerMapping.put(pending.id, pending);
+                final var pending = new NetconfLayer();
+                netconfLayerMapping.put("pending.id", pending);
                 return future;
             }
 
@@ -357,18 +360,18 @@ public final class CallHomeMountService implements AutoCloseable {
             public CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession,
                     final NegotiatedSshAlg sshAlg) {
                 final var remoteAddr = clientSession.getRemoteAddress();
-                topology.enableNode(asNode(id, remoteAddr, new ProtocolBuilder().setName(Protocol.Name.SSH)
+                final var netconfLayer = new NetconfLayer();
+                topology.enableCallHomeNode(asNode(id, remoteAddr, new ProtocolBuilder().setName(Protocol.Name.SSH)
                     .setSpecification(new SshCaseBuilder().setSshTransportParameters(sshTransportParameters).build())
-                    .build()), sshAlg);
-                final var netconfLayer = netconfLayerMapping.remove(id);
-                return netconfLayer == null ? null : new CallHomeSshSessionContext(id, remoteAddr, clientSession,
-                    netconfLayer.sessionListener, netconfLayer.netconfSessionFuture);
+                    .build()), sshAlg, netconfLayer);
+                return netconfLayer.sessionListener == null ? null : new CallHomeSshSessionContext(id, remoteAddr,
+                    clientSession, netconfLayer.sessionListener, netconfLayer.sessionFuture);
             }
 
             @Override
             public void remove(final String id) {
                 super.remove(id);
-                topology.disableNode(new NodeId(id));
+                topology.disableCallHomeNode(new NodeId(id));
             }
         };
     }
@@ -378,16 +381,16 @@ public final class CallHomeMountService implements AutoCloseable {
         return new CallHomeTlsSessionContextManager(authProvider, statusRecorder) {
             @Override
             public CallHomeTlsSessionContext createContext(final String id, final Channel channel) {
-                topology.enableNode(asNode(id, channel.remoteAddress(), TLS_PROTOCOL), null);
-                final var netconfLayer = netconfLayerMapping.remove(id);
-                return netconfLayer == null ? null : new CallHomeTlsSessionContext(id, channel,
-                    netconfLayer.sessionListener, netconfLayer.netconfSessionFuture());
+                final var netconfLayer = new NetconfLayer();
+                topology.enableCallHomeNode(asNode(id, channel.remoteAddress(), TLS_PROTOCOL), null, netconfLayer);
+                return netconfLayer.sessionListener == null ? null : new CallHomeTlsSessionContext(id, channel,
+                    netconfLayer.sessionListener, netconfLayer.sessionFuture);
             }
 
             @Override
             public void remove(final String id) {
                 super.remove(id);
-                topology.disableNode(new NodeId(id));
+                topology.disableCallHomeNode(new NodeId(id));
             }
         };
     }
@@ -397,7 +400,7 @@ public final class CallHomeMountService implements AutoCloseable {
         for (final var change : changes) {
             final var deletedDevice = change.getRootNode().dataBefore();
             if (deletedDevice != null) {
-                topology.disableNode(new NodeId(deletedDevice.getUniqueId()));
+                topology.disableCallHomeNode(new NodeId(deletedDevice.getUniqueId()));
             }
         }
     }
@@ -427,14 +430,21 @@ public final class CallHomeMountService implements AutoCloseable {
     @Deactivate
     @Override
     public void close() {
-        netconfLayerMapping.forEach((key, value) -> value.netconfSessionFuture.cancel(true));
+        netconfLayerMapping.forEach((key, value) -> value.sessionFuture.cancel(true));
         netconfLayerMapping.clear();
         allowedDevicesReg.close();
         endpointsReg.close();
     }
 
-    private record NetconfLayer(String id, NetconfClientSessionListener sessionListener,
-        SettableFuture<NetconfClientSession> netconfSessionFuture) {
+    private static final class NetconfLayer implements CallHomeSessionInitializer {
+        final SettableFuture<NetconfClientSession> sessionFuture = SettableFuture.create();
+        NetconfClientSessionListener sessionListener;
+
+        @Override
+        public ListenableFuture<NetconfClientSession> initialize(final NetconfClientSessionListener listener) {
+            sessionListener = requireNonNull(listener);
+            return sessionFuture;
+        }
     }
 
     private static @NonNull SshTransportParameters buildSshTransportParameters(
