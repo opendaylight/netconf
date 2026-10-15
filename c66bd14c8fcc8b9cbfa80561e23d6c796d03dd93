@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ea1c9eb_0d043123",
+        "filename": "tests/libraries/netconf_cluster.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-15T15:25:14Z",
+      "side": 1,
+      "message": "IDK - delete is successful (has something to delete) - returns 200, if data did not exist it returns 409 (kind of success), why do we need to retry something?",
+      "revId": "c66bd14c8fcc8b9cbfa80561e23d6c796d03dd93",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54cdea7b_bcd5891a",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-15T15:25:14Z",
+      "side": 1,
+      "message": "why do use use \\ here at the end of line?",
+      "revId": "c66bd14c8fcc8b9cbfa80561e23d6c796d03dd93",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
