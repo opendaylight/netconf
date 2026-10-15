@@ -20,6 +20,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "faacf1d3_cb6ee234",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-15T15:49:15Z",
+      "side": 1,
+      "message": "writer_node here in docs",
+      "revId": "c66bd14c8fcc8b9cbfa80561e23d6c796d03dd93",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce1ee7bf_db6b8e2f",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-15T15:49:15Z",
+      "side": 1,
+      "message": "writer_node here missing 😄",
+      "revId": "c66bd14c8fcc8b9cbfa80561e23d6c796d03dd93",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "54cdea7b_bcd5891a",
         "filename": "tests/suites/clustering/test_clustering_outages.py",
         "patchSetId": 14
