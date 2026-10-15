@@ -85,7 +85,10 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
      * @return a future producing {@link SSHClient}
      * @throws UnsupportedConfigurationException if any of configurations is invalid or incomplete
      * @throws NullPointerException if any of required parameters is null
+     * @deprecated Use {@link #listenClient(String, TransportChannelListener, TcpServerGrouping,
+     *             SSHClientSessionHandler)} instead.
      */
+    @Deprecated(since = "12.0.3")
     public @NonNull ListenableFuture<SSHClient> listenClient(final String subsystem,
             final TransportChannelListener<? super SSHTransportChannel> listener,
             final SSHNegotiatedAlgListener algListener, final TcpServerGrouping listenParams,
@@ -106,12 +109,35 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
      * @return a future producing {@link SSHClient}
      * @throws UnsupportedConfigurationException if any of configurations is invalid or incomplete
      * @throws NullPointerException if any of required parameters is null
+     * @deprecated Use {@link #listenClient(String, TransportChannelListener, TcpServerGrouping,
+     *             SSHClientSessionHandler)} instead.
      */
+    @Deprecated(since = "12.0.3")
     public @NonNull ListenableFuture<SSHClient> listenClient(final String subsystem,
             final TransportChannelListener<? super SSHTransportChannel> listener, final TcpServerGrouping listenParams,
             final SshClientGrouping clientParams, final ClientFactoryManagerConfigurator configurator)
             throws UnsupportedConfigurationException {
         return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams, configurator)
+            .listen(newServerBootstrap(), listenParams);
+    }
+
+    /**
+     * Builds and starts Call-Home SSH Client. The supplied {@link SSHClientSessionHandler} decides which connecting
+     * servers are accepted and provides the credentials used to authenticate to them, so there is no client identity
+     * or server authentication to configure. The client uses the default SSH algorithms and no keepalives.
+     *
+     * @param subsystem bound subsystem name
+     * @param listener client channel listener, required
+     * @param listenParams TCP transport configuration addressing inbound connection, required
+     * @param handler handler of the client sessions, required
+     * @return a future producing {@link SSHClient}
+     * @throws UnsupportedConfigurationException if any of configurations is invalid or incomplete
+     * @throws NullPointerException if any of required parameters is null
+     */
+    public @NonNull ListenableFuture<SSHClient> listenClient(final String subsystem,
+            final TransportChannelListener<? super SSHTransportChannel> listener, final TcpServerGrouping listenParams,
+            final SSHClientSessionHandler handler) throws UnsupportedConfigurationException {
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, requireNonNull(handler))
             .listen(newServerBootstrap(), listenParams);
     }
 
