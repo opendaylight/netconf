@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
-import org.opendaylight.netconf.shaded.sshd.common.kex.KexProposalOption;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -110,11 +109,7 @@ public final class SSHClient extends SSHTransportStack {
         final var sessionId = sessionId(clientSession);
         LOG.debug("Authenticating session {}", sessionId);
         clientSession.auth().addListener(future -> onAuthComplete(future, sessionId));
-        final var algs = NegotiatedAlgorithms.of(
-            clientSession.getNegotiatedKexParameter(KexProposalOption.ALGORITHMS),
-            clientSession.getNegotiatedKexParameter(KexProposalOption.SERVERKEYS),
-            clientSession.getNegotiatedKexParameter(KexProposalOption.C2SENC),
-            clientSession.getNegotiatedKexParameter(KexProposalOption.C2SMAC));
+        final var algs = NegotiatedAlgorithms.of(clientSession);
         algListener.onAlgorithmsNegotiated(algs.keyExchange(), algs.hostKey(), algs.encryption(), algs.mac());
     }
 
