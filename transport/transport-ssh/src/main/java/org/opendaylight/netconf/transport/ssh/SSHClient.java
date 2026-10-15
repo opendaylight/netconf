@@ -21,12 +21,12 @@ import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
-import org.opendaylight.netconf.shaded.sshd.common.kex.KexProposalOption;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.SshClientGrouping;
@@ -81,6 +81,18 @@ public final class SSHClient extends SSHTransportStack {
         return of(ioServiceFactory, executorService, subsystem, listener, NOOP, clientParams, configurator);
     }
 
+    static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory,
+            final ScheduledExecutorService executorService, final KeystoreSupport keystoreSupport,
+            final String subsystem, final TransportChannelListener<? super SSHTransportChannel> listener,
+            final SSHClientSessionHandler handler) throws UnsupportedConfigurationException {
+        return new SSHClient(subsystem, listener, NOOP,
+            new TransportSshClient.Builder(ioServiceFactory, executorService, keystoreSupport)
+                // null sets the same default algorithms as for any client configured without transport-params
+                .transportParams(null)
+                .sessionHandler(handler)
+                .buildChecked());
+    }
+
     @VisibleForTesting
     static SSHClient of(final String subsystem, final TransportChannelListener<? super SSHTransportChannel> listener,
             final SSHNegotiatedAlgListener algListener, final TransportSshClient transportSshClient)
@@ -110,11 +122,7 @@ public final class SSHClient extends SSHTransportStack {
         final var sessionId = sessionId(clientSession);
         LOG.debug("Authenticating session {}", sessionId);
         clientSession.auth().addListener(future -> onAuthComplete(future, sessionId));
-        final var algs = NegotiatedAlgorithms.of(
-            clientSession.getNegotiatedKexParameter(KexProposalOption.ALGORITHMS),
-            clientSession.getNegotiatedKexParameter(KexProposalOption.SERVERKEYS),
-            clientSession.getNegotiatedKexParameter(KexProposalOption.C2SENC),
-            clientSession.getNegotiatedKexParameter(KexProposalOption.C2SMAC));
+        final var algs = NegotiatedAlgorithms.of(clientSession);
         algListener.onAlgorithmsNegotiated(algs.keyExchange(), algs.hostKey(), algs.encryption(), algs.mac());
     }
 
