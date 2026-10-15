@@ -14,9 +14,9 @@ import com.google.common.util.concurrent.SettableFuture;
 import java.net.SocketAddress;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.transport.ssh.SSHClientSessionRef;
 
-public record CallHomeSshSessionContext(String id, SocketAddress remoteAddress, ClientSession sshSession,
+public record CallHomeSshSessionContext(String id, SocketAddress remoteAddress, SSHClientSessionRef sshSession,
         NetconfClientSessionListener netconfSessionListener, SettableFuture<NetconfClientSession> settableFuture)
         implements CallHomeSessionContext {
 
@@ -30,9 +30,7 @@ public record CallHomeSshSessionContext(String id, SocketAddress remoteAddress, 
 
     @Override
     public void close() {
-        if (sshSession.isOpen()) {
-            sshSession.close(true);
-        }
+        sshSession.close();
     }
 
     @Override
