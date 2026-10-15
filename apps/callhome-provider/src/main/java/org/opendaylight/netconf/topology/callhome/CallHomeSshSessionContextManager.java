@@ -16,7 +16,7 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
 import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.transport.ssh.SSHClientSessionRef;
 
 public class CallHomeSshSessionContextManager extends AbstractCallHomeSessionContextManager<CallHomeSshSessionContext> {
 
@@ -32,15 +32,15 @@ public class CallHomeSshSessionContextManager extends AbstractCallHomeSessionCon
             .findFirst().map(Map.Entry::getValue).orElse(null);
     }
 
-    public CallHomeSshSessionContext findBySshSession(final ClientSession clientSession) {
+    public @Nullable CallHomeSshSessionContext findBySshSession(final SSHClientSessionRef clientSession) {
         requireNonNull(clientSession);
         return contexts.entrySet().stream()
-            .filter(entry -> clientSession == entry.getValue().sshSession())
+            .filter(entry -> clientSession.equals(entry.getValue().sshSession()))
             .findFirst().map(Map.Entry::getValue).orElse(null);
     }
 
     /**
-     * Builds {@link CallHomeSshSessionContext} based on SSH {@link ClientSession}.
+     * Builds {@link CallHomeSshSessionContext} based on SSH {@link SSHClientSessionRef}.
      *
      * <p>The method expected to be overridden in order to inject
      * {@link org.opendaylight.netconf.client.NetconfClientSessionListener NetconfClientSessionListener} and/or
@@ -51,9 +51,9 @@ public class CallHomeSshSessionContextManager extends AbstractCallHomeSessionCon
      * @param clientSession SSH session instance
      * @return created object or {@code null} if it cannot be created for some reason
      */
-    public @Nullable CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession,
+    public @Nullable CallHomeSshSessionContext createContext(final String id, final SSHClientSessionRef clientSession,
             final NegotiatedSshAlg sshAlg) {
-        return new CallHomeSshSessionContext(id, clientSession.getRemoteAddress(), clientSession,
+        return new CallHomeSshSessionContext(id, clientSession.remoteAddress(), clientSession,
             new SimpleNetconfClientSessionListener(), SettableFuture.create());
     }
 }

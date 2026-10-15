@@ -11,9 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.net.InetAddress;
-import java.net.SocketAddress;
 import java.security.PublicKey;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -22,17 +20,12 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
-import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
-import org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory;
-import org.opendaylight.netconf.shaded.sshd.client.auth.pubkey.UserAuthPublicKeyFactory;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
-import org.opendaylight.netconf.shaded.sshd.common.kex.KexProposalOption;
-import org.opendaylight.netconf.shaded.sshd.common.session.Session;
-import org.opendaylight.netconf.shaded.sshd.common.session.SessionListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
-import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
 import org.opendaylight.netconf.transport.ssh.NegotiatedAlgorithms;
 import org.opendaylight.netconf.transport.ssh.SSHClient;
+import org.opendaylight.netconf.transport.ssh.SSHClientCredentials;
+import org.opendaylight.netconf.transport.ssh.SSHClientSessionHandler;
+import org.opendaylight.netconf.transport.ssh.SSHClientSessionRef;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
@@ -75,89 +68,79 @@ public final class CallHomeSshServer implements AutoCloseable {
         // NB actual username will be assigned dynamically but predefined one is required for transport initialization
         final var sshClientParams = new SshClientParametersBuilder().setClientIdentity(
             new ClientIdentityBuilder().setUsername("ignored").build()).build();
-        final var configurator = new ClientFactoryManagerConfigurator() {
+        final var sessionHandler = new SSHClientSessionHandler() {
             @Override
-            protected void configureClientFactoryManager(final ClientFactoryManager factoryManager) {
-                factoryManager.setServerKeyVerifier((clientSession, remoteAddress, serverKey)
-                    -> verifyServerKey(clientSession, remoteAddress, serverKey));
-                factoryManager.addSessionListener(createSessionListener());
-                // supported auth factories
-                factoryManager.setUserAuthFactories(List.of(
-                    UserAuthPasswordFactory.INSTANCE,
-                    new UserAuthPublicKeyFactory()));
+            public @Nullable SSHClientCredentials checkServerKey(final SSHClientSessionRef session,
+                    final PublicKey serverKey, final NegotiatedAlgorithms algorithms) {
+                return verifyServerKey(session, serverKey, algorithms);
+            }
+
+            @Override
+            public void sessionClosed(final SSHClientSessionRef session) {
+                onSessionClosed(session);
             }
         };
         try {
             client = transportStackFactory.listenClient(TransportConstants.SSH_SUBSYSTEM, transportChannelListener,
-                tcpServerParams, sshClientParams, configurator).get(timeoutMillis, TimeUnit.MILLISECONDS);
+                tcpServerParams, sshClientParams, sessionHandler).get(timeoutMillis, TimeUnit.MILLISECONDS);
         } catch (UnsupportedConfigurationException | InterruptedException | ExecutionException | TimeoutException e) {
             throw new IllegalStateException("Could not start SSH Call-Home server", e);
         }
     }
 
-    private SessionListener createSessionListener() {
-        return new SessionListener() {
-            @Override
-            public void sessionClosed(final Session session) {
-                if (session instanceof ClientSession clientSession) {
-                    final var context = contextManager.findBySshSession(clientSession);
-                    if (context != null) {
-                        contextManager.remove(context.id());
-                        if (!clientSession.isAuthenticated()) {
-                            // threat unauthenticated session closure as authentication failure
-                            // in case there was context object created for the session
-                            statusRecorder.reportFailedAuth(context.id());
-                        } else if (context.settableFuture().isDone()) {
-                            // disconnected after netconf session established
-                            statusRecorder.reportDisconnected(context.id());
-                        }
-                    }
-                }
+    private void onSessionClosed(final SSHClientSessionRef session) {
+        final var context = contextManager.findBySshSession(session);
+        if (context != null) {
+            contextManager.remove(context.id());
+            if (!session.isAuthenticated()) {
+                // threat unauthenticated session closure as authentication failure
+                // in case there was context object created for the session
+                statusRecorder.reportFailedAuth(context.id());
+            } else if (context.settableFuture().isDone()) {
+                // disconnected after netconf session established
+                statusRecorder.reportDisconnected(context.id());
             }
-        };
+        }
     }
 
-    private boolean verifyServerKey(final ClientSession clientSession, final SocketAddress remoteAddress,
-            final PublicKey serverKey) {
+    private @Nullable SSHClientCredentials verifyServerKey(final SSHClientSessionRef session, final PublicKey serverKey,
+            final NegotiatedAlgorithms algorithms) {
+        final var remoteAddress = session.remoteAddress();
         final CallHomeSshAuthSettings authSettings = authProvider.provideAuth(remoteAddress, serverKey);
         if (authSettings == null) {
             // no auth for server key
             statusRecorder.reportUnknown(remoteAddress, serverKey);
             LOG.info("No auth settings found. Connection from {} rejected.", remoteAddress);
-            return false;
+            return null;
         }
         if (contextManager.exists(authSettings.id())) {
             LOG.info("Session context with same id {} already exists. Connection from {} rejected.",
                 authSettings.id(), remoteAddress);
-            return false;
+            return null;
         }
-        final var context = contextManager.createContext(authSettings.id(), clientSession,
-            readNegotiatedAlg(clientSession));
+        final var context = contextManager.createContext(authSettings.id(), session, readNegotiatedAlg(algorithms));
         if (context == null) {
             // if there is an issue creating context then the cause expected to be
             // logged within overridden createContext() method
-            return false;
+            return null;
         }
         contextManager.register(context);
 
-        // Session context is ok, apply auth settings to current session
-        authSettings.applyTo(clientSession);
+        // Session context is ok, authenticate the current session with the auth settings
         LOG.debug("Session context is created for SSH session: {}", context);
-        return true;
+        return authSettings.credentials();
     }
 
     @VisibleForTesting
-    static @Nullable NegotiatedSshAlg readNegotiatedAlg(final @NonNull ClientSession session) {
-        final var kex = session.getNegotiatedKexParameter(KexProposalOption.ALGORITHMS);
-        final var hostKey = session.getNegotiatedKexParameter(KexProposalOption.SERVERKEYS);
-        final var encryption = session.getNegotiatedKexParameter(KexProposalOption.C2SENC);
-        final var mac = session.getNegotiatedKexParameter(KexProposalOption.C2SMAC);
+    static @Nullable NegotiatedSshAlg readNegotiatedAlg(final @NonNull NegotiatedAlgorithms algorithms) {
+        final var kex = algorithms.keyExchange();
+        final var hostKey = algorithms.hostKey();
+        final var encryption = algorithms.encryption();
+        final var mac = algorithms.mac();
         if (kex == null || hostKey == null || encryption == null || mac == null) {
             return null;
         }
-        final var mappedAlgs = NegotiatedAlgorithms.of(kex, hostKey, encryption, mac);
-        return new NegotiatedSshAlg(mappedAlgs.keyExchange(), mappedAlgs.hostKey(),
-            mappedAlgs.encryption(), mappedAlgs.mac());
+        return new NegotiatedSshAlg(kex, hostKey, encryption, mac);
     }
 
     @Override

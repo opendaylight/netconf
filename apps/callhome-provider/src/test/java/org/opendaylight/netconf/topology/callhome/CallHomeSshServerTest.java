@@ -46,8 +46,8 @@ import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.SessionListener;
 import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.topology.callhome.CallHomeSshAuthSettings.DefaultAuthSettings;
+import org.opendaylight.netconf.transport.ssh.SSHClientSessionRef;
 import org.opendaylight.netconf.transport.ssh.SSHServer;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.crypt.hash.rev140806.CryptHash;
@@ -171,9 +171,9 @@ class CallHomeSshServerTest {
         final var contextManager = new CallHomeSshSessionContextManager() {
             // inject netconf session listener
             @Override
-            public CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession,
+            public CallHomeSshSessionContext createContext(final String id, final SSHClientSessionRef clientSession,
                     final NegotiatedSshAlg sshAlg) {
-                return new CallHomeSshSessionContext(id, clientSession.getRemoteAddress(), clientSession,
+                return new CallHomeSshSessionContext(id, clientSession.remoteAddress(), clientSession,
                     clientSessionListener, SettableFuture.create());
             }
         };
