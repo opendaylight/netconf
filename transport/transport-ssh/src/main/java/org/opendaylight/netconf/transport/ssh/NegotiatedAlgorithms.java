@@ -9,6 +9,8 @@ package org.opendaylight.netconf.transport.ssh;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.shaded.sshd.common.kex.KexProposalOption;
+import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshEncryptionAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm;
@@ -44,5 +46,18 @@ public record NegotiatedAlgorithms(
             PublicKeyPolicy.INSTANCE.algOf(hostKey),
             EncryptionPolicy.INSTANCE.algOf(encryption),
             MacPolicy.INSTANCE.algOf(mac));
+    }
+
+    /**
+     * Returns the algorithms negotiated on a client session.
+     *
+     * @param session the session
+     * @return the negotiated algorithms
+     */
+    static @NonNull NegotiatedAlgorithms of(final @NonNull Session session) {
+        return of(session.getNegotiatedKexParameter(KexProposalOption.ALGORITHMS),
+            session.getNegotiatedKexParameter(KexProposalOption.SERVERKEYS),
+            session.getNegotiatedKexParameter(KexProposalOption.C2SENC),
+            session.getNegotiatedKexParameter(KexProposalOption.C2SMAC));
     }
 }
