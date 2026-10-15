@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23069d97_9f8f8a02",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-15T08:04:25Z",
+      "side": 1,
+      "message": "This is based on patchset 9 of 124594 and I am assuming that it needs a rebase yes? I noticed that there might be some inconsistencies with `EMPTY_DEVICE_DATA`/`EMPTY_DEVICE_DATA_PATTERN` (and maybe some other things). So I tried the rebase locally, and one: there are some conflicts, but also two: there are some issues which won\u0027t show as a conflict and could be missed until merge.\n\n\nissues are:\n\nConflict in test_clustering_outages.py is only around the EMPTY_DATA definition, and clustering_crud_suite.py merges with no conflict, but after resolving, three references still point at EMPTY_DEVICE_DATA, which this change removes:\n[\n- in 124595, clustering_crud_suite.py: `EMPTY_DATA \u003d netconf.EMPTY_DEVICE_DATA`\n- in 124594, test_clustering_outages.py: `expected_data\u003dnetconf.EMPTY_DEVICE_DATA`\n- in 124594, test_clustering_outages.py: `check_device_data_on_nodes(NODE_IPS,netconf.EMPTY_DEVICE_DATA)`\n\n]\nThose lines don\u0027t exist in the patchset this is based on, which is why nothing flags them im pretty sure. From my checks, the result is an AttributeError on import and every clustering suite failing at collection\n\nnetconf_cluster.py is fine.\n\nTLDR - FIX\n----------\nSimplest fix is probably to point those three at EMPTY_DEVICE_DATA_PATTERN while you\u0027re rebasing — they all go through wait_device_config_data, which already accepts a pattern, so nothing else needs to change. I can also do this on my end afterwards instead if need be.",
+      "revId": "4d5f968339f88064973a18fb12ec977b1c317aab",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

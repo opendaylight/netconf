@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "020b8368_4bbb0964",
+        "filename": "tests/libraries/netconf_cluster.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-15T08:04:25Z",
+      "side": 1,
+      "message": "`delete_when_present` was converted to `does_device_data_match_expected`, but this still uses `!\u003d expected`.\n\n`_wait_until_device_data_applied` takes `str | re.Pattern` and `create_device_data` forwards `expected` straight into it, so a compiled pattern here would compare a `str` against an `re.Pattern`, which I checked and it\u0027s always unequal: so the guard would `POST` on every retry and lose the protection, which is why it exists I suppose.\n\nNothing passes a pattern to `create_device_data` today, so i\u0027d say it\u0027s latent rather than broken, but for consistency with `delete_when_present`, could this use the helper too? And also widen the annotation to `str | re.Pattern`?",
+      "revId": "15423fd31e9a359462aab97035ddc363725607f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
