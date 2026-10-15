@@ -40,12 +40,12 @@ import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
+import org.opendaylight.netconf.transport.ssh.SSHClientSessionRef;
 import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
@@ -354,9 +354,9 @@ public final class CallHomeMountService implements AutoCloseable {
     public CallHomeSshSessionContextManager createSshSessionContextManager() {
         return new CallHomeSshSessionContextManager() {
             @Override
-            public CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession,
-                    final NegotiatedSshAlg sshAlg) {
-                final var remoteAddr = clientSession.getRemoteAddress();
+            public @Nullable CallHomeSshSessionContext createContext(final String id,
+                    final SSHClientSessionRef clientSession, final NegotiatedSshAlg sshAlg) {
+                final var remoteAddr = clientSession.remoteAddress();
                 topology.enableNode(asNode(id, remoteAddr, new ProtocolBuilder().setName(Protocol.Name.SSH)
                     .setSpecification(new SshCaseBuilder().setSshTransportParameters(sshTransportParameters).build())
                     .build()), sshAlg);

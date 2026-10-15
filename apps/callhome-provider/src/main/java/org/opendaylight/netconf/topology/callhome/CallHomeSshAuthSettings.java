@@ -11,9 +11,10 @@ import static java.util.Objects.requireNonNull;
 
 import java.security.KeyPair;
 import java.util.Collection;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.transport.ssh.SSHClientCredentials;
 
 /**
  * Authorization context for incoming call home sessions.
@@ -30,11 +31,11 @@ public interface CallHomeSshAuthSettings {
     String id();
 
     /**
-     * Applies auth settings on {@link ClientSession} instance for subsequent {@link ClientSession#auth()} invocation.
+     * Returns the credentials used to authenticate the call home session. transport-ssh sets them on the SSH session.
      *
-     * @param session client session object
+     * @return the credentials
      */
-    void applyTo(ClientSession session);
+    SSHClientCredentials credentials();
 
     /**
      * Default implementation of {@link CallHomeSshAuthSettings}. Serves SSH authentication by password(s) and/or
@@ -57,18 +58,9 @@ public interface CallHomeSshAuthSettings {
         }
 
         @Override
-        public void applyTo(final ClientSession session) {
-            session.setUsername(username);
-            if (keyPairs != null) {
-                for (KeyPair keyPair : keyPairs) {
-                    session.addPublicKeyIdentity(keyPair);
-                }
-            }
-            if (passwords != null) {
-                for (String password : passwords) {
-                    session.addPasswordIdentity(password);
-                }
-            }
+        public SSHClientCredentials credentials() {
+            return new SSHClientCredentials(username, passwords == null ? List.of() : List.copyOf(passwords),
+                keyPairs == null ? List.of() : List.copyOf(keyPairs));
         }
     }
 }

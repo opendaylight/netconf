@@ -40,9 +40,9 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.ssh.SSHClientSessionRef;
 import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.protocol.specification.SshCase;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.protocol.specification.ssh._case.SshTransportParameters;
@@ -77,7 +77,7 @@ class CallHomeMountServiceTest {
     @Mock
     private NegotiatedSshAlg sshAlg;
     @Mock
-    private ClientSession sshSession;
+    private SSHClientSessionRef sshSession;
     @Mock
     private Channel nettyChannel;
     @Mock
@@ -97,7 +97,7 @@ class CallHomeMountServiceTest {
     @Test
     void sshSessionContextManager() {
         reproduceEnsureNodeId2();
-        doReturn(SOCKET_ADDRESS).when(sshSession).getRemoteAddress();
+        doReturn(SOCKET_ADDRESS).when(sshSession).remoteAddress();
         final var sshSessionContextManager = service.createSshSessionContextManager();
 
         // id 1 -- netconf layer created
@@ -191,7 +191,7 @@ class CallHomeMountServiceTest {
         service = new CallHomeMountService(topology,
             config("curve25519-sha256", "hmac-sha2-256", "aes256-ctr", "ssh-ed25519"));
         reproduceEnsureNodeId2();
-        doReturn(SOCKET_ADDRESS).when(sshSession).getRemoteAddress();
+        doReturn(SOCKET_ADDRESS).when(sshSession).remoteAddress();
 
         assertNotNull(service.createSshSessionContextManager().createContext(ID1, sshSession, sshAlg));
 
@@ -206,7 +206,7 @@ class CallHomeMountServiceTest {
     void onEndpointsChangedRecomputesTransportParameters() {
         service = new CallHomeMountService(topology, config("", "", "aes256-ctr, aes128-ctr", ""));
         reproduceEnsureNodeId2();
-        doReturn(SOCKET_ADDRESS).when(sshSession).getRemoteAddress();
+        doReturn(SOCKET_ADDRESS).when(sshSession).remoteAddress();
 
         // a datastore notification triggers recomputation of the SSH algorithms
         service.onEndpointsChanged(List.of());
