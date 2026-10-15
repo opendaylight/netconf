@@ -137,13 +137,8 @@ final class TransportSshClient extends SshClient {
             } else {
                 ConfigUtils.setKeepAlives(ret, null, null);
             }
-            if (clientIdentity == null) {
-                throw new UnsupportedConfigurationException("Client parameters are required");
-            }
-            final var username = clientIdentity.getUsername();
-            if (username == null) {
-                throw new UnsupportedConfigurationException("Client parameters are missing username");
-            }
+            // With a session handler, the username is set on each session once the handler accepts its server
+            final var username = configurator instanceof SessionHandlerConfigurator ? null : requireUsername();
 
             if (clientIdentity != null && clientIdentity.getNone() == null) {
                 setClientIdentity(ret, clientIdentity, configurator == null);
@@ -162,6 +157,17 @@ final class TransportSshClient extends SshClient {
 
             ret.setSessionFactory(new TransportClientSessionFactory(ret, username));
             return ret;
+        }
+
+        private String requireUsername() throws UnsupportedConfigurationException {
+            if (clientIdentity == null) {
+                throw new UnsupportedConfigurationException("Client parameters are required");
+            }
+            final var username = clientIdentity.getUsername();
+            if (username == null) {
+                throw new UnsupportedConfigurationException("Client parameters are missing username");
+            }
+            return username;
         }
 
         /**

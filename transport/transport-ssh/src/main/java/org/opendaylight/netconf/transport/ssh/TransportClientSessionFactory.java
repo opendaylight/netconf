@@ -7,26 +7,29 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
-import static java.util.Objects.requireNonNull;
-
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.client.session.SessionFactory;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoSession;
 
 /**
- * A {@link SessionFactory} producing {@link TransportClientSession}s for a particular user.
+ * A {@link SessionFactory} producing {@link TransportClientSession}s. If a username is configured, it is set on each
+ * session. Otherwise, the username is set later, e.g. by {@link SessionHandlerConfigurator} once the server is
+ * accepted.
  */
 final class TransportClientSessionFactory extends SessionFactory {
-    private final String username;
+    private final @Nullable String username;
 
-    TransportClientSessionFactory(final TransportSshClient client, final String username) {
+    TransportClientSessionFactory(final TransportSshClient client, final @Nullable String username) {
         super(client);
-        this.username = requireNonNull(username);
+        this.username = username;
     }
 
     @Override
     protected TransportClientSession doCreateSession(final IoSession ioSession) throws Exception {
         final var ret = new TransportClientSession((TransportSshClient) getClient(), ioSession);
-        ret.setUsername(username);
+        if (username != null) {
+            ret.setUsername(username);
+        }
         return ret;
     }
 }
