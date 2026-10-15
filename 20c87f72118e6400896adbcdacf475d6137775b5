@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0221d75b_4898806a",
+        "filename": "tests/libraries/utils.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-15T15:46:41Z",
+      "side": 1,
+      "message": "could just that similar named function above accept None?",
+      "revId": "20c87f72118e6400896adbcdacf475d6137775b5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
