@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33722f54_8de4ed4b",
+        "filename": "tests/suites/clusteringscale/test_clusteringscale_performance.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-15T06:42:12Z",
+      "side": 1,
+      "message": "Pytest applies xfail to setup and teardown too, and every helper here raises AssertionError, so a device that never mounts, data that never reaches node 2/3, or even a cluster startup failure is reported as the NETCONF-1666 xfail. Which step does NETCONF-1666 actually break? Could we drop the marker and call pytest.xfail() only around that step\u0027s AssertionError, so other regressions still fail?",
+      "revId": "36d9ebbfca7084d8b434aa7455e17ddd81f1ee26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
