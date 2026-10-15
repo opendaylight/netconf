@@ -22,6 +22,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.List;
@@ -46,22 +47,35 @@ import org.opendaylight.netconf.server.api.monitoring.SessionListener;
 import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
-import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyPairProvider;
-import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
-import org.opendaylight.netconf.shaded.sshd.server.auth.password.PasswordAuthenticator;
-import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
-import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.PublickeyAuthenticator;
-import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.UserAuthPublicKeyFactory;
 import org.opendaylight.netconf.topology.callhome.CallHomeSshAuthSettings.DefaultAuthSettings;
 import org.opendaylight.netconf.transport.ssh.SSHServer;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
-import org.opendaylight.netconf.transport.ssh.ServerFactoryManagerConfigurator;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.crypt.hash.rev140806.CryptHash;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.RsaPrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.SubjectPublicKeyInfoFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010._private.key.grouping._private.key.type.CleartextPrivateKeyBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.InlineBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.inline.InlineDefinitionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev251204.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.CapabilitiesBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.server.rev251204.netconf.server.callhome.stack.grouping.transport.ssh.ssh.SshServerParameters;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.server.rev251204.netconf.server.callhome.stack.grouping.transport.ssh.ssh.SshServerParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ClientAuthentication;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ClientAuthenticationBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ServerIdentity;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ServerIdentityBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.client.authentication.UsersBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.client.authentication.users.User;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.client.authentication.users.UserBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.client.authentication.users.user.PasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.client.authentication.users.user.PublicKeysBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.server.identity.HostKeyBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.server.identity.host.key.host.key.type.PublicKeyBuilder;
+import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 @ExtendWith(MockitoExtension.class)
@@ -107,11 +121,18 @@ class CallHomeSshServerTest {
             // client 1 is not identified
             return null;
         };
-        // client side authenticators
-        final PasswordAuthenticator passwordAuthenticator =
-            (username, password, session) -> USERNAME.equals(username) && PASSWORD.equals(password);
-        final PublickeyAuthenticator publicKeyAuthenticator =
-            (username, publicKey, session) -> serverKeys.getPublic().equals(publicKey);
+        // client side SSH server parameters: clients 1 to 3 accept the password, client 4 accepts the server key
+        final var passwordAuth = clientAuthentication(new UserBuilder()
+            .setName(USERNAME)
+            .setPassword(new PasswordBuilder().setHashedPassword(new CryptHash("$0$" + PASSWORD)).build())
+            .build());
+        final var client1Params = serverParameters(client1Keys, passwordAuth);
+        final var client2Params = serverParameters(client2Keys, passwordAuth);
+        final var client3Params = serverParameters(client3Keys, passwordAuth);
+        final var client4Params = serverParameters(client4Keys, clientAuthentication(new UserBuilder()
+            .setName(USERNAME)
+            .setPublicKeys(new PublicKeysBuilder().setInlineOrTruststore(publicKey(serverKeys.getPublic())).build())
+            .build()));
 
         // Netconf layer for clients
         doReturn(serverSessionListener).when(monitoringService).getSessionListener();
@@ -163,59 +184,29 @@ class CallHomeSshServerTest {
 
         try {
             // client 1: rejected due to public key is not identified
-            client1 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams, null,
-                new ServerFactoryManagerConfigurator() {
-                    @Override
-                    protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
-                        factoryManager.setKeyPairProvider(KeyPairProvider.wrap(client1Keys));
-                        factoryManager.setPasswordAuthenticator(passwordAuthenticator);
-                        factoryManager.setUserAuthFactories(List.of(UserAuthPasswordFactory.INSTANCE));
-                    }
-                }).get(TIMEOUT, TimeUnit.MILLISECONDS);
+            client1 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams,
+                client1Params).get(TIMEOUT, TimeUnit.MILLISECONDS);
             // verify unknown key reported
             verify(statusRecorder, timeout(TIMEOUT).times(1))
                 .reportUnknown(any(InetSocketAddress.class), eq(client1Keys.getPublic()));
 
             // client 2: rejected due to auth failure (wrong password)
-            client2 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams, null,
-                new ServerFactoryManagerConfigurator() {
-                    @Override
-                    protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
-                        factoryManager.setKeyPairProvider(KeyPairProvider.wrap(client2Keys));
-                        factoryManager.setPasswordAuthenticator(passwordAuthenticator);
-                        factoryManager.setUserAuthFactories(List.of(UserAuthPasswordFactory.INSTANCE));
-                    }
-                }).get(TIMEOUT, TimeUnit.MILLISECONDS);
+            client2 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams,
+                client2Params).get(TIMEOUT, TimeUnit.MILLISECONDS);
             // verify auth failure reported for known key
             verify(statusRecorder, timeout(TIMEOUT).times(1)).reportFailedAuth("client2-id");
 
             // client 3: success with password auth
-            client3 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams, null,
-                new ServerFactoryManagerConfigurator() {
-                    @Override
-                    protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
-                        factoryManager.setKeyPairProvider(KeyPairProvider.wrap(client3Keys));
-                        factoryManager.setPasswordAuthenticator(passwordAuthenticator);
-                        factoryManager.setUserAuthFactories(List.of(UserAuthPasswordFactory.INSTANCE));
-                    }
-                }).get(TIMEOUT, TimeUnit.MILLISECONDS);
+            client3 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams,
+                client3Params).get(TIMEOUT, TimeUnit.MILLISECONDS);
             // verify netconf sessions established
             verify(clientSessionListener, timeout(TIMEOUT).times(1)).onSessionUp(any(NetconfClientSession.class));
             verify(serverSessionListener, timeout(TIMEOUT).times(1)).onSessionUp(any(NetconfServerSession.class));
             verify(statusRecorder, times(1)).reportSuccess("client3-id");
 
             // client 4: success with public key auth
-            client4 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams, null,
-                new ServerFactoryManagerConfigurator() {
-                    @Override
-                    protected void configureServerFactoryManager(final ServerFactoryManager factoryManager) {
-                        factoryManager.setKeyPairProvider(KeyPairProvider.wrap(client4Keys));
-                        final var pkFactory = new UserAuthPublicKeyFactory();
-                        pkFactory.setSignatureFactories(factoryManager.getSignatureFactories());
-                        factoryManager.setPublickeyAuthenticator(publicKeyAuthenticator);
-                        factoryManager.setUserAuthFactories(List.of(pkFactory));
-                    }
-                }).get(TIMEOUT, TimeUnit.MILLISECONDS);
+            client4 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams,
+                client4Params).get(TIMEOUT, TimeUnit.MILLISECONDS);
             // verify netconf sessions established
             verify(clientSessionListener, timeout(TIMEOUT).times(2)).onSessionUp(any(NetconfClientSession.class));
             verify(serverSessionListener, timeout(TIMEOUT).times(2)).onSessionUp(any(NetconfServerSession.class));
@@ -248,6 +239,61 @@ class CallHomeSshServerTest {
         try (var socket = new ServerSocket(0)) {
             return socket.getLocalPort();
         }
+    }
+
+    private static ClientAuthentication clientAuthentication(final User user) {
+        return new ClientAuthenticationBuilder()
+            .setUsers(new UsersBuilder().setUser(BindingMap.of(user)).build())
+            .build();
+    }
+
+    private static SshServerParameters serverParameters(final KeyPair hostKeys,
+            final ClientAuthentication clientAuthentication) {
+        return new SshServerParametersBuilder()
+            .setServerIdentity(serverIdentity(hostKeys))
+            .setClientAuthentication(clientAuthentication)
+            .build();
+    }
+
+    private static ServerIdentity serverIdentity(final KeyPair keyPair) {
+        return new ServerIdentityBuilder()
+            .setHostKey(List.of(new HostKeyBuilder()
+                .setName("host-key")
+                .setHostKeyType(new PublicKeyBuilder()
+                    .setPublicKey(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010
+                        .ssh.server.grouping.server.identity.host.key.host.key.type._public.key.PublicKeyBuilder()
+                        .setInlineOrKeystore(new InlineBuilder()
+                            .setInlineDefinition(new InlineDefinitionBuilder()
+                                .setPublicKeyFormat(SubjectPublicKeyInfoFormat.VALUE)
+                                .setPublicKey(keyPair.getPublic().getEncoded())
+                                .setPrivateKeyFormat(RsaPrivateKeyFormat.VALUE)
+                                .setPrivateKeyType(new CleartextPrivateKeyBuilder()
+                                    .setCleartextPrivateKey(keyPair.getPrivate().getEncoded())
+                                    .build())
+                                .build())
+                            .build())
+                        .build())
+                    .build())
+                .build()))
+            .build();
+    }
+
+    private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
+            .inline.or.truststore._public.keys.grouping.inline.or.truststore.Inline publicKey(
+                final PublicKey publicKey) {
+        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
+            .inline.or.truststore._public.keys.grouping.inline.or.truststore.InlineBuilder()
+            .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010
+                .inline.or.truststore._public.keys.grouping.inline.or.truststore.inline.InlineDefinitionBuilder()
+                .setPublicKey(BindingMap.of(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore
+                    .rev241010.inline.or.truststore._public.keys.grouping.inline.or.truststore.inline.inline.definition
+                    .PublicKeyBuilder()
+                    .setName("public-key")
+                    .setPublicKeyFormat(SubjectPublicKeyInfoFormat.VALUE)
+                    .setPublicKey(publicKey.getEncoded())
+                    .build()))
+                .build())
+            .build();
     }
 
     private static KeyPair generateKeyPair() throws Exception {

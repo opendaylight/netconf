@@ -73,6 +73,18 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc9640</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc9641</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>rfc9642</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc9643-ietf-tcp-client</artifactId>
         </dependency>
         <dependency>
@@ -187,6 +199,11 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.ietf.model</groupId>
+            <artifactId>iana-crypt-hash</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc6022</artifactId>
             <scope>test</scope>
         </dependency>
@@ -211,10 +228,27 @@
             <artifactId>netconf-server</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>draft-ietf-netconf-server</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <!-- Tests use these models directly, so the analysis expects test scope. They must stay in compile
+                         scope: the YANG imports of ietf-netconf-client need them, and test scope breaks the YANG build. -->
+                    <ignoredNonTestScopedDependencies>
+                        <ignoredNonTestScopedDependency>org.opendaylight.ietf.model:rfc9640</ignoredNonTestScopedDependency>
+                        <ignoredNonTestScopedDependency>org.opendaylight.ietf.model:rfc9641</ignoredNonTestScopedDependency>
+                        <ignoredNonTestScopedDependency>org.opendaylight.ietf.model:rfc9642</ignoredNonTestScopedDependency>
+                    </ignoredNonTestScopedDependencies>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
