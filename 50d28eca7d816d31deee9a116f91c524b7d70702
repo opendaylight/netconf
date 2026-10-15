@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e91d825a_b0af3ecc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-15T15:31:15Z",
+      "side": 1,
+      "message": "what could not run - is that in original as well?",
+      "revId": "50d28eca7d816d31deee9a116f91c524b7d70702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ec3100a_42ee1af7",
+        "filename": "tests/libraries/netconf_cluster.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-15T15:31:15Z",
+      "side": 1,
+      "message": "it is applied? has been?",
+      "revId": "50d28eca7d816d31deee9a116f91c524b7d70702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5317cf3d_322c0f21",
+        "filename": "tests/libraries/netconf_cluster.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-15T15:31:15Z",
+      "side": 1,
+      "message": "it is?",
+      "revId": "50d28eca7d816d31deee9a116f91c524b7d70702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9bfce87_a7c08c84",
+        "filename": "tests/suites/clustering/test_clustering_entity.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-15T15:31:15Z",
+      "side": 1,
+      "message": "can be oneline?",
+      "revId": "50d28eca7d816d31deee9a116f91c524b7d70702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
