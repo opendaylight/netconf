@@ -20,6 +20,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -41,12 +42,20 @@ final class ServerRequestExecutor implements PendingRequestListener {
      * @param ctx the {@link ChannelHandlerContext} on which the request is occuring
      * @param streamId the HTTP/2 stream ID, if present
      * @param version HTTP version of the request
+     * @param body streaming body to close when request processing ends, if present
      */
     @NonNullByDefault
-    private record RequestContext(ChannelHandlerContext ctx, HttpVersion version, @Nullable Integer streamId) {
+    private record RequestContext(ChannelHandlerContext ctx, HttpVersion version, @Nullable Integer streamId,
+            @Nullable RequestBodyInputStream body) {
         RequestContext {
             requireNonNull(ctx);
             requireNonNull(version);
+        }
+
+        void closeBody() {
+            if (body != null) {
+                body.close();
+            }
         }
     }
 
@@ -80,29 +89,55 @@ final class ServerRequestExecutor implements PendingRequestListener {
         respExecutor.shutdown();
     }
 
-    void executeRequest(final ChannelHandlerContext ctx, final HttpVersion version, final Integer streamId,
+    void executeRequest(final ChannelHandlerContext ctx, final HttpVersion version, final @Nullable Integer streamId,
             final PendingRequest<?> pending, final ByteBuf content) {
         // We are invoked with content's reference and need to make sure it gets released.
-        final var context = new RequestContext(ctx, version, streamId);
+        final var context = new RequestContext(ctx, version, streamId, null);
         if (content.isReadable()) {
-            executeRequest(context, pending, new ByteBufInputStream(content, true));
+            try {
+                executeRequest(context, pending, new ByteBufInputStream(content, true));
+            } catch (RejectedExecutionException e) {
+                // No reader was scheduled, so release the reference transferred to this method.
+                content.release();
+                throw e;
+            }
         } else {
             content.release();
-            executeRequest(context, pending, (ByteBufInputStream) null);
+            executeRequest(context, pending, null);
         }
     }
 
     private void executeRequest(final RequestContext context, final PendingRequest<?> pending,
-            final ByteBufInputStream body) {
+            final @Nullable InputStream body) {
         // Remember metadata about the request and then execute it
         pendingRequests.put(pending, context);
-        reqExecutor.execute(() -> pending.execute(this, body));
+        try {
+            reqExecutor.execute(() -> pending.execute(this, body));
+        } catch (RejectedExecutionException e) {
+            pendingRequests.remove(pending, context);
+            throw e;
+        }
+    }
+
+    /**
+     * Submit an incrementally delivered body without waiting for its content. The executor closes the body when the
+     * request signals completion or failure, releasing unread content and discarding further incoming content. The
+     * handler remains responsible for closing or cancelling the body if submission fails or the transport terminates.
+     *
+     * @throws RejectedExecutionException if the executor rejects submission; the request is not tracked and the caller
+     *         remains responsible for releasing the body
+     */
+    void executeStreamingRequest(final ChannelHandlerContext ctx, final HttpVersion version,
+            final @Nullable Integer streamId, final PendingRequest<?> pending,
+            final @NonNull RequestBodyInputStream body) {
+        executeRequest(new RequestContext(ctx, version, streamId, requireNonNull(body)), pending, body);
     }
 
     @Override
     public void requestComplete(final PendingRequest<?> request, final Response response) {
         final var req = pendingRequests.remove(request);
         if (req != null) {
+            req.closeBody();
             respond(req.ctx, req.streamId, req.version, response);
         } else {
             LOG.warn("Cannot pair request {}, not sending response {}", request, response, new Throwable());
@@ -114,6 +149,7 @@ final class ServerRequestExecutor implements PendingRequestListener {
         LOG.warn("Internal error while processing {}", request, cause);
         final var req = pendingRequests.remove(request);
         if (req != null) {
+            req.closeBody();
             session.respond(req.ctx, req.streamId, formatException(cause, req.ctx(), req.version()));
         } else {
             LOG.warn("Cannot pair request, not sending response", new Throwable());
