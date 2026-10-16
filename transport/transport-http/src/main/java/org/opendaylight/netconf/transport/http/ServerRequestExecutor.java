@@ -20,6 +20,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -80,23 +81,47 @@ final class ServerRequestExecutor implements PendingRequestListener {
         respExecutor.shutdown();
     }
 
-    void executeRequest(final ChannelHandlerContext ctx, final HttpVersion version, final Integer streamId,
+    void executeRequest(final ChannelHandlerContext ctx, final HttpVersion version, final @Nullable Integer streamId,
             final PendingRequest<?> pending, final ByteBuf content) {
         // We are invoked with content's reference and need to make sure it gets released.
         final var context = new RequestContext(ctx, version, streamId);
         if (content.isReadable()) {
-            executeRequest(context, pending, new ByteBufInputStream(content, true));
+            try {
+                executeRequest(context, pending, new ByteBufInputStream(content, true));
+            } catch (RejectedExecutionException e) {
+                // No reader was scheduled, so release the reference transferred to this method.
+                content.release();
+                throw e;
+            }
         } else {
             content.release();
-            executeRequest(context, pending, (ByteBufInputStream) null);
+            executeRequest(context, pending, null);
         }
     }
 
     private void executeRequest(final RequestContext context, final PendingRequest<?> pending,
-            final ByteBufInputStream body) {
+            final @Nullable InputStream body) {
         // Remember metadata about the request and then execute it
         pendingRequests.put(pending, context);
-        reqExecutor.execute(() -> pending.execute(this, body));
+        try {
+            reqExecutor.execute(() -> pending.execute(this, body));
+        } catch (RejectedExecutionException e) {
+            pendingRequests.remove(pending, context);
+            throw e;
+        }
+    }
+
+    /**
+     * Submit an incrementally delivered body without waiting for its content. The handler is responsible for closing
+     * or cancelling the body if submission fails or request processing ends early.
+     *
+     * @throws RejectedExecutionException if the executor rejects submission; the request is not tracked and the caller
+     *         remains responsible for releasing the body
+     */
+    void executeStreamingRequest(final ChannelHandlerContext ctx, final HttpVersion version,
+            final @Nullable Integer streamId, final PendingRequest<?> pending,
+            final @NonNull RequestBodyInputStream body) {
+        executeRequest(new RequestContext(ctx, version, streamId), pending, requireNonNull(body));
     }
 
     @Override
