@@ -26,7 +26,20 @@
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.install.skip>true</maven.install.skip>
+        <sonar.host.url>
+            http://localhost:9000
+        </sonar.host.url>
     </properties>
+        <repositories>
+        <repository>
+            <id>opendaylight-snapshots</id>
+            <url>https://nexus.opendaylight.org/content/repositories/opendaylight.snapshot/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
 
     <modules>
         <module>artifacts</module>
