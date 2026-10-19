@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6967c8ff_34ed1839",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T09:16:17Z",
+      "side": 1,
+      "message": "Because this check sits in teardown, it also runs when the device never mounted (for example a follower never connecting, which is how Bug 8086 itself regresses), and then adds an ERROR saying ODL ignored the cache. Could it move into test_bug8086 after run_crud_flow, so it only runs once the mount is proven and reports as a test failure?",
+      "revId": "142fc61fec6c4dc9d527473679c52cb88af51199",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
