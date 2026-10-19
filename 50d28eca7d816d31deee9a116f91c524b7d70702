@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e6dd1e6_5bf3a9b6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-19T08:25:05Z",
+      "side": 1,
+      "message": "CRUD-RPC, and PyTest-side only — it asked for preconditions after that fixture was renamed to odl_standalone, so it failed at setup.",
+      "parentUuid": "e91d825a_b0af3ecc",
+      "revId": "50d28eca7d816d31deee9a116f91c524b7d70702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4ec3100a_42ee1af7",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-15T15:31:15Z",
       "side": 1,
       "message": "it is applied? has been?",
+      "revId": "50d28eca7d816d31deee9a116f91c524b7d70702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b27b354_8f582b82",
+        "filename": "tests/libraries/netconf_cluster.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-19T08:25:05Z",
+      "side": 1,
+      "message": "Done, \"confirms it landed\".",
+      "parentUuid": "4ec3100a_42ee1af7",
       "revId": "50d28eca7d816d31deee9a116f91c524b7d70702",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1786bb2f_afd75349",
+        "filename": "tests/libraries/netconf_cluster.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-19T08:25:05Z",
+      "side": 1,
+      "message": "same as before - done",
+      "parentUuid": "5317cf3d_322c0f21",
+      "revId": "50d28eca7d816d31deee9a116f91c524b7d70702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a9bfce87_a7c08c84",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-10-15T15:31:15Z",
       "side": 1,
       "message": "can be oneline?",
+      "revId": "50d28eca7d816d31deee9a116f91c524b7d70702",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3368bb7a_5a93e7c5",
+        "filename": "tests/suites/clustering/test_clustering_entity.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-19T08:25:05Z",
+      "side": 1,
+      "message": "It\u0027s 90 chars on one line, (blacks default) limit is 88.",
+      "parentUuid": "a9bfce87_a7c08c84",
       "revId": "50d28eca7d816d31deee9a116f91c524b7d70702",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
