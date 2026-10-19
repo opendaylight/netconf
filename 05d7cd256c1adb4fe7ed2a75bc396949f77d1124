@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c392c86_98c07a6b",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T09:14:52Z",
+      "side": 1,
+      "message": "If the configure PUT is rejected and nothing was mounted, this DELETE answers 409 data-missing and its AssertionError replaces the configure failure, so a bug 5089 reproduction is reported as \"Unexpected failure in DELETE response\". Could the cleanup on the setup-failure path log its own error instead of raising, and re-raise the original?",
+      "revId": "05d7cd256c1adb4fe7ed2a75bc396949f77d1124",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f599a3a1_790ea55a",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T09:14:52Z",
+      "side": 1,
+      "message": "These helpers resend the write whenever the read-back does not match yet, including after ODL answered 204. That was right for the outages suite, but here it means a first PUT that is accepted and then lost, on the very steps attributed to bug 4968, gets silently re-sent and the run goes green. Could the retry cover only rejected requests, and the accepted write then be waited for without resending? Same for create and delete.",
+      "revId": "05d7cd256c1adb4fe7ed2a75bc396949f77d1124",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
