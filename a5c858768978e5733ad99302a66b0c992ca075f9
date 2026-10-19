@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "126bdbc4_2531bf92",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-19T08:08:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70a843ee_f2321fe3",
+      "revId": "a5c858768978e5733ad99302a66b0c992ca075f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b7b07bfe_b1cdbb8e",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-15T15:38:17Z",
       "side": 1,
       "message": "what does it mean for us?",
+      "revId": "a5c858768978e5733ad99302a66b0c992ca075f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c26c4a1_c244b50a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-19T08:08:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b7b07bfe_b1cdbb8e",
       "revId": "a5c858768978e5733ad99302a66b0c992ca075f9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
