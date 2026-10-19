@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa4afe69_8b1bad71",
+        "filename": "tests/libraries/netconf_cluster.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-19T08:14:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ea1c9eb_0d043123",
+      "revId": "c66bd14c8fcc8b9cbfa80561e23d6c796d03dd93",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "faacf1d3_cb6ee234",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-15T15:49:15Z",
       "side": 1,
       "message": "writer_node here in docs",
+      "revId": "c66bd14c8fcc8b9cbfa80561e23d6c796d03dd93",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d386bfd0_f3b5a8cc",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-19T08:14:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "faacf1d3_cb6ee234",
       "revId": "c66bd14c8fcc8b9cbfa80561e23d6c796d03dd93",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f72ad33_61c94032",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-19T08:14:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce1ee7bf_db6b8e2f",
+      "revId": "c66bd14c8fcc8b9cbfa80561e23d6c796d03dd93",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "54cdea7b_bcd5891a",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-10-15T15:25:14Z",
       "side": 1,
       "message": "why do use use \\ here at the end of line?",
+      "revId": "c66bd14c8fcc8b9cbfa80561e23d6c796d03dd93",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "198dd183_0feb2ec1",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-19T08:14:17Z",
+      "side": 1,
+      "message": "allure uses markdown so this suppresses the newline but keeps the next line\u0027s indentation, so the stored description ends up with runs of spaces mid-sentence.\n\nThere really is no practical reason for it, just visual in allure and also at this point I have used in in other places too so it wouldn\u0027t be consistent to remove them here.",
+      "parentUuid": "54cdea7b_bcd5891a",
       "revId": "c66bd14c8fcc8b9cbfa80561e23d6c796d03dd93",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
