@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a80a807_f6dcfdc5",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/ConfigUtils.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T07:49:50Z",
+      "side": 1,
+      "message": "Same name as the package-level method it is called from, but a different job. This is a lookup only. Rename please",
+      "revId": "3a9f763850fd8bc5f42e50f7a1c75288a8d25b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad2cb92f_bcb74d5a",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStackFactory.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T07:49:50Z",
+      "side": 1,
+      "message": "This overload has the same arity as listenServer(..., SshServerGrouping, ServerFactoryManagerConfigurator), so any downstream call passing a literal null as the last argument stops compiling as ambiguous (the 4-arg listenServer above had to stop delegating for that reason). Since this is a public API on a patch stream, could the KeystoreAccess be a sixth parameter of the configurator overload instead, or the method get a distinct name?",
+      "revId": "3a9f763850fd8bc5f42e50f7a1c75288a8d25b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b376ccf_fc1c1214",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/TestUtils.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T07:49:50Z",
+      "side": 1,
+      "message": "Import the `HostKeyBuilder` and one `PublicKeyBuilder`, keep the FQN only for the clashing one. It will slightly help the readability compared to 4 FQN",
+      "revId": "3a9f763850fd8bc5f42e50f7a1c75288a8d25b4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
