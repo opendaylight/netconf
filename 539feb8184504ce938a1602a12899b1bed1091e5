@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b721ceda_42713a90",
+        "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientFactoryImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T07:55:48Z",
+      "side": 1,
+      "message": "Four public constructors is a lot for one class. Also \"new NetconfClientFactoryImpl(timer, null)\" no longer compiles (ambiguous). Keep one full constructor plus the activation one, or document which is for whom.",
+      "revId": "539feb8184504ce938a1602a12899b1bed1091e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90a1aad1_58ddb16b",
+        "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientFactoryImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T07:55:48Z",
+      "side": 1,
+      "message": "A static greedy reference means SCR deactivates and recreates this component whenever a higher-ranked KeystoreAccess appears or the legacy one goes away. It\u0027ll call close() then shut down the SSH event loop and every consumer holding NetconfClientFactory restarts. Would a dynamic greedy (volatile) reference avoid the restart altogether? Just something for consideration.",
+      "revId": "539feb8184504ce938a1602a12899b1bed1091e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
