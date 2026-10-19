@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed544551_c4176d3d",
+        "filename": "keystore/keystore-legacy/src/main/java/org/opendaylight/netconf/keystore/legacy/CertifiedPrivateKey.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T07:42:58Z",
+      "side": 1,
+      "message": "Remove the \"as\" -\u003e \"which has an attached\"",
+      "revId": "c0fe504da66dedc63a06d3df4ec12de0daf4f7c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2383cb3_51ce1a8a",
+        "filename": "keystore/keystore-legacy/src/main/java/org/opendaylight/netconf/keystore/legacy/impl/DefaultNetconfKeystoreService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T07:42:58Z",
+      "side": 1,
+      "message": "Returns null - can be @Nullable",
+      "revId": "c0fe504da66dedc63a06d3df4ec12de0daf4f7c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e9ec8e1_f0cba17f",
+        "filename": "keystore/keystore-legacy/src/test/java/org/opendaylight/netconf/keystore/legacy/impl/DefaultNetconfKeystoreServiceTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T07:42:58Z",
+      "side": 1,
+      "message": "The test covers only \"first update is invalid\". The more interesting contract: \"a later invalid update keeps the previous good keys\" — is not tested. Can we add that in?",
+      "revId": "c0fe504da66dedc63a06d3df4ec12de0daf4f7c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51ac837f_78c1b38d",
+        "filename": "keystore/keystore-none/src/main/java/org/opendaylight/netconf/keystore/none/NoneKeystoreAccess.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T07:42:58Z",
+      "side": 1,
+      "message": "Use Integer.MIN_VALUE instead of the magic literal",
+      "revId": "c0fe504da66dedc63a06d3df4ec12de0daf4f7c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97be0ba0_f519dbed",
+        "filename": "keystore/keystore-none/src/main/java/org/opendaylight/netconf/keystore/none/NoneKeystoreAccess.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T07:42:58Z",
+      "side": 1,
+      "message": "This copies EmptyKeystoreAccess line for line. Do we need it?",
+      "revId": "c0fe504da66dedc63a06d3df4ec12de0daf4f7c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
