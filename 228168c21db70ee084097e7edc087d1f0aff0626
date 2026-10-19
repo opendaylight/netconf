@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "858aae56_8b732658",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T09:02:13Z",
+      "side": 1,
+      "message": "If any step between this kill and start_member at line 363 fails, the member is never restarted: the configured_device teardown then deconfigures through dead member 1 (cycle 1) or waits on a dead member (cycles 2/3), so it errors and leaves the device mounted, and the session\u0027s cluster stays one member short. Could you put the steps after the kill in a try/finally that restarts the member if the happy path did not?",
+      "revId": "228168c21db70ee084097e7edc087d1f0aff0626",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
