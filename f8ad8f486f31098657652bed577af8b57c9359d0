@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c203e8ce_8cdef340",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T08:00:47Z",
+      "side": 1,
+      "message": "This is only used once.. can be inlined",
+      "revId": "f8ad8f486f31098657652bed577af8b57c9359d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22102d95_c6dc79ca",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T08:00:47Z",
+      "side": 1,
+      "message": "With this, a missing key-id is no longer an immediate device failure: NetconfNodeHandler catches the UnsupportedConfigurationException at line 274, logs it at DEBUG and retries, and max-connection-attempts defaults to 0 (forever), so a typo\u0027d key-id leaves the node \"connecting\" with nothing visible. Could the catch in NetconfNodeHandler.lockedConnect log at WARN (at least on the first attempt) so the reason is not lost?",
+      "revId": "f8ad8f486f31098657652bed577af8b57c9359d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bd79f43_e1b1c615",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultCredentialProvider.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-19T08:00:47Z",
+      "side": 1,
+      "message": "Add the since/forRemoval info to the @Deprecated annotation(just like above)",
+      "revId": "f8ad8f486f31098657652bed577af8b57c9359d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
