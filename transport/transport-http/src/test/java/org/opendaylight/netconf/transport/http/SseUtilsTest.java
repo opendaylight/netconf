@@ -66,9 +66,13 @@ class SseUtilsTest {
 
     private static void assertSameContent(final List<ByteBuf> expected, final List<ByteBuf> actual) {
         assertNotNull(actual);
-        assertEquals(expected.size(), actual.size());
-        for (int i = 0; i < expected.size(); i++) {
-            assertArrayEquals(ByteBufUtil.getBytes(expected.get(i)), ByteBufUtil.getBytes(actual.get(i)));
+        try {
+            assertEquals(expected.size(), actual.size());
+            for (int i = 0; i < expected.size(); i++) {
+                assertArrayEquals(ByteBufUtil.getBytes(expected.get(i)), ByteBufUtil.getBytes(actual.get(i)));
+            }
+        } finally {
+            actual.forEach(ByteBuf::release);
         }
     }
 }
