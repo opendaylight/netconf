@@ -10,13 +10,19 @@ package org.opendaylight.netconf.topology.spi;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
+import com.google.common.util.concurrent.SettableFuture;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.List;
@@ -38,6 +44,9 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
+import org.opendaylight.netconf.client.NetconfClientSession;
+import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
@@ -49,6 +58,7 @@ import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.test.util.CustomTreeModification;
+import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -64,6 +74,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev25
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
@@ -77,6 +88,8 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 
 @ExtendWith(MockitoExtension.class)
 class AbstractNetconfTopologyTest {
+    private static final NodeId NODE_ID = new NodeId("nodeId");
+
     @Mock
     private NetconfTimer timer;
     @Mock
@@ -107,6 +120,10 @@ class AbstractNetconfTopologyTest {
     private DataObjectIdentifierWithKey<Node, NodeKey> path;
     @Mock
     private NegotiatedSshAlg sshAlg;
+    @Mock
+    private CallHomeSessionInitializer initializer;
+    @Mock
+    private CallHomeSessionInitializer otherInitializer;
 
     @Captor
     private ArgumentCaptor<Throwable> exceptionCaptor;
@@ -214,6 +231,174 @@ class AbstractNetconfTopologyTest {
         topology.onDataTreeChanged(List.of(
             new CustomTreeModification(LogicalDatastoreType.OPERATIONAL, path, dataObjectDeleted)));
         verify(delegate).close();
+    }
+
+    @Test
+    void callHomeNodeIsRejectedWhileConfigured() throws Exception {
+        final var topology = newTopology();
+        final var connectFuture = SettableFuture.<NetconfClientSession>create();
+        doReturn(connectFuture).when(clientFactory).createClient(any(NetconfClientConfiguration.class),
+            any(SSHNegotiatedAlgListener.class));
+        topology.ensureNode(configuredNode(), null);
+
+        // the call-home node is not created and the configured node is left intact
+        assertNull(topology.ensureCallHomeNode(configuredNode(), null, initializer));
+        verifyNoInteractions(initializer);
+        assertFalse(connectFuture.isCancelled());
+        verify(delegate, never()).close();
+    }
+
+    @Test
+    void configuredNodeReplaceConnectedCallHome() throws Exception {
+        final var topology = newTopology();
+        final var sessionFuture = SettableFuture.<NetconfClientSession>create();
+        final var connectFuture = SettableFuture.<NetconfClientSession>create();
+        doReturn(sessionFuture).when(initializer).initialize(any(NetconfClientSessionListener.class));
+        doReturn(connectFuture).when(clientFactory).createClient(any(NetconfClientConfiguration.class),
+            any(SSHNegotiatedAlgListener.class));
+        topology.ensureCallHomeNode(configuredNode(), null, initializer);
+        doNothing().when(delegate).close();
+
+        topology.ensureNode(configuredNode(), null);
+
+        // the previous call-home node is disconnected and replaced
+        assertTrue(sessionFuture.isCancelled());
+        verify(delegate).close();
+        verify(clientFactory).createClient(any(NetconfClientConfiguration.class),
+            any(SSHNegotiatedAlgListener.class));
+        assertFalse(connectFuture.isCancelled());
+    }
+
+    @Test
+    void callHomeNodeReplacesPreviousCallHomeNode() throws Exception {
+        final var topology = newTopology();
+        final var sessionFuture = SettableFuture.<NetconfClientSession>create();
+        final var otherSessionFuture = SettableFuture.<NetconfClientSession>create();
+        doReturn(sessionFuture).when(initializer).initialize(any(NetconfClientSessionListener.class));
+        doReturn(otherSessionFuture).when(otherInitializer).initialize(any(NetconfClientSessionListener.class));
+        final var registration = topology.ensureCallHomeNode(configuredNode(), null, initializer);
+        doNothing().when(delegate).close();
+
+        assertNotNull(topology.ensureCallHomeNode(configuredNode(), null, otherInitializer));
+
+        // the previous call-home node is disconnected and replaced
+        assertTrue(sessionFuture.isCancelled());
+        verify(delegate).close();
+        verify(otherInitializer).initialize(any(NetconfClientSessionListener.class));
+        assertFalse(otherSessionFuture.isCancelled());
+
+        // closing the registration of the replaced call-home node does not affect its replacement
+        registration.close();
+        assertFalse(otherSessionFuture.isCancelled());
+        verify(delegate).close();
+    }
+
+    @Test
+    void deleteNodeDoesNotDisconnectCallHomeNode() throws Exception {
+        final var topology = newTopology();
+        final var sessionFuture = SettableFuture.<NetconfClientSession>create();
+        doReturn(sessionFuture).when(initializer).initialize(any(NetconfClientSessionListener.class));
+        final var registration = topology.ensureCallHomeNode(configuredNode(), null, initializer);
+
+        topology.deleteNode(NODE_ID);
+        assertFalse(sessionFuture.isCancelled());
+        verify(delegate, never()).close();
+
+        doNothing().when(delegate).close();
+        registration.close();
+        assertTrue(sessionFuture.isCancelled());
+        verify(delegate).close();
+    }
+
+    @Test
+    void closeReplacedCallHomeNodeDoesNotDisconnectConfiguredNode() throws Exception {
+        final var topology = newTopology();
+        final var sessionFuture = SettableFuture.<NetconfClientSession>create();
+        final var connectFuture = SettableFuture.<NetconfClientSession>create();
+        doReturn(sessionFuture).when(initializer).initialize(any(NetconfClientSessionListener.class));
+        doReturn(connectFuture).when(clientFactory).createClient(any(NetconfClientConfiguration.class),
+            any(SSHNegotiatedAlgListener.class));
+        final var registration = topology.ensureCallHomeNode(configuredNode(), null, initializer);
+        doNothing().when(delegate).close();
+        topology.ensureNode(configuredNode(), null);
+        verify(delegate).close();
+
+        registration.close();
+        assertFalse(connectFuture.isCancelled());
+        verify(delegate).close();
+
+        topology.deleteNode(NODE_ID);
+        assertTrue(connectFuture.isCancelled());
+        verify(delegate, times(2)).close();
+    }
+
+    @Test
+    void sshParamsUpdateDoesNotReconnectCallHomeNode() throws Exception {
+        final var topology = newTopology();
+        final var connectFuture = SettableFuture.<NetconfClientSession>create();
+        doReturn(connectFuture).when(clientFactory).createClient(any(NetconfClientConfiguration.class),
+            any(SSHNegotiatedAlgListener.class));
+        topology.ensureNode(configuredNode(), null);
+
+        final var sessionFuture = SettableFuture.<NetconfClientSession>create();
+        doReturn(sessionFuture).when(initializer).initialize(any(NetconfClientSessionListener.class));
+        topology.ensureCallHomeNode(configuredNode(new NodeId("callHomeNodeId")), null, initializer);
+
+        final var sshParams = AbstractNetconfTopology.defaultSshParams();
+        doNothing().when(wtx).put(eq(LogicalDatastoreType.OPERATIONAL), any(DataObjectIdentifier.class), eq(sshParams));
+        doNothing().when(delegate).close();
+        topology.updateSshParams(sshParams);
+
+        // the configured node is reconnected ...
+        assertTrue(connectFuture.isCancelled());
+        verify(clientFactory, times(2)).createClient(any(NetconfClientConfiguration.class),
+            any(SSHNegotiatedAlgListener.class));
+        // ... while the call-home node is left intact
+        assertFalse(sessionFuture.isCancelled());
+        verify(initializer).initialize(any(NetconfClientSessionListener.class));
+        verify(delegate).close();
+    }
+
+    private TestingNetconfTopologyImpl newTopology() {
+        doReturn(wtx).when(dataBroker).newWriteOnlyTransaction();
+        doReturn(CommitInfo.emptyFluentFuture()).when(wtx).commit();
+        doNothing().when(wtx).merge(eq(LogicalDatastoreType.OPERATIONAL), any(DataObjectIdentifier.class),
+            any(Topology.class));
+
+        return new TestingNetconfTopologyImpl("id", clientFactory, timer, new NetconfTopologySchemaAssembler(1),
+            schemaManager, dataBroker, mountPointService,
+            new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
+                sslContextFactoryProvider), deviceActionFactory,
+            new DefaultBaseNetconfSchemaProvider(DaggerDefaultYangParserComponent.create().parserFactory()));
+    }
+
+    private static Node configuredNode() {
+        return configuredNode(NODE_ID);
+    }
+
+    private static Node configuredNode(final NodeId nodeId) {
+        return new NodeBuilder()
+            .setNodeId(nodeId)
+            .addAugmentation(new NetconfNodeAugmentBuilder()
+                .setNetconfNode(new NetconfNodeBuilder()
+                    .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                    .setPort(new PortNumber(Uint16.valueOf(9999)))
+                    .setReconnectOnChangedSchema(true)
+                    .setSchemaless(true)
+                    .setTcpOnly(true)
+                    .setLockDatastore(true)
+                    .setBackoffMultiplier(Decimal64.valueOf("1.5"))
+                    .setConcurrentRpcLimit(Uint16.ONE)
+                    .setMaxConnectionAttempts(Uint32.ONE)
+                    .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
+                    .setMinBackoffMillis(Uint16.valueOf(100))
+                    .setKeepaliveDelay(Uint32.ZERO)
+                    .setConnectionTimeoutMillis(Uint32.valueOf(1000))
+                    .setMaxBackoffMillis(Uint32.valueOf(1000))
+                    .setBackoffJitter(Decimal64.valueOf("0.0"))
+                    .build())
+                .build())
+            .build();
     }
 
     private final class TestingNetconfTopologyImpl extends AbstractNetconfTopology
