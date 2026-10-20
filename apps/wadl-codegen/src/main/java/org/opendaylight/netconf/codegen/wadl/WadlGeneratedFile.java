@@ -237,7 +237,7 @@ final class WadlGeneratedFile implements GeneratedFile {
         writer.writeEndElement();
 
         final var children = ((DataNodeContainer) schemaNode).getChildNodes().stream()
-            .filter(WadlGeneratedFile::isListOrContainer)
+            .filter(child -> child instanceof ContainerSchemaNode || child instanceof ListSchemaNode)
             .toList();
 
         if (config) {
@@ -296,10 +296,5 @@ final class WadlGeneratedFile implements GeneratedFile {
         writer.writeEmptyElement("representation");
         writer.writeAttribute("mediaType", mediaType);
         writer.writeAttribute("element", name);
-    }
-
-    @NonNullByDefault
-    private static boolean isListOrContainer(final DataSchemaNode schemaNode) {
-        return schemaNode instanceof ListSchemaNode || schemaNode instanceof ContainerSchemaNode;
     }
 }
