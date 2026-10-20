@@ -12,7 +12,6 @@ import com.google.common.collect.Table;
 import java.util.Set;
 import org.opendaylight.yangtools.plugin.generator.api.FileGenerator;
 import org.opendaylight.yangtools.plugin.generator.api.GeneratedFile;
-import org.opendaylight.yangtools.plugin.generator.api.GeneratedFileLifecycle;
 import org.opendaylight.yangtools.plugin.generator.api.GeneratedFilePath;
 import org.opendaylight.yangtools.plugin.generator.api.GeneratedFileType;
 import org.opendaylight.yangtools.plugin.generator.api.ModuleResourceResolver;
@@ -26,10 +25,9 @@ final class WadlGenerator implements FileGenerator {
         final var result = ImmutableTable.<GeneratedFileType, GeneratedFilePath, GeneratedFile>builder();
 
         for (var module : localModules) {
-            final var body = new WadlTemplate(context, module).body();
-            if (body != null) {
-                result.put(GeneratedFileType.RESOURCE, new GeneratedFilePath(module.getName() + ".wadl"),
-                    GeneratedFile.of(GeneratedFileLifecycle.TRANSIENT, body));
+            final var wadlFile = WadlTemplate.of(context, module);
+            if (wadlFile != null) {
+                result.put(GeneratedFileType.RESOURCE, new GeneratedFilePath(module.getName() + ".wadl"), wadlFile);
             }
         }
         return result.build();
