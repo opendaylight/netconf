@@ -10,12 +10,13 @@ package org.opendaylight.netconf.codegen.wadl;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.Iterables;
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.xtend2.lib.StringConcatenation;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -23,7 +24,6 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.ModuleImport;
 
 final class WadlTemplate {
     private final List<DataSchemaNode> operationalData = new ArrayList<>();
@@ -33,6 +33,7 @@ final class WadlTemplate {
 
     private List<LeafSchemaNode> pathListParams;
 
+    @NonNullByDefault
     WadlTemplate(final EffectiveModelContext context, final Module module) {
         this.context = requireNonNull(context);
         this.module = requireNonNull(module);
@@ -47,345 +48,187 @@ final class WadlTemplate {
         }
     }
 
-    public CharSequence body() {
-        if (!module.getRpcs().isEmpty() || !configData.isEmpty() || !operationalData.isEmpty()) {
-            return application();
-        }
-        return null;
+    @Nullable String body() {
+        return module.getRpcs().isEmpty() && configData.isEmpty() && operationalData.isEmpty() ? null : application();
     }
 
-    private CharSequence application() {
-        StringConcatenation builder = new StringConcatenation();
-        builder.append("<?xml version=\"1.0\"?>");
-        builder.newLine();
-        builder.append("<application xmlns=\"http://wadl.dev.java.net/2009/02\" ");
-        builder.append(importsAsNamespaces());
-        builder.append(" xmlns:");
-        builder.append(module.getPrefix());
-        builder.append("=\"");
-        builder.append(module.getNamespace());
-        builder.append("\">");
-        builder.newLineIfNotEmpty();
-        builder.newLine();
-        builder.append("    ");
-        builder.append("<grammars>");
-        builder.newLine();
-        builder.append("        ");
-        builder.append("<include href=\"");
-        builder.append(module.getName(), "        ");
-        builder.append(".yang\"/>");
-        builder.newLineIfNotEmpty();
+    @NonNullByDefault
+    private String application() {
+        // FIXME: use XMLStreamWriter into a ByteArray, etc.
+        final var bb = new BlockBuilder()
+            .eol("<?xml version=\"1.0\"?>")
+            .oe("application").attr("xmlns", "http://wadl.dev.java.net/2009/02");
 
-        for (final ModuleImport imprt : module.getImports()) {
-            builder.append("        ");
-            builder.append("<include href=\"");
-            builder.append(imprt.getModuleName(), "        ");
-            builder.append(".yang\"/>");
-            builder.newLineIfNotEmpty();
+        final var moduleImports =  module.getImports();
+        for (var moduleImport : moduleImports) {
+            bb.xmlns(moduleImport.getPrefix(),
+                context.findModule(moduleImport.getModuleName().getLocalName(), moduleImport.getRevision())
+                    .orElseThrow()
+                    .getNamespace()).newLine();
         }
-
-        builder.append("    ");
-        builder.append("</grammars>");
-        builder.newLine();
-        builder.newLine();
-        builder.append("    ");
-        builder.append("<resources base=\"http://localhost:9998/restconf\">");
-        builder.newLine();
-
+        bb
+            .xmlns(module.getPrefix(), module.getNamespace()).oB()
+            .nl()
+            .oE("grammars")
+                .oe("include").attr("href", module.getName() + YangConstants.RFC6020_YANG_FILE_EXTENSION).cE();
+        for (var moduleImport : moduleImports) {
+            bb
+                .oe("include").attr("href", moduleImport.getModuleName() + YangConstants.RFC6020_YANG_FILE_EXTENSION)
+                .cE();
+        }
+        bb
+            .cE("grammars")
+            .nl()
+            .oe("resources").attr("base", "http://localhost:9998/restconf").oB();
         if (!operationalData.isEmpty()) {
-            builder.append("        ");
-            builder.append("<resource path=\"operational\">");
-            builder.newLine();
-            for (final DataSchemaNode schemaNode : operationalData) {
-                builder.append("        ");
-                builder.append("    ");
-                builder.append(firstResource(schemaNode, false), "            ");
-                builder.newLineIfNotEmpty();
+            bb
+                .oe("resource").attr("path", "operational").oB();
+            for (var data : operationalData) {
+                firstResource(bb, data, false);
             }
-            builder.append("        ");
-            builder.append("</resource>");
-            builder.newLine();
+            bb
+                .cE("resource");
         }
 
         if (!configData.isEmpty()) {
-            builder.append("        ");
-            builder.append("<resource path=\"config\">");
-            builder.newLine();
-
-            for (final DataSchemaNode schemaNode : configData) {
-                builder.append("        ");
-                builder.append("    ");
-                builder.append(mehodPost(schemaNode), "            ");
-                builder.newLineIfNotEmpty();
+            bb
+                .oe("resource").attr("path", "config").oB();
+            for (var data : configData) {
+                methodPost(bb, data);
             }
-            for (final DataSchemaNode schemaNode : configData) {
-                builder.append("        ");
-                builder.append("    ");
-                builder.append(firstResource(schemaNode, true), "            ");
-                builder.newLineIfNotEmpty();
+            for (var data : configData) {
+                firstResource(bb, data, true);
             }
-            builder.append("        ");
-            builder.append("</resource>");
-            builder.newLine();
+            bb
+                .cE("resource");
         }
 
         final var rpcs = module.getRpcs();
         if (!rpcs.isEmpty()) {
-            builder.append("        ");
-            builder.append("<resource path=\"operations\">");
-            builder.newLine();
+            bb
+                .oe("resource").attr("path", "operations").oB();
             for (var rpc : rpcs) {
-                builder.append("        ");
-                builder.append("    ");
-                builder.append("<resource path=\"");
-                builder.append(module.getName(), "            ");
-                builder.append(":");
-                builder.append(rpc.getQName().getLocalName(), "            ");
-                builder.append("\">");
-                builder.newLineIfNotEmpty();
-                builder.append("        ");
-                builder.append("    ");
-                builder.append("    ");
-                builder.append(methodPostRpc(), "                ");
-                builder.newLineIfNotEmpty();
-                builder.append("        ");
-                builder.append("    ");
-                builder.append("</resource>");
-                builder.newLine();
+                bb
+                    .oe("resource").attr("path", module.getName() + ':' + rpc.getQName().getLocalName()).oB()
+                        .oe("method").attr("name", "POST").oB()
+                            .elem("request", representation(null, "input"))
+                            .elem("response", representation(null, "output"))
+                        .cE("method")
+                    .cE("resource");
             }
-            builder.append("        ");
-            builder.append("</resource>");
-            builder.newLine();
+            bb.cE("resource");
         }
 
-        builder.append("    ");
-        builder.append("</resources>");
-        builder.newLine();
-        builder.append("</application>");
-        builder.newLine();
-        return builder;
+        return bb
+                .cE("resources")
+            .cE("application")
+            .toRawString();
     }
 
-    private CharSequence importsAsNamespaces() {
-        StringConcatenation builder = new StringConcatenation();
-        for (final ModuleImport imprt : module.getImports()) {
-            builder.append("xmlns:");
-            builder.append(imprt.getPrefix());
-            builder.append("=\"");
-            builder.append(context.findModule(imprt.getModuleName().getLocalName(),
-                imprt.getRevision()).orElseThrow().getNamespace());
-            builder.append("\"");
-            builder.newLineIfNotEmpty();
-        }
-        return builder;
+    @NonNullByDefault
+    private void firstResource(final BlockBuilder bb, final DataSchemaNode schemaNode, final boolean config) {
+        bb
+            .oe("resource").str(" path=\"").str(module.getName()).str(":").frg(createPath(schemaNode)).str("\"").oB()
+                .frg(resourceBody(schemaNode, config))
+            .cE("resource");
     }
 
-    private String firstResource(final DataSchemaNode schemaNode, final boolean config) {
-        StringConcatenation builder = new StringConcatenation();
-        builder.append("<resource path=\"");
-        builder.append(module.getName());
-        builder.append(":");
-        builder.append(createPath(schemaNode));
-        builder.append("\">");
-        builder.newLineIfNotEmpty();
-        builder.append("    ");
-        builder.append(resourceBody(schemaNode, config), "    ");
-        builder.newLineIfNotEmpty();
-        builder.append("</resource>");
-        builder.newLine();
-        return builder.toString();
-    }
-
-    private String resource(final DataSchemaNode schemaNode, final boolean config) {
-        StringConcatenation builder = new StringConcatenation();
-        builder.append("<resource path=\"");
-        builder.append(createPath(schemaNode));
-        builder.append("\">");
-        builder.newLineIfNotEmpty();
-        builder.append("    ");
-        builder.append(resourceBody(schemaNode, config), "    ");
-        builder.newLineIfNotEmpty();
-        builder.append("</resource>");
-        builder.newLine();
-        return builder.toString();
-    }
-
-    private String createPath(final DataSchemaNode schemaNode) {
-        pathListParams = new ArrayList<>();
-        StringBuilder path = new StringBuilder().append(schemaNode.getQName().getLocalName());
+    @NonNullByDefault
+    private BlockFragment createPath(final DataSchemaNode schemaNode) {
+        final var localName = schemaNode.getQName().getLocalName();
         if (schemaNode instanceof ListSchemaNode listNode) {
-            for (final QName listKey : listNode.getKeyDefinition()) {
-                pathListParams.add((LeafSchemaNode) listNode.getDataChildByName(listKey));
-                path.append("'/{").append(listKey.getLocalName()).append('}');
+            final var keyDefinition = listNode.getKeyDefinition();
+            final var size = keyDefinition.size();
+            if (size != 0) {
+                final var keyLeaves = new ArrayList<LeafSchemaNode>(size);
+                for (var leafName : keyDefinition) {
+                    keyLeaves.add((LeafSchemaNode) listNode.getDataChildByName(leafName));
+                }
+                pathListParams = List.copyOf(keyLeaves);
+                return bb -> {
+                    bb.str(localName);
+                    for (var leafName : keyDefinition) {
+                        bb.str("'/{").str(leafName.getLocalName()).str("}");
+                    }
+                };
             }
         }
-        return path.toString();
+
+        pathListParams = List.of();
+        return bb -> bb.str(localName);
     }
 
-    private String resourceBody(final DataSchemaNode schemaNode, final boolean config) {
-        StringConcatenation builder = new StringConcatenation();
-        if (pathListParams != null && !pathListParams.isEmpty()) {
-            builder.append(resourceParams());
-            builder.newLineIfNotEmpty();
-        }
-        builder.append(methodGet(schemaNode));
-        builder.newLineIfNotEmpty();
-        builder.newLineIfNotEmpty();
-        final var children = Iterables.filter(((DataNodeContainer) schemaNode).getChildNodes(),
-            WadlTemplate::isListOrContainer);
-        if (config) {
-            builder.append(methodDelete(schemaNode));
-            builder.newLineIfNotEmpty();
-            builder.append(methodPut(schemaNode));
-            builder.newLineIfNotEmpty();
-            for (final DataSchemaNode child : children) {
-                builder.append(mehodPost(child));
-                builder.newLineIfNotEmpty();
+    @NonNullByDefault
+    private BlockFragment resourceBody(final DataSchemaNode schemaNode, final boolean config) {
+        return bb -> {
+            if (pathListParams != null && !pathListParams.isEmpty()) {
+                for (var pathParam : pathListParams) {
+                    if (pathParam != null) {
+                        bb
+                            .oe("param")
+                                .attr("required", "true")
+                                .attr("style", "template")
+                                .attr("name", pathParam.getQName().getLocalName())
+                                .attr("type", pathParam.typeDefinition().getQName().getLocalName())
+                            .cE();
+                    }
+                }
             }
-        }
-        for (final DataSchemaNode child : children) {
-            builder.append(resource(child, config));
-            builder.newLineIfNotEmpty();
-        }
-        return builder.toString();
-    }
 
-    private CharSequence resourceParams() {
-        StringConcatenation builder = new StringConcatenation();
-        for (final LeafSchemaNode pathParam : pathListParams) {
-            if (pathParam != null) {
-                builder.newLineIfNotEmpty();
-                builder.append("<param required=\"true\" style=\"template\" name=\"");
-                builder.append(pathParam.getQName().getLocalName());
-                builder.append("\" type=\"");
-                builder.append(pathParam.typeDefinition().getQName().getLocalName());
-                builder.append("\"/>");
-                builder.newLineIfNotEmpty();
+            bb
+                .oe("method").attr("name", "GET").oB()
+                    .elem("response", representation(schemaNode.getQName()))
+                .cE("method");
+
+            final var children = ((DataNodeContainer) schemaNode).getChildNodes().stream()
+                .filter(WadlTemplate::isListOrContainer)
+                .toList();
+
+            if (config) {
+                bb
+                    .eol("<method name=\"DELETE\" />")
+                    .oe("method").attr("name", "PUT").oB()
+                        .elem("request", representation(schemaNode.getQName()))
+                    .cE("method");
+                for (var child : children) {
+                    methodPost(bb, child);
+                }
             }
-        }
-        return builder;
+
+            for (var child : children) {
+                bb
+                    .oe("resource").attr("path", createPath(child)).oB()
+                        .frg(resourceBody(child, config))
+                    .cE("resource");
+            }
+        };
     }
 
-    private static CharSequence methodGet(final DataSchemaNode schemaNode) {
-        StringConcatenation builder = new StringConcatenation();
-        builder.append("<method name=\"GET\">");
-        builder.newLine();
-        builder.append("    ");
-        builder.append("<response>");
-        builder.newLine();
-        builder.append("        ");
-        builder.append(representation(schemaNode.getQName()), "        ");
-        builder.newLineIfNotEmpty();
-        builder.append("    ");
-        builder.append("</response>");
-        builder.newLine();
-        builder.append("</method>");
-        builder.newLine();
-        return builder;
+    @NonNullByDefault
+    private static BlockBuilder methodPost(final BlockBuilder bb, final DataSchemaNode schemaNode) {
+        return bb
+            .oe("method").attr("name", "POST").oB()
+                .elem("request", representation(schemaNode.getQName()))
+            .cE("method");
     }
 
-    private static CharSequence methodPut(final DataSchemaNode schemaNode) {
-        StringConcatenation builder = new StringConcatenation();
-        builder.append("<method name=\"PUT\">");
-        builder.newLine();
-        builder.append("    ");
-        builder.append("<request>");
-        builder.newLine();
-        builder.append("        ");
-        builder.append(representation(schemaNode.getQName()), "        ");
-        builder.newLineIfNotEmpty();
-        builder.append("    ");
-        builder.append("</request>");
-        builder.newLine();
-        builder.append("</method>");
-        builder.newLine();
-        return builder;
-    }
-
-    private static CharSequence mehodPost(final DataSchemaNode schemaNode) {
-        StringConcatenation builder = new StringConcatenation();
-        builder.append("<method name=\"POST\">");
-        builder.newLine();
-        builder.append("    ");
-        builder.append("<request>");
-        builder.newLine();
-        builder.append("        ");
-        builder.append(representation(schemaNode.getQName()), "        ");
-        builder.newLineIfNotEmpty();
-        builder.append("    ");
-        builder.append("</request>");
-        builder.newLine();
-        builder.append("</method>");
-        builder.newLine();
-        return builder;
-    }
-
-    private static CharSequence methodPostRpc() {
-        StringConcatenation builder = new StringConcatenation();
-        builder.append("<method name=\"POST\">");
-        builder.newLine();
-        builder.append("    ");
-        builder.append("<request>");
-        builder.newLine();
-        builder.append("    ");
-        builder.append("    ");
-        builder.append(representation(null, "input"), "        ");
-        builder.newLineIfNotEmpty();
-        builder.append("    ");
-        builder.append("</request>");
-        builder.newLine();
-        builder.append("    ");
-        builder.append("<response>");
-        builder.newLine();
-        builder.append("    ");
-        builder.append("    ");
-        builder.append(representation(null, "output"), "        ");
-        builder.newLineIfNotEmpty();
-        builder.append("    ");
-        builder.append("</response>");
-        builder.newLine();
-        builder.append("</method>");
-        builder.newLine();
-        return builder;
-    }
-
-    private static CharSequence methodDelete(final DataSchemaNode schemaNode) {
-        StringConcatenation builder = new StringConcatenation();
-        builder.append("<method name=\"DELETE\" />");
-        builder.newLine();
-        return builder;
-    }
-
-    private static CharSequence representation(final QName qname) {
+    @NonNullByDefault
+    private static BlockFragment representation(final QName qname) {
         return representation(qname.getNamespace(), qname.getLocalName());
     }
 
-    private static CharSequence representation(final XMLNamespace prefix, final String name) {
-        StringConcatenation builder = new StringConcatenation();
-        builder.newLineIfNotEmpty();
-        builder.append("<representation mediaType=\"application/xml\" element=\"");
-        builder.append(name);
-        builder.append("\"/>");
-        builder.newLineIfNotEmpty();
-        builder.append("<representation mediaType=\"text/xml\" element=\"");
-        builder.append(name);
-        builder.append("\"/>");
-        builder.newLineIfNotEmpty();
-        builder.append("<representation mediaType=\"application/json\" element=\"");
-        builder.append(name);
-        builder.append("\"/>");
-        builder.newLineIfNotEmpty();
-        builder.append("<representation mediaType=\"application/yang.data+xml\" element=\"");
-        builder.append(name);
-        builder.append("\"/>");
-        builder.newLineIfNotEmpty();
-        builder.append("<representation mediaType=\"application/yang.data+json\" element=\"");
-        builder.append(name);
-        builder.append("\"/>");
-        builder.newLineIfNotEmpty();
-        return builder;
+    @NonNullByDefault
+    private static BlockFragment representation(final @Nullable XMLNamespace prefix, final String name) {
+        return bb -> bb
+            .oe("representation").attr("mediaType", "application/xml").attr("element", name).cE()
+            .oe("representation").attr("mediaType", "text/xml").attr("element", name).cE()
+            .oe("representation").attr("mediaType", "application/json").attr("element", name).cE()
+            .oe("representation").attr("mediaType", "application/yang.data+xml").attr("element", name).cE()
+            .oe("representation").attr("mediaType", "application/yang.data+json").attr("element", name).cE()
+            .toRawString();
     }
 
+    @NonNullByDefault
     private static boolean isListOrContainer(final DataSchemaNode schemaNode) {
         return schemaNode instanceof ListSchemaNode || schemaNode instanceof ContainerSchemaNode;
     }

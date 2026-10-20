@@ -783,7 +783,7 @@ class WadlGeneneratorTest {
     void testDemoTopology() {
         assertEquals("""
             <?xml version="1.0"?>
-            <application xmlns="http://wadl.dev.java.net/2009/02"  xmlns:tp="urn:model.1demo-275topology.4.5.my">
+            <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:tp="urn:model.1demo-275topology.4.5.my">
 
                 <grammars>
                     <include href="demo-topology.yang"/>
