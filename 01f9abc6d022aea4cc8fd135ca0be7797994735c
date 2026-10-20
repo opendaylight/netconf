@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d113d0d5_80ce198a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T13:49:55Z",
+      "side": 1,
+      "message": "Install HTTP/2 multiplexer before h2c upgrade",
+      "revId": "01f9abc6d022aea4cc8fd135ca0be7797994735c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c5d6381_098a2a7f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/PlainHTTPClient.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T13:49:55Z",
+      "side": 1,
+      "message": "maybe, no big deal, but we lost the name: h2-multiplexer, are we going to reintroduce it or add another one?",
+      "revId": "01f9abc6d022aea4cc8fd135ca0be7797994735c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8df601d7_dfb4859a",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/PlainHTTPClientTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T13:49:55Z",
+      "side": 1,
+      "message": "Tests that \u003cwhat\u003e?",
+      "revId": "01f9abc6d022aea4cc8fd135ca0be7797994735c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d9ca604_f0a3a6d8",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/PlainHTTPClientTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T13:49:55Z",
+      "side": 1,
+      "message": "what if infinite loop hangs? can we introduce for (int \u003c 20) loop instead?",
+      "revId": "01f9abc6d022aea4cc8fd135ca0be7797994735c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "483facd1_aa782832",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/PlainHTTPClientTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T13:49:55Z",
+      "side": 1,
+      "message": "rather while loop",
+      "revId": "01f9abc6d022aea4cc8fd135ca0be7797994735c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
