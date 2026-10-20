@@ -27,9 +27,12 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
+import org.opendaylight.netconf.topology.spi.CallHomeSessionInitializer;
+import org.opendaylight.netconf.topology.spi.CallHomeTopologyService;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.netconf.topology.spi.NetconfTopologyRPCProvider;
@@ -56,9 +59,9 @@ import org.slf4j.LoggerFactory;
 
 // Non-final for testing
 @Singleton
-@Component(service = { })
+@Component(immediate = true, service = { CallHomeTopologyService.class })
 public class NetconfTopologyImpl extends AbstractNetconfTopology
-        implements DataTreeChangeListener<Node>, AutoCloseable {
+        implements DataTreeChangeListener<Node>, AutoCloseable, CallHomeTopologyService {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyImpl.class);
 
     private Registration dtclReg;
@@ -175,5 +178,11 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
         final var nodeId = node.getNodeId();
         LOG.debug("Config for node {} {}", nodeId, operation);
         ensureNode(node, null);
+    }
+
+    @Override
+    public Registration enableCallHomeNode(final Node node, final NegotiatedSshAlg sshAlg,
+            final CallHomeSessionInitializer initializer) {
+        return ensureCallHomeNode(node, sshAlg, initializer);
     }
 }
