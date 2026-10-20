@@ -140,7 +140,7 @@ public abstract class AbstractNetconfTopology {
             new SshPublicKeyAlgorithm(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
                 .iana.ssh._public.key.algs.rev241016.SshPublicKeyAlgorithm.SshRsa));
 
-    private final HashMap<NodeId, NetconfNodeHandler> activeConnectors = new HashMap<>();
+    private final HashMap<NodeId, AbstractNodeHandler> activeConnectors = new HashMap<>();
     private final NetconfClientFactory clientFactory;
     private final DeviceActionFactory deviceActionFactory;
     private final SchemaResourceManager schemaManager;
@@ -206,6 +206,13 @@ public abstract class AbstractNetconfTopology {
             .build();
     }
 
+    /**
+     * Connect a node configured in the topology, replacing any previous connection of a configured node with the same
+     * identifier. The configuration is ignored while a call-home node with the same identifier is connected.
+     *
+     * @param node configured node
+     * @param sshAlg SSH algorithms negotiated with the device in advance, {@code null} if not applicable
+     */
     // Non-final for testing
     protected void ensureNode(final Node node, final NegotiatedSshAlg sshAlg) {
         lockedEnsureNode(node, sshAlg);
@@ -218,10 +225,9 @@ public abstract class AbstractNetconfTopology {
             LOG.info("RemoteDevice{{}} was already configured, disconnecting", nodeId);
             prev.close();
         }
-        final var netconfNodeAugment = node.augmentation(NetconfNodeAugment.class);
-        final var netconfNode = netconfNodeAugment != null ? netconfNodeAugment.getNetconfNode() : null;
+
+        final var netconfNode = getNetconfNode(node, nodeId);
         if (netconfNode == null) {
-            LOG.warn("RemoteDevice{{}} is missing NETCONF node configuration, not connecting it", nodeId);
             return;
         }
 
@@ -230,9 +236,55 @@ public abstract class AbstractNetconfTopology {
     }
 
     /**
-     * Reconnect node based on existing NetconfNodeHandler.
+     * Connect a node backed by a transport accepted from a call-home device, replacing any previous call-home node
+     * with the same identifier. The node is rejected, and {@code initializer} is not invoked, if a node with the same
+     * identifier is configured in the topology.
      *
-     * @param oldHandler existing {@link NetconfNodeHandler} of node to be reconnected
+     * @param node synthetic node describing the call-home device
+     * @param sshAlg SSH algorithms negotiated with the device, {@code null} for TLS or if not available
+     * @param initializer initializer of the NETCONF session on the accepted transport
+     * @see CallHomeTopologyService#enableCallHomeNode(Node, NegotiatedSshAlg, CallHomeSessionInitializer)
+     */
+    protected synchronized void lockedEnsureCallHomeNode(final Node node, final NegotiatedSshAlg sshAlg,
+            final CallHomeSessionInitializer initializer) {
+        final var nodeId = node.requireNodeId();
+        final var prev = activeConnectors.get(nodeId);
+        if (prev instanceof NetconfNodeHandler) {
+            LOG.warn("RemoteDevice{{}} is configured in topology {}, rejecting call-home connection", nodeId,
+                topologyId);
+            return;
+        }
+        if (prev != null) {
+            LOG.info("Call-home RemoteDevice{{}} was already connected, disconnecting", nodeId);
+            activeConnectors.remove(nodeId);
+            prev.close();
+        }
+
+        final var netconfNode = getNetconfNode(node, nodeId);
+        if (netconfNode == null) {
+            return;
+        }
+
+        final var deviceId = getRemoteDeviceId(netconfNode, nodeId);
+        if (deviceId == null) {
+            return;
+        }
+        final var deviceSalFacade = createSalFacade(deviceId, netconfNode.getCredentials(),
+            netconfNode.requireLockDatastore());
+
+        LOG.info("Connecting call-home RemoteDevice{{}}", nodeId);
+        final var nodeHandler = new CallHomeNodeHandler(timer, baseSchemaProvider, schemaManager, schemaAssembler,
+            deviceActionFactory, deviceSalFacade, deviceId, nodeId, netconfNode,
+            node.augmentation(NetconfNodeAugmentedOptional.class), initializer, sshAlg);
+        activeConnectors.put(nodeId, nodeHandler);
+        nodeHandler.connect();
+    }
+
+    /**
+     * Reconnect a configured node based on its existing handler. Only applicable to {@link NetconfNodeHandler}s, as
+     * call-home nodes cannot be reconnected by the topology.
+     *
+     * @param oldHandler existing handler of the configured node to be reconnected
      */
     private synchronized void reconnectNode(final NetconfNodeHandler oldHandler) {
         final var nodeId = oldHandler.nodeId();
@@ -247,11 +299,8 @@ public abstract class AbstractNetconfTopology {
 
     private synchronized void connectNode(final NetconfNode netconfNode, final NodeId nodeId,
             final NetconfNodeAugmentedOptional nodeOptional, final NegotiatedSshAlg sshAlg) {
-        final RemoteDeviceId deviceId;
-        try {
-            deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode);
-        } catch (NoSuchElementException e) {
-            LOG.warn("RemoteDevice{{}} has invalid configuration, not connecting it", nodeId, e);
+        final var deviceId = getRemoteDeviceId(netconfNode, nodeId);
+        if (deviceId == null) {
             return;
         }
 
@@ -273,23 +322,45 @@ public abstract class AbstractNetconfTopology {
         nodeHandler.connect();
     }
 
+    /**
+     * Disconnect a node configured in the topology. Call-home nodes are not affected.
+     *
+     * @param nodeId identifier of the configured node
+     */
     // Non-final for testing
     protected void deleteNode(final NodeId nodeId) {
         lockedDeleteNode(nodeId);
     }
 
-    private synchronized void lockedDeleteNode(final NodeId nodeId) {
-        final var nodeName = nodeId.getValue();
-        LOG.debug("Disconnecting RemoteDevice{{}}", nodeName);
+    /**
+     * Disconnect a node connected through call-home. Nodes configured in the topology are not affected.
+     *
+     * @param nodeId identifier of the call-home node
+     * @see CallHomeTopologyService#disableCallHomeNode(NodeId)
+     */
+    // Non-final for testing
+    protected void deleteCallHomeNode(final NodeId nodeId) {
+        lockedDeleteCallHomeNode(nodeId);
+    }
 
-        final var connectorDTO = activeConnectors.remove(nodeId);
-        if (connectorDTO != null) {
-            connectorDTO.close();
+    private synchronized void lockedDeleteNode(final NodeId nodeId) {
+        if (activeConnectors.get(nodeId) instanceof NetconfNodeHandler handler) {
+            LOG.debug("Disconnecting RemoteDevice{{}}", nodeId.getValue());
+            activeConnectors.remove(nodeId);
+            handler.close();
+        }
+    }
+
+    private synchronized void lockedDeleteCallHomeNode(final NodeId nodeId) {
+        if (activeConnectors.get(nodeId) instanceof CallHomeNodeHandler handler) {
+            LOG.debug("Disconnecting call-home RemoteDevice{{}}", nodeId.getValue());
+            activeConnectors.remove(nodeId);
+            handler.close();
         }
     }
 
     protected final synchronized void deleteAllNodes() {
-        activeConnectors.values().forEach(NetconfNodeHandler::close);
+        activeConnectors.values().forEach(AbstractNodeHandler::close);
         activeConnectors.clear();
     }
 
@@ -313,9 +384,14 @@ public abstract class AbstractNetconfTopology {
                 LOG.debug("Topology ssh parameters updated successfully");
                 sshParams = rootNode;
 
-                //recreate all nodes so new topology config comes in to effect
-                for (var node : activeConnectors.values()) {
-                    reconnectNode(node);
+                // recreate all nodes so new topology config comes in to effect. Call-home nodes cannot be reconnected
+                // by us and their SSH parameters are not driven by topology configuration, hence they are skipped.
+                synchronized (AbstractNetconfTopology.this) {
+                    for (var node : List.copyOf(activeConnectors.values())) {
+                        if (node instanceof NetconfNodeHandler handler) {
+                            reconnectNode(handler);
+                        }
+                    }
                 }
             }
 
@@ -366,5 +442,26 @@ public abstract class AbstractNetconfTopology {
             return helper.toString().replace(nodeCredentials, "***");
         }
         return helper.toString();
+    }
+
+    private static NetconfNode getNetconfNode(final Node node, final NodeId nodeId) {
+        final var netconfNodeAugment = node.augmentation(NetconfNodeAugment.class);
+        final var netconfNode = netconfNodeAugment != null ? netconfNodeAugment.getNetconfNode() : null;
+        if (netconfNode == null) {
+            LOG.warn("RemoteDevice{{}} is missing NETCONF node configuration, not connecting it", nodeId);
+            return null;
+        }
+        return netconfNode;
+    }
+
+    private static RemoteDeviceId getRemoteDeviceId(final NetconfNode netconfNode, final NodeId nodeId) {
+        final RemoteDeviceId deviceId;
+        try {
+            deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode);
+        } catch (NoSuchElementException e) {
+            LOG.warn("RemoteDevice{{}} has invalid configuration, not connecting it", nodeId, e);
+            return null;
+        }
+        return deviceId;
     }
 }

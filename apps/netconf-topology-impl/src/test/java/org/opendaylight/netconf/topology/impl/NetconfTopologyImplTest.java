@@ -7,7 +7,9 @@
  */
 package org.opendaylight.netconf.topology.impl;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -35,6 +37,7 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
+import org.opendaylight.netconf.topology.spi.CallHomeSessionInitializer;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -96,6 +99,8 @@ class NetconfTopologyImplTest {
     private DataTreeModification<Node> treeMod;
     @Mock
     private NegotiatedSshAlg sshAlg;
+    @Mock
+    private CallHomeSessionInitializer initializer;
 
     @Test
     void testOnDataTreeChange() throws Exception {
@@ -164,6 +169,30 @@ class NetconfTopologyImplTest {
         }
     }
 
+    @Test
+    void testCallHomeNodeLifecycle() throws Exception {
+        doReturn(wtx).when(dataBroker).newWriteOnlyTransaction();
+        doReturn(CommitInfo.emptyFluentFuture()).when(wtx).commit();
+
+        try (var schemaAssembler = new NetconfTopologySchemaAssembler(1)) {
+            final var spyTopology = spy(new TestingNetconfTopologyImpl(TOPOLOGY_KEY.getTopologyId().getValue(),
+                mockedClientFactory, mockedTimer, schemaAssembler, mockedResourceManager, dataBroker, mountPointService,
+                encryptionService, builderFactory, rpcProviderService,
+                new DefaultBaseNetconfSchemaProvider(DaggerDefaultYangParserComponent.create().parserFactory())));
+            final var nodeId = new NodeId("call-home-node");
+            final var node = new NodeBuilder().setNodeId(nodeId).build();
+
+            spyTopology.enableCallHomeNode(node, sshAlg, initializer);
+            verify(spyTopology).lockedEnsureCallHomeNode(node, sshAlg, initializer);
+
+            spyTopology.disableCallHomeNode(nodeId);
+            verify(spyTopology).deleteCallHomeNode(nodeId);
+            // call-home nodes are not managed as configured nodes
+            verify(spyTopology, never()).ensureNode(any(), any());
+            verify(spyTopology, never()).deleteNode(any());
+        }
+    }
+
     private static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
         TestingNetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory,
                 final NetconfTimer timer, final NetconfTopologySchemaAssembler schemaAssembler,
@@ -182,6 +211,17 @@ class NetconfTopologyImplTest {
 
         @Override
         public void deleteNode(final NodeId nodeId) {
+            // No-op
+        }
+
+        @Override
+        public void lockedEnsureCallHomeNode(final Node node, final NegotiatedSshAlg sshAlg,
+                final CallHomeSessionInitializer initializer) {
+            // No-op
+        }
+
+        @Override
+        public void deleteCallHomeNode(final NodeId nodeId) {
             // No-op
         }
     }
