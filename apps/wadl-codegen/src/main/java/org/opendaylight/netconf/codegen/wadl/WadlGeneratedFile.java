@@ -52,8 +52,6 @@ final class WadlGeneratedFile implements GeneratedFile {
     private final EffectiveModelContext context;
     private final Module module;
 
-    private List<LeafSchemaNode> pathListParams;
-
     @NonNullByDefault
     private WadlGeneratedFile(final EffectiveModelContext context, final Module module,
             final List<DataSchemaNode> configData, final List<DataSchemaNode> operationalData) {
@@ -185,15 +183,15 @@ final class WadlGeneratedFile implements GeneratedFile {
     private void firstResource(final XMLStreamWriter writer, final DataSchemaNode schemaNode, final boolean config)
             throws XMLStreamException {
         final var sb = new StringBuilder().append(module.getName()).append(':');
-        createPath(sb, schemaNode);
+        final var pathParams = createPath(sb, schemaNode);
         writer.writeStartElement("resource");
         writer.writeAttribute("path", sb.toString());
-        resourceBody(writer, schemaNode, config);
+        resourceBody(writer, schemaNode, config, pathParams);
         writer.writeEndElement();
     }
 
     @NonNullByDefault
-    private void createPath(final StringBuilder sb, final DataSchemaNode schemaNode) {
+    private static List<LeafSchemaNode> createPath(final StringBuilder sb, final DataSchemaNode schemaNode) {
         sb.append(schemaNode.getQName().getLocalName());
 
         if (schemaNode instanceof ListSchemaNode listNode) {
@@ -204,28 +202,25 @@ final class WadlGeneratedFile implements GeneratedFile {
                 for (var leafName : keyDefinition) {
                     keyLeaves.add((LeafSchemaNode) listNode.getDataChildByName(leafName));
                 }
-                pathListParams = List.copyOf(keyLeaves);
                 for (var leafName : keyDefinition) {
                     sb.append("'/{").append(leafName.getLocalName()).append('}');
                 }
-                return;
+                return keyLeaves;
             }
         }
-        pathListParams = List.of();
+        return List.of();
     }
 
     @NonNullByDefault
-    private void resourceBody(final XMLStreamWriter writer, final DataSchemaNode schemaNode, final boolean config)
-            throws XMLStreamException {
-        if (pathListParams != null && !pathListParams.isEmpty()) {
-            for (var pathParam : pathListParams) {
-                if (pathParam != null) {
-                    writer.writeEmptyElement("param");
-                    writer.writeAttribute("required", "true");
-                    writer.writeAttribute("style", "template");
-                    writer.writeAttribute("name", pathParam.getQName().getLocalName());
-                    writer.writeAttribute("type", pathParam.typeDefinition().getQName().getLocalName());
-                }
+    private static void resourceBody(final XMLStreamWriter writer, final DataSchemaNode schemaNode,
+            final boolean config, final List<LeafSchemaNode> pathParams) throws XMLStreamException {
+        if (!pathParams.isEmpty()) {
+            for (var pathParam : pathParams) {
+                writer.writeEmptyElement("param");
+                writer.writeAttribute("required", "true");
+                writer.writeAttribute("style", "template");
+                writer.writeAttribute("name", pathParam.getQName().getLocalName());
+                writer.writeAttribute("type", pathParam.typeDefinition().getQName().getLocalName());
             }
         }
 
@@ -257,9 +252,9 @@ final class WadlGeneratedFile implements GeneratedFile {
         for (var child : children) {
             writer.writeStartElement("resource");
             final var sb = new StringBuilder();
-            createPath(sb, child);
+            final var childParams = createPath(sb, child);
             writer.writeAttribute("path", sb.toString());
-            resourceBody(writer, child, config);
+            resourceBody(writer, child, config, childParams);
             writer.writeEndElement();
         }
     }
