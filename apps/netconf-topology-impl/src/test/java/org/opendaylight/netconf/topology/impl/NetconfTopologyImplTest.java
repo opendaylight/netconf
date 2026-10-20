@@ -9,7 +9,6 @@ package org.opendaylight.netconf.topology.impl;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -158,7 +157,7 @@ class NetconfTopologyImplTest {
 
             doReturn(objWritten).when(treeMod).getRootNode();
             spyTopology.onDataTreeChanged(changes);
-            verify(spyTopology).ensureNode(node, null);
+            verify(spyTopology).ensureNode(node);
 
             doReturn(TOPOLOGY_PATH.toBuilder().child(Node.class, key).build()).when(treeMod).path();
             doReturn(objDeleted).when(treeMod).getRootNode();
@@ -170,7 +169,7 @@ class NetconfTopologyImplTest {
             spyTopology.onDataTreeChanged(changes);
 
             // one in previous creating and deleting node and one in updating
-            verify(spyTopology, times(2)).ensureNode(node, null);
+            verify(spyTopology, times(2)).ensureNode(node);
         }
     }
 
@@ -192,7 +191,7 @@ class NetconfTopologyImplTest {
             assertSame(registration, spyTopology.enableCallHomeNode(node, sshAlg, initializer));
             verify(spyTopology).ensureCallHomeNode(node, sshAlg, initializer);
             // call-home nodes are not managed as configured nodes
-            verify(spyTopology, never()).ensureNode(any(Node.class), nullable(NegotiatedSshAlg.class));
+            verify(spyTopology, never()).ensureNode(any(Node.class));
             verify(spyTopology, never()).deleteNode(any(NodeId.class));
         }
     }
@@ -209,7 +208,7 @@ class NetconfTopologyImplTest {
         }
 
         @Override
-        public void ensureNode(final Node configNode, final NegotiatedSshAlg sshAlg) {
+        public void ensureNode(final Node configNode) {
             // No-op
         }
 
