@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe31b825_68944cdc",
+        "filename": "apps/restconf-nb/src/main/resources/restconf8040.cfg",
+        "patchSetId": 9
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-20T16:17:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f531e1b2_a2522dcd",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "87474aca_84a26fa9",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-20T12:45:05Z",
       "side": 1,
       "message": "probably, just this getter is enough to get everything from it..",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30ac5dcf_8cd0c417",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-20T16:17:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87474aca_84a26fa9",
       "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f49c3d3d_a4c051c2",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-20T16:17:14Z",
+      "side": 1,
+      "message": "Added chunkSize and frameSize to both equals() and hashCode()",
+      "parentUuid": "5cc76ff3_f56fec2c",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "97ccedf0_cc774449",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-10-20T12:45:05Z",
       "side": 1,
       "message": "maybe, its just enough to pass requestLimits()",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abccd167_60cef4f0",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-20T16:17:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97ccedf0_cc774449",
       "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a33d483c_70948d71",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-20T16:17:14Z",
+      "side": 1,
+      "message": "toJava() returns long, but the aggregator requires int. The range is validated in HttpRequestLimits, so intValue() is safe here",
+      "parentUuid": "c4e8f355_b4ec2450",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9459ef00_5c9631a2",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-10-20T12:45:05Z",
       "side": 1,
       "message": "@NonNullByDefault?",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "520d8d58_c34dccd7",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-20T16:17:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9459ef00_5c9631a2",
       "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6477a3f8_0b4466a0",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-20T16:17:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e0cb2d8_21643dd3",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "97768e72_c49903f8",
@@ -133,6 +259,24 @@
       "writtenOn": "2026-10-20T12:45:05Z",
       "side": 1,
       "message": ".toJava?",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae68e333_ed28bc95",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-20T16:17:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97768e72_c49903f8",
       "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -154,6 +298,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fac1a3c_9abe3c2d",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-20T16:17:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8bd64c53_3a37a1fb",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eb714528_fdcac243",
@@ -171,6 +333,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c5b43ff_38eb0e93",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-20T16:17:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eb714528_fdcac243",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4955eb1d_00827ab9",
@@ -184,6 +364,24 @@
       "writtenOn": "2026-10-20T12:45:05Z",
       "side": 1,
       "message": "can we make also range check here?",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8728c6f3_c027d401",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HttpRequestLimits.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-20T16:17:14Z",
+      "side": 1,
+      "message": "Added range validation here for all four limits, including the upper bound of Integer.MAX_VALUE, with boundary tests",
+      "parentUuid": "4955eb1d_00827ab9",
       "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
