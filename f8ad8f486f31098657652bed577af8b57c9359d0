@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "270e5354_a8f56ae7",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-20T16:39:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c203e8ce_8cdef340",
+      "revId": "f8ad8f486f31098657652bed577af8b57c9359d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "22102d95_c6dc79ca",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "314224d6_fb4f07fe",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-20T16:39:30Z",
+      "side": 1,
+      "message": "Thanks, done. NetconfNodeHandler.lockedConnect() now logs the UnsupportedConfigurationException at WARN on the first attempt. Later attempts usually fail the same way, so they stay at DEBUG and do not flood the log while the node keeps retrying.",
+      "parentUuid": "22102d95_c6dc79ca",
+      "revId": "f8ad8f486f31098657652bed577af8b57c9359d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3bd79f43_e1b1c615",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-10-19T08:00:47Z",
       "side": 1,
       "message": "Add the since/forRemoval info to the @Deprecated annotation(just like above)",
+      "revId": "f8ad8f486f31098657652bed577af8b57c9359d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36467c12_a77b5ce3",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultCredentialProvider.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-20T16:39:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3bd79f43_e1b1c615",
       "revId": "f8ad8f486f31098657652bed577af8b57c9359d0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
