@@ -88,7 +88,7 @@ jobs:
           delay: "0s"
 
       - name: Setup Java
-        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: temurin
           java-version: "21"
@@ -117,7 +117,7 @@ jobs:
     steps:
       - name: Get workflow conclusion
         # yamllint disable-line rule:line-length
-        uses: im-open/workflow-conclusion@fce18569e28a9f2ed1feca1e6d4251e6a7365fdc # v2.2.4
+        uses: im-open/workflow-conclusion@8eac7f17381a6917bc04fec3e2c92e70ebc37526 # v3.0.0
       - name: Report workflow conclusion
         # yamllint disable-line rule:line-length
         uses: lfit/gerrit-review-action@537251ec667665b386f70b330b05446e3fc29087 # v0.9
