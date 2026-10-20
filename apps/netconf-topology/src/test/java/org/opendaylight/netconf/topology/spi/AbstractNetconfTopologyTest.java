@@ -50,7 +50,6 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
-import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
@@ -118,8 +117,6 @@ class AbstractNetconfTopologyTest {
     private DataObjectDeleted<Node> dataObjectDeleted;
     @Mock
     private DataObjectIdentifierWithKey<Node, NodeKey> path;
-    @Mock
-    private NegotiatedSshAlg sshAlg;
     @Mock
     private CallHomeSessionInitializer initializer;
     @Mock
@@ -239,7 +236,7 @@ class AbstractNetconfTopologyTest {
         final var connectFuture = SettableFuture.<NetconfClientSession>create();
         doReturn(connectFuture).when(clientFactory).createClient(any(NetconfClientConfiguration.class),
             any(SSHNegotiatedAlgListener.class));
-        topology.ensureNode(configuredNode(), null);
+        topology.ensureNode(configuredNode());
 
         // the call-home node is not created and the configured node is left intact
         assertNull(topology.ensureCallHomeNode(configuredNode(), null, initializer));
@@ -259,7 +256,7 @@ class AbstractNetconfTopologyTest {
         topology.ensureCallHomeNode(configuredNode(), null, initializer);
         doNothing().when(delegate).close();
 
-        topology.ensureNode(configuredNode(), null);
+        topology.ensureNode(configuredNode());
 
         // the previous call-home node is disconnected and replaced
         assertTrue(sessionFuture.isCancelled());
@@ -320,7 +317,7 @@ class AbstractNetconfTopologyTest {
             any(SSHNegotiatedAlgListener.class));
         final var registration = topology.ensureCallHomeNode(configuredNode(), null, initializer);
         doNothing().when(delegate).close();
-        topology.ensureNode(configuredNode(), null);
+        topology.ensureNode(configuredNode());
         verify(delegate).close();
 
         registration.close();
@@ -338,7 +335,7 @@ class AbstractNetconfTopologyTest {
         final var connectFuture = SettableFuture.<NetconfClientSession>create();
         doReturn(connectFuture).when(clientFactory).createClient(any(NetconfClientConfiguration.class),
             any(SSHNegotiatedAlgListener.class));
-        topology.ensureNode(configuredNode(), null);
+        topology.ensureNode(configuredNode());
 
         final var sessionFuture = SettableFuture.<NetconfClientSession>create();
         doReturn(sessionFuture).when(initializer).initialize(any(NetconfClientSessionListener.class));
@@ -417,7 +414,7 @@ class AbstractNetconfTopologyTest {
         public void onDataTreeChanged(final List<DataTreeModification<Node>> changes) {
             for (var change : changes) {
                 switch (change.getRootNode()) {
-                    case DataObjectWritten<Node> written -> ensureNode(written.dataAfter(), sshAlg);
+                    case DataObjectWritten<Node> written -> ensureNode(written.dataAfter());
                     case DataObjectDeleted<Node> deleted ->
                         deleteNode(deleted.coerceKeyStep(Node.class).key().getNodeId());
                     case DataObjectModified<Node> modified ->

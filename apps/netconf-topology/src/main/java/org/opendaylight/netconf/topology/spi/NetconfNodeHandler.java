@@ -103,10 +103,6 @@ public final class NetconfNodeHandler extends AbstractNodeHandler {
     private final @NonNull NetconfClientConfigurationBuilderFactory builderFactory;
     private final @NonNull SshTransportTopologyParameters sshParams;
 
-    // SSH algorithms known up-front for call-home connections (null for regular connections); used as the per-attempt
-    // baseline for negotiatedSshAlg.
-    private final @Nullable NegotiatedSshAlg callHomeSshAlg;
-
     private final long maxBackoff;
     private final long maxAttempts;
     private final int minBackoff;
@@ -128,15 +124,13 @@ public final class NetconfNodeHandler extends AbstractNodeHandler {
             final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final RemoteDeviceHandler delegate,
             final RemoteDeviceId deviceId, final NodeId nodeId, final NetconfNode node,
-            final NetconfNodeAugmentedOptional nodeOptional, final SshTransportTopologyParameters sshParams,
-            final @Nullable NegotiatedSshAlg callHomeSshAlg) {
+            final NetconfNodeAugmentedOptional nodeOptional, final SshTransportTopologyParameters sshParams) {
         super(timer, baseSchemaProvider, schemaManager, schemaAssembler, deviceActionFactory, delegate, deviceId,
             nodeId, node, nodeOptional);
         this.clientFactory = requireNonNull(clientFactory);
         this.builderFactory = requireNonNull(builderFactory);
         this.sshParams = requireNonNull(sshParams);
         this.timer = requireNonNull(timer);
-        this.callHomeSshAlg = callHomeSshAlg;
 
         maxAttempts = node.requireMaxConnectionAttempts().toJava();
         minBackoff = node.requireMinBackoffMillis().toJava();
@@ -144,6 +138,30 @@ public final class NetconfNodeHandler extends AbstractNodeHandler {
         final long potentialMaxBackoff = node.requireMaxBackoffMillis().toJava();
         maxBackoff = potentialMaxBackoff >= minBackoff ? potentialMaxBackoff : minBackoff;
         jitter = node.getBackoffJitter().doubleValue();
+    }
+
+    /**
+     * Construct a handler of a configured node. {@code callHomeSshAlg} is ignored.
+     *
+     * @deprecated Call-home devices are handled by {@link CallHomeNodeHandler}, hence {@code callHomeSshAlg} is
+     *             ignored: it is no longer reported as the negotiated SSH algorithms of the device, these are reported
+     *             only from the SSH key exchange of each connection attempt. Use
+     *             {@link #NetconfNodeHandler(NetconfClientFactory, NetconfTimer, BaseNetconfSchemaProvider,
+     *             SchemaResourceManager, NetconfTopologySchemaAssembler, NetconfClientConfigurationBuilderFactory,
+     *             DeviceActionFactory, RemoteDeviceHandler, RemoteDeviceId, NodeId, NetconfNode,
+     *             NetconfNodeAugmentedOptional, SshTransportTopologyParameters)} instead.
+     */
+    @Deprecated(since = "12.0.3", forRemoval = true)
+    public NetconfNodeHandler(final NetconfClientFactory clientFactory, final NetconfTimer timer,
+            final BaseNetconfSchemaProvider baseSchemaProvider, final SchemaResourceManager schemaManager,
+            final NetconfTopologySchemaAssembler schemaAssembler,
+            final NetconfClientConfigurationBuilderFactory builderFactory,
+            final DeviceActionFactory deviceActionFactory, final RemoteDeviceHandler delegate,
+            final RemoteDeviceId deviceId, final NodeId nodeId, final NetconfNode node,
+            final NetconfNodeAugmentedOptional nodeOptional, final SshTransportTopologyParameters sshParams,
+            final @Nullable NegotiatedSshAlg callHomeSshAlg) {
+        this(clientFactory, timer, baseSchemaProvider, schemaManager, schemaAssembler, builderFactory,
+            deviceActionFactory, delegate, deviceId, nodeId, node, nodeOptional, sshParams);
     }
 
     @Override
@@ -155,9 +173,9 @@ public final class NetconfNodeHandler extends AbstractNodeHandler {
 
     @GuardedBy("this")
     private void lockedConnect() {
-        // Reset to the per-attempt baseline; the SSHNegotiatedAlgListener will refill it during key establishment for
-        // regular SSH connections.
-        setNegotiatedSshAlg(callHomeSshAlg);
+        // Forget algorithms of the previous attempt, the SSHNegotiatedAlgListener fills them in during key exchange.
+        // They remain null for transports other than SSH.
+        setNegotiatedSshAlg(null);
         if (clientConfig == null) {
             try {
                 clientConfig = builderFactory.createClientConfigurationBuilder(nodeId(), netconfNode(), sshParams)

@@ -41,8 +41,8 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
-import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
-import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.topology.spi.CallHomeSessionInitializer;
+import org.opendaylight.netconf.topology.spi.CallHomeTopologyService;
 import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.protocol.specification.SshCase;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.protocol.specification.ssh._case.SshTransportParameters;
@@ -51,16 +51,15 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev260605.netconf.callhome.server.AllowedDevices;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev260605.netconf.callhome.server.allowed.devices.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev260605.netconf.callhome.server.allowed.devices.DeviceKey;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.binding.DataObjectIdentifier;
+import org.opendaylight.yangtools.concepts.Registration;
 
 @ExtendWith(MockitoExtension.class)
 class CallHomeMountServiceTest {
 
     private static final SocketAddress SOCKET_ADDRESS = new InetSocketAddress("127.0.0.1", 12345);
     private static final String ID1 = "id1";
-    private static final NodeId NODE_ID1 = new NodeId(ID1);
     private static final String ID2 = "id2";
     private static final DataObjectIdentifier<Device> IDENTIFIER =
         DataObjectIdentifier.builder(NetconfCallhomeServer.class)
@@ -69,7 +68,7 @@ class CallHomeMountServiceTest {
             .build();
 
     @Mock
-    private CallHomeTopology topology;
+    private CallHomeTopologyService topology;
     @Mock
     private NetconfClientSessionListener sessionListener;
     @Mock
@@ -84,6 +83,10 @@ class CallHomeMountServiceTest {
     private CallHomeTlsAuthProvider tlsAuthProvider;
     @Mock
     private CallHomeStatusRecorder statusRecorder;
+    @Mock
+    private Registration registration1;
+    @Mock
+    private Registration registration2;
 
     private CallHomeMountService service;
     private ListenableFuture<NetconfClientSession> netconfSessionFuture;
@@ -113,11 +116,11 @@ class CallHomeMountServiceTest {
         assertNull(sshSessionContextManager.createContext(ID2, sshSession, sshAlg));
 
         // verify that node is enabled with SSH
-        verify(topology, times(1)).enableNode(node1, sshAlg);
+        verify(topology, times(1)).enableCallHomeNode(eq(node1), eq(sshAlg), any());
 
         // remove context
         sshSessionContextManager.remove(ID1);
-        verify(topology, times(1)).disableNode(eq(NODE_ID1));
+        verify(registration1).close();
     }
 
     @Test
@@ -138,15 +141,58 @@ class CallHomeMountServiceTest {
         assertNull(tlsSessionContextManager.createContext(ID2, nettyChannel));
 
         // verify that node is enabled with TLS
-        verify(topology, times(1)).enableNode(node1, null);
+        verify(topology, times(1)).enableCallHomeNode(eq(node1), eq(null), any());
 
         // remove context
         tlsSessionContextManager.remove(ID1);
-        verify(topology, times(1)).disableNode(eq(NODE_ID1));
+        verify(registration1).close();
+    }
+
+    @Test
+    void sshSessionContextManagerCloseDisablesNodes() throws Exception {
+        reproduceEnsureNodeId2();
+        doReturn(SOCKET_ADDRESS).when(sshSession).getRemoteAddress();
+        final var sshSessionContextManager = service.createSshSessionContextManager();
+        sshSessionContextManager.register(sshSessionContextManager.createContext(ID1, sshSession, sshAlg));
+
+        sshSessionContextManager.close();
+        verify(registration1).close();
+
+        // the node is not disabled again
+        service.close();
+        verify(registration1).close();
+    }
+
+    @Test
+    void tlsSessionContextManagerCloseDisablesNodes() throws Exception {
+        reproduceEnsureNodeId2();
+        doReturn(SOCKET_ADDRESS).when(nettyChannel).remoteAddress();
+        final var tlsSessionContextManager = service.createTlsSessionContextManager(tlsAuthProvider, statusRecorder);
+        tlsSessionContextManager.register(tlsSessionContextManager.createContext(ID1, nettyChannel));
+
+        tlsSessionContextManager.close();
+        verify(registration1).close();
+
+        // the node is not disabled again
+        service.close();
+        verify(registration1).close();
+    }
+
+    @Test
+    void closeDisablesRemainingNodes() {
+        reproduceEnsureNodeId2();
+        doReturn(SOCKET_ADDRESS).when(sshSession).getRemoteAddress();
+        assertNotNull(service.createSshSessionContextManager().createContext(ID1, sshSession, sshAlg));
+
+        service.close();
+        verify(registration1).close();
     }
 
     @Test
     void testDeletingDeviceFromTopologyAfterModification() {
+        reproduceEnsureNodeId2();
+        doReturn(SOCKET_ADDRESS).when(sshSession).getRemoteAddress();
+        assertNotNull(service.createSshSessionContextManager().createContext(ID1, sshSession, sshAlg));
         final var mockDeviceBeforeAddition = createMockDevice(ID1);
         final DataObjectWritten<Device> mockObjectWritten = mock();
 
@@ -154,18 +200,31 @@ class CallHomeMountServiceTest {
         when(mockObjectWritten.dataBefore()).thenReturn(mockDeviceBeforeAddition);
         service.onAllowedDevicesChanged(List.of(new CustomTreeModification(LogicalDatastoreType.CONFIGURATION,
             IDENTIFIER, mockObjectWritten)));
-        verify(topology, times(1)).disableNode(NODE_ID1);
+        verify(registration1).close();
 
         // modification of deleting device from 'allowed-devices' container
         final DataObjectDeleted<Device> mockObjectDeleted = mock();
         when(mockObjectDeleted.dataBefore()).thenReturn(mockDeviceBeforeAddition);
         service.onAllowedDevicesChanged(List.of(
             new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, IDENTIFIER, mockObjectDeleted)));
-        verify(topology, times(2)).disableNode(NODE_ID1);
+        // the node has already been disabled
+        verify(registration1).close();
     }
 
     @Test
     void testDeletingMultipleDevices() {
+        // accept both devices
+        doAnswer(invocation -> {
+            final var init = (CallHomeSessionInitializer) invocation.getArguments()[2];
+            init.initialize(sessionListener);
+            return ID1.equals(((Node) invocation.getArguments()[0]).requireNodeId().getValue()) ? registration1
+                : registration2;
+        }).when(topology).enableCallHomeNode(any(Node.class), eq(sshAlg), any(CallHomeSessionInitializer.class));
+        doReturn(SOCKET_ADDRESS).when(sshSession).getRemoteAddress();
+        final var sshSessionContextManager = service.createSshSessionContextManager();
+        assertNotNull(sshSessionContextManager.createContext(ID1, sshSession, sshAlg));
+        assertNotNull(sshSessionContextManager.createContext(ID2, sshSession, sshAlg));
+
         final var mockDevice1 = createMockDevice(ID1);
         final var mockDevice2 = createMockDevice(ID2);
 
@@ -182,8 +241,8 @@ class CallHomeMountServiceTest {
             new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, IDENTIFIER, mockModification2)
         ));
 
-        verify(topology, times(1)).disableNode(new NodeId(ID1));
-        verify(topology, times(1)).disableNode(new NodeId(ID2));
+        verify(registration1).close();
+        verify(registration2).close();
     }
 
     @Test
@@ -228,22 +287,13 @@ class CallHomeMountServiceTest {
         doAnswer(invocation -> {
             node1 = (Node) invocation.getArguments()[0];
             if (ID1.equals(node1.requireNodeId().getValue())) {
-                final var configBuilderFactory = service.createClientConfigurationBuilderFactory();
-                final var config = configBuilderFactory
-                    .createClientConfigurationBuilder(node1.requireNodeId(),
-                        node1.augmentation(NetconfNodeAugment.class).getNetconfNode(),
-                        AbstractNetconfTopology.defaultSshParams())
-                    .withSessionListener(sessionListener).build();
-                try {
-                    netconfSessionFuture = service.createClientFactory().createClient(config, algListener);
-                } catch (UnsupportedConfigurationException e) {
-                    netconfSessionFuture = null;
-                }
-            } else {
-                netconfSessionFuture = null;
+                final var init = (CallHomeSessionInitializer) invocation.getArguments()[2];
+                netconfSessionFuture = init.initialize(sessionListener);
+                return registration1;
             }
+            netconfSessionFuture = null;
             return null;
-        }).when(topology).enableNode(any(Node.class), any());
+        }).when(topology).enableCallHomeNode(any(Node.class), any(), any(CallHomeSessionInitializer.class));
     }
 
     private static Device createMockDevice(final String deviceId) {
