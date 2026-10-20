@@ -2111,9 +2111,13 @@ Netty endpoint related settings are also configurable:
 * ``group-threads``, which defaults to ``0``
 * ``default-encoding``, which defaults to ``json``
 
-HTTP/2 related settings are also configurable:
+HTTP related settings are also configurable:
 
 * ``http2-max-frame-size``, which defaults to ``16384``
+* ``http1-max-initial-line-length``, which defaults to ``8192``
+* ``http-max-header-size``, which defaults to ``16384``
+* ``http1-max-request-chunk-size``, which defaults to ``8192``
+* ``http-max-request-body-size``, which defaults to ``10485760``
 * ``http-write-buffer-low-watermark``, which defaults to ``32768``
 * ``http-write-buffer-high-watermark``, which defaults to ``65536``
 
@@ -2158,6 +2162,21 @@ When this is set to true, the server will violate RFC8040 and report "404" inste
 *http2-max-frame-size* — Maximum HTTP/2 frame payload size in bytes this server is willing to accept from the client.
 Valid values are 16384-16777215.
 
+*http1-max-initial-line-length* — Maximum length of an inbound HTTP/1.1 request line in bytes. A request exceeding
+it is rejected with '414 URI Too Long'.
+
+*http-max-header-size* — Maximum size of the inbound HTTP/1.1 header section in bytes. A request exceeding it is
+rejected with '431 Request Header Fields Too Large'. The same value is advertised to HTTP/2 clients as
+SETTINGS_MAX_HEADER_LIST_SIZE.
+
+*http1-max-request-chunk-size* — Maximum size of a single HTTP object emitted by the HTTP/1.1 request decoder in bytes.
+It does not limit the complete request body. Not to be confused with *http1-chunk-size*, which applies to responses.
+
+*http-max-request-body-size* — Maximum size of an inbound request body in bytes, for both HTTP/1.1 and HTTP/2.
+A request exceeding it is rejected with '413 Content Too Large'. On HTTP/2 this limit applies per stream, so with
+100 concurrent streams the default permits about 1 GiB of buffered bodies per connection. Bodies are aggregated
+before authentication, so setting this value too high risks exhausting server RAM.
+
 *http-write-buffer-low-watermark* — Netty channel write buffer low watermark in bytes.
 
 *http-write-buffer-high-watermark* — Netty channel write buffer high watermark in bytes. Setting this value too high
@@ -2188,6 +2207,10 @@ file, ``org.opendaylight.restconf.nb.rfc8040.cfg``, for example:
     group-threads=0
     default-encoding=json
     http2-max-frame-size=16384
+    http1-max-initial-line-length=8192
+    http-max-header-size=16384
+    http1-max-request-chunk-size=8192
+    http-max-request-body-size=10485760
     http-write-buffer-low-watermark=32768
     http-write-buffer-high-watermark=65536
     tls-certificate=etc/tls/cert.pem
@@ -2214,6 +2237,10 @@ Or use Karaf CLI:
     opendaylight-user@root>config:property-set group-threads 0
     opendaylight-user@root>config:property-set default-encoding "json"
     opendaylight-user@root>config:property-set http2-max-frame-size 16384
+    opendaylight-user@root>config:property-set http1-max-initial-line-length 8192
+    opendaylight-user@root>config:property-set http-max-header-size 16384
+    opendaylight-user@root>config:property-set http1-max-request-chunk-size 8192
+    opendaylight-user@root>config:property-set http-max-request-body-size 10485760
     opendaylight-user@root>config:property-set http-write-buffer-low-watermark 32768
     opendaylight-user@root>config:property-set http-write-buffer-high-watermark 65536
     opendaylight-user@root>config:property-set tls-certificate "etc/tls/cert.pem"
