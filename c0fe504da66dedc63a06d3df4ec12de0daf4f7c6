@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2950317_a2633727",
+        "filename": "keystore/keystore-legacy/src/main/java/org/opendaylight/netconf/keystore/legacy/CertifiedPrivateKey.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-20T15:41:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed544551_c4176d3d",
+      "revId": "c0fe504da66dedc63a06d3df4ec12de0daf4f7c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b2383cb3_51ce1a8a",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-19T07:42:58Z",
       "side": 1,
       "message": "Returns null - can be @Nullable",
+      "revId": "c0fe504da66dedc63a06d3df4ec12de0daf4f7c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce3710bf_8c5514b5",
+        "filename": "keystore/keystore-legacy/src/main/java/org/opendaylight/netconf/keystore/legacy/impl/DefaultNetconfKeystoreService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-20T15:41:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b2383cb3_51ce1a8a",
       "revId": "c0fe504da66dedc63a06d3df4ec12de0daf4f7c6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cf4c009_c71fd027",
+        "filename": "keystore/keystore-legacy/src/test/java/org/opendaylight/netconf/keystore/legacy/impl/DefaultNetconfKeystoreServiceTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-20T15:41:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4e9ec8e1_f0cba17f",
+      "revId": "c0fe504da66dedc63a06d3df4ec12de0daf4f7c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "51ac837f_78c1b38d",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "503ea5e1_51f2b53c",
+        "filename": "keystore/keystore-none/src/main/java/org/opendaylight/netconf/keystore/none/NoneKeystoreAccess.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-20T15:41:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51ac837f_78c1b38d",
+      "revId": "c0fe504da66dedc63a06d3df4ec12de0daf4f7c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "97be0ba0_f519dbed",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-10-19T07:42:58Z",
       "side": 1,
       "message": "This copies EmptyKeystoreAccess line for line. Do we need it?",
+      "revId": "c0fe504da66dedc63a06d3df4ec12de0daf4f7c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b00398b_55f02a35",
+        "filename": "keystore/keystore-none/src/main/java/org/opendaylight/netconf/keystore/none/NoneKeystoreAccess.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-20T15:41:35Z",
+      "side": 1,
+      "message": "They serve different purposes. EmptyKeystoreAccess is the package-private\nsingleton behind KeystoreAccess.empty(), for non-OSGi callers (Dagger, tests,\nthe NetconfClientFactoryImpl constructors without a keystore). NoneKeystoreAccess\nis the OSGi component that registers a KeystoreAccess service with the lowest\nranking, so the mandatory reference in NetconfClientFactoryImpl is satisfied\nwhen keystore-legacy is not installed. keystore-api is a plain API bundle\nwithout DS, so the component cannot live there.",
+      "parentUuid": "97be0ba0_f519dbed",
       "revId": "c0fe504da66dedc63a06d3df4ec12de0daf4f7c6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
