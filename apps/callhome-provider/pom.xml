@@ -74,6 +74,7 @@
         <dependency>
             <groupId>org.opendaylight.ietf.model</groupId>
             <artifactId>rfc9643-ietf-tcp-client</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.ietf.model</groupId>
@@ -94,10 +95,6 @@
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
             <artifactId>mdsal-common-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>mdsal-dom-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
@@ -236,6 +233,15 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <ignoredNonTestScopedDependencies>
+                        <!-- require to resolve yang sources, while we use these in tests -->
+                        <ignoredNonTestScopedDependency>org.opendaylight.ietf.model:rfc9643-ietf-tcp-client</ignoredNonTestScopedDependency>
+                    </ignoredNonTestScopedDependencies>
+                </configuration>
             </plugin>
         </plugins>
     </build>
