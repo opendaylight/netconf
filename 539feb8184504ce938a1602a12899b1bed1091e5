@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "37d59f10_7e40b6e7",
+        "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientFactoryImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-20T15:44:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b721ceda_42713a90",
+      "revId": "539feb8184504ce938a1602a12899b1bed1091e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90a1aad1_58ddb16b",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-19T07:55:48Z",
       "side": 1,
       "message": "A static greedy reference means SCR deactivates and recreates this component whenever a higher-ranked KeystoreAccess appears or the legacy one goes away. It\u0027ll call close() then shut down the SSH event loop and every consumer holding NetconfClientFactory restarts. Would a dynamic greedy (volatile) reference avoid the restart altogether? Just something for consideration.",
+      "revId": "539feb8184504ce938a1602a12899b1bed1091e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ea2f717_877a92c1",
+        "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientFactoryImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-20T15:44:39Z",
+      "side": 1,
+      "message": "Thanks, I would rather keep it as it is. The restart only happens when a new keystore becomes available, so reactivating makes sense. A dynamic greedy reference would avoid the restart, but it cannot be passed as an activation parameter. It would need a volatile field instead, and open SSH sessions would keep using the keys from the old keystore.",
+      "parentUuid": "90a1aad1_58ddb16b",
       "revId": "539feb8184504ce938a1602a12899b1bed1091e5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
