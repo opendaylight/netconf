@@ -79,7 +79,7 @@ final class WadlTemplate {
         for (final ModuleImport imprt : module.getImports()) {
             builder.append("        ");
             builder.append("<include href=\"");
-            builder.append(imprt.getModuleName(), "        ");
+            builder.append(imprt.getModuleName().getLocalName(), "        ");
             builder.append(".yang\"/>");
             builder.newLineIfNotEmpty();
         }

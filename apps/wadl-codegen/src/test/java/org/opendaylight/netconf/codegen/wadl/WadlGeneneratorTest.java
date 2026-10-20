@@ -46,7 +46,7 @@ class WadlGeneneratorTest {
 
                 <grammars>
                     <include href="controller-network.yang"/>
-                    <include href="Unqualified{localName=ietf-inet-types}.yang"/>
+                    <include href="ietf-inet-types.yang"/>
                 </grammars>
 
                 <resources base="http://localhost:9998/restconf">
@@ -732,7 +732,7 @@ class WadlGeneneratorTest {
 
                 <grammars>
                     <include href="controller-network-rpcs.yang"/>
-                    <include href="Unqualified{localName=ietf-inet-types}.yang"/>
+                    <include href="ietf-inet-types.yang"/>
                 </grammars>
 
                 <resources base="http://localhost:9998/restconf">
