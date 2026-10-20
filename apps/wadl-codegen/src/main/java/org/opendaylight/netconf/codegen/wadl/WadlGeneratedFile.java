@@ -36,8 +36,8 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class WadlTemplate implements GeneratedFile {
-    private static final Logger LOG = LoggerFactory.getLogger(WadlTemplate.class);
+final class WadlGeneratedFile implements GeneratedFile {
+    private static final Logger LOG = LoggerFactory.getLogger(WadlGeneratedFile.class);
     private static final IndentedXML INDENTED_XML = IndentedXML.of(4);
     private static final XMLOutputFactory XOF;
 
@@ -55,7 +55,7 @@ final class WadlTemplate implements GeneratedFile {
     private List<LeafSchemaNode> pathListParams;
 
     @NonNullByDefault
-    private WadlTemplate(final EffectiveModelContext context, final Module module,
+    private WadlGeneratedFile(final EffectiveModelContext context, final Module module,
             final List<DataSchemaNode> configData, final List<DataSchemaNode> operationalData) {
         this.context = requireNonNull(context);
         this.module = requireNonNull(module);
@@ -64,7 +64,7 @@ final class WadlTemplate implements GeneratedFile {
 
     }
 
-    static @Nullable WadlTemplate of(final @NonNull EffectiveModelContext context, final @NonNull Module module) {
+    static @Nullable WadlGeneratedFile of(final @NonNull EffectiveModelContext context, final @NonNull Module module) {
         final var operationalData = new ArrayList<DataSchemaNode>();
         final var configData = new ArrayList<DataSchemaNode>();
         for (var child : module.getChildNodes()) {
@@ -78,7 +78,7 @@ final class WadlTemplate implements GeneratedFile {
         }
 
         return module.getRpcs().isEmpty() && configData.isEmpty() && operationalData.isEmpty() ? null
-            : new WadlTemplate(context, module, configData, operationalData);
+            : new WadlGeneratedFile(context, module, configData, operationalData);
     }
 
     @Override
@@ -237,7 +237,7 @@ final class WadlTemplate implements GeneratedFile {
         writer.writeEndElement();
 
         final var children = ((DataNodeContainer) schemaNode).getChildNodes().stream()
-            .filter(WadlTemplate::isListOrContainer)
+            .filter(WadlGeneratedFile::isListOrContainer)
             .toList();
 
         if (config) {
