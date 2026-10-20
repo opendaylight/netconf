@@ -170,7 +170,7 @@ class NetconfNodeHandlerTest {
                         .setPassword("testpassword")
                         .build())
                     .build())
-                .build(), null, AbstractNetconfTopology.defaultSshParams(), null);
+                .build(), null, AbstractNetconfTopology.defaultSshParams());
     }
 
     @AfterEach
@@ -357,7 +357,7 @@ class NetconfNodeHandlerTest {
                         .build())
                     .build())
                 .build(),
-                null, AbstractNetconfTopology.defaultSshParams(), null);
+                null, AbstractNetconfTopology.defaultSshParams());
 
         // return null when attempt to load credentials fot key id
         doReturn(null).when(credentialProvider).credentialForId(any());
@@ -400,7 +400,7 @@ class NetconfNodeHandlerTest {
                     .setPassword("testpassword")
                     .build())
                 .build())
-            .build(), null, AbstractNetconfTopology.defaultSshParams(), null);
+            .build(), null, AbstractNetconfTopology.defaultSshParams());
 
         // Test 1000 iterations and pick the smallest value.
         // Less iteration has higher chance to not catch NETCONF-1408 issue.

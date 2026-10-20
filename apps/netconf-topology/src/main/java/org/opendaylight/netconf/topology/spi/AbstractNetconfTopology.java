@@ -211,14 +211,27 @@ public abstract class AbstractNetconfTopology {
      * identifier. The configuration is ignored while a call-home node with the same identifier is connected.
      *
      * @param node configured node
-     * @param sshAlg SSH algorithms negotiated with the device in advance, {@code null} if not applicable
      */
     // Non-final for testing
-    protected void ensureNode(final Node node, final NegotiatedSshAlg sshAlg) {
-        lockedEnsureNode(node, sshAlg);
+    protected void ensureNode(final Node node) {
+        lockedEnsureNode(node);
     }
 
-    private synchronized void lockedEnsureNode(final Node node, final NegotiatedSshAlg sshAlg) {
+    /**
+     * Connect a configured node.
+     *
+     * @param node configured node
+     * @param sshAlg ignored
+     * @deprecated Call-home nodes are enabled through {@link CallHomeTopologyService#enableCallHomeNode(Node,
+     *             NegotiatedSshAlg, CallHomeSessionInitializer)}, hence {@code sshAlg} is ignored. Use
+     *             {@link #ensureNode(Node)} instead.
+     */
+    @Deprecated(forRemoval = true)
+    protected void ensureNode(final Node node, final NegotiatedSshAlg sshAlg) {
+        ensureNode(node);
+    }
+
+    private synchronized void lockedEnsureNode(final Node node) {
         final var nodeId = node.requireNodeId();
         final var prev = activeConnectors.remove(nodeId);
         if (prev != null) {
@@ -232,7 +245,7 @@ public abstract class AbstractNetconfTopology {
         }
 
         final var nodeOptional = node.augmentation(NetconfNodeAugmentedOptional.class);
-        connectNode(netconfNode, nodeId, nodeOptional, sshAlg);
+        connectNode(netconfNode, nodeId, nodeOptional);
     }
 
     /**
@@ -294,11 +307,11 @@ public abstract class AbstractNetconfTopology {
         oldHandler.close();
 
         // FIXME: NETCONF-925: preserve NetconfNodeAugmentedOptional of oldHandler
-        connectNode(netconfNode, nodeId, null, null);
+        connectNode(netconfNode, nodeId, null);
     }
 
     private synchronized void connectNode(final NetconfNode netconfNode, final NodeId nodeId,
-            final NetconfNodeAugmentedOptional nodeOptional, final NegotiatedSshAlg sshAlg) {
+            final NetconfNodeAugmentedOptional nodeOptional) {
         final var deviceId = getRemoteDeviceId(netconfNode, nodeId);
         if (deviceId == null) {
             return;
@@ -313,7 +326,7 @@ public abstract class AbstractNetconfTopology {
 
         final NetconfNodeHandler nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemaProvider,
             schemaManager, schemaAssembler, builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId,
-            netconfNode, nodeOptional, sshParams, sshAlg);
+            netconfNode, nodeOptional, sshParams);
 
         // ... record it ...
         activeConnectors.put(nodeId, nodeHandler);
