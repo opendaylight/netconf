@@ -27,9 +27,12 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
+import org.opendaylight.netconf.topology.spi.CallHomeSessionInitializer;
+import org.opendaylight.netconf.topology.spi.CallHomeTopologyService;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.netconf.topology.spi.NetconfTopologyRPCProvider;
@@ -38,6 +41,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev25
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.network.topology.topology.topology.types.TopologyNetconf;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.network.topology.topology.topology.types.topology.netconf.SshTransportTopologyParameters;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
@@ -56,9 +60,9 @@ import org.slf4j.LoggerFactory;
 
 // Non-final for testing
 @Singleton
-@Component(service = { })
+@Component(service = { CallHomeTopologyService.class })
 public class NetconfTopologyImpl extends AbstractNetconfTopology
-        implements DataTreeChangeListener<Node>, AutoCloseable {
+        implements DataTreeChangeListener<Node>, AutoCloseable, CallHomeTopologyService {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyImpl.class);
 
     private Registration dtclReg;
@@ -175,5 +179,16 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
         final var nodeId = node.getNodeId();
         LOG.debug("Config for node {} {}", nodeId, operation);
         ensureNode(node, null);
+    }
+
+    @Override
+    public void enableCallHomeNode(final Node node, final NegotiatedSshAlg sshAlg,
+            final CallHomeSessionInitializer initializer) {
+        lockedEnsureCallHomeNode(node, sshAlg, initializer);
+    }
+
+    @Override
+    public void disableCallHomeNode(final NodeId nodeId) {
+        deleteCallHomeNode(nodeId);
     }
 }

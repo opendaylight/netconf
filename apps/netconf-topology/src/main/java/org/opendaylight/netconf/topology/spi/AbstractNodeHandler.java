@@ -52,10 +52,10 @@ import org.slf4j.LoggerFactory;
  * keepalive and RPC timeout facades, and forwards device state to a delegate {@link RemoteDeviceHandler}.
  *
  * <p>How the NETCONF session is established is left to subclasses: {@link NetconfNodeHandler} connects to the device
- * and reconnects as needed.
+ * and reconnects as needed, {@link CallHomeNodeHandler} attaches to a transport accepted from a call-home device.
  */
 abstract sealed class AbstractNodeHandler extends AbstractRegistration implements RemoteDeviceHandler
-        permits NetconfNodeHandler {
+        permits CallHomeNodeHandler, NetconfNodeHandler {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNodeHandler.class);
 
     private final @NonNull List<Registration> yanglibRegistrations;
@@ -67,7 +67,7 @@ abstract sealed class AbstractNodeHandler extends AbstractRegistration implement
 
     // SSH algorithms negotiated for the current session, reported to the delegate in onDeviceConnected(). Maintained
     // by subclasses: NetconfNodeHandler resets it on each connection attempt and fills it from its
-    // SSHNegotiatedAlgListener.
+    // SSHNegotiatedAlgListener, CallHomeNodeHandler sets it once from the accepted transport.
     @GuardedBy("this")
     private @Nullable NegotiatedSshAlg negotiatedSshAlg;
 
@@ -182,8 +182,9 @@ abstract sealed class AbstractNodeHandler extends AbstractRegistration implement
      * {@inheritDoc}
      *
      * <p>The {@code ignoredSshAlg} argument is disregarded: this handler tracks the algorithms negotiated for the
-     * current session itself (via the {@link SSHNegotiatedAlgListener} of {@link NetconfNodeHandler}, or seeded from
-     * a call-home baseline) and substitutes that value when forwarding to its delegate.
+     * current session itself (via the {@link SSHNegotiatedAlgListener} of {@link NetconfNodeHandler}, or as provided
+     * by the call-home transport to {@link CallHomeNodeHandler}) and substitutes that value when forwarding to its
+     * delegate.
      */
     @Override
     public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
