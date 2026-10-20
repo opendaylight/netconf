@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.topology.callhome;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
@@ -16,8 +18,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -28,29 +28,15 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification.WithDataAfter;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
-import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
-import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.NegotiatedSshAlg;
-import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
-import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
-import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
-import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
-import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
-import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
-import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
-import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
+import org.opendaylight.netconf.topology.spi.CallHomeSessionInitializer;
+import org.opendaylight.netconf.topology.spi.CallHomeTopologyService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev251204.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshEncryptionAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshKeyExchangeAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.common.rev241010.SshMacAlgorithm;
@@ -98,43 +84,26 @@ import org.slf4j.LoggerFactory;
 /**
  * Service is responsible for call-home to topology integration.
  *
- * <p>To manage remote device as a topology node the topology component (based on
- * {@link AbstractNetconfTopology AbstractNetconfTopology}) creates an instance
- * of {@link NetconfNodeHandler NetconfNodeHandler} based on provided
- * {@link Node}.
+ * <p>Call-home devices are exposed as nodes of the NETCONF topology provided through {@link CallHomeTopologyService}.
+ * The topology owns the node, i.e. its {@link org.opendaylight.netconf.topology.spi.CallHomeNodeHandler}, mount point
+ * and operational state, while this service owns the accepted SSH or TLS transport.
  *
- * <p>The mentioned NetconfNodeHandler initializes connection to remote device via sequence of following actions (see
- * {@link AbstractNetconfTopology#ensureNode(Node, NegotiatedSshAlg) ensureNode(Node)} and
- * {@link NetconfNodeHandler#lockedConnect() connect()}):
- *
+ * <p>Following sequence of actions is performed when an incoming connection is mapped to a topology node:
  * <ul>
- *     <li>Builds an instance of {@link NetconfDeviceCommunicator
- *     NetconfDeviceCommunicator} implementation of {@link NetconfClientSessionListener} which is used to check the
- *     NETCONF session state and communicate with device using NETCONF protocol </li>
- *     <li>Builds Netconf client configuration using provided {@link NetconfClientConfigurationBuilderFactory}</li>
- *     <li>Builds Netconf client using configuration composed and triggers connection</li>
- * </ul>
- *
- * <p>This service uses custom implementations of {@link NetconfClientConfigurationBuilderFactory} and
- * {@link NetconfClientFactory} in order to capture the instance of {@link NetconfClientSessionListener} from topology
- * component which is required to establish NETCONF layer. See {@link #createClientConfigurationBuilderFactory()}
- * and {@link #createClientFactory()}.
- *
- * <p>Following sequence of actions is performed when incoming connection is mapped to topology node:
- * <ul>
- *     <li>When incoming connection is identified the {@link CallHomeSshSessionContext} instance expected to be created.
- *     The createContext() method is invoked within protocol associated {@link CallHomeSessionContextManager} --
- *     see {@link #createSshSessionContextManager()} and
+ *     <li>When the incoming connection is identified, the protocol-specific {@link CallHomeSessionContextManager}
+ *     invokes {@code createContext()} -- see {@link #createSshSessionContextManager()} and
  *     {@link #createTlsSessionContextManager(CallHomeTlsAuthProvider, CallHomeStatusRecorder)}</li>
- *     <li>Due to both {@link NetconfClientSessionListener} and {@link SettableFuture} are required to build session
- *     context the {@link CallHomeTopology#enableNode(Node, NegotiatedSshAlg)} is called using synthetic {@link Node}
- *     instance composed via {@link #asNode(String, SocketAddress, Protocol)}. This triggers Netconf client
- *     construct/connect logic (as explained above) resulting captured object placed into
- *     {@link #netconfLayerMapping}.</li>
- *     <li>Accepted instance of {@link NetconfClientSessionListener} is used to establish Netconf layer --
- *     see {@link CallHomeTransportChannelListener}</li>
- *     <li>Accepted instance of {@link SettableFuture} (representing connection to remote device) is used to
- *     signal connection state to topology component</li>
+ *     <li>A synthetic {@link Node} is composed via {@link #asNode(String, SocketAddress, Protocol)} and passed to
+ *     {@link CallHomeTopologyService#enableCallHomeNode(Node, NegotiatedSshAlg, CallHomeSessionInitializer)} together
+ *     with a {@link CallHomeSessionInitializer}</li>
+ *     <li>If the node is accepted, the topology invokes the initializer, which captures the node's
+ *     {@link NetconfClientSessionListener} and returns a {@link SettableFuture} representing the NETCONF session. If
+ *     the node is rejected, the initializer is not invoked and the connection is refused.</li>
+ *     <li>The captured {@link NetconfClientSessionListener} is used to establish the NETCONF layer on the accepted
+ *     transport -- see {@link CallHomeTransportChannelListener}</li>
+ *     <li>The {@link SettableFuture} is used to signal the NETCONF session state to the topology node</li>
+ *     <li>When the transport goes away, or the device is removed from allowed devices, the node is removed via
+ *     {@link CallHomeTopologyService#disableCallHomeNode(NodeId)}</li>
  * </ul>
  */
 @Component(service = CallHomeMountService.class, immediate = true,
@@ -232,8 +201,7 @@ public final class CallHomeMountService implements AutoCloseable {
     private static final DataObjectReference<Endpoints> ENDPOINTS_IDENTIFIER = DataObjectReference
         .builder(NetconfCallhomeServer.class).child(Global.class).child(Endpoints.class).build();
 
-    private final Map<String, NetconfLayer> netconfLayerMapping = new ConcurrentHashMap<>();
-    private final CallHomeTopology topology;
+    private final CallHomeTopologyService topology;
     private final Configuration config;
     private final Registration allowedDevicesReg;
     private final Registration endpointsReg;
@@ -243,23 +211,8 @@ public final class CallHomeMountService implements AutoCloseable {
 
     @Activate
     @Inject
-    public CallHomeMountService(
-            @Reference final NetconfTimer timer,
-            @Reference final NetconfTopologySchemaAssembler schemaAssembler,
-            @Reference final SchemaResourceManager schemaRepositoryProvider,
-            @Reference final BaseNetconfSchemaProvider baseSchemaProvider,
-            @Reference final DataBroker dataBroker,
-            @Reference final DOMMountPointService mountService,
-            @Reference final DeviceActionFactory deviceActionFactory, final Configuration config) {
-        this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, timer, schemaAssembler, schemaRepositoryProvider,
-            baseSchemaProvider, dataBroker, mountService, deviceActionFactory, config);
-    }
-
-    public CallHomeMountService(final String topologyId, final NetconfTimer timer,
-            final NetconfTopologySchemaAssembler schemaAssembler, final SchemaResourceManager schemaRepositoryProvider,
-            final BaseNetconfSchemaProvider baseSchemaProvider, final DataBroker dataBroker,
-            final DOMMountPointService mountService, final DeviceActionFactory deviceActionFactory,
-            final Configuration config) {
+    public CallHomeMountService(@Reference final DataBroker dataBroker,
+            @Reference final CallHomeTopologyService topologyService, final Configuration config) {
         this.config = config;
         sshTransportParameters = buildSshTransportParameters(CallHomeListenEndpoints.readSshTransportParams(dataBroker),
             config);
@@ -267,15 +220,11 @@ public final class CallHomeMountService implements AutoCloseable {
             this::onAllowedDevicesChanged);
         endpointsReg = dataBroker.registerTreeChangeListener(LogicalDatastoreType.CONFIGURATION, ENDPOINTS_IDENTIFIER,
             this::onEndpointsChanged);
-        final var clientConfBuilderFactory = createClientConfigurationBuilderFactory();
-        final var clientFactory = createClientFactory();
-        topology = new CallHomeTopology(topologyId, clientFactory, timer, schemaAssembler,
-            schemaRepositoryProvider, dataBroker, mountService, clientConfBuilderFactory,
-            baseSchemaProvider, deviceActionFactory);
+        topology = topologyService;
     }
 
     @VisibleForTesting
-    CallHomeMountService(final CallHomeTopology topology, final Configuration config) {
+    CallHomeMountService(final CallHomeTopologyService topology, final Configuration config) {
         this.topology = topology;
         this.config = config;
         sshTransportParameters = buildSshTransportParameters(null, config);
@@ -284,38 +233,6 @@ public final class CallHomeMountService implements AutoCloseable {
         };
         endpointsReg = () -> {
             // do nothing
-        };
-    }
-
-    @VisibleForTesting
-    NetconfClientConfigurationBuilderFactory createClientConfigurationBuilderFactory() {
-        // use minimal configuration, only id and session listener are used
-        return (nodeId, node, unused) -> NetconfClientConfigurationBuilder.create()
-            .withName(nodeId.getValue())
-            .withConnectionTimeoutMillis(config.connection$_$timeout$_$millis())
-            // below parameters are only required to pass configuration validation
-            // actual values play no role
-            .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
-            .withTcpParameters(new TcpClientParametersBuilder().build());
-    }
-
-    @VisibleForTesting
-    NetconfClientFactory createClientFactory() {
-        return new NetconfClientFactory() {
-            @Override
-            public ListenableFuture<NetconfClientSession> createClient(
-                    final NetconfClientConfiguration clientConfiguration, final SSHNegotiatedAlgListener algListener) {
-                final var future = SettableFuture.<NetconfClientSession>create();
-                final var pending = new NetconfLayer(clientConfiguration.getName(),
-                    clientConfiguration.getSessionListener(), future);
-                netconfLayerMapping.put(pending.id, pending);
-                return future;
-            }
-
-            @Override
-            public void close() throws Exception {
-                // do nothing
-            }
         };
     }
 
@@ -357,18 +274,18 @@ public final class CallHomeMountService implements AutoCloseable {
             public CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession,
                     final NegotiatedSshAlg sshAlg) {
                 final var remoteAddr = clientSession.getRemoteAddress();
-                topology.enableNode(asNode(id, remoteAddr, new ProtocolBuilder().setName(Protocol.Name.SSH)
+                final var netconfLayer = new NetconfLayer();
+                topology.enableCallHomeNode(asNode(id, remoteAddr, new ProtocolBuilder().setName(Protocol.Name.SSH)
                     .setSpecification(new SshCaseBuilder().setSshTransportParameters(sshTransportParameters).build())
-                    .build()), sshAlg);
-                final var netconfLayer = netconfLayerMapping.remove(id);
-                return netconfLayer == null ? null : new CallHomeSshSessionContext(id, remoteAddr, clientSession,
-                    netconfLayer.sessionListener, netconfLayer.netconfSessionFuture);
+                    .build()), sshAlg, netconfLayer);
+                return netconfLayer.sessionListener == null ? null : new CallHomeSshSessionContext(id, remoteAddr,
+                    clientSession, netconfLayer.sessionListener, netconfLayer.sessionFuture);
             }
 
             @Override
             public void remove(final String id) {
                 super.remove(id);
-                topology.disableNode(new NodeId(id));
+                topology.disableCallHomeNode(new NodeId(id));
             }
         };
     }
@@ -378,16 +295,16 @@ public final class CallHomeMountService implements AutoCloseable {
         return new CallHomeTlsSessionContextManager(authProvider, statusRecorder) {
             @Override
             public CallHomeTlsSessionContext createContext(final String id, final Channel channel) {
-                topology.enableNode(asNode(id, channel.remoteAddress(), TLS_PROTOCOL), null);
-                final var netconfLayer = netconfLayerMapping.remove(id);
-                return netconfLayer == null ? null : new CallHomeTlsSessionContext(id, channel,
-                    netconfLayer.sessionListener, netconfLayer.netconfSessionFuture());
+                final var netconfLayer = new NetconfLayer();
+                topology.enableCallHomeNode(asNode(id, channel.remoteAddress(), TLS_PROTOCOL), null, netconfLayer);
+                return netconfLayer.sessionListener == null ? null : new CallHomeTlsSessionContext(id, channel,
+                    netconfLayer.sessionListener, netconfLayer.sessionFuture);
             }
 
             @Override
             public void remove(final String id) {
                 super.remove(id);
-                topology.disableNode(new NodeId(id));
+                topology.disableCallHomeNode(new NodeId(id));
             }
         };
     }
@@ -397,7 +314,7 @@ public final class CallHomeMountService implements AutoCloseable {
         for (final var change : changes) {
             final var deletedDevice = change.getRootNode().dataBefore();
             if (deletedDevice != null) {
-                topology.disableNode(new NodeId(deletedDevice.getUniqueId()));
+                topology.disableCallHomeNode(new NodeId(deletedDevice.getUniqueId()));
             }
         }
     }
@@ -427,14 +344,23 @@ public final class CallHomeMountService implements AutoCloseable {
     @Deactivate
     @Override
     public void close() {
-        netconfLayerMapping.forEach((key, value) -> value.netconfSessionFuture.cancel(true));
-        netconfLayerMapping.clear();
         allowedDevicesReg.close();
         endpointsReg.close();
     }
 
-    private record NetconfLayer(String id, NetconfClientSessionListener sessionListener,
-        SettableFuture<NetconfClientSession> netconfSessionFuture) {
+    /**
+     * {@link CallHomeSessionInitializer} capturing the session listener of the topology node, so that it can be
+     * attached to the accepted transport. The session listener remains {@code null} if the topology rejects the node.
+     */
+    private static final class NetconfLayer implements CallHomeSessionInitializer {
+        final SettableFuture<NetconfClientSession> sessionFuture = SettableFuture.create();
+        NetconfClientSessionListener sessionListener;
+
+        @Override
+        public ListenableFuture<NetconfClientSession> initialize(final NetconfClientSessionListener listener) {
+            sessionListener = requireNonNull(listener);
+            return sessionFuture;
+        }
     }
 
     private static @NonNull SshTransportParameters buildSshTransportParameters(

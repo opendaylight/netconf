@@ -96,10 +96,6 @@
             <artifactId>mdsal-common-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>mdsal-dom-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
             <artifactId>ietf-topology</artifactId>
         </dependency>
@@ -236,6 +232,14 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <ignoredNonTestScopedDependencies>
+                        <ignoredNonTestScopedDependency>org.opendaylight.ietf.model:rfc9643-ietf-tcp-client</ignoredNonTestScopedDependency>
+                    </ignoredNonTestScopedDependencies>
+                </configuration>
             </plugin>
         </plugins>
     </build>
