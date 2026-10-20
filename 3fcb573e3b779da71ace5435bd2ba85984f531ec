@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e6f93070_f354a0ff",
+        "filename": "apps/wadl-codegen/src/test/java/org/opendaylight/netconf/codegen/wadl/WadlGeneneratorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-10-20T21:03:04Z",
+      "side": 1,
+      "message": "https://docs.opendaylight.org/en/latest/contributor-guides/copyright.html#edited-files",
+      "parentUuid": "002f5cd7_dc7fb8f6",
+      "revId": "3fcb573e3b779da71ace5435bd2ba85984f531ec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f786afbe_399d140e",
         "filename": "apps/wadl-codegen/src/test/java/org/opendaylight/netconf/codegen/wadl/WadlGeneneratorTest.java",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "writtenOn": "2026-10-20T14:07:53Z",
       "side": 1,
       "message": "final",
+      "revId": "3fcb573e3b779da71ace5435bd2ba85984f531ec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b97f548e_023fc79c",
+        "filename": "apps/wadl-codegen/src/test/java/org/opendaylight/netconf/codegen/wadl/WadlGeneneratorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-10-20T21:03:04Z",
+      "side": 1,
+      "message": "how?",
+      "parentUuid": "edf9c233_ea135661",
       "revId": "3fcb573e3b779da71ace5435bd2ba85984f531ec",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
