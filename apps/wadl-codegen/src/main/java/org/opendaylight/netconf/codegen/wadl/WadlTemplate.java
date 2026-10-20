@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.Iterables;
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
@@ -115,7 +116,7 @@ final class WadlTemplate {
             for (final DataSchemaNode schemaNode : configData) {
                 builder.append("        ");
                 builder.append("    ");
-                builder.append(mehodPost(schemaNode), "            ");
+                builder.append(methodPost(schemaNode), "            ");
                 builder.newLineIfNotEmpty();
             }
             for (final DataSchemaNode schemaNode : configData) {
@@ -239,7 +240,7 @@ final class WadlTemplate {
             builder.append(methodPut(schemaNode));
             builder.newLineIfNotEmpty();
             for (final DataSchemaNode child : children) {
-                builder.append(mehodPost(child));
+                builder.append(methodPost(child));
                 builder.newLineIfNotEmpty();
             }
         }
@@ -250,103 +251,60 @@ final class WadlTemplate {
         return builder.toString();
     }
 
-    private CharSequence resourceParams() {
-        StringConcatenation builder = new StringConcatenation();
-        for (final LeafSchemaNode pathParam : pathListParams) {
+    private String resourceParams() {
+        final var bb = new BlockBuilder();
+        for (var pathParam : pathListParams) {
             if (pathParam != null) {
-                builder.newLineIfNotEmpty();
-                builder.append("<param required=\"true\" style=\"template\" name=\"");
-                builder.append(pathParam.getQName().getLocalName());
-                builder.append("\" type=\"");
-                builder.append(pathParam.typeDefinition().getQName().getLocalName());
-                builder.append("\"/>");
-                builder.newLineIfNotEmpty();
+                bb
+                    .oe("param").attr("required", "true").attr("style", "template")
+                        .attr("name", pathParam.getQName().getLocalName())
+                        .attr("type", pathParam.typeDefinition().getQName().getLocalName()).cE();
             }
         }
-        return builder;
+        return bb.toRawString();
     }
 
-    private static CharSequence methodGet(final DataSchemaNode schemaNode) {
-        StringConcatenation builder = new StringConcatenation();
-        builder.append("<method name=\"GET\">");
-        builder.newLine();
-        builder.append("    ");
-        builder.append("<response>");
-        builder.newLine();
-        builder.append("        ");
-        builder.append(representation(schemaNode.getQName()), "        ");
-        builder.newLineIfNotEmpty();
-        builder.append("    ");
-        builder.append("</response>");
-        builder.newLine();
-        builder.append("</method>");
-        builder.newLine();
-        return builder;
+    private static String methodGet(final DataSchemaNode schemaNode) {
+        return new BlockBuilder()
+            .oe("method").sp().attr("name", "GET").sE()
+                .oe("response").sE()
+                    .frg(representation(schemaNode.getQName()))
+                .eE("response")
+            .eE("method")
+            .toRawString();
     }
 
-    private static CharSequence methodPut(final DataSchemaNode schemaNode) {
-        StringConcatenation builder = new StringConcatenation();
-        builder.append("<method name=\"PUT\">");
-        builder.newLine();
-        builder.append("    ");
-        builder.append("<request>");
-        builder.newLine();
-        builder.append("        ");
-        builder.append(representation(schemaNode.getQName()), "        ");
-        builder.newLineIfNotEmpty();
-        builder.append("    ");
-        builder.append("</request>");
-        builder.newLine();
-        builder.append("</method>");
-        builder.newLine();
-        return builder;
+    private static String methodPut(final DataSchemaNode schemaNode) {
+        return new BlockBuilder()
+            .oe("method").sp().attr("name", "PUT").sE()
+                .oe("request").sE()
+                    .frg(representation(schemaNode.getQName()))
+                .eE("request")
+            .eE("method")
+            .toRawString();
     }
 
-    private static CharSequence mehodPost(final DataSchemaNode schemaNode) {
-        StringConcatenation builder = new StringConcatenation();
-        builder.append("<method name=\"POST\">");
-        builder.newLine();
-        builder.append("    ");
-        builder.append("<request>");
-        builder.newLine();
-        builder.append("        ");
-        builder.append(representation(schemaNode.getQName()), "        ");
-        builder.newLineIfNotEmpty();
-        builder.append("    ");
-        builder.append("</request>");
-        builder.newLine();
-        builder.append("</method>");
-        builder.newLine();
-        return builder;
+    private static String methodPost(final DataSchemaNode schemaNode) {
+        return new BlockBuilder()
+            .oe("method").sp().attr("name", "POST").sE()
+                .oe("request").sE()
+                    .frg(representation(schemaNode.getQName()))
+                .eE("request")
+            .eE("method")
+            .toRawString();
     }
 
-    private static CharSequence methodPostRpc() {
-        StringConcatenation builder = new StringConcatenation();
-        builder.append("<method name=\"POST\">");
-        builder.newLine();
-        builder.append("    ");
-        builder.append("<request>");
-        builder.newLine();
-        builder.append("    ");
-        builder.append("    ");
-        builder.append(representation(null, "input"), "        ");
-        builder.newLineIfNotEmpty();
-        builder.append("    ");
-        builder.append("</request>");
-        builder.newLine();
-        builder.append("    ");
-        builder.append("<response>");
-        builder.newLine();
-        builder.append("    ");
-        builder.append("    ");
-        builder.append(representation(null, "output"), "        ");
-        builder.newLineIfNotEmpty();
-        builder.append("    ");
-        builder.append("</response>");
-        builder.newLine();
-        builder.append("</method>");
-        builder.newLine();
-        return builder;
+    private static String methodPostRpc() {
+        return new BlockBuilder()
+            .oe("method").sp().attr("name", "POST").sE()
+                .oe("request").sE()
+                     .frg(representation(null, "input"))
+                .eE("request")
+                .oe("response").sE()
+                     .frg(representation(null, "output"))
+                .eE("response")
+            .eE("method")
+            .toRawString();
     }
 
     private static CharSequence methodDelete(final DataSchemaNode schemaNode) {
@@ -356,34 +314,18 @@ final class WadlTemplate {
         return builder;
     }
 
-    private static CharSequence representation(final QName qname) {
+    private static @NonNull BlockFragment representation(final @NonNull QName qname) {
         return representation(qname.getNamespace(), qname.getLocalName());
     }
 
-    private static CharSequence representation(final XMLNamespace prefix, final String name) {
-        StringConcatenation builder = new StringConcatenation();
-        builder.newLineIfNotEmpty();
-        builder.append("<representation mediaType=\"application/xml\" element=\"");
-        builder.append(name);
-        builder.append("\"/>");
-        builder.newLineIfNotEmpty();
-        builder.append("<representation mediaType=\"text/xml\" element=\"");
-        builder.append(name);
-        builder.append("\"/>");
-        builder.newLineIfNotEmpty();
-        builder.append("<representation mediaType=\"application/json\" element=\"");
-        builder.append(name);
-        builder.append("\"/>");
-        builder.newLineIfNotEmpty();
-        builder.append("<representation mediaType=\"application/yang.data+xml\" element=\"");
-        builder.append(name);
-        builder.append("\"/>");
-        builder.newLineIfNotEmpty();
-        builder.append("<representation mediaType=\"application/yang.data+json\" element=\"");
-        builder.append(name);
-        builder.append("\"/>");
-        builder.newLineIfNotEmpty();
-        return builder;
+    private static @NonNull BlockFragment representation(final XMLNamespace prefix, final @NonNull String name) {
+        return bb -> bb
+            .oe("representation").sp().attr("mediaType", "application/xml").sp().attr("element", name).cE()
+            .oe("representation").sp().attr("mediaType", "text/xml").sp().attr("element", name).cE()
+            .oe("representation").sp().attr("mediaType", "application/json").sp().attr("element", name).cE()
+            .oe("representation").sp().attr("mediaType", "application/yang.data+xml").sp().attr("element", name).cE()
+            .oe("representation").sp().attr("mediaType", "application/yang.data+json").sp().attr("element", name).cE()
+            .toRawString();
     }
 
     private static boolean isListOrContainer(final DataSchemaNode schemaNode) {
