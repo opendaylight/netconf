@@ -10,10 +10,16 @@ package org.opendaylight.netconf.codegen.wadl;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yangtools.util.xml.IndentedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.common.YangConstants;
@@ -26,6 +32,15 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
 final class WadlTemplate {
+    private static final IndentedXML INDENTED_XML = IndentedXML.of(4);
+    private static final XMLOutputFactory XOF;
+
+    static {
+        final var factory = XMLOutputFactory.newFactory();
+        factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
+        XOF = factory;
+    }
+
     private final List<DataSchemaNode> operationalData = new ArrayList<>();
     private final List<DataSchemaNode> configData = new ArrayList<>();
     private final EffectiveModelContext context;
@@ -48,38 +63,66 @@ final class WadlTemplate {
         }
     }
 
-    @Nullable String body() {
+    @Nullable String body() throws IOException {
         return module.getRpcs().isEmpty() && configData.isEmpty() && operationalData.isEmpty() ? null : application();
     }
 
     @NonNullByDefault
-    private String application() {
-        // FIXME: use XMLStreamWriter into a ByteArray, etc.
-        final var bb = new BlockBuilder()
-            .eol("<?xml version=\"1.0\"?>")
-            .oe("application").attr("xmlns", "http://wadl.dev.java.net/2009/02");
+    private String application() throws IOException {
+        final var sw = new StringWriter();
+        final XMLStreamWriter ww;
+        try {
+            ww = INDENTED_XML.wrapStreamWriter(XOF.createXMLStreamWriter(sw));
+        } catch (XMLStreamException e) {
+            throw new IOException("Failed to create writer", e);
+        }
 
+        try {
+            application(ww);
+            ww.flush();
+        } catch (XMLStreamException e) {
+            final var thrown = new IOException("Failed to write document", e);
+            try {
+                ww.close();
+            } catch (XMLStreamException suppressed) {
+                // TODO Auto-generated catch block
+                suppressed.printStackTrace();
+            }
+            throw thrown;
+        }
+
+        return sw.toString();
+    }
+
+    private void application(final XMLStreamWriter writer) throws XMLStreamException {
+        writer.writeStartDocument();
+        writer.writeStartElement("application");
+        writer.writeDefaultNamespace("http://wadl.dev.java.net/2009/02");
         final var moduleImports =  module.getImports();
         for (var moduleImport : moduleImports) {
-            bb.xmlns(moduleImport.getPrefix(),
+            writer.writeNamespace(moduleImport.getPrefix(),
                 context.findModule(moduleImport.getModuleName().getLocalName(), moduleImport.getRevision())
                     .orElseThrow()
-                    .getNamespace()).newLine();
+                    .getNamespace().toString());
         }
-        bb
-            .xmlns(module.getPrefix(), module.getNamespace()).oB()
-            .nl()
-            .oE("grammars")
-                .oe("include").attr("href", module.getName() + YangConstants.RFC6020_YANG_FILE_EXTENSION).cE();
+
+        writer.writeCharacters("\n");
+        writer.writeStartElement("grammars");
+        writer.writeStartElement("include");
+        writer.writeAttribute("href", module.getName() + YangConstants.RFC6020_YANG_FILE_EXTENSION);
+        writer.writeEndElement();
         for (var moduleImport : moduleImports) {
-            bb
-                .oe("include").attr("href", moduleImport.getModuleName() + YangConstants.RFC6020_YANG_FILE_EXTENSION)
-                .cE();
+            writer.writeStartElement("include");
+            writer.writeAttribute("href", moduleImport.getModuleName() + YangConstants.RFC6020_YANG_FILE_EXTENSION);
+            writer.writeEndElement();
         }
-        bb
-            .cE("grammars")
-            .nl()
-            .oe("resources").attr("base", "http://localhost:9998/restconf").oB();
+        writer.writeEndElement();
+
+
+        writer.writeCharacters("\n");
+        writer.writeStartElement("resources");
+        writer.writeAttribute("base", "http://localhost:9998/restconf");
+
         if (!operationalData.isEmpty()) {
             bb
                 .oe("resource").attr("path", "operational").oB();
