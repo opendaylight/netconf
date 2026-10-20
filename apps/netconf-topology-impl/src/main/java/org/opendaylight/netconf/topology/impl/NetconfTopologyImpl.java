@@ -178,7 +178,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     private void ensureNode(final String operation, final Node node) {
         final var nodeId = node.getNodeId();
         LOG.debug("Config for node {} {}", nodeId, operation);
-        ensureNode(node, null);
+        ensureNode(node);
     }
 
     @Override
