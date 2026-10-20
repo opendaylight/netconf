@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf1664b1_142d7273",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-20T16:57:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "999d1473_298801cb",
+      "revId": "5906972a94f30a92ad24d2144f0c8fd15e83681d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e85a9a7b_5b02c075",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-19T08:07:55Z",
       "side": 1,
       "message": "This covers only the synchronous createClient failure. The async path (connectFailed, e.g. rejected authentication, which the commit message mentions) is untested. Above in socketFailuresAreRetried() at line 289 we already capture the ConnectGivenUpException after failing with \"second\", so asserting its message there would cover it cheaply.",
+      "revId": "5906972a94f30a92ad24d2144f0c8fd15e83681d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98f4ea20_923cc689",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandlerTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-20T16:57:13Z",
+      "side": 1,
+      "message": "Done, the message is now asserted in socketFailuresAreRetried().",
+      "parentUuid": "e85a9a7b_5b02c075",
       "revId": "5906972a94f30a92ad24d2144f0c8fd15e83681d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
