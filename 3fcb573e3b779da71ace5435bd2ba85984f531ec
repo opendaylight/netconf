@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "002f5cd7_dc7fb8f6",
+        "filename": "apps/wadl-codegen/src/test/java/org/opendaylight/netconf/codegen/wadl/WadlGeneneratorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T14:07:53Z",
+      "side": 1,
+      "message": "and others",
+      "revId": "3fcb573e3b779da71ace5435bd2ba85984f531ec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f786afbe_399d140e",
+        "filename": "apps/wadl-codegen/src/test/java/org/opendaylight/netconf/codegen/wadl/WadlGeneneratorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T14:07:53Z",
+      "side": 1,
+      "message": "just ..Generator..",
+      "revId": "3fcb573e3b779da71ace5435bd2ba85984f531ec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "edf9c233_ea135661",
+        "filename": "apps/wadl-codegen/src/test/java/org/opendaylight/netconf/codegen/wadl/WadlGeneneratorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T14:07:53Z",
+      "side": 1,
+      "message": "final",
+      "revId": "3fcb573e3b779da71ace5435bd2ba85984f531ec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10644b6b_0f93f08e",
+        "filename": "apps/wadl-codegen/src/test/java/org/opendaylight/netconf/codegen/wadl/WadlGeneneratorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T14:07:53Z",
+      "side": 1,
+      "message": "add assertEquals(3, WADL_FILES.size()) in before() or in a separate test ..",
+      "revId": "3fcb573e3b779da71ace5435bd2ba85984f531ec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
