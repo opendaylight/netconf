@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f531e1b2_a2522dcd",
+        "filename": "apps/restconf-nb/src/main/resources/restconf8040.cfg",
+        "patchSetId": 9
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T12:45:05Z",
+      "side": 1,
+      "message": "can we use smaller default? maybe this is too much..",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87474aca_84a26fa9",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T12:45:05Z",
+      "side": 1,
+      "message": "probably, just this getter is enough to get everything from it..",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cc76ff3_f56fec2c",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T12:45:05Z",
+      "side": 1,
+      "message": "aren\u0027t we missing one field?",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97ccedf0_cc774449",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T12:45:05Z",
+      "side": 1,
+      "message": "maybe, its just enough to pass requestLimits()",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4e8f355_b4ec2450",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSessionBootstrap.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T12:45:05Z",
+      "side": 1,
+      "message": "toJava?",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9459ef00_5c9631a2",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T12:45:05Z",
+      "side": 1,
+      "message": "@NonNullByDefault?",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e0cb2d8_21643dd3",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T12:45:05Z",
+      "side": 1,
+      "message": "can we accept record here, instead of four parameters?",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97768e72_c49903f8",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPScheme.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T12:45:05Z",
+      "side": 1,
+      "message": ".toJava?",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bd64c53_3a37a1fb",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T12:45:05Z",
+      "side": 1,
+      "message": "so connection is closed? can you document it?",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb714528_fdcac243",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T12:45:05Z",
+      "side": 1,
+      "message": "do we need separate maxRequestBodySize when we have requestLimits?",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4955eb1d_00827ab9",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HttpRequestLimits.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-20T12:45:05Z",
+      "side": 1,
+      "message": "can we make also range check here?",
+      "revId": "24f340f038d8cb941ef46bf0b10e1f7b5b9dd5de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
