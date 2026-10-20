@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "53afe9db_fa430d9a",
+        "filename": "keystore/keystore-api/src/main/java/org/opendaylight/netconf/keystore/api/KeystoreAccess.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-20T15:41:31Z",
+      "side": 1,
+      "message": "Done, I removed both methods. A central keystore reference is a leafref, so the generated code gives us a String and not an AsymmetricKeyKey or SymmetricKeyKey. So I was not able to find a good use for those methods as originally planned.",
+      "parentUuid": "37603198_901be2c9",
+      "revId": "63539f56298811d75f6f83e3be6b582881136e69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "26c709c2_98fa6ae5",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-19T07:34:47Z",
       "side": 1,
       "message": "Copyright year.. here and in the other files",
+      "revId": "63539f56298811d75f6f83e3be6b582881136e69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67d7f9cd_d1c5756b",
+        "filename": "keystore/keystore-api/src/main/java/org/opendaylight/netconf/keystore/api/package-info.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-20T15:41:31Z",
+      "side": 1,
+      "message": "Those are original files from previous WIP solution.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/114018/4",
+      "parentUuid": "26c709c2_98fa6ae5",
       "revId": "63539f56298811d75f6f83e3be6b582881136e69",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
