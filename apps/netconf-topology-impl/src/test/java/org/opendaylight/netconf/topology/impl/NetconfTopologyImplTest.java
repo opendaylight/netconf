@@ -153,7 +153,7 @@ class NetconfTopologyImplTest {
 
             doReturn(objWritten).when(treeMod).getRootNode();
             spyTopology.onDataTreeChanged(changes);
-            verify(spyTopology).ensureNode(node, null);
+            verify(spyTopology).ensureNode(node);
 
             doReturn(TOPOLOGY_PATH.toBuilder().child(Node.class, key).build()).when(treeMod).path();
             doReturn(objDeleted).when(treeMod).getRootNode();
@@ -165,7 +165,7 @@ class NetconfTopologyImplTest {
             spyTopology.onDataTreeChanged(changes);
 
             // one in previous creating and deleting node and one in updating
-            verify(spyTopology, times(2)).ensureNode(node, null);
+            verify(spyTopology, times(2)).ensureNode(node);
         }
     }
 
@@ -188,7 +188,7 @@ class NetconfTopologyImplTest {
             spyTopology.disableCallHomeNode(nodeId);
             verify(spyTopology).deleteCallHomeNode(nodeId);
             // call-home nodes are not managed as configured nodes
-            verify(spyTopology, never()).ensureNode(any(), any());
+            verify(spyTopology, never()).ensureNode(any());
             verify(spyTopology, never()).deleteNode(any());
         }
     }
@@ -205,7 +205,7 @@ class NetconfTopologyImplTest {
         }
 
         @Override
-        public void ensureNode(final Node configNode, final NegotiatedSshAlg sshAlg) {
+        public void ensureNode(final Node configNode) {
             // No-op
         }
 
