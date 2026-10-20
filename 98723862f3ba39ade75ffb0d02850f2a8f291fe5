@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "00792ba0_8d7b8e03",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-20T16:24:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8b4d3d1c_bceae008",
+      "revId": "98723862f3ba39ade75ffb0d02850f2a8f291fe5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "98336a83_70f5c51c",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-20T12:46:01Z",
       "side": 1,
       "message": "change accordingly the previous patch..",
+      "revId": "98723862f3ba39ade75ffb0d02850f2a8f291fe5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2aa36514_14c0f2b0",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 2120,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-20T16:24:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98336a83_70f5c51c",
       "revId": "98723862f3ba39ade75ffb0d02850f2a8f291fe5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
