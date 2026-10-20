@@ -42,16 +42,14 @@ class WadlGeneneratorTest {
     @Test
     void testControllerNetwork() {
         assertTransientResource("controller-network", """
-            <?xml version="1.0"?>
+            <?xml version="1.0" ?>
             <application xmlns="http://wadl.dev.java.net/2009/02" \
-            xmlns:inet="urn:ietf:params:xml:ns:yang:ietf-inet-types"
-             xmlns:topos="urn:opendaylight:controller:network">
-
+            xmlns:inet="urn:ietf:params:xml:ns:yang:ietf-inet-types" \
+            xmlns:topos="urn:opendaylight:controller:network">
                 <grammars>
                     <include href="controller-network.yang"/>
                     <include href="ietf-inet-types.yang"/>
                 </grammars>
-
                 <resources base="http://localhost:9998/restconf">
                     <resource path="config">
                         <method name="POST">
@@ -73,7 +71,7 @@ class WadlGeneneratorTest {
                                     <representation mediaType="application/yang.data+json" element="network"/>
                                 </response>
                             </method>
-                            <method name="DELETE" />
+                            <method name="DELETE"/>
                             <method name="PUT">
                                 <request>
                                     <representation mediaType="application/xml" element="network"/>
@@ -111,7 +109,7 @@ class WadlGeneneratorTest {
                                         <representation mediaType="application/yang.data+json" element="topologies"/>
                                     </response>
                                 </method>
-                                <method name="DELETE" />
+                                <method name="DELETE"/>
                                 <method name="PUT">
                                     <request>
                                         <representation mediaType="application/xml" element="topologies"/>
@@ -141,7 +139,7 @@ class WadlGeneneratorTest {
                                             <representation mediaType="application/yang.data+json" element="topology"/>
                                         </response>
                                     </method>
-                                    <method name="DELETE" />
+                                    <method name="DELETE"/>
                                     <method name="PUT">
                                         <request>
                                             <representation mediaType="application/xml" element="topology"/>
@@ -188,7 +186,7 @@ class WadlGeneneratorTest {
                                                 <representation mediaType="application/yang.data+json" element="types"/>
                                             </response>
                                         </method>
-                                        <method name="DELETE" />
+                                        <method name="DELETE"/>
                                         <method name="PUT">
                                             <request>
                                                 <representation mediaType="application/xml" element="types"/>
@@ -209,7 +207,7 @@ class WadlGeneneratorTest {
                                                 <representation mediaType="application/yang.data+json" element="nodes"/>
                                             </response>
                                         </method>
-                                        <method name="DELETE" />
+                                        <method name="DELETE"/>
                                         <method name="PUT">
                                             <request>
                                                 <representation mediaType="application/xml" element="nodes"/>
@@ -241,7 +239,7 @@ class WadlGeneneratorTest {
             element="node"/>
                                                 </response>
                                             </method>
-                                            <method name="DELETE" />
+                                            <method name="DELETE"/>
                                             <method name="PUT">
                                                 <request>
                                                     <representation mediaType="application/xml" element="node"/>
@@ -281,7 +279,7 @@ class WadlGeneneratorTest {
             element="termination-points"/>
                                                     </response>
                                                 </method>
-                                                <method name="DELETE" />
+                                                <method name="DELETE"/>
                                                 <method name="PUT">
                                                     <request>
                                                         <representation mediaType="application/xml" \
@@ -326,7 +324,7 @@ class WadlGeneneratorTest {
             element="termination-point"/>
                                                         </response>
                                                     </method>
-                                                    <method name="DELETE" />
+                                                    <method name="DELETE"/>
                                                     <method name="PUT">
                                                         <request>
                                                             <representation mediaType="application/xml" \
@@ -355,7 +353,7 @@ class WadlGeneneratorTest {
                                                 <representation mediaType="application/yang.data+json" element="links"/>
                                             </response>
                                         </method>
-                                        <method name="DELETE" />
+                                        <method name="DELETE"/>
                                         <method name="PUT">
                                             <request>
                                                 <representation mediaType="application/xml" element="links"/>
@@ -387,7 +385,7 @@ class WadlGeneneratorTest {
             element="link"/>
                                                 </response>
                                             </method>
-                                            <method name="DELETE" />
+                                            <method name="DELETE"/>
                                             <method name="PUT">
                                                 <request>
                                                     <representation mediaType="application/xml" element="link"/>
@@ -433,7 +431,7 @@ class WadlGeneneratorTest {
             element="source"/>
                                                     </response>
                                                 </method>
-                                                <method name="DELETE" />
+                                                <method name="DELETE"/>
                                                 <method name="PUT">
                                                     <request>
                                                         <representation mediaType="application/xml" element="source"/>
@@ -460,7 +458,7 @@ class WadlGeneneratorTest {
             element="destination"/>
                                                     </response>
                                                 </method>
-                                                <method name="DELETE" />
+                                                <method name="DELETE"/>
                                                 <method name="PUT">
                                                     <request>
                                                         <representation mediaType="application/xml" \
@@ -491,7 +489,7 @@ class WadlGeneneratorTest {
             element="network-elements"/>
                                     </response>
                                 </method>
-                                <method name="DELETE" />
+                                <method name="DELETE"/>
                                 <method name="PUT">
                                     <request>
                                         <representation mediaType="application/xml" element="network-elements"/>
@@ -527,7 +525,7 @@ class WadlGeneneratorTest {
             element="network-element"/>
                                         </response>
                                     </method>
-                                    <method name="DELETE" />
+                                    <method name="DELETE"/>
                                     <method name="PUT">
                                         <request>
                                             <representation mediaType="application/xml" element="network-element"/>
@@ -569,7 +567,7 @@ class WadlGeneneratorTest {
                                                 <representation mediaType="application/yang.data+json" element="ports"/>
                                             </response>
                                         </method>
-                                        <method name="DELETE" />
+                                        <method name="DELETE"/>
                                         <method name="PUT">
                                             <request>
                                                 <representation mediaType="application/xml" element="ports"/>
@@ -602,7 +600,7 @@ class WadlGeneneratorTest {
             element="port"/>
                                                 </response>
                                             </method>
-                                            <method name="DELETE" />
+                                            <method name="DELETE"/>
                                             <method name="PUT">
                                                 <request>
                                                     <representation mediaType="application/xml" element="port"/>
@@ -628,7 +626,7 @@ class WadlGeneneratorTest {
             element="flow-tables"/>
                                             </response>
                                         </method>
-                                        <method name="DELETE" />
+                                        <method name="DELETE"/>
                                         <method name="PUT">
                                             <request>
                                                 <representation mediaType="application/xml" element="flow-tables"/>
@@ -664,7 +662,7 @@ class WadlGeneneratorTest {
             element="flow-table"/>
                                                 </response>
                                             </method>
-                                            <method name="DELETE" />
+                                            <method name="DELETE"/>
                                             <method name="PUT">
                                                 <request>
                                                     <representation mediaType="application/xml" element="flow-table"/>
@@ -721,23 +719,20 @@ class WadlGeneneratorTest {
                         </resource>
                     </resource>
                 </resources>
-            </application>
-            """);
+            </application>""");
     }
 
     @Test
     void testControllerNetworkRpcs() {
         assertTransientResource("controller-network-rpcs", """
-            <?xml version="1.0"?>
+            <?xml version="1.0" ?>
             <application xmlns="http://wadl.dev.java.net/2009/02" \
-            xmlns:inet="urn:ietf:params:xml:ns:yang:ietf-inet-types"
-             xmlns:topos="urn:opendaylight:controller:network:rpcs">
-
+            xmlns:inet="urn:ietf:params:xml:ns:yang:ietf-inet-types" \
+            xmlns:topos="urn:opendaylight:controller:network:rpcs">
                 <grammars>
                     <include href="controller-network-rpcs.yang"/>
                     <include href="ietf-inet-types.yang"/>
                 </grammars>
-
                 <resources base="http://localhost:9998/restconf">
                     <resource path="operations">
                         <resource path="controller-network-rpcs:activate-software-image">
@@ -778,20 +773,17 @@ class WadlGeneneratorTest {
                         </resource>
                     </resource>
                 </resources>
-            </application>
-            """);
+            </application>""");
     }
 
     @Test
     void testDemoTopology() {
         assertTransientResource("demo-topology", """
-            <?xml version="1.0"?>
-            <application xmlns="http://wadl.dev.java.net/2009/02"  xmlns:tp="urn:model.1demo-275topology.4.5.my">
-
+            <?xml version="1.0" ?>
+            <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:tp="urn:model.1demo-275topology.4.5.my">
                 <grammars>
                     <include href="demo-topology.yang"/>
                 </grammars>
-
                 <resources base="http://localhost:9998/restconf">
                     <resource path="config">
                         <method name="POST">
@@ -813,7 +805,7 @@ class WadlGeneneratorTest {
                                     <representation mediaType="application/yang.data+json" element="topology"/>
                                 </response>
                             </method>
-                            <method name="DELETE" />
+                            <method name="DELETE"/>
                             <method name="PUT">
                                 <request>
                                     <representation mediaType="application/xml" element="topology"/>
@@ -851,7 +843,7 @@ class WadlGeneneratorTest {
                                         <representation mediaType="application/yang.data+json" element="network-nodes"/>
                                     </response>
                                 </method>
-                                <method name="DELETE" />
+                                <method name="DELETE"/>
                                 <method name="PUT">
                                     <request>
                                         <representation mediaType="application/xml" element="network-nodes"/>
@@ -883,7 +875,7 @@ class WadlGeneneratorTest {
             element="network-node"/>
                                         </response>
                                     </method>
-                                    <method name="DELETE" />
+                                    <method name="DELETE"/>
                                     <method name="PUT">
                                         <request>
                                             <representation mediaType="application/xml" element="network-node"/>
@@ -932,7 +924,7 @@ class WadlGeneneratorTest {
             element="network-interface"/>
                                             </response>
                                         </method>
-                                        <method name="DELETE" />
+                                        <method name="DELETE"/>
                                         <method name="PUT">
                                             <request>
                                                 <representation mediaType="application/xml" \
@@ -959,7 +951,7 @@ class WadlGeneneratorTest {
             element="node-attributes"/>
                                             </response>
                                         </method>
-                                        <method name="DELETE" />
+                                        <method name="DELETE"/>
                                         <method name="PUT">
                                             <request>
                                                 <representation mediaType="application/xml" element="node-attributes"/>
@@ -984,7 +976,7 @@ class WadlGeneneratorTest {
                                         <representation mediaType="application/yang.data+json" element="network-links"/>
                                     </response>
                                 </method>
-                                <method name="DELETE" />
+                                <method name="DELETE"/>
                                 <method name="PUT">
                                     <request>
                                         <representation mediaType="application/xml" element="network-links"/>
@@ -1016,7 +1008,7 @@ class WadlGeneneratorTest {
             element="network-link"/>
                                         </response>
                                     </method>
-                                    <method name="DELETE" />
+                                    <method name="DELETE"/>
                                     <method name="PUT">
                                         <request>
                                             <representation mediaType="application/xml" element="network-link"/>
@@ -1070,7 +1062,7 @@ class WadlGeneneratorTest {
             element="source"/>
                                             </response>
                                         </method>
-                                        <method name="DELETE" />
+                                        <method name="DELETE"/>
                                         <method name="PUT">
                                             <request>
                                                 <representation mediaType="application/xml" element="source"/>
@@ -1094,7 +1086,7 @@ class WadlGeneneratorTest {
             element="destination"/>
                                             </response>
                                         </method>
-                                        <method name="DELETE" />
+                                        <method name="DELETE"/>
                                         <method name="PUT">
                                             <request>
                                                 <representation mediaType="application/xml" element="destination"/>
@@ -1119,7 +1111,7 @@ class WadlGeneneratorTest {
             element="link-attributes"/>
                                             </response>
                                         </method>
-                                        <method name="DELETE" />
+                                        <method name="DELETE"/>
                                         <method name="PUT">
                                             <request>
                                                 <representation mediaType="application/xml" element="link-attributes"/>
@@ -1137,8 +1129,7 @@ class WadlGeneneratorTest {
                         </resource>
                     </resource>
                 </resources>
-            </application>
-            """);
+            </application>""");
     }
 
     private static void assertTransientResource(final String moduleName, final String expected) {
