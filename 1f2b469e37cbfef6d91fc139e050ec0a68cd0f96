@@ -33,6 +33,40 @@
       "message": "recheck",
       "revId": "1f2b469e37cbfef6d91fc139e050ec0a68cd0f96",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a01672b0_69f41dcf",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T08:11:38Z",
+      "side": 1,
+      "message": "use .formatted()",
+      "revId": "1f2b469e37cbfef6d91fc139e050ec0a68cd0f96",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb88a64c_a9172c44",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T08:11:38Z",
+      "side": 1,
+      "message": "lastFailure is only cleared in onDeviceConnected, and onDeviceDisconnected never sets it, so if attempt 1 fails with \"Cannot resolve key\" and attempt 2 gets a session that drops during schema setup, we give up blaming the key. Could we reset lastFailure at the start of each attempt in lockedConnect (next to negotiatedSshAlg), and maybe record the early-disconnect case too?",
+      "revId": "1f2b469e37cbfef6d91fc139e050ec0a68cd0f96",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
