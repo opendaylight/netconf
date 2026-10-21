@@ -16,6 +16,24 @@
       "message": "These data checks used to pass DEVICE_CHECK_TIMEOUT and now rely on the library default of 60, which only coincidentally equals the constant. Could you pass timeout\u003dDEVICE_CHECK_TIMEOUT explicitly here and on the other wait_device_config_data calls in this suite, as test_clustering_crud.py does, so raising the constant later still covers them?",
       "revId": "ac12a01f76cf0a53d3e0acf9e1ba36dc76b1f7f6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fabc566_61fc00ad",
+        "filename": "tests/suites/clustering/test_clustering_entity.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-21T10:33:18Z",
+      "side": 1,
+      "message": "Done; \nOh yea, they were both 60 by coincidence - all six wait_device_config_data calls in this suite now pass `timeout\u003dDEVICE_CHECK_TIMEOUT`, matching test_clustering_crud.py",
+      "parentUuid": "89e4f626_cb3d216b",
+      "revId": "ac12a01f76cf0a53d3e0acf9e1ba36dc76b1f7f6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
