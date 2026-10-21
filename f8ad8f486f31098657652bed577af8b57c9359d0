@@ -107,6 +107,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ca2ef14_05fe2ef6",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-21T13:07:26Z",
+      "side": 1,
+      "message": "I changed the WARN log from the first attempt only to every attempt, so\nit matches the wrong password behavior, which also logs on every retry.",
+      "parentUuid": "13c5e456_d5462a26",
+      "revId": "f8ad8f486f31098657652bed577af8b57c9359d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3bd79f43_e1b1c615",
