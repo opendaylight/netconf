@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "097c5c2c_5ec0b116",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T09:12:17Z",
+      "side": 1,
+      "message": "This covers HTTP/2, but on HTTP/1.1 RestconfSession.blockedRequests() holds every pipelined request without a bound, so an authenticated client can now park 1 MiB per request instead of 16 KiB. Is it worth stating that here, and tracking a follow-up to stop auto-read or cap the queue while a request is in flight?",
+      "revId": "b6b471c5a07b3835ed639f35cbbf67bcaa3ed6f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a71b9e68_9ed2b8d7",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T09:12:17Z",
+      "side": 1,
+      "message": "Now that HttpRequestLimits exists, could this constructor (and the String overload, the six-argument HTTPServerSessionBootstrap constructor and AlpnUpgradeHandler) take the record instead of four more positional Uint32s? With ten Uint32 parameters in a row, swapping maxHeaderSize and maxRequestBodySize compiles and validates silently.",
+      "revId": "b6b471c5a07b3835ed639f35cbbf67bcaa3ed6f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "097be190_6ddb7a9e",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T09:12:17Z",
+      "side": 1,
+      "message": "Add the chunkSize and frameSize as well, since equals now compares them as well.",
+      "revId": "b6b471c5a07b3835ed639f35cbbf67bcaa3ed6f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43666f13_5514b57b",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/NettyEndpointConfigurationTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T09:12:17Z",
+      "side": 1,
+      "message": "This re-tests HttpRequestLimits that HTTPServerSessionBootstrapTest already covers. Keep one.",
+      "revId": "b6b471c5a07b3835ed639f35cbbf67bcaa3ed6f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b26ea5b_26e01a56",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T09:12:17Z",
+      "side": 1,
+      "message": "In RESTCONF this branch is never reached over HTTP/1.1: RestconfSession.handlerAdded puts the auth handler in front of the session, and Netty\u0027s placeholder for a too-long line or header carries no Authorization header, so AbstractBasicAuthHandler (line 46) answers 401 instead of 414/431. Could the auth handler forward requests whose decoderResult() failed before calling authenticate(), plus a test that goes through RestconfSession with auth?",
+      "revId": "b6b471c5a07b3835ed639f35cbbf67bcaa3ed6f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da8cc92b_c7977802",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T09:12:17Z",
+      "side": 1,
+      "message": "this if chain can be a \"return switch\"",
+      "revId": "b6b471c5a07b3835ed639f35cbbf67bcaa3ed6f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b87c4ca6_1dbe74b3",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T09:12:17Z",
+      "side": 1,
+      "message": "The commit message still says the body default goes from 16 KiB to 10 MiB and that it permits about 1 GiB per HTTP/2 connection, but this constant, the OSGi description and the cfg all say 1 MiB / 100 MiB. Could you update the message, and use this constant instead of the leftover 10485760 literals in the tests?",
+      "revId": "b6b471c5a07b3835ed639f35cbbf67bcaa3ed6f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "513644ac_f314368d",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrapTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T09:12:17Z",
+      "side": 1,
+      "message": "A failure does not say which limit failed. Use @ParameterizedTest with a @MethodSource of (index, value) pairs (like HTTPSchemeTest.hostUriOfValid)",
+      "revId": "b6b471c5a07b3835ed639f35cbbf67bcaa3ed6f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
