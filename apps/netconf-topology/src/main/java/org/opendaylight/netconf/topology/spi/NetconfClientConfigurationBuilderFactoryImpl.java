@@ -132,40 +132,43 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             final Credentials credentials, final Protocol protocol,
             final SshTransportTopologyParameters topologySshParams) {
         final var sshParamsBuilder = new SshClientParametersBuilder();
-        if (credentials instanceof LoginPwUnencrypted unencrypted) {
-            final var loginPassword = unencrypted.getLoginPasswordUnencrypted();
-            sshParamsBuilder.setClientIdentity(loginPasswordIdentity(
-                loginPassword.getUsername(), loginPassword.getPassword()));
-        } else if (credentials instanceof LoginPw loginPw) {
-            final var loginPassword = loginPw.getLoginPassword();
-            final var username = loginPassword.getUsername();
-
-            final byte[] plainBytes;
-            try {
-                plainBytes = encryptionService.decrypt(loginPassword.getPassword());
-            } catch (GeneralSecurityException e) {
-                throw new IllegalStateException("Failed to decrypt password", e);
+        switch (credentials) {
+            case LoginPwUnencrypted unencrypted -> {
+                final var loginPassword = unencrypted.getLoginPasswordUnencrypted();
+                sshParamsBuilder.setClientIdentity(loginPasswordIdentity(
+                    loginPassword.getUsername(), loginPassword.getPassword()));
             }
+            case LoginPw loginPw -> {
+                final var loginPassword = loginPw.getLoginPassword();
+                final var username = loginPassword.getUsername();
 
-            sshParamsBuilder.setClientIdentity(loginPasswordIdentity(username,
-                new String(plainBytes, StandardCharsets.UTF_8)));
-        } else if (credentials instanceof KeyAuth keyAuth) {
-            final var keyBased = keyAuth.getKeyBased();
-            // key-id is optional in the model, without it there is no key to authenticate with
-            final var keyId = keyBased.getKeyId();
-            if (keyId == null) {
-                throw new IllegalArgumentException("Key-based credentials are missing key-id");
+                final byte[] plainBytes;
+                try {
+                    plainBytes = encryptionService.decrypt(loginPassword.getPassword());
+                } catch (GeneralSecurityException e) {
+                    throw new IllegalStateException("Failed to decrypt password", e);
+                }
+
+                sshParamsBuilder.setClientIdentity(loginPasswordIdentity(username,
+                    new String(plainBytes, StandardCharsets.UTF_8)));
             }
-            sshParamsBuilder.setClientIdentity(new ClientIdentityBuilder()
-                .setUsername(keyBased.getUsername())
-                .setPublicKey(new PublicKeyBuilder()
-                    .setInlineOrKeystore(credentialProvider == null
-                        ? new CentralKeystoreBuilder().setCentralKeystoreReference(keyId).build()
-                        : inlineKeyPair(credentialProvider, keyId))
-                    .build())
-                .build());
-        } else {
-            throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
+            case KeyAuth keyAuth -> {
+                final var keyBased = keyAuth.getKeyBased();
+                // key-id is optional in the model, without it there is no key to authenticate with
+                final var keyId = keyBased.getKeyId();
+                if (keyId == null) {
+                    throw new IllegalArgumentException("Key-based credentials are missing key-id");
+                }
+                sshParamsBuilder.setClientIdentity(new ClientIdentityBuilder()
+                    .setUsername(keyBased.getUsername())
+                    .setPublicKey(new PublicKeyBuilder()
+                        .setInlineOrKeystore(credentialProvider == null
+                            ? new CentralKeystoreBuilder().setCentralKeystoreReference(keyId).build()
+                            : inlineKeyPair(credentialProvider, keyId))
+                        .build())
+                    .build());
+            }
+            default -> throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
         }
 
         final var transportParamBuilder = new TransportParamsBuilder();
