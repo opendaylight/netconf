@@ -16,6 +16,24 @@
       "message": "We\u0027re breaking public API here. Anyone calling NetconfClientFactoryImpl(timer) or (timer, factory) will stop compiling suddenly. No deprecation, no warning, nothing... This needs a careful reconsideration.",
       "revId": "b30225797ccee8b07e92ade3ffe2a83ac3a8d79a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b31afbf_feaf3447",
+        "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientFactoryImpl.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-21T12:15:49Z",
+      "side": 0,
+      "message": "Done, both old constructors are back as @Deprecated(forRemoval \u003d true)\nand use KeystoreAccess.empty().",
+      "parentUuid": "544f150a_3878f437",
+      "revId": "b30225797ccee8b07e92ade3ffe2a83ac3a8d79a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
