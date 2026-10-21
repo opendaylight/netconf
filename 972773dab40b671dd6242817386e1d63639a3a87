@@ -33,6 +33,40 @@
       "message": "recheck",
       "revId": "972773dab40b671dd6242817386e1d63639a3a87",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3add91e_33c4241a",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/RequestBodyInputStream.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T08:45:39Z",
+      "side": 1,
+      "message": "How is the handler meant to do flow control here? append() never reports how much is queued and nothing signals when the reader drains, so the handler can only cap total size, which leaves streaming with the same memory profile as aggregation. Would a queued-bytes count plus a low-water callback (fired outside the lock) make sense, or should the Javadoc say only a size limit is expected?",
+      "revId": "972773dab40b671dd6242817386e1d63639a3a87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f39bc7e_e69ba858",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerRequestExecutor.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T08:45:39Z",
+      "side": 1,
+      "message": "Once this is submitted, nothing releases the stream\u0027s retained buffers if the request stops reading early: e.g. JsonChildBody.toNormalizedNode never closes its reader, and ConsumableBody.close() is a no-op after consume(), so a malformed 10 MB JSON POST keeps the rest of the upload retained. Could RequestContext carry the body and requestComplete/requestFailed call body.close()? That drains the rest of the upload as DISCARDING and frees COMPLETED leftovers.",
+      "revId": "972773dab40b671dd6242817386e1d63639a3a87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
