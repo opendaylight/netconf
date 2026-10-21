@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd0224f2_5088d864",
+        "filename": "apps/wadl-codegen/src/test/java/org/opendaylight/netconf/codegen/wadl/WadlGeneneratorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-21T12:06:17Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "e6f93070_f354a0ff",
+      "revId": "3fcb573e3b779da71ace5435bd2ba85984f531ec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f786afbe_399d140e",
@@ -102,6 +120,24 @@
       "side": 1,
       "message": "how?",
       "parentUuid": "edf9c233_ea135661",
+      "revId": "3fcb573e3b779da71ace5435bd2ba85984f531ec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e06559b2_4ff57b5b",
+        "filename": "apps/wadl-codegen/src/test/java/org/opendaylight/netconf/codegen/wadl/WadlGeneneratorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-21T12:06:17Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "b97f548e_023fc79c",
       "revId": "3fcb573e3b779da71ace5435bd2ba85984f531ec",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
