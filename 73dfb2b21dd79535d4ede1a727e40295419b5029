@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af43ab53_9ec557c8",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T08:08:06Z",
+      "side": 1,
+      "message": "API breaking. CredentialProvider is only deprecated for removal here, yet the public constructor that took it is removed outright, so existing callers break in the same release that tells them they have time to migrate. Could we keep the three-argument constructor as a @Deprecated delegate that ignores the CredentialProvider?",
+      "revId": "73dfb2b21dd79535d4ede1a727e40295419b5029",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0e18ba3_b087e586",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T08:08:06Z",
+      "side": 1,
+      "message": "Since we\u0027re already touching this long if-else-if chain, can we use switch instead?",
+      "revId": "73dfb2b21dd79535d4ede1a727e40295419b5029",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

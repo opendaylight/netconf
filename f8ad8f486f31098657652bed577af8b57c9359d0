@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "38e05904_32ddf67a",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T08:08:06Z",
+      "side": 1,
+      "message": "This is not sufficient. The single WARN is easy to miss. Could we also surface the reason in the node\u0027s status on the first failed attempt, not only in the log? Or something like that...",
+      "parentUuid": "314224d6_fb4f07fe",
+      "revId": "f8ad8f486f31098657652bed577af8b57c9359d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3bd79f43_e1b1c615",
         "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultCredentialProvider.java",
         "patchSetId": 3
