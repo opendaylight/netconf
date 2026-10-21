@@ -16,6 +16,57 @@
       "message": "recheck",
       "revId": "af3fae1a5e83d7ad306be5f8216cbab832dbdc08",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6b7096f_18a490ef",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 2126,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T09:19:06Z",
+      "side": 1,
+      "message": "I can\u0027t find odl-http-server revision 2026-07-31, server-limits or odl-server-limits anywhere in this tree or the fetched branches (the latest odl-http-server.yang I see is 2026-04-15, QUIC only), and here the OSGi settings go straight into NettyEndpointConfiguration. Is this note meant for a different branch or a not-yet-merged change? If so, could it be dropped from this commit?",
+      "revId": "af3fae1a5e83d7ad306be5f8216cbab832dbdc08",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b242bb5b_6f77e041",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 2185,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T09:19:06Z",
+      "side": 1,
+      "message": "Netty\u0027s HttpObjectAggregator actually sends \"413 Request Entity Too Large\".\nAlso revisit this memory warning once the base commit settles the memory concern about the HTTP/1.1\u0027s unbounded pipelining.",
+      "revId": "af3fae1a5e83d7ad306be5f8216cbab832dbdc08",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09a8e81c_e20c832a",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 2186,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-21T09:19:06Z",
+      "side": 1,
+      "message": "Line too long",
+      "revId": "af3fae1a5e83d7ad306be5f8216cbab832dbdc08",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
