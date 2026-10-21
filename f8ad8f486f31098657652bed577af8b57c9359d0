@@ -89,6 +89,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "13c5e456_d5462a26",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-21T12:14:40Z",
+      "side": 1,
+      "message": "On master, a missing key was the only authentication problem that failed the node at once, without a retry. Other authentication failures, for example a wrong password, are retried. With the default max-connection-attempts of 0 they retry forever, and the only trace is an INFO \"authentication failed\" log line in karaf.log. When the attempts are limited, master shows only \"Given up connecting ... after N attempts\" in connected-message.\n\nThis change makes a missing key behave the same way as the other authentication failures, and it can connect once the key is added to the keystore. It also logs the first failure at WARN, and with the next patch the reason is shown in connected-message when the node gives up.\n\nI agree that the reason should also be visible while the node keeps retrying, but that applies to every connection failure, not only to keys. It needs a new callback from NetconfNodeHandler to the topology adapter,",
+      "parentUuid": "38e05904_32ddf67a",
+      "revId": "f8ad8f486f31098657652bed577af8b57c9359d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3bd79f43_e1b1c615",
