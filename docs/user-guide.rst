@@ -2174,7 +2174,7 @@ Limits imposed on an inbound request are also configurable:
 * ``http1-max-initial-line-length``, which defaults to ``8192``
 * ``http1-max-header-size``, which defaults to ``16384``
 * ``http1-max-request-chunk-size``, which defaults to ``8192``
-* ``http-request-body-max-size``, which defaults to ``10485760``
+* ``http-request-body-max-size``, which defaults to ``1048576`` (1 MiB)
 
 HTTP/2 and HTTP/3 related settings are also configurable:
 
@@ -2286,7 +2286,7 @@ file, ``org.opendaylight.restconf.nb.rfc8040.cfg``, for example:
     http1-max-initial-line-length=8192
     http1-max-header-size=16384
     http1-max-request-chunk-size=8192
-    http-request-body-max-size=10485760
+    http-request-body-max-size=1048576
     http2-max-frame-size=16384
     http-write-buffer-low-watermark=32768
     http-write-buffer-high-watermark=65536
@@ -2320,7 +2320,7 @@ Or use Karaf CLI:
     opendaylight-user@root>config:property-set http1-max-initial-line-length 8192
     opendaylight-user@root>config:property-set http1-max-header-size 16384
     opendaylight-user@root>config:property-set http1-max-request-chunk-size 8192
-    opendaylight-user@root>config:property-set http-request-body-max-size 10485760
+    opendaylight-user@root>config:property-set http-request-body-max-size 1048576
     opendaylight-user@root>config:property-set http2-max-frame-size 16384
     opendaylight-user@root>config:property-set http-write-buffer-low-watermark 32768
     opendaylight-user@root>config:property-set http-write-buffer-high-watermark 65536
