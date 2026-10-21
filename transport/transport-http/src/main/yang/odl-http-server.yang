@@ -93,7 +93,7 @@ module odl-http-server {
         type uint32 {
           range "1..2147483647";
         }
-        default 10485760;
+        default 1048576;
         description
           "Maximum size of the request body, in octets, counted after transfer
            coding is decoded. Exceeding it is rejected with '413 Content Too
