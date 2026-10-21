@@ -114,35 +114,38 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             final Credentials credentials, final Protocol protocol,
             final SshTransportTopologyParameters topologySshParams) {
         final var sshParamsBuilder = new SshClientParametersBuilder();
-        if (credentials instanceof LoginPwUnencrypted unencrypted) {
-            final var loginPassword = unencrypted.getLoginPasswordUnencrypted();
-            sshParamsBuilder.setClientIdentity(loginPasswordIdentity(
-                loginPassword.getUsername(), loginPassword.getPassword()));
-        } else if (credentials instanceof LoginPw loginPw) {
-            final var loginPassword = loginPw.getLoginPassword();
-            final var username = loginPassword.getUsername();
-
-            final byte[] plainBytes;
-            try {
-                plainBytes = encryptionService.decrypt(loginPassword.getPassword());
-            } catch (GeneralSecurityException e) {
-                throw new IllegalStateException("Failed to decrypt password", e);
+        switch (credentials) {
+            case LoginPwUnencrypted unencrypted -> {
+                final var loginPassword = unencrypted.getLoginPasswordUnencrypted();
+                sshParamsBuilder.setClientIdentity(loginPasswordIdentity(
+                    loginPassword.getUsername(), loginPassword.getPassword()));
             }
+            case LoginPw loginPw -> {
+                final var loginPassword = loginPw.getLoginPassword();
+                final var username = loginPassword.getUsername();
 
-            sshParamsBuilder.setClientIdentity(loginPasswordIdentity(username,
-                new String(plainBytes, StandardCharsets.UTF_8)));
-        } else if (credentials instanceof KeyAuth keyAuth) {
-            final var keyBased = keyAuth.getKeyBased();
-            sshParamsBuilder.setClientIdentity(new ClientIdentityBuilder()
-                .setUsername(keyBased.getUsername())
-                .setPublicKey(new PublicKeyBuilder()
-                    .setInlineOrKeystore(new CentralKeystoreBuilder()
-                        .setCentralKeystoreReference(keyBased.getKeyId())
+                final byte[] plainBytes;
+                try {
+                    plainBytes = encryptionService.decrypt(loginPassword.getPassword());
+                } catch (GeneralSecurityException e) {
+                    throw new IllegalStateException("Failed to decrypt password", e);
+                }
+
+                sshParamsBuilder.setClientIdentity(loginPasswordIdentity(username,
+                    new String(plainBytes, StandardCharsets.UTF_8)));
+            }
+            case KeyAuth keyAuth -> {
+                final var keyBased = keyAuth.getKeyBased();
+                sshParamsBuilder.setClientIdentity(new ClientIdentityBuilder()
+                    .setUsername(keyBased.getUsername())
+                    .setPublicKey(new PublicKeyBuilder()
+                        .setInlineOrKeystore(new CentralKeystoreBuilder()
+                            .setCentralKeystoreReference(keyBased.getKeyId())
+                            .build())
                         .build())
-                    .build())
-                .build());
-        } else {
-            throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
+                    .build());
+            }
+            default -> throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
         }
 
         final var transportParamBuilder = new TransportParamsBuilder();
