@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "27c7a963e49c3ec0b0dd8c9f3fdbc518b9ee551d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5dab4e8_7a086d46",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T14:19:33Z",
+      "side": 1,
+      "message": "All three callers of reconnectOrFail() (connectFailed, onDeviceDisconnected, onDeviceFailed) write lastFailure right before calling it, so the reset in lockedConnect and the null branch in scheduleReconnect never change the outcome, and lastFailureIsResetOnEachAttempt still passes with the reset removed. Could we pass the reason as a parameter, reconnectOrFail(String) → scheduleReconnect(String), and drop the field?",
+      "revId": "27c7a963e49c3ec0b0dd8c9f3fdbc518b9ee551d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72108afc_408faa75",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T14:19:33Z",
+      "side": 1,
+      "message": "This is quite ugly. Use .formatted()",
+      "revId": "27c7a963e49c3ec0b0dd8c9f3fdbc518b9ee551d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
