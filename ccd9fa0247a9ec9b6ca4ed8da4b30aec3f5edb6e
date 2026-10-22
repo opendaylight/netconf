@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c3221a8_104d2d59",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-22T11:26:58Z",
+      "side": 1,
+      "message": "Is this related to NETCONF-1690?",
+      "revId": "ccd9fa0247a9ec9b6ca4ed8da4b30aec3f5edb6e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
