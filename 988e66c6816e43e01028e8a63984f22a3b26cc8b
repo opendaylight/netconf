@@ -16,6 +16,57 @@
       "message": "recheck",
       "revId": "988e66c6816e43e01028e8a63984f22a3b26cc8b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ba6b2df_7c32e989",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T13:16:32Z",
+      "side": 1,
+      "message": "Why did we move this entire block of methods here?",
+      "revId": "988e66c6816e43e01028e8a63984f22a3b26cc8b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4872cf7b_b66eb075",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T13:16:32Z",
+      "side": 1,
+      "message": "use .formatted()",
+      "revId": "988e66c6816e43e01028e8a63984f22a3b26cc8b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb80b7fe_33abf419",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T13:16:32Z",
+      "side": 1,
+      "message": "Why the wrapping? It fits on one line",
+      "revId": "988e66c6816e43e01028e8a63984f22a3b26cc8b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
