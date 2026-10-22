@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "493a5960_7d009ae4",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPSchemeCleartextUpgradeTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T12:00:29Z",
+      "side": 1,
+      "message": "MessageAggregator allocates the composite buffer even for an empty body, so I don\u0027t think that is why the body is needed. What the body actually does is make releaseInbound() on line 59 load-bearing: UpgradeEvent counts on the request content, which the replayed stream-1 DATA frame also retains, so without that call refCnt() is 2. This needs rewrite (and probably a small comment at channel.releaseInbound() below). Or - optionally - you can use a body-less GET instead.",
+      "revId": "fc3dd90e349aaf6b65dcf6af3a7f1ed788eacab6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0f17011_3f8e8cc0",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPSchemeCleartextUpgradeTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T12:00:29Z",
+      "side": 1,
+      "message": "When an assertion fails, event.release() and channel.finishAndReleaseAll() are skipped, so the failing run leaks buffers. That\u0027s why @AfterEach exists.",
+      "revId": "fc3dd90e349aaf6b65dcf6af3a7f1ed788eacab6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfc7d8fb_41abca41",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPSchemeCleartextUpgradeTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T12:00:29Z",
+      "side": 1,
+      "message": "A failure reads \"expected:1 but was:2\", which tells the reader nothing about a leak.",
+      "revId": "fc3dd90e349aaf6b65dcf6af3a7f1ed788eacab6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
