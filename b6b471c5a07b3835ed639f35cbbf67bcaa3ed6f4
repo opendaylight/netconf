@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c36c7cb_157e9179",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-22T10:15:13Z",
+      "side": 1,
+      "message": "covered in https://lf-opendaylight.atlassian.net/browse/NETCONF-1704",
+      "parentUuid": "d883bcff_143eba43",
+      "revId": "b6b471c5a07b3835ed639f35cbbf67bcaa3ed6f4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a71b9e68_9ed2b8d7",
