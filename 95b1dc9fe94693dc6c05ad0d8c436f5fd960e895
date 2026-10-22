@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d20f3f6f_c2e2ed4a",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T11:21:32Z",
+      "side": 1,
+      "message": "Do we need 3 copies of the same thing? We already have 2 copies of EMPTY_DATA in test_clustering_entity.py and test_clustering_crud.py.",
+      "revId": "95b1dc9fe94693dc6c05ad0d8c436f5fd960e895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee7c4ad3_8889eee4",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T11:21:32Z",
+      "side": 1,
+      "message": "Is this actually necessary? It never uses \"self\", and it exists only because utils.report_known_bug_on_failure does not accept \"None\". If that\u0027s correct, can we let report_known_bug_on_failure take \"bug_id | None\" and yield straight through on None?",
+      "revId": "95b1dc9fe94693dc6c05ad0d8c436f5fd960e895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7f9e6e3_619e31ba",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T11:21:32Z",
+      "side": 1,
+      "message": "report_known_bug_on_failure re-raises, so a single known-bug failure (e.g. the 5761 catch-up check in cycle 1) ends this loop and the modify/delete cycles never run, whereas the Robot suite ran every case (Without_Fast_Failing). Could the catch-up check record its failure and let the loop continue, failing at the end, or is stopping at the first failure intended for this series? If intended, maybe note it in the commit message.",
+      "revId": "95b1dc9fe94693dc6c05ad0d8c436f5fd960e895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
