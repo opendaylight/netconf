@@ -52,6 +52,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9926ad4_628a23de",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/RequestBodyInputStream.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-22T07:40:09Z",
+      "side": 1,
+      "message": "Agreed. Backpressure is covered by https://lf-opendaylight.atlassian.net/browse/NETCONF-1704 including queue accounting and drain notifications outside the lock. For this patch, I clarified the Javadoc to state the current size-limit requirement and buffering limitations.",
+      "parentUuid": "f3add91e_33c4241a",
+      "revId": "972773dab40b671dd6242817386e1d63639a3a87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7f39bc7e_e69ba858",
@@ -65,6 +83,24 @@
       "writtenOn": "2026-10-21T08:45:39Z",
       "side": 1,
       "message": "Once this is submitted, nothing releases the stream\u0027s retained buffers if the request stops reading early: e.g. JsonChildBody.toNormalizedNode never closes its reader, and ConsumableBody.close() is a no-op after consume(), so a malformed 10 MB JSON POST keeps the rest of the upload retained. Could RequestContext carry the body and requestComplete/requestFailed call body.close()? That drains the rest of the upload as DISCARDING and frees COMPLETED leftovers.",
+      "revId": "972773dab40b671dd6242817386e1d63639a3a87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7efeddc9_ba23e55d",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerRequestExecutor.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-22T07:40:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f39bc7e_e69ba858",
       "revId": "972773dab40b671dd6242817386e1d63639a3a87",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
