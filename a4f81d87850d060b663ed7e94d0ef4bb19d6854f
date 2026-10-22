@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "981acf42_6936f06c",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 602,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T11:04:32Z",
+      "side": 1,
+      "message": "We still build the same \"yang-ext:mount?content\u003dconfig\" URL and GET by hand? The commit\u0027s goal is one copy, and this leaves a second copy in the same file. The new docstring at 697 even points at it. We can just call get_device_config_data(device_name) and keep only the regex assertion.",
+      "revId": "a4f81d87850d060b663ed7e94d0ef4bb19d6854f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9eb4af8_d3ce74d1",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 747,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T11:04:32Z",
+      "side": 1,
+      "message": "Moving these asserts from the test classes into a library loses pytest\u0027s assertion rewriting (it only rewrites test modules, conftest and registered modules), so a failure inside wait_device_config_data now ends with an empty \"Last encountered error:\". Could you give the three asserts here, and the read-back one in netconf_cluster._wait_until_device_data_applied, an explicit message with the host, the returned data and the expected value, like check_device_data_is_empty does?",
+      "revId": "a4f81d87850d060b663ed7e94d0ef4bb19d6854f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f578275_5db10418",
+        "filename": "tests/libraries/netconf_cluster.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T11:04:32Z",
+      "side": 1,
+      "message": "unused",
+      "revId": "a4f81d87850d060b663ed7e94d0ef4bb19d6854f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
