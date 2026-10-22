@@ -101,6 +101,75 @@
       "message": "This loop iterates the HashMap without the topology lock, on the commit callback thread. That was already the case, but call-home now puts and removes entries from SSH/Netty threads at any time, so a ConcurrentModificationException becomes reachable. Could the loop move into a synchronized method that iterates a copy of activeConnectors.values()?",
       "revId": "c76966024c19b6235a2a7a6a15447497205f405d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0873105_53686931",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/CallHomeNodeHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-22T14:04:14Z",
+      "side": 1,
+      "message": "Can be package-private.",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 6
+      },
+      "revId": "c76966024c19b6235a2a7a6a15447497205f405d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ddb4a90_b38d19be",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/CallHomeNodeHandlerTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-22T14:04:14Z",
+      "side": 1,
+      "message": "Can we use instead @Mock field for this.",
+      "range": {
+        "startLine": 288,
+        "startChar": 54,
+        "endLine": 288,
+        "endChar": 80
+      },
+      "revId": "c76966024c19b6235a2a7a6a15447497205f405d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "833f8da4_4aa7c3ed",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/CallHomeNodeHandlerTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-22T14:04:14Z",
+      "side": 1,
+      "message": "Please remove any() calls and use preferable eq() or any(Type.class)",
+      "range": {
+        "startLine": 289,
+        "startChar": 53,
+        "endLine": 289,
+        "endChar": 58
+      },
+      "revId": "c76966024c19b6235a2a7a6a15447497205f405d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
