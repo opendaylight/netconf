@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20311b40_c4f32c2a",
+        "filename": "apps/netconf-topology-impl/src/main/java/org/opendaylight/netconf/topology/impl/NetconfTopologyImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T13:29:01Z",
+      "side": 1,
+      "message": "Providing a service without immediate \u003d true makes this a delayed DS component, so SCR only instantiates it when someone gets CallHomeTopologyService. With odl-netconf-topology alone (and at this commit in every install) nothing does, so the config DTCL is never registered and configured devices are never mounted. Could you add immediate \u003d true, as the call-home components already do?",
+      "revId": "c76966024c19b6235a2a7a6a15447497205f405d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77e1fc2c_80ef9eae",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T13:29:01Z",
+      "side": 1,
+      "message": "The ignored configuration is never re-applied: the DTCL delivers it once, so after the call-home device goes away node X stays configured but unconnected until someone rewrites it. It also contradicts \"configured nodes take precedence\" in CallHomeTopologyService. Could we either let configuration replace the call-home handler, or keep the ignored Node and replay it from lockedDeleteCallHomeNode?",
+      "revId": "c76966024c19b6235a2a7a6a15447497205f405d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c95ce44_519fed96",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T13:29:01Z",
+      "side": 1,
+      "message": "So this is just a silent rejection without any trace? The configured-node path above logs a WARN (line 237). Let\u0027s add a similar WARN here.",
+      "revId": "c76966024c19b6235a2a7a6a15447497205f405d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72447c6e_191fec20",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T13:29:01Z",
+      "side": 1,
+      "message": "connectNode catches NoSuchElementException from toRemoteDeviceId, but this path does not, and it runs after the previous call-home handler was already closed. CallHomeMountService always sets host and port, so this may be theoretical, but should we validate before closing prev and reject with a WARN like connectNode does?",
+      "revId": "c76966024c19b6235a2a7a6a15447497205f405d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab1062af_1843281d",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T13:29:01Z",
+      "side": 1,
+      "message": "Why did we widen the type, if this is only applicable for NetconfNodeHandler (as the javadoc says)?",
+      "revId": "c76966024c19b6235a2a7a6a15447497205f405d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "808ad65f_c370e6c8",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T13:29:01Z",
+      "side": 1,
+      "message": "This loop iterates the HashMap without the topology lock, on the commit callback thread. That was already the case, but call-home now puts and removes entries from SSH/Netty threads at any time, so a ConcurrentModificationException becomes reachable. Could the loop move into a synchronized method that iterates a copy of activeConnectors.values()?",
+      "revId": "c76966024c19b6235a2a7a6a15447497205f405d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
