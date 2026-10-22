@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e26df840_9261f80f",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T14:16:52Z",
+      "side": 1,
+      "message": "This bridge keeps old callers compiling but drops the CredentialProvider, so code still using it with the deprecated NetconfClientFactoryImpl(timer) (which binds KeystoreAccess.empty()) gets \"Cannot resolve key\" for every key-auth device and retries forever. The goal of deprecation is \"This old approach still works, but not for long - you should switch before it\u0027s gone!\". So could the deprecated path keep resolving the key through the provider? If so, don\u0027t forget to update the javadoc.",
+      "revId": "35ec40e2e36c5201afb265e3427a98859915f3ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd88a8b9_8f821ea0",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T14:16:52Z",
+      "side": 1,
+      "message": "key-id is optional in odl-netconf-device.yang, and with it absent transport-ssh\u0027s requireCentralKeystoreReference() throws NoSuchElementException, which NetconfNodeHandler does not catch, so the node hangs in \"connecting\" with no retry and no status. Could we throw IllegalArgumentException here when key-id is null, so the existing catch at NetconfNodeHandler.lockedConnect reports it?",
+      "revId": "35ec40e2e36c5201afb265e3427a98859915f3ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
