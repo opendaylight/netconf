@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "b36df6755ce49daf9cf3758ccf991af2ccfda8cb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5a25167_27c99c4f",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStackFactory.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T14:37:44Z",
+      "side": 1,
+      "message": "SessionHandlerConfigurator overrides the ServerKeyVerifier and the auth factories after clientParams is applied, so server-authentication and the client-identity auth methods in clientParams are silently ignored here (and a configured password, I believe, stays on the client as a fallback for every device). Could this overload reject such clientParams, or take only transport params and keepalives, so the \"ignored\" username in call-home can go too?",
+      "revId": "b36df6755ce49daf9cf3758ccf991af2ccfda8cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9938acb1_5174266d",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SessionHandlerConfigurator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T14:37:44Z",
+      "side": 1,
+      "message": "sshd calls the ServerKeyVerifier again on every key re-exchange (by default hourly), so checkServerKey also runs for an authenticated session, despite the Javadoc saying \"before authentication\". Call-home then hits contextManager.exists() and drops its own device. Could we remember the accepted key in a session attribute and, on re-key, just compare it with KeyUtils.compareKeys without calling the handler, plus a reExchangeKeys() test?",
+      "revId": "b36df6755ce49daf9cf3758ccf991af2ccfda8cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
