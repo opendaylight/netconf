@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "593c5813_bf67a03b",
+        "filename": "apps/callhome-provider/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T13:40:23Z",
+      "side": 1,
+      "message": "I think this can be removed if we just set the actual dependency above to \u003cscope\u003etest\u003c/scope\u003e, right? If anything blocks that, please write a short comment here explaining what that is.",
+      "revId": "a35a7692b9dd53b8f8c8f1d1efbe8e211ed9bb70",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2dcd8ab_ec0f5c5c",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T13:40:23Z",
+      "side": 1,
+      "message": "We\u0027re breaking public API without any deprecation warning? This drops the public (String topologyId, ...) constructor and changes AbstractNetconfTopology.ensureNode and the NetconfNodeHandler constructor, so non-OSGi embedders lose the custom topology id option and break on upgrade. I\u0027d keep the old constructors as @deprecated.",
+      "revId": "a35a7692b9dd53b8f8c8f1d1efbe8e211ed9bb70",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b57fa677_7133816b",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-22T13:40:23Z",
+      "side": 1,
+      "message": "Am I right that between super.remove(id) and this call a reconnect of the same device can pass exists(id) and enable a new node, which this then closes?",
+      "revId": "a35a7692b9dd53b8f8c8f1d1efbe8e211ed9bb70",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
