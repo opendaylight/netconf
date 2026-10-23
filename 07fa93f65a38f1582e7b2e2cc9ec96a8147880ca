@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fd59882_b66c4694",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ActorProxyNetconfServiceFacade.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-23T17:37:47Z",
+      "side": 0,
+      "message": "this seems to be the real root cause, use this patch and abandon the previous one",
+      "revId": "07fa93f65a38f1582e7b2e2cc9ec96a8147880ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
