@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cef054a_8b43e1f3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-23T17:37:14Z",
+      "side": 1,
+      "message": "IDK, do we have better title, what is done?",
+      "revId": "07fa93f65a38f1582e7b2e2cc9ec96a8147880ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4402b8f1_4d41c2b3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-23T17:37:14Z",
+      "side": 1,
+      "message": "adding shared actor jus bring complexity..",
+      "revId": "07fa93f65a38f1582e7b2e2cc9ec96a8147880ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "827a2001_2c8b3e72",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-23T17:37:14Z",
+      "side": 1,
+      "message": "separate patch",
+      "revId": "07fa93f65a38f1582e7b2e2cc9ec96a8147880ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a52cede1_7ec33cf0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-23T17:37:14Z",
+      "side": 1,
+      "message": "no, we do not need it..",
+      "revId": "07fa93f65a38f1582e7b2e2cc9ec96a8147880ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f44b1790_b2c038ff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-23T17:37:14Z",
+      "side": 1,
+      "message": "we will have 2 patches:from this one:\n```\n  Fix master mount registration race                                                                     \n                                                                                                         \n  MasterSalFacade used to construct ProxyNetconfDataTreeService before                                   \n  sending CreateInitialMasterActorData to the master actor. With no                                      \n  ordering guarantee between the two, a request could reach                                              \n  NetconfNodeActor while its dataStoreService was still null and fail.                                   \n                                                                                                         \n  Mount registration is now deferred until CreateInitialMasterActorData                                  \n  is acknowledged, and skipped if the device disconnected in the                                         \n  meantime. NetconfNodeActor also replies with NotMasterException                                        \n  instead of creating a NetconfDataTreeServiceActor backed by a null                                     \n  dataStoreService.                                                                                      \n                                                                                                         \n  JIRA: NETCONF-1666                                                                                     \n  - Contents: MasterSalFacade (the connectionGeneration check and the deferred                           \n    registerMasterMountPoint()), the null guard in NetconfNodeActor (still one new actor per request),   \n    MasterSalFacadeTest, and the null-guard test in NetconfNodeActorTest.                                \n  - Note for the author: register the mount outside the synchronized block. \n  \nReply to edit-config requests in NetconfDataTreeServiceActor                                           \n                                                                                                         \n  Merge/replace/create/delete/remove requests were executed without                                      \n  replying, so a caller had no way to learn whether the edit succeeded.                                  \n  Route them through invokeRpcCall() like commit and cancel, replacing                                   \n  the duplicated submit() helper.                                                                        \n                                                                                                         \n  JIRA: NETCONF-1665                                                                                     \n  - Contents: the edit handlers in NetconfDataTreeServiceActor wrapped in invokeRpcCall(...), submit()   \n    removed, and the NetconfDataTreeServiceActorTest changes.                                            \n  - Not included: the removal of the GET self-stop and the hasPendingActivity logic.                     \n  - Optional: stop the actor after it replies, the way the GET handler already does. That stops a later  \n    idle cancel() from sending discard-changes/unlock after the commit has already finished.             \n  - Until commit 3 lands: the proxy still uses tell() with no sender, so these replies go to dead        \n    letters. That\u0027s harmless.",
+      "revId": "07fa93f65a38f1582e7b2e2cc9ec96a8147880ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
