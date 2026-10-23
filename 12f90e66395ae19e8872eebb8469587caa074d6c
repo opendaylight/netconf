@@ -69,6 +69,24 @@
       "parentUuid": "3d2701c4_aed43bea",
       "revId": "12f90e66395ae19e8872eebb8469587caa074d6c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c92c651d_ead0d64a",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-23T08:31:08Z",
+      "side": 1,
+      "message": "I tried this guard with a regression test using a chunked POST with a long chunk extension. However, HttpObjectAggregator.beginAggregation() removes the chunked transfer encoding before the request reaches HTTPServerSession, so HttpUtil.isTransferEncodingChunked(msg) returns false and the response is still 414. Preserving that information would require additional handling around aggregation",
+      "parentUuid": "37d718a9_2c1923cf",
+      "revId": "12f90e66395ae19e8872eebb8469587caa074d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
