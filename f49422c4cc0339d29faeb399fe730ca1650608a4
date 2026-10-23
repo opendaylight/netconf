@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72ac4212_44c2a334",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-23T12:27:01Z",
+      "side": 1,
+      "message": "on input or output?",
+      "revId": "f49422c4cc0339d29faeb399fe730ca1650608a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba7622a1_d858aa06",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-23T12:27:01Z",
+      "side": 1,
+      "message": "// HTTP/3 always runs over TLS, RFC 9114 section 3.1 mandates the \"https\" scheme\n    private static final String SCHEME \u003d HTTPScheme.HTTPS.name().toLowerCase(Locale.ROOT);",
+      "revId": "f49422c4cc0339d29faeb399fe730ca1650608a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1dfcfd80_4fb20643",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-23T12:27:01Z",
+      "side": 1,
+      "message": "request.headers().set(ExtensionHeaderNames.SCHEME.text(), SCHEME);",
+      "revId": "f49422c4cc0339d29faeb399fe730ca1650608a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b19e4bba_5ec69a9a",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-23T12:27:01Z",
+      "side": 1,
+      "message": "make error handling consistent with HTTP2, log error, why IOE?",
+      "revId": "f49422c4cc0339d29faeb399fe730ca1650608a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfe82959_33cb55fe",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/SingleResponseHandler.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-23T12:27:01Z",
+      "side": 1,
+      "message": "caw we have stream id here?",
+      "revId": "f49422c4cc0339d29faeb399fe730ca1650608a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

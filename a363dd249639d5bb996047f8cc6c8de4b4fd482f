@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "083baafc_53bca1df",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp2Session.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-23T12:27:01Z",
+      "side": 0,
+      "message": "why this changs is not described in commit message? do we really need it in this patch?",
+      "revId": "a363dd249639d5bb996047f8cc6c8de4b4fd482f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
