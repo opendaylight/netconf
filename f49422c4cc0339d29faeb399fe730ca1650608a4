@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc7d3ccc_af530e8e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ConfigUtils.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-23T16:34:48Z",
+      "side": 0,
+      "message": "we also would need a follow up to make clear what of these bidi are really for the client and which are just and only for the server, add fixme with a ticket #",
+      "revId": "f49422c4cc0339d29faeb399fe730ca1650608a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

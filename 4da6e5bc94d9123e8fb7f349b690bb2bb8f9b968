@@ -16,6 +16,40 @@
       "message": "can we move this to another ticket?",
       "revId": "4da6e5bc94d9123e8fb7f349b690bb2bb8f9b968",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c760b8b_ff09c683",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-23T16:34:48Z",
+      "side": 1,
+      "message": "can we use \"\"\" syntax?",
+      "revId": "4da6e5bc94d9123e8fb7f349b690bb2bb8f9b968",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6696dc81_c845ee89",
+        "filename": "usecase/netconf-topology-1node-transient/src/test/java/org/opendaylight/netconf/dagger/mdsal/MdsalDomBrokerTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-23T16:34:48Z",
+      "side": 1,
+      "message": "probably, the server/client setting split should be done in this model",
+      "revId": "4da6e5bc94d9123e8fb7f349b690bb2bb8f9b968",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
