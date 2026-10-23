@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "087c3c3f_d7aa2a48",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-23T07:57:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b341e984_29974521",
+      "revId": "12f90e66395ae19e8872eebb8469587caa074d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d2701c4_aed43bea",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-22T12:38:12Z",
       "side": 1,
       "message": "Netty\u0027s HttpObjectDecoder also throws TooLongHttpLineException for an over-long chunk-size line (checked on 4.2.16: a chunked POST with a long chunk extension ends up here), so such a request gets 414 URI Too Long although its URI is fine. Could we map it to 414 only when the request is not chunked, for example with a guard on HttpUtil.isTransferEncodingChunked(msg), and add a test for that case?",
+      "revId": "12f90e66395ae19e8872eebb8469587caa074d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37d718a9_2c1923cf",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-23T07:57:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d2701c4_aed43bea",
       "revId": "12f90e66395ae19e8872eebb8469587caa074d6c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
