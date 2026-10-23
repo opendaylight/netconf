@@ -16,6 +16,23 @@
       "message": "This is the real fix and its content would be:\n\n```\n  - Contents: ActorProxyNetconfServiceFacade switched from tell() to ask(), plus the NetconfNodeActorTest\n    update. Keep the current commit message, but delete \"NetconfDataTreeServiceActor now replies to      \n    edit-config messages accordingly\", because that is now commit 2.                                     \n  - Add one sentence: this alone fixes the ordering, because NetconfDataOperations only calls commit()   \n    once the edit futures have completed.                                                                \n  - JIRA: NETCONF-1665 only.  \n  \n```",
       "revId": "28254250910315a69427eaa4f88e43c5820c5830",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c56c1ddf_860a8820",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-23T17:44:34Z",
+      "side": 1,
+      "message": "Approach looks good: waiting for the master\u0027s reply removes the fake                                   \n  success and fixes the ordering. Please move the                                                        \n  NetconfDataTreeServiceActor reply changes from If98444c1 into a separate                               \n  commit before this one (see my comment there), otherwise the asks would                                \n  time out.",
+      "revId": "28254250910315a69427eaa4f88e43c5820c5830",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
