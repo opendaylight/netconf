@@ -9,8 +9,8 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.mdsal.common.api.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.mdsal.common.api.FluentFutures.immediateFluentFuture;
@@ -18,6 +18,7 @@ import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATI
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.OPERATIONAL;
 
 import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +39,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.FluentFutures;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.spi.DataStoreService;
 import org.opendaylight.netconf.topology.singleton.impl.netconf.NetconfServiceFailedException;
@@ -82,7 +84,7 @@ class NetconfDataTreeServiceActorTest {
     @BeforeEach
     void setUp() {
         actorRef = TestActorRef.create(system,
-            NetconfDataTreeServiceActor.props(dataStoreService, Duration.ofSeconds(2)));
+            NetconfDataTreeServiceActor.props(dataStoreService, Duration.ofSeconds(5)));
         probe = TestProbe.apply(system);
     }
 
@@ -157,6 +159,7 @@ class NetconfDataTreeServiceActorTest {
         final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
         actorRef.tell(new MergeEditConfigRequest(node), probe.ref());
         verify(dataStoreService).merge(PATH, NODE);
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
     }
 
     @Test
@@ -165,6 +168,7 @@ class NetconfDataTreeServiceActorTest {
         final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
         actorRef.tell(new ReplaceEditConfigRequest(node), probe.ref());
         verify(dataStoreService).replace(PATH, NODE);
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
     }
 
     @Test
@@ -173,6 +177,7 @@ class NetconfDataTreeServiceActorTest {
         final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
         actorRef.tell(new CreateEditConfigRequest(node), probe.ref());
         verify(dataStoreService).create(PATH, NODE);
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
     }
 
     @Test
@@ -180,6 +185,7 @@ class NetconfDataTreeServiceActorTest {
         doReturn(EMPTY_RPC).when(dataStoreService).delete(PATH);
         actorRef.tell(new DeleteEditConfigRequest(PATH), probe.ref());
         verify(dataStoreService).delete(PATH);
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
     }
 
     @Test
@@ -187,6 +193,18 @@ class NetconfDataTreeServiceActorTest {
         doReturn(EMPTY_RPC).when(dataStoreService).remove(PATH);
         actorRef.tell(new RemoveEditConfigRequest(PATH), probe.ref());
         verify(dataStoreService).remove(PATH);
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
+    }
+
+    @Test
+    void testCreateFailure() {
+        final var cause = new NetconfServiceFailedException("fail");
+        doReturn(immediateFailedFluentFuture(cause)).when(dataStoreService).create(PATH, NODE);
+        actorRef.tell(new CreateEditConfigRequest(new NormalizedNodeMessage(PATH, NODE)), probe.ref());
+
+        verify(dataStoreService).create(PATH, NODE);
+        final var response = probe.expectMsgClass(Status.Failure.class);
+        assertEquals(cause, response.cause());
     }
 
     @Test
@@ -213,11 +231,30 @@ class NetconfDataTreeServiceActorTest {
     }
 
     @Test
-    void testIdleTimeout() {
-        final TestProbe testProbe = new TestProbe(system);
-        testProbe.watch(actorRef);
-        doReturn(EMPTY_RPC).when(dataStoreService).cancel();
-        verify(dataStoreService, timeout(3000)).cancel();
-        testProbe.expectTerminated(actorRef, TIMEOUT.duration());
+    void testStopAfterIssuingOperation() {
+        final var watcher = new TestProbe(system);
+        watcher.watch(actorRef);
+        final var result = SettableFuture.<DOMRpcResult>create();
+        doReturn(result).when(dataStoreService).create(PATH, NODE);
+        actorRef.tell(new CreateEditConfigRequest(new NormalizedNodeMessage(PATH, NODE)), probe.ref());
+
+        // The actor is done once it has issued the operation, before the operation completes
+        watcher.expectTerminated(actorRef, TIMEOUT.duration());
+
+        // The reply is still delivered once the operation completes
+        result.set(new DefaultDOMRpcResult());
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
+    }
+
+    @Test
+    void testStopWithoutRequest() {
+        final var idleActor = system.actorOf(
+            NetconfDataTreeServiceActor.props(dataStoreService, Duration.ofMillis(100)));
+        final var watcher = new TestProbe(system);
+        watcher.watch(idleActor);
+
+        // An actor whose request never arrives stops on its own, with nothing to cancel
+        watcher.expectTerminated(idleActor, TIMEOUT.duration());
+        verifyNoInteractions(dataStoreService);
     }
 }

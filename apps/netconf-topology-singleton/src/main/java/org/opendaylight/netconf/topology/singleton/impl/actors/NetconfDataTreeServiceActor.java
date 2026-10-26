@@ -43,19 +43,17 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDataTreeServiceActor.class);
 
     private final DataStoreService dataStoreService;
-    private final long idleTimeout;
 
-    private NetconfDataTreeServiceActor(final DataStoreService dataStoreService, final Duration idleTimeout) {
+    private NetconfDataTreeServiceActor(final DataStoreService dataStoreService, final Duration requestTimeout) {
         this.dataStoreService = dataStoreService;
-        this.idleTimeout = idleTimeout.toSeconds();
-        if (this.idleTimeout > 0) {
-            context().setReceiveTimeout(JavaDurationConverters.asFiniteDuration(idleTimeout));
-        }
+        // The request may never arrive, for example when the requester's ask for this actor timed out before it was
+        // created. Do not linger until the device disconnects in that case. There is nothing to cancel yet.
+        context().setReceiveTimeout(JavaDurationConverters.asFiniteDuration(requestTimeout));
     }
 
-    static Props props(final DataStoreService netconfService, final Duration idleTimeout) {
-        return Props.create(NetconfDataTreeServiceActor.class, () ->
-            new NetconfDataTreeServiceActor(netconfService, idleTimeout));
+    static Props props(final DataStoreService netconfService, final Duration requestTimeout) {
+        return Props.create(NetconfDataTreeServiceActor.class,
+            () -> new NetconfDataTreeServiceActor(netconfService, requestTimeout));
     }
 
     @Override
@@ -64,58 +62,37 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
             final YangInstanceIdentifier path = getRequest.path();
             final ListenableFuture<Optional<NormalizedNode>> future = dataStoreService.get(getRequest.store(),
                     getRequest.path(), getRequest.fields());
-            context().stop(self());
             sendResult(future, path, sender(), self());
         } else if (message instanceof MergeEditConfigRequest request) {
-            dataStoreService.merge(
+            invokeRpcCall(() -> dataStoreService.merge(
                 request.getNormalizedNodeMessage().getIdentifier(),
-                request.getNormalizedNodeMessage().getNode());
+                request.getNormalizedNodeMessage().getNode()), sender(), self());
         } else if (message instanceof ReplaceEditConfigRequest request) {
-            dataStoreService.replace(
+            invokeRpcCall(() -> dataStoreService.replace(
                 request.getNormalizedNodeMessage().getIdentifier(),
-                request.getNormalizedNodeMessage().getNode());
+                request.getNormalizedNodeMessage().getNode()), sender(), self());
         } else if (message instanceof CreateEditConfigRequest request) {
-            dataStoreService.create(
+            invokeRpcCall(() -> dataStoreService.create(
                 request.getNormalizedNodeMessage().getIdentifier(),
-                request.getNormalizedNodeMessage().getNode());
+                request.getNormalizedNodeMessage().getNode()), sender(), self());
         } else if (message instanceof DeleteEditConfigRequest request) {
-            dataStoreService.delete(request.getPath());
+            invokeRpcCall(() -> dataStoreService.delete(request.getPath()), sender(), self());
         } else if (message instanceof RemoveEditConfigRequest request) {
-            dataStoreService.remove(request.getPath());
+            invokeRpcCall(() -> dataStoreService.remove(request.getPath()), sender(), self());
         } else if (message instanceof CommitRequest) {
-            submit(sender(), self());
+            invokeRpcCall(dataStoreService::commit, sender(), self());
         } else if (message instanceof CancelChangesRequest) {
             invokeRpcCall(dataStoreService::cancel, sender(), self());
         } else if (message instanceof ReceiveTimeout) {
-            LOG.warn("Haven't received any message for {} seconds, cancelling transaction and stopping actor",
-                idleTimeout);
-            invokeRpcCall(dataStoreService::cancel, sender(), self());
-            context().stop(self());
+            LOG.debug("{}: No request received, stopping", self());
         } else {
             unhandled(message);
+            return;
         }
-    }
-
-    private void submit(final ActorRef requester, final ActorRef self) {
-        Futures.addCallback(dataStoreService.commit(), new FutureCallback<DOMRpcResult>() {
-            @Override
-            public void onSuccess(final DOMRpcResult result) {
-                if (result == null) {
-                    requester.tell(new EmptyResultResponse(), getSender());
-                    return;
-                }
-                NormalizedNodeMessage nodeMessageResp = null;
-                if (result.value() != null) {
-                    nodeMessageResp = new NormalizedNodeMessage(YangInstanceIdentifier.of(), result.value());
-                }
-                requester.tell(new InvokeRpcMessageReply(nodeMessageResp, result.errors()), self);
-            }
-
-            @Override
-            public void onFailure(final Throwable throwable) {
-                requester.tell(new Status.Failure(throwable), self);
-            }
-        }, MoreExecutors.directExecutor());
+        // Each request gets its own actor, which is done once it has issued its operation. The reply is sent when
+        // the operation completes, even though the actor is stopped by then.
+        // FIXME: NETCONF-1709: nothing cancels a transaction abandoned between its edits and its commit
+        context().stop(self());
     }
 
     private void invokeRpcCall(final Supplier<ListenableFuture<? extends DOMRpcResult>> operation,
@@ -124,7 +101,7 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
             @Override
             public void onSuccess(final DOMRpcResult rpcResult) {
                 if (rpcResult == null) {
-                    requester.tell(new EmptyResultResponse(), getSender());
+                    requester.tell(new EmptyResultResponse(), self);
                     return;
                 }
                 NormalizedNodeMessage nodeMessageResp = null;

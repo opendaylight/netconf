@@ -186,7 +186,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             // only master contains reference to dataStoreService, never create an actor without it
             if (dataStoreService != null) {
                 final var netconfActor = context().actorOf(NetconfDataTreeServiceActor.props(dataStoreService,
-                    writeTxIdleTimeout));
+                    actorResponseWaitTime.multipliedBy(2)));
                 sender().tell(new Success(netconfActor), self());
             } else {
                 LOG.warn("{}: Received {} but we don't appear to be the master", id, message);
