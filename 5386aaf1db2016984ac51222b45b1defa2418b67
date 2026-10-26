@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20a44738_65c9bbb8",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/RequestBodyInputStream.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-26T08:49:27Z",
+      "side": 1,
+      "message": "Do we not need to override available() as well? It will always return 0 otherwise.",
+      "revId": "5386aaf1db2016984ac51222b45b1defa2418b67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
