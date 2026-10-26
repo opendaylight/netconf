@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -157,6 +158,7 @@ class NetconfDataTreeServiceActorTest {
         final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
         actorRef.tell(new MergeEditConfigRequest(node), probe.ref());
         verify(dataStoreService).merge(PATH, NODE);
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
     }
 
     @Test
@@ -165,6 +167,7 @@ class NetconfDataTreeServiceActorTest {
         final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
         actorRef.tell(new ReplaceEditConfigRequest(node), probe.ref());
         verify(dataStoreService).replace(PATH, NODE);
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
     }
 
     @Test
@@ -173,6 +176,7 @@ class NetconfDataTreeServiceActorTest {
         final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
         actorRef.tell(new CreateEditConfigRequest(node), probe.ref());
         verify(dataStoreService).create(PATH, NODE);
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
     }
 
     @Test
@@ -180,6 +184,7 @@ class NetconfDataTreeServiceActorTest {
         doReturn(EMPTY_RPC).when(dataStoreService).delete(PATH);
         actorRef.tell(new DeleteEditConfigRequest(PATH), probe.ref());
         verify(dataStoreService).delete(PATH);
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
     }
 
     @Test
@@ -187,6 +192,18 @@ class NetconfDataTreeServiceActorTest {
         doReturn(EMPTY_RPC).when(dataStoreService).remove(PATH);
         actorRef.tell(new RemoveEditConfigRequest(PATH), probe.ref());
         verify(dataStoreService).remove(PATH);
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
+    }
+
+    @Test
+    void testCreateFailure() {
+        final var cause = new NetconfServiceFailedException("fail");
+        doReturn(FluentFutures.immediateFailedFluentFuture(cause)).when(dataStoreService).create(PATH, NODE);
+        actorRef.tell(new CreateEditConfigRequest(new NormalizedNodeMessage(PATH, NODE)), probe.ref());
+
+        verify(dataStoreService).create(PATH, NODE);
+        final Status.Failure response = probe.expectMsgClass(Status.Failure.class);
+        assertEquals(cause, response.cause());
     }
 
     @Test
@@ -210,6 +227,20 @@ class NetconfDataTreeServiceActorTest {
         verify(dataStoreService).commit();
         final Status.Failure response = probe.expectMsgClass(Status.Failure.class);
         assertEquals(cause, response.cause());
+    }
+
+    @Test
+    void testStopAfterReply() {
+        final TestProbe testProbe = new TestProbe(system);
+        testProbe.watch(actorRef);
+        doReturn(EMPTY_RPC).when(dataStoreService).create(PATH, NODE);
+        actorRef.tell(new CreateEditConfigRequest(new NormalizedNodeMessage(PATH, NODE)), probe.ref());
+
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
+        testProbe.expectTerminated(actorRef, TIMEOUT.duration());
+        // A stopped actor must not cancel what a later transaction does on the same device once its idle timeout
+        // would have elapsed.
+        verify(dataStoreService, after(3000).never()).cancel();
     }
 
     @Test
