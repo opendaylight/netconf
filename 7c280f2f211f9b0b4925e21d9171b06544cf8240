@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "298990f4_66f1a1cd",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/RequestBodyInputStream.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-26T07:22:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7e6f511_a1e370fe",
+      "revId": "7c280f2f211f9b0b4925e21d9171b06544cf8240",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "84aec05d_221b2c35",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-22T12:09:25Z",
       "side": 1,
       "message": "The executor already tracks every streaming body in pendingRequests, but shutdown() at line 87 does not cancel them, so a reader blocked in read() on a dropped connection waits forever unless the handler catches every path. Would it make sense for shutdown() to call body.cancel() on all tracked contexts, leaving the handler responsible only for the rejected-submission case?",
+      "revId": "7c280f2f211f9b0b4925e21d9171b06544cf8240",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77963cf4_f8dcbb53",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerRequestExecutor.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-26T07:22:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "84aec05d_221b2c35",
       "revId": "7c280f2f211f9b0b4925e21d9171b06544cf8240",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
