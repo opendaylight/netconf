@@ -176,10 +176,16 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             actorResponseWaitTime = refreshSlave.getActorResponseWaitTime();
             id = refreshSlave.getId();
             schemaProvider = refreshSlave.getSetup().getDeviceSchemaProvider();
-        } else if (message instanceof NetconfDataTreeServiceRequest) {
-            final var netconfActor = context().actorOf(NetconfDataTreeServiceActor.props(dataStoreService,
-                writeTxIdleTimeout));
-            sender().tell(new Success(netconfActor), self());
+        } else if (message instanceof NetconfDataTreeServiceRequest) { // master
+            // only master contains reference to dataStoreService, never create an actor without it
+            if (dataStoreService != null) {
+                final var netconfActor = context().actorOf(NetconfDataTreeServiceActor.props(dataStoreService,
+                    writeTxIdleTimeout));
+                sender().tell(new Success(netconfActor), self());
+            } else {
+                LOG.warn("{}: Received {} but we don't appear to be the master", id, message);
+                sender().tell(new Failure(new NotMasterException(self())), self());
+            }
         }
     }
 
