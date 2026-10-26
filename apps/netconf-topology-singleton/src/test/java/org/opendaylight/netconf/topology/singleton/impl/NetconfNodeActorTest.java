@@ -96,6 +96,7 @@ import org.opendaylight.netconf.topology.singleton.messages.NotMasterException;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.RegisterMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.UnregisterSlaveMountPoint;
+import org.opendaylight.netconf.topology.singleton.messages.netconf.NetconfDataTreeServiceRequest;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.DepthParam;
@@ -761,6 +762,18 @@ class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         verify(dataStoreService, timeout(1000)).replace(emptyPath, contNode);
         // FIXME: commit should not be called after unsuccessful replace operation.
         verify(dataStoreService, timeout(1000)).commit();
+    }
+
+    @Test
+    void testNetconfDataTreeServiceRequestBeforeMasterInitialized() {
+        // Without master data there is no dataStoreService to back the actor with.
+        masterRef.tell(new NetconfDataTreeServiceRequest(), testKit.getRef());
+        final var notMaster = testKit.expectMsgClass(Failure.class);
+        assertInstanceOf(NotMasterException.class, notMaster.cause());
+
+        initializeMaster(List.of());
+        masterRef.tell(new NetconfDataTreeServiceRequest(), testKit.getRef());
+        assertInstanceOf(ActorRef.class, testKit.expectMsgClass(Success.class).status());
     }
 
     private ActorRef registerSlaveMountPoint() {
