@@ -87,6 +87,24 @@
       "parentUuid": "37d718a9_2c1923cf",
       "revId": "12f90e66395ae19e8872eebb8469587caa074d6c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "486d79f3_0d9c6cec",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-26T11:43:01Z",
+      "side": 1,
+      "message": "Right, but there is another option we can also try. For an over-long request line Netty substitutes its placeholder request (GET /bad-request HTTP/1.0, no headers), which the comment at line 140 already relies on. An over-long chunk line keeps the real request line and headers, plus the content-length the aggregator adds. So \"case TooLongHttpLineException ignored when msg.headers().isEmpty()\" would tell them apart, wouldn\u0027t it? It needs statusOf(msg, cause), called before  msg.release(). It\u0027s worth a try. And if that\u0027s too ugly, it should be fine keeping 414 and adding a one-line comment in statusOf saying that over-long chunk-size lines are reported the same way.",
+      "parentUuid": "c92c651d_ead0d64a",
+      "revId": "12f90e66395ae19e8872eebb8469587caa074d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
