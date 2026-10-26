@@ -16,6 +16,24 @@
       "message": "let\u0027s separate private and private final",
       "revId": "c45fc263defb4561a9405d5624da36e6c522542b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a658d6d1_759c7cfb",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPSchemeCleartextUpgradeTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-26T08:37:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "66e882cc_04c3e540",
+      "revId": "c45fc263defb4561a9405d5624da36e6c522542b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
