@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
@@ -59,11 +60,20 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     private final NetconfDeviceMount mount;
     private final boolean lockDatastore;
 
+    @GuardedBy("this")
     private NetconfDeviceSchema currentSchema = null;
+    @GuardedBy("this")
     private NetconfSessionPreferences netconfSessionPreferences = null;
+    @GuardedBy("this")
     private RemoteDeviceServices deviceServices = null;
+    @GuardedBy("this")
     private DOMDataBroker deviceDataBroker = null;
+    @GuardedBy("this")
     private DataStoreService dataStoreService = null;
+    // Bumped on every connect, disconnect, failure and close, so that a mount registration scheduled for an earlier
+    // connection can tell it has been superseded
+    @GuardedBy("this")
+    private long connectionGeneration;
 
     /**
      * MasterSalFacade is responsible for handling the connection and disconnection
@@ -99,7 +109,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
     }
 
     @Override
-    public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
+    public synchronized void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
             final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services,
             final @Nullable NegotiatedSshAlg negotiatedSshAlg) {
         currentSchema = requireNonNull(deviceSchema);
@@ -110,28 +120,67 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
                 + "the device", id);
         }
 
-        LOG.info("Device {} connected - registering master mount point", id);
+        LOG.info("Device {} connected - initializing master actor", id);
 
-        registerMasterMountPoint();
+        initializeDeviceServices();
 
-        sendInitialDataToActor().whenComplete((success, failure) -> {
-            if (failure != null) {
-                LOG.error("{}: CreateInitialMasterActorData to {} failed", id, masterActorRef, failure);
+        final var generation = ++connectionGeneration;
+        sendInitialDataToActor().whenComplete((success, failure) -> onMasterActorInitialized(generation, failure,
+            deviceSchema, sessionPreferences, services, negotiatedSshAlg));
+    }
+
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    private void onMasterActorInitialized(final long generation, final Throwable failure,
+            final NetconfDeviceSchema deviceSchema, final NetconfSessionPreferences sessionPreferences,
+            final RemoteDeviceServices services, final @Nullable NegotiatedSshAlg negotiatedSshAlg) {
+        // The device may have disconnected while the master actor was being initialized. Registering now would
+        // leave a mount nobody unregisters and write the device back as connected.
+        if (isSuperseded(generation)) {
+            LOG.debug("{}: Connection superseded while initializing master actor, not registering mount point", id);
+            return;
+        }
+        if (failure != null) {
+            LOG.error("{}: CreateInitialMasterActorData to {} failed", id, masterActorRef, failure);
+            return;
+        }
+
+        // Only register the mount once CreateInitialMasterActorData has been processed. Otherwise a request on it
+        // could reach masterActorRef while its dataStoreService is still null.
+        try {
+            registerMasterMountPoint(deviceSchema, services);
+        } catch (RuntimeException e) {
+            // We are running as a callback, nobody else would ever see this
+            LOG.error("{}: Failed to register master mount point", id, e);
+            return;
+        }
+
+        synchronized (this) {
+            // The mount is registered without holding the lock, so a disconnect may have happened meanwhile. It had
+            // nothing to unregister yet, hence we have to do it.
+            if (generation != connectionGeneration) {
+                LOG.debug("{}: Connection superseded while registering mount point, unregistering it", id);
+                mount.onDeviceDisconnected();
                 return;
             }
             updateDeviceData(deviceSchema, sessionPreferences, negotiatedSshAlg);
-        });
+        }
+    }
+
+    private synchronized boolean isSuperseded(final long generation) {
+        return generation != connectionGeneration;
     }
 
     @Override
-    public void onDeviceDisconnected() {
+    public synchronized void onDeviceDisconnected() {
         LOG.info("Device {} disconnected - unregistering master mount point", id);
+        connectionGeneration++;
         datastoreAdapter.updateDeviceData(false, NetconfDeviceCapabilities.empty(), null, null);
         mount.onDeviceDisconnected();
     }
 
     @Override
-    public void onDeviceFailed(final Throwable throwable) {
+    public synchronized void onDeviceFailed(final Throwable throwable) {
+        connectionGeneration++;
         datastoreAdapter.setDeviceAsFailed(throwable);
         mount.onDeviceDisconnected();
     }
@@ -143,6 +192,11 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
     @Override
     public void close() {
+        // A mount registration still in progress notices this and unregisters what it registered. The lock is not
+        // held while blocking on the shutdown.
+        synchronized (this) {
+            connectionGeneration++;
+        }
         final var future = datastoreAdapter.shutdown();
         mount.close();
 
@@ -156,7 +210,8 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         }
     }
 
-    private void registerMasterMountPoint() {
+    @GuardedBy("this")
+    private void initializeDeviceServices() {
         requireNonNull(id);
 
         final var databind = requireNonNull(currentSchema,
@@ -167,26 +222,31 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
         deviceDataBroker = newDeviceDataBroker(databind, preferences);
         dataStoreService = newDataStoreService(databind, preferences);
+    }
 
+    private void registerMasterMountPoint(final NetconfDeviceSchema deviceSchema, final RemoteDeviceServices services) {
         final var proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef, actorResponseWaitTime);
-        mount.onDeviceConnected(databind.modelContext(),
+        mount.onDeviceConnected(deviceSchema.databind().modelContext(),
             new NetconfDataOperations(new DataOperationsServiceImpl(proxyNetconfService)),
-            deviceServices,
+            services,
             // We need to create ProxyDOMDataBroker so accessing mountpoint
             // on leader node would be same as on follower node
             new ProxyDOMDataBroker(id, masterActorRef, actorResponseWaitTime));
     }
 
+    @GuardedBy("this")
     protected DOMDataBroker newDeviceDataBroker(final DatabindContext databind,
             final NetconfSessionPreferences preferences) {
         return new NetconfDeviceDataBroker(id, databind, deviceServices.rpcs(), preferences, lockDatastore);
     }
 
+    @GuardedBy("this")
     protected DataStoreService newDataStoreService(final DatabindContext databind,
             final NetconfSessionPreferences preferences) {
         return AbstractDataStore.of(id, databind, deviceServices.rpcs(), preferences, lockDatastore);
     }
 
+    @GuardedBy("this")
     private CompletionStage<Object> sendInitialDataToActor() {
         final var sourceIdentifiers = List.copyOf(getConstituentModuleIdentifiers(
             currentSchema.databind().modelContext()));
