@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84dc91f0_d6cf27b7",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStackFactory.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-26T13:20:08Z",
+      "side": 1,
+      "message": "Done, the overload now takes only the handler, without clientParams, and call-home no longer needs the \"ignored\" username. I left out transport params and keepalives too, since call-home has always passed null for them.",
+      "parentUuid": "d5a25167_27c99c4f",
+      "revId": "b36df6755ce49daf9cf3758ccf991af2ccfda8cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9938acb1_5174266d",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-10-22T14:37:44Z",
       "side": 1,
       "message": "sshd calls the ServerKeyVerifier again on every key re-exchange (by default hourly), so checkServerKey also runs for an authenticated session, despite the Javadoc saying \"before authentication\". Call-home then hits contextManager.exists() and drops its own device. Could we remember the accepted key in a session attribute and, on re-key, just compare it with KeyUtils.compareKeys without calling the handler, plus a reExchangeKeys() test?",
+      "revId": "b36df6755ce49daf9cf3758ccf991af2ccfda8cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f162528e_e39e0898",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SessionHandlerConfigurator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-26T13:20:08Z",
+      "side": 1,
+      "message": "Thx, done.",
+      "parentUuid": "9938acb1_5174266d",
       "revId": "b36df6755ce49daf9cf3758ccf991af2ccfda8cb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
