@@ -105,6 +105,24 @@
       "parentUuid": "c92c651d_ead0d64a",
       "revId": "12f90e66395ae19e8872eebb8469587caa074d6c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "277634ef_257645b9",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-26T12:39:04Z",
+      "side": 1,
+      "message": "Yes that works, I added the guard and call statusOf(msg, cause) before msg.release().",
+      "parentUuid": "486d79f3_0d9c6cec",
+      "revId": "12f90e66395ae19e8872eebb8469587caa074d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
