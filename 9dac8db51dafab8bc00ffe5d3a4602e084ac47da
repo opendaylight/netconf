@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "9dac8db51dafab8bc00ffe5d3a4602e084ac47da",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d67ec7f_f34cb698",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-10-26T08:18:23Z",
+      "side": 1,
+      "message": "Vanadium branch is no more supported.",
+      "revId": "9dac8db51dafab8bc00ffe5d3a4602e084ac47da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
