@@ -9,7 +9,6 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.mdsal.common.api.FluentFutures.immediateFailedFluentFuture;
@@ -18,7 +17,6 @@ import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATI
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.OPERATIONAL;
 
 import com.google.common.util.concurrent.FluentFuture;
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -82,7 +80,7 @@ class NetconfDataTreeServiceActorTest {
     @BeforeEach
     void setUp() {
         actorRef = TestActorRef.create(system,
-            NetconfDataTreeServiceActor.props(dataStoreService, Duration.ofSeconds(2)));
+            NetconfDataTreeServiceActor.props(dataStoreService));
         probe = TestProbe.apply(system);
     }
 
@@ -157,6 +155,7 @@ class NetconfDataTreeServiceActorTest {
         final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
         actorRef.tell(new MergeEditConfigRequest(node), probe.ref());
         verify(dataStoreService).merge(PATH, NODE);
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
     }
 
     @Test
@@ -165,6 +164,7 @@ class NetconfDataTreeServiceActorTest {
         final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
         actorRef.tell(new ReplaceEditConfigRequest(node), probe.ref());
         verify(dataStoreService).replace(PATH, NODE);
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
     }
 
     @Test
@@ -173,6 +173,7 @@ class NetconfDataTreeServiceActorTest {
         final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
         actorRef.tell(new CreateEditConfigRequest(node), probe.ref());
         verify(dataStoreService).create(PATH, NODE);
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
     }
 
     @Test
@@ -180,6 +181,7 @@ class NetconfDataTreeServiceActorTest {
         doReturn(EMPTY_RPC).when(dataStoreService).delete(PATH);
         actorRef.tell(new DeleteEditConfigRequest(PATH), probe.ref());
         verify(dataStoreService).delete(PATH);
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
     }
 
     @Test
@@ -187,6 +189,18 @@ class NetconfDataTreeServiceActorTest {
         doReturn(EMPTY_RPC).when(dataStoreService).remove(PATH);
         actorRef.tell(new RemoveEditConfigRequest(PATH), probe.ref());
         verify(dataStoreService).remove(PATH);
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
+    }
+
+    @Test
+    void testCreateFailure() {
+        final var cause = new NetconfServiceFailedException("fail");
+        doReturn(FluentFutures.immediateFailedFluentFuture(cause)).when(dataStoreService).create(PATH, NODE);
+        actorRef.tell(new CreateEditConfigRequest(new NormalizedNodeMessage(PATH, NODE)), probe.ref());
+
+        verify(dataStoreService).create(PATH, NODE);
+        final var response = probe.expectMsgClass(Status.Failure.class);
+        assertEquals(cause, response.cause());
     }
 
     @Test
@@ -213,11 +227,13 @@ class NetconfDataTreeServiceActorTest {
     }
 
     @Test
-    void testIdleTimeout() {
-        final TestProbe testProbe = new TestProbe(system);
+    void testStopAfterReply() {
+        final var testProbe = new TestProbe(system);
         testProbe.watch(actorRef);
-        doReturn(EMPTY_RPC).when(dataStoreService).cancel();
-        verify(dataStoreService, timeout(3000)).cancel();
+        doReturn(EMPTY_RPC).when(dataStoreService).create(PATH, NODE);
+        actorRef.tell(new CreateEditConfigRequest(new NormalizedNodeMessage(PATH, NODE)), probe.ref());
+
+        probe.expectMsgClass(InvokeRpcMessageReply.class);
         testProbe.expectTerminated(actorRef, TIMEOUT.duration());
     }
 }

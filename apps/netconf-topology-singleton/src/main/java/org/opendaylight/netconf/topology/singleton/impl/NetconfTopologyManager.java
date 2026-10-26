@@ -89,8 +89,8 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
         String topology$_$id() default "topology-netconf";
 
         @AttributeDefinition(min = "0", max = "65535",
-            description = "Idle time in seconds after which write transaction is cancelled automatically. If 0, "
-                + "automatic cancellation is turned off.")
+            description = "Idle time in seconds after which a write transaction opened through a mount point's "
+                + "DOMDataBroker is cancelled automatically. If 0, automatic cancellation is turned off.")
         int write$_$transaction$_$idle$_$timeout() default 0;
     }
 
