@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "59418462_dc6dc1dd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-27T13:06:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cef054a_8b43e1f3",
+      "revId": "07fa93f65a38f1582e7b2e2cc9ec96a8147880ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4402b8f1_4d41c2b3",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-23T17:37:14Z",
       "side": 1,
       "message": "adding shared actor jus bring complexity..",
+      "revId": "07fa93f65a38f1582e7b2e2cc9ec96a8147880ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec30c790_e67321cc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-27T13:06:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4402b8f1_4d41c2b3",
       "revId": "07fa93f65a38f1582e7b2e2cc9ec96a8147880ca",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b17631d_6acac31d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-27T13:06:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "827a2001_2c8b3e72",
+      "revId": "07fa93f65a38f1582e7b2e2cc9ec96a8147880ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a52cede1_7ec33cf0",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-10-23T17:37:14Z",
       "side": 1,
       "message": "no, we do not need it..",
+      "revId": "07fa93f65a38f1582e7b2e2cc9ec96a8147880ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3214742e_a321a174",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-27T13:06:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a52cede1_7ec33cf0",
       "revId": "07fa93f65a38f1582e7b2e2cc9ec96a8147880ca",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
