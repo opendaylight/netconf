@@ -30,6 +30,11 @@ DELETED_STATUS_CODES = {404, 409}
 
 log = logging.getLogger(__name__)
 
+# Distinguishes "auth not passed at all" (use the default admin/admin Basic
+# Auth below) from an explicit `auth=None` (send no credentials), so
+# existing callers keep today's behavior unchanged either way.
+_DEFAULT_AUTH = object()
+
 
 def restconf_base_url(host: str = ODL_IP) -> str:
     """Builds the RESTCONF base URL for a given node.
@@ -79,6 +84,8 @@ def get_from_uri(
     expected_code: int | List[int] | None = None,
     http_timeout: float | tuple[float, float] | None = None,
     host: str = ODL_IP,
+    base_url: str | None = None,
+    auth=_DEFAULT_AUTH,
 ) -> requests.Response:
     """Sends HTTP GET request to ODL.
 
@@ -94,16 +101,27 @@ def get_from_uri(
         host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
             the only node); pass another address (e.g. from
             variables.CLUSTER_MEMBER_IPS) to target a different cluster member.
+        base_url (str | None): Full "http://host:port" base to send the
+            request to, overriding the default restconf_base_url(host) -
+            e.g. to reach a different RESTCONF implementation on the same
+            node (such as the JAX-RS one some AAA features require).
+        auth: HTTP auth to send, overriding the default admin/admin Basic
+            Auth. Pass None explicitly to send no credentials at all (e.g.
+            when the endpoint under test authenticates some other way, such
+            as trusted reverse-proxy headers).
 
     Returns:
         requests.Response: Response returned by ODL for GET call.
     """
-    url = f"{restconf_base_url(host)}/{uri}"
+    url = f"{base_url if base_url is not None else restconf_base_url(host)}/{uri}"
+    resolved_auth = (
+        requests.auth.HTTPBasicAuth("admin", "admin") if auth is _DEFAULT_AUTH else auth
+    )
     log.info(f"Sending GET request to {url} with headers {headers}")
     response = requests.get(
         url,
         headers=headers,
-        auth=requests.auth.HTTPBasicAuth("admin", "admin"),
+        auth=resolved_auth,
         timeout=http_timeout,
     )
 
@@ -143,6 +161,8 @@ def put_to_uri_request(
     expected_code: int | List[int] | None = None,
     http_timeout: float | tuple[float, float] | None = None,
     host: str = ODL_IP,
+    base_url: str | None = None,
+    auth=_DEFAULT_AUTH,
 ) -> requests.Response:
     """Sends HTTP PUT request to ODL using provided data.
 
@@ -160,11 +180,20 @@ def put_to_uri_request(
         host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
             the only node); pass another address (e.g. from
             variables.CLUSTER_MEMBER_IPS) to target a different cluster member.
+        base_url (str | None): Full "http://host:port" base to send the
+            request to, overriding the default restconf_base_url(host) -
+            e.g. to reach a different RESTCONF implementation on the same
+            node (such as the JAX-RS one some AAA features require).
+        auth: HTTP auth to send, overriding the default admin/admin Basic
+            Auth. Pass None explicitly to send no credentials at all.
 
     Returns:
         requests.Response: Response returned by ODL for PUT call.
     """
-    url = f"{restconf_base_url(host)}/{uri}"
+    url = f"{base_url if base_url is not None else restconf_base_url(host)}/{uri}"
+    resolved_auth = (
+        requests.auth.HTTPBasicAuth("admin", "admin") if auth is _DEFAULT_AUTH else auth
+    )
     log.info(
         f"Sending PUT request to {url} with headers {headers} containing the following "
         f"payload: {data}"
@@ -173,7 +202,7 @@ def put_to_uri_request(
         url=url,
         data=data,
         headers=headers,
-        auth=requests.auth.HTTPBasicAuth("admin", "admin"),
+        auth=resolved_auth,
         timeout=http_timeout,
     )
 
@@ -281,6 +310,8 @@ def delete_from_uri_request(
     expected_code: int | List[int] | None = None,
     http_timeout: float | tuple[float, float] | None = None,
     host: str = ODL_IP,
+    base_url: str | None = None,
+    auth=_DEFAULT_AUTH,
 ) -> requests.Response:
     """Sends HTTP DELETE request to ODL.
 
@@ -296,15 +327,24 @@ def delete_from_uri_request(
         host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
             the only node); pass another address (e.g. from
             variables.CLUSTER_MEMBER_IPS) to target a different cluster member.
+        base_url (str | None): Full "http://host:port" base to send the
+            request to, overriding the default restconf_base_url(host) -
+            e.g. to reach a different RESTCONF implementation on the same
+            node (such as the JAX-RS one some AAA features require).
+        auth: HTTP auth to send, overriding the default admin/admin Basic
+            Auth. Pass None explicitly to send no credentials at all.
 
     Returns:
         requests.Response: Response returned by ODL for DELETE call.
     """
-    url = f"{restconf_base_url(host)}/{uri}"
+    url = f"{base_url if base_url is not None else restconf_base_url(host)}/{uri}"
+    resolved_auth = (
+        requests.auth.HTTPBasicAuth("admin", "admin") if auth is _DEFAULT_AUTH else auth
+    )
     log.info(f"Sending DELETE request to {url}")
     response = requests.delete(
         url=url,
-        auth=requests.auth.HTTPBasicAuth("admin", "admin"),
+        auth=resolved_auth,
         timeout=http_timeout,
     )
 
@@ -458,6 +498,8 @@ def put_templated_request(
     expected_code: int | List[int] | None = None,
     http_timeout: float | tuple[float, float] | None = None,
     host: str = ODL_IP,
+    base_url: str | None = None,
+    auth=_DEFAULT_AUTH,
 ) -> requests.Response:
     """Evaluates and sends PUT request using template file.
 
@@ -482,6 +524,12 @@ def put_templated_request(
         host (str): Node to send the request to. Defaults to ODL_IP (node 1 /
             the only node); pass another address (e.g. from
             variables.CLUSTER_MEMBER_IPS) to target a different cluster member.
+        base_url (str | None): Full "http://host:port" base to send the
+            request to, overriding the default restconf_base_url(host) -
+            e.g. to reach a different RESTCONF implementation on the same
+            node (such as the JAX-RS one some AAA features require).
+        auth: HTTP auth to send, overriding the default admin/admin Basic
+            Auth. Pass None explicitly to send no credentials at all.
 
     Returns:
         requests.Response: Response returned by ODL for PUT call.
@@ -505,6 +553,8 @@ def put_templated_request(
         expected_code=expected_code,
         http_timeout=http_timeout,
         host=host,
+        base_url=base_url,
+        auth=auth,
     )
 
     if verify:
