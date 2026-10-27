@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75401ef9_da733be2",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 602,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-27T08:35:51Z",
+      "side": 1,
+      "message": "calls `get_device_config_data(device_name)` and keeps only the regex assertion",
+      "parentUuid": "981acf42_6936f06c",
+      "revId": "a4f81d87850d060b663ed7e94d0ef4bb19d6854f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f9eb4af8_d3ce74d1",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "87e8b779_d62a5625",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 747,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-27T08:35:51Z",
+      "side": 1,
+      "message": "Added messages with host, expected and actual to the three asserts here and to the read-back in `_wait_until_device_data_applied`\n\nWithout them a failure way along in a retry loop reports `Last encountered error:` and nothing else, which I raninto on the last clustered CRUD suite run",
+      "parentUuid": "f9eb4af8_d3ce74d1",
+      "revId": "a4f81d87850d060b663ed7e94d0ef4bb19d6854f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8f578275_5db10418",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-10-22T11:04:32Z",
       "side": 1,
       "message": "unused",
+      "revId": "a4f81d87850d060b663ed7e94d0ef4bb19d6854f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ff93faf_4e897a7d",
+        "filename": "tests/libraries/netconf_cluster.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-27T08:35:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f578275_5db10418",
       "revId": "a4f81d87850d060b663ed7e94d0ef4bb19d6854f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
