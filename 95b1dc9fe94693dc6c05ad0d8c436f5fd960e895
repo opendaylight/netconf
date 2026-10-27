@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e06bcd13_3060d7aa",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-27T08:31:35Z",
+      "side": 1,
+      "message": "Alright, down to one definition: `netconf.EMPTY_DEVICE_DATA` (with entity and the CRUD suite aliasing it)",
+      "parentUuid": "d20f3f6f_c2e2ed4a",
+      "revId": "95b1dc9fe94693dc6c05ad0d8c436f5fd960e895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee7c4ad3_8889eee4",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c110836_d63c8e7e",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-27T08:31:35Z",
+      "side": 1,
+      "message": "Dropped the wrapper and widened `report_known_bug_on_failure` to `str | None`\n\n_(it was already done in 124595 but I moved it down here so this change stops adding something the next one removes)_",
+      "parentUuid": "ee7c4ad3_8889eee4",
+      "revId": "95b1dc9fe94693dc6c05ad0d8c436f5fd960e895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d7f9e6e3_619e31ba",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-10-22T11:21:32Z",
       "side": 1,
       "message": "report_known_bug_on_failure re-raises, so a single known-bug failure (e.g. the 5761 catch-up check in cycle 1) ends this loop and the modify/delete cycles never run, whereas the Robot suite ran every case (Without_Fast_Failing). Could the catch-up check record its failure and let the loop continue, failing at the end, or is stopping at the first failure intended for this series? If intended, maybe note it in the commit message.",
+      "revId": "95b1dc9fe94693dc6c05ad0d8c436f5fd960e895",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6f2b374_f0ca1e60",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-27T08:31:35Z",
+      "side": 1,
+      "message": "Catch-up failures are now collected and raised after the last cycle and the step still reports as failed. Operation and propagation checks stay \u0027fail-fast\u0027 since the cycles share state.",
+      "parentUuid": "d7f9e6e3_619e31ba",
       "revId": "95b1dc9fe94693dc6c05ad0d8c436f5fd960e895",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
