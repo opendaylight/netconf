@@ -16,6 +16,24 @@
       "message": "Assisted-by",
       "revId": "df992fee1ce87319be26550171d1911ed6566079",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b043823_e0e5f3e7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-27T11:10:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db541350_6e25917a",
+      "revId": "df992fee1ce87319be26550171d1911ed6566079",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
