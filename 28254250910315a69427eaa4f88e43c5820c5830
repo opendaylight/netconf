@@ -33,6 +33,42 @@
       "message": "Approach looks good: waiting for the master\u0027s reply removes the fake                                   \n  success and fixes the ordering. Please move the                                                        \n  NetconfDataTreeServiceActor reply changes from If98444c1 into a separate                               \n  commit before this one (see my comment there), otherwise the asks would                                \n  time out.",
       "revId": "28254250910315a69427eaa4f88e43c5820c5830",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e74aaf7_509f7c92",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-27T14:07:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c56c1ddf_860a8820",
+      "revId": "28254250910315a69427eaa4f88e43c5820c5830",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d84f2c5_7ec5b10b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-27T14:07:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8cc945e5_0702c395",
+      "revId": "28254250910315a69427eaa4f88e43c5820c5830",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
