@@ -14,6 +14,7 @@ from typing import ContextManager, Iterator, Callable, List, Optional, Set
 
 from libraries import cluster
 from libraries import infra
+from libraries import jaxrs_restconf
 from libraries.variables import variables
 
 TOOLS_IP = variables.TOOLS_IP
@@ -199,6 +200,38 @@ def teardown_kill_all_running_ssereceiver_processes():
             r"echo 'No running instance of ssereceiver.py script.'"
         )
     )
+
+
+@pytest.fixture(scope="class")
+def jaxrs_restconf_endpoint(request: pytest.FixtureRequest):
+    """Fixture to install the JAX-RS RESTCONF endpoint for a test class
+
+    Does nothing if it's already installed. Otherwise installs it and
+    uninstalls it again at the end, so later suites see the same Karaf
+    whether or not the class using it was selected. The uninstall is
+    registered as a finalizer before the install, so it still runs if the
+    install fails part-way. A class fixture depending on this one is torn
+    down first, so it can still undo its own changes over the endpoint.
+
+    Args:
+        request (FixtureRequest): Request fixture for registering the
+            finalizer.
+
+    Returns:
+        None
+    """
+    with infra.log_step("step_check_jaxrs_restconf_installed"):
+        preinstalled = infra.is_karaf_feature_installed(jaxrs_restconf.FEATURE)
+    if preinstalled:
+        return
+
+    def _uninstall():
+        with infra.log_step("step_uninstall_jaxrs_restconf"):
+            jaxrs_restconf.uninstall()
+
+    request.addfinalizer(_uninstall)
+    with infra.log_step("step_install_jaxrs_restconf"):
+        jaxrs_restconf.ensure_installed()
 
 
 @pytest.fixture(scope="class", autouse=True)
