@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "22986488_0f297e0a",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-27T08:49:10Z",
+      "side": 1,
+      "message": "Fixed. \n\nThe fixture tracks whether setup completed; if it didn\u0027t -\u003e a cleanup failure is logged and the original error propagates (so a 5089 reproduction reports as the configure failure rather than `Unexpected failure in DELETE response`)",
+      "parentUuid": "6c392c86_98c07a6b",
+      "revId": "05d7cd256c1adb4fe7ed2a75bc396949f77d1124",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f599a3a1_790ea55a",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-19T09:14:52Z",
       "side": 1,
       "message": "These helpers resend the write whenever the read-back does not match yet, including after ODL answered 204. That was right for the outages suite, but here it means a first PUT that is accepted and then lost, on the very steps attributed to bug 4968, gets silently re-sent and the run goes green. Could the retry cover only rejected requests, and the accepted write then be waited for without resending? Same for create and delete.",
+      "revId": "05d7cd256c1adb4fe7ed2a75bc396949f77d1124",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10bcbe8e_b3386ac3",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-27T08:49:10Z",
+      "side": 1,
+      "message": "Tried it. The write really is lost, and the suite then fails every run, so I reverted.\n\nDevice log for the first create: \n```\nlock(m-4), commit(m-5), edit-config(m-6), unlock(m-7)\n```\nthe commit is sent before the edit but none follows, so the change is discarded in the candidate while RESTCONF answers `2xx`. Device logs `\"Making commit without open candidate transaction\"`. Same as in bug8086, all 10 read-backs return `\u003cdata/\u003e`\n\nSo the resend is the only reason these suites are ever green Worth a bug — happy to .\nSo the resend is the only reason these suites are ever green... so what, Im guessing it\u0027s worth a bug report then? (assuming it is I am going to drop the resend once it\u0027s fixed)",
+      "parentUuid": "f599a3a1_790ea55a",
       "revId": "05d7cd256c1adb4fe7ed2a75bc396949f77d1124",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
