@@ -16,6 +16,24 @@
       "message": "Because this check sits in teardown, it also runs when the device never mounted (for example a follower never connecting, which is how Bug 8086 itself regresses), and then adds an ERROR saying ODL ignored the cache. Could it move into test_bug8086 after run_crud_flow, so it only runs once the mount is proven and reports as a test failure?",
       "revId": "142fc61fec6c4dc9d527473679c52cb88af51199",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd7f7d44_e1d3399a",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-10-27T08:51:04Z",
+      "side": 1,
+      "message": "Moved it into the test after `run_crud_flow`. It now only runs once the mount is proven, and a miss reports as a failure rather than a teardown error (previously the test showed a vague `ERROR` attached).",
+      "parentUuid": "6967c8ff_34ed1839",
+      "revId": "142fc61fec6c4dc9d527473679c52cb88af51199",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
