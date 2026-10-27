@@ -21,6 +21,7 @@ class SuiteOrder(IntEnum):
     CALLHOME = auto()
     NOTIFICATIONS = auto()
     KEY_AUTH = auto()
+    OAUTH_PROXY_HEADER = auto()
     CRUD = auto()
     CRUD_ACTION = auto()
     CRUD_RPC = auto()
