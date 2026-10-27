@@ -173,6 +173,24 @@
       "message": "Please drop these parts:                                                                               \n     - the shared dataTreeServiceActor and stopDataTreeServiceActor()                                    \n     - masterActorResolver and the retry logic in ProxyNetconfService                                    \n       (and the related ProxyNetconfServiceTest changes)                                                 \n     - the ProxyNetconfDataTreeService rewrite                                                           \n     - the removal of the GET self-stop and the hasPendingActivity logic",
       "revId": "07fa93f65a38f1582e7b2e2cc9ec96a8147880ca",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c69a33ce_a9b27bc3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-27T13:06:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "92029205_5a476b0b",
+      "revId": "07fa93f65a38f1582e7b2e2cc9ec96a8147880ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
