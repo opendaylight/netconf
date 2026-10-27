@@ -24,6 +24,15 @@ from libraries.variables import variables
 CONTROLLER_MAX_MEM = variables.CONTROLLER_MAX_MEM
 karaf_shell_instances = dict()
 
+# Karaf prints these to the console instead of failing the command:
+# "Error executing command" for any exception, "No configuration is being
+# edited" when config:property-set/config:update run without a config:edit
+# session.
+_KARAF_ERROR_MARKERS = (
+    "Error executing command",
+    "No configuration is being edited",
+)
+
 log = logging.getLogger(__name__)
 
 # Log line format for log_step's per-step capture; conftest.py sets it from
@@ -431,7 +440,11 @@ def restart_karaf(
 
 
 def execute_karaf_command(
-    command: str, host: str = "127.0.0.1", port: int = 8101
+    command: str,
+    host: str = "127.0.0.1",
+    port: int = 8101,
+    verify: bool = False,
+    timeout: int = 30,
 ) -> tuple[str, str]:
     """Executed specific command using ODL karaf CLI console
 
@@ -442,6 +455,14 @@ def execute_karaf_command(
         host (str): Address of the karaf instance to connect to. Defaults to
             the single-node address; cluster members each get their own.
         port (int): Karaf SSH port of the instance to connect to.
+        verify (bool): Fail if the command didn't succeed - either the SSH
+            call itself failed, or Karaf printed one of its own error
+            messages (it reports those as console output, not as an
+            error). Off by default, so callers that only log or probe
+            keep getting the raw result back.
+        timeout (int): Seconds to wait for the command to finish (for the
+            Karaf prompt to come back). Raise it for commands that block
+            for long, like feature:install.
 
     Returns:
         tuple[str, str]: Stdout from karaf CLI, stderr from karaf CLI.
@@ -453,14 +474,19 @@ def execute_karaf_command(
     shell_instance = karaf_shell_instances[(host, port)]
 
     try:
-        stdout = shell_instance.execute(command)
+        stdout = shell_instance.execute(command, timeout=timeout)
         log.info(f"Command Output:\n{stdout}")
-
-        return stdout, ""
+        stderr = ""
 
     except Exception as e:
         log.error(f"Failed to execute karaf command: {e}")
-        return "", str(e)
+        stdout, stderr = "", str(e)
+
+    if verify:
+        assert not stderr and not any(
+            marker in stdout for marker in _KARAF_ERROR_MARKERS
+        ), f"Karaf command {command!r} failed: {stderr or stdout}"
+    return stdout, stderr
 
 
 def log_message_to_karaf(message: str, host: str = "127.0.0.1"):
