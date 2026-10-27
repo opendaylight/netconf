@@ -1,0 +1,28 @@
+{
+    "aaa-app-config:shiro-configuration": {
+        "main": [
+            {
+                "pair-key": "tokenAuthRealm",
+                "pair-value": "org.opendaylight.aaa.shiro.realm.TokenAuthRealm"
+            },
+            {
+                "pair-key": "oauth2ProxyHeaderRealm",
+                "pair-value": "org.opendaylight.aaa.shiro.realm.Oauth2ProxyHeaderRealm"
+            },
+            {
+                "pair-key": "oauth2ProxyHeaderFilter",
+                "pair-value": "org.opendaylight.aaa.shiro.filters.Oauth2ProxyHeaderFilter"
+            },
+            {
+                "pair-key": "securityManager.realms",
+                "pair-value": "$tokenAuthRealm, $oauth2ProxyHeaderRealm"
+            }
+        ],
+        "urls": [
+            {
+                "pair-key": "/**/data/ietf-yang-library:yang-library**",
+                "pair-value": "oauth2ProxyHeaderFilter, roles[netconf-admin-role]"
+            }
+        ]
+    }
+}
