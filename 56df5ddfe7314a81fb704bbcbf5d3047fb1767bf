@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "67980f97_d661d38e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/RequestBodyInputStream.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-28T08:49:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c76ab65_0299d506",
+      "revId": "56df5ddfe7314a81fb704bbcbf5d3047fb1767bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f2019ba9_0970b4f0",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3de58172_09c28047",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/RequestBodyInputStreamTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-28T08:49:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f2019ba9_0970b4f0",
+      "revId": "56df5ddfe7314a81fb704bbcbf5d3047fb1767bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "55a4647d_ebddbfbb",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-10-28T08:26:40Z",
       "side": 1,
       "message": "Can you please use any(SOME.class) here? This avoids matching null and\nmakes it more robust.",
+      "revId": "56df5ddfe7314a81fb704bbcbf5d3047fb1767bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe8b0662_07f962d2",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/ServerRequestExecutorTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-28T08:49:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55a4647d_ebddbfbb",
       "revId": "56df5ddfe7314a81fb704bbcbf5d3047fb1767bf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
