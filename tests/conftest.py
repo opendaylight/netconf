@@ -195,7 +195,7 @@ def odl_three_node_cluster():
     """Fixture for 3-node ODL cluster session setup.
 
     Stages one Karaf distribution per entry in CLUSTER_MEMBER_IPS (member 1
-    reuses the distribution `preconditions` would otherwise start), wires
+    reuses the distribution `odl_standalone` would otherwise start), wires
     them into a single pekko cluster and starts every member in order.
 
     Args:
