@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e04ab328_008e0dcb",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-28T09:11:55Z",
+      "side": 1,
+      "message": "Can you please unify this? The next commit uses `413 Request Entity Too Large.`\nhttps://git.opendaylight.org/gerrit/c/netconf/+/127065/7/docs/user-guide.rst#2186",
+      "range": {
+        "startLine": 185,
+        "startChar": 36,
+        "endLine": 185,
+        "endChar": 59
+      },
+      "revId": "12f90e66395ae19e8872eebb8469587caa074d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b341e984_29974521",
         "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/NettyEndpointConfiguration.java",
         "patchSetId": 11
@@ -121,6 +144,69 @@
       "side": 1,
       "message": "Yes that works, I added the guard and call statusOf(msg, cause) before msg.release().",
       "parentUuid": "486d79f3_0d9c6cec",
+      "revId": "12f90e66395ae19e8872eebb8469587caa074d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8de9325_4428bbb4",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrapTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-28T09:11:55Z",
+      "side": 1,
+      "message": "Please use @Mock as a class field instead.",
+      "revId": "12f90e66395ae19e8872eebb8469587caa074d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ba67703_488225d9",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrapTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-28T09:11:55Z",
+      "side": 1,
+      "message": "You can use DEFAULT_MAX_REQUEST_CHUNK_SIZE here instead of 8192.",
+      "range": {
+        "startLine": 69,
+        "startChar": 35,
+        "endLine": 69,
+        "endChar": 39
+      },
+      "revId": "12f90e66395ae19e8872eebb8469587caa074d6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "952fa156_c2ae4091",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrapTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-28T09:11:55Z",
+      "side": 1,
+      "message": "Same here DEFAULT_MAX_REQUEST_BODY_SIZE.",
+      "range": {
+        "startLine": 69,
+        "startChar": 57,
+        "endLine": 69,
+        "endChar": 64
+      },
       "revId": "12f90e66395ae19e8872eebb8469587caa074d6c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
