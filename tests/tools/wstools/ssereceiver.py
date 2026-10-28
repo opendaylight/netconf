@@ -53,10 +53,9 @@ def parse_arguments():
 
 
 def main():
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(get_events())
-    loop.run_until_complete(asyncio.sleep(0))
-    loop.close()
+    # asyncio.run, because get_event_loop() has been deprecated since Python
+    # 3.10 and raises on 3.14 when there is no current loop.
+    asyncio.run(get_events())
 
 
 if __name__ == "__main__":
