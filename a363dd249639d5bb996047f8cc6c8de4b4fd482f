@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e38d816_6021a0a8",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientQuicUnderlay.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-28T12:00:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fed74ae3_733c028a",
+      "revId": "a363dd249639d5bb996047f8cc6c8de4b4fd482f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "99be1b06_5c540386",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-10-23T11:38:34Z",
       "side": 1,
       "message": "setup your IDE to use consistent copyright, do we have any other examples of `PANTHEON.tech,`?",
+      "revId": "a363dd249639d5bb996047f8cc6c8de4b4fd482f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d4d12d8_601adacd",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/QuicHTTPClient.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-28T12:00:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "48634469_b41c9212",
       "revId": "a363dd249639d5bb996047f8cc6c8de4b4fd482f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
