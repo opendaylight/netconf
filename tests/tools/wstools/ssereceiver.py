@@ -14,6 +14,10 @@ async def get_events():
     auth = aiohttp.BasicAuth(args.user, args.password)
     client = aiohttp.ClientSession(connector=conn, auth=auth)
     async with sse_client.EventSource(args.uri, session=client) as event_source:
+        # Entering the context establishes the subscription. Say so, because
+        # the stream only carries what happens from this point on and a client
+        # has no other way to tell when it is safe to trigger an event.
+        logger.info("Subscribed to the event stream")
         try:
             async for event in event_source:
                 logger.info(event)

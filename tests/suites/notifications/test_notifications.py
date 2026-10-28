@@ -11,7 +11,6 @@
 
 import logging
 import textwrap
-import time
 import xml.etree.ElementTree as ET
 
 import allure
@@ -34,6 +33,13 @@ RFC8040_STREAMS_URI = (
 RESTCONF_SUBSCRIBE_DATA = "subscribe.xml"
 RESTCONF_CONFIG_DATA = "config_data.xml"
 RECEIVER_LOG_FILE = "tmp/receiver.log"
+# Logged by tools/wstools/ssereceiver.py once its subscription is established.
+RECEIVER_SUBSCRIBED_MESSAGE = "Subscribed to the event stream"
+# How long the receiver log is polled, both for the subscription and for the
+# notifications (retry count x interval seconds). Each normally shows up in
+# about a second; the budget is only there so a loaded machine does not fail.
+RECEIVER_RETRY_COUNT = 30
+RECEIVER_RETRY_INTERVAL = 1
 CONTROLLER_LOG_LEVEL = "INFO"
 
 
@@ -153,8 +159,22 @@ class TestNotifications:
                 f"--logfile {RECEIVER_LOG_FILE}",
                 run_in_background=True,
             )
-            time.sleep(2)
-            output = infra.get_file_content(RECEIVER_LOG_FILE)
+
+            def receiver_subscribed() -> str:
+                """Return the receiver log once it reports its subscription."""
+                _, started = infra.shell(f"cat {RECEIVER_LOG_FILE}")
+                assert RECEIVER_SUBSCRIBED_MESSAGE in started
+                return started
+
+            # Wait for the subscription rather than for a fixed two seconds.
+            # The stream only carries what happens once the receiver is
+            # subscribed, so a change made before that is never delivered and
+            # no amount of waiting in the check below recovers it.
+            output = utils.wait_until_function_pass(
+                RECEIVER_RETRY_COUNT,
+                RECEIVER_RETRY_INTERVAL,
+                receiver_subscribed,
+            )
             log.info(f"{output=}")
 
         with allure_step_with_separate_logging("step_change_ds_config"):
@@ -176,10 +196,23 @@ class TestNotifications:
             assert resp.status_code in templated_requests.ALLOWED_STATUS_CODES
 
         with allure_step_with_separate_logging("step_check_notification"):
-            # Check the WSS/SSE listener log for a change notification.
-            rc, notification = infra.shell(f"cat {RECEIVER_LOG_FILE}")
-            log.info(f"Notification: {notification}")
-            self.notification = notification
+            # Check the WSS/SSE listener log for a change notification. The
+            # receiver writes what it receives asynchronously, so the log is
+            # polled rather than read once in the same fraction of a second as
+            # the change above. Waiting for the delete is enough, as it is the
+            # later of the two changes.
+            def read_received_notifications() -> str:
+                """Return the receiver log once it holds the delete."""
+                _, received = infra.shell(f"cat {RECEIVER_LOG_FILE}")
+                assert "<operation>deleted</operation>" in received
+                return received
+
+            self.notification = utils.wait_until_function_pass(
+                RECEIVER_RETRY_COUNT,
+                RECEIVER_RETRY_INTERVAL,
+                read_received_notifications,
+            )
+            log.info(f"Notification: {self.notification}")
             assert "<notification xmlns=" in self.notification
             assert "<eventTime>" in self.notification
             assert "<data-changed-notification xmlns=" in self.notification
@@ -202,7 +235,7 @@ class TestNotifications:
                 log.info(f"Received notification payload: {self.notification}")
                 packed_data = data.replace("\n", "")
                 packed_data = packed_data.replace(" ", "")
-                packed_notification = notification.replace("\n", "")
+                packed_notification = self.notification.replace("\n", "")
                 packed_notification = packed_notification.replace("\\n", "")
                 packed_notification = packed_notification.replace(" ", "")
                 assert packed_data in packed_notification
