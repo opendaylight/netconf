@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "634c3829_9760ae37",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-28T12:04:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99be1b06_5c540386",
+      "revId": "a363dd249639d5bb996047f8cc6c8de4b4fd482f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "48634469_b41c9212",
