@@ -16,6 +16,24 @@
       "message": "Is this related to NETCONF-1690?",
       "revId": "ccd9fa0247a9ec9b6ca4ed8da4b30aec3f5edb6e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16a29ea3_af0e76b6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-10-28T11:29:23Z",
+      "side": 1,
+      "message": "ah, yes, I forgot there was an issue for it.",
+      "parentUuid": "7c3221a8_104d2d59",
+      "revId": "ccd9fa0247a9ec9b6ca4ed8da4b30aec3f5edb6e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
