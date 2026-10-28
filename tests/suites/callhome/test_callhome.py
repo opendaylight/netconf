@@ -10,6 +10,7 @@
 #
 
 import logging
+import shlex
 import textwrap
 
 import allure
@@ -35,6 +36,7 @@ NETCONF_MOUNT_EXPECTED_VALUE = (
 ODL_IP = variables.ODL_IP
 WHITELIST = variables.CALLHOME_WHITELIST
 NETCONF_KEYSTORE_DATA_URL = variables.NETCONF_KEYSTORE_DATA_URL
+NETOPEER_DIR = variables.NETOPEER_DIR
 
 log = logging.getLogger(__name__)
 
@@ -42,18 +44,16 @@ log = logging.getLogger(__name__)
 @pytest.fixture(scope="class")
 def netopeer_pub_key():
     """Get the hostkey used by netopeer."""
-    rc, netopeer_public_key = infra.shell(
-        "awk '{print $2}' /tmp/configuration-files/ssh_host_rsa_key.pub"
-    )
+    key_file = shlex.quote(f"{NETOPEER_DIR}/configuration-files/ssh_host_rsa_key.pub")
+    rc, netopeer_public_key = infra.shell(f"awk '{{print $2}}' {key_file}")
     yield netopeer_public_key
 
 
 @pytest.fixture(scope="class")
 def incorrect_pub_key():
     """Get hostkey which is different than the one used by netopeer."""
-    rc, incorrect_public_key = infra.shell(
-        "awk '{print $2}' /tmp/incorrect_ssh_host_rsa_key.pub"
-    )
+    key_file = shlex.quote(f"{NETOPEER_DIR}/incorrect_ssh_host_rsa_key.pub")
+    rc, incorrect_public_key = infra.shell(f"awk '{{print $2}}' {key_file}")
     yield incorrect_public_key
 
 
