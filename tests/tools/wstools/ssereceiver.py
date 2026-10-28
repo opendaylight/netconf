@@ -53,10 +53,11 @@ def parse_arguments():
 
 
 def main():
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(get_events())
-    loop.run_until_complete(asyncio.sleep(0))
-    loop.close()
+    # asyncio.run rather than get_event_loop: since Python 3.12 the latter no
+    # longer creates a loop when none is running, and on 3.14 it raises. It
+    # also shuts the loop down properly, which the sleep(0) before close() was
+    # standing in for.
+    asyncio.run(get_events())
 
 
 if __name__ == "__main__":
