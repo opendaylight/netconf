@@ -17,12 +17,12 @@ files were reused.
 
 ## Directory Structure
 
-| Directory   | Description                                                                                     |
-| :---------- | :---------------------------------------------------------------------------------------------- |
-| `libraries` | Reusable test functions used by the test cases.                                                 |
-| `suites`    | The test suites, one directory per suite.                                                       |
-| `tools`     | Custom test tools, such as the websocket and SSE receivers used to verify notification streams. |
-| `variables` | Test data, mostly templates used for the NETCONF and RESTCONF calls.                            |
+| Directory   | Description                                                                                                             |
+| :---------- | :---------------------------------------------------------------------------------------------------------------------- |
+| `libraries` | Reusable test functions used by the test cases.                                                                         |
+| `suites`    | The test suites, one directory per suite.                                                                               |
+| `tools`     | Custom test tools, such as `start_netopeer.sh` and the websocket and SSE receivers used to verify notification streams. |
+| `variables` | Test data, mostly templates used for the NETCONF and RESTCONF calls.                                                    |
 
 The following directories are produced by a test run and are not tracked:
 
@@ -34,6 +34,23 @@ The following directories are produced by a test run and are not tracked:
 | `opendaylight-member-*` | One distribution per cluster member, started for the clustering tests.                  |
 | `results`               | Test tool logs and performance metrics.                                                 |
 | `tmp`                   | Temporary files, cleared at the start of every run.                                     |
+
+## Netopeer2 Simulator
+
+The suites marked with the `netopeer2` PyTest marker, `callhome` and `KeyAuth`, exercise NETCONF
+Call Home and key based authentication against a real NETCONF device, simulated by a
+[sysrepo/sysrepo-netopeer2](https://hub.docker.com/r/sysrepo/sysrepo-netopeer2) container. Nothing
+in a test run starts it, so it has to be started once beforehand and left running:
+
+```sh
+tests/tools/start_netopeer.sh
+```
+
+The script provisions `/tmp/pytest-netopeer/`, generates the SSH host keys and TLS certificates the
+container needs, stages the key the KeyAuth suite authenticates with, labels the bind mounts for
+SELinux and brings the container up in the background. It needs `docker`, `ssh-keygen` and
+`openssl` on `PATH`. The same container then serves any number of runs. Re-run the script after a
+reboot, as `/tmp` is a tmpfs on most distributions and the container loses everything it mounts.
 
 ## Test Execution
 
