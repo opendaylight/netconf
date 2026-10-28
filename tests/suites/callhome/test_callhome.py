@@ -35,6 +35,7 @@ NETCONF_MOUNT_EXPECTED_VALUE = (
 ODL_IP = variables.ODL_IP
 WHITELIST = variables.CALLHOME_WHITELIST
 NETCONF_KEYSTORE_DATA_URL = variables.NETCONF_KEYSTORE_DATA_URL
+NETOPEER_DIR = variables.NETOPEER_DIR
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ log = logging.getLogger(__name__)
 def netopeer_pub_key():
     """Get the hostkey used by netopeer."""
     rc, netopeer_public_key = infra.shell(
-        "awk '{print $2}' /tmp/configuration-files/ssh_host_rsa_key.pub"
+        f"awk '{{print $2}}' {NETOPEER_DIR}/configuration-files/ssh_host_rsa_key.pub"
     )
     yield netopeer_public_key
 
@@ -52,7 +53,7 @@ def netopeer_pub_key():
 def incorrect_pub_key():
     """Get hostkey which is different than the one used by netopeer."""
     rc, incorrect_public_key = infra.shell(
-        "awk '{print $2}' /tmp/incorrect_ssh_host_rsa_key.pub"
+        f"awk '{{print $2}}' {NETOPEER_DIR}/incorrect_ssh_host_rsa_key.pub"
     )
     yield incorrect_public_key
 
