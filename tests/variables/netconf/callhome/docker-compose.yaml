@@ -11,6 +11,8 @@ services:
       - CALL_HOME_SSH_PORT=NETCONF_CH_SSH
       - CALL_HOME_TLS_PORT=NETCONF_CH_TLS
     volumes:
-      - /tmp/configuration-files:/root/configuration-files
-      - /tmp/init_configuration.sh:/root/init_configuration.sh
-      - /tmp/keyauth/sb-rsa-key.pub:/home/netconf/.ssh/authorized_keys
+      # :z relabels each mount for SELinux, which otherwise denies the
+      # container every path it is given and fails its start-up script.
+      - ${NETOPEER_DIR:-/tmp/pytest-netopeer}/configuration-files:/root/configuration-files:z
+      - ${NETOPEER_DIR:-/tmp/pytest-netopeer}/init_configuration.sh:/root/init_configuration.sh:z
+      - ${NETOPEER_DIR:-/tmp/pytest-netopeer}/keyauth/sb-rsa-key.pub:/home/netconf/.ssh/authorized_keys:z
