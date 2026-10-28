@@ -15,6 +15,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http2.Http2StreamChannel;
+import io.netty.handler.codec.quic.QuicStreamChannel;
 import java.nio.channels.ClosedChannelException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
@@ -22,8 +23,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A pipeline handler completing a single {@link FutureCallback} exactly once, with the single expected response,
- * an error, or the channel closing. Used by {@link ClientHttp2Session}, whose per-request child channels each carry
- * exactly one such handler for the lifetime of that channel.
+ * an error, or the channel closing. Shared by {@link ClientHttp2Session} and {@link ClientHttp3Session}, whose
+ * per-request child/stream channels each carry exactly one such handler for the lifetime of that channel.
  */
 final class SingleResponseHandler extends SimpleChannelInboundHandler<FullHttpResponse> {
     private static final Logger LOG = LoggerFactory.getLogger(SingleResponseHandler.class);
@@ -66,6 +67,10 @@ final class SingleResponseHandler extends SimpleChannelInboundHandler<FullHttpRe
     }
 
     private static Object streamId(final Channel channel) {
-        return channel instanceof Http2StreamChannel http2 ? http2.stream().id() : channel;
+        return switch (channel) {
+            case Http2StreamChannel http2 -> http2.stream().id();
+            case QuicStreamChannel quic -> quic.streamId();
+            default -> channel;
+        };
     }
 }
