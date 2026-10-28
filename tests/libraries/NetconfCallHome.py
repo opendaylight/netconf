@@ -23,6 +23,7 @@ WHITELIST = variables.CALLHOME_WHITELIST
 GLOBAL_CONFIG_URL = "/restconf/data/odl-netconf-callhome-server:netconf-callhome-server/global/credentials"
 NETCONF_KEYSTORE_URL = "/restconf/operations/netconf-keystore"
 NETCONF_KEYSTORE_DATA_URL = variables.NETCONF_KEYSTORE_DATA_URL
+NETOPEER_DIR = variables.NETOPEER_DIR
 
 CREATE_GLOBAL_CREDENTIALS_REQ = (
     "variables/netconf/callhome/json/create_global_credentials.json"
@@ -53,7 +54,8 @@ def get_certificate_file_content(file_name: str):
         str: Certificate or key file content.
     """
     rc, content = infra.shell(
-        f"sed -z 's!\\n!\\\\n!g' /tmp/configuration-files/certs/{file_name}"
+        f"sed -z 's!\\n!\\\\n!g' "
+        f"{NETOPEER_DIR}/configuration-files/certs/{file_name}"
     )
 
     return content
@@ -65,7 +67,9 @@ def register_keys_and_certificates_in_odl_cotroller():
     """
 
     # Registere client key
-    pem_client_key = infra.get_file_content("/tmp/configuration-files/certs/client.key")
+    pem_client_key = infra.get_file_content(
+        f"{NETOPEER_DIR}/configuration-files/certs/client.key"
+    )
     template = infra.get_file_content(ADD_KEYSTORE_ENTRY_REQ)
     body = template.replace("{pem-client-key}", pem_client_key)
     templated_requests.post_to_uri(
