@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0350f809_86ae0e13",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-28T12:31:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72ac4212_44c2a334",
+      "revId": "f49422c4cc0339d29faeb399fe730ca1650608a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ba7622a1_d858aa06",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-23T12:27:01Z",
       "side": 1,
       "message": "// HTTP/3 always runs over TLS, RFC 9114 section 3.1 mandates the \"https\" scheme\n    private static final String SCHEME \u003d HTTPScheme.HTTPS.name().toLowerCase(Locale.ROOT);",
+      "revId": "f49422c4cc0339d29faeb399fe730ca1650608a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82e5d21c_04f090e2",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-28T12:31:21Z",
+      "side": 1,
+      "message": "netty overrides it, Http3FrameToHttpObjectCodec.toHttp3Headers() sets the scheme header to HTTPS no matter what, so this is unnecessary IMHO",
+      "parentUuid": "ba7622a1_d858aa06",
       "revId": "f49422c4cc0339d29faeb399fe730ca1650608a4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "802deaad_5e837276",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-28T12:31:21Z",
+      "side": 1,
+      "message": "see comment above",
+      "parentUuid": "1dfcfd80_4fb20643",
+      "revId": "f49422c4cc0339d29faeb399fe730ca1650608a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b19e4bba_5ec69a9a",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9afb9b8a_7b74ab0e",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/ClientHttp3Session.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-28T12:31:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b19e4bba_5ec69a9a",
+      "revId": "f49422c4cc0339d29faeb399fe730ca1650608a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bfe82959_33cb55fe",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-10-23T12:27:01Z",
       "side": 1,
       "message": "caw we have stream id here?",
+      "revId": "f49422c4cc0339d29faeb399fe730ca1650608a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b8adc42_3bb78afb",
+        "filename": "protocol/restconf-client/src/main/java/org/opendaylight/restconf/client/impl/SingleResponseHandler.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-28T12:31:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bfe82959_33cb55fe",
       "revId": "f49422c4cc0339d29faeb399fe730ca1650608a4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
