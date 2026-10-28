@@ -48,6 +48,11 @@ class Variables(BaseSettings):
     ODL_NETCONF_USER: str = "admin"
     ODL_NETCONF_NAMESPACE: str = "urn:ietf:params:xml:ns:netconf:base:1.0"
 
+    # Where tools/start_netopeer.sh provisions the Netopeer2 environment the
+    # callhome and KeyAuth suites read their keys and certificates from. The
+    # script carries the same path; keep the two in step.
+    NETOPEER_DIR: str = "/tmp/pytest-netopeer"
+
     CALLHOME_WHITELIST: str = (
         "restconf/data/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices"
     )
