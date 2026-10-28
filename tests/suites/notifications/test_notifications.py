@@ -11,7 +11,6 @@
 
 import logging
 import textwrap
-import time
 import xml.etree.ElementTree as ET
 
 import allure
@@ -34,6 +33,13 @@ RFC8040_STREAMS_URI = (
 RESTCONF_SUBSCRIBE_DATA = "subscribe.xml"
 RESTCONF_CONFIG_DATA = "config_data.xml"
 RECEIVER_LOG_FILE = "tmp/receiver.log"
+# Logged by tools/wstools/ssereceiver.py once its subscription is established.
+RECEIVER_SUBSCRIBED_MESSAGE = "Subscribed to the event stream"
+# How long the receiver log is polled, both for the subscription and for the
+# notifications (retry count * interval seconds). Each normally shows up in
+# about a second; the budget is only there so a loaded machine does not fail.
+RECEIVER_RETRY_COUNT = 30
+RECEIVER_RETRY_INTERVAL = 1
 CONTROLLER_LOG_LEVEL = "INFO"
 
 
@@ -62,6 +68,44 @@ class TestNotifications:
         log.info(f"{resp=}")
         log.info(f"{resp.headers=}")
         log.info(f"{resp.text=}")
+
+    def wait_for_receiver_log(self, marker: str, description: str) -> str:
+        """Polls the receiver log until it holds marker, or the receiver dies.
+
+        Args:
+            marker (str): Text the receiver writes to its log once the thing
+                being waited for has happened.
+            description (str): What is being waited for, named in the failure
+                messages.
+
+        Returns:
+            str: The whole receiver log, once it holds marker.
+        """
+
+        def receiver_log_holds_marker() -> str:
+            """Return the receiver log once it holds marker."""
+            if self.ssreceiver_process.poll() is not None:
+                output, _ = self.ssreceiver_process.communicate()
+                # pytest.fail raises outside the Exception hierarchy, so the
+                # retry loop does not swallow it. A receiver that has exited
+                # will never write the marker, and its traceback would
+                # otherwise sit unread in the pipe while the poll runs out.
+                pytest.fail(
+                    f"The SSE receiver exited with code "
+                    f"{self.ssreceiver_process.returncode} while waiting for "
+                    f"{description}. Its output was:\n{output}"
+                )
+            _, content = infra.shell(f"cat {RECEIVER_LOG_FILE}")
+            # Spelled out rather than left to pytest's rewriting, which would
+            # put the whole receiver log into every attempt's retry message.
+            assert marker in content, f"receiver log does not hold {description} yet"
+            return content
+
+        return utils.wait_until_function_pass(
+            RECEIVER_RETRY_COUNT,
+            RECEIVER_RETRY_INTERVAL,
+            receiver_log_holds_marker,
+        )
 
     @allure.description(
         textwrap.dedent(
@@ -153,8 +197,14 @@ class TestNotifications:
                 f"--logfile {RECEIVER_LOG_FILE}",
                 run_in_background=True,
             )
-            time.sleep(2)
-            output = infra.get_file_content(RECEIVER_LOG_FILE)
+
+            # Wait for the subscription rather than for a fixed two seconds.
+            # The stream only carries what happens once the receiver is
+            # subscribed, so a change made before that is never delivered and
+            # no amount of waiting in the check below recovers it.
+            output = self.wait_for_receiver_log(
+                RECEIVER_SUBSCRIBED_MESSAGE, "the subscription"
+            )
             log.info(f"{output=}")
 
         with allure_step_with_separate_logging("step_change_ds_config"):
@@ -176,10 +226,15 @@ class TestNotifications:
             assert resp.status_code in templated_requests.ALLOWED_STATUS_CODES
 
         with allure_step_with_separate_logging("step_check_notification"):
-            # Check the WSS/SSE listener log for a change notification.
-            rc, notification = infra.shell(f"cat {RECEIVER_LOG_FILE}")
-            log.info(f"Notification: {notification}")
-            self.notification = notification
+            # Check the WSS/SSE listener log for a change notification. The
+            # receiver writes what it receives asynchronously, so the log is
+            # polled rather than read once in the same fraction of a second as
+            # the change above. Waiting for the delete is enough, as it is the
+            # later of the two changes.
+            self.notification = self.wait_for_receiver_log(
+                "<operation>deleted</operation>", "the delete notification"
+            )
+            log.info(f"Notification: {self.notification}")
             assert "<notification xmlns=" in self.notification
             assert "<eventTime>" in self.notification
             assert "<data-changed-notification xmlns=" in self.notification
@@ -202,7 +257,7 @@ class TestNotifications:
                 log.info(f"Received notification payload: {self.notification}")
                 packed_data = data.replace("\n", "")
                 packed_data = packed_data.replace(" ", "")
-                packed_notification = notification.replace("\n", "")
+                packed_notification = self.notification.replace("\n", "")
                 packed_notification = packed_notification.replace("\\n", "")
                 packed_notification = packed_notification.replace(" ", "")
                 assert packed_data in packed_notification
