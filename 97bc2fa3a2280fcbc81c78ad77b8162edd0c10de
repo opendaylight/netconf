@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "963fdede_43443d86",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp3SseService.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-28T13:26:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ebbf0b05_ce125d26",
+      "revId": "97bc2fa3a2280fcbc81c78ad77b8162edd0c10de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5173d045_05fd271f",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "816f2f72_add506ca",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp3SseService.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-28T13:26:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5173d045_05fd271f",
+      "revId": "97bc2fa3a2280fcbc81c78ad77b8162edd0c10de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a3970fa1_eae1656f",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-10-23T16:12:04Z",
       "side": 1,
       "message": "inconsistent copyright",
+      "revId": "97bc2fa3a2280fcbc81c78ad77b8162edd0c10de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc591990_0208e542",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseStreamHandler.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-10-28T13:26:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a3970fa1_eae1656f",
       "revId": "97bc2fa3a2280fcbc81c78ad77b8162edd0c10de",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
