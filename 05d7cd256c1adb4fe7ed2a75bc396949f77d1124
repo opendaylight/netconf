@@ -69,6 +69,24 @@
       "parentUuid": "f599a3a1_790ea55a",
       "revId": "05d7cd256c1adb4fe7ed2a75bc396949f77d1124",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9a9fce3_aefe99d7",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T12:42:04Z",
+      "side": 1,
+      "message": "That really seems like a bug. Please create a ticket for it and put the link here.\nPut a FIXME into the code, so we can revisit it later once the bug is fixed and drop the resend.",
+      "parentUuid": "10bcbe8e_b3386ac3",
+      "revId": "05d7cd256c1adb4fe7ed2a75bc396949f77d1124",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
