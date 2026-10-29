@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -66,7 +65,7 @@ class Http1RequestDispatcherTest {
     void beforeEach() {
         channel = newChannel();
         channel.pipeline()
-            .addLast(Http1RequestDispatcher.HANDLER_NAME, new Http1RequestDispatcher(MAX_CONTENT_LENGTH))
+            .addLast(Http1RequestDispatcher.HANDLER_NAME, new Http1RequestDispatcher(MAX_CONTENT_LENGTH, false))
             .addLast("probe", probe);
     }
 
@@ -214,7 +213,7 @@ class Http1RequestDispatcherTest {
         final var wireChannel = newChannel();
         wireChannel.pipeline()
             .addLast(new HttpServerCodec())
-            .addLast(Http1RequestDispatcher.HANDLER_NAME, new Http1RequestDispatcher(MAX_CONTENT_LENGTH))
+            .addLast(Http1RequestDispatcher.HANDLER_NAME, new Http1RequestDispatcher(MAX_CONTENT_LENGTH, false))
             .addLast("probe", wireProbe);
 
         // exactly what ClientHttp1SseService puts on the wire
@@ -250,18 +249,18 @@ class Http1RequestDispatcherTest {
      * aggregator holding on to none of them.
      */
     @Test
-    void streamedRequestBypassesAggregator() {
+    void streamedRequestBypassesAggregator() throws Exception {
         final var streaming = streamingChannel();
         final var request = chunkedRequest();
         streaming.writeInbound(request);
-        // forwarded as-is, the aggregator is not holding on to it
-        assertSame(request, streaming.readInbound());
+        final var received = assertInstanceOf(StreamingHttpRequest.class, streaming.readInbound());
 
         streaming.writeInbound(new DefaultHttpContent(Unpooled.copiedBuffer("first", CharsetUtil.UTF_8)));
-        assertContent("first", streaming.readInbound());
+        assertEquals("first", new String(received.body().readNBytes(5), CharsetUtil.UTF_8));
 
         streaming.writeInbound(new DefaultLastHttpContent(Unpooled.copiedBuffer("last", CharsetUtil.UTF_8)));
-        assertContent("last", streaming.readInbound());
+        assertEquals("last", new String(received.body().readAllBytes(), CharsetUtil.UTF_8));
+        received.body().close();
     }
 
     /**
@@ -277,8 +276,8 @@ class Http1RequestDispatcherTest {
         streaming.writeInbound(new DefaultHttpContent(Unpooled.copiedBuffer("body", CharsetUtil.UTF_8)));
         streaming.writeInbound(LastHttpContent.EMPTY_LAST_CONTENT);
 
-        assertEquals(List.of(DefaultHttpRequest.class, DefaultHttpContent.class,
-            LastHttpContent.EMPTY_LAST_CONTENT.getClass()), streamingProbe.observed);
+        assertEquals(List.of(StreamingHttpRequest.class), streamingProbe.observed);
+        assertInstanceOf(StreamingHttpRequest.class, streaming.readInbound()).body().close();
     }
 
     /**
@@ -323,7 +322,7 @@ class Http1RequestDispatcherTest {
         assertStatus(HttpResponseStatus.CONTINUE, streaming.readOutbound());
         assertNull(streaming.readOutbound());
         assertFalse(request.headers().contains(HttpHeaderNames.EXPECT));
-        assertSame(request, streaming.readInbound());
+        assertInstanceOf(StreamingHttpRequest.class, streaming.readInbound());
     }
 
     /**
@@ -351,7 +350,7 @@ class Http1RequestDispatcherTest {
         streaming.writeInbound(chunkedRequest());
         assertInstanceOf(HttpRequest.class, streaming.readInbound());
         streaming.writeInbound(LastHttpContent.EMPTY_LAST_CONTENT);
-        assertInstanceOf(LastHttpContent.class, streaming.readInbound());
+        assertNull(streaming.readInbound());
 
         final var second = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/restconf/data");
         second.headers().set(HttpHeaderNames.CONTENT_LENGTH, 2);

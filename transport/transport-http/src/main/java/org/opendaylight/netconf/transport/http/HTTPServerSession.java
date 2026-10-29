@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -21,6 +20,7 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
@@ -29,10 +29,12 @@ import io.netty.handler.codec.http.TooLongHttpHeaderException;
 import io.netty.handler.codec.http.TooLongHttpLineException;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 import io.netty.util.AsciiString;
+import io.netty.util.ReferenceCountUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
@@ -62,7 +64,7 @@ import org.slf4j.LoggerFactory;
  * snapshot -- which is the typical use case.
  */
 @Beta
-public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandler<FullHttpRequest>
+public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandler<HttpRequest>
         permits ConcurrentHTTPServerSession, PipelinedHTTPServerSession {
     private static final Logger LOG = LoggerFactory.getLogger(HTTPServerSession.class);
     private static final AsciiString STREAM_ID = ExtensionHeaderNames.STREAM_ID.text();
@@ -84,9 +86,6 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
     //  result which mode of operation is effective. We probably need to have two subclasses of this thing, with
     //  HTTP/1.1 and HTTP/2 specializations.
 
-    // FIXME: this heavily depends on the object model and is tied to HTTPServer using aggregators, so perhaps we should
-    //        reconsider the design
-
     private final HTTPScheme scheme;
     private final Uint32 chunkSize;
 
@@ -95,7 +94,7 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
     private ResponseWriter responseWriter;
 
     protected HTTPServerSession(final HTTPScheme scheme, final Uint32 chunkSize) {
-        super(FullHttpRequest.class, false);
+        super(HttpRequest.class, false);
         this.scheme = requireNonNull(scheme);
         this.chunkSize = requireNonNull(chunkSize);
     }
@@ -127,7 +126,7 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
     }
 
     @Override
-    protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
+    protected void channelRead0(final ChannelHandlerContext ctx, final HttpRequest msg) {
         final var headers = msg.headers();
         // non-null indicates HTTP/2 request, which we need to propagate to any response
         final var streamId = headers.getInt(STREAM_ID);
@@ -139,7 +138,7 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
         if (decoderResult.isFailure()) {
             final var cause = decoderResult.cause();
             LOG.debug("Cannot decode request {}", msg, cause);
-            msg.release();
+            releaseRequest(msg);
             // note: not 'version' -- a request whose line did not parse is reported as HTTP/1.0 by the decoder, and
             //       answering an HTTP/1.1 client in HTTP/1.0 would be a second error on top of the first
             respond(ctx, streamId, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, statusOf(cause)));
@@ -156,14 +155,14 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
         final var hostItr = headers.valueStringIterator(HttpHeaderNames.HOST);
         if (!hostItr.hasNext()) {
             LOG.debug("No Host header in request {}", msg);
-            msg.release();
+            releaseRequest(msg);
             respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST));
             return;
         }
         final var host = hostItr.next();
         if (hostItr.hasNext()) {
             LOG.debug("Multiple Host header values in request {}", msg);
-            msg.release();
+            releaseRequest(msg);
             respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST));
             return;
         }
@@ -172,7 +171,7 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
             hostUri = scheme.hostUriOf(host);
         } catch (URISyntaxException e) {
             LOG.debug("Invalid Host header value '{}'", host, e);
-            msg.release();
+            releaseRequest(msg);
             respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST));
             return;
         }
@@ -184,7 +183,7 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
         final var method = implementationOf(nettyMethod);
         if (method == null) {
             LOG.debug("Method {} not implemented", nettyMethod);
-            msg.release();
+            releaseRequest(msg);
             respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.NOT_IMPLEMENTED));
             return;
         }
@@ -194,7 +193,7 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
         // should result in Allow: listing the contents of IMPLEMENTED_METHODS
         final var uri = msg.uri();
         if (HttpUtil.isAsteriskForm(uri)) {
-            msg.release();
+            releaseRequest(msg);
             respond(ctx, streamId, asteriskRequest(version, method));
             return;
         }
@@ -209,7 +208,7 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
             requestUri = new URI(uri);
         } catch (URISyntaxException e) {
             LOG.debug("Invalid request-target '{}'", uri, e);
-            msg.release();
+            releaseRequest(msg);
             respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST));
             return;
         }
@@ -224,21 +223,38 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
             targetUri = hostUri.resolve(requestUri);
         } else {
             LOG.debug("Unsupported request-target '{}'", requestUri);
-            msg.release();
+            releaseRequest(msg);
             respond(ctx, streamId, new DefaultFullHttpResponse(version, HttpResponseStatus.BAD_REQUEST));
             return;
         }
 
         switch (tryPrepareRequest(method, targetUri, msg.headers())) {
             case CompletedRequest completed -> {
-                msg.release();
+                releaseRequest(msg);
                 LOG.debug("Immediate response to {} {}", method, targetUri);
                 executor.respond(ctx, streamId, version, completed.asResponse());
             }
             case PendingRequest<?> pending -> {
                 LOG.debug("Scheduling execution of {} {}", method, targetUri);
-                executor.executeRequest(ctx, version, streamId, pending, msg.content());
+                if (msg instanceof StreamingHttpRequest streaming) {
+                    try {
+                        executor.executeStreamingRequest(ctx, version, streamId, pending, streaming.body());
+                    } catch (RejectedExecutionException e) {
+                        streaming.body().cancel();
+                        throw e;
+                    }
+                } else {
+                    executor.executeRequest(ctx, version, streamId, pending, ((FullHttpRequest) msg).content());
+                }
             }
+        }
+    }
+
+    private static void releaseRequest(final HttpRequest request) {
+        if (request instanceof StreamingHttpRequest streaming) {
+            streaming.body().close();
+        } else {
+            ReferenceCountUtil.release(request);
         }
     }
 
@@ -297,9 +313,6 @@ public abstract sealed class HTTPServerSession extends SimpleChannelInboundHandl
     /**
      * Prepare an incoming HTTP request. The first two arguments are provided as context, which should be reflected back
      * to {@link #respond(ChannelHandlerContext, Integer, HttpResponse)} when responding to the request.
-     *
-     * <p>The ownership of request body is transferred to the implementation of this method. It is its responsibility to
-     * {@link ByteBuf#release()} it when no longer needed.
      *
      * @param method {@link ImplementedMethod} being requested
      * @param targetUri URI of the target resource
