@@ -12,10 +12,11 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http2.Http2Exception;
+import io.netty.util.ReferenceCountUtil;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.util.ArrayDeque;
@@ -40,7 +41,7 @@ final class RestconfSession extends PipelinedHTTPServerSession {
     private final @NonNull DefaultTransportSession transportSession;
     private final @NonNull EndpointRoot root;
     // stores requests to be invoked in FIFO pipeline one after one
-    private final @NonNull Deque<@NonNull FullHttpRequest> blockedRequests = new ArrayDeque<>();
+    private final @NonNull Deque<@NonNull HttpRequest> blockedRequests = new ArrayDeque<>();
 
     @NonNullByDefault
     RestconfSession(final HTTPScheme scheme, final SocketAddress remoteAddress, final EndpointRoot root,
@@ -70,17 +71,34 @@ final class RestconfSession extends PipelinedHTTPServerSession {
         try {
             super.channelInactive(ctx);
         } finally {
+            releaseBlockedRequests();
             transportSession.close();
         }
     }
 
     @Override
-    protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
+    public void handlerRemoved(final ChannelHandlerContext ctx) {
+        try {
+            super.handlerRemoved(ctx);
+        } finally {
+            releaseBlockedRequests();
+        }
+    }
+
+    private void releaseBlockedRequests() {
+        HttpRequest request;
+        while ((request = blockedRequests.poll()) != null) {
+            ReferenceCountUtil.release(request);
+        }
+    }
+
+    @Override
+    protected void channelRead0(final ChannelHandlerContext ctx, final HttpRequest msg) {
         if (blockedRequests.isEmpty()) {
-            blockedRequests.offer(msg.retain());
-            super.channelRead0(ctx, msg);
+            blockedRequests.offer(msg);
+            super.channelRead0(ctx, ReferenceCountUtil.retain(msg));
         } else {
-            blockedRequests.offer(msg.retain());
+            blockedRequests.offer(msg);
         }
     }
 
@@ -90,13 +108,13 @@ final class RestconfSession extends PipelinedHTTPServerSession {
         final var respond = super.respond(ctx, streamId, response);
         respond.addListener(future -> {
             ctx.executor().execute(() -> {
-                // remove processed msg and push it up the channel
+                // Release the queue reference after processing completes
                 if (!blockedRequests.isEmpty()) {
-                    ctx.fireChannelRead(blockedRequests.poll());
+                    ReferenceCountUtil.release(blockedRequests.poll());
                 }
                 if (future.isSuccess()) {
                     if (!blockedRequests.isEmpty()) {
-                        super.channelRead0(ctx, blockedRequests.peek());
+                        super.channelRead0(ctx, ReferenceCountUtil.retain(blockedRequests.peek()));
                     }
                 } else {
                     ctx.close();
@@ -117,13 +135,13 @@ final class RestconfSession extends PipelinedHTTPServerSession {
     @Override
     protected void notifyRequestFinished(final ChannelHandlerContext ctx) {
         ctx.executor().execute(() -> {
-            // remove processed msg and push it up the channel
+            // Release the queue reference after processing completes
             if (!blockedRequests.isEmpty()) {
-                ctx.fireChannelRead(blockedRequests.poll());
+                ReferenceCountUtil.release(blockedRequests.poll());
             }
             // start processing the next msg if exists
             if (!blockedRequests.isEmpty()) {
-                super.channelRead0(ctx, blockedRequests.peek());
+                super.channelRead0(ctx, ReferenceCountUtil.retain(blockedRequests.peek()));
             }
         });
     }

@@ -15,7 +15,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultHttpContent;
-import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpRequest;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
 import org.opendaylight.yangtools.concepts.Registration;
 
@@ -32,7 +32,7 @@ import org.opendaylight.yangtools.concepts.Registration;
  * <p>Hence what this does is drop any request we receive and terminate the connection when the stream ends. That way we
  * are fully compliant with the HTTP specification.
  */
-final class ChannelSender extends SimpleChannelInboundHandler<FullHttpRequest> implements Sender {
+final class ChannelSender extends SimpleChannelInboundHandler<HttpRequest> implements Sender {
     private static final ByteBuf EMPTY_LINE = Unpooled.wrappedBuffer(new byte[] { '\r', '\n' }).asReadOnly();
 
     private final int sseMaximumFragmentLength;
@@ -41,7 +41,7 @@ final class ChannelSender extends SimpleChannelInboundHandler<FullHttpRequest> i
     private ChannelHandlerContext context;
 
     ChannelSender(final int sseMaximumFragmentLength) {
-        super(FullHttpRequest.class);
+        super(HttpRequest.class);
         this.sseMaximumFragmentLength = sseMaximumFragmentLength;
         context = null;
     }
@@ -51,7 +51,7 @@ final class ChannelSender extends SimpleChannelInboundHandler<FullHttpRequest> i
     }
 
     @Override
-    protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
+    protected void channelRead0(final ChannelHandlerContext ctx, final HttpRequest msg) {
         // No-op, just drop the message
     }
 
