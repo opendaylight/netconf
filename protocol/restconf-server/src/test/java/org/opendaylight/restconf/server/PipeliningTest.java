@@ -18,12 +18,10 @@ class PipeliningTest extends AbstractRequestProcessorTest {
     @Test
     void testPipeliningQueue() {
         mockExecutor();
-        final var request = buildRequest(HttpMethod.GET, DATA_PATH, TestUtils.TestEncoding.JSON, null);
-
-        // Dispatch all requests manually
-        manualRequestDispatch(request);
-        manualRequestDispatch(request);
-        manualRequestDispatch(request);
+        // Each dispatch transfers its own request reference to the session.
+        for (int i = 0; i < 3; ++i) {
+            manualRequestDispatch(buildRequest(HttpMethod.GET, DATA_PATH, TestUtils.TestEncoding.JSON, null));
+        }
 
         // At this point, all requests are queued
         assertEquals(3, blockedRequestsSize());
