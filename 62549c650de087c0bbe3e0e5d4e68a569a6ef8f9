@@ -50,6 +50,24 @@
       "message": "This will spam the log quire badly. Each failed poll logs the full AssertionError. Give the assert a short clear message instead.",
       "revId": "62549c650de087c0bbe3e0e5d4e68a569a6ef8f9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8884e42f_650ced3e",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-10-29T13:19:48Z",
+      "side": 1,
+      "message": "I am not sure if the DeferredLogHandler which is used by retry functions properly handles this. But it should discard all log messages except for last loop iteration, which could be either success, or failure.",
+      "parentUuid": "a39292a3_3c26f5ce",
+      "revId": "62549c650de087c0bbe3e0e5d4e68a569a6ef8f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
