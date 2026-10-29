@@ -33,6 +33,24 @@
       "message": "add fixme with the link to remaining issues",
       "revId": "493632c6d0f582b6629f3c0c73e8895d59dcf61d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7f10034_062e16ae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-10-29T09:45:51Z",
+      "side": 1,
+      "message": "https://lf-opendaylight.atlassian.net/browse/NETCONF-1705\nwas done in https://git.opendaylight.org/gerrit/c/netconf/+/126885",
+      "parentUuid": "a801d9d9_763fe51b",
+      "revId": "493632c6d0f582b6629f3c0c73e8895d59dcf61d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
