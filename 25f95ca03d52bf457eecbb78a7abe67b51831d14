@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "237dbf37_565561f7",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T11:13:40Z",
+      "side": 1,
+      "message": "Now that nodes live in the shared NetconfTopologyImpl, who removes them when the call-home servers stop? AbstractCallHomeSessionContextManager.close() closes the contexts without calling the overridden remove(id), so disableCallHomeNode() only runs if the SSH sessionClosed event happens to find the context first. Could the two context managers override close() to disable their nodes, like LegacyCallHomeTopology does with deleteAllNodes()?",
+      "revId": "25f95ca03d52bf457eecbb78a7abe67b51831d14",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a63696a9_131d905c",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T11:13:40Z",
+      "side": 1,
+      "message": "This overload now ignores sshAlg, and NetconfTopologyImpl no longer calls it, so a downstream subclass that overrides it, or a caller that relied on sshAlg being reported (same for the deprecated NetconfNodeHandler constructor), changes behaviour without any compile-time signal. Is that intended? If so, could the @deprecated text say it is ignored and no longer invoked; otherwise keep passing sshAlg through until removal.",
+      "revId": "25f95ca03d52bf457eecbb78a7abe67b51831d14",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
