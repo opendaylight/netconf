@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f099c2e_b2f89b1f",
+        "filename": "tests/suites/clustering/test_clustering_bug8086.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T12:44:00Z",
+      "side": 1,
+      "message": "bug8086.robot seeds only car@2014-08-18.yang, so ODL builds the car-people set partly from the cache and partly from the device; seeding all three takes that mix away. Am I right that this mix is the Bug 8086 condition? If so, could we seed only car, as the original does? The \"cache was used\" check still works, since people and car-people then get fetched.",
+      "revId": "0c748a0eabf87021d3095c1cf1260bde08e1cd2c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
