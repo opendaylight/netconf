@@ -130,16 +130,20 @@ final class ServerRequestExecutor implements PendingRequestListener {
     /**
      * Submit an incrementally delivered body without waiting for its content. The executor closes the body when the
      * request signals completion or failure, releasing unread content and discarding further incoming content. The
-     * executor cancels tracked bodies on shutdown. The handler remains responsible for closing or cancelling the body
-     * if submission fails.
+     * executor cancels tracked bodies on shutdown. Submission failure cancels the body immediately.
      *
-     * @throws RejectedExecutionException if the executor rejects submission; the request is not tracked and the caller
-     *         remains responsible for releasing the body
+     * @throws RejectedExecutionException if the executor rejects submission; the request is not tracked and the
+     *         body is cancelled
      */
     void executeStreamingRequest(final ChannelHandlerContext ctx, final HttpVersion version,
             final @Nullable Integer streamId, final PendingRequest<?> pending,
             final @NonNull RequestBodyInputStream body) {
-        executeRequest(new RequestContext(ctx, version, streamId, requireNonNull(body)), pending, body);
+        try {
+            executeRequest(new RequestContext(ctx, version, streamId, requireNonNull(body)), pending, body);
+        } catch (RejectedExecutionException e) {
+            body.cancel();
+            throw e;
+        }
     }
 
     @Override
