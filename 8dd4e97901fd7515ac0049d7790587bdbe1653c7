@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac5dabf3_ab8c59f6",
+        "filename": "tests/suites/CRUD-RPC/test_crud_rpc.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:01:16Z",
+      "side": 1,
+      "message": "The rename commit also added @pytest.mark.standalone above this line in every other suite, and the collection hook in conftest.py only recognises standalone tests by that marker. Without it, -m standalone skips this suite, and running it together with the clustering suites leaves the cluster tests unskipped, so both Karaf setups start on the same ports. Could you add the marker here as well?",
+      "revId": "8dd4e97901fd7515ac0049d7790587bdbe1653c7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
