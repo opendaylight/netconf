@@ -16,6 +16,74 @@
       "message": "recheck",
       "revId": "e65a5b5a02bb3519760b5162be8267c0a4f10b69",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b875025_599cb41f",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNodeHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-29T11:13:24Z",
+      "side": 1,
+      "message": "The \u0027baseSchemaProvider\u0027 parameter fits to this line too.\n```\n    AbstractNodeHandler(final NetconfTimer timer, final BaseNetconfSchemaProvider baseSchemaProvider,\n            final SchemaResourceManager schemaManager, final NetconfTopologySchemaAssembler schemaAssembler,\n            final DeviceActionFactory deviceActionFactory, final RemoteDeviceHandler delegate,\n            final RemoteDeviceId deviceId, final NodeId nodeId, final NetconfNode node,\n            final NetconfNodeAugmentedOptional nodeOptional) {\n```",
+      "revId": "e65a5b5a02bb3519760b5162be8267c0a4f10b69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31c74b3c_05cfc207",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-29T11:13:24Z",
+      "side": 1,
+      "message": "The `timer` and `clientConfig` fields only change position. Keep the original order.",
+      "revId": "e65a5b5a02bb3519760b5162be8267c0a4f10b69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "700fbe71_678005e3",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-29T11:13:24Z",
+      "side": 1,
+      "message": "Why wraps after schemaAssembler, at 72 characters? deviceActionFactory, delegate, deviceId, still fit on the line.",
+      "revId": "e65a5b5a02bb3519760b5162be8267c0a4f10b69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97ff5d18_55ac7232",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-29T11:13:24Z",
+      "side": 1,
+      "message": "Extra empty space.",
+      "revId": "e65a5b5a02bb3519760b5162be8267c0a4f10b69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
