@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d74d8ad_e27b651f",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:32:18Z",
+      "side": 1,
+      "message": "\"some of the original test files were reused\"",
+      "revId": "061a9310eba3231870da43103d1ce221f7d5098d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcab101d_60734e8b",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:32:18Z",
+      "side": 1,
+      "message": "It doesn\u0027t \"unpack\".. it \"replaces tests/opendaylight with a fresh copy of the distribution built in usecase/karaf\"",
+      "revId": "061a9310eba3231870da43103d1ce221f7d5098d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ce18a31_5ef4747c",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:32:18Z",
+      "side": 1,
+      "message": "\"which is what the GitHub Actions verify job runs\"... which job is this? gerrit-verify.yaml passes MVN_PROFILES \"docker\" and runs tox only for \"docs\", and the merge jobs use \"integrationtests\" (no hyphen). None of those enable integration-tests. If the job lives elsewhere or is still planned, could the sentence say so, so nobody assumes CI already covers the smoke suites?",
+      "revId": "061a9310eba3231870da43103d1ce221f7d5098d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b12a298a_81dc9ca9",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:32:18Z",
+      "side": 1,
+      "message": "the real filter is \"(smoke and not performance) or always\" - why not say it exactly?",
+      "revId": "061a9310eba3231870da43103d1ce221f7d5098d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ecb6dd2c_aa25c28d",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:32:18Z",
+      "side": 1,
+      "message": "\"skipping unit tests and static analysis\"",
+      "revId": "061a9310eba3231870da43103d1ce221f7d5098d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d32c677b_a4b0ca0e",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:32:18Z",
+      "side": 1,
+      "message": "This replaces the default -m \"(smoke and not performance) or always\", so the \"always\" readiness suite in suites/ready is no longer collected and CRUD starts right after \"System ready\". Could the example be \u0027-- suites/ready suites/CRUD\u0027, with a note that tox.args replaces the default filter?",
+      "revId": "061a9310eba3231870da43103d1ce221f7d5098d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
