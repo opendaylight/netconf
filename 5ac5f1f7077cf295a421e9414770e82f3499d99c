@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1aea494b_7ca28689",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T12:10:32Z",
+      "side": 1,
+      "message": "check_device_data_is_empty a few hundred lines down accepts both \u003cdata .../\u003e and \u003cdata ...\u003e\u003c/data\u003e, but this constant and delete_device_data\u0027s guard accept only the long form. Am I right that a member answering the self-closed form would make the delete re-send and fail on 409 until the retries run out? Please correct me if I\u0027m wrong here.",
+      "revId": "5ac5f1f7077cf295a421e9414770e82f3499d99c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6da3267f_7f747b34",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T12:10:32Z",
+      "side": 1,
+      "message": "If start_member times out here, member_restarted stays False, so the finally block runs ./bin/start a second time for a member whose first Karaf process is still alive and booting, and waits another 300 s. Could the flag be set before this call (restart attempted) rather than after it succeeds?",
+      "revId": "5ac5f1f7077cf295a421e9414770e82f3499d99c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be5bcf76_e5ec127c",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 436,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T12:10:32Z",
+      "side": 1,
+      "message": "If a later cycle raises (e.g. the modify step fails), we leave this loop early and the catch-up failures already collected are never raised, so the test summary only shows the last error. Could the loop catch the hard failure and append the collected catch-up failures to its message before re-raising?",
+      "revId": "5ac5f1f7077cf295a421e9414770e82f3499d99c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
