@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06bb3abb_765c3ead",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:43:14Z",
+      "side": 1,
+      "message": "callhome and KeyAuth are both marked smoke, so the default mvn -Pintegration-tests run documented below includes them and fails without the container. Could this section say that, and show how to deselect them, e.g. -m \"(smoke and not performance and not netopeer2) or always\"?",
+      "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65aea3b7_3e6270be",
+        "filename": "tests/libraries/variables.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:43:14Z",
+      "side": 1,
+      "message": "Since Variables is a BaseSettings, NETOPEER_DIR can be overridden from the environment, but start_netopeer.sh:22 and the bind mounts in docker-compose.yaml hard-code /tmp/pytest-netopeer, so an override moves only the suites. Could the script use ${NETOPEER_DIR:-/tmp/pytest-netopeer}, export it, and the compose file use ${NETOPEER_DIR} in the mounts?",
+      "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c99d2348_d02a476f",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:43:14Z",
+      "side": 1,
+      "message": "This checks `docker` but not the Compose v2 plugin (`docker compose`). Hosts with only `docker-compose` v1 fail late, at line 106.",
+      "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c865e554_c5e1852b",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:43:14Z",
+      "side": 1,
+      "message": "The work directory is deleted while the previous container still has it mounted. `down` only follows at line 106",
+      "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d1d55da_194f47a7",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:43:14Z",
+      "side": 1,
+      "message": "Am I right that genrsa has no -traditional before OpenSSL 3? On 1.1.1 hosts (Ubuntu 20.04, RHEL 8) this would abort under set -e after line 40 has already removed the old setup. Could the flag be added only when \"openssl genrsa -help\" lists it, since 1.1 already writes PKCS#1?",
+      "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a02e507f_2d00161b",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:43:14Z",
+      "side": 1,
+      "message": "Why chcon? Compose can do it with the `:z` volume suffix. Add `:z` to the three mounts in `docker-compose.yaml:14` and drop the `chcon` block",
+      "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fea08300_a7cd6dcb",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:43:14Z",
+      "side": 1,
+      "message": "`certs` is labelled but never mounted. Only its copy inside `configuration-files` is. Can be dropped.",
+      "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc2da1e0_349465f6",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:43:14Z",
+      "side": 1,
+      "message": "up -d returns as soon as the container starts, so if init_configuration.sh or netopeer2-server fails (or an old container from someone\u0027s private script, a different compose project, still holds port 830 on the host network) this still reports success. Could the script wait for port 830 and print compose ps/logs and exit 1 if it never appears?",
+      "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
