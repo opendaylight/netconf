@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "847fdd43_62546b00",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:08:58Z",
+      "side": 1,
+      "message": "The x reads like a variable. Use \"retry count * interval seconds\" for clarity",
+      "revId": "62549c650de087c0bbe3e0e5d4e68a569a6ef8f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df6c83d1_689d3f8a",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:08:58Z",
+      "side": 1,
+      "message": "If the receiver dies (bad URI, 404, missing module), this still polls for 30s and then fails on the missing \"Subscribed\" line, while the receiver\u0027s traceback stays unread in the Popen stdout pipe. Could the poll check self.ssreceiver_process.poll() and pytest.fail with its stdout when it has exited? Since both polled functions only differ in the marker, one helper method could do this for both.",
+      "revId": "62549c650de087c0bbe3e0e5d4e68a569a6ef8f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a39292a3_3c26f5ce",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T13:08:58Z",
+      "side": 1,
+      "message": "This will spam the log quire badly. Each failed poll logs the full AssertionError. Give the assert a short clear message instead.",
+      "revId": "62549c650de087c0bbe3e0e5d4e68a569a6ef8f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
