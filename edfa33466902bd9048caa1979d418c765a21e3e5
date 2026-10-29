@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab23115d_c98efd8a",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T11:09:45Z",
+      "side": 1,
+      "message": "lockedEnsureNode() further down still does activeConnectors.remove(nodeId) and closes whatever was there, so configuring a node actually evicts a connected call-home node with the same ID, the opposite of what this sentence and the CallHomeTopologyService class javadoc say. The commit message (\"configured nodes taking precedence\") matches the code, so could the two javadocs be corrected, and a test added for \"call-home first, then configured\"?",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26a1158a_a48127e8",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T11:09:45Z",
+      "side": 1,
+      "message": "Elsewhere in this class the locked* methods are private and called through a protected wrapper (ensureNode/lockedEnsureNode, and deleteCallHomeNode/lockedDeleteCallHomeNode in this very patch). Could this become a protected ensureCallHomeNode() over a private lockedEnsureCallHomeNode(), so subclasses and tests cannot bypass the locking and both halves of the call-home API look the same?",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07182631_61b69648",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/CallHomeNodeHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T11:09:45Z",
+      "side": 1,
+      "message": "what happens if initialize() throws here?",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f2d19cb_700704f5",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/CallHomeTopologyService.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-29T11:09:45Z",
+      "side": 1,
+      "message": "Since this is a new SPI, would it be worth having enableCallHomeNode() return a Registration that closes only the handler it created, instead of disabling by NodeId? With an ID-only remove, a late remove from a dropped session can close the handler of the device\u0027s newer session (the race marked FIXME NETCONF-1705 in CallHomeMountService), and that is hard to fix once the SPI has outside users.",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
