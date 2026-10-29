@@ -260,6 +260,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "67dfd898_b8e6a418",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/CallHomeNodeHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-29T11:13:34Z",
+      "side": 1,
+      "message": "Where? I am able to build this chain with CallHomeNodeHandler package-private\nwithout issues. The only use outside of the package is the javadoc link, which\ncan be replaced.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/126885/9/apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java#99",
+      "parentUuid": "6f088e5c_5e380cba",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 6
+      },
+      "revId": "c76966024c19b6235a2a7a6a15447497205f405d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9ddb4a90_b38d19be",
         "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/CallHomeNodeHandlerTest.java",
         "patchSetId": 1

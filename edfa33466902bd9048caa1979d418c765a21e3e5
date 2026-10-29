@@ -20,6 +20,46 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "28b3cdf4_8a3e76ce",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-29T11:13:34Z",
+      "side": 1,
+      "message": "Same here. does not match what the code does.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/127074/comment/77e1fc2c_80ef9eae/",
+      "range": {
+        "startLine": 211,
+        "startChar": 18,
+        "endLine": 211,
+        "endChar": 109
+      },
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9c9edbb_c604816f",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-29T11:13:34Z",
+      "side": 1,
+      "message": "When prev is a CallHomeNodeHandler, this logs \"was already configured\", which is\nmisleading: the node being disconnected is a call-home node. Could you log that\ncase separately, for example:\n```\n  if (prev instanceof CallHomeNodeHandler) {\n      LOG.info(\"Call-home RemoteDevice{{}} is replaced by configuration, disconnecting\", nodeId);\n  } else {\n      LOG.info(\"RemoteDevice{{}} was already configured, disconnecting\", nodeId);\n  }\n```",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "26a1158a_a48127e8",
         "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
         "patchSetId": 5
@@ -31,6 +71,40 @@
       "writtenOn": "2026-10-29T11:09:45Z",
       "side": 1,
       "message": "Elsewhere in this class the locked* methods are private and called through a protected wrapper (ensureNode/lockedEnsureNode, and deleteCallHomeNode/lockedDeleteCallHomeNode in this very patch). Could this become a protected ensureCallHomeNode() over a private lockedEnsureCallHomeNode(), so subclasses and tests cannot bypass the locking and both halves of the call-home API look the same?",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08ebb95d_d1fb2e88",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-29T11:13:34Z",
+      "side": 1,
+      "message": "The previous call-home node is closed before the new one is validated. If getNetconfNode() or getRemoteDeviceId() then rejects the new node, the old one is\nalready gone and nothing replaces it. Could you run both checks first and only\nthen close `prev`? For example:\n```\n  final var nodeId \u003d node.requireNodeId();\n  final var prev \u003d activeConnectors.get(nodeId);\n  if (prev instanceof NetconfNodeHandler) {\n      // WARN and return, as now\n  }\n  final var netconfNode \u003d getNetconfNode(node, nodeId);\n  if (netconfNode \u003d\u003d null) {\n      return;\n  }\n  final var deviceId \u003d getRemoteDeviceId(netconfNode, nodeId);\n  if (deviceId \u003d\u003d null) {\n      return;\n  }\n  if (prev !\u003d null) {\n      LOG.info(\"Call-home RemoteDevice{{}} was already connected, disconnecting\", nodeId);\n      activeConnectors.remove(nodeId);\n      prev.close();\n  }\n```",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44b0cccb_1106fab8",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/CallHomeNodeHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-29T11:13:34Z",
+      "side": 1,
+      "message": "Parameter \"baseSchemaProvider\" fits to this line.\n\n```\n    CallHomeNodeHandler(final NetconfTimer timer, final BaseNetconfSchemaProvider baseSchemaProvider,\n            final SchemaResourceManager schemaManager, final NetconfTopologySchemaAssembler schemaAssembler,\n```",
       "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -54,6 +128,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1073a671_3995c1d4",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/CallHomeTopologyService.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-29T11:13:34Z",
+      "side": 1,
+      "message": "This sentence does not match what the code does. lockedEnsureNode() removes and\ncloses any handler with the same NodeId, including a CallHomeNodeHandler, so\nconfiguring a node replaces the call-home node instead of being ignored.\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/127074/comment/77e1fc2c_80ef9eae/",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 98
+      },
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4f2d19cb_700704f5",
         "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/CallHomeTopologyService.java",
         "patchSetId": 5
@@ -65,6 +162,40 @@
       "writtenOn": "2026-10-29T11:09:45Z",
       "side": 1,
       "message": "Since this is a new SPI, would it be worth having enableCallHomeNode() return a Registration that closes only the handler it created, instead of disabling by NodeId? With an ID-only remove, a late remove from a dropped session can close the handler of the device\u0027s newer session (the race marked FIXME NETCONF-1705 in CallHomeMountService), and that is hard to fix once the SPI has outside users.",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "542ecd5d_1b46f5d6",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopologyTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-29T11:13:34Z",
+      "side": 1,
+      "message": "Here is a test for a call-home node being rejected while a configured node\nexists, but none for the opposite case: a configured node replacing a call-home\nnode. Could you add one, similar to callHomeNodeIsRejectedWhileConfigured?\n1. Enable a call-home node X through lockedEnsureCallHomeNode().\n2. Call ensureNode() with a configured node X.\n3. Verify the call-home session future was cancelled and createClient() was\n   called for the configured node.\n4. Call deleteCallHomeNode(X) and verify the configured node stays connected.\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/127074/comment/77e1fc2c_80ef9eae/",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d5daa6e_0a6823bd",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopologyTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-10-29T11:13:34Z",
+      "side": 1,
+      "message": "Can you please use any(SOME.class) here? This avoids matching null and\nmakes it more robust.",
       "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
