@@ -25,6 +25,8 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerUpgradeHandler;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.LastHttpContent;
+import io.netty.util.ReferenceCountUtil;
+import java.io.IOException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
@@ -36,23 +38,15 @@ import org.slf4j.LoggerFactory;
  * request, is going to be processed. The selected mode stays in effect until the request's {@link LastHttpContent} has
  * been forwarded, at which point the dispatcher resets and evaluates the next request arriving on the same connection.
  *
- * <p>When streaming is enabled, only a successfully-decoded request using {@code Transfer-Encoding: chunked} is
- * selected as {@link RequestMode#STREAMING} and routed past {@link HttpObjectAggregator}, so that it and its body
- * travel down the pipeline as they are decoded. This choice is based on message framing, as the body length is not
+ * <p>Only a successfully-decoded request using {@code Transfer-Encoding: chunked} is
+ * selected as {@link RequestMode#STREAMING} and routed past {@link HttpObjectAggregator}. Its headers reach the
+ * session immediately, and subsequent content is delivered to the associated input stream. The body length is not
  * known from the initial headers: a chunked request is streamed even if it eventually carries no body. A failed
  * request or one declaring {@code Content-Length}, including one exceeding the configured limit, is selected as
  * {@link RequestMode#AGGREGATED} and forwarded through the aggregator onto the existing {@link FullHttpRequest} path.
  *
- * <p>The streaming path skips {@link HttpObjectAggregator} only: the messages are re-injected from the aggregator's
- * own {@link ChannelHandlerContext}, hence every other handler downstream of it, most notably the {@link AuthHandler},
- * observes a streamed request. This does not yet allow {@link AbstractBasicAuthHandler} to reject the entire request:
- * it consumes the rejected {@link HttpRequest}, but the following {@link HttpContent} messages continue to the
- * session. An aggregated request does not have this gap because its body is part of the rejected
- * {@link FullHttpRequest}.
- *
- * <p>FIXME NETCONF-1668: implement streaming logic
- * Note streaming is disabled until {@link HTTPServerSession} can consume a streamed request body, as it accepts
- * only {@link FullHttpRequest}. While it is disabled, all requests are selected as {@link RequestMode#AGGREGATED}.
+ * <p>Streamed headers skip only the aggregator. Subsequent content is delivered to the request body stream,
+ * preserving downstream authentication and session preparation.
  */
 final class Http1RequestDispatcher extends ChannelInboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(Http1RequestDispatcher.class);
@@ -95,13 +89,11 @@ final class Http1RequestDispatcher extends ChannelInboundHandlerAdapter {
         AGGREGATED,
         /**
          * The request is eligible for being forwarded past {@link HttpObjectAggregator}, ending up as an
-         * {@link HttpRequest} followed by its {@link HttpContent}s.
+         * {@link StreamingHttpRequest} whose body receives subsequent content.
          */
         STREAMING
     }
 
-    // True if an eligible chunked request is actually routed past the aggregator
-    private final boolean streamingSupported;
     private final int maxRequestBodySize;
 
     // The aggregator's own context, i.e. where the messages of a streamed request are re-injected. Established by
@@ -111,21 +103,11 @@ final class Http1RequestDispatcher extends ChannelInboundHandlerAdapter {
     // Becomes a RequestMode on HttpRequest and returns to IDLE after the corresponding LastHttpContent
     private @NonNull State state = Idle.IDLE;
 
-    // FIXME: streaming also needs a way to suppress the remaining HttpContent after AuthHandler rejects its request.
-    // FIXME: streaming must enforce the configured request-body size limit and provide backpressure before it is
-    //        enabled, as bypassing HttpObjectAggregator also bypasses its MAX_HTTP_CONTENT_LENGTH enforcement.
-    Http1RequestDispatcher(final int maxRequestBodySize) {
-        this(maxRequestBodySize, false);
-    }
+    // Present only while receiving a streamed request body
+    private @Nullable RequestBodyInputStream body;
 
-    // FIXME: remove the streamingSupported argument and stream unconditionally once HTTPServerSession consumes a
-    //        streamed request body. Until it does, routing a request past the aggregator leaves it unanswered, as the
-    //        session accepts only FullHttpRequest including the SSE GET issued by ClientHttp1SseService, which
-    //        carries Transfer-Encoding: chunked despite having no body.
-    @VisibleForTesting
-    Http1RequestDispatcher(final int maxRequestBodySize, final boolean streamingSupported) {
+    Http1RequestDispatcher(final int maxRequestBodySize) {
         this.maxRequestBodySize = maxRequestBodySize;
-        this.streamingSupported = streamingSupported;
     }
 
     @Override
@@ -142,7 +124,34 @@ final class Http1RequestDispatcher extends ChannelInboundHandlerAdapter {
             case FullHttpRequest request -> ctx.fireChannelRead(request);
             case HttpRequest request when state == Idle.IDLE -> startRequest(ctx, request);
             case HttpContent content when state instanceof RequestMode mode -> {
-                forward(ctx, mode, content);
+                if (mode == RequestMode.STREAMING) {
+                    final var currentBody = body;
+                    if (currentBody == null) {
+                        ReferenceCountUtil.release(content);
+                        return;
+                    }
+                    try {
+                        if (content.decoderResult().isFailure()) {
+                            currentBody.fail(content.decoderResult().cause());
+                            body = null;
+                            ctx.close();
+                        } else {
+                            currentBody.append(content.content());
+                            if (content instanceof LastHttpContent) {
+                                currentBody.complete();
+                                body = null;
+                            }
+                        }
+                    } catch (IOException e) {
+                        currentBody.fail(e);
+                        body = null;
+                        ctx.close();
+                    } finally {
+                        ReferenceCountUtil.release(content);
+                    }
+                } else {
+                    forward(ctx, mode, content);
+                }
                 if (content instanceof LastHttpContent) {
                     LOG.debug("{}: {} request complete, next request will be evaluated afresh", ctx.channel(), mode);
                     state = Idle.IDLE;
@@ -163,7 +172,7 @@ final class Http1RequestDispatcher extends ChannelInboundHandlerAdapter {
         final var expect = request.headers().get(HttpHeaderNames.EXPECT);
         final var expectationSupported = expect == null || HttpHeaderValues.CONTINUE.contentEqualsIgnoreCase(expect);
 
-        final var mode = streamingSupported && request.decoderResult().isSuccess()
+        final var mode = request.decoderResult().isSuccess()
             && HttpUtil.isTransferEncodingChunked(request) && expectationSupported ? RequestMode.STREAMING
                 : RequestMode.AGGREGATED;
         LOG.debug("{}: {} {} dispatched as {}", ctx.channel(), request.method(), request.uri(), mode);
@@ -179,7 +188,42 @@ final class Http1RequestDispatcher extends ChannelInboundHandlerAdapter {
         // FullHttpRequest is the only HttpRequest which is also a LastHttpContent, and those have been dealt
         // with in channelRead() already, so there is always a body to follow here
         state = mode;
-        forward(ctx, mode, request);
+        if (mode == RequestMode.STREAMING) {
+            final var streaming = new StreamingHttpRequest(request);
+            body = streaming.body();
+            forward(ctx, mode, streaming);
+        } else {
+            forward(ctx, mode, request);
+        }
+    }
+
+    @Override
+    public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
+        cancelBody();
+        super.channelInactive(ctx);
+    }
+
+    @Override
+    public void handlerRemoved(final ChannelHandlerContext ctx) throws Exception {
+        cancelBody();
+        super.handlerRemoved(ctx);
+    }
+
+    @Override
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+        if (body != null) {
+            body.fail(cause);
+            body = null;
+        }
+        ctx.close();
+        super.exceptionCaught(ctx, cause);
+    }
+
+    private void cancelBody() {
+        if (body != null) {
+            body.cancel();
+            body = null;
+        }
     }
 
     private void forward(final ChannelHandlerContext ctx, final RequestMode mode, final Object msg) {

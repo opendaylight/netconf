@@ -92,7 +92,7 @@ class ServerRequestExecutorTest {
     }
 
     @Test
-    void rejectedSubmissionDoesNotTrackRequestOrTakeBodyOwnership() throws Exception {
+    void rejectedSubmissionCancelsBodyAndDoesNotTrackRequest() throws Exception {
         final var executor = new ServerRequestExecutor("rejected-stream", session, Uint32.valueOf(1024));
         executor.shutdown();
         try (var stream = new RequestBodyInputStream()) {
@@ -103,8 +103,8 @@ class ServerRequestExecutorTest {
             verifyNoInteractions(session, ctx, pending);
             final var buffer = Unpooled.buffer(1).writeByte(7);
             try {
-                assertTrue(stream.append(buffer));
-                assertEquals(7, stream.read());
+                assertThrows(IOException.class, () -> stream.append(buffer));
+                assertThrows(IOException.class, stream::read);
                 assertEquals(1, buffer.refCnt());
             } finally {
                 buffer.release();

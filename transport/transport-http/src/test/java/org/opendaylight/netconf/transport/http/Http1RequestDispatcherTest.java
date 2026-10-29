@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -22,14 +21,13 @@ import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.DefaultLastHttpContent;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.util.CharsetUtil;
@@ -129,55 +127,24 @@ class Http1RequestDispatcherTest {
     }
 
     /**
-     * A chunked request would be STREAMING, but while streaming is disabled it is aggregated instead, because
-     * HTTPServerSession consumes only FullHttpRequest.
+     * A chunked request delivers its headers and first body bytes before the final chunk arrives.
      */
     @Test
-    // FIXME NETCONF-1668: rework this test after implementation is settled
-    void chunkedRequestIsAggregatedUntilStreamingIsImplemented() {
+    void chunkedRequestIsDeliveredIncrementally() throws Exception {
         channel.writeInbound(chunkedRequest());
-        assertNull(channel.readInbound());
+        final var request = assertInstanceOf(StreamingHttpRequest.class, channel.readInbound());
+        try {
+            final var body = request.body();
+            channel.writeInbound(new DefaultHttpContent(Unpooled.copiedBuffer("first", CharsetUtil.UTF_8)));
+            assertEquals(5, body.available());
+            assertEquals("first", new String(body.readNBytes(5), CharsetUtil.UTF_8));
 
-        channel.writeInbound(new DefaultHttpContent(Unpooled.copiedBuffer("first", CharsetUtil.UTF_8)));
-        assertNull(channel.readInbound());
-
-        channel.writeInbound(new DefaultLastHttpContent(Unpooled.copiedBuffer("last", CharsetUtil.UTF_8)));
-        assertAggregated("firstlast", channel.readInbound());
-    }
-
-    /**
-     * A chunked request still reaches everything installed after the aggregator, which in a real pipeline is the
-     * AuthHandler and the session.
-     */
-    @Test
-    void chunkedRequestReachesHandlersAfterAggregator() {
-        channel.writeInbound(chunkedRequest());
-        channel.writeInbound(new DefaultHttpContent(Unpooled.copiedBuffer("body", CharsetUtil.UTF_8)));
-        channel.writeInbound(LastHttpContent.EMPTY_LAST_CONTENT);
-
-        assertEquals(1, probe.observed.size());
-        assertAggregated("body", channel.readInbound());
-    }
-
-    /**
-     * The mode is picked per request, not per connection: requests pipelined on a single connection are evaluated
-     * independently of one another.
-     */
-    @Test
-    void pipelinedRequestsAreEvaluatedSeparately() {
-        // a chunked request ...
-        channel.writeInbound(chunkedRequest());
-        channel.writeInbound(new DefaultLastHttpContent(Unpooled.copiedBuffer("one", CharsetUtil.UTF_8)));
-        assertAggregated("one", channel.readInbound());
-
-        // ... followed by a fixed-length one on the same connection
-        final var second = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/restconf/data");
-        second.headers().set(HttpHeaderNames.CONTENT_LENGTH, 2);
-        channel.writeInbound(second);
-        assertNull(channel.readInbound());
-
-        channel.writeInbound(new DefaultLastHttpContent(Unpooled.copiedBuffer("ok", CharsetUtil.UTF_8)));
-        assertAggregated("ok", channel.readInbound());
+            channel.writeInbound(new DefaultLastHttpContent(Unpooled.copiedBuffer("last", CharsetUtil.UTF_8)));
+            assertEquals("last", new String(body.readNBytes(4), CharsetUtil.UTF_8));
+            assertEquals(-1, body.read());
+        } finally {
+            request.release();
+        }
     }
 
     /**
@@ -186,7 +153,8 @@ class Http1RequestDispatcherTest {
      */
     @Test
     void expect100ContinueIsAnsweredExactlyOnce() {
-        final var request = chunkedRequest();
+        final var request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/");
+        HttpUtil.setContentLength(request, 2);
         request.headers().set(HttpHeaderNames.EXPECT, HttpHeaderValues.CONTINUE);
         channel.writeInbound(request);
 
@@ -205,11 +173,10 @@ class Http1RequestDispatcherTest {
 
     /**
      * ClientHttp1SseService issues its SSE GET with {@code Transfer-Encoding: chunked} even though it carries no body,
-     * hence the server never decodes it into a FullHttpRequest on its own. Routing it past the aggregator leaves it
-     * unanswered, which silently disables HTTP/1.1 event streams.
+     * and the streaming body must therefore reach EOF immediately.
      */
     @Test
-    void sseStyleChunkedGetIsStillDeliveredAsFullHttpRequest() {
+    void sseStyleChunkedGetHasEmptyStreamingBody() throws Exception {
         final var wireProbe = new Probe();
         final var wireChannel = newChannel();
         wireChannel.pipeline()
@@ -229,39 +196,21 @@ class Http1RequestDispatcherTest {
             \r
             """, CharsetUtil.UTF_8));
 
-        // exactly one message, and it is a fully aggregated request, not a bare header plus content
+        // Headers are delivered once, and the zero-length final chunk completes the body.
         assertEquals(1, wireProbe.observed.size());
-        assertAggregated("", wireChannel.readInbound());
+        final var request = assertInstanceOf(StreamingHttpRequest.class, wireChannel.readInbound());
+        assertEquals(-1, request.body().read());
+        request.release();
     }
 
     /**
-     * A pipeline with the streaming path enabled, i.e. what the dispatcher does once HTTPServerSession can consume a
-     * streamed request body.
+     * A pipeline using the production streaming path.
      */
     private EmbeddedChannel streamingChannel() {
         final var streaming = newChannel();
         streaming.pipeline()
-            .addLast(Http1RequestDispatcher.HANDLER_NAME, new Http1RequestDispatcher(MAX_CONTENT_LENGTH, true));
+            .addLast(Http1RequestDispatcher.HANDLER_NAME, new Http1RequestDispatcher(MAX_CONTENT_LENGTH));
         return streaming;
-    }
-
-    /**
-     * With streaming enabled a chunked request and every one of its chunks are forwarded as they are decoded, with the
-     * aggregator holding on to none of them.
-     */
-    @Test
-    void streamedRequestBypassesAggregator() {
-        final var streaming = streamingChannel();
-        final var request = chunkedRequest();
-        streaming.writeInbound(request);
-        // forwarded as-is, the aggregator is not holding on to it
-        assertSame(request, streaming.readInbound());
-
-        streaming.writeInbound(new DefaultHttpContent(Unpooled.copiedBuffer("first", CharsetUtil.UTF_8)));
-        assertContent("first", streaming.readInbound());
-
-        streaming.writeInbound(new DefaultLastHttpContent(Unpooled.copiedBuffer("last", CharsetUtil.UTF_8)));
-        assertContent("last", streaming.readInbound());
     }
 
     /**
@@ -277,8 +226,8 @@ class Http1RequestDispatcherTest {
         streaming.writeInbound(new DefaultHttpContent(Unpooled.copiedBuffer("body", CharsetUtil.UTF_8)));
         streaming.writeInbound(LastHttpContent.EMPTY_LAST_CONTENT);
 
-        assertEquals(List.of(DefaultHttpRequest.class, DefaultHttpContent.class,
-            LastHttpContent.EMPTY_LAST_CONTENT.getClass()), streamingProbe.observed);
+        assertEquals(List.of(StreamingHttpRequest.class), streamingProbe.observed);
+        assertInstanceOf(StreamingHttpRequest.class, streaming.readInbound()).release();
     }
 
     /**
@@ -291,7 +240,7 @@ class Http1RequestDispatcherTest {
         wireChannel.pipeline()
             .addLast(new HttpServerCodec())
             .addLast(Http1RequestDispatcher.HANDLER_NAME,
-                new Http1RequestDispatcher(MAX_CONTENT_LENGTH, true));
+                new Http1RequestDispatcher(MAX_CONTENT_LENGTH));
 
         wireChannel.writeInbound(Unpooled.copiedBuffer("""
             POST /restconf/data HTTP/1.1\r
@@ -323,7 +272,7 @@ class Http1RequestDispatcherTest {
         assertStatus(HttpResponseStatus.CONTINUE, streaming.readOutbound());
         assertNull(streaming.readOutbound());
         assertFalse(request.headers().contains(HttpHeaderNames.EXPECT));
-        assertSame(request, streaming.readInbound());
+        assertInstanceOf(StreamingHttpRequest.class, streaming.readInbound()).release();
     }
 
     /**
@@ -349,9 +298,9 @@ class Http1RequestDispatcherTest {
     void streamedRequestIsFollowedByAnAggregatedOne() {
         final var streaming = streamingChannel();
         streaming.writeInbound(chunkedRequest());
-        assertInstanceOf(HttpRequest.class, streaming.readInbound());
+        assertInstanceOf(StreamingHttpRequest.class, streaming.readInbound()).release();
         streaming.writeInbound(LastHttpContent.EMPTY_LAST_CONTENT);
-        assertInstanceOf(LastHttpContent.class, streaming.readInbound());
+        assertNull(streaming.readInbound());
 
         final var second = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/restconf/data");
         second.headers().set(HttpHeaderNames.CONTENT_LENGTH, 2);
@@ -366,15 +315,6 @@ class Http1RequestDispatcherTest {
         final var newChannel = new EmbeddedChannel();
         channels.add(newChannel);
         return newChannel;
-    }
-
-    private static void assertContent(final String expected, final Object msg) {
-        final var content = assertInstanceOf(HttpContent.class, msg);
-        try {
-            assertEquals(expected, content.content().toString(CharsetUtil.UTF_8));
-        } finally {
-            content.release();
-        }
     }
 
     private static DefaultHttpRequest chunkedRequest() {
