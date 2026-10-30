@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "186b51fa_289fe93b",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/ClientSessionInfo.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-30T09:40:37Z",
+      "side": 1,
+      "message": "The IoSession id comes from NettyIoService.sessionSeq, which is per I/O service, so two SSHClients built with the same handler both hand out id 1 and their refs compare equal. Since the class holds the ClientSession anyway, could equals/hashCode use session identity (session \u003d\u003d other.session, System.identityHashCode(session)) instead?",
+      "revId": "74898c382973ab7d69643071abf1c5e3157d8a66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92bab242_ee014642",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SessionHandlerConfigurator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-30T09:40:37Z",
+      "side": 1,
+      "message": "reExchangeKeys only covers the same-key case. Nothing fails if this comparison is removed. Could we add a small unit test that calls the installed ServerKeyVerifier twice on a mocked ClientSession with two different keys and asserts true, then false, with checkServerKey invoked once?",
+      "revId": "74898c382973ab7d69643071abf1c5e3157d8a66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da7b2b30_a137486f",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportSshClient.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-30T09:40:37Z",
+      "side": 1,
+      "message": "This is quite an ugly way of deciding, whether a username is required. Could the builder get an explicit mode instead, e.g. a sessionHandler(handler) method that installs SessionHandlerConfigurator and sets a perSessionCredentials flag, so this line reads perSessionCredentials ? null : requireUsername()?",
+      "revId": "74898c382973ab7d69643071abf1c5e3157d8a66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
