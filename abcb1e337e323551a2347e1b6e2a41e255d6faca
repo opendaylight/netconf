@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa509e69_14650028",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/AbstractBasicAuthHandler.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-30T08:04:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c1fe120c_c5b9d6ef",
+      "revId": "abcb1e337e323551a2347e1b6e2a41e255d6faca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dee1e315_22bea97c",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-10-29T10:42:12Z",
       "side": 1,
       "message": "The same default HttpRequestLimits is also built in NettyEndpointConfiguration.java:69, and OSGiNorthbound imports this Netty handler only for the constants. Could the DEFAULT_* constants and a shared HttpRequestLimits.DEFAULT live on the record, so both constructors use one instance and cannot drift apart?",
+      "revId": "abcb1e337e323551a2347e1b6e2a41e255d6faca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8594b45_51464c36",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSessionBootstrap.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-10-30T08:04:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "93f2af4b_f647d19f",
       "revId": "abcb1e337e323551a2347e1b6e2a41e255d6faca",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
