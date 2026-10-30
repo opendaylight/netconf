@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9373537c_47daec58",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeSshServer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-30T09:45:04Z",
+      "side": 1,
+      "message": "\"treat\"",
+      "revId": "b31a0e6d0ee4346e8f556bb7fbe2c8f96ebc63dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c4878d4_ac89627b",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeSshServer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-30T09:45:04Z",
+      "side": 1,
+      "message": "credentials() runs after createContext() and register(), so if an implementation of this public interface throws here, the context is already registered and onSessionClosed reports it as a failed auth. Could we fetch the credentials right after the authSettings null check, before any context is created?",
+      "revId": "b31a0e6d0ee4346e8f556bb7fbe2c8f96ebc63dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
