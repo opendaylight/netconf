@@ -29,6 +29,8 @@ window.onload = function () {
   // Begin Swagger UI call region
   const ui = SwaggerUIBundle({
     urls: swagger_urls,
+    // Swagger UI configuration (validatorUrl) from etc/org.opendaylight.restconf.nb.rfc8040.oauth2.cfg
+    configUrl: document.URL.split('/openapi')[0] + `/openapi/api/v3/ui-config`,
     dom_id: '#swagger-ui',
     docExpansion: 'none',
     deepLinking: true,

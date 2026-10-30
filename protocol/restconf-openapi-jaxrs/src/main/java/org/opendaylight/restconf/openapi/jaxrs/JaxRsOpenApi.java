@@ -79,6 +79,14 @@ public final class JaxRsOpenApi {
     }
 
     @GET
+    @Path("/ui-config")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUiConfig() {
+        // Never cached, configuration may change at runtime
+        return Response.ok(openApiService.getUiConfig()).header(HttpHeaders.CACHE_CONTROL, "no-store").build();
+    }
+
+    @GET
     @Path("/mounts")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getListOfMounts(@Context final UriInfo uriInfo) {

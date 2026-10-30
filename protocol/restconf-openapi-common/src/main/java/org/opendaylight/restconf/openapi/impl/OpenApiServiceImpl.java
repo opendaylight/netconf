@@ -19,6 +19,7 @@ import org.opendaylight.restconf.openapi.api.OpenApiService;
 import org.opendaylight.restconf.openapi.model.DocumentEntity;
 import org.opendaylight.restconf.openapi.model.MetadataEntity;
 import org.opendaylight.restconf.openapi.model.MountPointsEntity;
+import org.opendaylight.restconf.openapi.model.UiConfigEntity;
 import org.opendaylight.restconf.openapi.model.security.OpenApiOauth2Configuration;
 import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
 
@@ -32,6 +33,7 @@ public final class OpenApiServiceImpl implements OpenApiService, AutoCloseable {
     private final MountPointOpenApi mountPointOpenApiRFC8040;
     private final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040;
     private final String basePath;
+    private final UiConfigEntity uiConfig;
 
     public OpenApiServiceImpl(final DOMSchemaService schemaService, final DOMMountPointService mountPointService,
             final String basePath) {
@@ -40,13 +42,37 @@ public final class OpenApiServiceImpl implements OpenApiService, AutoCloseable {
 
     public OpenApiServiceImpl(final DOMSchemaService schemaService, final DOMMountPointService mountPointService,
             final String basePath, final @Nullable OpenApiOauth2Configuration oauth2Config) {
-        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService, oauth2Config),
-            new OpenApiGeneratorRFC8040(schemaService, oauth2Config), basePath);
+        this(schemaService, mountPointService, basePath, oauth2Config, null, null);
+    }
+
+    /**
+     * Creates OpenAPI service.
+     *
+     * @param schemaService schema service
+     * @param mountPointService mount point service
+     * @param basePath RESTCONF API root path
+     * @param oauth2Config OAuth2 configuration, {@code null} when OAuth2 is disabled
+     * @param scheme scheme used in generated documents, {@code null} or blank to resolve it from the request
+     * @param validatorUrl Swagger UI validator URL, {@code null} or blank to disable the validator
+     */
+    public OpenApiServiceImpl(final DOMSchemaService schemaService, final DOMMountPointService mountPointService,
+            final String basePath, final @Nullable OpenApiOauth2Configuration oauth2Config,
+            final @Nullable String scheme, final @Nullable String validatorUrl) {
+        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService, oauth2Config, scheme),
+            new OpenApiGeneratorRFC8040(schemaService, oauth2Config, scheme), basePath, validatorUrl);
     }
 
     @VisibleForTesting
     public OpenApiServiceImpl(final MountPointOpenApiGeneratorRFC8040 mountPointOpenApiGeneratorRFC8040,
             final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040, final String basePath) {
+        this(mountPointOpenApiGeneratorRFC8040, openApiGeneratorRFC8040, basePath, null);
+    }
+
+    @VisibleForTesting
+    public OpenApiServiceImpl(final MountPointOpenApiGeneratorRFC8040 mountPointOpenApiGeneratorRFC8040,
+            final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040, final String basePath,
+            final @Nullable String validatorUrl) {
+        uiConfig = new UiConfigEntity(validatorUrl);
         mountPointOpenApiRFC8040 = requireNonNull(mountPointOpenApiGeneratorRFC8040).getMountPointOpenApi();
         this.openApiGeneratorRFC8040 = requireNonNull(openApiGeneratorRFC8040);
         this.basePath = "/" + requireNonNull(basePath) + "/";
@@ -85,6 +111,11 @@ public final class OpenApiServiceImpl implements OpenApiService, AutoCloseable {
     @Override
     public MountPointsEntity getListOfMounts() {
         return mountPointOpenApiRFC8040.getInstanceIdentifiers();
+    }
+
+    @Override
+    public UiConfigEntity getUiConfig() {
+        return uiConfig;
     }
 
     @Override

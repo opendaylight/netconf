@@ -113,6 +113,13 @@ final class OpenApiResourceInstance extends WebHostResourceInstance {
                     default -> GHO_METHOD_NOT_ALLOWED;
                 };
             case "single" -> single(method, targetUri, peeler, headers);
+            case "ui-config" -> peeler.hasNext() ? EmptyResponse.NOT_FOUND
+                : switch (method) {
+                    case GET -> new EntityRequestResponse(service.getUiConfig());
+                    case HEAD -> JSON_OK;
+                    case OPTIONS -> GHO_OK;
+                    default -> GHO_METHOD_NOT_ALLOWED;
+                };
             case "ui" -> HeadersResponse.of(HttpResponseStatus.SEE_OTHER,
                 HttpHeaderNames.LOCATION, "/" + path() + "/explorer/index.html");
             default -> peeler.hasNext() ? EmptyResponse.NOT_FOUND

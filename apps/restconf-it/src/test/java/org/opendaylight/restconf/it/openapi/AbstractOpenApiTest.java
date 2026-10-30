@@ -90,6 +90,16 @@ public class AbstractOpenApiTest extends AbstractIT {
                 }
 
                 @Override
+                public String openapi$_$scheme() {
+                    return "";
+                }
+
+                @Override
+                public String swagger$_$ui$_$validator$_$url() {
+                    return "";
+                }
+
+                @Override
                 public Class<OpenApiResourceProvider.Configuration> annotationType() {
                     return OpenApiResourceProvider.Configuration.class;
                 }

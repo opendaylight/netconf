@@ -30,7 +30,13 @@ public class MountPointOpenApiGeneratorRFC8040 extends BaseYangOpenApiGenerator 
     public MountPointOpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService,
             final @NonNull DOMMountPointService mountService,
             final @Nullable OpenApiOauth2Configuration oauth2Config) {
-        super(schemaService, oauth2Config);
+        this(schemaService, mountService, oauth2Config, null);
+    }
+
+    public MountPointOpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService,
+            final @NonNull DOMMountPointService mountService,
+            final @Nullable OpenApiOauth2Configuration oauth2Config, final @Nullable String scheme) {
+        super(schemaService, oauth2Config, scheme);
         mountPointOpenApi = new MountPointOpenApi(schemaService, mountService, this);
         mountPointOpenApi.init();
     }

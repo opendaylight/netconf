@@ -13,6 +13,7 @@ import java.net.URI;
 import org.opendaylight.restconf.openapi.model.DocumentEntity;
 import org.opendaylight.restconf.openapi.model.MetadataEntity;
 import org.opendaylight.restconf.openapi.model.MountPointsEntity;
+import org.opendaylight.restconf.openapi.model.UiConfigEntity;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
@@ -100,6 +101,13 @@ public interface OpenApiService {
      * module. The API for each module is served by <code> getDocByModule()</code> method.
      */
     MountPointsEntity getListOfMounts();
+
+    /**
+     * Returns Swagger UI configuration, loaded by the explorer through Swagger UI {@code configUrl} option.
+     *
+     * @return Swagger UI configuration
+     */
+    UiConfigEntity getUiConfig();
 
     /**
      * Generate OpenAPI specification document listing APIs for module.

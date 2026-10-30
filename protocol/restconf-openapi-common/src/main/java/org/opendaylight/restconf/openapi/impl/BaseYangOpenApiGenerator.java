@@ -33,13 +33,17 @@ import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class BaseYangOpenApiGenerator {
+    private static final Logger LOG = LoggerFactory.getLogger(BaseYangOpenApiGenerator.class);
     private static final String CONTROLLER_RESOURCE_NAME = "Controller";
     private static final Pattern FORWARDED_PROTO_PATTERN = Pattern.compile("(?i)proto=\"?(\\w+)\"?");
 
     private final DOMSchemaService schemaService;
     private final @Nullable OpenApiOauth2Configuration oauth2Config;
+    private final @Nullable String configuredScheme;
 
     protected BaseYangOpenApiGenerator(final @NonNull DOMSchemaService schemaService) {
         this(schemaService, null);
@@ -47,8 +51,22 @@ public abstract class BaseYangOpenApiGenerator {
 
     protected BaseYangOpenApiGenerator(final @NonNull DOMSchemaService schemaService,
             final @Nullable OpenApiOauth2Configuration oauth2Config) {
+        this(schemaService, oauth2Config, null);
+    }
+
+    /**
+     * Creates generator.
+     *
+     * @param schemaService schema service
+     * @param oauth2Config OAuth2 configuration, {@code null} when OAuth2 is disabled
+     * @param scheme scheme used in generated documents ({@code http} or {@code https}), {@code null} or blank to
+     *     resolve it from proxy headers and request URI
+     */
+    protected BaseYangOpenApiGenerator(final @NonNull DOMSchemaService schemaService,
+            final @Nullable OpenApiOauth2Configuration oauth2Config, final @Nullable String scheme) {
         this.schemaService = requireNonNull(schemaService);
         this.oauth2Config = oauth2Config;
+        configuredScheme = normalizeScheme(scheme);
     }
 
     public @Nullable OpenApiOauth2Configuration oauth2Config() {
@@ -133,6 +151,11 @@ public abstract class BaseYangOpenApiGenerator {
 
     public String resolveScheme(final URI uri, final @Nullable String forwardedHeader,
             final @Nullable String forwardedProtoHeader) {
+        // Configured scheme
+        if (configuredScheme != null) {
+            return configuredScheme;
+        }
+
         // RFC 7239 Forwarded header
         if (forwardedHeader != null) {
             final var firstElement = forwardedHeader.split(",", 2)[0];
@@ -189,6 +212,18 @@ public abstract class BaseYangOpenApiGenerator {
             .filter(module -> !module.getRpcs().isEmpty() || module.getChildNodes().stream()
                 .anyMatch(node -> node instanceof ContainerSchemaNode || node instanceof ListSchemaNode))
             .toList();
+    }
+
+    private static @Nullable String normalizeScheme(final @Nullable String scheme) {
+        if (scheme == null || scheme.isBlank()) {
+            return null;
+        }
+        final var normalized = scheme.trim().toLowerCase(Locale.ROOT);
+        if (isSupportedScheme(normalized)) {
+            return normalized;
+        }
+        LOG.warn("Ignoring unsupported OpenAPI scheme {}, only http and https are supported", scheme);
+        return null;
     }
 
     private static boolean isSupportedScheme(final String scheme) {

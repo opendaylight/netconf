@@ -105,4 +105,34 @@ class BaseYangOpenApiGeneratorTest {
             Arguments.of(HTTPS, uriHttp, "proto=https", HTTP)
         );
     }
+
+    /**
+     * Verifies that a configured scheme takes precedence over proxy headers and the request URI, and that blank or
+     * unsupported configured schemes are ignored.
+     */
+    @ParameterizedTest
+    @MethodSource("configuredSchemes")
+    void testResolveConfiguredScheme(final String expected, final String configuredScheme, final String uriString,
+            final String forwardedHeader, final String forwardedProtoHeader) throws Exception {
+        final var openApiGenerator = new BaseYangOpenApiGenerator(schemaService, null, configuredScheme) {};
+        assertEquals(expected, openApiGenerator.resolveScheme(
+            new URI(uriString), forwardedHeader, forwardedProtoHeader));
+    }
+
+    private static Stream<Arguments> configuredSchemes() {
+        final var uriHttp = "http://localhost:8181/openapi/api/v3/";
+
+        return Stream.of(
+            // Configured scheme wins over request URI and both headers
+            Arguments.of(HTTPS, HTTPS, uriHttp, null, null),
+            Arguments.of(HTTPS, HTTPS, uriHttp, "proto=http", HTTP),
+            Arguments.of(HTTP, HTTP, "https://localhost:8181/openapi/api/v3/", "proto=https", HTTPS),
+            Arguments.of(HTTPS, " HTTPS ", uriHttp, null, null),
+
+            // Blank or unsupported configured scheme is ignored
+            Arguments.of(HTTPS, "", uriHttp, "proto=https", null),
+            Arguments.of(HTTPS, " ", uriHttp, null, HTTPS),
+            Arguments.of(HTTP, "ftp", uriHttp, null, null)
+        );
+    }
 }

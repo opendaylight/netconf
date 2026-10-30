@@ -27,4 +27,9 @@ public class OpenApiGeneratorRFC8040 extends BaseYangOpenApiGenerator {
             final @Nullable OpenApiOauth2Configuration oauth2Config) {
         super(schemaService, oauth2Config);
     }
+
+    public OpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService,
+            final @Nullable OpenApiOauth2Configuration oauth2Config, final @Nullable String scheme) {
+        super(schemaService, oauth2Config, scheme);
+    }
 }

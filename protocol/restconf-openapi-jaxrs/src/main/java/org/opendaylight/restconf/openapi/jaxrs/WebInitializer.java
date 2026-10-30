@@ -62,6 +62,18 @@ public final class WebInitializer implements AutoCloseable {
             Leave empty (default) to omit refreshUrl from the generated OpenAPI document.
             """)
         String oauth2$_$refresh$_$url() default "";
+
+        @AttributeDefinition(description = """
+            Scheme (http or https) used in the server URL of the generated OpenAPI document.
+            Leave empty (default) to resolve it from the Forwarded or X-Forwarded-Proto header, or from the request.
+            """)
+        String openapi$_$scheme() default "";
+
+        @AttributeDefinition(description = """
+            URL of the online validator used by Swagger UI to validate the displayed OpenAPI document.
+            Leave empty or set to "none" (default) to disable the validator.
+            """)
+        String swagger$_$ui$_$validator$_$url() default "none";
     }
 
     private final OpenApiServiceImpl openApiService;
@@ -75,7 +87,8 @@ public final class WebInitializer implements AutoCloseable {
             final Configuration configuration) throws ServletException {
         final var oauth2Config = oauth2Configuration(configuration);
         openApiService = new OpenApiServiceImpl(schemaService, mountPointService,
-            endpoint.configuration().restconf(), oauth2Config);
+            endpoint.configuration().restconf(), oauth2Config, configuration.openapi$_$scheme(),
+            configuration.swagger$_$ui$_$validator$_$url());
         final var webContextBuilder = WebContext.builder()
             .name("OpenAPI")
             .contextPath("/openapi")

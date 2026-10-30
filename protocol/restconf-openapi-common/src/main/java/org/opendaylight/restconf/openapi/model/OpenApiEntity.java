@@ -16,7 +16,7 @@ import org.eclipse.jdt.annotation.NonNull;
  */
 public abstract sealed class OpenApiEntity permits ComponentsEntity, DocumentEntity, InfoEntity, MetadataEntity,
         MountPointsEntity, OpenApiVersionEntity, OperationEntity, PathEntity, PathsEntity, SchemaEntity, SchemasEntity,
-        SecurityEntity, SecuritySchemesEntity, ServerEntity, ServersEntity {
+        SecurityEntity, SecuritySchemesEntity, ServerEntity, ServersEntity, UiConfigEntity {
     /**
      * Generate JSON events into specified generator.
      *

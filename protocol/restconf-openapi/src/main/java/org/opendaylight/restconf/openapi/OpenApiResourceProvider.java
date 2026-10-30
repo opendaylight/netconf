@@ -41,6 +41,18 @@ public final class OpenApiResourceProvider implements WebHostResourceProvider, A
             Template.
             """)
         String api$_$root$_$path() default "restconf";
+
+        @AttributeDefinition(description = """
+            Scheme (http or https) used in the server URL of the generated OpenAPI document.
+            Leave empty (default) to resolve it from the Forwarded or X-Forwarded-Proto header, or from the request.
+            """)
+        String openapi$_$scheme() default "";
+
+        @AttributeDefinition(description = """
+            URL of the online validator used by Swagger UI to validate the displayed OpenAPI document.
+            Leave empty or set to "none" (default) to disable the validator.
+            """)
+        String swagger$_$ui$_$validator$_$url() default "none";
     }
 
     private final OpenApiServiceImpl service;
@@ -49,7 +61,8 @@ public final class OpenApiResourceProvider implements WebHostResourceProvider, A
     @Activate
     public OpenApiResourceProvider(@Reference final DOMSchemaService schemaService,
             @Reference final DOMMountPointService mountPointService, final Configuration configuration) {
-        service = new OpenApiServiceImpl(schemaService, mountPointService, configuration.api$_$root$_$path());
+        service = new OpenApiServiceImpl(schemaService, mountPointService, configuration.api$_$root$_$path(), null,
+            configuration.openapi$_$scheme(), configuration.swagger$_$ui$_$validator$_$url());
     }
 
     @Override
