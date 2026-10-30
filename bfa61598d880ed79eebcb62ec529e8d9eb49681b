@@ -16,6 +16,91 @@
       "message": "recheck",
       "revId": "bfa61598d880ed79eebcb62ec529e8d9eb49681b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d66acdd3_6ba74777",
+        "filename": "transport/transport-api/src/main/java/org/opendaylight/netconf/transport/api/AbstractTransportStack.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-30T10:33:24Z",
+      "side": 1,
+      "message": "I\u0027m not sure this this widening is necessary. It widens an exported transport-api method only so the top-level ClientQuicUnderlay record can call it? HTTPServer solves the same need with a private nested QuicUnderlay record that calls the protected method; could ClientQuicUnderlay become a private record inside HTTPClient so this stays protected?",
+      "revId": "bfa61598d880ed79eebcb62ec529e8d9eb49681b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec67c5c6_8e82b001",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-30T10:33:24Z",
+      "side": 1,
+      "message": "Just a nit.. the switch just below already dispatches on transport, so could this become a \"case Quic quic -\u003e { return connectQuic(...); }\" arm there? Then every supported transport is visible in one place, and definite assignment of the three params still works because the arm returns.",
+      "revId": "bfa61598d880ed79eebcb62ec529e8d9eb49681b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82d71350_ab6e6d14",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-30T10:33:24Z",
+      "side": 1,
+      "message": "Only server-authentication is read from tls-client-parameters here. client-identity, hello-params and keepalives are silently dropped, so a configured client certificate or a TLS 1.3/cipher restriction just disappears when switching from the TLS case to Quic. Could we throw UnsupportedConfigurationException when any of them is present (as is done for raw public keys), or wire client-identity into QuicSslContextBuilder.keyManager()?",
+      "revId": "bfa61598d880ed79eebcb62ec529e8d9eb49681b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfe65d8f_2da92460",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPServerQuicBindFailureTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-30T10:33:24Z",
+      "side": 1,
+      "message": "This is the server test, and the method it describes is HTTPServer.QuicUnderlay.shutdown(), which owns quicGroup. ClientQuicUnderlay has no event loop group, so this looks like a wrong rename. please revert to QuicUnderlay.",
+      "revId": "bfa61598d880ed79eebcb62ec529e8d9eb49681b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c566e80b_9a4dbce8",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/QuicClientTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-30T10:33:24Z",
+      "side": 1,
+      "message": "empty line",
+      "revId": "bfa61598d880ed79eebcb62ec529e8d9eb49681b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
