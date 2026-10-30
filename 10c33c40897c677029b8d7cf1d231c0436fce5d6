@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e291b16b_f7de468d",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseStreamHandler.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-30T11:08:41Z",
+      "side": 1,
+      "message": "Does every HttpContent end on an SSE line boundary? Http3FrameCodec emits partial DATA frames as QUIC packets arrive (~1200 bytes), so a larger notification gets split into two bogus fields, and a split right after \"data:\" makes SseUtils.parseChunks call charAt past the end, which closes the stream. Could the handler buffer the incomplete trailing line between chunks (and guard that charAt)?\n\nNone of the HTTP/3 SSE tests sends an event big enough to be split across QUIC packets like that. Could we add a test that streams one event over 2 KB over HTTP/3 and checks the data field arrives intact? I suspect it would currently arrive as two broken fields, because processChunks parses each chunk as whole lines.",
+      "revId": "10c33c40897c677029b8d7cf1d231c0436fce5d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6eb3307a_8f0daa41",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseStreamHandler.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-10-30T11:08:41Z",
+      "side": 1,
+      "message": "Nothing tests this rejection path: the restconf-it SSE helpers only log onStartFailure and wait for a successful start. Could we add a test that requests a non-existent stream over HTTP/3 and asserts onStartFailure is called once, with the status and body in the message, and that onStreamStarted is never called?",
+      "revId": "10c33c40897c677029b8d7cf1d231c0436fce5d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
