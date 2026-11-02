@@ -41,6 +41,48 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a9c0129_10ca21b7",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-02T18:42:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab23115d_c98efd8a",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c70f0002_4ce5bf5a",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-02T18:42:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28b3cdf4_8a3e76ce",
+      "range": {
+        "startLine": 211,
+        "startChar": 18,
+        "endLine": 211,
+        "endChar": 109
+      },
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c9c9edbb_c604816f",
@@ -54,6 +96,24 @@
       "writtenOn": "2026-10-29T11:13:34Z",
       "side": 1,
       "message": "When prev is a CallHomeNodeHandler, this logs \"was already configured\", which is\nmisleading: the node being disconnected is a call-home node. Could you log that\ncase separately, for example:\n```\n  if (prev instanceof CallHomeNodeHandler) {\n      LOG.info(\"Call-home RemoteDevice{{}} is replaced by configuration, disconnecting\", nodeId);\n  } else {\n      LOG.info(\"RemoteDevice{{}} was already configured, disconnecting\", nodeId);\n  }\n```",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e998c70_b954eb29",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-02T18:42:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c9c9edbb_c604816f",
       "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -75,6 +135,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2df888f_d54f9003",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-02T18:42:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "26a1158a_a48127e8",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "08ebb95d_d1fb2e88",
@@ -88,6 +166,24 @@
       "writtenOn": "2026-10-29T11:13:34Z",
       "side": 1,
       "message": "The previous call-home node is closed before the new one is validated. If getNetconfNode() or getRemoteDeviceId() then rejects the new node, the old one is\nalready gone and nothing replaces it. Could you run both checks first and only\nthen close `prev`? For example:\n```\n  final var nodeId \u003d node.requireNodeId();\n  final var prev \u003d activeConnectors.get(nodeId);\n  if (prev instanceof NetconfNodeHandler) {\n      // WARN and return, as now\n  }\n  final var netconfNode \u003d getNetconfNode(node, nodeId);\n  if (netconfNode \u003d\u003d null) {\n      return;\n  }\n  final var deviceId \u003d getRemoteDeviceId(netconfNode, nodeId);\n  if (deviceId \u003d\u003d null) {\n      return;\n  }\n  if (prev !\u003d null) {\n      LOG.info(\"Call-home RemoteDevice{{}} was already connected, disconnecting\", nodeId);\n      activeConnectors.remove(nodeId);\n      prev.close();\n  }\n```",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7aac2b6a_2edaf8fe",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-02T18:42:56Z",
+      "side": 1,
+      "message": "same behavior is for configured nodes and in this case the node is trying to reconnect with incorrect configuration, I don\u0027t think the best solution is to keep is connected with old one",
+      "parentUuid": "08ebb95d_d1fb2e88",
       "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -109,6 +205,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f37a66d0_348e4962",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/CallHomeNodeHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-02T18:42:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44b0cccb_1106fab8",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "07182631_61b69648",
@@ -122,6 +236,24 @@
       "writtenOn": "2026-10-29T11:09:45Z",
       "side": 1,
       "message": "what happens if initialize() throws here?",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2094676d_8e3d1b34",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/CallHomeNodeHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-02T18:42:56Z",
+      "side": 1,
+      "message": "I don\u0027t really see a reason to catch anything here. Only the communicator can\u0027t be null which is annotated.",
+      "parentUuid": "07182631_61b69648",
       "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -149,6 +281,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec85d98f_a98647cc",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/CallHomeTopologyService.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-02T18:42:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1073a671_3995c1d4",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 98
+      },
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4f2d19cb_700704f5",
@@ -162,6 +318,24 @@
       "writtenOn": "2026-10-29T11:09:45Z",
       "side": 1,
       "message": "Since this is a new SPI, would it be worth having enableCallHomeNode() return a Registration that closes only the handler it created, instead of disabling by NodeId? With an ID-only remove, a late remove from a dropped session can close the handler of the device\u0027s newer session (the race marked FIXME NETCONF-1705 in CallHomeMountService), and that is hard to fix once the SPI has outside users.",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0de7833_a353899b",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/CallHomeTopologyService.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-02T18:42:56Z",
+      "side": 1,
+      "message": "Done\n\nbut I would leave the actual fix for next task as some changes how CallHomeSessionContext is handled are needed",
+      "parentUuid": "4f2d19cb_700704f5",
       "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -183,6 +357,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "34d85ca1_a63c87ba",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopologyTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-02T18:42:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "542ecd5d_1b46f5d6",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0d5daa6e_0a6823bd",
@@ -196,6 +388,24 @@
       "writtenOn": "2026-10-29T11:13:34Z",
       "side": 1,
       "message": "Can you please use any(SOME.class) here? This avoids matching null and\nmakes it more robust.",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f363d81_75a0d3b0",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopologyTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-02T18:42:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d5daa6e_0a6823bd",
       "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
