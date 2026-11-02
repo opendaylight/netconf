@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6bd43f9_3856207a",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNodeHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-02T18:42:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b875025_599cb41f",
+      "revId": "e65a5b5a02bb3519760b5162be8267c0a4f10b69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "31c74b3c_05cfc207",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-10-29T11:13:24Z",
       "side": 1,
       "message": "The `timer` and `clientConfig` fields only change position. Keep the original order.",
+      "revId": "e65a5b5a02bb3519760b5162be8267c0a4f10b69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "336e1bf0_c5326a13",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-02T18:42:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31c74b3c_05cfc207",
       "revId": "e65a5b5a02bb3519760b5162be8267c0a4f10b69",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b49a229_f7adddb6",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-02T18:42:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "700fbe71_678005e3",
+      "revId": "e65a5b5a02bb3519760b5162be8267c0a4f10b69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "97ff5d18_55ac7232",
@@ -82,6 +136,24 @@
       "writtenOn": "2026-10-29T11:13:24Z",
       "side": 1,
       "message": "Extra empty space.",
+      "revId": "e65a5b5a02bb3519760b5162be8267c0a4f10b69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "251e9075_7509219a",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-02T18:42:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97ff5d18_55ac7232",
       "revId": "e65a5b5a02bb3519760b5162be8267c0a4f10b69",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
