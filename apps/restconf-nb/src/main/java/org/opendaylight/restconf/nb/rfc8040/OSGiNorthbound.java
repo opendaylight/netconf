@@ -177,7 +177,7 @@ public final class OSGiNorthbound {
                 '413 Content Too Large'. Applies to HTTP/1.1, HTTP/2 and HTTP/3 alike.
                 """,
             min = "1")
-        int http$_$request$_$body$_$max$_$size() default 10485760; // 10 MiB
+        int http$_$request$_$body$_$max$_$size() default 262144; // 256 KiB
 
         @AttributeDefinition(
             name = "HTTP write buffer low watermark (bytes)",
