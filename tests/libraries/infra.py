@@ -7,6 +7,7 @@
 #
 
 import logging
+import os
 import signal
 import subprocess
 
@@ -141,6 +142,18 @@ def count_port_occurrences(port: int, state: str, name: str) -> int:
     return int(stdout)
 
 
+def _start_karaf(cwd: str):
+    """Starts the Karaf process in `cwd`.
+
+    Args:
+        cwd (str): Distribution directory to start.
+
+    Returns:
+        None
+    """
+    shell(f"JAVA_OPTS=-Xmx{CONTROLLER_MAX_MEM} ./bin/start", cwd=cwd)
+
+
 def start_odl_with_features(features: tuple[str], cwd: str = "opendaylight"):
     """Starts ODL with installed provided features.
 
@@ -168,26 +181,56 @@ def start_odl_with_features(features: tuple[str], cwd: str = "opendaylight"):
         cwd=cwd,
     )
 
-    # start ODL
-    shell(f"JAVA_OPTS=-Xmx{CONTROLLER_MAX_MEM} ./bin/start", cwd=cwd)
+    _start_karaf(cwd)
 
 
-def wait_for_odl_ready(cwd: str = "opendaylight", timeout: int = 60):
-    """Blocks until ODL logs "System ready" in the given distribution.
+def count_system_ready(cwd: str = "opendaylight") -> int:
+    """Counts the "System ready" lines logged so far in distribution `cwd`.
+
+    Reads every karaf.log* file, not just the current one, so a log
+    rollover moving earlier lines into karaf.log.1 doesn't lower the count.
+
+    Args:
+        cwd (str): Distribution directory whose logs to read.
+
+    Returns:
+        int: Number of "System ready" lines found.
+    """
+    _, out = shell(
+        "cat data/log/karaf.log* 2>/dev/null"
+        " | grep -c 'org.opendaylight.infrautils.*System ready' || true",
+        cwd=cwd,
+    )
+    return int(out.strip() or 0)
+
+
+def wait_for_odl_ready(
+    cwd: str = "opendaylight", timeout: int = 60, previous_count: int = 0
+):
+    """Blocks until ODL logs "System ready" in the given distribution more
+    times than `previous_count`.
+
+    The default of 0 waits for the first one. After a restart, the lines
+    from before it are still in the log, so pass the count_system_ready
+    value taken before the restart to wait for a new one instead.
 
     Args:
         cwd (str): Distribution directory whose log to poll.
         timeout (int): Seconds to wait before failing.
+        previous_count (int): Number of "System ready" lines to ignore.
 
     Returns:
         None
     """
+
+    def _verify_new_system_ready():
+        assert (
+            count_system_ready(cwd) > previous_count
+        ), f"ODL in {cwd} hasn't logged a new 'System ready' yet"
+
     interval = 5
-    retry_shell_command(
-        timeout // interval,
-        interval,
-        "grep 'org.opendaylight.infrautils.*System ready' data/log/karaf.log",
-        cwd=cwd,
+    utils.wait_until_function_pass(
+        timeout // interval, interval, _verify_new_system_ready
     )
 
 
@@ -196,6 +239,8 @@ def stop_all_karaf_instances():
 
     Matches on the process command line, so it stops all ODL instances at
     once regardless of how many are running (single node or cluster members).
+    Also discards every cached Karaf shell connection, since all of them
+    would otherwise be left pointing at a now-dead process.
 
     Args:
         None
@@ -204,6 +249,177 @@ def stop_all_karaf_instances():
         None
     """
     shell("kill $(pgrep -f org.apache.karaf.main.[M]ain | grep -v ^$$\\$)")
+    for shell_instance in karaf_shell_instances.values():
+        shell_instance.close()
+    karaf_shell_instances.clear()
+
+
+def _find_karaf_processes(cwd: str) -> list[psutil.Process]:
+    """Finds the Karaf main process(es) launched from distribution `cwd`.
+
+    Karaf's start script passes its own distribution directory, resolved to
+    an absolute path, as -Dkaraf.base, so an exact match on that argument
+    identifies only this instance - unlike a substring match, it can't
+    confuse "opendaylight" with "opendaylight-member-1".
+
+    Args:
+        cwd (str): Distribution directory the Karaf was started from.
+
+    Returns:
+        list[psutil.Process]: Matching processes, possibly empty.
+    """
+    base_arg = f"-Dkaraf.base={os.path.realpath(cwd)}"
+    matches = []
+    for process in psutil.process_iter(["cmdline"]):
+        cmdline = process.info["cmdline"] or []
+        if "org.apache.karaf.main.Main" in cmdline and base_arg in cmdline:
+            matches.append(process)
+    return matches
+
+
+def stop_karaf(cwd: str = "opendaylight", host: str = "127.0.0.1", port: int = 8101):
+    """Stops only the Karaf process launched from `cwd` and waits until it's
+    gone, leaving any other instance on the host (e.g. other cluster
+    members) running.
+
+    Tries a graceful SIGTERM first; if Karaf's shutdown hangs (e.g. a Pekko
+    cluster leave or a blocked Blueprint container), falls back to SIGKILL
+    so a half-dead JVM isn't left holding the data/ lock and the SSH port.
+    Fails if the SSH port is still in LISTEN state afterwards.
+
+    Also discards the cached Karaf shell connection to this instance, since
+    it would otherwise be left pointing at a now-dead process.
+
+    Args:
+        cwd (str): Distribution directory to stop.
+        host (str): Address of this instance's Karaf SSH console.
+        port (int): Karaf SSH port of this instance.
+
+    Returns:
+        None
+    """
+    processes = _find_karaf_processes(cwd)
+    if not processes:
+        log.warning(
+            f"No Karaf process found with -Dkaraf.base={os.path.realpath(cwd)}, "
+            f"nothing to stop"
+        )
+    for process in processes:
+        try:
+            stop_process_by_pid(process.pid, timeout=60, missing_ok=True)
+        except AssertionError:
+            log.warning(
+                f"Karaf with PID {process.pid} didn't stop gracefully within "
+                f"60 s, killing it"
+            )
+            stop_process_by_pid(
+                process.pid, gracefully=False, timeout=30, missing_ok=True
+            )
+    shell_instance = karaf_shell_instances.pop((host, port), None)
+    if shell_instance is not None:
+        shell_instance.close()
+    # If nothing matched -Dkaraf.base (or the wrong instance was stopped),
+    # the old Karaf still owns the SSH port and the data/ lock, and a new
+    # one started now would just wait on that lock until its "System ready"
+    # wait times out. Fail here instead, with the actual cause.
+    try:
+        utils.wait_until_function_returns_value(
+            5, 1, [], get_listening_sockets, host, port
+        )
+    except AssertionError as e:
+        raise AssertionError(
+            f"Karaf SSH port {host}:{port} is still in LISTEN state after "
+            f"stopping Karaf in {cwd}"
+        ) from e
+
+
+def get_listening_sockets(host: str, port: int) -> list[str]:
+    """Lists the TCP sockets listening on `host`:`port`, including sockets
+    bound to all addresses (0.0.0.0 or [::]) on that port.
+
+    Args:
+        host (str): IP address to check.
+        port (int): TCP port to check.
+
+    Returns:
+        list[str]: Matching `ss` output lines, possibly empty.
+    """
+    # [::ffff:host] is how a dual-stack (e.g. Java) socket bound to an IPv4
+    # address shows up.
+    _, stdout = shell(
+        f"ss -Htlnp 'src {host}:{port} or src [::ffff:{host}]:{port}"
+        f" or src 0.0.0.0:{port} or src [::]:{port}'"
+    )
+    return stdout.splitlines()
+
+
+def _verify_karaf_shell_reachable(host: str, port: int):
+    """Asserts the Karaf SSH console accepts a connection.
+
+    Uses its own throwaway connection rather than the shared cache: this is
+    a check, not a place to establish the connection other callers reuse.
+
+    Args:
+        host (str): Node to probe.
+        port (int): Karaf SSH port.
+
+    Returns:
+        None
+    """
+    instance = KarafShell(host=host, port=port)
+    try:
+        instance.connect()
+    finally:
+        instance.close()
+
+
+def wait_for_karaf_shell_ready(host: str = "127.0.0.1", port: int = 8101):
+    """Blocks until the Karaf SSH console is reachable.
+
+    Args:
+        host (str): Node to probe.
+        port (int): Karaf SSH port.
+
+    Returns:
+        None
+    """
+    utils.wait_until_function_pass(30, 2, _verify_karaf_shell_reachable, host, port)
+
+
+def restart_karaf(
+    cwd: str = "opendaylight",
+    host: str = "127.0.0.1",
+    port: int = 8101,
+    timeout: int = 300,
+):
+    """Restarts the Karaf process running in `cwd`, and waits until ODL
+    logs a new "System ready" and its SSH console is reachable again. Any
+    other Karaf on the host (e.g. other cluster members) is left running.
+
+    Reuses the directory's existing configuration as-is - unlike
+    start_odl_with_features, this never touches featuresBoot, since it's
+    for restarting an already-configured instance, not a first-time setup.
+
+    "System ready" is the same signal the session setup waits for, so
+    after this returns every installed feature is as ready as it was at
+    the start of the session. The "System ready" lines from before the
+    restart are still in the log, so this waits for their count to grow
+    rather than for any line to be present.
+
+    Args:
+        cwd (str): Distribution directory to restart.
+        host (str): Node whose Karaf SSH console to wait for.
+        port (int): Karaf SSH port of this instance.
+        timeout (int): Seconds to wait for the new "System ready".
+
+    Returns:
+        None
+    """
+    previous_count = count_system_ready(cwd)
+    stop_karaf(cwd, host=host, port=port)
+    _start_karaf(cwd)
+    wait_for_odl_ready(cwd, timeout=timeout, previous_count=previous_count)
+    wait_for_karaf_shell_ready(host=host, port=port)
 
 
 def execute_karaf_command(
@@ -359,7 +575,12 @@ def copy_dir(
     shell(f"cp -r {src_dir} {dst_dir}")
 
 
-def stop_process_by_pid(pid: int, gracefully: bool = True, timeout: int | None = 5):
+def stop_process_by_pid(
+    pid: int,
+    gracefully: bool = True,
+    timeout: int | None = 5,
+    missing_ok: bool = False,
+):
     """Stops process by sending signal and verifies it is not running.
 
     Args:
@@ -367,6 +588,9 @@ def stop_process_by_pid(pid: int, gracefully: bool = True, timeout: int | None =
         gracefully (bool): Determines which signal should be sent,
             for gracefully it sends SIGTERM, otherwise SIGKILL
         timeout (int | None): Seconds to wait for termination. None skips verification.
+        missing_ok (bool): Return quietly if no process with `pid` exists
+            (e.g. it already exited), instead of raising
+            psutil.NoSuchProcess.
 
     Returns:
         None
@@ -374,8 +598,14 @@ def stop_process_by_pid(pid: int, gracefully: bool = True, timeout: int | None =
     log.info(f"Stopping process with PID {pid}")
     signal_to_be_sent = signal.SIGTERM if gracefully else signal.SIGKILL
     log.info(f"Sending signal {signal_to_be_sent} to process with PID {pid}")
-    process = psutil.Process(pid)
-    process.send_signal(signal_to_be_sent)
+    try:
+        process = psutil.Process(pid)
+        process.send_signal(signal_to_be_sent)
+    except psutil.NoSuchProcess:
+        if not missing_ok:
+            raise
+        log.info(f"Process with PID {pid} is already gone")
+        return
 
     if timeout is not None:
         # check if it is still running
