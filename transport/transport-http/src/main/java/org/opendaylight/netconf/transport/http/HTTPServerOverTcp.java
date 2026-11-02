@@ -27,11 +27,11 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.tcp.server.grouping.LocalBindBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.odl.http.server.listen.stack.grouping.LimitsUnderHttpTcpBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.odl.server.limits.grouping.OdlServerLimits;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.odl.server.limits.grouping.OdlServerLimitsBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.server.limits.grouping.ServerLimits;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.server.limits.grouping.ServerLimitsBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.odl.http.server.listen.stack.grouping.LimitsUnderHttpTcpBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.odl.server.limits.grouping.OdlServerLimits;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.odl.server.limits.grouping.OdlServerLimitsBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.server.limits.grouping.ServerLimits;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.server.limits.grouping.ServerLimitsBuilder;
 import org.opendaylight.yangtools.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
