@@ -30,8 +30,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.listen.stack.grouping.transport.http.over.tcp.http.over.tcp.HttpServerParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.listen.stack.grouping.transport.http.over.tcp.http.over.tcp.TcpServerParameters;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.odl.http.server.listen.stack.grouping.LimitsUnderHttpTcpBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.server.limits.grouping.ServerLimitsBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.odl.http.server.listen.stack.grouping.LimitsUnderHttpTcpBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.server.limits.grouping.ServerLimitsBuilder;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
 /**

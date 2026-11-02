@@ -12,10 +12,10 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.HttpServerListenStackGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.listen.stack.grouping.transport.HttpOverTcp;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev260204.http.server.listen.stack.grouping.transport.HttpOverTls;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.OdlServerLimitsGrouping;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.ServerLimitsGrouping;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.odl.http.server.listen.stack.grouping.LimitsUnderHttpTcp;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev260731.odl.http.server.listen.stack.grouping.LimitsUnderHttpTls;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.OdlServerLimitsGrouping;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.ServerLimitsGrouping;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.odl.http.server.listen.stack.grouping.LimitsUnderHttpTcp;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.yang.http.server.rev261103.odl.http.server.listen.stack.grouping.LimitsUnderHttpTls;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
 /**
@@ -54,10 +54,9 @@ public record HTTPServerLimits(
     public static final int MAX_FRAME_SIZE = 16777215;
 
     /**
-     * Default limits, matching the {@code default} substatements of the YANG model. The body limit is deliberately
-     * generous, as RESTCONF requests routinely carry an entire subtree.
+     * Default limits, matching the {@code default} substatements of the YANG model.
      */
-    public static final HTTPServerLimits DEFAULT = new HTTPServerLimits(8192, 16384, 8192, 10485760, MIN_FRAME_SIZE);
+    public static final HTTPServerLimits DEFAULT = new HTTPServerLimits(8192, 16384, 8192, 262144, MIN_FRAME_SIZE);
 
     public HTTPServerLimits {
         checkPositive(maxInitialLineLength, "maxInitialLineLength");
