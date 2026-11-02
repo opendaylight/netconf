@@ -141,6 +141,18 @@ def count_port_occurrences(port: int, state: str, name: str) -> int:
     return int(stdout)
 
 
+def _start_karaf(cwd: str):
+    """Starts the Karaf process in `cwd`.
+
+    Args:
+        cwd (str): Distribution directory to start.
+
+    Returns:
+        None
+    """
+    shell(f"JAVA_OPTS=-Xmx{CONTROLLER_MAX_MEM} ./bin/start", cwd=cwd)
+
+
 def start_odl_with_features(features: tuple[str], cwd: str = "opendaylight"):
     """Starts ODL with installed provided features.
 
@@ -168,8 +180,7 @@ def start_odl_with_features(features: tuple[str], cwd: str = "opendaylight"):
         cwd=cwd,
     )
 
-    # start ODL
-    shell(f"JAVA_OPTS=-Xmx{CONTROLLER_MAX_MEM} ./bin/start", cwd=cwd)
+    _start_karaf(cwd)
 
 
 def wait_for_odl_ready(cwd: str = "opendaylight", timeout: int = 60):
@@ -196,6 +207,8 @@ def stop_all_karaf_instances():
 
     Matches on the process command line, so it stops all ODL instances at
     once regardless of how many are running (single node or cluster members).
+    Also discards every cached Karaf shell connection, since all of them
+    would otherwise be left pointing at a now-dead process.
 
     Args:
         None
@@ -204,6 +217,83 @@ def stop_all_karaf_instances():
         None
     """
     shell("kill $(pgrep -f org.apache.karaf.main.[M]ain | grep -v ^$$\\$)")
+    for shell_instance in karaf_shell_instances.values():
+        shell_instance.close()
+    karaf_shell_instances.clear()
+
+
+def _verify_no_karaf_running():
+    """Asserts no Karaf process is currently running.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    # `|| true` keeps the expected no-match case (pgrep exit 1) from being
+    # logged as a shell error; the assertion is decided by stdout being
+    # empty, not by the exit code.
+    _, out = shell("pgrep -f org.apache.karaf.main.[M]ain || true")
+    assert not out.strip(), "a Karaf process is still running"
+
+
+def _verify_karaf_shell_reachable(host: str, port: int):
+    """Asserts the Karaf SSH console accepts a connection.
+
+    Uses its own throwaway connection rather than the shared cache: this is
+    a check, not a place to establish the connection other callers reuse.
+
+    Args:
+        host (str): Node to probe.
+        port (int): Karaf SSH port.
+
+    Returns:
+        None
+    """
+    instance = KarafShell(host=host, port=port)
+    try:
+        instance.connect()
+    finally:
+        instance.close()
+
+
+def wait_for_karaf_shell_ready(host: str = "127.0.0.1", port: int = 8101):
+    """Blocks until the Karaf SSH console is reachable.
+
+    Args:
+        host (str): Node to probe.
+        port (int): Karaf SSH port.
+
+    Returns:
+        None
+    """
+    utils.wait_until_function_pass(30, 2, _verify_karaf_shell_reachable, host, port)
+
+
+def restart_karaf(cwd: str = "opendaylight", host: str = "127.0.0.1"):
+    """Restarts the Karaf process running in `cwd`, and waits until its SSH
+    console is reachable again.
+
+    Reuses the directory's existing configuration as-is - unlike
+    start_odl_with_features, this never touches featuresBoot, since it's
+    for restarting an already-configured instance, not a first-time setup.
+
+    Doesn't wait for RESTCONF to come back up itself: a caller that needs
+    to know when it's truly ready again should poll RESTCONF directly
+    instead.
+
+    Args:
+        cwd (str): Distribution directory to restart.
+        host (str): Node whose Karaf SSH console to wait for.
+
+    Returns:
+        None
+    """
+    stop_all_karaf_instances()
+    utils.wait_until_function_pass(12, 5, _verify_no_karaf_running)
+    _start_karaf(cwd)
+    wait_for_karaf_shell_ready(host=host)
 
 
 def execute_karaf_command(
