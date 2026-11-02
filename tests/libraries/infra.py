@@ -6,11 +6,15 @@
 # and is available at http://www.eclipse.org/legal/epl-v10.html
 #
 
+from collections.abc import Generator
+from contextlib import contextmanager
+import io
 import logging
 import os
 import signal
 import subprocess
 
+import allure
 import psutil
 
 from libraries import utils
@@ -416,6 +420,47 @@ def log_message_to_karaf(message: str, host: str = "127.0.0.1"):
         None
     """
     execute_karaf_command(f"log:log 'ROBOT MESSAGE: {message}'", host=host)
+
+
+@contextmanager
+def log_step(title: str, log_format: str) -> Generator[any, None, None]:
+    """Execute an Allure step with its own separately-captured logging.
+
+    Standalone counterpart to the allure_step_with_separate_logging fixture,
+    for use from a fixture whose own scope (e.g. class) is broader than that
+    fixture's function scope - pytest does not allow a broader-scoped
+    fixture to depend on a narrower-scoped one.
+
+    Args:
+        title (str): Step title.
+        log_format (str): Log line format, as returned by
+            request.config.getini("log_format").
+
+    Returns:
+        Generator[any, None, None]: context manager for allure step
+    """
+    log_capture_string = io.StringIO()
+    handler = logging.StreamHandler(log_capture_string)
+    formatter = logging.Formatter(log_format)
+    handler.setFormatter(formatter)
+
+    root_logger = logging.getLogger()
+    root_logger.addHandler(handler)
+
+    try:
+        with allure.step(title) as allure_step:
+            log_message_to_karaf(f"Starting step: {title}")
+            yield allure_step
+    finally:
+        log_message_to_karaf(f"End of step: {title}")
+        root_logger.removeHandler(handler)
+        log_contents = log_capture_string.getvalue()
+        if log_contents:
+            allure.attach(
+                log_contents,
+                name=f"Logs for '{title}'",
+                attachment_type=allure.attachment_type.TEXT,
+            )
 
 
 def is_karaf_feature_installed(feature_name: str, host: str = "127.0.0.1") -> bool:

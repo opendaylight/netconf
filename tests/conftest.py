@@ -6,13 +6,10 @@
 # and is available at http://www.eclipse.org/legal/epl-v10.html
 #
 
-import allure
 from collections.abc import Callable
-from contextlib import contextmanager
-import io
 import logging
 import pytest
-from typing import ContextManager, Generator, Iterator, Callable, List, Optional, Set
+from typing import ContextManager, Iterator, Callable, List, Optional, Set
 
 
 from libraries import cluster
@@ -88,42 +85,8 @@ def allure_step_with_separate_logging(
     Returns:
         Callable: context manager for allure step with separate logging.
     """
-
-    @contextmanager
-    def _log_step(title: str) -> Generator[any, None, None]:
-        """Execute allure step with separate logging
-
-        Args:
-            title (str): Step title.
-
-        Returns:
-            Generator[any, None, None]: context manager for allure step
-        """
-        log_capture_string = io.StringIO()
-        handler = logging.StreamHandler(log_capture_string)
-        tox_ini_log_fromat = request.config.getini("log_format")
-        formatter = logging.Formatter(tox_ini_log_fromat)
-        handler.setFormatter(formatter)
-
-        root_logger = logging.getLogger()
-        root_logger.addHandler(handler)
-
-        try:
-            with allure.step(title) as allure_step:
-                infra.log_message_to_karaf(f"Starting step: {title}")
-                yield allure_step
-        finally:
-            infra.log_message_to_karaf(f"End of step: {title}")
-            root_logger.removeHandler(handler)
-            log_contents = log_capture_string.getvalue()
-            if log_contents:
-                allure.attach(
-                    log_contents,
-                    name=f"Logs for '{title}'",
-                    attachment_type=allure.attachment_type.TEXT,
-                )
-
-    return _log_step
+    log_format = request.config.getini("log_format")
+    return lambda title: infra.log_step(title, log_format)
 
 
 @pytest.fixture
