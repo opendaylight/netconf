@@ -54,10 +54,9 @@ public record HTTPServerLimits(
     public static final int MAX_FRAME_SIZE = 16777215;
 
     /**
-     * Default limits, matching the {@code default} substatements of the YANG model. The body limit is deliberately
-     * generous, as RESTCONF requests routinely carry an entire subtree.
+     * Default limits, matching the {@code default} substatements of the YANG model.
      */
-    public static final HTTPServerLimits DEFAULT = new HTTPServerLimits(8192, 16384, 8192, 10485760, MIN_FRAME_SIZE);
+    public static final HTTPServerLimits DEFAULT = new HTTPServerLimits(8192, 16384, 8192, 262144, MIN_FRAME_SIZE);
 
     public HTTPServerLimits {
         checkPositive(maxInitialLineLength, "maxInitialLineLength");
