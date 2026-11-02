@@ -18,11 +18,12 @@ log = logging.getLogger(__name__)
 class KarafShell:
     """
     A persistent SSH client for Karaf that keeps a single shell open.
-    It auto-connects, executes commands, and cleans up ANSI control codes
-    while preserving the prompt at the end.
+    It auto-connects, executes commands, and strips ANSI control codes and
+    the trailing shell prompt from the returned output.
     """
 
     KARAF_PROMPT_REGEX = r"[a-zA-Z0-9_\-\.]+@[a-zA-Z0-9_\-\.]+>\s*"
+    _ANSI_ESCAPE = re.compile(r"\x1b\[[0-9;]*[a-zA-Z]")
 
     def __init__(self, host="127.0.0.1", port=8101, user="karaf", password="karaf"):
         self.host = host
@@ -117,8 +118,12 @@ class KarafShell:
             # Remove the echoed command from output (first line)
             raw_output = "\n".join(raw_output.split("\n")[1:])
 
-            # Return the final output
+            # Return the final output, with the trailing prompt dropped too -
+            # it's real shell content, not rendering noise, so it's stripped
+            # here rather than as part of _clean_terminal_noise.
             cleaned_output = self._clean_terminal_noise(raw_output)
+            # Remove karaf prompt from the output
+            cleaned_output = re.sub(self.prompt_regex, "", cleaned_output)
             return cleaned_output
 
         except Exception as e:
@@ -128,8 +133,8 @@ class KarafShell:
 
     def _clean_terminal_noise(self, raw_text: str) -> str:
         """
-        Cleanes terminal text from messy artifacts hidden by carriage return character
-        '\r'.
+        Cleans terminal text from rendering artifacts: ANSI control codes and
+        content hidden by carriage-return overwrites ('\r').
 
         Args:
             raw_text (int): Raw text as read from SSH output.
@@ -137,6 +142,7 @@ class KarafShell:
         Returns:
             str: Cleaned output.
         """
+        raw_text = self._ANSI_ESCAPE.sub("", raw_text)
         # Normalize \r\n to \n first so that trailing \r on each line is not
         # mistaken for an in-line overwrite control character.
         raw_text = raw_text.replace("\r\n", "\n")
