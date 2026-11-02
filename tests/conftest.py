@@ -73,6 +73,47 @@ def pytest_collection_modifyitems(items):
             item.add_marker(skip_cluster)
 
 
+@contextmanager
+def log_step(title: str, log_format: str) -> Generator[any, None, None]:
+    """Execute an Allure step with its own separately-captured logging.
+
+    Standalone counterpart to the allure_step_with_separate_logging fixture,
+    for use from a fixture whose own scope (e.g. class) is broader than that
+    fixture's function scope - pytest does not allow a broader-scoped
+    fixture to depend on a narrower-scoped one.
+
+    Args:
+        title (str): Step title.
+        log_format (str): Log line format, as returned by
+            request.config.getini("log_format").
+
+    Returns:
+        Generator[any, None, None]: context manager for allure step
+    """
+    log_capture_string = io.StringIO()
+    handler = logging.StreamHandler(log_capture_string)
+    formatter = logging.Formatter(log_format)
+    handler.setFormatter(formatter)
+
+    root_logger = logging.getLogger()
+    root_logger.addHandler(handler)
+
+    try:
+        with allure.step(title) as allure_step:
+            infra.log_message_to_karaf(f"Starting step: {title}")
+            yield allure_step
+    finally:
+        infra.log_message_to_karaf(f"End of step: {title}")
+        root_logger.removeHandler(handler)
+        log_contents = log_capture_string.getvalue()
+        if log_contents:
+            allure.attach(
+                log_contents,
+                name=f"Logs for '{title}'",
+                attachment_type=allure.attachment_type.TEXT,
+            )
+
+
 @pytest.fixture
 def allure_step_with_separate_logging(
     request: pytest.FixtureRequest,
@@ -88,42 +129,8 @@ def allure_step_with_separate_logging(
     Returns:
         Callable: context manager for allure step with separate logging.
     """
-
-    @contextmanager
-    def _log_step(title: str) -> Generator[any, None, None]:
-        """Execute allure step with separate logging
-
-        Args:
-            title (str): Step title.
-
-        Returns:
-            Generator[any, None, None]: context manager for allure step
-        """
-        log_capture_string = io.StringIO()
-        handler = logging.StreamHandler(log_capture_string)
-        tox_ini_log_fromat = request.config.getini("log_format")
-        formatter = logging.Formatter(tox_ini_log_fromat)
-        handler.setFormatter(formatter)
-
-        root_logger = logging.getLogger()
-        root_logger.addHandler(handler)
-
-        try:
-            with allure.step(title) as allure_step:
-                infra.log_message_to_karaf(f"Starting step: {title}")
-                yield allure_step
-        finally:
-            infra.log_message_to_karaf(f"End of step: {title}")
-            root_logger.removeHandler(handler)
-            log_contents = log_capture_string.getvalue()
-            if log_contents:
-                allure.attach(
-                    log_contents,
-                    name=f"Logs for '{title}'",
-                    attachment_type=allure.attachment_type.TEXT,
-                )
-
-    return _log_step
+    log_format = request.config.getini("log_format")
+    return lambda title: log_step(title, log_format)
 
 
 @pytest.fixture
