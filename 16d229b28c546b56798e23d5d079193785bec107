@@ -16,6 +16,24 @@
       "message": "add test mentioned in comments:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/124250/comment/e291b16b_f7de468d/\nhttps://git.opendaylight.org/gerrit/c/netconf/+/124250/comment/6eb3307a_8f0daa41/",
       "revId": "16d229b28c546b56798e23d5d079193785bec107",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "124794e1_9414ca41",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 38
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-03T10:35:41Z",
+      "side": 1,
+      "message": "not resolved",
+      "parentUuid": "7b8fa8b9_1209c6af",
+      "revId": "16d229b28c546b56798e23d5d079193785bec107",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
