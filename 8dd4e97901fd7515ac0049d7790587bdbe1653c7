@@ -16,6 +16,24 @@
       "message": "The rename commit also added @pytest.mark.standalone above this line in every other suite, and the collection hook in conftest.py only recognises standalone tests by that marker. Without it, -m standalone skips this suite, and running it together with the clustering suites leaves the cluster tests unskipped, so both Karaf setups start on the same ports. Could you add the marker here as well?",
       "revId": "8dd4e97901fd7515ac0049d7790587bdbe1653c7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df29e2ad_e2fe6869",
+        "filename": "tests/suites/CRUD-RPC/test_crud_rpc.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-03T09:39:20Z",
+      "side": 1,
+      "message": "Confirmed and added. \n\nWithout it `--setup-plan` on CRUD-RPC plus a clustering suite sets up both `odl_standalone` and `odl_three_node_cluster` in one session; with it the cluster test is skipped as intended.\n\n(was only one of 14 standalone suites missing the marker)",
+      "parentUuid": "ac5dabf3_ab8c59f6",
+      "revId": "8dd4e97901fd7515ac0049d7790587bdbe1653c7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
