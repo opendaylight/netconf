@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "87e09b91_9b92c46c",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/ClientSessionInfo.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-03T12:01:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "186b51fa_289fe93b",
+      "revId": "74898c382973ab7d69643071abf1c5e3157d8a66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "92bab242_ee014642",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "04ddbc19_94193ae8",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SessionHandlerConfigurator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-03T12:01:26Z",
+      "side": 1,
+      "message": "Done. Added NC1696Test, which calls the installed ServerKeyVerifier twice on a mocked ClientSession with two different keys.",
+      "parentUuid": "92bab242_ee014642",
+      "revId": "74898c382973ab7d69643071abf1c5e3157d8a66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "da7b2b30_a137486f",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-10-30T09:40:37Z",
       "side": 1,
       "message": "This is quite an ugly way of deciding, whether a username is required. Could the builder get an explicit mode instead, e.g. a sessionHandler(handler) method that installs SessionHandlerConfigurator and sets a perSessionCredentials flag, so this line reads perSessionCredentials ? null : requireUsername()?",
+      "revId": "74898c382973ab7d69643071abf1c5e3157d8a66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf222fa9_77701a46",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/TransportSshClient.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-03T12:01:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da7b2b30_a137486f",
       "revId": "74898c382973ab7d69643071abf1c5e3157d8a66",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
