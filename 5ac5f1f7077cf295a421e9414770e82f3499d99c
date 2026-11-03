@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "54fd53c6_02b47ffe",
+        "filename": "tests/libraries/netconf.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-03T08:37:25Z",
+      "side": 1,
+      "message": "That\u0027s the pretty-printer. `get_from_uri` logs the response through `minidom.toprettyxml`, which self-closes empty elements; `response.text` is the long form. \n\nalso `test_clustering_crud.py` and `test_clustering_entity.py` on master already compare against this string with equality. The regex in `check_device_data_is_empty` is inherited from the CRUD suites and not a second form ODL sends. \n\n-\u003e Added a note on the constant so the logs don\u0027t mislead.",
+      "parentUuid": "1aea494b_7ca28689",
+      "revId": "5ac5f1f7077cf295a421e9414770e82f3499d99c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6da3267f_7f747b34",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a337779_4ebba228",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-03T08:37:25Z",
+      "side": 1,
+      "message": "Done.\n\n\nstart_member launches Karaf and then polls, so a timeout leaves it running. Flag moved before the call and renamed member_restart_attempted.",
+      "parentUuid": "6da3267f_7f747b34",
+      "revId": "5ac5f1f7077cf295a421e9414770e82f3499d99c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "be5bcf76_e5ec127c",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-10-29T12:10:32Z",
       "side": 1,
       "message": "If a later cycle raises (e.g. the modify step fails), we leave this loop early and the catch-up failures already collected are never raised, so the test summary only shows the last error. Could the loop catch the hard failure and append the collected catch-up failures to its message before re-raising?",
+      "revId": "5ac5f1f7077cf295a421e9414770e82f3499d99c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e790e94_96d2771f",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 436,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-03T08:37:25Z",
+      "side": 1,
+      "message": "Done\n\nthe loop now catches the hard failure and re-raises an AssertionError carrying both it and the collected catch-up failures, chained from the original; Nothing collected means it is re-raised untouched.",
+      "parentUuid": "be5bcf76_e5ec127c",
       "revId": "5ac5f1f7077cf295a421e9414770e82f3499d99c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
