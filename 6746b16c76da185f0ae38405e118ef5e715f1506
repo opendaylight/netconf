@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "6746b16c76da185f0ae38405e118ef5e715f1506",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7513144d_80514c6a",
+        "filename": "transport/transport-http/src/main/yang/odl-http-server.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-03T07:50:24Z",
+      "side": 1,
+      "message": "Revision 2026-07-31 has already shipped in 12.0.0-12.0.2 with default 10485760. Is it acceptable here to change it under the same revision, or should this get a new revision as well?",
+      "revId": "6746b16c76da185f0ae38405e118ef5e715f1506",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
