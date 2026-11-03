@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbc61afe_f5fc06b3",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/RestconfStreamingLifecycleTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-03T08:15:56Z",
+      "side": 1,
+      "message": "Import it",
+      "revId": "d1ed5ea0622e00f924dd519a528fde3640d7d6bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b41848e5_0883596d",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServerSession.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-03T08:15:56Z",
+      "side": 1,
+      "message": "Is it not necessary to release the message here before we throw?",
+      "revId": "d1ed5ea0622e00f924dd519a528fde3640d7d6bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe42370e_8e0323d6",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-03T08:15:56Z",
+      "side": 1,
+      "message": "should the currentBody be cleared here?",
+      "revId": "d1ed5ea0622e00f924dd519a528fde3640d7d6bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6960c74a_d50f4b3b",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-03T08:15:56Z",
+      "side": 1,
+      "message": "This can lead to OOM. Streamed bodies no longer pass HttpObjectAggregator, so nothing enforces maxRequestBodySize any more. A chunked PUT of any size is accepted, and a pipelined request queued in RestconfSession buffers its whole body unread. The parent change listed this as a precondition for enabling streaming, and RequestBodyInputStream expects the handler to enforce it.",
+      "revId": "d1ed5ea0622e00f924dd519a528fde3640d7d6bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4eb4a1a_645f9585",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1StreamingTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-03T08:15:56Z",
+      "side": 1,
+      "message": "import",
+      "revId": "d1ed5ea0622e00f924dd519a528fde3640d7d6bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f5143ca_c181e49d",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1StreamingTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-03T08:15:56Z",
+      "side": 1,
+      "message": "channel.finishAndReleaseAll() should be in try-finally just like the sibling tests have it. Otherwise a failed assertion leaks the channel\u0027s buffers into later tests\u0027 leak reports. Here, and elsewhere.",
+      "revId": "d1ed5ea0622e00f924dd519a528fde3640d7d6bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ceca6082_c587c325",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1StreamingTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-03T08:15:56Z",
+      "side": 1,
+      "message": "empty line",
+      "revId": "d1ed5ea0622e00f924dd519a528fde3640d7d6bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
