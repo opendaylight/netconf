@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "778cc2da_bdb41ae1",
+        "filename": "transport/transport-api/src/main/java/org/opendaylight/netconf/transport/api/AbstractTransportStack.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-03T10:21:40Z",
+      "side": 1,
+      "message": "it was requested for it to be top level\nhttps://git.opendaylight.org/gerrit/c/netconf/+/124022/comment/e8572824_5d9be411/\n\nI used a small package private HTTPClient.closeChannel(Channel) helper which can use that protected method",
+      "parentUuid": "d66acdd3_6ba74777",
+      "revId": "bfa61598d880ed79eebcb62ec529e8d9eb49681b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec67c5c6_8e82b001",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-10-30T10:33:24Z",
       "side": 1,
       "message": "Just a nit.. the switch just below already dispatches on transport, so could this become a \"case Quic quic -\u003e { return connectQuic(...); }\" arm there? Then every supported transport is visible in one place, and definite assignment of the three params still works because the arm returns.",
+      "revId": "bfa61598d880ed79eebcb62ec529e8d9eb49681b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fedb6ae8_209c91be",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-03T10:21:40Z",
+      "side": 1,
+      "message": "this was proposed here: https://git.opendaylight.org/gerrit/c/netconf/+/124022/comment/27b457e8_6c5105d0/\n\nand removed from switch, since QUIC isn\u0027t the same kind of transport option (it doesn\u0027t go through AUTH_PROVIDER_FACTORY/transformUnderlay like tcp/tls)",
+      "parentUuid": "ec67c5c6_8e82b001",
       "revId": "bfa61598d880ed79eebcb62ec529e8d9eb49681b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd3edfb4_2e1e60de",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-03T10:21:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "82d71350_ab6e6d14",
+      "revId": "bfa61598d880ed79eebcb62ec529e8d9eb49681b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bfe65d8f_2da92460",
@@ -86,6 +140,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "50e8a1e7_f3861933",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HTTPServerQuicBindFailureTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-03T10:21:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bfe65d8f_2da92460",
+      "revId": "bfa61598d880ed79eebcb62ec529e8d9eb49681b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c566e80b_9a4dbce8",
@@ -99,6 +171,24 @@
       "writtenOn": "2026-10-30T10:33:24Z",
       "side": 1,
       "message": "empty line",
+      "revId": "bfa61598d880ed79eebcb62ec529e8d9eb49681b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3741209_201e2a6b",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/QuicClientTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-03T10:21:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c566e80b_9a4dbce8",
       "revId": "bfa61598d880ed79eebcb62ec529e8d9eb49681b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
