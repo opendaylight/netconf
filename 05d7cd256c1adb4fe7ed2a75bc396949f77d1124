@@ -105,6 +105,24 @@
       "parentUuid": "f9a9fce3_aefe99d7",
       "revId": "05d7cd256c1adb4fe7ed2a75bc396949f77d1124",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d53646a3_a8ec4212",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-03T08:49:52Z",
+      "side": 1,
+      "message": "Ye, I checked and that seems to be it. Same trace (commit before edit-config, same device and payload), and 1665 is still open, so I suppose no new ticket needed? \n\nFIXME added on `_wait_until_device_data_applied` in `netconf_cluster.py`, since that is the one place the resend is. Also all four clustering suites go through that.\n\nlastly, its docstring blamed mount point churn for the lost write, corrected to the commit ordering.",
+      "parentUuid": "25973be4_7ac7d5d4",
+      "revId": "05d7cd256c1adb4fe7ed2a75bc396949f77d1124",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
