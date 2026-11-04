@@ -16,6 +16,24 @@
       "message": "With HTTP 1.1 pipelining, this response bypasses RestconfSession\u0027s ordered queue: if an earlier request is still executing, the client reads this 4xx as that request\u0027s answer and the real answer is lost when the connection closes. Since HTTPServerSession.channelRead0 already rejects decoder failures, could this branch just forward the request (retained) and let the session answer it in order?",
       "revId": "e8f2d26a3a80aba6f5aefd58446db2234ed9d858",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13be06cd_8f0be8ca",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/AbstractBasicAuthHandler.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-04T08:31:31Z",
+      "side": 1,
+      "message": "Agreed. Since 2026-07-31 has already shipped, this change needs a new revision",
+      "parentUuid": "b8508219_4baaf481",
+      "revId": "e8f2d26a3a80aba6f5aefd58446db2234ed9d858",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
