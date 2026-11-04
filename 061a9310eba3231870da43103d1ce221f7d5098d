@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b498851_9c4c6c6d",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T09:07:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d74d8ad_e27b651f",
+      "revId": "061a9310eba3231870da43103d1ce221f7d5098d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dcab101d_60734e8b",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-29T13:32:18Z",
       "side": 1,
       "message": "It doesn\u0027t \"unpack\".. it \"replaces tests/opendaylight with a fresh copy of the distribution built in usecase/karaf\"",
+      "revId": "061a9310eba3231870da43103d1ce221f7d5098d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d489c1e_005aa4c2",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T09:07:48Z",
+      "side": 1,
+      "message": "The profile copies usecase/karaf/target/assembly/, fair enough, \"unpacks\" was wrong.",
+      "parentUuid": "dcab101d_60734e8b",
       "revId": "061a9310eba3231870da43103d1ce221f7d5098d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "53491332_5433a667",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T09:07:48Z",
+      "side": 1,
+      "message": "Right, fixed; states that no CI job enables the profile, without naming the workflows (since that would go stale in time), so nobody assumes the smoke suites are covered\n\n(had a look and: for context, integrationtests is not a misspelling of this profile: it was a separate one removed from the repo in 2018, and the Jenkins job kept passing it ever since - since on missing, mvn only give a warning instead of a red blob.)",
+      "parentUuid": "3ce18a31_5ef4747c",
+      "revId": "061a9310eba3231870da43103d1ce221f7d5098d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "852ce992_705217dd",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T09:07:48Z",
+      "side": 1,
+      "message": "Done\n\nQuoting `-m \"(smoke and not performance) or always\"`",
+      "parentUuid": "b12a298a_81dc9ca9",
+      "revId": "061a9310eba3231870da43103d1ce221f7d5098d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ecb6dd2c_aa25c28d",
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6ea5e3a_14be6921",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T09:07:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ecb6dd2c_aa25c28d",
+      "revId": "061a9310eba3231870da43103d1ce221f7d5098d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d32c677b_a4b0ca0e",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-10-29T13:32:18Z",
       "side": 1,
       "message": "This replaces the default -m \"(smoke and not performance) or always\", so the \"always\" readiness suite in suites/ready is no longer collected and CRUD starts right after \"System ready\". Could the example be \u0027-- suites/ready suites/CRUD\u0027, with a note that tox.args replaces the default filter?",
+      "revId": "061a9310eba3231870da43103d1ce221f7d5098d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98e11b23_f2e47d89",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T09:07:48Z",
+      "side": 1,
+      "message": "Done. \n\nThe example is now `-- suites/ready suites/CRUD`, with a note that `tox.args` replaces the default in full, including the `-m` filter.\n\nConfirmed by collection: old:1, new:5.",
+      "parentUuid": "d32c677b_a4b0ca0e",
       "revId": "061a9310eba3231870da43103d1ce221f7d5098d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
