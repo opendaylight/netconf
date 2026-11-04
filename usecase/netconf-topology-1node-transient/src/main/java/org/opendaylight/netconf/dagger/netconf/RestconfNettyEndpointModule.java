@@ -111,7 +111,8 @@ public interface RestconfNettyEndpointModule {
     @Singleton
     static NettyEndpointConfiguration nettyEndpointConfiguration(final RFC8040Configuration config) {
         final var httpOverTcp = HTTPServerOverTcp.of(config.bindAddress(), config.bindPort(),
-            HTTPServerLimits.DEFAULT.withMaxFrameSize(config.http2MaxFrameSize));
+            HTTPServerLimits.DEFAULT.withMaxRequestBodySize(config.httpRequestBodyMaxSize)
+                .withMaxFrameSize(config.http2MaxFrameSize));
         final var svcHeader = buildAltSvcHeader(config.bindPort, 0);
 
         return new NettyEndpointConfiguration(
@@ -202,6 +203,8 @@ public interface RestconfNettyEndpointModule {
      *     HTTP/2 response chunk size follows the peer's SETTINGS_MAX_FRAME_SIZE. For HTTP/3 this value is used as
      *     the configured upper bound when deriving the effective response chunk size. Its main purpose is to avoid
      *     out-of-memory issues when sending large response.
+     * @param httpRequestBodyMaxSize Maximum size of an HTTP request body in bytes. Requests exceeding this value
+     *     are rejected with 413 Content Too Large.
      * @param http2MaxFrameSize Maximum HTTP/2 DATA frame payload size (SETTINGS_MAX_FRAME_SIZE) this server is willing
      *     to accept from clients. If not overridden, the RFC7540 default 16384 is used. Valid range 16384–16777215.
      * @param httpWriteBufferLowWatermark Netty channel write buffer low watermark used for outbound backpressure.
@@ -259,6 +262,10 @@ public interface RestconfNettyEndpointModule {
         @DefaultValue("262144") // 256 KiB
         @Min(1)
         int httpChunkSize,
+
+        @DefaultValue("262144") // 256 KiB
+        @Min(1)
+        int httpRequestBodyMaxSize,
 
         @DefaultValue("16384")
         @Min(16384)
