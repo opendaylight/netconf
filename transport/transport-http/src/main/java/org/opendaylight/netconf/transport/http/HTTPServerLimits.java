@@ -110,6 +110,17 @@ public record HTTPServerLimits(
     }
 
     /**
+     * {@return a copy of these limits with {@link #maxRequestBodySize()} replaced}
+     *
+     * @param newMaxRequestBodySize the new maximum request body size, in bytes
+     */
+    public HTTPServerLimits withMaxRequestBodySize(final int newMaxRequestBodySize) {
+        return newMaxRequestBodySize == maxRequestBodySize ? this
+            : new HTTPServerLimits(maxInitialLineLength, maxHeaderSize, maxRequestChunkSize, newMaxRequestBodySize,
+                maxFrameSize);
+    }
+
+    /**
      * {@return a copy of these limits with {@link #maxFrameSize()} replaced}
      *
      * @param newMaxFrameSize the new {@code SETTINGS_MAX_FRAME_SIZE}
