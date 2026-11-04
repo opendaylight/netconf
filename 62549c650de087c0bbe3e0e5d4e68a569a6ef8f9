@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "41b802ab_5f3c4b93",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T08:34:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "847fdd43_62546b00",
+      "revId": "62549c650de087c0bbe3e0e5d4e68a569a6ef8f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "df6c83d1_689d3f8a",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-29T13:08:58Z",
       "side": 1,
       "message": "If the receiver dies (bad URI, 404, missing module), this still polls for 30s and then fails on the missing \"Subscribed\" line, while the receiver\u0027s traceback stays unread in the Popen stdout pipe. Could the poll check self.ssreceiver_process.poll() and pytest.fail with its stdout when it has exited? Since both polled functions only differ in the marker, one helper method could do this for both.",
+      "revId": "62549c650de087c0bbe3e0e5d4e68a569a6ef8f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4585461_bedafa40",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T08:34:27Z",
+      "side": 1,
+      "message": "Done\n\nBoth polls now go through one `wait_for_receiver_log(marker, description)`.\nChecks `poll()` first and `pytest.fails` with the process output; since `Failed` is a `BaseException` the retry loop doesn\u0027t take it, so a receiver that crashed on start-up fails instantly instead of after 30s.",
+      "parentUuid": "df6c83d1_689d3f8a",
       "revId": "62549c650de087c0bbe3e0e5d4e68a569a6ef8f9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -66,6 +102,24 @@
       "side": 1,
       "message": "I am not sure if the DeferredLogHandler which is used by retry functions properly handles this. But it should discard all log messages except for last loop iteration, which could be either success, or failure.",
       "parentUuid": "a39292a3_3c26f5ce",
+      "revId": "62549c650de087c0bbe3e0e5d4e68a569a6ef8f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2739362_01f14e24",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T08:34:27Z",
+      "side": 1,
+      "message": "The assert now carries an explicit message.\n\nThe deferred handler only wraps the call to the polled function - the `failed with: ...` line is logged outside it, once per attempt. Measured under pytest, plain assert put the full receiver log in each of them.",
+      "parentUuid": "8884e42f_650ced3e",
       "revId": "62549c650de087c0bbe3e0e5d4e68a569a6ef8f9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
