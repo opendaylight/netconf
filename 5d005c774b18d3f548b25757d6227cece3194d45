@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "201b964d_7eee7ea6",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-04T14:35:10Z",
+      "side": 1,
+      "message": "remove field initializations in a separate patch",
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d13040bc_871c8071",
         "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
         "patchSetId": 21
