@@ -16,6 +16,40 @@
       "message": "pleas check what should happen here\n\nAs I understan this would mean the actor was created but never received any message\nsending dataStoreService::cancel doesn\u0027t sound correct\n\nas you write in commit message \n\"With a non-zero timeout\na lingering actor would instead send discard-changes and unlock once\nit expired, cancelling whatever a later transaction was doing on the\nsame device.\"",
       "revId": "2d5ba641d6f73053907aab5b7c00e546f0a5470a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8891f39_39a9a420",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActorTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-04T14:32:52Z",
+      "side": 1,
+      "message": "var",
+      "revId": "2d5ba641d6f73053907aab5b7c00e546f0a5470a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8c3c49c_b9bfe8f8",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActorTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-04T14:32:52Z",
+      "side": 1,
+      "message": "var",
+      "revId": "2d5ba641d6f73053907aab5b7c00e546f0a5470a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
