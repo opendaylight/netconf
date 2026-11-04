@@ -38,6 +38,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dac8aeae_38db6c93",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-04T12:49:58Z",
+      "side": 1,
+      "message": "Can we use quicParams.nonnullQuicClientParameters() here instead? If the container is not present, it returns an empty one instead of null. Its leaves are still null, but all of them have default values in the model, so you can fall back to those defaults for each leaf that is not set instead of throwing:\n\nhttps://github.com/opendaylight/netconf/blob/master/transport/transport-http/src/main/yang/odl-quic-common.yang#L33",
+      "range": {
+        "startLine": 160,
+        "startChar": 65,
+        "endLine": 160,
+        "endChar": 101
+      },
+      "revId": "a363dd249639d5bb996047f8cc6c8de4b4fd482f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "99be1b06_5c540386",
         "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
         "patchSetId": 25
