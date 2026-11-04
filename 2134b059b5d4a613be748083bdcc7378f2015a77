@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc612590_2fe00da9",
+        "filename": "tests/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T10:31:49Z",
+      "side": 1,
+      "message": "Done.\n\nThe Netopeer2 section now says both suites are marked `smoke`, so the default selection runs them and they fail with no container up, and shows the `not netopeer2` filter.",
+      "parentUuid": "06bb3abb_765c3ead",
+      "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "65aea3b7_3e6270be",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-29T13:43:14Z",
       "side": 1,
       "message": "Since Variables is a BaseSettings, NETOPEER_DIR can be overridden from the environment, but start_netopeer.sh:22 and the bind mounts in docker-compose.yaml hard-code /tmp/pytest-netopeer, so an override moves only the suites. Could the script use ${NETOPEER_DIR:-/tmp/pytest-netopeer}, export it, and the compose file use ${NETOPEER_DIR} in the mounts?",
+      "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad653d25_ec42eec6",
+        "filename": "tests/libraries/variables.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T10:31:49Z",
+      "side": 1,
+      "message": "Done. \n\nThe script takes `NETOPEER_DIR` from the environment with the same default and exports it, and the compose file uses `${NETOPEER_DIR:-/tmp/pytest-netopeer}` in all three mounts\n\n(Verified with `docker compose config`: an override moves all three bind sources.)",
+      "parentUuid": "65aea3b7_3e6270be",
       "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa94e58f_4a6e8ed9",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T10:31:49Z",
+      "side": 1,
+      "message": "Done.\n\n(checked separately with `docker compose version`, since v1 is its own command and I believe it would pass the docker check)",
+      "parentUuid": "c99d2348_d02a476f",
+      "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c865e554_c5e1852b",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-10-29T13:43:14Z",
       "side": 1,
       "message": "The work directory is deleted while the previous container still has it mounted. `down` only follows at line 106",
+      "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8033ec3d_afc2c05a",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T10:31:49Z",
+      "side": 1,
+      "message": "Done. \n\n`down --remove-orphans` now runs before the `rm -rf`, guarded on the compose file existing so a first run skips it. The call at the end is just `up -d`.",
+      "parentUuid": "c865e554_c5e1852b",
       "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d44ef30a_9bc2d951",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T10:31:49Z",
+      "side": 1,
+      "message": "Ye, you\u0027re right.\n\n`-traditional` arrived in 3.0. The flag is now added only when `openssl genrsa -help` lists it, leaving 1.x to write PKCS#1 aince it already does. \n\n(tested both branches, the 1.1.1 one with a stubbed `openssl` on `PATH`)",
+      "parentUuid": "9d1d55da_194f47a7",
+      "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a02e507f_2d00161b",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-10-29T13:43:14Z",
       "side": 1,
       "message": "Why chcon? Compose can do it with the `:z` volume suffix. Add `:z` to the three mounts in `docker-compose.yaml:14` and drop the `chcon` block",
+      "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9826307f_badf9b2f",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T10:31:49Z",
+      "side": 1,
+      "message": "Done. \n\nThe three mounts carry `:z` and the chcon block is gone. I checked on an enforcing host and all three paths come out `container_file_t`, which is what `chcon -t svirt_sandbox_file_t` resolved to anyway, and the callhome and KeyAuth suites pass against the container.",
+      "parentUuid": "a02e507f_2d00161b",
       "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5dbd9f7_29d3c603",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T10:31:49Z",
+      "side": 1,
+      "message": "Dropped.. together with the rest of the block.",
+      "parentUuid": "fea08300_a7cd6dcb",
+      "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc2da1e0_349465f6",
@@ -133,6 +259,24 @@
       "writtenOn": "2026-10-29T13:43:14Z",
       "side": 1,
       "message": "up -d returns as soon as the container starts, so if init_configuration.sh or netopeer2-server fails (or an old container from someone\u0027s private script, a different compose project, still holds port 830 on the host network) this still reports success. Could the script wait for port 830 and print compose ps/logs and exit 1 if it never appears?",
+      "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3354129_3fca5249",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T10:31:49Z",
+      "side": 1,
+      "message": "Done. \n\nThe script polls port 830 for 30s after `up -d`, and on a timeout prints `compose ps` and `compose logs` and exits 1. \n\nIt still cannot tell the stale-container case from a good start.. since both answer on 830, but the logs are at hand when/if it does fail.",
+      "parentUuid": "bc2da1e0_349465f6",
       "revId": "2134b059b5d4a613be748083bdcc7378f2015a77",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

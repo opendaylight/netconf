@@ -16,6 +16,24 @@
       "message": "Change-Id: I1d414b347ec8ccd5c481f6f4b592018c623b0422\nAssisted-by: Claude Opus 5 \u003cnoreply@anthropic.com\u003e\nSigned-off-by: Branislav Taran \u003cbranislav.taran@pantheon.tech\u003e",
       "revId": "487b0c3dd2c0149cf9af10cffa87523955c16759",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "561e6994_c738df87",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-04T10:31:49Z",
+      "side": 1,
+      "message": "Right, old mistake sorry - I forgot that after initial addition of change-id I have to go back to amend for correct order.",
+      "parentUuid": "3334e3bb_bbbe4963",
+      "revId": "487b0c3dd2c0149cf9af10cffa87523955c16759",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
