@@ -16,6 +16,166 @@
       "message": "recheck",
       "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d13040bc_871c8071",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-04T14:32:45Z",
+      "side": 1,
+      "message": "@GuardedBy(\"this\")",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 53
+      },
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84c2f779_21d3b17d",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-04T14:32:45Z",
+      "side": 1,
+      "message": "Can be in one line.",
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f12231c_1e77834b",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacadeTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-04T14:32:45Z",
+      "side": 1,
+      "message": "Please move this belove class fields.",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 5
+      },
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35208546_ee53bf0e",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacadeTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-04T14:32:45Z",
+      "side": 1,
+      "message": "Please use @Mock fields here instead of mock(). This also lets you remove @SuppressWarnings(\"unchecked\") from this method: the warning comes from mock(ObjectRegistration.class), and a @Mock field of type ObjectRegistration\u003cDOMMountPoint\u003e does not produce it.",
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92f3a1c8_3589e712",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacadeTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-04T14:32:45Z",
+      "side": 1,
+      "message": "Please use any(SomeType.class) instead of any(). It makes the test stricter, because the typed matcher does not match a null value.",
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04742b8c_8e43b5bd",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacadeTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-04T14:32:45Z",
+      "side": 1,
+      "message": "```\n        doAnswer(invocation -\u003e {\n            strategy.set(invocation.getArgument(1));\n            return mountPointBuilder;\n        }).when(mountPointBuilder).addService(eq(DOMServerStrategy.class), any(DOMServerStrategy.class));\n```",
+      "range": {
+        "startLine": 192,
+        "startChar": 0,
+        "endLine": 197,
+        "endChar": 60
+      },
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5cc7233_cabb0940",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacadeTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-04T14:32:45Z",
+      "side": 1,
+      "message": "This does not need the fully qualified name. {@link NetconfDeviceDataBroker} / {@link AbstractDataStore}",
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f2c20c3_556c46fb",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacadeTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-04T14:32:45Z",
+      "side": 1,
+      "message": "Please remove semicolon from docs.",
+      "range": {
+        "startLine": 212,
+        "startChar": 14,
+        "endLine": 212,
+        "endChar": 15
+      },
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
