@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1d01f14_0878c604",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActor.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-05T14:45:47Z",
+      "side": 1,
+      "message": "Now that the actor stops after its operation, timeout can only fire on actor that never got its request, so it has nothing to cancel. It now just stops.",
+      "parentUuid": "0e0677cd_64850b32",
+      "revId": "2d5ba641d6f73053907aab5b7c00e546f0a5470a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a8891f39_39a9a420",
