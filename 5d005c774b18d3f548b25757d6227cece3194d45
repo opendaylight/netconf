@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2b4e57a_56f6b2e6",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-05T13:50:40Z",
+      "side": 1,
+      "message": "We actually already attempted it here: https://git.opendaylight.org/gerrit/c/netconf/+/120457\n\nnulls are there to prevent UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR error from spotbugs, otherwise we would need to suppress warning",
+      "parentUuid": "201b964d_7eee7ea6",
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d13040bc_871c8071",
