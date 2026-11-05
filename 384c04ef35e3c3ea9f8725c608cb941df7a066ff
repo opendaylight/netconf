@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "824b727b_496cffd8",
+        "filename": "tests/suites/callhome/test_callhome.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-05T18:32:52Z",
+      "side": 1,
+      "message": "It is even possible to quote the path for security \n\n```\npath \u003d shlex.quote(f\"{NETOPEER_DIR}/configuration-files/certs/{file_name}\")\nrc, content \u003d infra.shell(f\"sed -z \u0027s!\\\\n!\\\\\\\\n!g\u0027 {path}\")\n```",
+      "revId": "384c04ef35e3c3ea9f8725c608cb941df7a066ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7fe43c1_e400ebcf",
+        "filename": "tests/suites/callhome/test_callhome.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-05T18:32:52Z",
+      "side": 1,
+      "message": "Also in here to use `shlex.quote`",
+      "revId": "384c04ef35e3c3ea9f8725c608cb941df7a066ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a590fb21_0e2a5469",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-05T18:32:52Z",
+      "side": 1,
+      "message": "Do we need another variable `WORK_DIR`, could we just not use `NETOPEER_DIR`?",
+      "revId": "384c04ef35e3c3ea9f8725c608cb941df7a066ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58b72734_6dbcb9a2",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-05T18:32:52Z",
+      "side": 1,
+      "message": "What about making these three var overwritable by env vars, while keeping default values? Something like it is for `NETOPEER_DIR`.\n`ODL_SYSTEM_IP`\n`CALL_HOME_SSH_PORT`\n`CALL_HOME_TLS_PORT`",
+      "revId": "384c04ef35e3c3ea9f8725c608cb941df7a066ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0bb9138_fcd23c4c",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-05T18:32:52Z",
+      "side": 1,
+      "message": "Could we rather identify the container by specific name and try to stop that one? (e.g. in `docker-compose.yaml` `container_name: pytest-netopeer2-server`)",
+      "revId": "384c04ef35e3c3ea9f8725c608cb941df7a066ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b24a920b_8f8d8246",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-05T18:32:52Z",
+      "side": 1,
+      "message": "Can we add here a check, that the path is pointing to some location under `/tmp/` that by mistake it would not remove something important if using wrong directory?",
+      "revId": "384c04ef35e3c3ea9f8725c608cb941df7a066ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
