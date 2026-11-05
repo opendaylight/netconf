@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "65836a28_80a4388c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-05T11:42:36Z",
+      "side": 1,
+      "message": "Limit the subject line to 50 characters",
+      "revId": "df086ac0071584789a17337459c49b16c8dd6839",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "766b7810_12e5ef3a",
@@ -14,6 +31,23 @@
       "writtenOn": "2026-11-05T11:08:43Z",
       "side": 1,
       "message": "recheck",
+      "revId": "df086ac0071584789a17337459c49b16c8dd6839",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "249d86ab_b66b80fb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-05T11:42:36Z",
+      "side": 1,
+      "message": "Please look at the callhome failure in github run.\n```\n  [INFO] Running org.opendaylight.netconf.topology.callhome.CallHomeTlsServerTest\n  [ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.821 s \u003c\u003c\u003c FAILURE! -- in org.opendaylight.netconf.topology.callhome.CallHomeTlsServerTest\n  [ERROR] org.opendaylight.netconf.topology.callhome.CallHomeTlsServerTest.integrationTest -- Time elapsed: 0.817 s \u003c\u003c\u003c FAILURE!\n  Wanted but not invoked:\n  statusRecorder.reportSuccess(\"client-id\");\n  -\u003e at org.opendaylight.netconf.topology.callhome.CallHomeTlsServerTest.integrationTest(CallHomeTlsServerTest.java:205)\n  \n  However, there were exactly 2 interactions with this mock:\n  statusRecorder.onTransportChannelFailure(\n      javax.net.ssl.SSLHandshakeException: (certificate_unknown) PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target\n  );\n  -\u003e at org.opendaylight.netconf.topology.callhome.CallHomeTransportChannelListener.onTransportChannelFailed(CallHomeTransportChannelListener.java:77)\n```",
       "revId": "df086ac0071584789a17337459c49b16c8dd6839",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
