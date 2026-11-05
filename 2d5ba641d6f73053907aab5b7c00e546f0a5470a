@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "91a79249_76f5bd44",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActorTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-05T11:40:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a8891f39_39a9a420",
+      "revId": "2d5ba641d6f73053907aab5b7c00e546f0a5470a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b8c3c49c_b9bfe8f8",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-11-04T14:32:52Z",
       "side": 1,
       "message": "var",
+      "revId": "2d5ba641d6f73053907aab5b7c00e546f0a5470a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58515b9e_db880ae9",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActorTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-05T11:40:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b8c3c49c_b9bfe8f8",
       "revId": "2d5ba641d6f73053907aab5b7c00e546f0a5470a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
