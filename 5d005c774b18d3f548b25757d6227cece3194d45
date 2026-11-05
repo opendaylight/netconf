@@ -58,6 +58,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c999802_397e9a8c",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-05T11:40:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d13040bc_871c8071",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 53
+      },
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "84c2f779_21d3b17d",
@@ -71,6 +95,24 @@
       "writtenOn": "2026-11-04T14:32:45Z",
       "side": 1,
       "message": "Can be in one line.",
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c6f16f6_2a3b597d",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-05T11:40:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "84c2f779_21d3b17d",
       "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -98,6 +140,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2101f518_1cca944b",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacadeTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-05T11:40:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f12231c_1e77834b",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 5
+      },
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35208546_ee53bf0e",
@@ -115,6 +181,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "da3f9e58_5c29cc65",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacadeTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-05T11:40:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35208546_ee53bf0e",
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "92f3a1c8_3589e712",
@@ -128,6 +212,24 @@
       "writtenOn": "2026-11-04T14:32:45Z",
       "side": 1,
       "message": "Please use any(SomeType.class) instead of any(). It makes the test stricter, because the typed matcher does not match a null value.",
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec774d39_6eb7222d",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacadeTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-05T11:40:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "92f3a1c8_3589e712",
       "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -155,6 +257,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7be08e42_0af8f613",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacadeTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-05T11:40:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "04742b8c_8e43b5bd",
+      "range": {
+        "startLine": 192,
+        "startChar": 0,
+        "endLine": 197,
+        "endChar": 60
+      },
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c5cc7233_cabb0940",
@@ -172,6 +298,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a905b0d_08e4c668",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacadeTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-05T11:40:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5cc7233_cabb0940",
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2f2c20c3_556c46fb",
@@ -185,6 +329,30 @@
       "writtenOn": "2026-11-04T14:32:45Z",
       "side": 1,
       "message": "Please remove semicolon from docs.",
+      "range": {
+        "startLine": 212,
+        "startChar": 14,
+        "endLine": 212,
+        "endChar": 15
+      },
+      "revId": "5d005c774b18d3f548b25757d6227cece3194d45",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dca1a29d_417894b3",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacadeTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-05T11:40:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f2c20c3_556c46fb",
       "range": {
         "startLine": 212,
         "startChar": 14,
