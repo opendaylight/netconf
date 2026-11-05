@@ -50,6 +50,24 @@
       "message": "Please look at the callhome failure in github run.\n```\n  [INFO] Running org.opendaylight.netconf.topology.callhome.CallHomeTlsServerTest\n  [ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.821 s \u003c\u003c\u003c FAILURE! -- in org.opendaylight.netconf.topology.callhome.CallHomeTlsServerTest\n  [ERROR] org.opendaylight.netconf.topology.callhome.CallHomeTlsServerTest.integrationTest -- Time elapsed: 0.817 s \u003c\u003c\u003c FAILURE!\n  Wanted but not invoked:\n  statusRecorder.reportSuccess(\"client-id\");\n  -\u003e at org.opendaylight.netconf.topology.callhome.CallHomeTlsServerTest.integrationTest(CallHomeTlsServerTest.java:205)\n  \n  However, there were exactly 2 interactions with this mock:\n  statusRecorder.onTransportChannelFailure(\n      javax.net.ssl.SSLHandshakeException: (certificate_unknown) PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target\n  );\n  -\u003e at org.opendaylight.netconf.topology.callhome.CallHomeTransportChannelListener.onTransportChannelFailed(CallHomeTransportChannelListener.java:77)\n```",
       "revId": "df086ac0071584789a17337459c49b16c8dd6839",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1c0b69a_1194a4a2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-05T11:48:18Z",
+      "side": 1,
+      "message": "Its run after my recheck:\nhttps://github.com/opendaylight/netconf/actions/runs/42016542248",
+      "parentUuid": "249d86ab_b66b80fb",
+      "revId": "df086ac0071584789a17337459c49b16c8dd6839",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
