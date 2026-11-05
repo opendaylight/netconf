@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53679b17_c96b874b",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-05T12:41:15Z",
+      "side": 1,
+      "message": "@Nullable",
+      "revId": "7a51bd0594c9234e0a557808e2c741ed31edfaa8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65208416_9f2940aa",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 475,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-05T12:41:15Z",
+      "side": 1,
+      "message": "@Nullable",
+      "revId": "7a51bd0594c9234e0a557808e2c741ed31edfaa8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
