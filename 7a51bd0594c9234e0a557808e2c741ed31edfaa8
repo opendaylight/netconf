@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3b78a3d_2c7d8b1a",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-06T08:15:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53679b17_c96b874b",
+      "revId": "7a51bd0594c9234e0a557808e2c741ed31edfaa8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "65208416_9f2940aa",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-05T12:41:15Z",
       "side": 1,
       "message": "@Nullable",
+      "revId": "7a51bd0594c9234e0a557808e2c741ed31edfaa8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08b5f32f_4b710f14",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 475,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-06T08:15:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "65208416_9f2940aa",
       "revId": "7a51bd0594c9234e0a557808e2c741ed31edfaa8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
