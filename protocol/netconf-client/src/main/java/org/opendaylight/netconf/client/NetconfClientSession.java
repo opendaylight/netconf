@@ -10,7 +10,9 @@ package org.opendaylight.netconf.client;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
 import java.util.Collection;
+import org.opendaylight.netconf.codec.FramingException;
 import org.opendaylight.netconf.codec.MessageDecoder;
 import org.opendaylight.netconf.codec.MessageWriter;
 import org.opendaylight.netconf.codec.XMLMessageDecoder;
@@ -49,6 +51,17 @@ public class NetconfClientSession
     @Override
     protected NetconfClientSession thisInstance() {
         return this;
+    }
+
+    @Override
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+        if (cause instanceof FramingException) {
+            // A framing error closes the session. See FramingException.
+            LOG.warn("Session {} closing after a framing error", this, cause);
+            ctx.close();
+            return;
+        }
+        super.exceptionCaught(ctx, cause);
     }
 
     @Override
