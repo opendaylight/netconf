@@ -39,11 +39,11 @@ final class SendErrorExceptionUtil {
         channelFuture.addListener(new SendErrorVerifyingListener(sendErrorException));
     }
 
-    static void sendErrorMessage(final Channel channel, final DocumentedException sendErrorException) {
+    static ChannelFuture sendErrorMessage(final Channel channel, final DocumentedException sendErrorException) {
         LOG.trace("Sending error", sendErrorException);
         final Document errorDocument = createDocument(sendErrorException);
         ChannelFuture channelFuture = channel.writeAndFlush(new NetconfMessage(errorDocument));
-        channelFuture.addListener(new SendErrorVerifyingListener(sendErrorException));
+        return channelFuture.addListener(new SendErrorVerifyingListener(sendErrorException));
     }
 
     static void sendErrorMessage(final NetconfSession session, final DocumentedException sendErrorException,

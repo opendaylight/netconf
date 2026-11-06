@@ -7,7 +7,9 @@
  */
 package org.opendaylight.netconf.codec;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -17,11 +19,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
-import io.netty.handler.codec.DecoderException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class ChunkedFrameDecoderTest {
     private static final String EXPECTED_MESSAGE = """
@@ -126,7 +129,7 @@ class ChunkedFrameDecoderTest {
 
     /**
      * Two-step write: first complete the DATA section (which allocates 'chunk'), then send a malformed footer byte that
-     * causes decode() to throw IllegalStateException.
+     * causes decode() to throw FramingException.
      *
      * <p>We check refCnt after the exception but BEFORE channel.close() to prove that the try-catch releases 'chunk'
      * immediately, not merely deferring to teardown.
@@ -145,9 +148,9 @@ class ChunkedFrameDecoderTest {
             assertEquals(1, capturedChunk.refCnt(), "chunk must be live (refCnt=1) before the malformed byte");
 
             // Step 2: '\n' advances FOOTER_ONE to FOOTER_TWO; 'X' fails checkHash and throws.
-            final var ex = assertThrows(DecoderException.class,
+            final var ex = assertThrows(FramingException.class,
                 () -> channel.writeInbound(Unpooled.copiedBuffer("\nX".getBytes(StandardCharsets.UTF_8))));
-            assertInstanceOf(IllegalStateException.class, ex.getCause());
+            assertEquals("Malformed chunk footer encountered (byte 1)", ex.getMessage());
 
             // Assert BEFORE channel.close(). If we closed first, ChunkedFrameDecoder.handlerRemoved0() would release
             // chunk regardless of whether the try-catch is present, hiding the bug.
@@ -180,10 +183,9 @@ class ChunkedFrameDecoderTest {
             assertEquals(1, capturedChunk.refCnt(), "chunk must be live (refCnt=1) before the oversized chunk header");
 
             // Step 2: "\n#5" starts the next chunk. Each '0' grows the size, and at 5000 checkChunkSize() throws.
-            final var ex = assertThrows(DecoderException.class,
+            final var ex = assertThrows(FramingException.class,
                 () -> channel.writeInbound(Unpooled.copiedBuffer("\n#5000\n".getBytes(StandardCharsets.UTF_8))));
-            final var cause = assertInstanceOf(IllegalStateException.class, ex.getCause());
-            assertEquals("Chunk size 5000 exceeds maximum 4096", cause.getMessage());
+            assertEquals("Chunk size 5000 exceeds maximum 4096", ex.getMessage());
 
             // Assert BEFORE channel.close(). If we closed first, ChunkedFrameDecoder.handlerRemoved0() would release
             // chunk regardless of whether the try-catch is present, hiding the bug.
@@ -194,24 +196,52 @@ class ChunkedFrameDecoderTest {
     }
 
     /**
-     * After a framing error the decoder must start again from a clean state, so the next valid message decodes
-     * correctly instead of failing on the released chunk buffer.
+     * RFC 6242 section 4.2: if the chunk-size or its value is invalid, or an error occurs while decoding, the peer
+     * MUST terminate the NETCONF session by closing the SSH channel. Each input fails at a different place in the
+     * chunked framing.
+     *
+     * <p>The decoder reports a {@link FramingException} and leaves the channel open, so that the handler of the error
+     * can send an error reply before it closes the channel. All further input is dropped, so no message is decoded
+     * after the error and the error is reported only once.
      */
-    @Test
-    void testMalformedFooterThenValidMessage() {
+    @ParameterizedTest
+    @ValueSource(strings = {
+        // Bad first header byte, '\n' expected
+        "X",
+        // Bad second header byte, '#' expected
+        "\nX",
+        // Bad first chunk-size digit, [1-9] expected
+        "\n#0",
+        // Bad next chunk-size digit, [0-9] or '\n' expected
+        "\n#1X",
+        // Chunk size over the maximum of 4096
+        "\n#5000\n",
+        // Bad first footer byte, '\n' expected
+        "\n#4\n<rpcX",
+        // Bad second footer byte, '#' expected
+        "\n#4\n<rpc\nX",
+        // Bad third footer byte, '#' or [1-9] expected
+        "\n#4\n<rpc\n#X",
+        // Bad last footer byte, '\n' expected
+        "\n#4\n<rpc\n##X",
+        // Bad first header byte followed by more bad bytes, which would fail again if decoded
+        "X\nX",
+    })
+    void testMalformedFrameDropsFurtherInput(final String malformed) {
         final var channel = new EmbeddedChannel(decoder);
         try {
-            // Step 1: header + complete data, state lands at FOOTER_ONE.
-            channel.writeInbound(Unpooled.copiedBuffer(INCOMPLETE_CHUNK.getBytes(StandardCharsets.UTF_8)));
+            final var ex = assertThrows(FramingException.class,
+                () -> channel.writeInbound(Unpooled.copiedBuffer(malformed.getBytes(StandardCharsets.UTF_8))));
+            assertTrue(channel.isOpen(), "the handler of the error must close the channel, not the decoder");
 
-            // Step 2: 'X' is not a valid footer byte. decode() releases the chunk and resets its state.
-            final var ex = assertThrows(DecoderException.class,
-                () -> channel.writeInbound(Unpooled.copiedBuffer("\nX".getBytes(StandardCharsets.UTF_8))));
-            assertInstanceOf(IllegalStateException.class, ex.getCause());
+            // A valid message after the error is dropped, not decoded
+            assertFalse(channel.writeInbound(Unpooled.copiedBuffer(
+                CHUNKED_MESSAGE_ONE.getBytes(StandardCharsets.UTF_8))));
+            assertEquals(0, channel.inboundMessages().size());
 
-            // Step 3: a complete valid message is decoded as a whole.
-            channel.writeInbound(Unpooled.copiedBuffer(CHUNKED_MESSAGE_ONE.getBytes(StandardCharsets.UTF_8)));
-            assertChunk(new ArrayList<>(channel.inboundMessages()));
+            // Closing the channel decodes any bytes left in the input once more, which must not fail again
+            channel.close();
+            assertDoesNotThrow(channel::checkException, "the framing error must be reported only once");
         } finally {
             channel.close();
         }

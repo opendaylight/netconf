@@ -40,6 +40,8 @@ public final class ChunkedFrameDecoder extends FrameDecoder {
     private State state = State.HEADER_ONE;
     private long chunkSize;
     private CompositeByteBuf chunk;
+    // Set after a framing error. All further input is dropped.
+    private boolean dropInput;
 
     /**
      * Construct an instance with specified maximum chunk size.
@@ -55,21 +57,21 @@ public final class ChunkedFrameDecoder extends FrameDecoder {
     private static void checkNewLine(final byte byteToCheck, final String errorMessage) {
         if (byteToCheck != '\n') {
             LOG.debug(GOT_PARAM_WHILE_WAITING_FOR_PARAM, byteToCheck, (byte)'\n');
-            throw new IllegalStateException(errorMessage);
+            throw new FramingException(errorMessage);
         }
     }
 
     private static void checkHash(final byte byteToCheck, final String errorMessage) {
         if (byteToCheck != '#') {
             LOG.debug(GOT_PARAM_WHILE_WAITING_FOR_PARAM, byteToCheck, (byte)'#');
-            throw new IllegalStateException(errorMessage);
+            throw new FramingException(errorMessage);
         }
     }
 
     private void checkChunkSize() {
         if (chunkSize > maxChunkSize) {
             LOG.debug("Parsed chunk size {}, maximum allowed is {}", chunkSize, maxChunkSize);
-            throw new IllegalStateException("Chunk size " + chunkSize + " exceeds maximum " + maxChunkSize);
+            throw new FramingException("Chunk size %s exceeds maximum %s".formatted(chunkSize, maxChunkSize));
         }
     }
 
@@ -80,15 +82,19 @@ public final class ChunkedFrameDecoder extends FrameDecoder {
 
     @Override
     protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out)
-            throws IllegalStateException {
+            throws FramingException {
+        if (dropInput) {
+            // A framing error was reported already. Drop all input until the channel is closed.
+            in.skipBytes(in.readableBytes());
+            return;
+        }
+
         try {
             tryDecode(in, out);
-        } catch (final IllegalStateException e) {
-            // FIXME: NETCONF-1694: https://www.rfc-editor.org/info/rfc6242/#section-4.2
-            //        If the chunk-size and the chunk-size value respectively are invalid
-            //        or if an error occurs during the decoding process, the peer MUST
-            //        terminate the NETCONF session by closing the corresponding SSH channel.
-            resetDecoder();
+        } catch (final FramingException e) {
+            dropInput = true;
+            releaseChunkBuffer();
+            // The handler of this exception closes the channel. See FramingException.
             throw e;
         }
     }
@@ -96,9 +102,9 @@ public final class ChunkedFrameDecoder extends FrameDecoder {
     /**
      * Decode the chunked frames in the input and add each complete message to {@code out}.
      *
-     * @throws IllegalStateException if the input does not match RFC 6242 chunked framing.
+     * @throws FramingException if the input does not match RFC 6242 chunked framing.
      */
-    private void tryDecode(final ByteBuf in, final List<Object> out) throws IllegalStateException {
+    private void tryDecode(final ByteBuf in, final List<Object> out) throws FramingException {
         while (in.isReadable()) {
             switch (state) {
                 case HEADER_ONE -> {
@@ -125,7 +131,7 @@ public final class ChunkedFrameDecoder extends FrameDecoder {
                     }
                     if (b < '0' || b > '9') {
                         LOG.debug(GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM, b, (byte)'0', (byte)'9');
-                        throw new IllegalStateException("Invalid chunk size encountered");
+                        throw new FramingException("Invalid chunk size encountered");
                     }
                     chunkSize *= 10;
                     chunkSize += b - '0';
@@ -177,18 +183,6 @@ public final class ChunkedFrameDecoder extends FrameDecoder {
         in.discardReadBytes();
     }
 
-    /**
-     * After a framing error, start again from the header of a new message.
-     *
-     * <p>Without this reset the next input continues in the old state with no chunk buffer,
-     * which fails with a NullPointerException and leaks the buffer read in the DATA state.
-     */
-    private void resetDecoder() {
-        releaseChunkBuffer();
-        state = State.HEADER_ONE;
-        chunkSize = 0;
-    }
-
     private void releaseChunkBuffer() {
         if (chunk != null) {
             chunk.release();
@@ -206,7 +200,7 @@ public final class ChunkedFrameDecoder extends FrameDecoder {
             state = State.FOOTER_FOUR;
         } else {
             LOG.debug(GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM_PARAM, byteToCheck, (byte) '#', (byte) '1', (byte) '9');
-            throw new IllegalStateException("Malformed chunk footer encountered (byte 2)");
+            throw new FramingException("Malformed chunk footer encountered (byte 2)");
         }
     }
 
@@ -224,7 +218,7 @@ public final class ChunkedFrameDecoder extends FrameDecoder {
     private static int processHeaderLengthFirst(final byte byteToCheck) {
         if (!isHeaderLengthFirst(byteToCheck)) {
             LOG.debug(GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM, byteToCheck, (byte)'1', (byte)'9');
-            throw new IllegalStateException("Invalid chunk size encountered (byte 0)");
+            throw new FramingException("Invalid chunk size encountered (byte 0)");
         }
 
         return byteToCheck - '0';
