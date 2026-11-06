@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "def6ee6a_29963c5e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-06T08:15:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "65836a28_80a4388c",
+      "revId": "df086ac0071584789a17337459c49b16c8dd6839",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "766b7810_12e5ef3a",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 7
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "Its run after my recheck:\nhttps://github.com/opendaylight/netconf/actions/runs/42016542248",
       "parentUuid": "249d86ab_b66b80fb",
+      "revId": "df086ac0071584789a17337459c49b16c8dd6839",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cff1586a_0abd124f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-06T08:15:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a1c0b69a_1194a4a2",
       "revId": "df086ac0071584789a17337459c49b16c8dd6839",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
