@@ -50,6 +50,24 @@
       "message": "A failed cycle can leave the killed member down permanently: the kill isn\u0027t covered by the restart safety net, and when that safety net\u0027s own restart fails it\u0027s only logged instead of raised — it should raise instead, so the failure isn\u0027t swallowed.",
       "revId": "72f24e28d5c26d6d88064ede9bbbc831d7745186",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c22f832f_1c7611a1",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-06T13:27:01Z",
+      "side": 1,
+      "message": "Maybe also here it might be possible to use the `addfinalizer` https://docs.pytest.org/en/stable/how-to/fixtures.html#adding-finalizers-directly",
+      "parentUuid": "b8710e59_5394ba42",
+      "revId": "72f24e28d5c26d6d88064ede9bbbc831d7745186",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
