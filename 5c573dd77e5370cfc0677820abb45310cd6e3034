@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a709c307_cca1cb0d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 30
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-06T14:06:40Z",
+      "side": 1,
+      "message": "added OdlHttpClientFeatureProvider",
+      "parentUuid": "ea11410c_20eea98a",
+      "revId": "5c573dd77e5370cfc0677820abb45310cd6e3034",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0f9946c9_b176726d",
@@ -41,6 +59,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "29b9c670_b7da0799",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-06T14:06:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f9946c9_b176726d",
+      "range": {
+        "startLine": 90,
+        "startChar": 56,
+        "endLine": 90,
+        "endChar": 57
+      },
+      "revId": "5c573dd77e5370cfc0677820abb45310cd6e3034",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7d923d9d_c4ad8803",
@@ -54,6 +96,24 @@
       "writtenOn": "2026-11-04T12:49:58Z",
       "side": 1,
       "message": "Can be in one line.",
+      "revId": "5c573dd77e5370cfc0677820abb45310cd6e3034",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa1bc33c_0d1c0dfd",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/QuicClientTest.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-06T14:06:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7d923d9d_c4ad8803",
       "revId": "5c573dd77e5370cfc0677820abb45310cd6e3034",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
