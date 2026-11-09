@@ -34,6 +34,24 @@
       "parentUuid": "b8508219_4baaf481",
       "revId": "e8f2d26a3a80aba6f5aefd58446db2234ed9d858",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c33c82f_7e1288cb",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/AbstractBasicAuthHandler.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-09T08:56:22Z",
+      "side": 1,
+      "message": "Done. Decoder failures are now forwarded with retain(), letting the session reject them in response order",
+      "parentUuid": "13be06cd_8f0be8ca",
+      "revId": "e8f2d26a3a80aba6f5aefd58446db2234ed9d858",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
