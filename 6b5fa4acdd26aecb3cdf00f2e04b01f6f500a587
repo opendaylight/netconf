@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "669313d9_497aa176",
+        "filename": "apps/restconf-nb/src/main/resources/restconf8040.cfg",
+        "patchSetId": 21
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-09T11:58:46Z",
+      "side": 1,
+      "message": "on master we have it called http-request-body-max-size, is that intentional difference?\nif not, consider using same name",
+      "range": {
+        "startLine": 45,
+        "startChar": 1,
+        "endLine": 45,
+        "endChar": 27
+      },
+      "revId": "6b5fa4acdd26aecb3cdf00f2e04b01f6f500a587",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
