@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b187c27e_ec3222be",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp3SseService.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-09T09:23:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aee4c14b_48e556cc",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 76
+      },
+      "revId": "fdeb26ba9a1d331e8952c6a762203cb6d40e9c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9924790a_6ed3d026",
@@ -37,6 +61,24 @@
       "writtenOn": "2026-11-04T12:50:22Z",
       "side": 1,
       "message": "Please move this field up to the other final fields.",
+      "revId": "fdeb26ba9a1d331e8952c6a762203cb6d40e9c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77c96850_d4ec66ee",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseStreamHandler.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-09T09:23:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9924790a_6ed3d026",
       "revId": "fdeb26ba9a1d331e8952c6a762203cb6d40e9c1b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -64,6 +106,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e44dd874_3ebbff0d",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseStreamHandler.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-09T09:23:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "16c4dabb_9676192c",
+      "range": {
+        "startLine": 100,
+        "startChar": 8,
+        "endLine": 100,
+        "endChar": 43
+      },
+      "revId": "fdeb26ba9a1d331e8952c6a762203cb6d40e9c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "07b4bdba_b4352853",
@@ -77,6 +143,30 @@
       "writtenOn": "2026-11-04T12:50:22Z",
       "side": 1,
       "message": "int -\u003e var",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 49
+      },
+      "revId": "fdeb26ba9a1d331e8952c6a762203cb6d40e9c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98abd9c3_a99f7345",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseStreamHandler.java",
+        "patchSetId": 33
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-09T09:23:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07b4bdba_b4352853",
       "range": {
         "startLine": 99,
         "startChar": 0,
