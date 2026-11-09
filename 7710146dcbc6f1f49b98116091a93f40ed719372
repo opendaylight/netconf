@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7ef8b7f_154403b5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-09T08:45:12Z",
+      "side": 1,
+      "message": "Can you please add an explanation here why we are lowering it from 10 MiB to 256 KiB?",
+      "revId": "7710146dcbc6f1f49b98116091a93f40ed719372",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "71780add_5775beb9",
