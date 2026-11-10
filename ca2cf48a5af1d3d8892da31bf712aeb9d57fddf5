@@ -16,6 +16,210 @@
       "message": "recheck",
       "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9cb1fbeb_284a7602",
+        "filename": "tests/libraries/aaa_shiro_config.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T11:31:45Z",
+      "side": 1,
+      "message": "Line too long. Here and elsewhere",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d7778e7_c1c9f90a",
+        "filename": "tests/libraries/aaa_shiro_config.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T11:31:45Z",
+      "side": 1,
+      "message": "The first phase rejects None, but here None (filter momentarily unregistered mid-reload) can become settled_id and be accepted as final if re-registration takes over settle_duration. Should None restart the countdown instead, with an assert settled_id is not None after the loop?",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd89979d_8b3ae6d4",
+        "filename": "tests/libraries/jaxrs_restconf.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T11:31:45Z",
+      "side": 1,
+      "message": "Actually the attempts have 5s HTTP timeout, which together(retry-count\u003d120) can take up to ~12 min. Say \"attempts, one second apart\" to state this more clearly.",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "beb4ef72_6c4c1d13",
+        "filename": "tests/libraries/jaxrs_restconf.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T11:31:45Z",
+      "side": 1,
+      "message": "no need to catch the result of feature:install?",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fa9a6bc_ee6fe872",
+        "filename": "tests/libraries/oauth_proxy_header.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T11:31:45Z",
+      "side": 1,
+      "message": "variables/oauth/proxy_header/shiro_configuration.json is not part of this change",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01940da3_f59d3713",
+        "filename": "tests/libraries/oauth_proxy_header.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T11:31:45Z",
+      "side": 1,
+      "message": "After this teardown restart only the JAX-RS endpoint on 8181 is awaited, but the next suites (CRUD etc.) use the Netty RESTCONF on 8182 and the NETCONF topology, which nothing waits for; the old \"System ready\" line in karaf.log also makes wait_for_odl_ready useless here. Could restart_karaf (or this function) wait for a fresh \"System ready\", or at least poll 8182 too?",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be29c1c0_efb822d5",
+        "filename": "tests/libraries/oauth_proxy_header.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T11:31:45Z",
+      "side": 1,
+      "message": "execute_karaf_command returns errors instead of raising, and none of these three commands checks them. If the shell reconnects mid-sequence the config:edit session is lost and the failure only surfaces later as a misleading \"filter hasn\u0027t been reloaded\" timeout. Could each call assert on its stderr, or use config:property-set -p \u003cpid\u003e so no edit session is needed?",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21fe9393_0590bb18",
+        "filename": "tests/libraries/templated_requests.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T11:31:45Z",
+      "side": 1,
+      "message": "This is repeated many times - replace with a simple module constant DEFAULT_AUTH",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f380bd59_3067f061",
+        "filename": "tests/suites/OAuth/test_oauth_proxy_header.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T11:31:45Z",
+      "side": 1,
+      "message": "Is this claim true? Doesn\u0027t class-scoped fixture\u0027s teardown always run before a session-scoped teardown?",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46c39f08_7819b960",
+        "filename": "tests/suites/OAuth/test_oauth_proxy_header.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T11:31:45Z",
+      "side": 1,
+      "message": "If anything after the write fails here (e.g. the 120-attempt wait_for_ready times out), pytest skips the code after yield, so the suite\u0027s shiro-configuration stays for the rest of the session. Could the restore be registered with request.addfinalizer before the write? odl_403_roles_filter_settings and override_parser_config have the same gap.",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21645648_a60325e7",
+        "filename": "tests/suites/OAuth/test_oauth_proxy_header.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T11:31:45Z",
+      "side": 1,
+      "message": "Stick to one ordering everywhere.. either keep @pytest.mark.smoke above, or below @allure",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e4e838e_900f6c0b",
+        "filename": "tests/tox.ini",
+        "patchSetId": 9
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T11:31:45Z",
+      "side": 1,
+      "message": "there are no JWT tests",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
