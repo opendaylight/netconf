@@ -123,6 +123,24 @@
       "parentUuid": "25973be4_7ac7d5d4",
       "revId": "05d7cd256c1adb4fe7ed2a75bc396949f77d1124",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfad1877_48634b7d",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T11:49:04Z",
+      "side": 1,
+      "message": "yes.. there\u0027s no need for a new ticket then. Let\u0027s wait for the fix for 1665 and rebase this atop of it so they can get merged in the right order and ideally together.",
+      "parentUuid": "d53646a3_a8ec4212",
+      "revId": "05d7cd256c1adb4fe7ed2a75bc396949f77d1124",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
