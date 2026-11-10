@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "753724fbc4b7c88e9c00c9567072034e3c574940",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c784a7a8_9696b6d2",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T13:26:17Z",
+      "side": 1,
+      "message": "Since the mount is now registered only after the actor replies, onDeviceConnected returns with no mount, and NetconfDevice immediately calls onRemoteSchemaUp, which flushes queued notifications into onNotification -\u003e mount.publish. That throws \"Device not set up yet\" on first connect, and on reconnect publishes to the previous mount\u0027s stale service.",
+      "revId": "753724fbc4b7c88e9c00c9567072034e3c574940",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
