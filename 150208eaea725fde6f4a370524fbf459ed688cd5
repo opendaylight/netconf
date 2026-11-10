@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "26d5452a_9f7619fd",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-10T10:17:26Z",
+      "side": 1,
+      "message": "Could we couple more tightly the `rm -rf` command with the condition by using `else` block creating function or similar way?\n```\nif [...]; then\n    ...\nelse\n    rm -rf \"$NETOPEER_DIR\"\nfi\n```\nThat way it wouldn\u0027t break if the checks were later moved, e.g. further down the script, so that the `rm -rf` ran before them.",
+      "revId": "150208eaea725fde6f4a370524fbf459ed688cd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c0535c00_402d5582",
         "filename": "tests/tools/start_netopeer.sh",
         "patchSetId": 7
