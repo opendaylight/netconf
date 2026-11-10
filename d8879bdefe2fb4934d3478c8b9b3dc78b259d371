@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55c11451_51e46065",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1StreamingTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-10T12:06:25Z",
+      "side": 1,
+      "message": "At other places you use assertInstanceOf(), \nconsider using consistent approach,\nit also gives mor clear fail message\n\nsame on lines: 162,182",
+      "range": {
+        "startLine": 143,
+        "startChar": 33,
+        "endLine": 143,
+        "endChar": 51
+      },
+      "revId": "d8879bdefe2fb4934d3478c8b9b3dc78b259d371",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
