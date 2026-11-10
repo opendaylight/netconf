@@ -16,6 +16,24 @@
       "message": "If an exception is raised from teardown, this would cover exception from setup or test steps. Maybe we could try to use the `addfinalizer` method instead.\n```\nWe have to be careful though, because pytest will run that finalizer once it’s been\nadded, even if that fixture raises an exception after adding the finalizer. \n```\nhttps://docs.pytest.org/en/stable/how-to/fixtures.html#adding-finalizers-directly\n\nSo it should execute the teardown even if exception is raised before. It should also show **both** exception if **setup/test** fails and also **teardown**.",
       "revId": "9f5de144c211fb526aa969554fd510734fa95f17",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00e98857_3c260797",
+        "filename": "tests/suites/clustering/clustering_crud_suite.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-10T08:43:24Z",
+      "side": 1,
+      "message": "Done, switched to `request.addfinalizer`. with the finalizer there are two separate entries, ERROR at setup and ERROR at teardown, so both are visible as you expected.\n\n(Nitpick: the finalizer is registered before the configure request rather than after it; request can reach ODL and still raise on the way back, so device stays mounted, registering afterwards would leak it. Thats why `device_configured` flag stays, but now only to decide whether a cleanup failure is a real leak (raised) or the expected result of a device that was never mounted (logged))",
+      "parentUuid": "00b24e0d_836736fe",
+      "revId": "9f5de144c211fb526aa969554fd510734fa95f17",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
