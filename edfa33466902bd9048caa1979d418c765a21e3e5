@@ -258,6 +258,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "db49bd9a_6d7a9585",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/CallHomeNodeHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T11:58:43Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "2094676d_8e3d1b34",
+      "revId": "edfa33466902bd9048caa1979d418c765a21e3e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1073a671_3995c1d4",
