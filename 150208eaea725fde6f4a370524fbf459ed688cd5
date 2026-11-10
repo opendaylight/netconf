@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f34f3b3_d9c41770",
+        "filename": "tests/libraries/variables.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T09:59:06Z",
+      "side": 1,
+      "message": "Am I right that this does not hold under tox? tests/tox.ini only passes the proxy variables and JAVA_HOME, so tox drops NETOPEER_DIR and the suites keep reading /tmp/pytest-netopeer while the container mounts the override. Could you add NETOPEER_DIR to passenv in tests/tox.ini in this change?",
+      "revId": "150208eaea725fde6f4a370524fbf459ed688cd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "424b8089_15759671",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T09:59:06Z",
+      "side": 1,
+      "message": "docker-compose.yaml is a very common file name, so pointing NETOPEER_DIR at any compose-based project (or at someone\u0027s old private netopeer setup) passes this guard and the whole directory is rm -rf\u0027d. Could the script touch a dedicated marker such as .provisioned-by-start_netopeer after mkdir, and check for that file here instead?",
+      "revId": "150208eaea725fde6f4a370524fbf459ed688cd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0535c00_402d5582",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T09:59:06Z",
+      "side": 1,
+      "message": "With host networking, any process already on port 830 makes this probe succeed while our new container fails to bind and exits, so the suites then talk to a device with different keys. Could you refuse to start when 830 is already taken before up -d, and also require docker inspect to show pytest-netopeer2-server running here?",
+      "revId": "150208eaea725fde6f4a370524fbf459ed688cd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
