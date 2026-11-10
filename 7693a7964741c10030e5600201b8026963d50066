@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40bcf7d4_e0de9c68",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T09:38:35Z",
+      "side": 1,
+      "message": "pytest still rewrites an assert that has a message. It appends \"assert \u0027marker\u0027 in \u0027\u003clog\u003e\u0027\" after it. If the goal is to keep the log out of the retry messages, an explicit \"if marker not in content: raise AssertionError(...)\" does that, and the comment above can say so.",
+      "revId": "7693a7964741c10030e5600201b8026963d50066",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6456a15b_3b9ac3ac",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T09:38:35Z",
+      "side": 1,
+      "message": "Am I right that the PUT on the whole network-topology container also reports deleted for any topology an earlier suite left in config (e.g. topology-netconf)? Then this returns after the PUT\u0027s notification and the DELETE\u0027s is never checked. Waiting until the log holds two data-changed-notification elements would pin it to the second request.",
+      "revId": "7693a7964741c10030e5600201b8026963d50066",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
