@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6c1c162_f53d9381",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-10T08:43:27Z",
+      "side": 1,
+      "message": "Done. Added `cluster.get_any_reachable_member()` and the teardown uses it.",
+      "parentUuid": "504d76a5_dc1b3706",
+      "revId": "72f24e28d5c26d6d88064ede9bbbc831d7745186",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a03d6ce3_e4ab4409",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-06T09:00:47Z",
       "side": 1,
       "message": "I think this could be also moved to the `try:` block.",
+      "revId": "72f24e28d5c26d6d88064ede9bbbc831d7745186",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b722829f_ed5fcbfe",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-10T08:43:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a03d6ce3_e4ab4409",
       "revId": "72f24e28d5c26d6d88064ede9bbbc831d7745186",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -66,6 +102,24 @@
       "side": 1,
       "message": "Maybe also here it might be possible to use the `addfinalizer` https://docs.pytest.org/en/stable/how-to/fixtures.html#adding-finalizers-directly",
       "parentUuid": "b8710e59_5394ba42",
+      "revId": "72f24e28d5c26d6d88064ede9bbbc831d7745186",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f079eef_be9d804b",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-10T08:43:27Z",
+      "side": 1,
+      "message": "Done.\n\nSmall adjustement made: safety only runs when the cycle already failed (if the body completes, `member_restart_attempted` is set), so a plain raise would always replace the real failure with the restart failure - It now raises an `AssertionError`.\n\n`addfinalizer`: it doens\u0027t work here I think - tried but Finalizers are at fixure scope and they run at teardown, but the member has to be up again before the next cycle. Also `run_outage_cycle` has no request.",
+      "parentUuid": "c22f832f_1c7611a1",
       "revId": "72f24e28d5c26d6d88064ede9bbbc831d7745186",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
