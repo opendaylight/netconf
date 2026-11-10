@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ece9c03_c5d1eaf3",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ActorProxyNetconfServiceFacade.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T13:13:11Z",
+      "side": 1,
+      "message": "Edits can now time out here (default actor-response-wait-time is 5 s) while the master still completes them, so a slow edit-config is reported as \"master is down\" yet leaves the candidate edited and locked, and with the idle-timeout cancel gone in the previous patch nothing cleans it up.",
+      "revId": "c4fbee310b33dc23c101ee82709d119be914d0ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12810328_7d3a5931",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ActorProxyNetconfServiceFacade.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T13:13:11Z",
+      "side": 1,
+      "message": "Wrapping here hides a NetconfDocumentedException from the master (e.g. lock-denied from Candidate.lock) as a cause, and NetconfDataOperations.decodeException only checks the top-level type, so a slave reports a generic operation-failed where the master node reports the device\u0027s error tag. Could we pass NetconfDocumentedException through unwrapped, or have decodeException search the cause chain?",
+      "revId": "c4fbee310b33dc23c101ee82709d119be914d0ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "286419f7_adbc26e4",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ActorProxyNetconfServiceFacade.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T13:13:11Z",
+      "side": 1,
+      "message": "This was ok, as it used to read \"Commit of operation\". However now it will read: \"Create of operation failed\" or \"Discard changes of operation failed\" which is ugly. Reword, or simplify to \"%s: %s operation failed\"",
+      "revId": "c4fbee310b33dc23c101ee82709d119be914d0ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fc4c212_471e5daf",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ActorProxyNetconfServiceFacade.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T13:13:11Z",
+      "side": 1,
+      "message": "The edit tests in ProxyNetconfServiceTest still only assert the outgoing message and never reply, so they pass with or without this change, and this new EmptyResultResponse success path (a behaviour change for commit and cancel) has no test. Could we extend them to reply and assert the returned future, plus one failure and one EmptyResultResponse case?",
+      "revId": "c4fbee310b33dc23c101ee82709d119be914d0ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
