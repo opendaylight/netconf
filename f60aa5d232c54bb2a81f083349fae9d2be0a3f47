@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb06eb88_f765724d",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActor.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T13:04:04Z",
+      "side": 1,
+      "message": "This entire if-else-if chain can be replaced with a switch(message)",
+      "revId": "f60aa5d232c54bb2a81f083349fae9d2be0a3f47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36f63967_1092a3c7",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActor.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T13:04:04Z",
+      "side": 1,
+      "message": "With the actor stopping right after its request, this timeout can only fire when there is nothing to cancel, so write-transaction-idle-timeout (described as \"cancelled automatically\" in NetconfTopologyManager) silently stops covering forwarded RESTCONF writes, and an abandoned edit leaves the candidate locked for the next transaction to commit. Could we drop the receive timeout here entirely, adjust that description, and track abandoned-transaction cleanup? (maybe in a follow-up ticket?)",
+      "revId": "f60aa5d232c54bb2a81f083349fae9d2be0a3f47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e008adc4_4111b69f",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActorTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-10T13:04:04Z",
+      "side": 1,
+      "message": "The actor here has a 2s idle timeout and the ReceiveTimeout branch now also ends in stop(), so this 5s expectTerminated (and the never().cancel() check) still pass if the stop after the request is removed. Could we expect termination within 1 s instead, or use an actor with a zero idle timeout, so the test fails without the fix? That would also drop the after(3000) sleep.",
+      "revId": "f60aa5d232c54bb2a81f083349fae9d2be0a3f47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
