@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e1295be_7a740e2a",
+        "filename": "tests/suites/callhome/test_callhome.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-10T09:02:32Z",
+      "side": 1,
+      "message": "Done.\n\nAlso applied to the `sed -z` call in `NetconfCallHome.py`; `NetconfCallHome.py`:71 builds a path too but passes it to `infra.get_file_content` - stays unquoted because it\u0027s plain `open()`",
+      "parentUuid": "824b727b_496cffd8",
+      "revId": "384c04ef35e3c3ea9f8725c608cb941df7a066ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d7fe43c1_e400ebcf",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-05T18:32:52Z",
       "side": 1,
       "message": "Also in here to use `shlex.quote`",
+      "revId": "384c04ef35e3c3ea9f8725c608cb941df7a066ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5c9c079_f8333502",
+        "filename": "tests/suites/callhome/test_callhome.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-10T09:02:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d7fe43c1_e400ebcf",
       "revId": "384c04ef35e3c3ea9f8725c608cb941df7a066ff",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ecc2d58_8ff3c60c",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-10T09:02:32Z",
+      "side": 1,
+      "message": "Done.\n\nit was just a pure alias so using the original now.",
+      "parentUuid": "a590fb21_0e2a5469",
+      "revId": "384c04ef35e3c3ea9f8725c608cb941df7a066ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "58b72734_6dbcb9a2",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-11-05T18:32:52Z",
       "side": 1,
       "message": "What about making these three var overwritable by env vars, while keeping default values? Something like it is for `NETOPEER_DIR`.\n`ODL_SYSTEM_IP`\n`CALL_HOME_SSH_PORT`\n`CALL_HOME_TLS_PORT`",
+      "revId": "384c04ef35e3c3ea9f8725c608cb941df7a066ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a06e018_cfb39d80",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-10T09:02:32Z",
+      "side": 1,
+      "message": "Done\n\nall three take `${VAR:-default}` the same way `NETOPEER_DIR` does.",
+      "parentUuid": "58b72734_6dbcb9a2",
       "revId": "384c04ef35e3c3ea9f8725c608cb941df7a066ff",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b4d2cdc_cc830185",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-10T09:02:32Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "e0bb9138_fcd23c4c",
+      "revId": "384c04ef35e3c3ea9f8725c608cb941df7a066ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b24a920b_8f8d8246",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-11-05T18:32:52Z",
       "side": 1,
       "message": "Can we add here a check, that the path is pointing to some location under `/tmp/` that by mistake it would not remove something important if using wrong directory?",
+      "revId": "384c04ef35e3c3ea9f8725c608cb941df7a066ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f96ea84_80f797ca",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-10T09:02:32Z",
+      "side": 1,
+      "message": "Done.\n\nNOTE: not as a `/tmp` check. it\u0027s a `tmpfs` on many hosts -\u003e container doesn\u0027t survive a reboot and pointing `NETOPEER_DIR` somewhere persistent is a reason to override it in my opinion; `/tmp` would block that.\n\nINSTEAD: the path is absolute and at least two steps deep, and absent/empty or contain the compose file an earlier run put there. I tested the guard against `/`, `/tmp`, a relative path and `$HOME` -\u003e all refused, including the cases that should pass",
+      "parentUuid": "b24a920b_8f8d8246",
       "revId": "384c04ef35e3c3ea9f8725c608cb941df7a066ff",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
