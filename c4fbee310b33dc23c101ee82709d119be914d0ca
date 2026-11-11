@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "434f9433_ae385a2c",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ActorProxyNetconfServiceFacade.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-11T11:37:01Z",
+      "side": 1,
+      "message": "This is tracked in NETCONF-1709, and I added a FIXME here.",
+      "parentUuid": "6ece9c03_c5d1eaf3",
+      "revId": "c4fbee310b33dc23c101ee82709d119be914d0ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "12810328_7d3a5931",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-10T13:13:11Z",
       "side": 1,
       "message": "Wrapping here hides a NetconfDocumentedException from the master (e.g. lock-denied from Candidate.lock) as a cause, and NetconfDataOperations.decodeException only checks the top-level type, so a slave reports a generic operation-failed where the master node reports the device\u0027s error tag. Could we pass NetconfDocumentedException through unwrapped, or have decodeException search the cause chain?",
+      "revId": "c4fbee310b33dc23c101ee82709d119be914d0ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36d8d651_3cbc8562",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ActorProxyNetconfServiceFacade.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-11T11:37:01Z",
+      "side": 1,
+      "message": "NetconfDocumentedException from the master is now passed through unwrapped, so decodeException turns it into a RequestException with the device\u0027s error tag, same as on the master node",
+      "parentUuid": "12810328_7d3a5931",
       "revId": "c4fbee310b33dc23c101ee82709d119be914d0ca",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "619d183a_6853422c",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ActorProxyNetconfServiceFacade.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-11T11:37:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "286419f7_adbc26e4",
+      "revId": "c4fbee310b33dc23c101ee82709d119be914d0ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5fc4c212_471e5daf",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-11-10T13:13:11Z",
       "side": 1,
       "message": "The edit tests in ProxyNetconfServiceTest still only assert the outgoing message and never reply, so they pass with or without this change, and this new EmptyResultResponse success path (a behaviour change for commit and cancel) has no test. Could we extend them to reply and assert the returned future, plus one failure and one EmptyResultResponse case?",
+      "revId": "c4fbee310b33dc23c101ee82709d119be914d0ca",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2ebfdce_77387db8",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ActorProxyNetconfServiceFacade.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-11T11:37:01Z",
+      "side": 1,
+      "message": "The edit tests now reply and check the returned future",
+      "parentUuid": "5fc4c212_471e5daf",
       "revId": "c4fbee310b33dc23c101ee82709d119be914d0ca",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
