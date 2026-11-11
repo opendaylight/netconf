@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "56a8ea80_b6e85146",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-11T11:56:03Z",
+      "side": 1,
+      "message": "Done\n\nExplicit raise now, comment corrected.",
+      "parentUuid": "40bcf7d4_e0de9c68",
+      "revId": "7693a7964741c10030e5600201b8026963d50066",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6456a15b_3b9ac3ac",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-10T09:38:35Z",
       "side": 1,
       "message": "Am I right that the PUT on the whole network-topology container also reports deleted for any topology an earlier suite left in config (e.g. topology-netconf)? Then this returns after the PUT\u0027s notification and the DELETE\u0027s is never checked. Waiting until the log holds two data-changed-notification elements would pin it to the second request.",
+      "revId": "7693a7964741c10030e5600201b8026963d50066",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "537a46c4_e3b67bb6",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-11T11:56:03Z",
+      "side": 1,
+      "message": "The PUT can\u0027t report deleted. The subscription is scope `BASE` with no stream params, so `DataTreeCandidateSerializer.serialize` takes the `serializeData(rootPath, candidate.getRootNode(), ...)` branch: one `data-change-event` per notification, for `/network-topology` itself, and `modificationTypeToOperation` maps `WRITE` to created/updated, only `DELETE`/`DISAPPEARED` to deleted. A leftover topology only decides which of created or updated the PUT reports.\n\nYour fix is still better, so switched to waiting for two `data-changed-notification` elements, same reason the create assertion below now accepts an update as well (the Robot original chose between those two too, just by stream version instead).\n\nHowever there is one issue -\u003e leftover `netconf-notif` from an aborted run makes the PUT a no-op (nothing is sent and the wait times out where matching on `deleted` would have passed). \nI think it might be preferable for it to fail here?",
+      "parentUuid": "6456a15b_3b9ac3ac",
       "revId": "7693a7964741c10030e5600201b8026963d50066",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
