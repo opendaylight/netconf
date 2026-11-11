@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "53f6a8e3_91ef84d3",
+        "filename": "tests/libraries/aaa_shiro_config.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-11T22:50:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9cb1fbeb_284a7602",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9d7778e7_c1c9f90a",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-11-10T11:31:45Z",
       "side": 1,
       "message": "The first phase rejects None, but here None (filter momentarily unregistered mid-reload) can become settled_id and be accepted as final if re-registration takes over settle_duration. Should None restart the countdown instead, with an assert settled_id is not None after the loop?",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec59f2ef_005dbc33",
+        "filename": "tests/libraries/aaa_shiro_config.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-11T22:50:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d7778e7_c1c9f90a",
       "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "11d66f6d_20eee6ae",
+        "filename": "tests/libraries/jaxrs_restconf.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-11T22:50:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd89979d_8b3ae6d4",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "beb4ef72_6c4c1d13",
@@ -82,6 +136,24 @@
       "writtenOn": "2026-11-10T11:31:45Z",
       "side": 1,
       "message": "no need to catch the result of feature:install?",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ee39a14_aa2d7ce2",
+        "filename": "tests/libraries/jaxrs_restconf.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-11T22:50:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "beb4ef72_6c4c1d13",
       "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -103,6 +175,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4112c1b_480b7fa2",
+        "filename": "tests/libraries/oauth_proxy_header.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-11T22:50:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fa9a6bc_ee6fe872",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "01940da3_f59d3713",
@@ -116,6 +206,24 @@
       "writtenOn": "2026-11-10T11:31:45Z",
       "side": 1,
       "message": "After this teardown restart only the JAX-RS endpoint on 8181 is awaited, but the next suites (CRUD etc.) use the Netty RESTCONF on 8182 and the NETCONF topology, which nothing waits for; the old \"System ready\" line in karaf.log also makes wait_for_odl_ready useless here. Could restart_karaf (or this function) wait for a fresh \"System ready\", or at least poll 8182 too?",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6762d6da_21c91f23",
+        "filename": "tests/libraries/oauth_proxy_header.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-11T22:50:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "01940da3_f59d3713",
       "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -137,6 +245,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa06fafc_07c19147",
+        "filename": "tests/libraries/oauth_proxy_header.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-11T22:50:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be29c1c0_efb822d5",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "21fe9393_0590bb18",
@@ -150,6 +276,24 @@
       "writtenOn": "2026-11-10T11:31:45Z",
       "side": 1,
       "message": "This is repeated many times - replace with a simple module constant DEFAULT_AUTH",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3737826e_ab26eedf",
+        "filename": "tests/libraries/templated_requests.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-11T22:50:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "21fe9393_0590bb18",
       "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -171,6 +315,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0759bbb4_5269a2b9",
+        "filename": "tests/suites/OAuth/test_oauth_proxy_header.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-11T22:50:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f380bd59_3067f061",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "46c39f08_7819b960",
@@ -184,6 +346,24 @@
       "writtenOn": "2026-11-10T11:31:45Z",
       "side": 1,
       "message": "If anything after the write fails here (e.g. the 120-attempt wait_for_ready times out), pytest skips the code after yield, so the suite\u0027s shiro-configuration stays for the rest of the session. Could the restore be registered with request.addfinalizer before the write? odl_403_roles_filter_settings and override_parser_config have the same gap.",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6a983ed_61091226",
+        "filename": "tests/suites/OAuth/test_oauth_proxy_header.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-11T22:50:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "46c39f08_7819b960",
       "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -205,6 +385,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c97ec44d_e9cd7acd",
+        "filename": "tests/suites/OAuth/test_oauth_proxy_header.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-11T22:50:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "21645648_a60325e7",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3e4e838e_900f6c0b",
@@ -218,6 +416,24 @@
       "writtenOn": "2026-11-10T11:31:45Z",
       "side": 1,
       "message": "there are no JWT tests",
+      "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e0ec231_612bb5d5",
+        "filename": "tests/tox.ini",
+        "patchSetId": 9
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-11T22:50:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3e4e838e_900f6c0b",
       "revId": "ca2cf48a5af1d3d8892da31bf712aeb9d57fddf5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
