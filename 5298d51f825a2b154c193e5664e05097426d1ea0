@@ -22,6 +22,30 @@
       },
       "revId": "5298d51f825a2b154c193e5664e05097426d1ea0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "35778873_8e3a2742",
+        "filename": "tests/tools/wstools/ssereceiver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-11T11:55:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7df25781_42c8b508",
+      "range": {
+        "startLine": 56,
+        "startChar": 6,
+        "endLine": 59,
+        "endChar": 22
+      },
+      "revId": "5298d51f825a2b154c193e5664e05097426d1ea0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
