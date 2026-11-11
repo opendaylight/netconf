@@ -33,6 +33,24 @@
       "message": "There are now three listenClient() overloads all described as \"Builds and starts Call-Home SSH Client\", and after the callhome-provider change nothing in the repo uses the two which take the ClientFactoryManagerConfigurator. A caller won\u0027t know which one is the \"prefered one\". Since we\u0027re getting rid of the shaded-sshd, shouldn\u0027t those two methods get deprecated? Or at least their javadoc changed to point the caller to this one and stating it is the \"prefered way\".",
       "revId": "cc1e903c9937d5397199e6722c85fa406791285a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de9c7e81_7f84d21b",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStackFactory.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-11T10:09:43Z",
+      "side": 1,
+      "message": "Thanks, I have marked them as deprecated. When the sshd server side is resolved, they will be marked for removal.",
+      "parentUuid": "2380eb9a_1f31773d",
+      "revId": "cc1e903c9937d5397199e6722c85fa406791285a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
