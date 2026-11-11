@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "442ee592_cffc81d9",
+        "filename": "tests/libraries/variables.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-11T13:46:03Z",
+      "side": 1,
+      "message": "Added;",
+      "parentUuid": "0f34f3b3_d9c41770",
+      "revId": "150208eaea725fde6f4a370524fbf459ed688cd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "424b8089_15759671",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-10T09:59:06Z",
       "side": 1,
       "message": "docker-compose.yaml is a very common file name, so pointing NETOPEER_DIR at any compose-based project (or at someone\u0027s old private netopeer setup) passes this guard and the whole directory is rm -rf\u0027d. Could the script touch a dedicated marker such as .provisioned-by-start_netopeer after mkdir, and check for that file here instead?",
+      "revId": "150208eaea725fde6f4a370524fbf459ed688cd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d26146f_7dace1a2",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-11T13:46:03Z",
+      "side": 1,
+      "message": "Yea fair enough (ran the ps7 guard against a dir with a docker-compose.yaml next to unrelated files and it rm -rf\u0027ed immidiatelly - bad thing to miss).\n\nSwitched to a `.provisioned-by-start_netopeer` marker, `touched` right after the\n`mkdir` so an interrupted run still leaves a directory the next one recognises.\n\n\n(The guard now lets the script claim the dir only when nothing of anyone\nelse\u0027s is in it, it carries the marker, or it\u0027s empty. Kept the empty case so pointing `NETOPEER_DIR` at a fresh mountpoint still works)",
+      "parentUuid": "424b8089_15759671",
       "revId": "150208eaea725fde6f4a370524fbf459ed688cd5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d661f049_0d57745c",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-11T13:46:03Z",
+      "side": 1,
+      "message": "Alright done;\n\nthe `rm -rf` is now a branch of the test rather than a statement after\nit, so it cannot be reached without it. \nI ended up not going as far as a function since the `rm` is the only statement that needs pinning.",
+      "parentUuid": "26d5452a_9f7619fd",
+      "revId": "150208eaea725fde6f4a370524fbf459ed688cd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c0535c00_402d5582",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-11-10T09:59:06Z",
       "side": 1,
       "message": "With host networking, any process already on port 830 makes this probe succeed while our new container fails to bind and exits, so the suites then talk to a device with different keys. Could you refuse to start when 830 is already taken before up -d, and also require docker inspect to show pytest-netopeer2-server running here?",
+      "revId": "150208eaea725fde6f4a370524fbf459ed688cd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a65fb3bd_c64390a0",
+        "filename": "tests/tools/start_netopeer.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-11T13:46:03Z",
+      "side": 1,
+      "message": "Both added;\n\na refusal before up -d when 830 already answers;\na docker inspect check in the wait loop that fails fast with ps \n+ logs when the container is not running.\n\n(Also, turned out not to be hypothetical, my host had a container from a ps before container_name: was fixed still up on 830, under its `compose-generated`\nname, so the `rm -f` by name missed it)",
+      "parentUuid": "c0535c00_402d5582",
       "revId": "150208eaea725fde6f4a370524fbf459ed688cd5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
