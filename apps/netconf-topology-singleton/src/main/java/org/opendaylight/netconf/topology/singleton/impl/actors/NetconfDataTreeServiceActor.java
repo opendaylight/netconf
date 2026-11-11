@@ -47,34 +47,32 @@ public final class NetconfDataTreeServiceActor extends UntypedAbstractActor {
 
     @Override
     public void onReceive(final Object message) {
-        if (message instanceof GetRequest getRequest) {
-            final YangInstanceIdentifier path = getRequest.path();
-            final ListenableFuture<Optional<NormalizedNode>> future = dataStoreService.get(getRequest.store(),
-                    getRequest.path(), getRequest.fields());
-            sendResult(future, path, sender(), self());
-        } else if (message instanceof MergeEditConfigRequest request) {
-            invokeRpcCall(() -> dataStoreService.merge(
+        switch (message) {
+            case GetRequest getRequest -> {
+                final YangInstanceIdentifier path = getRequest.path();
+                final ListenableFuture<Optional<NormalizedNode>> future = dataStoreService.get(getRequest.store(),
+                        getRequest.path(), getRequest.fields());
+                sendResult(future, path, sender(), self());
+            }
+            case MergeEditConfigRequest request -> invokeRpcCall(() -> dataStoreService.merge(
                 request.getNormalizedNodeMessage().getIdentifier(),
                 request.getNormalizedNodeMessage().getNode()), sender(), self());
-        } else if (message instanceof ReplaceEditConfigRequest request) {
-            invokeRpcCall(() -> dataStoreService.replace(
+            case ReplaceEditConfigRequest request -> invokeRpcCall(() -> dataStoreService.replace(
                 request.getNormalizedNodeMessage().getIdentifier(),
                 request.getNormalizedNodeMessage().getNode()), sender(), self());
-        } else if (message instanceof CreateEditConfigRequest request) {
-            invokeRpcCall(() -> dataStoreService.create(
+            case CreateEditConfigRequest request -> invokeRpcCall(() -> dataStoreService.create(
                 request.getNormalizedNodeMessage().getIdentifier(),
                 request.getNormalizedNodeMessage().getNode()), sender(), self());
-        } else if (message instanceof DeleteEditConfigRequest request) {
-            invokeRpcCall(() -> dataStoreService.delete(request.getPath()), sender(), self());
-        } else if (message instanceof RemoveEditConfigRequest request) {
-            invokeRpcCall(() -> dataStoreService.remove(request.getPath()), sender(), self());
-        } else if (message instanceof CommitRequest) {
-            invokeRpcCall(dataStoreService::commit, sender(), self());
-        } else if (message instanceof CancelChangesRequest) {
-            invokeRpcCall(dataStoreService::cancel, sender(), self());
-        } else {
-            unhandled(message);
-            return;
+            case DeleteEditConfigRequest request ->
+                invokeRpcCall(() -> dataStoreService.delete(request.getPath()), sender(), self());
+            case RemoveEditConfigRequest request ->
+                invokeRpcCall(() -> dataStoreService.remove(request.getPath()), sender(), self());
+            case CommitRequest unused -> invokeRpcCall(dataStoreService::commit, sender(), self());
+            case CancelChangesRequest unused -> invokeRpcCall(dataStoreService::cancel, sender(), self());
+            default -> {
+                unhandled(message);
+                return;
+            }
         }
         // Each request gets its own actor, which is done once it has issued its operation. The reply is sent when
         // the operation completes, even though the actor is stopped by then.
