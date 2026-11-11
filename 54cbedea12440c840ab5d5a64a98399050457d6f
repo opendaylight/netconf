@@ -50,6 +50,24 @@
       "message": "The docstring says this restarts the Karaf in cwd, but this line stops every Karaf on the host and only the one in cwd is started again, so restarting one cluster member would leave the others down. Could you either document it as standalone-only, or stop just the cwd instance (e.g. ./bin/stop in cwd and wait for that PID)?",
       "revId": "54cbedea12440c840ab5d5a64a98399050457d6f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec6f96aa_a675cbc5",
+        "filename": "tests/libraries/infra.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-11T22:49:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "34a13ede_36cec2bb",
+      "revId": "54cbedea12440c840ab5d5a64a98399050457d6f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
