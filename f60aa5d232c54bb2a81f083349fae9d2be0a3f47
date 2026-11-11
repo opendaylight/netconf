@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "554f1374_88fe2311",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActor.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-11T11:36:54Z",
+      "side": 1,
+      "message": "this chain predates this change, so I did it in a separate patch: https://git.opendaylight.org/gerrit/c/netconf/+/127720",
+      "parentUuid": "fb06eb88_f765724d",
+      "revId": "f60aa5d232c54bb2a81f083349fae9d2be0a3f47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "36f63967_1092a3c7",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f953688_361cfa75",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActor.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-11T11:36:54Z",
+      "side": 1,
+      "message": "receive timeout is removed from the actor and write-transaction-idle-timeout description now says it covers DOMDataBroker transactions only. Cleaning up a abandoned transaction in a follow-up ticket https://lf-opendaylight.atlassian.net/browse/NETCONF-1709",
+      "parentUuid": "36f63967_1092a3c7",
+      "revId": "f60aa5d232c54bb2a81f083349fae9d2be0a3f47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e008adc4_4111b69f",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-11-10T13:04:04Z",
       "side": 1,
       "message": "The actor here has a 2s idle timeout and the ReceiveTimeout branch now also ends in stop(), so this 5s expectTerminated (and the never().cancel() check) still pass if the stop after the request is removed. Could we expect termination within 1 s instead, or use an actor with a zero idle timeout, so the test fails without the fix? That would also drop the after(3000) sleep.",
+      "revId": "f60aa5d232c54bb2a81f083349fae9d2be0a3f47",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "734d36cf_10402dc8",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActorTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-11T11:36:54Z",
+      "side": 1,
+      "message": "testIdleTimeout is removed together with the receive timeout. it checked that idle actor cancels the transaction and stops, which is exactly the behaviour we\u0027re dropping, so there\u0027s nothing left for it to test.",
+      "parentUuid": "e008adc4_4111b69f",
       "revId": "f60aa5d232c54bb2a81f083349fae9d2be0a3f47",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
