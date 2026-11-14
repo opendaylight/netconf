@@ -22,8 +22,8 @@ import io.netty.handler.codec.http2.Http2StreamChannel;
 import io.netty.handler.codec.http2.Http2StreamChannelBootstrap;
 import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
 import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
+import io.netty.util.concurrent.FutureListener;
 import java.util.Locale;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.http.HTTPScheme;
 import org.opendaylight.restconf.client.ClientSession;
 import org.slf4j.Logger;
@@ -53,35 +53,41 @@ public final class ClientHttp2Session extends ClientSession {
     }
 
     @Override
-    protected void executeRequest(final @NonNull Channel channel, final @NonNull FullHttpRequest request,
-            final @NonNull FutureCallback<FullHttpResponse> callback) {
-        bootstrap.open().addListener(future -> {
-            if (!future.isSuccess()) {
-                LOG.error("Failed to open HTTP/2 stream for request {}", request.uri(), future.cause());
+    protected void executeRequest(final Channel channel, final FullHttpRequest request,
+            final FutureCallback<FullHttpResponse> callback) {
+        bootstrap.open().addListener((FutureListener<Http2StreamChannel>) sf -> {
+            final var sfCause = sf.cause();
+            if (sfCause != null) {
+                LOG.error("Failed to open HTTP/2 stream for request {}", request.uri(), sfCause);
                 // Prevent memory leak if stream creation fails
                 request.release();
-                callback.onFailure(future.cause());
+                callback.onFailure(sfCause);
                 return;
             }
 
-            final var streamChannel = (Http2StreamChannel) future.getNow();
+            final var ch = sf.getNow();
             request.headers().set(ExtensionHeaderNames.SCHEME.text(), scheme.name().toLowerCase(Locale.ROOT));
-            streamChannel.pipeline().addLast(new Http2StreamFrameToHttpObjectCodec(false));
-            streamChannel.pipeline().addLast(new HttpContentDecompressor(0));
+            final var pipeline = ch.pipeline()
+                .addLast(new Http2StreamFrameToHttpObjectCodec(false))
+                .addLast(new HttpContentDecompressor(0));
+
             // Generate and attach Auth handler if available
             final var authFactory = getAuthFactory(channel);
             if (authFactory != null) {
                 final var authProvider = authFactory.get();
                 if (authProvider != null) {
-                    streamChannel.pipeline().addLast(authProvider);
+                    pipeline.addLast(authProvider);
                 }
             }
-            streamChannel.pipeline().addLast(new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));
-            streamChannel.pipeline().addLast(new SingleResponseHandler(callback));
-            streamChannel.writeAndFlush(request).addListener(writeFuture -> {
-                if (!writeFuture.isSuccess()) {
-                    LOG.error("Failed to write request to HTTP/2 stream {}", streamChannel.id(), writeFuture.cause());
-                    streamChannel.pipeline().fireExceptionCaught(writeFuture.cause());
+
+            pipeline
+                .addLast(new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH))
+                .addLast(new SingleResponseHandler(callback));
+            ch.writeAndFlush(request).addListener(wf -> {
+                final var wfCause = wf.cause();
+                if (wfCause != null) {
+                    LOG.error("Failed to write request to HTTP/2 stream {}", ch.id(), wfCause);
+                    ch.pipeline().fireExceptionCaught(wfCause);
                 }
             });
         });
