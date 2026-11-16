@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.EcPrivateKeyFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.PrivateKeyFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.PublicKeyFormat;
@@ -78,15 +79,13 @@ class ConfigUtilsTest {
 
     @ParameterizedTest(name = "Set private key from pair: {0}")
     @MethodSource("asymmetricKeyArgs")
-    @Disabled
-        // raw public key is not implemented yet
+    @Disabled("FIXME: raw public key is not implemented yet")
     void setPrivateKeyFromKeyPair(final String testDesc,
             final PublicKeyFormat publicKeyFormat, final byte[] publicKeyBytes,
             final PrivateKeyFormat privateKeyFormat, final byte[] privateKeyBytes,
             final byte[] certificateBytes) throws Exception {
-        final var rawPrivateKey = buildAsymmetricKeyGrouping(publicKeyFormat, publicKeyBytes,
-                privateKeyFormat, privateKeyBytes);
-        ConfigUtils.setAsymmetricKey(keyStore, rawPrivateKey);
+        SslHandlerFactory.setAsymmetricKey(KeystoreSupport.inlineOnly().asymmetric(), keyStore,
+            buildAsymmetricKeyGrouping(publicKeyFormat, publicKeyBytes, privateKeyFormat, privateKeyBytes));
         assertTrue(keyStore.containsAlias(DEFAULT_PRIVATE_KEY_ALIAS));
         assertTrue(keyStore.isKeyEntry(DEFAULT_PRIVATE_KEY_ALIAS));
         assertNotNull(keyStore.getKey(DEFAULT_PRIVATE_KEY_ALIAS, EMPTY_SECRET));

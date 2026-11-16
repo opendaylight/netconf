@@ -17,7 +17,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.crypto.CMSCertificateParser;
 import org.opendaylight.netconf.transport.crypto.KeyPairParser;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreAsymmetricKeyGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststoreCertsGrouping;
 
@@ -73,34 +72,6 @@ final class ConfigUtils {
             mapBuilder.put(alias, CMSCertificateParser.parseCertificate(cert.requireCertData()));
         }
         return mapBuilder.build();
-    }
-
-    /**
-     * Builds asymmetric key pair from configuration data provided, validates it then puts into given key store.
-     *
-     * @param keyStore keystore
-     * @param input configuration
-     * @throws UnsupportedConfigurationException if key pair is not set to key store
-     */
-    static void setAsymmetricKey(final @NonNull KeyStore keyStore,
-            final @NonNull InlineOrKeystoreAsymmetricKeyGrouping input)
-            throws UnsupportedConfigurationException {
-
-        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
-                        .inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.Inline.class,
-                input.getInlineOrKeystore());
-        final var inlineDef = inline.getInlineDefinition();
-        if (inlineDef == null) {
-            throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
-        }
-        final var keyPair = KeyPairParser.parseKeyPair(inlineDef);
-        try {
-            // FIXME: the below line throws an exception bc keyStore does not support private key without certificate
-            //        chain (belongs to implementation of raw public key feature support)
-            keyStore.setKeyEntry(DEFAULT_PRIVATE_KEY_ALIAS, keyPair.getPrivate(), EMPTY_SECRET, null);
-        } catch (KeyStoreException e) {
-            throw new UnsupportedConfigurationException("Failed to load private key", e);
-        }
     }
 
     /**

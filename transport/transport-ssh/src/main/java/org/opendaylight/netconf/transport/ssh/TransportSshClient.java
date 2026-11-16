@@ -15,6 +15,8 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.shaded.sshd.client.ClientBuilder;
 import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 import org.opendaylight.netconf.shaded.sshd.client.auth.UserAuthFactory;
@@ -27,6 +29,7 @@ import org.opendaylight.netconf.shaded.sshd.client.keyverifier.ServerKeyVerifier
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyIdentityProvider;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev241010.password.grouping.password.type.CleartextPassword;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentity;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.Keepalives;
@@ -71,16 +74,26 @@ final class TransportSshClient extends SshClient {
      * {@code ietf-netconf-client.yang} configuration.
      */
     static final class Builder extends ClientBuilder {
-        private final NettyIoServiceFactoryFactory ioServiceFactory;
-        private final ScheduledExecutorService executorService;
+        private final @NonNull NettyIoServiceFactoryFactory ioServiceFactory;
+        private final @NonNull ScheduledExecutorService executorService;
+        private final @NonNull KeystoreSupport keystoreSupport;
 
         private ClientFactoryManagerConfigurator configurator;
         private Keepalives keepAlives;
         private ClientIdentity clientIdentity;
 
+        // FIXME: NETCONF-1695: remove this constructor
+        @NonNullByDefault
         Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final ScheduledExecutorService executorService) {
+            this(ioServiceFactory, executorService, KeystoreSupport.inlineOnly());
+        }
+
+        @NonNullByDefault
+        Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final ScheduledExecutorService executorService,
+                final KeystoreSupport keystoreSupport) {
             this.ioServiceFactory = requireNonNull(ioServiceFactory);
             this.executorService = requireNonNull(executorService);
+            this.keystoreSupport = requireNonNull(keystoreSupport);
         }
 
         Builder transportParams(final TransportParamsGrouping params) throws UnsupportedConfigurationException {
@@ -146,7 +159,7 @@ final class TransportSshClient extends SshClient {
             }
 
             if (clientIdentity != null && clientIdentity.getNone() == null) {
-                setClientIdentity(ret, clientIdentity, configurator == null);
+                setClientIdentity(ret, keystoreSupport, clientIdentity, configurator == null);
             }
             if (configurator != null) {
                 configurator.configureClientFactoryManager(ret);
@@ -196,8 +209,9 @@ final class TransportSshClient extends SshClient {
             return super.fillWithDefaultValues();
         }
 
-        private static void setClientIdentity(final TransportSshClient client, final ClientIdentity clientIdentity,
-                final boolean throwExceptionIfNoAuthMethodDefined) throws UnsupportedConfigurationException {
+        private static void setClientIdentity(final TransportSshClient client, final KeystoreSupport keystoreSupport,
+                final ClientIdentity clientIdentity, final boolean throwExceptionIfNoAuthMethodDefined)
+                    throws UnsupportedConfigurationException {
             final var authFactoriesListBuilder = ImmutableList.<UserAuthFactory>builder();
             final var password = clientIdentity.getPassword();
             if (password != null) {
@@ -210,7 +224,7 @@ final class TransportSshClient extends SshClient {
             }
             final var hostBased = clientIdentity.getHostbased();
             if (hostBased != null) {
-                var keyPair = ConfigUtils.extractKeyPair(hostBased.getInlineOrKeystore());
+                var keyPair = keystoreSupport.asymmetric().keyOf(hostBased);
                 var factory = new UserAuthHostBasedFactory();
                 factory.setClientHostKeys(HostKeyIdentityProvider.wrap(keyPair));
                 factory.setClientUsername(clientIdentity.getUsername());
@@ -221,7 +235,7 @@ final class TransportSshClient extends SshClient {
             }
             final var publicKey = clientIdentity.getPublicKey();
             if (publicKey != null) {
-                final var keyPairs = ConfigUtils.extractKeyPair(publicKey.getInlineOrKeystore());
+                final var keyPairs = keystoreSupport.asymmetric().keyOf(publicKey);
                 client.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPairs));
                 authFactoriesListBuilder.add(new UserAuthPublicKeyFactory(client.getSignatureFactories()));
             }
