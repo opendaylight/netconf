@@ -68,6 +68,52 @@
       },
       "revId": "19a923a73b089644f7e015db7f9b1f4ccc90f37a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d950301f_cab4c75a",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-11-16T08:23:10Z",
+      "side": 1,
+      "message": "encapsulate this invariant in a sealed class hierarchy",
+      "range": {
+        "startLine": 103,
+        "startChar": 45,
+        "endLine": 103,
+        "endChar": 68
+      },
+      "revId": "19a923a73b089644f7e015db7f9b1f4ccc90f37a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea893b0e_cd67e88d",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-11-16T08:23:10Z",
+      "side": 1,
+      "message": "switch on msg",
+      "range": {
+        "startLine": 133,
+        "startChar": 12,
+        "endLine": 133,
+        "endChar": 43
+      },
+      "revId": "19a923a73b089644f7e015db7f9b1f4ccc90f37a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
