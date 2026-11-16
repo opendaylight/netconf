@@ -130,6 +130,11 @@
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>transport-keystore</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>transport-ssh</artifactId>
                 <version>${project.version}</version>
             </dependency>
