@@ -21,6 +21,7 @@
     <description>NETCONF client</description>
 
     <properties>
+        <argLine>--enable-native-access=io.netty.common -Dio.netty.leakDetection.level=paranoid</argLine>
         <!-- FIXME: fix these up and set maven.javadoc.failOnWarnings=true -->
         <doclint>all,-missing</doclint>
     </properties>
