@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.common.channel.ChannelFactory;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyPairProvider;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
@@ -43,6 +44,23 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.
 final class TransportSshServer extends SshServer {
     private TransportSshServer() {
         // Hidden on purpose
+    }
+
+    @NonNullByDefault
+    static TransportSshServer.Builder builder(final NettyIoServiceFactoryFactory ioServiceFactory,
+            final ScheduledExecutorService executorService, final KeystoreSupport keystoreSupport) {
+        return new Builder(ioServiceFactory, executorService, keystoreSupport);
+    }
+
+    @NonNullByDefault
+    static TransportSshServer of(final NettyIoServiceFactoryFactory ioServiceFactory,
+            final ScheduledExecutorService executorService, final KeystoreSupport keystoreSupport,
+            final @Nullable SshServerGrouping serverParams,
+            final @Nullable ServerFactoryManagerConfigurator configurator) throws UnsupportedConfigurationException {
+        return builder(ioServiceFactory, executorService, keystoreSupport)
+            .serverParams(serverParams)
+            .configurator(configurator)
+            .buildChecked();
     }
 
     /**
@@ -87,21 +105,16 @@ final class TransportSshServer extends SshServer {
         private ServerIdentity serverIdentity;
         private Keepalives keepAlives;
 
-        // FIXME: NETCONF-1695: remove this constructor
         @NonNullByDefault
-        Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final ScheduledExecutorService executorService) {
-            this(ioServiceFactory, executorService, KeystoreSupport.inlineOnly());
-        }
-
-        @NonNullByDefault
-        Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final ScheduledExecutorService executorService,
-                final KeystoreSupport keystoreSupport) {
+        private Builder(final NettyIoServiceFactoryFactory ioServiceFactory,
+                final ScheduledExecutorService executorService, final KeystoreSupport keystoreSupport) {
             this.ioServiceFactory = requireNonNull(ioServiceFactory);
             this.executorService = requireNonNull(executorService);
             this.keystoreSupport = requireNonNull(keystoreSupport);
         }
 
-        Builder serverParams(final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
+        @NonNullByDefault
+        Builder serverParams(final @Nullable SshServerGrouping serverParams) throws UnsupportedConfigurationException {
             if (serverParams != null) {
                 final var params = serverParams.getTransportParams();
                 EncryptionPolicy.INSTANCE.setTransportParams(this, params);
@@ -119,7 +132,8 @@ final class TransportSshServer extends SshServer {
             return this;
         }
 
-        Builder configurator(final ServerFactoryManagerConfigurator newConfigurator) {
+        @NonNullByDefault
+        Builder configurator(final @Nullable ServerFactoryManagerConfigurator newConfigurator) {
             configurator = newConfigurator;
             return this;
         }
@@ -148,7 +162,7 @@ final class TransportSshServer extends SshServer {
             throw new UnsupportedOperationException();
         }
 
-        TransportSshServer buildChecked() throws UnsupportedConfigurationException {
+        @NonNull TransportSshServer buildChecked() throws UnsupportedConfigurationException {
             final var ret = (TransportSshServer) super.build(true);
             if (keepAlives != null) {
                 ConfigUtils.setKeepAlives(ret, keepAlives.getMaxWait(), keepAlives.getMaxAttempts());

@@ -17,16 +17,14 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
-import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
-import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev241010.TcpClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev241010.TcpServerGrouping;
 import org.slf4j.Logger;
@@ -38,23 +36,13 @@ import org.slf4j.LoggerFactory;
 public final class SSHServer extends SSHTransportStack {
     private static final Logger LOG = LoggerFactory.getLogger(SSHServer.class);
 
-    private final String subsystem;
+    private final @NonNull String subsystem;
 
-    private SSHServer(final String subsystem, final TransportChannelListener<? super SSHTransportChannel> listener,
+    @NonNullByDefault
+    SSHServer(final String subsystem, final TransportChannelListener<? super SSHTransportChannel> listener,
             final TransportSshServer sshServer) {
         super(listener, sshServer, sshServer.getSessionFactory());
         this.subsystem = requireNonNull(subsystem);
-    }
-
-    static SSHServer of(final NettyIoServiceFactoryFactory ioServiceFactory,
-            final ScheduledExecutorService executorService, final String subsystem,
-            final TransportChannelListener<? super SSHTransportChannel> listener, final SshServerGrouping serverParams,
-            final ServerFactoryManagerConfigurator configurator) throws UnsupportedConfigurationException {
-        return new SSHServer(subsystem, listener,
-            new TransportSshServer.Builder(ioServiceFactory, executorService)
-                .serverParams(serverParams)
-                .configurator(configurator)
-                .buildChecked());
     }
 
     @NonNull ListenableFuture<SSHServer> connect(final Bootstrap bootstrap, final TcpClientGrouping connectParams)

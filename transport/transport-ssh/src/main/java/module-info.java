@@ -14,6 +14,7 @@ module org.opendaylight.netconf.transport.ssh {
         org.opendaylight.netconf.transport.ssh.impl.IetfSshServerFeatureProvider;
 
     requires transitive org.opendaylight.netconf.transport.api;
+    requires transitive org.opendaylight.netconf.transport.keystore;
     requires transitive org.opendaylight.netconf.transport.tcp;
     requires transitive org.opendaylight.yang.gen.ietf.ssh.client.rfc9644;
     requires transitive org.opendaylight.yang.gen.ietf.ssh.common.rfc9644;
@@ -25,7 +26,6 @@ module org.opendaylight.netconf.transport.ssh {
     requires org.bouncycastle.provider;
     requires org.opendaylight.netconf.shaded.sshd;
     requires org.opendaylight.netconf.transport.crypto;
-    requires org.opendaylight.netconf.transport.keystore;
     requires org.opendaylight.yang.gen.iana.crypt.hash;
     requires org.opendaylight.yang.gen.iana.ssh._public.key.algs;
     requires org.opendaylight.yang.gen.iana.ssh.encryption.algs;
