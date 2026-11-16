@@ -114,13 +114,15 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
         registerMasterMountPoint();
 
-        sendInitialDataToActor().whenComplete((success, failure) -> {
+        sendInitialDataToActor().whenCompleteAsync((success, failure) -> {
             if (failure != null) {
                 LOG.error("{}: CreateInitialMasterActorData to {} failed", id, masterActorRef, failure);
                 return;
             }
-            updateDeviceData(deviceSchema, sessionPreferences, negotiatedSshAlg);
-        });
+            updateDeviceDataLogged(deviceSchema, sessionPreferences, negotiatedSshAlg);
+            // on the actor system's dispatcher, as before 12.0: on ForkJoinPool.commonPool the binding codec
+            // fails in Karaf with IncorrectNestingException
+        }, actorSystem.dispatcher());
     }
 
     @Override
@@ -206,6 +208,17 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         // send initial data to master actor
         return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker,
             dataStoreService, sourceIdentifiers, deviceServices), actorResponseWaitTime);
+    }
+
+    // whenComplete() drops an exception its action throws: log it, or the device stays "connecting" in silence
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    private void updateDeviceDataLogged(final NetconfDeviceSchema deviceSchema,
+            final NetconfSessionPreferences sessionPreferences, final @Nullable NegotiatedSshAlg negotiatedSshAlg) {
+        try {
+            updateDeviceData(deviceSchema, sessionPreferences, negotiatedSshAlg);
+        } catch (RuntimeException | LinkageError e) {
+            LOG.error("{}: failed to write the connected device to the operational topology", id, e);
+        }
     }
 
     private void updateDeviceData(final NetconfDeviceSchema deviceSchema,
