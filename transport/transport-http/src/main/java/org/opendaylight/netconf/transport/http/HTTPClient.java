@@ -29,8 +29,7 @@ import io.netty.handler.codec.quic.QuicChannel;
 import io.netty.handler.codec.quic.QuicSslContextBuilder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.util.AttributeKey;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
+import io.netty.util.concurrent.FutureListener;
 import java.net.InetSocketAddress;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -211,7 +210,7 @@ public abstract sealed class HTTPClient extends HTTPTransportStack
                     .handler(new Http3ClientConnectionHandler())
                     .remoteAddress(remoteAddress)
                     .connect()
-                    .addListener((GenericFutureListener<Future<QuicChannel>>) connectFuture -> {
+                    .addListener((FutureListener<QuicChannel>) connectFuture -> {
                         final var connectCause = connectFuture.cause();
                         if (connectCause != null) {
                             // connect() includes the TLS handshake, report its failure as TLSTransportStack does
