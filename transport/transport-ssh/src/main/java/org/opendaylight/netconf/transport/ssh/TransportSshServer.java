@@ -15,6 +15,8 @@ import com.google.errorprone.annotations.DoNotCall;
 import java.security.KeyPair;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.shaded.sshd.common.channel.ChannelFactory;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyPairProvider;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
@@ -26,6 +28,7 @@ import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswor
 import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.UserAuthPublicKeyFactory;
 import org.opendaylight.netconf.shaded.sshd.server.forward.DirectTcpipFactory;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.ClientAuthentication;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev241010.ssh.server.grouping.Keepalives;
@@ -75,17 +78,27 @@ final class TransportSshServer extends SshServer {
             TransportChannelSessionFactory.INSTANCE,
             DirectTcpipFactory.INSTANCE);
 
-        private final NettyIoServiceFactoryFactory ioServiceFactory;
-        private final ScheduledExecutorService executorService;
+        private final @NonNull NettyIoServiceFactoryFactory ioServiceFactory;
+        private final @NonNull ScheduledExecutorService executorService;
+        private final @NonNull KeystoreSupport keystoreSupport;
 
         private ServerFactoryManagerConfigurator configurator;
         private ClientAuthentication clientAuthentication;
         private ServerIdentity serverIdentity;
         private Keepalives keepAlives;
 
+        // FIXME: NETCONF-1695: remove this constructor
+        @NonNullByDefault
         Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final ScheduledExecutorService executorService) {
+            this(ioServiceFactory, executorService, KeystoreSupport.inlineOnly());
+        }
+
+        @NonNullByDefault
+        Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final ScheduledExecutorService executorService,
+                final KeystoreSupport keystoreSupport) {
             this.ioServiceFactory = requireNonNull(ioServiceFactory);
             this.executorService = requireNonNull(executorService);
+            this.keystoreSupport = requireNonNull(keystoreSupport);
         }
 
         Builder serverParams(final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
@@ -143,7 +156,7 @@ final class TransportSshServer extends SshServer {
                 ConfigUtils.setKeepAlives(ret, null, null);
             }
             if (serverIdentity != null) {
-                setServerIdentity(ret, serverIdentity);
+                setServerIdentity(ret, keystoreSupport, serverIdentity);
             }
             if (clientAuthentication != null) {
                 setClientAuthentication(ret, clientAuthentication);
@@ -176,8 +189,8 @@ final class TransportSshServer extends SshServer {
             return super.fillWithDefaultValues();
         }
 
-        private static void setServerIdentity(final TransportSshServer server, final ServerIdentity serverIdentity)
-                throws UnsupportedConfigurationException {
+        private static void setServerIdentity(final TransportSshServer server, final KeystoreSupport keystoreSupport,
+                final ServerIdentity serverIdentity) throws UnsupportedConfigurationException {
             final var hostKeys = serverIdentity.getHostKey();
             if (hostKeys == null || hostKeys.isEmpty()) {
                 throw new UnsupportedConfigurationException("Host keys is missing in server identity configuration");
@@ -190,7 +203,7 @@ final class TransportSshServer extends SshServer {
                     case PublicKey publicKeyType -> {
                         final var publicKey = publicKeyType.getPublicKey();
                         if (publicKey != null) {
-                            keyPairsBuilder.add(ConfigUtils.extractKeyPair(publicKey.getInlineOrKeystore()));
+                            keyPairsBuilder.add(keystoreSupport.asymmetric().keyOf(publicKey));
                         }
                     }
                     case Certificate certificateType -> {
