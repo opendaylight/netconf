@@ -30,6 +30,7 @@ import io.netty.handler.codec.http2.Http2MultiplexHandler;
 import io.netty.handler.codec.http2.Http2StreamChannel;
 import io.netty.handler.codec.http2.Http2StreamChannelBootstrap;
 import io.netty.handler.codec.http2.Http2StreamFrameToHttpObjectCodec;
+import io.netty.util.concurrent.FutureListener;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.ServerSocket;
@@ -94,23 +95,26 @@ final class TestUtils {
         final var channel = clientChannel.channel();
         if (channel.pipeline().get(Http2MultiplexHandler.class) != null) {
             final var bootstrap = new Http2StreamChannelBootstrap(channel);
-            bootstrap.open().addListener(streamFuture -> {
-                if (!streamFuture.isSuccess()) {
+            bootstrap.open().addListener((FutureListener<Http2StreamChannel>) sf -> {
+                final var sfCause = sf.cause();
+                if (sfCause != null) {
                     request.release();
-                    future.setException(streamFuture.cause());
+                    future.setException(sfCause);
                     return;
                 }
-                final var streamChannel = (Http2StreamChannel) streamFuture.getNow();
-                streamChannel.pipeline().addLast(new Http2StreamFrameToHttpObjectCodec(false));
-                streamChannel.pipeline().addLast(new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));
-                addResponseHandler(streamChannel, future);
-                streamChannel.writeAndFlush(request);
+                final var ch = sf.getNow();
+                ch.pipeline()
+                    .addLast(new Http2StreamFrameToHttpObjectCodec(false))
+                    .addLast(new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));
+                addResponseHandler(ch, future);
+                ch.writeAndFlush(request);
             });
         } else {
             addResponseHandler(channel, future);
-            channel.writeAndFlush(request).addListener(requestFuture -> {
-                if (!requestFuture.isSuccess()) {
-                    future.setException(requestFuture.cause());
+            channel.writeAndFlush(request).addListener(wf -> {
+                final var wfCause = wf.cause();
+                if (wfCause != null) {
+                    future.setException(wfCause);
                 }
             });
         }
