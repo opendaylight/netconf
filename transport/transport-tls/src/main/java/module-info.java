@@ -15,6 +15,7 @@ module org.opendaylight.netconf.transport.tls {
 
     requires transitive io.netty.handler;
     requires transitive org.opendaylight.netconf.transport.api;
+    requires transitive org.opendaylight.netconf.transport.keystore;
     requires transitive org.opendaylight.yang.gen.ietf.tcp.client.rfc9643;
     requires transitive org.opendaylight.yang.gen.ietf.tcp.server.rfc9643;
     requires transitive org.opendaylight.yang.gen.ietf.tls.client.rfc9645;

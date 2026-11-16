@@ -25,6 +25,7 @@ module org.opendaylight.netconf.transport.ssh {
     requires org.bouncycastle.provider;
     requires org.opendaylight.netconf.shaded.sshd;
     requires org.opendaylight.netconf.transport.crypto;
+    requires org.opendaylight.netconf.transport.keystore;
     requires org.opendaylight.yang.gen.iana.crypt.hash;
     requires org.opendaylight.yang.gen.iana.ssh._public.key.algs;
     requires org.opendaylight.yang.gen.iana.ssh.encryption.algs;

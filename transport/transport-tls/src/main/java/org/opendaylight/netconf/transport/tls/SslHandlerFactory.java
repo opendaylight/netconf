@@ -7,13 +7,13 @@
  */
 package org.opendaylight.netconf.transport.tls;
 
-import static org.opendaylight.netconf.transport.tls.ConfigUtils.setAsymmetricKey;
 import static org.opendaylight.netconf.transport.tls.ConfigUtils.setEndEntityCertificateWithKey;
 import static org.opendaylight.netconf.transport.tls.ConfigUtils.setX509Certificates;
 import static org.opendaylight.netconf.transport.tls.KeyStoreUtils.buildKeyManagerFactory;
 import static org.opendaylight.netconf.transport.tls.KeyStoreUtils.buildTrustManagerFactory;
 import static org.opendaylight.netconf.transport.tls.KeyStoreUtils.newKeyStore;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.netty.channel.Channel;
@@ -24,14 +24,18 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import java.net.SocketAddress;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.util.List;
 import java.util.Objects;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.TrustManagerFactory;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.keystore.AsymmetricKeyParser;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.netconf.transport.tls.impl.IetfTlsCommonFeatureProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.tls.cipher.suite.algs.rev241016.TlsCipherSuiteAlgorithm;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreAsymmetricKeyGrouping;
@@ -232,8 +236,30 @@ public abstract class SslHandlerFactory {
     private static KeyManagerFactory newKeyManager(final @NonNull InlineOrKeystoreAsymmetricKeyGrouping rawPrivateKey)
             throws UnsupportedConfigurationException {
         final var keyStore = newKeyStore();
-        setAsymmetricKey(keyStore, rawPrivateKey);
+        setAsymmetricKey(KeystoreSupport.inlineOnly().asymmetric(), keyStore, rawPrivateKey);
         return buildKeyManagerFactory(keyStore);
+    }
+
+    /**
+     * Builds asymmetric key pair from configuration data provided, validates it then puts into given key store.
+     *
+     * @param keyStore keystore
+     * @param input configuration
+     * @throws UnsupportedConfigurationException if key pair is not set to key store
+     */
+    @VisibleForTesting
+    @NonNullByDefault
+    static void setAsymmetricKey(final AsymmetricKeyParser keyParser, final KeyStore keyStore,
+            final InlineOrKeystoreAsymmetricKeyGrouping input) throws UnsupportedConfigurationException {
+        final var keyPair = keyParser.keyOf(input);
+        try {
+            // FIXME: the below line throws an exception bc keyStore does not support private key without certificate
+            //        chain (belongs to implementation of raw public key feature support)
+            keyStore.setKeyEntry(ConfigUtils.DEFAULT_PRIVATE_KEY_ALIAS, keyPair.getPrivate(), ConfigUtils.EMPTY_SECRET,
+                null);
+        } catch (KeyStoreException e) {
+            throw new UnsupportedConfigurationException("Failed to load private key", e);
+        }
     }
 
     private static @NonNull SslContext buildSslContext(final SslContextBuilder builder,
