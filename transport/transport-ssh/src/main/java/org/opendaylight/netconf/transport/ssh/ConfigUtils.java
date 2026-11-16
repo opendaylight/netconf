@@ -9,7 +9,6 @@ package org.opendaylight.netconf.transport.ssh;
 
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.security.KeyPair;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.time.Duration;
@@ -24,7 +23,6 @@ import org.opendaylight.netconf.transport.crypto.KeyPairParser;
 import org.opendaylight.netconf.transport.crypto.KeyPairWithCertificate;
 import org.opendaylight.netconf.transport.crypto.PublicKeyParser;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.InlineOrKeystoreEndEntityCertWithKeyGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010.inline.or.keystore.asymmetric.key.grouping.InlineOrKeystore;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.InlineOrTruststoreCertsGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev241010.inline.or.truststore._public.keys.grouping.InlineOrTruststore;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -45,16 +43,6 @@ final class ConfigUtils {
         final var maxAttempts = cfgMaxAttempts == null ? KEEP_ALIVE_DEFAULT_ATTEMPTS : cfgMaxAttempts.intValue();
         final var maxWait = cfgMaxWait == null ? KEEP_ALIVE_DEFAULT_MAX_WAIT_SECONDS : cfgMaxWait.intValue();
         factoryMgr.setSessionHeartbeat(SessionHeartbeatController.HeartbeatType.IGNORE, Duration.ofSeconds(maxWait));
-    }
-
-    static KeyPair extractKeyPair(final InlineOrKeystore input) throws UnsupportedConfigurationException {
-        final var inline = ofType(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev241010
-                .inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.Inline.class, input);
-        final var inlineDef = inline.getInlineDefinition();
-        if (inlineDef == null) {
-            throw new UnsupportedConfigurationException("Missing inline definition in " + inline);
-        }
-        return KeyPairParser.parseKeyPair(inlineDef);
     }
 
     static List<Certificate> extractCertificates(final @Nullable InlineOrTruststoreCertsGrouping input)
