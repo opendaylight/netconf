@@ -141,6 +141,15 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         mount.publish(domNotification);
     }
 
+    /**
+     * Leave the device's operational data to the member that becomes its master next. From now on this facade does
+     * not write it, and {@link #close()} does not delete it.
+     */
+    void releaseOperationalData() {
+        LOG.info("Device {} handed over - leaving its operational data to the next master", id);
+        datastoreAdapter.release();
+    }
+
     @Override
     public void close() {
         final var future = datastoreAdapter.shutdown();

@@ -36,6 +36,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
     private volatile boolean closed;
     private volatile boolean isMaster;
+    private volatile boolean removed;
 
     private RemoteDeviceId remoteDeviceId;
 
@@ -77,8 +78,23 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             LOG.warn("Instance is already closed.");
             return FluentFutures.immediateNullFluentFuture();
         }
-        getTopologySingleton().becomeTopologyFollower(remoteDeviceId);
+        final var singleton = getTopologySingleton();
+        if (!removed) {
+            // The device stays configured and another member becomes its master. That member writes the device's
+            // operational data, and may already have started to: in a planned switchover the new master is selected
+            // before this one is closed. Deleting the node here would delete the new master's data.
+            singleton.releaseOperationalData();
+        }
+        singleton.becomeTopologyFollower(remoteDeviceId);
         return FluentFutures.immediateNullFluentFuture();
+    }
+
+    /**
+     * Note that the device's configuration was deleted, before the context is closed. The master then deletes the
+     * device's operational data; otherwise it leaves it to the next master.
+     */
+    void markRemoved() {
+        removed = true;
     }
 
     void refresh(final @NonNull NetconfTopologySetup setup) {
@@ -114,7 +130,12 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             LOG.warn("Instance is already closed.");
             return;
         }
-        getTopologySingleton().close();
+        final var singleton = getTopologySingleton();
+        if (!removed) {
+            // This member shuts down and the device stays configured: another member takes it over
+            singleton.releaseOperationalData();
+        }
+        singleton.close();
         closed = true;
     }
 }

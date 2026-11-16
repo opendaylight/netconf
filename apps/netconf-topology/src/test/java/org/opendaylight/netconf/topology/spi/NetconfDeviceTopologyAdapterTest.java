@@ -14,6 +14,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -166,5 +167,29 @@ class NetconfDeviceTopologyAdapterTest {
         listeners.getValue().onFailure(cause);
         final var ex = assertThrows(ExecutionException.class, () -> Futures.getDone(future));
         assertSame(cause, ex.getCause());
+    }
+
+    @Test
+    void testReleaseLeavesData() throws Exception {
+        doNothing().when(mockChain).close();
+
+        final var future = adapter.release();
+        verify(mockChain).close();
+        assertFalse(future.isDone());
+
+        // Nothing is written any more, and shutdown neither deletes the node nor returns another future
+        adapter.updateDeviceData(false, NetconfDeviceCapabilities.empty(), null, null);
+        adapter.updateClusteredDeviceData(true, "pekko://opendaylight-cluster-data@127.0.0.1:2550",
+            NetconfDeviceCapabilities.empty(), new SessionIdType(Uint32.ONE), null);
+        adapter.setDeviceAsFailed(new Exception("session down"));
+        assertSame(future, adapter.shutdown());
+        assertSame(future, adapter.release());
+
+        verify(mockChain, times(1)).newWriteOnlyTransaction();
+        verify(mockTx, never()).delete(any(LogicalDatastoreType.class), any(DataObjectIdentifier.class));
+        verify(mockTx, times(1)).commit();
+
+        listeners.getValue().onSuccess(Empty.value());
+        assertSame(Empty.value(), Futures.getDone(future));
     }
 }

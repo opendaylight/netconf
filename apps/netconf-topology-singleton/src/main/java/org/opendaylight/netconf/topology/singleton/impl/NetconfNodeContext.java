@@ -88,6 +88,17 @@ final class NetconfNodeContext implements AutoCloseable {
         }
     }
 
+    /**
+     * Leave the device's operational data to the member that becomes its master next, instead of deleting it when
+     * this member stops being master. Call it before {@link #becomeTopologyFollower(RemoteDeviceId)} or
+     * {@link #close()} when the device stays configured.
+     */
+    void releaseOperationalData() {
+        if (masterSalFacade != null) {
+            masterSalFacade.releaseOperationalData();
+        }
+    }
+
     void refreshSetupConnection(final @NonNull NetconfTopologySetup netconfTopologyDeviceSetup,
             final @NonNull RemoteDeviceId remoteDeviceId) {
         setup = requireNonNull(netconfTopologyDeviceSetup);
