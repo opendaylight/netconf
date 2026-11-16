@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6ec7eac_e4f4adc2",
+        "filename": "transport/transport-http/pom.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-11-16T08:21:11Z",
+      "side": 1,
+      "message": "please do not proliferate spotbugs unless absolutely positively required",
+      "range": {
+        "startLine": 30,
+        "startChar": 21,
+        "endLine": 30,
+        "endChar": 40
+      },
+      "revId": "19a923a73b089644f7e015db7f9b1f4ccc90f37a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf6c2846_61ed150c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-11-16T08:21:11Z",
+      "side": 1,
+      "message": "Netty does not carry nullness annotations, so using this while subclassing leads to bad interactions: use finer-grained annotations instead",
+      "range": {
+        "startLine": 58,
+        "startChar": 1,
+        "endLine": 58,
+        "endChar": 17
+      },
+      "revId": "19a923a73b089644f7e015db7f9b1f4ccc90f37a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb21e2ec_2792cdfd",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-11-16T08:21:11Z",
+      "side": 1,
+      "message": "above also removes the need for this",
+      "range": {
+        "startLine": 97,
+        "startChar": 5,
+        "endLine": 97,
+        "endChar": 23
+      },
+      "revId": "19a923a73b089644f7e015db7f9b1f4ccc90f37a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
