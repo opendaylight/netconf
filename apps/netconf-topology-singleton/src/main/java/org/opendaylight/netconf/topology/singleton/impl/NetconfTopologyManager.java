@@ -257,6 +257,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
     private void stopNetconfDeviceContext(final DataObjectIdentifier<Node> instanceIdentifier) {
         final var netconfTopologyContext = contexts.remove(instanceIdentifier);
         if (netconfTopologyContext != null) {
+            netconfTopologyContext.markRemoved();
             close(clusterRegistrations.remove(instanceIdentifier));
             close(netconfTopologyContext);
         }

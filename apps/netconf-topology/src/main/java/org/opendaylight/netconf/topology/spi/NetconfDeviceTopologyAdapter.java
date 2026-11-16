@@ -103,6 +103,9 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
 
     public synchronized void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities,
             final SessionIdType sessionId, final NegotiatedSshAlg negotiatedSshAlg) {
+        if (isClosed("update")) {
+            return;
+        }
         final var tx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.", id, tx.getIdentifier());
         tx.put(LogicalDatastoreType.OPERATIONAL, netconfNodePath(), newNetconfNodeBuilder(up, capabilities, sessionId)
@@ -114,6 +117,9 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
     public synchronized void updateClusteredDeviceData(final boolean up, final String masterAddress,
             final NetconfDeviceCapabilities capabilities, final SessionIdType sessionId,
             final NegotiatedSshAlg negotiatedSshAlg) {
+        if (isClosed("clustered update")) {
+            return;
+        }
         final var tx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.", id, tx.getIdentifier());
         tx.put(LogicalDatastoreType.OPERATIONAL, netconfNodePath(), newNetconfNodeBuilder(up, capabilities, sessionId)
@@ -127,6 +133,9 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
     }
 
     public synchronized void setDeviceAsFailed(final Throwable throwable) {
+        if (isClosed("failure")) {
+            return;
+        }
         final var data = new NetconfNodeBuilder()
                 .setHost(id.host())
                 .setPort(new PortNumber(Uint16.valueOf(id.address().getPort())))
@@ -157,6 +166,38 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
 
         txChain.close();
         return closeFuture;
+    }
+
+    /**
+     * Stop writing the device's operational data, but leave it in the datastore.
+     * 
+     * <p>This is for a member that hands the device over to another member,
+     * in a cluster: the new owner writes the device's state from now on, and may
+     * already have done so, so neither its node nor its connection status may be
+     * touched any more. A later {@link #shutdown()} returns the same future and
+     * does not delete the data either.
+     *
+     * @return a future that completes when the transaction chain is closed
+     */
+    public synchronized ListenableFuture<Empty> release() {
+        if (closeFuture != null) {
+            return closeFuture;
+        }
+
+        closeFuture = SettableFuture.create();
+        LOG.debug("{}: Leaving operational data to the next owner", id);
+        txChain.close();
+        return closeFuture;
+    }
+
+    @GuardedBy("this")
+    private boolean isClosed(final String operation) {
+        if (closeFuture == null) {
+            return false;
+        }
+        LOG.debug("{}: Ignoring device state {}: operational data is no longer written by this adapter", id,
+            operation);
+        return true;
     }
 
     private @NonNull WithKey<Node, NodeKey> nodePath() {

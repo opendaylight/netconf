@@ -15,6 +15,7 @@ import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
@@ -303,8 +304,12 @@ class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
                 new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, nodeInstanceId1,
                     dataObjectModification4)));
 
-        verify(mockClusterRegistration1).close();
-        verify(mockContext1).close();
+        // The context learns that the device is removed before its singleton is closed, so that the master deletes
+        // the device's operational data instead of leaving it to the next master
+        final var removalOrder = inOrder(mockContext1, mockClusterRegistration1);
+        removalOrder.verify(mockContext1).markRemoved();
+        removalOrder.verify(mockClusterRegistration1).close();
+        removalOrder.verify(mockContext1).close();
         verifyNoMoreInteractions(clusterSingletonServiceProvider, mockClusterRegistration2, mockContext2);
 
         // Notify of Node 1 created again.
