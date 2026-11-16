@@ -51,6 +51,7 @@ import org.opendaylight.netconf.test.tool.rpchandler.SettableOperationRpcProvide
 import org.opendaylight.netconf.test.tool.schemacache.SchemaSourceCache;
 import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.ssh.ServerFactoryManagerConfigurator;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
@@ -100,7 +101,7 @@ public class NetconfDeviceSimulator implements Closeable {
     public NetconfDeviceSimulator(final Configuration configuration) {
         this.configuration = configuration;
         servers = new ArrayList<>(configuration.getDeviceCount());
-        sshStackFactory = new SSHTransportStackFactory("netconf-device-simulator-threads",
+        sshStackFactory = new SSHTransportStackFactory(KeystoreSupport.inlineOnly(), "netconf-device-simulator-threads",
             configuration.getThreadPoolSize());
     }
 

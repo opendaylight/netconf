@@ -59,6 +59,7 @@ import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswor
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
 import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
@@ -125,7 +126,7 @@ class NetconfClientFactoryImplTest {
 
     @BeforeAll
     static void beforeAll() {
-        SERVER_FACTORY = new SSHTransportStackFactory("server", 0);
+        SERVER_FACTORY = new SSHTransportStackFactory(KeystoreSupport.inlineOnly(), "server", 0);
         TIMER = new DefaultNetconfTimer();
     }
 
