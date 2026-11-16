@@ -16,6 +16,7 @@ module org.opendaylight.netconf.transport.ssh {
     requires transitive org.opendaylight.netconf.transport.api;
     requires transitive org.opendaylight.netconf.transport.tcp;
     requires transitive org.opendaylight.yang.gen.ietf.ssh.client.rfc9644;
+    requires transitive org.opendaylight.yang.gen.ietf.ssh.common.rfc9644;
     requires transitive org.opendaylight.yang.gen.ietf.ssh.server.rfc9644;
     requires com.google.common;
     requires io.netty.buffer;
@@ -31,7 +32,6 @@ module org.opendaylight.netconf.transport.ssh {
     requires org.opendaylight.yang.gen.iana.ssh.mac.algs;
     requires org.opendaylight.yang.gen.ietf.crypto.types.rfc9640;
     requires org.opendaylight.yang.gen.ietf.keystore.rfc9642;
-    requires org.opendaylight.yang.gen.ietf.ssh.common.rfc9644;
     requires org.opendaylight.yang.gen.ietf.truststore.rfc9641;
     requires org.opendaylight.yangtools.binding.spec;
     requires org.opendaylight.yangtools.yang.common;
