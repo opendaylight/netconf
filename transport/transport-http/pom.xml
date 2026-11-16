@@ -22,6 +22,7 @@
     <description>NETCONF HTTP transport</description>
 
     <properties>
+        <argLine>--enable-native-access=ALL-UNNAMED -Dio.netty.leakDetection.level=paranoid</argLine>
         <odlparent.dependency.enforce>true</odlparent.dependency.enforce>
     </properties>
 

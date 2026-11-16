@@ -21,6 +21,10 @@
     <packaging>jar</packaging>
     <description>NETCONF TLS transport</description>
 
+    <properties>
+        <argLine>--enable-native-access=io.netty.common -Dio.netty.leakDetection.level=paranoid</argLine>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.google.guava</groupId>
