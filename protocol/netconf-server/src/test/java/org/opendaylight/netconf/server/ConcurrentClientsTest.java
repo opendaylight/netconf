@@ -68,6 +68,7 @@ import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFac
 import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
@@ -212,7 +213,9 @@ class ConcurrentClientsTest {
 
         startServer(threads, serverCaps);
         clientFactory = clientClass == NetconfClientRunnable.class
-            ? new NetconfClientFactoryImpl(timer, new SSHTransportStackFactory("client", threads)) : null;
+            ? new NetconfClientFactoryImpl(timer,
+                new SSHTransportStackFactory(KeystoreSupport.inlineOnly(), "client", threads))
+            : null;
 
         final var futures = new ArrayList<Future<?>>(CONCURRENCY);
         for (int i = 0; i < CONCURRENCY; i++) {

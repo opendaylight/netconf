@@ -42,6 +42,7 @@ import org.opendaylight.netconf.shaded.sshd.common.io.IoSession;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionListener;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.netconf.transport.spi.NettyTransportSupport;
 
 class NC1423Test extends AbstractClientServerTest {
@@ -91,6 +92,11 @@ class NC1423Test extends AbstractClientServerTest {
         );
     }
 
+    void initSshServer() {
+        sshServer = assertDoesNotThrow(() -> new SSHServer(SUBSYSTEM, clientListener,
+            TransportSshServer.of(serviceFactory, group, KeystoreSupport.inlineOnly(), sshServerConfig, null)));
+    }
+
     @Test
     void testKeyEstablishedEventFailure() throws Exception {
         // Prepares a use case where KeyEstablished sessionEvent is called and fails to update current authFutureHolder
@@ -126,7 +132,7 @@ class NC1423Test extends AbstractClientServerTest {
         }).when(transportSshSpy).addSessionListener(any());
 
         sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
-        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
+        initSshServer();
 
         // Execute connect.
         sshServer.listen(serverBootstrap, tcpServerConfig).get(2, TimeUnit.SECONDS);
@@ -176,7 +182,7 @@ class NC1423Test extends AbstractClientServerTest {
         }).when(transportSshSpy).addSessionListener(any());
 
         sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
-        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
+        initSshServer();
 
         // Execute connect.
         sshServer.listen(serverBootstrap, tcpServerConfig).get(2, TimeUnit.SECONDS);
@@ -212,7 +218,7 @@ class NC1423Test extends AbstractClientServerTest {
         }).when(transportSshSpy).addSessionListener(any());
 
         sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
-        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
+        initSshServer();
 
         // Execute connect.
         sshServer.listen(serverBootstrap, tcpServerConfig).get(2, TimeUnit.SECONDS);
@@ -248,7 +254,7 @@ class NC1423Test extends AbstractClientServerTest {
         }).when(transportSshSpy).addSessionListener(any());
 
         sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
-        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
+        initSshServer();
 
         // Execute connect.
         sshServer.listen(serverBootstrap, tcpServerConfig).get(2, TimeUnit.SECONDS);
@@ -282,7 +288,7 @@ class NC1423Test extends AbstractClientServerTest {
         }).when(transportSshSpy).addSessionListener(any());
 
         sshClient = SSHClient.of(SUBSYSTEM, clientListener, algListener, transportSshSpy);
-        sshServer = SSHServer.of(serviceFactory, group, SUBSYSTEM, serverListener, sshServerConfig, null);
+        initSshServer();
 
         // Execute connect.
         sshServer.listen(serverBootstrap, tcpServerConfig).get(2, TimeUnit.SECONDS);

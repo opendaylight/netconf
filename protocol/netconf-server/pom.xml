@@ -134,6 +134,15 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>netconf-test-util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>transport-keystore</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>transport-ssh</artifactId>
             <scope>test</scope>
         </dependency>
@@ -141,10 +150,6 @@
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>transport-tcp</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-test-util</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf.model</groupId>

@@ -10,6 +10,7 @@ package org.opendaylight.netconf.northbound;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -55,7 +56,7 @@ public final class TransportFactoryHolder implements AutoCloseable {
     }
 
     public TransportFactoryHolder(final int bossThreads, final int workerThreads) {
-        factory = new SSHTransportStackFactory("odl-netconf-nb-worker", workerThreads,
+        factory = new SSHTransportStackFactory(KeystoreSupport.inlineOnly(), "odl-netconf-nb-worker", workerThreads,
             "odl-netconf-nb-boss", bossThreads);
         LOG.info("NETCONF Northbound Netty context initialized");
     }

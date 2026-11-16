@@ -53,6 +53,7 @@ import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswor
 import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.UserAuthPublicKeyFactory;
 import org.opendaylight.netconf.topology.callhome.CallHomeSshAuthSettings.DefaultAuthSettings;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.netconf.transport.ssh.SSHServer;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.ssh.ServerFactoryManagerConfigurator;
@@ -129,7 +130,8 @@ class CallHomeSshServerTest {
         final var netconfTransportListener = new ServerTransportInitializer(negotiatorFactory);
 
         // tcp layer for clients
-        final var sshTransportFactory = new SSHTransportStackFactory("call-home-test-client", 0);
+        final var sshTransportFactory = new SSHTransportStackFactory(KeystoreSupport.inlineOnly(),
+            "call-home-test-client", 0);
         final var serverPort = serverPort();
         final var tcpConnectParams = new TcpClientParametersBuilder()
             .setRemoteAddress(new Host(IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress())))

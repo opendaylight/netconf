@@ -30,6 +30,7 @@ import org.opendaylight.netconf.shaded.sshd.common.kex.KexProposalOption;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
 import org.opendaylight.netconf.transport.ssh.NegotiatedAlgorithms;
 import org.opendaylight.netconf.transport.ssh.SSHClient;
@@ -247,6 +248,6 @@ public final class CallHomeSshServer implements AutoCloseable {
     }
 
     private static SSHTransportStackFactory defaultTransportStackFactory() {
-        return new SSHTransportStackFactory("ssh-call-home-server", 0);
+        return new SSHTransportStackFactory(KeystoreSupport.inlineOnly(), "ssh-call-home-server", 0);
     }
 }

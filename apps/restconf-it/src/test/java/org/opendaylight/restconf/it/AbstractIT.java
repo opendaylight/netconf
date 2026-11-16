@@ -62,6 +62,7 @@ import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.netconf.transport.http.HTTPClient;
 import org.opendaylight.netconf.transport.http.HTTPServerOverTcp;
 import org.opendaylight.netconf.transport.http.HttpClientStackConfiguration;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -148,7 +149,7 @@ public abstract class AbstractIT extends AbstractDataBrokerTest {
     static void beforeAll() {
         localAddress = InetAddress.getLoopbackAddress().getHostAddress();
         bootstrapFactory = new BootstrapFactory("restconf-netty-e2e", 8);
-        sshTransportStackFactory = new SSHTransportStackFactory("netconf-netty-e2e", 8);
+        sshTransportStackFactory = new SSHTransportStackFactory(KeystoreSupport.inlineOnly(), "netconf-netty-e2e", 8);
     }
 
     @BeforeEach
