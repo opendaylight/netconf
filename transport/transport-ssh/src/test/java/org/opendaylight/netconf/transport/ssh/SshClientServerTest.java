@@ -57,6 +57,7 @@ import org.opendaylight.netconf.shaded.sshd.server.session.ServerSession;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentity;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ClientIdentityBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev241010.ssh.client.grouping.ServerAuthentication;
@@ -81,7 +82,7 @@ class SshClientServerTest extends AbstractClientServerTest {
 
     @BeforeAll
     static void beforeAll() {
-        FACTORY = new SSHTransportStackFactory("IntegrationTest", 0);
+        FACTORY = new SSHTransportStackFactory(KeystoreSupport.inlineOnly(), "IntegrationTest", 0);
     }
 
     @AfterAll

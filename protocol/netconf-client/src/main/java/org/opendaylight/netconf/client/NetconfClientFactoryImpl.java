@@ -21,6 +21,7 @@ import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.keystore.KeystoreSupport;
 import org.opendaylight.netconf.transport.ssh.SSHNegotiatedAlgListener;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
@@ -47,7 +48,8 @@ public final class NetconfClientFactoryImpl implements NetconfClientFactory {
     @Activate
     public NetconfClientFactoryImpl(@Reference final NetconfTimer timer) {
         // FIXME: make factory component configurable for OSGi
-        this(timer, new SSHTransportStackFactory("odl-netconf-client", 0));
+        // FIXME: inject KeystoreSupport
+        this(timer, new SSHTransportStackFactory(KeystoreSupport.inlineOnly(), "odl-netconf-client", 0));
     }
 
     @PreDestroy
