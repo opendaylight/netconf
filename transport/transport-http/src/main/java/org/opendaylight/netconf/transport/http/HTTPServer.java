@@ -59,6 +59,20 @@ import org.slf4j.LoggerFactory;
  * implementation, for the appropriate handler.
  */
 public final class HTTPServer extends HTTPTransportStack {
+    private record TlsIdentity(X509Certificate certificate, PrivateKey privateKey) {
+        // FIXME: constructor and annotations
+    }
+
+    // FIXME: constructor and annotations
+    private record QuicUnderlay(Channel channel, EventLoopGroup quicGroup) implements TransportStack {
+        @Override
+        public ListenableFuture<Empty> shutdown() {
+            return Futures.whenAllComplete(HTTPServer.toListenableFuture(channel.close()),
+                HTTPServer.toListenableFuture(quicGroup.shutdownGracefully()))
+                .call(Empty::value, MoreExecutors.directExecutor());
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(HTTPServer.class);
 
     HTTPServer(final TransportChannelListener<? super HTTPTransportChannel> listener, final HTTPScheme scheme) {
@@ -262,17 +276,5 @@ public final class HTTPServer extends HTTPTransportStack {
                 }
             })
             .build();
-    }
-
-    private record TlsIdentity(X509Certificate certificate, PrivateKey privateKey) {
-    }
-
-    private record QuicUnderlay(Channel channel, EventLoopGroup quicGroup) implements TransportStack {
-        @Override
-        public @NonNull ListenableFuture<Empty> shutdown() {
-            return Futures.whenAllComplete(HTTPServer.toListenableFuture(channel.close()),
-                HTTPServer.toListenableFuture(quicGroup.shutdownGracefully()))
-                .call(Empty::value, MoreExecutors.directExecutor());
-        }
     }
 }
