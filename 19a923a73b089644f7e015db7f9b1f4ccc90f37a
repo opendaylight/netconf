@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bbfb445_20c52f42",
+        "filename": "transport/transport-http/pom.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-16T16:15:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c6ec7eac_e4f4adc2",
+      "range": {
+        "startLine": 30,
+        "startChar": 21,
+        "endLine": 30,
+        "endChar": 40
+      },
+      "revId": "19a923a73b089644f7e015db7f9b1f4ccc90f37a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cf6c2846_61ed150c",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-11-16T08:21:11Z",
       "side": 1,
       "message": "Netty does not carry nullness annotations, so using this while subclassing leads to bad interactions: use finer-grained annotations instead",
+      "range": {
+        "startLine": 58,
+        "startChar": 1,
+        "endLine": 58,
+        "endChar": 17
+      },
+      "revId": "19a923a73b089644f7e015db7f9b1f4ccc90f37a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "274ff5e2_3a63ae43",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-16T16:15:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cf6c2846_61ed150c",
       "range": {
         "startLine": 58,
         "startChar": 1,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4558e4a_d13e6a2c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-16T16:15:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb21e2ec_2792cdfd",
+      "range": {
+        "startLine": 97,
+        "startChar": 5,
+        "endLine": 97,
+        "endChar": 23
+      },
+      "revId": "19a923a73b089644f7e015db7f9b1f4ccc90f37a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d950301f_cab4c75a",
@@ -93,6 +165,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "65f5eb63_725586d1",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-16T16:15:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d950301f_cab4c75a",
+      "range": {
+        "startLine": 103,
+        "startChar": 45,
+        "endLine": 103,
+        "endChar": 68
+      },
+      "revId": "19a923a73b089644f7e015db7f9b1f4ccc90f37a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ea893b0e_cd67e88d",
@@ -106,6 +202,30 @@
       "writtenOn": "2026-11-16T08:23:10Z",
       "side": 1,
       "message": "switch on msg",
+      "range": {
+        "startLine": 133,
+        "startChar": 12,
+        "endLine": 133,
+        "endChar": 43
+      },
+      "revId": "19a923a73b089644f7e015db7f9b1f4ccc90f37a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2889e7b3_ff82ae00",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-16T16:15:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ea893b0e_cd67e88d",
       "range": {
         "startLine": 133,
         "startChar": 12,
