@@ -406,11 +406,20 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
         }
 
         /**
+         * A {@link SubscriptionFilter} that is a self-contained definition.
+         *
+         * @since 12.0.3
+         */
+        sealed interface Definition extends SubscriptionFilter {
+            // nothing else
+        }
+
+        /**
          * A subtree filter definition, provided as an {@link AnydataNode} document.
          *
          * @param document the subtree filter
          */
-        record SubtreeDefinition(AnydataNode<?> document) implements SubscriptionFilter {
+        record SubtreeDefinition(AnydataNode<?> document) implements Definition {
             public SubtreeDefinition {
                 requireNonNull(document);
             }
@@ -422,7 +431,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
          * @param xpath the XPath filter expression
          */
         // FIXME: this should be already parsed to yang-xpath-api
-        record XPathDefinition(String xpath) implements SubscriptionFilter {
+        record XPathDefinition(String xpath) implements Definition {
             public XPathDefinition {
                 requireNonNull(xpath);
             }
