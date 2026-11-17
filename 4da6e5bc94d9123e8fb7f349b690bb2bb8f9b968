@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "86edd85a_0e68da2a",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-17T11:10:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c760b8b_ff09c683",
+      "revId": "4da6e5bc94d9123e8fb7f349b690bb2bb8f9b968",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6696dc81_c845ee89",
