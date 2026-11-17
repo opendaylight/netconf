@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79c81736_5c04014c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 37
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-11-17T09:16:37Z",
+      "side": 1,
+      "message": "align logic and variable naming with ClientHttp2SseService -- it looks differently from when the Http3 thing was copy\u0026pasted from it",
+      "revId": "b6f8096f8d22af24912bd3acbb5f9d9f3d52700d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
