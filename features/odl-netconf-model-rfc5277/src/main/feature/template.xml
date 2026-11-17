@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.6.0" name="odl-netconf-12.0.3-SNAPSHOT">
+    <repository>mvn:org.opendaylight.ietf/odl-ietf-model-rfc6991/{{versionAsInProject}}/xml/features</repository>
+    <feature name="odl-netconf-model-rfc5277">
+        <feature version="{{semVerRange}}">odl-ietf-model-rfc6991</feature>
+        <bundle>mvn:org.opendaylight.netconf.model/rfc5277/{{versionAsInProject}}</bundle>
+    </feature>
+</features>
