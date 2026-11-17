@@ -943,6 +943,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         }
     }
 
+    @GuardedBy("filterLock")
     private void rebuildFiltersLocked(final Set<String> touchedFilters) {
         // Start with the currently published map to retain unaffected entries
         final var freshFilters = new HashMap<>(filters.getAcquire());
@@ -971,7 +972,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         filters.setRelease(ImmutableMap.copyOf(freshFilters));
         // Callback to update operational datastore with the list of filter names that compiled successfully
-        Futures.addCallback(filtersOperationalViewUpdated(filters.getAcquire().keySet()), new FutureCallback<>() {
+        Futures.addCallback(filtersOperationalViewUpdated(freshFilters.keySet()), new FutureCallback<>() {
             @Override
             public void onSuccess(final Void result) {
                 LOG.debug("Filters operational view update completed");
@@ -985,6 +986,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         refreshSubscriptions(touchedFilters);
     }
 
+    @GuardedBy("filterLock")
     private void refreshSubscriptions(final Set<String> names) {
         for (var subscription : subscriptions.values()) {
             var subscriptionFilter = subscription.filterName();
