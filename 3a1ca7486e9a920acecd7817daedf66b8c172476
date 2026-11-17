@@ -1,0 +1,136 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "455e993f_c3c68d8f",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/RestconfStreamingLifecycleTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-17T12:59:15Z",
+      "side": 1,
+      "message": "these strings appear multiple times, good place for a constant",
+      "range": {
+        "startLine": 131,
+        "startChar": 56,
+        "endLine": 131,
+        "endChar": 107
+      },
+      "revId": "3a1ca7486e9a920acecd7817daedf66b8c172476",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8082273_c6c98d56",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/RestconfStreamingLifecycleTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-17T12:59:15Z",
+      "side": 1,
+      "message": "extra line",
+      "revId": "3a1ca7486e9a920acecd7817daedf66b8c172476",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdc007b9_c6f9449f",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1StreamingTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-17T12:59:15Z",
+      "side": 1,
+      "message": "assertInstanceOf(...)",
+      "range": {
+        "startLine": 221,
+        "startChar": 34,
+        "endLine": 221,
+        "endChar": 56
+      },
+      "revId": "3a1ca7486e9a920acecd7817daedf66b8c172476",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "936d92a8_c0530be2",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1StreamingTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-17T12:59:15Z",
+      "side": 1,
+      "message": "pre existing tests use try/finally to release response even when check fail so it does not leak, should\u0027t that been done for all tests? (multiple tests here are affected)",
+      "range": {
+        "startLine": 236,
+        "startChar": 16,
+        "endLine": 236,
+        "endChar": 35
+      },
+      "revId": "3a1ca7486e9a920acecd7817daedf66b8c172476",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b300d0a_b3cf1351",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1StreamingTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-17T12:59:15Z",
+      "side": 1,
+      "message": "assertInstanceOf(...)",
+      "range": {
+        "startLine": 254,
+        "startChar": 38,
+        "endLine": 254,
+        "endChar": 60
+      },
+      "revId": "3a1ca7486e9a920acecd7817daedf66b8c172476",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee71b261_c1154b19",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1StreamingTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-17T12:59:15Z",
+      "side": 1,
+      "message": "assertInstanceOf(...)",
+      "range": {
+        "startLine": 389,
+        "startChar": 34,
+        "endLine": 389,
+        "endChar": 56
+      },
+      "revId": "3a1ca7486e9a920acecd7817daedf66b8c172476",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
