@@ -17,7 +17,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent.Rfc7950;
 import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
 import org.opendaylight.yangtools.databind.DatabindContext;
@@ -124,7 +123,7 @@ class SubtreeEventStreamFilterTest {
         assertFalse(streamFilter.test(MODEL_CONTEXT, notification(invalidPath)));
     }
 
-    private static DOMNotification notification(final YangInstanceIdentifier path) {
+    private static Rfc7950 notification(final YangInstanceIdentifier path) {
         return new Rfc7950(Absolute.of(INTERFACE_ENABLED_QNAME), path, notificationBody(), Instant.now());
     }
 
