@@ -12,5 +12,6 @@
         <feature version="[3,4)">odl-ietf-model-rfc9643</feature>
         <feature version="[3,4)">odl-ietf-model-rfc9644</feature>
         <feature version="[3,4)">odl-ietf-model-rfc9645</feature>
+        <feature version="[15,16)">odl-netty-http3</feature>
     </feature>
 </features>
