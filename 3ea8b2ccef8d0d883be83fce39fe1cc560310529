@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af52302c_b0c73c6b",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-17T17:32:23Z",
+      "side": 1,
+      "message": ".",
+      "range": {
+        "startLine": 371,
+        "startChar": 115,
+        "endLine": 371,
+        "endChar": 116
+      },
+      "revId": "3ea8b2ccef8d0d883be83fce39fe1cc560310529",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54fe2919_b75c0056",
+        "filename": "transport/transport-http/src/main/yang/odl-quic-common.yang",
+        "patchSetId": 13
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-17T17:32:23Z",
+      "side": 1,
+      "message": "Compared to the other descriptions in this model, this one is quite long. Is all of it needed? Can we have something simpler, like:\n```\nThe QUIC max_idle_timeout transport parameter. A connection that\nstays idle for longer than this is silently closed. A value of 0\nmeans this endpoint sets no limit. If both endpoints set a non-zero\nlimit, the lower one applies. If only one endpoint sets a limit,\nthat limit applies.\n```",
+      "revId": "3ea8b2ccef8d0d883be83fce39fe1cc560310529",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6330640_6b74e9b6",
+        "filename": "transport/transport-http/src/main/yang/odl-quic-common.yang",
+        "patchSetId": 13
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-17T17:32:23Z",
+      "side": 1,
+      "message": ". Otherwise",
+      "range": {
+        "startLine": 98,
+        "startChar": 36,
+        "endLine": 98,
+        "endChar": 46
+      },
+      "revId": "3ea8b2ccef8d0d883be83fce39fe1cc560310529",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
