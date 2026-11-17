@@ -73,60 +73,53 @@ jobs:
 
   maven-verify:
     needs: prepare
+    permissions:
+      contents: read
+      pull-requests: read # repository-metadata-action queries PR data
     # yamllint disable-line rule:line-length
-    uses: lfit/releng-reusable-workflows/.github/workflows/compose-maven-verify.yaml@fc3aea6f1ec56737c3cdd8fe1c46cbbb7209394b # v0.11.1
+    uses: lfreleng-actions/java-workflows/.github/workflows/maven-build-test.yaml@535e49d8407dc4dbca224c8f389716208fbee155 # v0.8.1
     with:
-      GERRIT_BRANCH: ${{ inputs.GERRIT_BRANCH }}
-      GERRIT_CHANGE_ID: ${{ inputs.GERRIT_CHANGE_ID }}
-      GERRIT_CHANGE_NUMBER: ${{ inputs.GERRIT_CHANGE_NUMBER }}
-      GERRIT_CHANGE_URL: ${{ inputs.GERRIT_CHANGE_URL }}
-      GERRIT_EVENT_TYPE: ${{ inputs.GERRIT_EVENT_TYPE }}
-      GERRIT_PATCHSET_NUMBER: ${{ inputs.GERRIT_PATCHSET_NUMBER }}
-      GERRIT_PATCHSET_REVISION: ${{ inputs.GERRIT_PATCHSET_REVISION }}
-      GERRIT_PROJECT: ${{ inputs.GERRIT_PROJECT }}
-      GERRIT_REFSPEC: ${{ inputs.GERRIT_REFSPEC }}
-      JDK_VERSION: "21"
-      MVN_VERSION: "3.9.6"
-      MVN_PROFILES: "docker"
-      MVN_PHASES: "clean install"
-      # yamllint disable rule:line-length
-      MVN_OPTS: >-
-        -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-        -Dmaven.repo.local=/tmp/r -Dorg.ops4j.pax.url.mvn.localRepository=/tmp/r
-        -DaltDeploymentRepository=staging::default::file:"${GITHUB_WORKSPACE}"/m2repo
-      # yamllint enable rule:line-length
-      ENV_VARS: ${{ toJSON(vars) }}
+      gerrit_refspec: ${{ inputs.GERRIT_REFSPEC }}
+      gerrit_project: ${{ inputs.GERRIT_PROJECT }}
+      gerrit_branch: ${{ inputs.GERRIT_BRANCH }}
+      java_version: "21"
+      mvn_version: "3.9.6"
+      mvn_profiles: "docker"
+      mvn_phases: "clean install"
+      # Gate on Grype findings only when the change touches a
+      # dependency; report them as warnings otherwise.
+      grype_gate_when: "dependencies-changed"
+      build_timeout_minutes: 60
+    secrets:
+      # Adds the opendaylight-snapshots repository profile, as the
+      # lfit workflow did through its MVN_GLOBAL_SETTINGS default.
+      maven_global_settings: ${{ vars.GLOBAL_SETTINGS }}
 
   tox-verify:
     needs: prepare
+    permissions:
+      contents: read
     # yamllint disable-line rule:line-length
-    uses: lfit/releng-reusable-workflows/.github/workflows/gerrit-compose-required-tox-verify.yaml@fc3aea6f1ec56737c3cdd8fe1c46cbbb7209394b # v0.11.1
+    uses: lfreleng-actions/generic-workflows/.github/workflows/tox-verify.yaml@55a94482efee5f27ebb2de3e7f6c05339f02fad9 # v0.8.1
     with:
-      GERRIT_BRANCH: ${{ inputs.GERRIT_BRANCH }}
-      GERRIT_CHANGE_ID: ${{ inputs.GERRIT_CHANGE_ID }}
-      GERRIT_CHANGE_NUMBER: ${{ inputs.GERRIT_CHANGE_NUMBER }}
-      GERRIT_CHANGE_URL: ${{ inputs.GERRIT_CHANGE_URL }}
-      GERRIT_EVENT_TYPE: ${{ inputs.GERRIT_EVENT_TYPE }}
-      GERRIT_PATCHSET_NUMBER: ${{ inputs.GERRIT_PATCHSET_NUMBER }}
-      GERRIT_PATCHSET_REVISION: ${{ inputs.GERRIT_PATCHSET_REVISION }}
-      GERRIT_PROJECT: ${{ inputs.GERRIT_PROJECT }}
-      GERRIT_REFSPEC: ${{ inputs.GERRIT_REFSPEC }}
-      TOX_ENVS: '["docs","docs-linkcheck"]'
+      gerrit_refspec: ${{ inputs.GERRIT_REFSPEC }}
+      gerrit_project: ${{ inputs.GERRIT_PROJECT }}
+      gerrit_branch: ${{ inputs.GERRIT_BRANCH }}
+      tox_envs: '["docs", "docs-linkcheck"]'
+      # docs-linkcheck follows arbitrary external links, which the
+      # shared allow-list cannot enumerate.
+      harden_runner_egress: "audit"
 
   pre-commit-linting:
     needs: prepare
+    permissions:
+      contents: read
     # yamllint disable-line rule:line-length
-    uses: lfit/releng-reusable-workflows/.github/workflows/compose-repo-linting.yaml@fc3aea6f1ec56737c3cdd8fe1c46cbbb7209394b # v0.11.1
+    uses: lfreleng-actions/generic-workflows/.github/workflows/linting-verify.yaml@55a94482efee5f27ebb2de3e7f6c05339f02fad9 # v0.8.1
     with:
-      GERRIT_BRANCH: ${{ inputs.GERRIT_BRANCH }}
-      GERRIT_CHANGE_ID: ${{ inputs.GERRIT_CHANGE_ID }}
-      GERRIT_CHANGE_NUMBER: ${{ inputs.GERRIT_CHANGE_NUMBER }}
-      GERRIT_CHANGE_URL: ${{ inputs.GERRIT_CHANGE_URL }}
-      GERRIT_EVENT_TYPE: ${{ inputs.GERRIT_EVENT_TYPE }}
-      GERRIT_PATCHSET_NUMBER: ${{ inputs.GERRIT_PATCHSET_NUMBER }}
-      GERRIT_PATCHSET_REVISION: ${{ inputs.GERRIT_PATCHSET_REVISION }}
-      GERRIT_PROJECT: ${{ inputs.GERRIT_PROJECT }}
-      GERRIT_REFSPEC: ${{ inputs.GERRIT_REFSPEC }}
+      gerrit_refspec: ${{ inputs.GERRIT_REFSPEC }}
+      gerrit_project: ${{ inputs.GERRIT_PROJECT }}
+      gerrit_branch: ${{ inputs.GERRIT_BRANCH }}
 
   vote:
     if: ${{ always() }}
