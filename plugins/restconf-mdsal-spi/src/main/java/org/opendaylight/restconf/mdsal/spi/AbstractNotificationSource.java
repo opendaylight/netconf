@@ -15,6 +15,8 @@ import java.util.function.Supplier;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
+import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent;
+import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent.Rfc6020;
 import org.opendaylight.restconf.server.spi.EventFormatterFactory;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sink;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
@@ -36,8 +38,23 @@ public abstract class AbstractNotificationSource extends Source<DOMNotification>
 
         @Override
         public void onNotification(final DOMNotification notification) {
-            sink.publish(modelContext.get(), notification,
-                notification instanceof DOMEvent domEvent ? domEvent.getEventInstant() : Instant.now());
+            final var event = toEvent(notification);
+            sink.publish(modelContext.get(), event, event.getEventInstant());
+        }
+
+        /**
+         * Normalize a {@link DOMNotification} to a {@link DOMNotificationEvent}, so that downstream
+         * consumers (filters, formatters) only need to handle {@link Rfc6020} and
+         * {@link DOMNotificationEvent.Rfc7950}. Plain notifications, such as those published by
+         * binding-based applications via the MD-SAL notification router, are top-level notifications
+         * and are therefore wrapped as {@link Rfc6020}.
+         */
+        private static DOMNotificationEvent toEvent(final DOMNotification notification) {
+            return switch (notification) {
+                case DOMNotificationEvent event -> event;
+                default -> new Rfc6020(notification.getBody(),
+                    notification instanceof DOMEvent domEvent ? domEvent.getEventInstant() : Instant.now());
+            };
         }
     }
 
