@@ -16,6 +16,24 @@
       "message": "we also would need a follow up to make clear what of these bidi are really for the client and which are just and only for the server, add fixme with a ticket #",
       "revId": "f49422c4cc0339d29faeb399fe730ca1650608a4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1bfdf60_5e48c64d",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ConfigUtils.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-17T13:42:44Z",
+      "side": 0,
+      "message": "https://lf-opendaylight.atlassian.net/browse/NETCONF-1710",
+      "parentUuid": "bc7d3ccc_af530e8e",
+      "revId": "f49422c4cc0339d29faeb399fe730ca1650608a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
