@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.6.0" name="odl-netconf-databind">
+    <repository>mvn:org.opendaylight.yangtools/odl-yangtools-databind/{{versionAsInProject}}/xml/features</repository>
+    <feature name="odl-netconf-databind">
+        <feature version="{{semVerRange}}">odl-yangtools-databind</feature>
+        <bundle>mvn:org.opendaylight.netconf/databind/{{versionAsInProject}}</bundle>
+    </feature>
+</features>
