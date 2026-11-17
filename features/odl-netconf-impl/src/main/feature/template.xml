@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.6.0" name="odl-netconf-impl">
+    <repository>mvn:org.opendaylight.ietf/odl-ietf-model-rfc6022/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.ietf/odl-ietf-model-rfc7407-ietf-x509-cert-to-name/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.netconf/odl-netconf-api/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.netconf/odl-netconf-common/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.netconf/odl-netconf-transport/{{versionAsInProject}}/xml/features</repository>
+    <feature name="odl-netconf-impl">
+        <feature version="{{semVerRange}}">odl-ietf-model-rfc6022</feature>
+        <feature version="{{semVerRange}}">odl-ietf-model-rfc7407-ietf-x509-cert-to-name</feature>
+        <feature version="{{semVerRange}}">odl-netconf-api</feature>
+        <feature version="{{semVerRange}}">odl-netconf-common</feature>
+        <feature version="{{semVerRange}}">odl-netconf-transport</feature>
+        <bundle>mvn:org.opendaylight.netconf/netconf-server/{{versionAsInProject}}</bundle>
+        <bundle>mvn:org.opendaylight.netconf.model/odl-netconf-monitoring/{{versionAsInProject}}</bundle>
+    </feature>
+</features>
