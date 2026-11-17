@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.6.0" name="odl-netconf-client">
+    <repository>mvn:org.opendaylight.netconf/odl-netconf-common/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.netconf/odl-netconf-transport/{{versionAsInProject}}/xml/features</repository>
+    <feature name="odl-netconf-client">
+        <feature version="{{semVerRange}}">odl-netconf-common</feature>
+        <feature version="{{semVerRange}}">odl-netconf-transport</feature>
+        <bundle>mvn:org.opendaylight.netconf/netconf-client/{{versionAsInProject}}</bundle>
+    </feature>
+</features>
