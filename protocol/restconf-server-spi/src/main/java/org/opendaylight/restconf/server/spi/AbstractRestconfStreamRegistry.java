@@ -96,7 +96,30 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     @Beta
     @NonNullByDefault
     public interface EventStreamFilter {
+        /**
+         * A specification of an {@link EventFilter}.
+         */
+        sealed interface Spec permits SubtreeFilterSpec, XPathFilterSpec {
+
+            SubscriptionFilter.Definition definition();
+        }
+
         boolean matches(EffectiveModelContext modelContext, Object event);
+    }
+
+    @NonNullByDefault
+    public record SubtreeFilterSpec(SubscriptionFilter.SubtreeDefinition definition) implements EventStreamFilter.Spec {
+        public SubtreeFilterSpec {
+            requireNonNull(definition);
+        }
+    }
+
+
+    @NonNullByDefault
+    public record XPathFilterSpec(SubscriptionFilter.XPathDefinition definition) implements EventStreamFilter.Spec {
+        public XPathFilterSpec {
+            requireNonNull(definition);
+        }
     }
 
     /**
@@ -1032,7 +1055,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             case SubscriptionFilter.Reference(var filterName) -> getFilter(filterName);
             case SubscriptionFilter.SubtreeDefinition(var anydata) -> parseSubtreeFilter(anydata);
             case SubscriptionFilter.XPathDefinition(final var xpath) -> parseXpathFilter(xpath);
-        };
+        }
     }
 
     @NonNullByDefault
