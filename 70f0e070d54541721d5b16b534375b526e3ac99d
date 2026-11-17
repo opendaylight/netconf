@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "336d7ee9_02567301",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-17T14:13:40Z",
+      "side": 1,
+      "message": "Is this our goal? Can we expect that or work towards that? For example translate any other notification type to RFC6020?",
+      "revId": "70f0e070d54541721d5b16b534375b526e3ac99d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a9399ce_3b7597b9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-17T14:13:40Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "70f0e070d54541721d5b16b534375b526e3ac99d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
