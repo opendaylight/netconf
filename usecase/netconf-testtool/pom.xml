@@ -195,7 +195,6 @@
                         </goals>
                         <phase>package</phase>
                         <configuration>
-                            <!-- TODO investigate why jar fails without this filter-->
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
@@ -203,6 +202,7 @@
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>module-info.class</exclude>
                                         <exclude>org.opendaylight.netconf.test.tool.client</exclude>
                                     </excludes>
                                 </filter>
@@ -232,6 +232,7 @@
                                           <exclude>META-INF/*.SF</exclude>
                                           <exclude>META-INF/*.DSA</exclude>
                                           <exclude>META-INF/*.RSA</exclude>
+                                          <exclude>module-info.class</exclude>
                                           <exclude>org.opendaylight.netconf.test.tool.client.http</exclude>
                                           <exclude>org.opendaylight.netconf.test.tool.rpc</exclude>
                                           <exclude>AcceptingAuthProvider</exclude>
@@ -275,6 +276,7 @@
                                           <exclude>META-INF/*.SF</exclude>
                                           <exclude>META-INF/*.DSA</exclude>
                                           <exclude>META-INF/*.RSA</exclude>
+                                          <exclude>module-info.class</exclude>
                                           <exclude>org.opendaylight.netconf.test.tool.rpc</exclude>
                                           <exclude>AcceptingAuthProvider</exclude>
                                           <exclude>org.opendaylight.netconf.test.tool.DummyMonitoringService</exclude>
@@ -317,6 +319,7 @@
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>module-info.class</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
