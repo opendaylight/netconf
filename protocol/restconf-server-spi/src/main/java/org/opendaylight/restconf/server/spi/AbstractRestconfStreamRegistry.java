@@ -661,6 +661,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             return;
         }
 
+        if (stopTime != null && !stopTime.isAfter(Instant.now())) {
+            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                "Stop-time must be in future."));
+            return;
+        }
+
         final var stream = lookupStream(streamName);
         if (stream == null) {
             request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
@@ -676,12 +682,6 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             return;
         }
         final var filterName = filter instanceof SubscriptionFilter.Reference(var name) ? name : null;
-
-        if (stopTime != null && !stopTime.isAfter(Instant.now())) {
-            request.failWith(new RequestException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
-                "Stop-time must be in future."));
-            return;
-        }
 
         final var id = Uint32.fromIntBits(prevDynamicId.incrementAndGet());
         final var receiverName = newReceiverName(session.description(), request.principal());
