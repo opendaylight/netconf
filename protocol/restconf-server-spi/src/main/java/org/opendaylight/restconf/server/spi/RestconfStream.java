@@ -26,6 +26,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
@@ -395,7 +396,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
     @NonNullByDefault
     public sealed interface SubscriptionFilter {
         /**
-         * A reference to an externally-provided filter.
+         * A reference to an externally-defined filter.
          *
          * @param filterName filter name
          */
@@ -406,7 +407,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
         }
 
         /**
-         * A {@link SubscriptionFilter} that is a self-contained definition.
+         * A self-contained definition of a {@link SubscriptionFilter}.
          *
          * @since 12.0.3
          */
@@ -430,10 +431,30 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
          *
          * @param xpath the XPath filter expression
          */
-        // FIXME: this should be already parsed to yang-xpath-api
+        // FIXME: hold an unbound YangXPathExpression
         record XPathDefinition(String xpath) implements Definition {
             public XPathDefinition {
                 requireNonNull(xpath);
+            }
+        }
+
+        /**
+         * A specification of a {@link SubscriptionFilter} in a domain-specific object model.
+         */
+        sealed interface Specification {
+            // marker interface only
+        }
+
+        record SubtreeSpecification(SubtreeFilter filter) implements Specification {
+            public SubtreeSpecification {
+                requireNonNull(filter);
+            }
+        }
+
+        // FIXME: hold an unbound YangXPathExpression.UnqualifiedBound
+        record XPathSpecification(String expression) implements Specification {
+            public XPathSpecification {
+                requireNonNull(expression);
             }
         }
     }
