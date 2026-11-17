@@ -11,7 +11,6 @@ import static org.opendaylight.netconf.databind.subtree.SubtreeMatcher.permitsPa
 
 import com.google.common.base.MoreObjects.ToStringHelper;
 import java.util.List;
-import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent.Rfc6020;
 import org.opendaylight.netconf.common.mdsal.DOMNotificationEvent.Rfc7950;
 import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
@@ -43,7 +42,6 @@ public final class SubtreeEventStreamFilter<T> extends EventFilter<T> {
         return switch (event) {
             case Rfc7950 n7950 -> n7950.path();
             case Rfc6020 ignored -> YangInstanceIdentifier.of();
-            case DOMNotification ignored -> YangInstanceIdentifier.of();
             case List<?> list when !list.isEmpty() && list.getFirst() instanceof DataTreeCandidate ->
                 YangInstanceIdentifier.of();
             default -> null;
@@ -54,7 +52,6 @@ public final class SubtreeEventStreamFilter<T> extends EventFilter<T> {
         return switch (event) {
             case Rfc7950 n7950 -> n7950.getBody();
             case Rfc6020 n6020 -> n6020.getBody();
-            case DOMNotification notification -> notification.getBody();
             case List<?> list when !list.isEmpty() && list.getFirst() instanceof DataTreeCandidate candidates ->
                 parseDataTreeCandidates((List<DataTreeCandidate>) candidates);
             default -> null;
