@@ -45,19 +45,6 @@ public final class SSHTransportStackFactory extends BootstrapFactory {
         this.keystoreSupport = requireNonNull(keystoreSupport);
     }
 
-    @NonNullByDefault
-    @Deprecated(since = "12.0.3", forRemoval = true)
-    public SSHTransportStackFactory(final String groupName, final int groupThreads) {
-        this(KeystoreSupport.inlineOnly(), groupName, groupThreads);
-    }
-
-    @NonNullByDefault
-    @Deprecated(since = "12.0.3", forRemoval = true)
-    public SSHTransportStackFactory(final String groupName, final int groupThreads, final String parentGroupName,
-            final int parentGroupThreads) {
-        this(KeystoreSupport.inlineOnly(), groupName, groupThreads, parentGroupName, parentGroupThreads);
-    }
-
     public @NonNull ListenableFuture<SSHClient> connectClient(final String subsystem,
             final TransportChannelListener<? super SSHTransportChannel> listener,
             final SSHNegotiatedAlgListener algListener, final TcpClientGrouping connectParams,
