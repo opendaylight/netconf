@@ -10,9 +10,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
-        <artifactId>feature-parent</artifactId>
+        <artifactId>template-feature-parent</artifactId>
         <version>12.0.3-SNAPSHOT</version>
-        <relativePath>../parent/pom.xml</relativePath>
+        <relativePath>../template-parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>odl-netconf-common</artifactId>
@@ -30,6 +30,12 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-netconf-api</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.odlparent</groupId>
             <artifactId>odl-netty-4</artifactId>
             <type>xml</type>
@@ -44,13 +50,15 @@
 
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-api</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
+            <artifactId>netconf-codec</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>shaded-exificient</artifactId>
         </dependency>
     </dependencies>
 </project>
