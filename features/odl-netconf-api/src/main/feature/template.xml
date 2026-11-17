@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.6.0" name="odl-netconf-api">
+    <repository>mvn:org.opendaylight.odlparent/odl-netty-4/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.ietf/odl-ietf-model-rfc6241/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.ietf/odl-ietf-model-rfc6470/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.ietf/odl-ietf-model-rfc8525/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.ietf/odl-ietf-model-rfc8526/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.netconf/odl-netconf-model-rfc5277/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.yangtools/odl-yangtools-util/{{versionAsInProject}}/xml/features</repository>
+    <feature name="odl-netconf-api">
+        <feature version="{{semVerRange}}">odl-netty-4</feature>
+        <feature version="{{semVerRange}}">odl-ietf-model-rfc6241</feature>
+        <feature version="{{semVerRange}}">odl-ietf-model-rfc6470</feature>
+        <feature version="{{semVerRange}}">odl-ietf-model-rfc8525</feature>
+        <feature version="{{semVerRange}}">odl-ietf-model-rfc8526</feature>
+        <feature version="{{semVerRange}}">odl-netconf-model-rfc5277</feature>
+        <feature version="{{semVerRange}}">odl-yangtools-util</feature>
+        <bundle>mvn:org.opendaylight.netconf/netconf-api/{{versionAsInProject}}</bundle>
+    </feature>
+</features>
