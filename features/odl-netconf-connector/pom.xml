@@ -57,11 +57,13 @@
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
-
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-restconf-server-api</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
         </dependency>
+
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-client-mdsal</artifactId>
