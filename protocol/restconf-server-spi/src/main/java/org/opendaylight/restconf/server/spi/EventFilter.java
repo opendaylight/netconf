@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.server.spi;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -21,12 +23,21 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  */
 @NonNullByDefault
 public abstract class EventFilter<T> implements AbstractRestconfStreamRegistry.EventStreamFilter {
-    // FIXME: protected EventFilter(Class<T> eventType) and remove the unchecked cast below
+    private final Class<T> eventType;
+
+    // FIXME: 13.0.0: remove this constructor
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    protected EventFilter() {
+        this((Class) Object.class);
+    }
+
+    protected EventFilter(final Class<T> eventType) {
+        this.eventType = requireNonNull(eventType);
+    }
 
     @Override
-    @SuppressWarnings("unchecked")
     public final boolean matches(final EffectiveModelContext modelContext, final Object event) {
-        return test(modelContext, (T) event);
+        return test(modelContext, eventType.cast(event));
     }
 
     protected abstract boolean test(EffectiveModelContext modelContext, T event);

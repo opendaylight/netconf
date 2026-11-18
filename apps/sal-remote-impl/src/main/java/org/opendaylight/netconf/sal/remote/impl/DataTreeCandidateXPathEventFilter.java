@@ -25,8 +25,9 @@ import org.w3c.dom.Document;
 final class DataTreeCandidateXPathEventFilter extends XPathEventFilter<List<DataTreeCandidate>> {
     private static final String DATA_CHANGE_EVENT_ELEMENT = DataChangeEvent.QNAME.getLocalName();
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     DataTreeCandidateXPathEventFilter(final String expression) throws XPathExpressionException {
-        super(expression);
+        super((Class) List.class, expression);
     }
 
     @Override

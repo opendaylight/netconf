@@ -29,6 +29,7 @@ public final class NotificationSubtreeEventFilter extends EventFilter<DOMNotific
     private final SubtreeFilter filter;
 
     public NotificationSubtreeEventFilter(final SubtreeFilter filter) {
+        super(DOMNotification.class);
         this.filter = requireNonNull(filter);
     }
 

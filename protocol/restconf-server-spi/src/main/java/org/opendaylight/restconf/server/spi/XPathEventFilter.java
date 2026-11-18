@@ -70,7 +70,14 @@ public abstract class XPathEventFilter<T> extends EventFilter<T> {
     private final String expression;
     private final XPathExpression filter;
 
+    // FIXME: 13.0.0: remove this constructor
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     protected XPathEventFilter(final String expression) throws XPathExpressionException {
+        this((Class) Object.class, expression);
+    }
+
+    protected XPathEventFilter(final Class<T> eventType, final String expression) throws XPathExpressionException {
+        super(eventType);
         this.expression = requireNonNull(expression);
 
         final XPath xpath;

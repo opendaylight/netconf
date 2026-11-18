@@ -25,7 +25,9 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 final class DataTreeCandidateSubtreeEventFilter extends EventFilter<List<DataTreeCandidate>> {
     private final SubtreeFilter filter;
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     DataTreeCandidateSubtreeEventFilter(final SubtreeFilter filter) {
+        super((Class) List.class);
         this.filter = requireNonNull(filter);
     }
 
