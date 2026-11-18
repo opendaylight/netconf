@@ -13,7 +13,6 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.Definition.FILTERS;
 import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.Definition.FILTER_SPEC;
 import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.Definition.STREAM_FILTER_PATH;
-import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.STREAM_FILTER;
 import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.SubtreeDefinition.STREAM_SUBTREE_FILTER;
 import static org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.YangModuleInfoImpl.qnameOf;
 
@@ -60,7 +59,7 @@ import org.opendaylight.restconf.mdsal.spi.NotificationSource;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.EventFormatter;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.SubtreeDefinition;
+import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
 import org.opendaylight.restconf.server.spi.SubtreeEventStreamFilter;
 import org.opendaylight.restconf.server.spi.TextParameters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.subscribed.notifications.rev191117.Subscription1;
@@ -249,7 +248,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             tclReg = changeExtension.registerTreeChangeListener(
                 // any configured filter
                 DOMDataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION,
-                    STREAM_FILTER_PATH.node(STREAM_FILTER).node(FILTER_SPEC)),
+                    STREAM_FILTER_PATH.node(SubscriptionFilter.STREAM_FILTER).node(FILTER_SPEC)),
                 new FilterSpecListener());
         } else {
             tclReg = null;
@@ -482,22 +481,24 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     @Override
     protected synchronized ListenableFuture<Void> modifySubscriptionParameters(final Uint32 subscriptionId,
             final RestconfStream.SubscriptionFilter filter, final Instant stopTime) {
+        final var targetBuilder = ImmutableNodes.newChoiceBuilder().withNodeIdentifier(TARGET_NODEID);
+        // FIXME: unconditional YANGTOOLS-1670 has been resolved
+        if (!(filter instanceof SubscriptionFilter.SubtreeDefinition)) {
+            targetBuilder.withChild(filter.toStreamFilter());
+        }
+
         final var pathArg = subscriptionArg(subscriptionId);
-        final var tx = txChain.newWriteOnlyTransaction();
         final var node = ImmutableNodes.newMapEntryBuilder()
             .withNodeIdentifier(pathArg)
             .withChild(ImmutableNodes.leafNode(ID_NODEID, subscriptionId))
-            .withChild(ImmutableNodes.newChoiceBuilder()
-                .withNodeIdentifier(TARGET_NODEID)
-                // FIXME: Uncomment once YANGTOOLS-1670 has been resolved.
-                // .withChild(filter.toStreamFilter())
-                .build());
+            .withChild(targetBuilder.build());
 
         // Ignore stop-time if it is null
         if (stopTime != null) {
             node.withChild(ImmutableNodes.leafNode(STOP_TIME_NODEID, stopTime.toString()));
         }
 
+        final var tx = txChain.newWriteOnlyTransaction();
         tx.merge(LogicalDatastoreType.OPERATIONAL, subscriptionPath(pathArg), node.build());
         return tx.commit().transform(info -> {
             LOG.debug("Modified subscription {} to operational datastore as of {}", subscriptionId, info);
@@ -551,14 +552,15 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     @Override
     protected EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) throws RequestException {
-        final var expression = new SubtreeDefinition(filter).bindTo(databindProvider.currentDatabind());
-        return new SubtreeEventStreamFilter<>(expression.filter());
+        return new SubtreeEventStreamFilter<>(new SubscriptionFilter.SubtreeDefinition(filter)
+            .bindTo(databindProvider.currentDatabind())
+            .filter());
     }
 
     @NonNullByDefault
     static YangInstanceIdentifier streamFilterPath(final Uint32 subscriptionId) {
         return YangInstanceIdentifier.of(SUBSCRIPTIONS_NODEID, SUBSCRIPTION_NODEID, subscriptionArg(subscriptionId),
-            TARGET_NODEID, STREAM_FILTER);
+            TARGET_NODEID, SubscriptionFilter.STREAM_FILTER);
     }
 
     @NonNullByDefault
