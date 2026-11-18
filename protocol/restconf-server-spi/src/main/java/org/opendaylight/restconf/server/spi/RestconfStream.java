@@ -15,6 +15,9 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
@@ -22,10 +25,14 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
@@ -33,13 +40,21 @@ import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.Event
 import org.opendaylight.restconf.server.spi.Subscriber.Rfc8040Subscriber;
 import org.opendaylight.restconf.server.spi.Subscriber.Rfc8639Subscriber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Filters;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver.State;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.Xpath10;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.databind.DatabindContext;
 import org.opendaylight.yangtools.databind.RequestException;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
+import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -411,7 +426,14 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
          * @since 12.0.3
          */
         sealed interface Definition extends SubscriptionFilter {
-            // nothing else
+            /**
+             * Bind this definition to a {@link DatabindContext}.
+             *
+             * @param databind {@link DatabindContext} to use
+             * @return a {@link FilterExpression}
+             * @throws RequestException if this definition cannot be bound
+             */
+            FilterExpression bindTo(DatabindContext databind) throws RequestException;
         }
 
         /**
@@ -420,8 +442,49 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
          * @param document the subtree filter
          */
         record SubtreeDefinition(AnydataNode<?> document) implements Definition {
+            private static final YangInstanceIdentifier STREAM_FILTER_PATH = YangInstanceIdentifier.of(
+                NodeIdentifier.create(Filters.QNAME), NodeIdentifier.create(StreamFilter.QNAME));
+            private static final XMLOutputFactory XOF;
+
+            static {
+                final var xof = XMLOutputFactory.newFactory();
+                xof.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
+                XOF = xof;
+            }
+
             public SubtreeDefinition {
                 requireNonNull(document);
+            }
+
+            @Override
+            public SubtreeFilterExpression bindTo(final DatabindContext databind) throws RequestException {
+                final SubtreeFilter filter;
+                try {
+                    filter = SubtreeFilter.readFrom(databind, toXmlStream(databind.modelContext()));
+                } catch (XMLStreamException e) {
+                    throw new RequestException("Failed to bind " + document.prettyTree(), e);
+                }
+                return new SubtreeFilterExpression(filter);
+            }
+
+            private XMLStreamReader toXmlStream(final EffectiveModelContext modelContext) throws RequestException {
+                // FIXME: this creates a temporary String: can we should be able to perform the equivalent just by
+                //        examining the document itself
+                final var stringWriter = new StringWriter();
+                try (var nnWriter = NormalizedNodeWriter.forStreamWriter(XMLStreamNormalizedNodeStreamWriter.create(
+                        XOF.createXMLStreamWriter(stringWriter), modelContext, STREAM_FILTER_PATH), null)) {
+                    nnWriter.write(document);
+                } catch (IOException | XMLStreamException e) {
+                    LOG.debug("Failed to write subtree filter {}", document.prettyTree(), e);
+                    throw new RequestException("Failed to write filter", e);
+                }
+
+                try {
+                    return UntrustedXML.createXMLStreamReader(new StringReader(stringWriter.toString()));
+                } catch (XMLStreamException e) {
+                    LOG.debug("Failed to stream subtree filter {}", document.prettyTree(), e);
+                    throw new RequestException("Failed to stream filter", e);
+                }
             }
         }
 
@@ -434,6 +497,11 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
         record XPathDefinition(String xpath) implements Definition {
             public XPathDefinition {
                 requireNonNull(xpath);
+            }
+
+            @Override
+            public XPathFilterExpression bindTo(final DatabindContext databind) throws RequestException {
+                return new XPathFilterExpression(databind, new Xpath10(xpath));
             }
         }
     }
