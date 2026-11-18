@@ -70,7 +70,8 @@ public abstract class XPathEventFilter<T> extends EventFilter<T> {
     private final String expression;
     private final XPathExpression filter;
 
-    protected XPathEventFilter(final String expression) throws XPathExpressionException {
+    protected XPathEventFilter(final Class<T> eventType, final String expression) throws XPathExpressionException {
+        super(eventType);
         this.expression = requireNonNull(expression);
 
         final XPath xpath;

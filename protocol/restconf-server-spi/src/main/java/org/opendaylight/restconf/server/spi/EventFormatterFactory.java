@@ -35,10 +35,7 @@ public abstract class EventFormatterFactory<T> {
         };
     }
 
-    // FIXME: 13.0.0: abstract and do not throw
-    public EventFilter<T> newFilter(final SubtreeFilterExpression expression) throws RequestException {
-        throw new RequestException(this.getClass().getCanonicalName() + " does not support subtree filters");
-    }
+    public abstract EventFilter<T> newFilter(SubtreeFilterExpression expression);
 
     // FIXME: do not throw once we do not need to parse the expression
     public EventFilter<T> newFilter(final XPathFilterExpression expression) throws RequestException {

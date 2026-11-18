@@ -26,7 +26,7 @@ import org.w3c.dom.Document;
 @NonNullByDefault
 public final class NotificationXPathEventFilter extends XPathEventFilter<DOMNotification> {
     public NotificationXPathEventFilter(final String expression) throws XPathExpressionException {
-        super(expression);
+        super(DOMNotification.class, expression);
     }
 
     @Override

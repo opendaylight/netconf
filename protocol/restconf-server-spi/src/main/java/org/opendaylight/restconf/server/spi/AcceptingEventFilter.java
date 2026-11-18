@@ -18,6 +18,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 final class AcceptingEventFilter<T> extends EventFilter<T> {
     private static final AcceptingEventFilter<?> INSTANCE = new AcceptingEventFilter<>();
 
+    @SuppressWarnings("removal")
     private AcceptingEventFilter() {
         // Hidden on purpose
     }
