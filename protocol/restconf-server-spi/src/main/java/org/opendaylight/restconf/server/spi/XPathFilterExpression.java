@@ -18,6 +18,7 @@ import org.opendaylight.yangtools.databind.DatabindContext;
  *
  * @since 12.0.3
  */
+// FIXME: 13.0.0: promote to org.opendaylight.netconf.databind along with FilterExpression
 // FIXME: hold an unbound YangXPathExpression.UnqualifiedBound instead of an Xpath10
 @NonNullByDefault
 public record XPathFilterExpression(DatabindContext databind, Xpath10 xpath) implements FilterExpression {

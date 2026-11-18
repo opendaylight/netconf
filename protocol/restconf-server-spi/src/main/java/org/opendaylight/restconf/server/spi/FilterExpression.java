@@ -19,6 +19,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
  *
  * @since 12.0.3
  */
+// FIXME: 13.0.0: promote to org.opendaylight.netconf.databind along with SubscriptionFilter
 @NonNullByDefault
 public sealed interface FilterExpression permits SubtreeFilterExpression, XPathFilterExpression {
     /**

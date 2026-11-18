@@ -59,6 +59,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
@@ -412,7 +413,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
      *   <li>a {@code SubscriptionFilter.XPathDefinition}, where we need to parse an XPath expression</li>
      * </ul>
      */
-    // FIXME: 13.0.0: promote to a top-level contract
+    // FIXME: 13.0.0: promote to org.opendaylight.netconf.databind
     @NonNullByDefault
     public sealed interface SubscriptionFilter {
         /**
@@ -427,11 +428,28 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
         }
 
         /**
-         * A self-contained definition of a {@link SubscriptionFilter}.
+         * A self-contained definition of a {@link SubscriptionFilter}, equivalent of {@link FilterSpec}.
          *
          * @since 12.0.3
          */
         sealed interface Definition extends SubscriptionFilter {
+            /**
+             * {@link FilterSpec#QNAME} as a {@link NodeIdentifier}.
+             */
+            NodeIdentifier FILTER_SPEC = NodeIdentifier.create(FilterSpec.QNAME);
+            /**
+             * {@link Filters#QNAME} as a {@link NodeIdentifier}.
+             */
+            NodeIdentifier FILTERS = NodeIdentifier.create(Filters.QNAME);
+            /**
+             * {@link StreamFilter#QNAME} as a {@link NodeIdentifier}.
+             */
+            NodeIdentifier STREAM_FILTER = NodeIdentifier.create(StreamFilter.QNAME);
+            /**
+             * {@link YangInstanceIdentifier} pointing to the {@link MapNode} of all {@link StreamFilter}s.
+             */
+            YangInstanceIdentifier STREAM_FILTER_PATH = YangInstanceIdentifier.of(FILTERS, STREAM_FILTER);
+
             /**
              * {@return a {@link Definition} corresponding to a {@link FilterSpec}}
              *
@@ -472,8 +490,6 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
              */
             public static final NodeIdentifier STREAM_SUBTREE_FILTER = NodeIdentifier.create(StreamSubtreeFilter.QNAME);
 
-            private static final YangInstanceIdentifier STREAM_FILTER_PATH = YangInstanceIdentifier.of(
-                NodeIdentifier.create(Filters.QNAME), NodeIdentifier.create(StreamFilter.QNAME));
             private static final XMLOutputFactory XOF;
 
             static {
