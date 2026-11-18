@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee0aba53_b5017a24",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-18T09:00:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "af52302c_b0c73c6b",
+      "range": {
+        "startLine": 371,
+        "startChar": 115,
+        "endLine": 371,
+        "endChar": 116
+      },
+      "revId": "3ea8b2ccef8d0d883be83fce39fe1cc560310529",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "54fe2919_b75c0056",
@@ -41,6 +65,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15cd7e79_4691962a",
+        "filename": "transport/transport-http/src/main/yang/odl-quic-common.yang",
+        "patchSetId": 13
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-18T09:00:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "54fe2919_b75c0056",
+      "revId": "3ea8b2ccef8d0d883be83fce39fe1cc560310529",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e6330640_6b74e9b6",
@@ -54,6 +96,30 @@
       "writtenOn": "2026-11-17T17:32:23Z",
       "side": 1,
       "message": ". Otherwise",
+      "range": {
+        "startLine": 98,
+        "startChar": 36,
+        "endLine": 98,
+        "endChar": 46
+      },
+      "revId": "3ea8b2ccef8d0d883be83fce39fe1cc560310529",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d0ad9e8_f9315e82",
+        "filename": "transport/transport-http/src/main/yang/odl-quic-common.yang",
+        "patchSetId": 13
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-18T09:00:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e6330640_6b74e9b6",
       "range": {
         "startLine": 98,
         "startChar": 36,
