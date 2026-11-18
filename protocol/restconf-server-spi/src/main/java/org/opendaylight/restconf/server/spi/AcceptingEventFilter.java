@@ -28,7 +28,7 @@ final class AcceptingEventFilter<T> extends EventFilter<T> {
     }
 
     @Override
-    boolean test(final EffectiveModelContext modelContext, T event) {
+    protected boolean test(final EffectiveModelContext modelContext, final T event) {
         return true;
     }
 

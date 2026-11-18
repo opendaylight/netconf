@@ -22,6 +22,7 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
+@Deprecated(since = "12.0.3", forRemoval = true)
 public final class SubtreeEventStreamFilter<T> extends EventFilter<T> {
     private final SubtreeFilter filter;
 
@@ -30,7 +31,7 @@ public final class SubtreeEventStreamFilter<T> extends EventFilter<T> {
     }
 
     @Override
-    boolean test(final EffectiveModelContext modelContext, final T event) {
+    protected boolean test(final EffectiveModelContext modelContext, final T event) {
         final var path = extractPath(event);
         final var body  = extractBody(event);
         if (path != null && body != null) {

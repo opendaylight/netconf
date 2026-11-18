@@ -38,7 +38,7 @@ import org.w3c.dom.Element;
  * @param <T> the type of events
  */
 @NonNullByDefault
-public abstract non-sealed class XPathEventFilter<T> extends EventFilter<T> {
+public abstract class XPathEventFilter<T> extends EventFilter<T> {
     private static final Logger LOG = LoggerFactory.getLogger(XPathEventFilter.class);
     private static final XPathFactory XPF = XPathFactory.newInstance();
 
@@ -82,7 +82,7 @@ public abstract non-sealed class XPathEventFilter<T> extends EventFilter<T> {
     }
 
     @Override
-    final boolean test(final EffectiveModelContext modelContext, final T event) {
+    protected final boolean test(final EffectiveModelContext modelContext, final T event) {
         final Document doc;
         try {
             doc = DBF.newDocumentBuilder().newDocument();

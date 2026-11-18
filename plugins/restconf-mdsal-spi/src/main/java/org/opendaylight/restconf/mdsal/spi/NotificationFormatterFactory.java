@@ -11,11 +11,17 @@ import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.restconf.server.spi.EventFormatterFactory;
+import org.opendaylight.restconf.server.spi.SubtreeFilterExpression;
 
 @NonNullByDefault
 public abstract class NotificationFormatterFactory extends EventFormatterFactory<DOMNotification> {
     protected NotificationFormatterFactory(final NotificationFormatter emptyFormatter) {
         super(emptyFormatter);
+    }
+
+    @Override
+    public final NotificationSubtreeEventFilter newFilter(final SubtreeFilterExpression expression) {
+        return new NotificationSubtreeEventFilter(expression.filter());
     }
 
     @Override

@@ -16,10 +16,12 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  * A filter of events.
  *
  * @param <T> the type of events
+ * @see AcceptingEventFilter
+ * @see XPathEventFilter
  */
 @NonNullByDefault
-public abstract sealed class EventFilter<T> implements AbstractRestconfStreamRegistry.EventStreamFilter
-        permits AcceptingEventFilter, SubtreeEventStreamFilter, XPathEventFilter {
+public abstract class EventFilter<T> implements AbstractRestconfStreamRegistry.EventStreamFilter {
+    // FIXME: 13.0.0: protected EventFilter(Class<T> eventType) and remove the unchecked cast below
 
     @Override
     @SuppressWarnings("unchecked")
@@ -27,7 +29,7 @@ public abstract sealed class EventFilter<T> implements AbstractRestconfStreamReg
         return test(modelContext, (T) event);
     }
 
-    abstract boolean test(EffectiveModelContext modelContext, T event);
+    protected abstract boolean test(EffectiveModelContext modelContext, T event);
 
     @Override
     public final String toString() {
