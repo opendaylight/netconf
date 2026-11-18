@@ -24,6 +24,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -107,6 +108,39 @@ import org.slf4j.LoggerFactory;
 @Singleton
 @Component(service = RestconfStream.Registry.class)
 public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamRegistry implements AutoCloseable {
+    // FIXME: also propagate DatabindContext changes
+    private final class FilterSpecListener implements DOMDataTreeChangeListener {
+        @Override
+        public void onInitialData() {
+            updateFilterDefinitions(Map.of());
+        }
+
+        @Override
+        public void onDataTreeChanged(final List<DataTreeCandidate> changes) {
+            final var nameToSpec = new HashMap<String, @Nullable ChoiceNode>();
+
+            for (var change : changes) {
+                // candidate root points to the the filter-spec itself, parent path identifies the filter that changed
+                final var filterId = verifyNotNull((NodeIdentifierWithPredicates)
+                    change.getRootPath().coerceParent().getLastPathArgument());
+                final var filterName = verifyNotNull((String) filterId.getValue(NAME_QNAME));
+
+                final var node = change.getRootNode();
+                switch (node.modificationType()) {
+                    case null -> throw new NullPointerException("Modification type is null for node: " + node);
+                    case APPEARED, SUBTREE_MODIFIED, WRITE ->
+                        nameToSpec.put(filterName, (ChoiceNode) node.getDataAfter());
+                    case DELETE, DISAPPEARED -> nameToSpec.put(filterName, null);
+                    case UNMODIFIED -> {
+                        // No-op
+                    }
+                }
+            }
+
+            updateFilterDefinitions(nameToSpec);
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfStreamRegistry.class);
     private static final ThreadFactory TF = Thread.ofVirtual().name("mdsal-subscription-counters", 0).factory();
 
@@ -223,17 +257,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                     // wildcard: any filter
                     STREAM_FILTER_NODEID,
                     FILTER_SPEC_NODEID)),
-                new DOMDataTreeChangeListener() {
-                    @Override
-                    public void onInitialData() {
-                        // No filters at all
-                    }
-
-                    @Override
-                    public void onDataTreeChanged(final List<DataTreeCandidate> changes) {
-                        onFilterSpecsUpdated(changes);
-                    }
-                });
+                new FilterSpecListener());
         } else {
             tclReg = null;
         }
@@ -312,31 +336,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     @VisibleForTesting
     synchronized void onModelContextUpdated(final EffectiveModelContext context) {
         super.updateModelContext(context);
-    }
-
-    @NonNullByDefault
-    private void onFilterSpecsUpdated(final List<DataTreeCandidate> changes) {
-        final var nameToSpec = new HashMap<String, @Nullable ChoiceNode>();
-
-        for (var change : changes) {
-            // candidate root points to the the filter-spec itself, parent path identifies the filter that changed
-            final var filterId = verifyNotNull((NodeIdentifierWithPredicates)
-                change.getRootPath().coerceParent().getLastPathArgument());
-            final var filterName = verifyNotNull((String) filterId.getValue(NAME_QNAME));
-
-            final var node = change.getRootNode();
-            switch (node.modificationType()) {
-                case null -> throw new NullPointerException("Modification type is null for node: " + node);
-                case APPEARED, SUBTREE_MODIFIED, WRITE ->
-                    nameToSpec.put(filterName, (ChoiceNode) node.getDataAfter());
-                case DELETE, DISAPPEARED -> nameToSpec.put(filterName, null);
-                case UNMODIFIED -> {
-                    // No-op
-                }
-            }
-        }
-
-        updateFilterDefinitions(nameToSpec);
     }
 
     @Override
