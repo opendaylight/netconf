@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50002384_d2017418",
+        "filename": "protocol/netconf-client/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-18T14:55:10Z",
+      "side": 1,
+      "message": "just scope\u003dtest?",
+      "revId": "1789dbe744b81447b48a10ae6de4d8be1fb756a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b6853b4_ebc7f662",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/FramingException.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-18T14:55:10Z",
+      "side": 1,
+      "message": "we need to document and, perhaps, rename the class to clarify that its mean for FramingMechanism#CHUNK only",
+      "revId": "1789dbe744b81447b48a10ae6de4d8be1fb756a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd742752_06fed93e",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/FramingException.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-18T14:55:10Z",
+      "side": 1,
+      "message": "consider @NonNullByDefault",
+      "revId": "1789dbe744b81447b48a10ae6de4d8be1fb756a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fef5e6c6_2ec5befa",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/DeserializerExceptionHandler.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-18T14:55:10Z",
+      "side": 1,
+      "message": "See {@link FramingException}",
+      "revId": "1789dbe744b81447b48a10ae6de4d8be1fb756a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
