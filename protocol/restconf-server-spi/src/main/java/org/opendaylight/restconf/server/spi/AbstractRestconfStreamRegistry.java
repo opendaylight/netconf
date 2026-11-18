@@ -106,6 +106,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     private final class DynSubscription extends AbstractRestconfStreamSubscription {
         private final Set<Rfc8639Subscriber<?>> receivers = ConcurrentHashMap.newKeySet();
 
+        // FIXME: rework in terms of SubscriptionFilter, FilterExpression and
+        //        EventFormatterFactory.newFilter(FilterExpression)
         private @Nullable EventStreamFilter filter;
         private @Nullable String filterName;
 
@@ -1012,6 +1014,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      */
     protected abstract ListenableFuture<Void> filtersOperationalViewUpdated(Set<String> workingNames);
 
+    // FIXME: this should take DatabindContext and return FilterExpression
     @NonNullByDefault
     private EventStreamFilter parseFilter(final ChoiceNode filterSpec) throws RequestException {
         final var subtree = (AnydataNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamSubtreeFilter.QNAME));
@@ -1045,9 +1048,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             "%s refers to an unknown stream filter", filterName);
     }
 
+    // FIXME: do not call this method
     @NonNullByDefault
     protected abstract EventStreamFilter parseSubtreeFilter(AnydataNode<?> filter) throws RequestException;
 
+    // FIXME: remove this method
     @NonNullByDefault
     private static EventStreamFilter parseXpathFilter(final String xpath) throws RequestException {
         // TODO: integrate yang-xpath-api and validate the propose xpath
