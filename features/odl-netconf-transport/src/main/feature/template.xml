@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.6.0" name="odl-netconf-transport">
+    <repository>mvn:org.opendaylight.ietf/odl-ietf-model-rfc7317-iana-crypt-hash/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.ietf/odl-ietf-model-rfc9643/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.ietf/odl-ietf-model-rfc9644/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.ietf/odl-ietf-model-rfc9645/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.odlparent/odl-netty-http3/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.netconf/odl-netconf-keystore/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.netconf/odl-netconf-truststore/{{versionAsInProject}}/xml/features</repository>
+    <repository>mvn:org.opendaylight.netconf/odl-netconf-transport-api/{{versionAsInProject}}/xml/features</repository>
+    <feature name="odl-netconf-transport">
+        <feature version="{{semVerRange}}">odl-ietf-model-rfc7317-iana-crypt-hash</feature>
+        <feature version="{{semVerRange}}">odl-ietf-model-rfc9643</feature>
+        <feature version="{{semVerRange}}">odl-ietf-model-rfc9644</feature>
+        <feature version="{{semVerRange}}">odl-ietf-model-rfc9645</feature>
+        <feature version="{{semVerRange}}">odl-netconf-keystore</feature>
+        <feature version="{{semVerRange}}">odl-netconf-transport-api</feature>
+        <feature version="{{semVerRange}}">odl-netconf-truststore</feature>
+        <feature version="{{semVerRange}}">odl-netty-http3</feature>
+        <bundle>mvn:commons-codec/commons-codec/{{versionAsInProject}}</bundle>
+        <bundle>mvn:org.opendaylight.netconf/shaded-sshd/{{versionAsInProject}}</bundle>
+        <bundle>mvn:org.opendaylight.netconf/transport-crypto/{{versionAsInProject}}</bundle>
+        <bundle>mvn:org.opendaylight.netconf/transport-http/{{versionAsInProject}}</bundle>
+        <bundle>mvn:org.opendaylight.netconf/transport-keystore/{{versionAsInProject}}</bundle>
+        <bundle>mvn:org.opendaylight.netconf/transport-ssh/{{versionAsInProject}}</bundle>
+        <bundle>mvn:org.opendaylight.netconf/transport-tcp/{{versionAsInProject}}</bundle>
+        <bundle>mvn:org.opendaylight.netconf/transport-tls/{{versionAsInProject}}</bundle>
+        <bundle>mvn:org.opendaylight.netconf/transport-udp/{{versionAsInProject}}</bundle>
+    </feature>
+</features>
