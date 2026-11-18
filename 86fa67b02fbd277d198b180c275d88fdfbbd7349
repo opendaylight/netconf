@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "704748e6_3a2c4cad",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-18T12:09:14Z",
+      "side": 1,
+      "message": "consider splitting to two commits with their tests",
+      "revId": "86fa67b02fbd277d198b180c275d88fdfbbd7349",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34b463a6_32a17b8e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-18T12:09:14Z",
+      "side": 1,
+      "message": "who catch any other runtime exception?",
+      "revId": "86fa67b02fbd277d198b180c275d88fdfbbd7349",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab1e4a43_4f5eed30",
+        "filename": "protocol/netconf-codec/src/test/java/org/opendaylight/netconf/codec/ChunkedFrameDecoderTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-18T12:09:14Z",
+      "side": 1,
+      "message": "please do not use reflection..",
+      "revId": "86fa67b02fbd277d198b180c275d88fdfbbd7349",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
