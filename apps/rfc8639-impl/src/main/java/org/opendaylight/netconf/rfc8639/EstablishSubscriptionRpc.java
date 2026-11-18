@@ -8,6 +8,8 @@
 package org.opendaylight.netconf.rfc8639;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.SubtreeDefinition.STREAM_SUBTREE_FILTER;
+import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.XPathDefinition.STREAM_XPATH_FILTER;
 
 import java.net.URI;
 import java.time.Instant;
@@ -65,8 +67,6 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
     private static final NodeIdentifier STREAM_FILTER_NODEID = NodeIdentifier.create(StreamFilter.QNAME);
     private static final NodeIdentifier STREAM_FILTER_NAME_NODEID =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-filter-name").intern());
-    private static final NodeIdentifier STREAM_SUBTREE_FILTER_NODEID = NodeIdentifier.create(StreamSubtreeFilter.QNAME);
-    private static final NodeIdentifier STREAM_XPATH_FILTER_NODEID = NodeIdentifier.create(StreamXpathFilter.QNAME);
     private static final NodeIdentifier TARGET_NODEID = NodeIdentifier.create(Target.QNAME);
 
     private static final Set<QName> SUPPORTED_ENCODINGS = Set.of(
@@ -149,11 +149,11 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         if (filterSpec == null) {
             return null;
         }
-        final var subtree = (AnydataNode<?>) filterSpec.childByArg(STREAM_SUBTREE_FILTER_NODEID);
+        final var subtree = (AnydataNode<?>) filterSpec.childByArg(STREAM_SUBTREE_FILTER);
         if (subtree != null) {
             return new SubscriptionFilter.SubtreeDefinition(subtree);
         }
-        final var xpath = (LeafNode<?>) filterSpec.childByArg(STREAM_XPATH_FILTER_NODEID);
+        final var xpath = (LeafNode<?>) filterSpec.childByArg(STREAM_XPATH_FILTER);
         if (xpath != null) {
             return new SubscriptionFilter.XPathDefinition((String) xpath.body());
         }

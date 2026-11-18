@@ -412,6 +412,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
      *   <li>a {@code SubscriptionFilter.XPathDefinition}, where we need to parse an XPath expression</li>
      * </ul>
      */
+    // FIXME: 13.0.0: promote to a top-level contract
     @NonNullByDefault
     public sealed interface SubscriptionFilter {
         /**
@@ -469,7 +470,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
             /**
              * {@link StreamSubtreeFilter#QNAME} as a {@link NodeIdentifier}.
              */
-            static final NodeIdentifier STREAM_SUBTREE_FILTER = NodeIdentifier.create(StreamSubtreeFilter.QNAME);
+            public static final NodeIdentifier STREAM_SUBTREE_FILTER = NodeIdentifier.create(StreamSubtreeFilter.QNAME);
 
             private static final YangInstanceIdentifier STREAM_FILTER_PATH = YangInstanceIdentifier.of(
                 NodeIdentifier.create(Filters.QNAME), NodeIdentifier.create(StreamFilter.QNAME));
@@ -529,7 +530,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
             /**
              * {@link StreamXpathFilter#QNAME} as a {@link NodeIdentifier}.
              */
-            static final NodeIdentifier STREAM_XPATH_FILTER = NodeIdentifier.create(StreamXpathFilter.QNAME);
+            public static final NodeIdentifier STREAM_XPATH_FILTER = NodeIdentifier.create(StreamXpathFilter.QNAME);
 
             public XPathDefinition {
                 requireNonNull(xpath);
