@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.6.0" name="odl-netconf-truststore">
+    <repository>mvn:org.opendaylight.ietf/odl-ietf-model-rfc9641/{{versionAsInProject}}/xml/features</repository>
+    <feature name="odl-netconf-truststore">
+        <feature version="{{semVerRange}}">odl-ietf-model-rfc9641</feature>
+        <bundle>mvn:org.opendaylight.netconf/truststore-api/{{versionAsInProject}}</bundle>
+        <bundle>mvn:org.opendaylight.netconf/truststore-none/{{versionAsInProject}}</bundle>
+    </feature>
+</features>
