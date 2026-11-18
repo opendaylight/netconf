@@ -12,10 +12,9 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.Definition.FILTERS;
 import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.Definition.FILTER_SPEC;
-import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.Definition.STREAM_FILTER;
 import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.Definition.STREAM_FILTER_PATH;
+import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.STREAM_FILTER;
 import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.SubtreeDefinition.STREAM_SUBTREE_FILTER;
-import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.XPathDefinition.STREAM_XPATH_FILTER;
 import static org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.YangModuleInfoImpl.qnameOf;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -154,8 +153,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private static final NodeIdentifier SUBSCRIPTION_NODEID = NodeIdentifier.create(Subscription.QNAME);
     private static final NodeIdentifier SUBSCRIPTIONS_NODEID = NodeIdentifier.create(Subscriptions.QNAME);
     private static final NodeIdentifier STREAM_NODEID = NodeIdentifier.create(Stream.QNAME);
-    private static final NodeIdentifier STREAM_FILTER_NAME_NODEID =
-        NodeIdentifier.create(qnameOf("stream-filter-name"));
     private static final NodeIdentifier TARGET_NODEID = NodeIdentifier.create(Target.QNAME);
     private static final YangInstanceIdentifier FILTERS_OPER_PATH = YangInstanceIdentifier.of(FILTERS);
     private static final ServiceGroupIdentifier SGI = new ServiceGroupIdentifier("restconf-stream-filters");
@@ -485,24 +482,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     @Override
     protected synchronized ListenableFuture<Void> modifySubscriptionParameters(final Uint32 subscriptionId,
             final RestconfStream.SubscriptionFilter filter, final Instant stopTime) {
-        final var filterNode = switch (filter) {
-            case RestconfStream.SubscriptionFilter.Reference(var filterName) ->
-                ImmutableNodes.leafNode(STREAM_FILTER_NAME_NODEID, filterName);
-            case RestconfStream.SubscriptionFilter.SubtreeDefinition(var anydata) ->
-                ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(FILTER_SPEC)
-                    .withChild(ImmutableNodes.newAnydataBuilder(AnydataNode.class)
-                        .withNodeIdentifier(STREAM_SUBTREE_FILTER)
-                        .withValue(anydata)
-                        .build())
-                    .build();
-            case RestconfStream.SubscriptionFilter.XPathDefinition(final var xpath) ->
-                ImmutableNodes.newChoiceBuilder()
-                    .withNodeIdentifier(FILTER_SPEC)
-                    .withChild(ImmutableNodes.leafNode(STREAM_XPATH_FILTER, xpath))
-                    .build();
-        };
-
         final var pathArg = subscriptionArg(subscriptionId);
         final var tx = txChain.newWriteOnlyTransaction();
         final var node = ImmutableNodes.newMapEntryBuilder()
@@ -511,10 +490,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
             .withChild(ImmutableNodes.newChoiceBuilder()
                 .withNodeIdentifier(TARGET_NODEID)
                 // FIXME: Uncomment once YANGTOOLS-1670 has been resolved.
-//                .withChild(ImmutableNodes.newChoiceBuilder()
-//                    .withNodeIdentifier(STREAM_FILTER_NODEID)
-//                    .withChild(filterNode)
-//                    .build())
+                // .withChild(filter.toStreamFilter())
                 .build());
 
         // Ignore stop-time if it is null
