@@ -10,6 +10,8 @@ package org.opendaylight.restconf.server.mdsal;
 import static com.google.common.base.Verify.verify;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.SubtreeDefinition.STREAM_SUBTREE_FILTER;
+import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.XPathDefinition.STREAM_XPATH_FILTER;
 import static org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.YangModuleInfoImpl.qnameOf;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -68,8 +70,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Subscriptions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.modifiable.Target;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.Subscription;
@@ -123,8 +123,6 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     private static final NodeIdentifier STREAM_FILTER_NODEID = NodeIdentifier.create(StreamFilter.QNAME);
     private static final NodeIdentifier STREAM_FILTER_NAME_NODEID =
         NodeIdentifier.create(qnameOf("stream-filter-name"));
-    private static final NodeIdentifier STREAM_XPATH_FILTER_NODEID = NodeIdentifier.create(StreamXpathFilter.QNAME);
-    private static final NodeIdentifier STREAM_SUBTREE_FILTER_NODEID = NodeIdentifier.create(StreamSubtreeFilter.QNAME);
     private static final NodeIdentifier TARGET_NODEID = NodeIdentifier.create(Target.QNAME);
     private static final YangInstanceIdentifier FILTERS_OPER_PATH = YangInstanceIdentifier.of(FILTERS_NODEID);
     private static final ServiceGroupIdentifier SGI = new ServiceGroupIdentifier("restconf-stream-filters");
@@ -499,14 +497,14 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
                 ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(FILTER_SPEC_NODEID)
                     .withChild(ImmutableNodes.newAnydataBuilder(AnydataNode.class)
-                        .withNodeIdentifier(STREAM_SUBTREE_FILTER_NODEID)
+                        .withNodeIdentifier(STREAM_SUBTREE_FILTER)
                         .withValue(anydata)
                         .build())
                     .build();
             case RestconfStream.SubscriptionFilter.XPathDefinition(final var xpath) ->
                 ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(FILTER_SPEC_NODEID)
-                    .withChild(ImmutableNodes.leafNode(STREAM_XPATH_FILTER_NODEID, xpath))
+                    .withChild(ImmutableNodes.leafNode(STREAM_XPATH_FILTER, xpath))
                     .build();
         };
 
@@ -633,7 +631,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
         // FIXME handle filter properly
         if (filter != null) {
             body.withChild(ImmutableNodes.newAnydataBuilder(NormalizedAnydata.class)
-                .withNodeIdentifier(STREAM_SUBTREE_FILTER_NODEID)
+                .withNodeIdentifier(STREAM_SUBTREE_FILTER)
                 .withValue(filter)
                 .build());
         }
