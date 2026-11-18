@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "587f4f19_731cc3e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2026-11-18T10:42:11Z",
+      "side": 1,
+      "message": "This needs to be rebased, I think most of the changes should not be there, but",
+      "revId": "543ce4ba7d1c2d4e3045f12cbcc72838072b7d0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
