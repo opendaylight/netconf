@@ -42,6 +42,9 @@ import org.opendaylight.restconf.server.spi.Subscriber.Rfc8639Subscriber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Filters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver.State;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.Xpath10;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -54,6 +57,8 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
+import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
@@ -427,6 +432,24 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
          */
         sealed interface Definition extends SubscriptionFilter {
             /**
+             * {@return a {@link Definition} corresponding to a {@link FilterSpec}}
+             *
+             * @param filterSpec the {@link FilterSpec} as a {@link ChoiceNode}
+             * @throws RequestException if {@code filterSpec} is not valid
+             * @since 12.0.3
+             */
+            static Definition ofFilterSpec(final ChoiceNode filterSpec) throws RequestException {
+                if (filterSpec.childByArg(SubtreeDefinition.STREAM_SUBTREE_FILTER) instanceof AnydataNode<?> subtree) {
+                    return new SubtreeDefinition(subtree);
+                }
+                if (filterSpec.childByArg(XPathDefinition.STREAM_XPATH_FILTER) instanceof LeafNode<?> xpath
+                    && xpath.body() instanceof String expression) {
+                    return new XPathDefinition(expression);
+                }
+                throw new RequestException("Invalid filter-spec " + filterSpec.prettyTree());
+            }
+
+            /**
              * Bind this definition to a {@link DatabindContext}.
              *
              * @param databind {@link DatabindContext} to use
@@ -437,11 +460,17 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
         }
 
         /**
-         * A subtree filter definition, provided as an {@link AnydataNode} document.
+         * A subtree filter definition, provided as an {@link AnydataNode} document modeled by
+         * {@link StreamSubtreeFilter#getStreamSubtreeFilter()}.
          *
          * @param document the subtree filter
          */
         record SubtreeDefinition(AnydataNode<?> document) implements Definition {
+            /**
+             * {@link StreamSubtreeFilter#QNAME} as a {@link NodeIdentifier}.
+             */
+            static final NodeIdentifier STREAM_SUBTREE_FILTER = NodeIdentifier.create(StreamSubtreeFilter.QNAME);
+
             private static final YangInstanceIdentifier STREAM_FILTER_PATH = YangInstanceIdentifier.of(
                 NodeIdentifier.create(Filters.QNAME), NodeIdentifier.create(StreamFilter.QNAME));
             private static final XMLOutputFactory XOF;
@@ -489,12 +518,19 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
         }
 
         /**
-         * A XPath filter definition, provided as a string containing the filter expression.
+         * A XPath filter definition, provided as a string containing the filter expression as modeled by
+         * {@link StreamXpathFilter#getStreamXpathFilter()}.
          *
          * @param xpath the XPath filter expression
          */
+        // FIXME: 13.0.0: Xpath10 instead of String
         // FIXME: hold an unbound YangXPathExpression
         record XPathDefinition(String xpath) implements Definition {
+            /**
+             * {@link StreamXpathFilter#QNAME} as a {@link NodeIdentifier}.
+             */
+            static final NodeIdentifier STREAM_XPATH_FILTER = NodeIdentifier.create(StreamXpathFilter.QNAME);
+
             public XPathDefinition {
                 requireNonNull(xpath);
             }
