@@ -11,12 +11,18 @@ import java.util.List;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.server.spi.EventFormatterFactory;
+import org.opendaylight.restconf.server.spi.SubtreeFilterExpression;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 
 @NonNullByDefault
 abstract class DataTreeCandidateFormatterFactory extends EventFormatterFactory<List<DataTreeCandidate>> {
     DataTreeCandidateFormatterFactory(final DataTreeCandidateFormatter emptyFormatter) {
         super(emptyFormatter);
+    }
+
+    @Override
+    public DataTreeCandidateSubtreeEventFilter newFilter(final SubtreeFilterExpression expression) {
+        return new DataTreeCandidateSubtreeEventFilter(expression.filter());
     }
 
     @Override
