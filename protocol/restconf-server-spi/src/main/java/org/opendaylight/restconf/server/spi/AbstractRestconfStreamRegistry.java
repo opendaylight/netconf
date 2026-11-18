@@ -8,6 +8,8 @@
 package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.SubtreeDefinition.STREAM_SUBTREE_FILTER;
+import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.XPathDefinition.STREAM_XPATH_FILTER;
 import static org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.YangModuleInfoImpl.qnameOf;
 
 import com.google.common.annotations.Beta;
@@ -55,8 +57,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.FilterUnavailable;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.NoSuchSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.SubscriptionId;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.SubscriptionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.ReceiversBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver;
@@ -1017,11 +1017,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     // FIXME: this should take DatabindContext and return FilterExpression
     @NonNullByDefault
     private EventStreamFilter parseFilter(final ChoiceNode filterSpec) throws RequestException {
-        final var subtree = (AnydataNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamSubtreeFilter.QNAME));
+        final var subtree = (AnydataNode<?>) filterSpec.childByArg(STREAM_SUBTREE_FILTER);
         if (subtree != null) {
             return parseSubtreeFilter(subtree);
         }
-        final var xpath = (LeafNode<?>) filterSpec.childByArg(new NodeIdentifier(StreamXpathFilter.QNAME));
+        final var xpath = (LeafNode<?>) filterSpec.childByArg(STREAM_XPATH_FILTER);
         if (xpath != null) {
             return parseXpathFilter((String) xpath.body());
         }
