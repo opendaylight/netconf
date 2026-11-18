@@ -69,6 +69,24 @@
       "parentUuid": "6456a15b_3b9ac3ac",
       "revId": "7693a7964741c10030e5600201b8026963d50066",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "816d5d29_66427c3f",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 9422
+      },
+      "writtenOn": "2026-11-18T08:31:57Z",
+      "side": 1,
+      "message": "Done. \n\nThe wait is for two `data-changed-notification` elements, so the `delete` check sees the DELETE\u0027s notification rather than returning on the PUT\u0027s. Which operation the PUT reports is now a comment in the code (since it depends on whether an earlier suite left a topology in config).",
+      "parentUuid": "537a46c4_e3b67bb6",
+      "revId": "7693a7964741c10030e5600201b8026963d50066",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
