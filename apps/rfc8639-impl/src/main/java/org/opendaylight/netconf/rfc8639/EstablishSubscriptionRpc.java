@@ -8,6 +8,8 @@
 package org.opendaylight.netconf.rfc8639;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.Definition.FILTER_SPEC;
+import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.Definition.STREAM_FILTER;
 import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.SubtreeDefinition.STREAM_SUBTREE_FILTER;
 import static org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.XPathDefinition.STREAM_XPATH_FILTER;
 
@@ -28,10 +30,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscription;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EstablishSubscriptionOutput;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.modifiable.Target;
 import org.opendaylight.yangtools.databind.RequestException;
@@ -57,14 +55,12 @@ import org.osgi.service.component.annotations.Reference;
 public final class EstablishSubscriptionRpc extends RpcImplementation {
     private static final NodeIdentifier ENCODING_NODEID =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "encoding").intern());
-    private static final NodeIdentifier FILTER_SPEC_NODEID = NodeIdentifier.create(FilterSpec.QNAME);
     private static final NodeIdentifier ID_NODEID =
         NodeIdentifier.create(QName.create(EstablishSubscriptionOutput.QNAME, "id").intern());
     private static final NodeIdentifier OUTPUT_NODEID = NodeIdentifier.create(EstablishSubscriptionOutput.QNAME);
     private static final NodeIdentifier STOP_TIME_NODEID =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stop-time").intern());
     private static final NodeIdentifier STREAM_NODEID = NodeIdentifier.create(Stream.QNAME);
-    private static final NodeIdentifier STREAM_FILTER_NODEID = NodeIdentifier.create(StreamFilter.QNAME);
     private static final NodeIdentifier STREAM_FILTER_NAME_NODEID =
         NodeIdentifier.create(QName.create(EstablishSubscriptionInput.QNAME, "stream-filter-name").intern());
     private static final NodeIdentifier TARGET_NODEID = NodeIdentifier.create(Target.QNAME);
@@ -106,7 +102,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         }
 
         // check stream filter
-        final var streamFilter = (ChoiceNode) target.childByArg(STREAM_FILTER_NODEID);
+        final var streamFilter = (ChoiceNode) target.childByArg(STREAM_FILTER);
         final var filter = streamFilter == null ? null : extractFilter(streamFilter);
 
         // check stop-time
@@ -145,7 +141,7 @@ public final class EstablishSubscriptionRpc extends RpcImplementation {
         if (streamFilterName != null) {
             return new SubscriptionFilter.Reference((String) streamFilterName.body());
         }
-        final var filterSpec = (ChoiceNode) streamFilter.childByArg(FILTER_SPEC_NODEID);
+        final var filterSpec = (ChoiceNode) streamFilter.childByArg(FILTER_SPEC);
         if (filterSpec == null) {
             return null;
         }
