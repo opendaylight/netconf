@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3341162e_2a0f9073",
+        "filename": "tests/suites/notifications/test_notifications.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-18T16:26:46Z",
+      "side": 1,
+      "message": "Accepting updated as well as created means the test can no longer tell whether a create is reported correctly. Could we delete network-topology:network-topology before the receiver starts (404 is accepted) and keep the created check? The PUT already replaces the whole container, so this is no more destructive.",
+      "revId": "06cba0ca44a30322455ada3f3863594eeba3cd85",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73c7aee5_4d5b2ee9",
+        "filename": "tests/tools/wstools/ssereceiver.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-18T16:26:46Z",
+      "side": 1,
+      "message": "Could the comment be simplified, e.g. \"Log that the subscription is active, so the test knows when it can trigger an event. Events sent before this point are not received.\"",
+      "revId": "06cba0ca44a30322455ada3f3863594eeba3cd85",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
