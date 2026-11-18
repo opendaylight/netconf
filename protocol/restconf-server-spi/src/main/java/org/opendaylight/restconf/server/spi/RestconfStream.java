@@ -45,6 +45,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscription.policy.modifiable.target.stream.stream.filter.ByReference;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver.State;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.Xpath10;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -58,9 +59,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -406,7 +409,7 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
     }
 
     /**
-     * A subscription filter. It can be either one of
+     * A subscription filter corresponding to {@link StreamFilter}. It can be either one of
      * <ul>
      *   <li>a {@code SubscriptionFilter.Reference}, which needs to be resolved, or<li>
      *   <li>a {@code SubscriptionFilter.SubtreeDefinition}, where we need to parse a document chunk, or</li>
@@ -417,13 +420,41 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
     @NonNullByDefault
     public sealed interface SubscriptionFilter {
         /**
-         * A reference to an externally-defined filter.
+         * {@link StreamFilter#QNAME} as a {@link NodeIdentifier}.
+         */
+        NodeIdentifier STREAM_FILTER = NodeIdentifier.create(StreamFilter.QNAME);
+
+        /**
+         * {@return this filter as a {@link StreamFilter} in {@link ChoiceNode}}
+         */
+        ChoiceNode toStreamFilter();
+
+        /**
+         * A reference to an externally-defined filter, as modeled by {@link ByReference}.
          *
          * @param filterName filter name
          */
         record Reference(String filterName) implements SubscriptionFilter {
+            /**
+             * The {@link NodeIdentifier} addressing {@link ByReference#getStreamFilterName()}.
+             */
+            public static final NodeIdentifier STREAM_FILTER_NAME =
+                NodeIdentifier.create(QName.create(ByReference.QNAME, "stream-filter-name").intern());
+
             public Reference {
                 requireNonNull(filterName);
+            }
+
+            @Override
+            public ChoiceNode toStreamFilter() {
+                return streamFilterWith(ImmutableNodes.leafNode(STREAM_FILTER_NAME, filterName));
+            }
+
+            static ChoiceNode streamFilterWith(final DataContainerChild streamFilterChild) {
+                return ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(STREAM_FILTER)
+                    .withChild(streamFilterChild)
+                    .build();
             }
         }
 
@@ -442,13 +473,28 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
              */
             NodeIdentifier FILTERS = NodeIdentifier.create(Filters.QNAME);
             /**
-             * {@link StreamFilter#QNAME} as a {@link NodeIdentifier}.
-             */
-            NodeIdentifier STREAM_FILTER = NodeIdentifier.create(StreamFilter.QNAME);
-            /**
              * {@link YangInstanceIdentifier} pointing to the {@link MapNode} of all {@link StreamFilter}s.
              */
             YangInstanceIdentifier STREAM_FILTER_PATH = YangInstanceIdentifier.of(FILTERS, STREAM_FILTER);
+
+            /**
+             * Bind this definition to a {@link DatabindContext}.
+             *
+             * @param databind {@link DatabindContext} to use
+             * @return a {@link FilterExpression}
+             * @throws RequestException if this definition cannot be bound
+             */
+            FilterExpression bindTo(DatabindContext databind) throws RequestException;
+
+            @Override
+            default ChoiceNode toStreamFilter() {
+                return Reference.streamFilterWith(toFilterSpec());
+            }
+
+            /**
+             * {@return a {@link ChoiceNode} representation of {@link FilterSpec} represented by this definition}
+             */
+            ChoiceNode toFilterSpec();
 
             /**
              * {@return a {@link Definition} corresponding to a {@link FilterSpec}}
@@ -467,15 +513,6 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
                 }
                 throw new RequestException("Invalid filter-spec " + filterSpec.prettyTree());
             }
-
-            /**
-             * Bind this definition to a {@link DatabindContext}.
-             *
-             * @param databind {@link DatabindContext} to use
-             * @return a {@link FilterExpression}
-             * @throws RequestException if this definition cannot be bound
-             */
-            FilterExpression bindTo(DatabindContext databind) throws RequestException;
         }
 
         /**
@@ -532,6 +569,17 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
                     throw new RequestException("Failed to stream filter", e);
                 }
             }
+
+            @Override
+            public ChoiceNode toFilterSpec() {
+                return ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(FILTER_SPEC)
+                    .withChild(ImmutableNodes.newAnydataBuilder(AnydataNode.class)
+                        .withNodeIdentifier(STREAM_SUBTREE_FILTER)
+                        .withValue(document)
+                        .build())
+                    .build();
+            }
         }
 
         /**
@@ -555,6 +603,14 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
             @Override
             public XPathFilterExpression bindTo(final DatabindContext databind) throws RequestException {
                 return new XPathFilterExpression(databind, new Xpath10(xpath));
+            }
+
+            @Override
+            public ChoiceNode toFilterSpec() {
+                return ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(FILTER_SPEC)
+                    .withChild(ImmutableNodes.leafNode(STREAM_XPATH_FILTER, xpath))
+                    .build();
             }
         }
     }
