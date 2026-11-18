@@ -10,9 +10,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
-        <artifactId>feature-parent</artifactId>
+        <artifactId>template-feature-parent</artifactId>
         <version>12.0.3-SNAPSHOT</version>
-        <relativePath>../parent/pom.xml</relativePath>
+        <relativePath>../template-parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>odl-netconf-transport</artifactId>
@@ -70,8 +70,24 @@
         </dependency>
 
         <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>shaded-sshd</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>transport-crypto</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>transport-http</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>transport-keystore</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
@@ -84,6 +100,10 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>transport-tls</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>transport-udp</artifactId>
         </dependency>
     </dependencies>
 </project>
