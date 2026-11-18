@@ -54,8 +54,6 @@ import org.opendaylight.restconf.mdsal.spi.NotificationSource;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.EventFormatter;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter.SubtreeDefinition;
-import org.opendaylight.restconf.server.spi.SubtreeEventStreamFilter;
 import org.opendaylight.restconf.server.spi.TextParameters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.subscribed.notifications.rev191117.Subscription1;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Filters;
@@ -582,8 +580,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
 
     @Override
     protected EventStreamFilter parseSubtreeFilter(final AnydataNode<?> filter) throws RequestException {
-        final var expression = new SubtreeDefinition(filter).bindTo(databindProvider.currentDatabind());
-        return new SubtreeEventStreamFilter<>(expression.filter());
+        throw new RequestException("Parsing not supported");
     }
 
     @NonNullByDefault

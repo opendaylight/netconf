@@ -63,14 +63,6 @@
             <classifier>features</classifier>
         </dependency>
 
-        <!-- FIXME: remove this dependency -->
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-mdsal-common</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-server-api</artifactId>

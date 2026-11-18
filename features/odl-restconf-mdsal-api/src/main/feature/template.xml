@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.6.0" name="odl-restconf-mdsal-api">
+    <repository>mvn:org.opendaylight.netconf/odl-netconf-mdsal-common/{{versionAsInProject}}/xml/features</repository>
     <repository>mvn:org.opendaylight.netconf/odl-restconf-server-api/{{versionAsInProject}}/xml/features</repository>
     <feature name="odl-restconf-mdsal-api">
+        <feature version="{{semVerRange}}">odl-netconf-mdsal-common</feature>
         <feature version="{{semVerRange}}">odl-restconf-server-api</feature>
         <bundle>mvn:org.opendaylight.netconf/restconf-mdsal-spi/{{versionAsInProject}}</bundle>
     </feature>
