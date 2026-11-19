@@ -69,6 +69,23 @@
       "message": "This needs to be rebased: the only thing that should remain are the two tests -- though perhaps reworked",
       "revId": "563fce18a1316cc3afca757a6c0a5dc9ec2aca50",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb39be88_4ee7e67c",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/CentralKeystoreTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-19T14:22:49Z",
+      "side": 1,
+      "message": "can we reuse the server?",
+      "revId": "563fce18a1316cc3afca757a6c0a5dc9ec2aca50",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
