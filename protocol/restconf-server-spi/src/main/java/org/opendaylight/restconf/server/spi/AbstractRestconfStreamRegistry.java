@@ -106,7 +106,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         private final Set<Rfc8639Subscriber<?>> receivers = ConcurrentHashMap.newKeySet();
 
         // FIXME: rework in terms of SubscriptionFilter, FilterExpression and
-        //        EventFormatterFactory.newFilter(FilterExpression)
+        //        EventFilterFactory.newFilter(FilterExpression)
         private @Nullable EventStreamFilter filter;
         private @Nullable String filterName;
 

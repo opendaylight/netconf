@@ -14,7 +14,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.databind.RequestException;
 
 @NonNullByDefault
-public abstract class EventFormatterFactory<T> {
+public abstract non-sealed class EventFormatterFactory<T> extends EventFilterFactory<T> {
     private final EventFormatter<T> emptyFormatter;
 
     protected EventFormatterFactory(final EventFormatter<T> emptyFormatter) {
@@ -25,22 +25,10 @@ public abstract class EventFormatterFactory<T> {
         return textParamaters.equals(TextParameters.EMPTY) ? emptyFormatter : newFormatter(textParamaters);
     }
 
+    // FIXME: 13.0.0: protected
     public abstract EventFormatter<T> newFormatter(TextParameters textParamaters);
 
-    // FIXME: no throws once both cases cannot throw
-    public final EventFilter<T> newFilter(final FilterExpression expression) throws RequestException {
-        return switch (expression) {
-            case SubtreeFilterExpression subtree -> newFilter(subtree);
-            case XPathFilterExpression xpath -> newFilter(xpath);
-        };
-    }
-
-    // FIXME: 13.0.0: abstract and do not throw
-    public EventFilter<T> newFilter(final SubtreeFilterExpression expression) throws RequestException {
-        throw new RequestException(this.getClass().getCanonicalName() + " does not support subtree filters");
-    }
-
-    // FIXME: do not throw once we do not need to parse the expression
+    @Override
     public EventFilter<T> newFilter(final XPathFilterExpression expression) throws RequestException {
         try {
             return newXPathFilter(expression.xpath().getValue());
