@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f1dea81_d8103367",
+        "filename": "apps/callhome-provider/src/test/java/org/opendaylight/netconf/topology/callhome/CallHomeSshServerTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-19T16:03:41Z",
+      "side": 1,
+      "message": "duplicate code with clientAuthentication method?",
+      "revId": "55102404bb8fa59198174dc41fee13b65c305f4f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
