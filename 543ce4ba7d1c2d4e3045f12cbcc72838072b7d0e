@@ -38,6 +38,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5c708f30_9f00829a",
+        "filename": "apps/netconf-topology/pom.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-19T13:46:02Z",
+      "side": 1,
+      "message": "should not be one up?",
+      "revId": "543ce4ba7d1c2d4e3045f12cbcc72838072b7d0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b727d4b0_9a82b0ec",
         "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientFactoryImpl.java",
         "patchSetId": 7
