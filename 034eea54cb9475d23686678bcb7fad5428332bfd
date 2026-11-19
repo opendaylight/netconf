@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "48b3d6c9_11ac3372",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-19T15:40:26Z",
+      "side": 1,
+      "message": "are we changing it here? what was previous behavior can we eliminate need to have https://git.opendaylight.org/gerrit/c/netconf/+/126842?",
+      "revId": "034eea54cb9475d23686678bcb7fad5428332bfd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bc7f55f8_dfbdba7b",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 8
