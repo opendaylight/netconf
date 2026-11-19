@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95f91e4d_c5a2f3de",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/ClientSessionInfo.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-19T16:14:15Z",
+      "side": 1,
+      "message": "I am unsure, maybe, we can consider to make it a record",
+      "revId": "85aba815e25c964837fa4b83c9a243915be7b177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e114f24_d9de8514",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClientSessionHandler.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-19T16:14:15Z",
+      "side": 1,
+      "message": "first sentence\nempty line\n\u003cp\u003eparagraph",
+      "revId": "85aba815e25c964837fa4b83c9a243915be7b177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56b3f000_20d625c1",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStackFactory.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-19T16:14:15Z",
+      "side": 1,
+      "message": "formatting",
+      "revId": "85aba815e25c964837fa4b83c9a243915be7b177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44c3f985_ebb1d0ac",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1696Test.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-19T16:14:15Z",
+      "side": 1,
+      "message": "can we test its accepted?",
+      "revId": "85aba815e25c964837fa4b83c9a243915be7b177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff822a8c_8edf83b5",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/SSHClientSessionHandlerTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-19T16:14:15Z",
+      "side": 1,
+      "message": "can we use awaitility?",
+      "revId": "85aba815e25c964837fa4b83c9a243915be7b177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
