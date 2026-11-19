@@ -98,6 +98,37 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         boolean matches(EffectiveModelContext modelContext, Object event);
     }
 
+    @NonNullByDefault
+    private sealed interface Filtering permits FilteringReq, FilteringImpl {
+
+        FilteringReq requirement();
+    }
+
+    @NonNullByDefault
+    private record FilteringReq(EventFilterFactory<?> factory, SubscriptionFilter filter) implements Filtering {
+        FilteringReq {
+            requireNonNull(factory);
+            requireNonNull(filter);
+        }
+
+        @Override
+        public FilteringReq requirement() {
+            return this;
+        }
+    }
+
+    @NonNullByDefault
+    private record FilteringImpl(
+            FilteringReq requirement,
+            SubscriptionFilter.Definition definition,
+            EventFilter<?> filter) implements Filtering {
+        FilteringImpl {
+            requireNonNull(requirement);
+            requireNonNull(definition);
+            requireNonNull(filter);
+        }
+    }
+
     /**
      * Internal implementation
      * of a <a href="https://www.rfc-editor.org/rfc/rfc8639#section-2.4">dynamic subscription</a>.
@@ -105,17 +136,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     private final class DynSubscription extends AbstractRestconfStreamSubscription {
         private final Set<Rfc8639Subscriber<?>> receivers = ConcurrentHashMap.newKeySet();
 
-        // FIXME: rework in terms of SubscriptionFilter, FilterExpression and
-        //        EventFilterFactory.newFilter(FilterExpression)
-        private @Nullable EventStreamFilter filter;
-        private @Nullable String filterName;
+        private @Nullable
+        final Filtering filtering;
 
         DynSubscription(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
-                final TransportSession session, final @Nullable EventStreamFilter filter,
-                final @Nullable String filterName, final @Nullable Instant stopTime) {
+                final TransportSession session, final @Nullable Filtering filtering, final @Nullable Instant stopTime) {
             super(id, encoding, streamName, receiverName, session, stopTime);
-            this.filter = filter;
-            this.filterName = filterName;
+            this.filtering = filtering;
         }
 
         @Override
@@ -675,6 +702,20 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             return;
         }
 
+        final EventFormatterFactory<?> factory;
+        try {
+            factory = stream.getFactory(encoding);
+        } catch (UnsupportedEncodingException e) {
+            request.failWith(new RequestException(e));
+            return;
+        }
+
+        final var filtering = switch (filter) {
+            case null -> null;
+            case SubscriptionFilter.Definition def -> new FilteringReq(factory, def);
+            case SubscriptionFilter.Reference ref -> new FilteringReq(factory, ref);
+        };
+
         final EventStreamFilter filterImpl;
         try {
             filterImpl = resolveFilter(filter);
@@ -692,7 +733,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 @Override
                 public void onSuccess(final Void result) {
                     final var subscription = new DynSubscription(id, encoding, streamName, receiverName, session,
-                        filterImpl, filterName, stopTime);
+                        filtering, stopTime);
                     subscriptions.put(id, subscription);
                     if (stopTime != null) {
                         initiateStopTime(id, stopTime);
