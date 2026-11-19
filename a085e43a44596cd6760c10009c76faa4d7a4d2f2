@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cb06280_245f9d9e",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T09:49:46Z",
+      "side": 1,
+      "message": "When a member stayed down (its restart failed), the deconfigure above correctly goes through a live member, but this loop then polls the dead one and adds a teardown ERROR about a refused connection on top of the real failure. Could teardown work out the reachable members once and check removal only on those, logging the skipped ones?",
+      "revId": "a085e43a44596cd6760c10009c76faa4d7a4d2f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78870dc9_eb648b71",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T09:49:46Z",
+      "side": 1,
+      "message": "The catch-up failure only reaches test_outages through the return at line 446. If the ownership wait at line 419 then fails in the same cycle, which is the likely follow-on when the member did not rejoin, the exception skips the return and the bug 5761 failure vanishes from the result. Could test_outages pass its catchup_failures list in, so this appends to it directly?",
+      "revId": "a085e43a44596cd6760c10009c76faa4d7a4d2f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aecd57ce_ca8bdabf",
+        "filename": "tests/suites/clustering/test_clustering_outages.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T09:49:46Z",
+      "side": 1,
+      "message": "If start_member in the finally raises while another exception is in flight, Python already chains the two and pytest prints both, so cycle_failure and the AssertionError wrapping at line 440 seem unnecessary. Catching BaseException also means a Ctrl-C followed by a failed restart is reported as a plain AssertionError instead of an interrupt. Could the finally just call start_member and let chaining do the rest?",
+      "revId": "a085e43a44596cd6760c10009c76faa4d7a4d2f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
