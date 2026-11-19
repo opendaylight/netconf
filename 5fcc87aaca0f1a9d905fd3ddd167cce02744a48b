@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d758ee8_4f036263",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/http3/AbstractHttp3E2ETest.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T13:33:54Z",
+      "side": 1,
+      "message": "Do we need 3 copies of this constant? Here, in AbstractNotificationSubscriptionHttp3Test and in AbstractOpenApiHttp3Test.",
+      "revId": "5fcc87aaca0f1a9d905fd3ddd167cce02744a48b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e264436e_ae5e0a83",
+        "filename": "apps/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T13:33:54Z",
+      "side": 1,
+      "message": "Nothing on the QUIC path sends packets while a non-SSE request is still being processed, so any HTTP/3 request taking over 30 s (e.g. a mounted-device RPC, whose default timeout is 60 s) now has its connection silently dropped with no response. Could we either raise this default above the longest server-side request timeout, or at least document in this description and the user guide that the timeout must exceed it?",
+      "revId": "5fcc87aaca0f1a9d905fd3ddd167cce02744a48b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40f67b2f_44d3b630",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T13:33:54Z",
+      "side": 1,
+      "message": "The name should carry the unit",
+      "revId": "5fcc87aaca0f1a9d905fd3ddd167cce02744a48b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69e8637b_84b917a0",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPClient.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T13:33:54Z",
+      "side": 1,
+      "message": "Compute the value first - just like initialMaxStreamData above",
+      "revId": "5fcc87aaca0f1a9d905fd3ddd167cce02744a48b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8b5e0c8_96a8e5cb",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HTTPServer.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T13:33:54Z",
+      "side": 1,
+      "message": "The leaf has default \"30000\" in YANG and HTTPClient falls back to it when unset, but here the server rejects a config without it, and since of() now takes a whole QuicServerParameters, a caller that only sets the three old leaves compiles fine and fails in listen() with a message that does not name the leaf. Could the server apply the same default as the client, or of() validate and say which leaf is missing?",
+      "revId": "5fcc87aaca0f1a9d905fd3ddd167cce02744a48b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "355d06e1_37116e23",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/QuicClientTest.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T13:33:54Z",
+      "side": 1,
+      "message": "This nicely proves the timeout closes an idle connection, but nothing proves the other half the commit relies on - that the SSE heartbeat keeps a quiet HTTP/3 subscription open.",
+      "revId": "5fcc87aaca0f1a9d905fd3ddd167cce02744a48b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
