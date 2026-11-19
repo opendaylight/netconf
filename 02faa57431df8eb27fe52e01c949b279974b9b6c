@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79d1025f_39657f47",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ActorProxyNetconfServiceFacade.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T13:13:00Z",
+      "side": 1,
+      "message": "The consequence is worse than \"edited and locked\": Candidate.lock() skips \u003clock\u003e while its flag is still true, so the next unrelated write piggybacks on the orphaned edit and its commit() publishes the change the first client was told had failed. Could we at least send cancel() through a fresh actor when an edit fails with AskTimeoutException (the device processes it after the late edit, RFC 6241 4.5), and spell out this consequence in the FIXME?",
+      "revId": "02faa57431df8eb27fe52e01c949b279974b9b6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
