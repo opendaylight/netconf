@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a7d4280_3c186ee1",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActor.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T13:09:19Z",
+      "side": 1,
+      "message": "Dropping the receive timeout also drops the only thing that stopped an actor whose request never arrived - for example when the proxy\u0027s ask for the actor timed out before the busy NetconfNodeActor replied. Such actors now live until the device is disconnected. Could we keep a receive timeout (say 2x actorResponseWaitTime) that only stops the actor, without sending cancel?",
+      "revId": "e7f3d84de5e9119cc48d8c8f7c017206b602835c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52795d3a_d4b1bff8",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActor.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T13:09:19Z",
+      "side": 1,
+      "message": "Since we\u0027re rewriting every branch of this if-else chain anyway, how about finally replacing it with a switch?",
+      "revId": "e7f3d84de5e9119cc48d8c8f7c017206b602835c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89e3c39d_91578281",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActor.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T13:09:19Z",
+      "side": 1,
+      "message": "Use \"self\" (the captured parameter) instead of the getSender(), like below at line 98",
+      "revId": "e7f3d84de5e9119cc48d8c8f7c017206b602835c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b7bb642b_8b1607fb",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActorTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T13:09:19Z",
+      "side": 1,
+      "message": "We already have the import for the FluentFuture.. so just use immediateFailedFluentFuture()",
+      "revId": "e7f3d84de5e9119cc48d8c8f7c017206b602835c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c40f05fa_566ae1b2",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActorTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T13:09:19Z",
+      "side": 1,
+      "message": "Actually the name doesn\u0027t match the logic. The actor stops after \"issuing the operation\", not after the reply. Can we utilize an incomplete SettableFuture that asserts termination before completing it, and then the reply? Just something for consideration.",
+      "revId": "e7f3d84de5e9119cc48d8c8f7c017206b602835c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
