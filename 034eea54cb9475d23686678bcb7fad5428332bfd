@@ -16,6 +16,74 @@
       "message": "needs to be rebased",
       "revId": "034eea54cb9475d23686678bcb7fad5428332bfd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3abcf72e_d631c31e",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-19T15:38:49Z",
+      "side": 1,
+      "message": "first sentence\n...",
+      "revId": "034eea54cb9475d23686678bcb7fad5428332bfd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "258138dc_ae59ed03",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-19T15:38:49Z",
+      "side": 1,
+      "message": "bad formatting ... key",
+      "revId": "034eea54cb9475d23686678bcb7fad5428332bfd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0b370e5_88a6c80f",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-19T15:38:49Z",
+      "side": 1,
+      "message": "message seems not be aligned with style of others in this file",
+      "revId": "034eea54cb9475d23686678bcb7fad5428332bfd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b3d9343_6b3044d4",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImplTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-19T15:38:49Z",
+      "side": 1,
+      "message": "this code seems to be duplicated in #keyBasedNode() method",
+      "revId": "034eea54cb9475d23686678bcb7fad5428332bfd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
