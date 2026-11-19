@@ -50,6 +50,23 @@
       "message": "recheck",
       "revId": "9a5b1bbfd289d09945c8b9e79746fcd3a73e6efe",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "acb8ef69_cc0d9f55",
+        "filename": "tests/suites/CRUD/test_crud.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T09:13:39Z",
+      "side": 1,
+      "message": "netconf.check_device_data_is_empty already performs exactly this regex check, and this commit already rewires it onto get_device_config_data. Could these five call sites (here, line 371, test_crud_action.py:167, test_crud_rpc.py:145 and :324) call it instead, so the definition of \"empty device data\" lives in one place?",
+      "revId": "9a5b1bbfd289d09945c8b9e79746fcd3a73e6efe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
