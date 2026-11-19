@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bcb504c_ef877076",
+        "filename": "tests/libraries/infra.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T10:12:54Z",
+      "side": 1,
+      "message": "Am I right that if nothing matches -Dkaraf.base here, we silently go on and start a second Karaf that just waits on the data/ lock, and the failure only shows up 300 s later as \"hasn\u0027t logged a new System ready\"? A warning plus a check that the SSH port is actually closed before _start_karaf would make that case obvious.",
+      "revId": "0b97b0c4e74264fac2a5f01bcbb06683e6c3a856",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58ba3375_6900593e",
+        "filename": "tests/libraries/infra.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-19T10:12:54Z",
+      "side": 1,
+      "message": "If Karaf\u0027s shutdown hangs (Pekko leave, a blocked Blueprint container), this raises after 60 s and leaves the old JVM running, so the restart fails and later tests hit a half-dead instance. Could we fall back to stop_process_by_pid(pid, gracefully\u003dFalse) when the graceful stop times out?",
+      "revId": "0b97b0c4e74264fac2a5f01bcbb06683e6c3a856",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
