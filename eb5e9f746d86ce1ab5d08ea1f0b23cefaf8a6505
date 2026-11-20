@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f04346f1_108555ef",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T14:36:43Z",
+      "side": 1,
+      "message": "Fixed in commit message.",
+      "parentUuid": "45e9860a_e7fc9901",
+      "revId": "eb5e9f746d86ce1ab5d08ea1f0b23cefaf8a6505",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e3bdfadd_bb0698e9",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "02efadc2_3664350b",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandlerTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T14:36:43Z",
+      "side": 1,
+      "message": "Fixed",
+      "parentUuid": "e3bdfadd_bb0698e9",
+      "revId": "eb5e9f746d86ce1ab5d08ea1f0b23cefaf8a6505",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c4ec4c29_f7364dae",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-11-20T09:58:06Z",
       "side": 1,
       "message": "With max-connection-attempts set to 1 this only shows that the first attempt fails. Nothing checks that a later attempt looks the key up again, which is the behaviour the commit message promises. Could we add a case with 2 attempts where lookupAsymmetric returns null and then a key, and verify it is called twice?",
+      "revId": "eb5e9f746d86ce1ab5d08ea1f0b23cefaf8a6505",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ecc7e972_715351e8",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandlerTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T14:36:43Z",
+      "side": 1,
+      "message": "Added new test case for it.",
+      "parentUuid": "c4ec4c29_f7364dae",
       "revId": "eb5e9f746d86ce1ab5d08ea1f0b23cefaf8a6505",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
