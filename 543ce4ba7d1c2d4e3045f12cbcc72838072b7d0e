@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "412eba43_62249b82",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T08:47:11Z",
+      "side": 1,
+      "message": "Thanks. Done, I kept only the NetconfClientFactoryImpl constructor update. I also dropped the deprecation of the NetconfClientFactoryImpl(NetconfTimer) constructor.",
+      "parentUuid": "9ffa9a42_a9ad4c23",
+      "revId": "543ce4ba7d1c2d4e3045f12cbcc72838072b7d0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5c708f30_9f00829a",
@@ -49,6 +67,24 @@
       "writtenOn": "2026-11-19T13:46:02Z",
       "side": 1,
       "message": "should not be one up?",
+      "revId": "543ce4ba7d1c2d4e3045f12cbcc72838072b7d0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0726fe91_fdf12506",
+        "filename": "apps/netconf-topology/pom.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T08:47:11Z",
+      "side": 1,
+      "message": "No, it declares \u003cscope\u003etest\u003c/scope\u003e and the dependency above does not.",
+      "parentUuid": "5c708f30_9f00829a",
       "revId": "543ce4ba7d1c2d4e3045f12cbcc72838072b7d0e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -70,6 +106,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d86e91f2_a943cd95",
+        "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientFactoryImpl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T08:47:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4cd9790_c9e3df66",
+      "revId": "543ce4ba7d1c2d4e3045f12cbcc72838072b7d0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b727d4b0_9a82b0ec",
@@ -83,6 +137,30 @@
       "writtenOn": "2026-11-18T10:44:07Z",
       "side": 1,
       "message": "@Nullable with optional cardinality",
+      "range": {
+        "startLine": 96,
+        "startChar": 13,
+        "endLine": 96,
+        "endChar": 22
+      },
+      "revId": "543ce4ba7d1c2d4e3045f12cbcc72838072b7d0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cbc6f339_7d6b05d8",
+        "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientFactoryImpl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T08:47:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b727d4b0_9a82b0ec",
       "range": {
         "startLine": 96,
         "startChar": 13,
