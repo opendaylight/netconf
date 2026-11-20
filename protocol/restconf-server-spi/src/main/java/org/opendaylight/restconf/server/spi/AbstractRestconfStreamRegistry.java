@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -491,8 +490,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      * </blockquote>
      */
     private final AtomicInteger prevDynamicId = new AtomicInteger(Integer.MAX_VALUE);
-    private final ConcurrentMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
-    private final ConcurrentMap<Uint32, DynSubscription> subscriptions = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Uint32, DynSubscription> subscriptions = new ConcurrentHashMap<>();
     private final ReentrantLock filterLock = new ReentrantLock(true);
     private final AtomicReference<ImmutableMap<String, EventStreamFilter>> filters =
         new AtomicReference<>(ImmutableMap.of());
