@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "748a51b1_b3b235c5",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountService.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T16:52:56Z",
+      "side": 1,
+      "message": "Here is added @Nullable.",
+      "parentUuid": "994235cd_776db72e",
+      "revId": "4fa17817c4c3a274393abbd966c19b7bfc6a0196",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "165119fd_4b42045e",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-19T16:17:27Z",
       "side": 1,
       "message": "is it better to switch to null?",
+      "revId": "4fa17817c4c3a274393abbd966c19b7bfc6a0196",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d1d7c0a_cb36e90a",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeSshServer.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T16:52:56Z",
+      "side": 1,
+      "message": "Yes. The handler now returns the credentials instead of setting them on the session, so SessionHandlerConfigurator can set them inside transport-ssh and callhome-provider does not need sshd types. One return value says both whether the server is accepted and which credentials to use. null rejects the server.",
+      "parentUuid": "165119fd_4b42045e",
       "revId": "4fa17817c4c3a274393abbd966c19b7bfc6a0196",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
