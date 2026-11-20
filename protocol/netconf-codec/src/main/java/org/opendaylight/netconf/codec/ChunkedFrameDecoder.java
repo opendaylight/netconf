@@ -74,6 +74,11 @@ public final class ChunkedFrameDecoder extends FrameDecoder {
     }
 
     @Override
+    protected void handlerRemoved0(final ChannelHandlerContext ctx) {
+        releaseChunkBuffer();
+    }
+
+    @Override
     protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out)
             throws IllegalStateException {
         while (in.isReadable()) {
@@ -146,6 +151,13 @@ public final class ChunkedFrameDecoder extends FrameDecoder {
         }
 
         in.discardReadBytes();
+    }
+
+    private void releaseChunkBuffer() {
+        if (chunk != null) {
+            chunk.release();
+            chunk = null;
+        }
     }
 
     private void extractNewChunkOrMessageEnd(final byte byteToCheck) {
