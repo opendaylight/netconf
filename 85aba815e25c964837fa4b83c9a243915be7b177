@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd78f9da_17cf51f2",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/ClientSessionInfo.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T16:52:48Z",
+      "side": 1,
+      "message": "Correct. Thanks.",
+      "parentUuid": "95f91e4d_c5a2f3de",
+      "revId": "85aba815e25c964837fa4b83c9a243915be7b177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5e114f24_d9de8514",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-19T16:14:15Z",
       "side": 1,
       "message": "first sentence\nempty line\n\u003cp\u003eparagraph",
+      "revId": "85aba815e25c964837fa4b83c9a243915be7b177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b48743f5_f4b0f3bf",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClientSessionHandler.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T16:52:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5e114f24_d9de8514",
       "revId": "85aba815e25c964837fa4b83c9a243915be7b177",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "04e8c3f3_97376a46",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHTransportStackFactory.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T16:52:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "56b3f000_20d625c1",
+      "revId": "85aba815e25c964837fa4b83c9a243915be7b177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "44c3f985_ebb1d0ac",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4ce93a2_c44e1ab4",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/NC1696Test.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T16:52:48Z",
+      "side": 1,
+      "message": "Done, added new test case.",
+      "parentUuid": "44c3f985_ebb1d0ac",
+      "revId": "85aba815e25c964837fa4b83c9a243915be7b177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ff822a8c_8edf83b5",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-11-19T16:14:15Z",
       "side": 1,
       "message": "can we use awaitility?",
+      "revId": "85aba815e25c964837fa4b83c9a243915be7b177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "936319e7_e8f28dae",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/SSHClientSessionHandlerTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T16:52:48Z",
+      "side": 1,
+      "message": "Here shutdown().get() only waits for the shutdown to complete. There is no condition or value to check afterwards, so there is nothing for Awaitility to poll.",
+      "parentUuid": "ff822a8c_8edf83b5",
       "revId": "85aba815e25c964837fa4b83c9a243915be7b177",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
