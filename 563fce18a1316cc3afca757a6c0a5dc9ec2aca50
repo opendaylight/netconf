@@ -71,6 +71,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d66d3ca_7848e762",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T07:12:26Z",
+      "side": 1,
+      "message": "Done, I have kept the old tests. I have also removed the TransportSshClient.Builder constructor without KeystoreSupport.",
+      "parentUuid": "4efb2934_b5caf24d",
+      "revId": "563fce18a1316cc3afca757a6c0a5dc9ec2aca50",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eb39be88_4ee7e67c",
@@ -84,6 +102,24 @@
       "writtenOn": "2026-11-19T14:22:49Z",
       "side": 1,
       "message": "can we reuse the server?",
+      "revId": "563fce18a1316cc3afca757a6c0a5dc9ec2aca50",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a690f59_be6e8b0e",
+        "filename": "transport/transport-ssh/src/test/java/org/opendaylight/netconf/transport/ssh/CentralKeystoreTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T07:12:26Z",
+      "side": 1,
+      "message": "We cannot reuse the same server for each test. Every test creates the server with a different sshServerConfig.",
+      "parentUuid": "eb39be88_4ee7e67c",
       "revId": "563fce18a1316cc3afca757a6c0a5dc9ec2aca50",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
