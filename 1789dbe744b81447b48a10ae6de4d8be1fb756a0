@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c48e52b_a3c28311",
+        "filename": "protocol/netconf-client/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T12:33:51Z",
+      "side": 1,
+      "message": "With `\u003cscope\u003etest\u003c/scope\u003e`\n\n```\n[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.16.0:compile (default-compile) on project netconf-client: Compilation failure\n[ERROR] module not found: io.netty.buffer\n```",
+      "parentUuid": "50002384_d2017418",
+      "revId": "1789dbe744b81447b48a10ae6de4d8be1fb756a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0b6853b4_ebc7f662",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-18T14:55:10Z",
       "side": 1,
       "message": "we need to document and, perhaps, rename the class to clarify that its mean for FramingMechanism#CHUNK only",
+      "revId": "1789dbe744b81447b48a10ae6de4d8be1fb756a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa0cdcd1_96fcd75e",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/FramingException.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T12:33:51Z",
+      "side": 1,
+      "message": "Renamed and improved javadoc.",
+      "parentUuid": "0b6853b4_ebc7f662",
       "revId": "1789dbe744b81447b48a10ae6de4d8be1fb756a0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "655b6207_938a309c",
+        "filename": "protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/FramingException.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T12:33:51Z",
+      "side": 1,
+      "message": "Thanks, done.",
+      "parentUuid": "dd742752_06fed93e",
+      "revId": "1789dbe744b81447b48a10ae6de4d8be1fb756a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fef5e6c6_2ec5befa",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-11-18T14:55:10Z",
       "side": 1,
       "message": "See {@link FramingException}",
+      "revId": "1789dbe744b81447b48a10ae6de4d8be1fb756a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "882d09df_2fcbf073",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/DeserializerExceptionHandler.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T12:33:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fef5e6c6_2ec5befa",
       "revId": "1789dbe744b81447b48a10ae6de4d8be1fb756a0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
