@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc0a117a_456282c6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T12:32:03Z",
+      "side": 1,
+      "message": "Done.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/127970/1",
+      "parentUuid": "704748e6_3a2c4cad",
+      "revId": "86fa67b02fbd277d198b180c275d88fdfbbd7349",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34b463a6_32a17b8e",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35304422_22faf0ce",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T12:32:03Z",
+      "side": 1,
+      "message": "Which other? We throw only IllegalStateException in ChunkedFrameDecoder.\nhttps://github.com/opendaylight/netconf/blob/master/protocol/netconf-codec/src/main/java/org/opendaylight/netconf/codec/ChunkedFrameDecoder.java#L179",
+      "parentUuid": "34b463a6_32a17b8e",
+      "revId": "86fa67b02fbd277d198b180c275d88fdfbbd7349",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ab1e4a43_4f5eed30",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-11-18T12:09:14Z",
       "side": 1,
       "message": "please do not use reflection..",
+      "revId": "86fa67b02fbd277d198b180c275d88fdfbbd7349",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8b7ab36_d68ecfcf",
+        "filename": "protocol/netconf-codec/src/test/java/org/opendaylight/netconf/codec/ChunkedFrameDecoderTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T12:32:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab1e4a43_4f5eed30",
       "revId": "86fa67b02fbd277d198b180c275d88fdfbbd7349",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
