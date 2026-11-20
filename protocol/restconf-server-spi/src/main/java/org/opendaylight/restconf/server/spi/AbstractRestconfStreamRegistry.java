@@ -104,16 +104,18 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      */
     private final class DynSubscription extends AbstractRestconfStreamSubscription {
         private final Set<Rfc8639Subscriber<?>> receivers = ConcurrentHashMap.newKeySet();
+        private final RestconfStream<?> stream;
 
         // FIXME: rework in terms of SubscriptionFilter, FilterExpression and
         //        EventFormatterFactory.newFilter(FilterExpression)
         private @Nullable EventStreamFilter filter;
         private @Nullable String filterName;
 
-        DynSubscription(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
-                final TransportSession session, final @Nullable EventStreamFilter filter,
+        DynSubscription(final Uint32 id, final QName encoding, final RestconfStream<?> stream,
+                final String receiverName, final TransportSession session, final @Nullable EventStreamFilter filter,
                 final @Nullable String filterName, final @Nullable Instant stopTime) {
-            super(id, encoding, streamName, receiverName, session, stopTime);
+            super(id, encoding, stream.name(), receiverName, session, stopTime);
+            this.stream = stream;
             this.filter = filter;
             this.filterName = filterName;
         }
@@ -135,15 +137,6 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         @NonNullByDefault
         private void addReceiver(final ServerRequest<Registration> request, final Sender sender,
                 final State receiverState) {
-            final var streamName = streamName();
-            final var stream = streams.get(streamName);
-            if (stream == null) {
-                // TODO: this should never happen, really
-                LOG.debug("Stream '{}' not found", streamName);
-                request.failWith(new RequestException("Subscription stream not found"));
-                return;
-            }
-
             final var session = request.session();
             if (session == null) {
                 request.failWith(new RequestException("This endpoint does not support dynamic subscriptions"));
@@ -686,8 +679,8 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         final var id = Uint32.fromIntBits(prevDynamicId.incrementAndGet());
         final var receiverName = newReceiverName(session.description(), request.principal());
-        final var subscription = new DynSubscription(id, encoding, streamName, receiverName, session,
-            filterImpl, filterName, stopTime);
+        final var subscription = new DynSubscription(id, encoding, stream, receiverName, session, filterImpl,
+            filterName, stopTime);
 
         Futures.addCallback(createSubscription(id, streamName, encoding, receiverName, stopTime),
             new FutureCallback<>() {
