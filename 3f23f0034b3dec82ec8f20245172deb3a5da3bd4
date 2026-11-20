@@ -16,6 +16,24 @@
       "message": "Add case null -\u003e throw new IllegalArgumentException(\"Missing credentials\");",
       "revId": "3f23f0034b3dec82ec8f20245172deb3a5da3bd4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78742586_660b29d9",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T14:36:55Z",
+      "side": 1,
+      "message": "Thanks. Resolved in next patch:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/127971/1",
+      "parentUuid": "7592cf08_5d0ff48e",
+      "revId": "3f23f0034b3dec82ec8f20245172deb3a5da3bd4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
