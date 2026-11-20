@@ -686,13 +686,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         final var id = Uint32.fromIntBits(prevDynamicId.incrementAndGet());
         final var receiverName = newReceiverName(session.description(), request.principal());
+        final var subscription = new DynSubscription(id, encoding, streamName, receiverName, session,
+            filterImpl, filterName, stopTime);
 
         Futures.addCallback(createSubscription(id, streamName, encoding, receiverName, stopTime),
             new FutureCallback<>() {
                 @Override
                 public void onSuccess(final Void result) {
-                    final var subscription = new DynSubscription(id, encoding, streamName, receiverName, session,
-                        filterImpl, filterName, stopTime);
                     subscriptions.put(id, subscription);
                     if (stopTime != null) {
                         initiateStopTime(id, stopTime);
