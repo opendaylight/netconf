@@ -170,6 +170,7 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
                         .build())
                     .build());
             }
+            case null -> throw new IllegalArgumentException("Missing credentials");
             default -> throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
         }
 

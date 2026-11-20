@@ -268,6 +268,13 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
         assertThrows(NoSuchElementException.class, () -> createConfig(nodeBuilder.setHost(null).build()));
     }
 
+    @Test
+    void testNoCredentials() {
+        final var node = nodeBuilder.setTcpOnly(false).setCredentials(null).build();
+        final var ex = assertThrows(IllegalArgumentException.class, () -> createConfig(node));
+        assertEquals("Missing credentials", ex.getMessage());
+    }
+
     private NetconfClientConfiguration createConfig(final NetconfNode netconfNode) {
         return factory.createClientConfigurationBuilder(NODE_ID, netconfNode,
                 AbstractNetconfTopology.defaultSshParams())
