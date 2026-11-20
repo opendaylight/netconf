@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
@@ -20,6 +21,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver.State;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.yang.common.Uint64;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +58,7 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
      *
      * @param <T> event type
      */
+    // FIXME: yeah... not quite: this is a Sender, but then it should be
     static final class Rfc8639Subscriber<T> extends Subscriber<T> {
         private static final Logger LOG = LoggerFactory.getLogger(Rfc8639Subscriber.class);
         private static final VarHandle EER_VH;
@@ -156,8 +159,8 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
         this.filter = requireNonNull(filter);
     }
 
-    final EventStreamFilter filter() {
-        return filter;
+    final boolean matches(final EffectiveModelContext modelContext, final @NonNull T event) {
+        return filter.matches(modelContext, event);
     }
 
     final EventFormatter<T> formatter() {
@@ -169,7 +172,7 @@ abstract sealed class Subscriber<T> extends AbstractRegistration {
     }
 
     final void setFilter(final EventStreamFilter newFilter) {
-        this.filter = requireNonNull(newFilter);
+        filter = requireNonNull(newFilter);
     }
 
     /**

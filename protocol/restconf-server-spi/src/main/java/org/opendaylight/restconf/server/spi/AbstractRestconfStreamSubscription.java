@@ -23,21 +23,22 @@ import org.opendaylight.yangtools.yang.common.Uint32;
  * Abstract base class for {@link RestconfStream.Subscription}s.
  */
 public abstract class AbstractRestconfStreamSubscription extends RestconfStream.Subscription {
+    protected final @NonNull RestconfStream<?> stream;
+
     private final @NonNull Uint32 id;
     private final @NonNull QName encoding;
-    private final @NonNull String streamName;
     private final @NonNull String receiverName;
     private final @NonNull TransportSession session;
 
     private @NonNull SubscriptionState state = SubscriptionState.ACTIVE;
     private @Nullable Instant stopTime;
 
-    protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final String streamName,
+    protected AbstractRestconfStreamSubscription(final Uint32 id, final QName encoding, final RestconfStream<?> stream,
             final String receiverName, final TransportSession session, final @Nullable Instant stopTime) {
         this.id = requireNonNull(id);
         this.encoding = requireNonNull(encoding);
         this.session = requireNonNull(session);
-        this.streamName = requireNonNull(streamName);
+        this.stream = requireNonNull(stream);
         this.receiverName = requireNonNull(receiverName);
         this.stopTime = stopTime;
     }
@@ -54,7 +55,7 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
 
     @Override
     public final String streamName() {
-        return streamName;
+        return stream.name();
     }
 
     @Override
@@ -105,7 +106,7 @@ public abstract class AbstractRestconfStreamSubscription extends RestconfStream.
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         helper.add("id", id)
             .add("encoding", encoding)
-            .add("stream", streamName)
+            .add("stream", streamName())
             .add("receiver", receiverName)
             .add("filter", filter());
         if (stopTime != null) {

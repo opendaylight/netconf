@@ -31,4 +31,5 @@ module org.opendaylight.restconf.server.spi {
     requires static com.github.spotbugs.annotations;
     requires static com.google.errorprone.annotations;
     requires static org.osgi.annotation.bundle;
+    requires org.opendaylight.yangtools.yang.model.api;
 }

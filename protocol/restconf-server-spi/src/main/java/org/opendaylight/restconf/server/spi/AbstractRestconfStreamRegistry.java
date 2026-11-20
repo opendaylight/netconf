@@ -20,7 +20,10 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.errorprone.annotations.concurrent.GuardedBy;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.security.Principal;
 import java.time.Duration;
@@ -98,22 +101,87 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         boolean matches(EffectiveModelContext modelContext, Object event);
     }
 
+    @NonNullByDefault
+    private static final class Rfc8639Receiver {
+        private static final Logger LOG = LoggerFactory.getLogger(Rfc8639Subscriber.class);
+        private static final VarHandle EER_VH;
+        private static final VarHandle SER_VH;
+
+        static {
+            final var lookup = MethodHandles.lookup();
+            try {
+                EER_VH = lookup.findVarHandle(Rfc8639Subscriber.class, "excludedEventRecords", long.class);
+                SER_VH = lookup.findVarHandle(Rfc8639Subscriber.class, "sentEventRecords", long.class);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new ExceptionInInitializerError(e);
+            }
+        }
+
+        private final String receiverName;
+        private final Sender sender;
+
+        @SuppressFBWarnings(value = "UUF_UNUSED_FIELD")
+        private long excludedEventRecords;
+        @SuppressFBWarnings(value = "UUF_UNUSED_FIELD")
+        private long sentEventRecords;
+        private final State receiverState;
+
+        Rfc8639Receiver(final Sender sender, final String receiverName, final State receiverState) {
+            this.sender = requireNonNull(sender);
+            this.receiverName = requireNonNull(receiverName);
+            this.receiverState = requireNonNull(receiverState);
+        }
+
+        void excludeRecord() {
+            EER_VH.getAndAdd(this, 1L);
+        }
+
+        void sendRecord(final String data) {
+            sender.sendDataMessage(data);
+            SER_VH.getAndAdd(this, 1L);
+        }
+
+        void sendEndOfStream() {
+            sender.endOfStream();
+        }
+    }
+
+    // FIXME: extends RestconfStream.Subscription
+    private abstract static sealed class AbstractSubscription<T>
+            permits DynamicSubscription {
+
+    }
+
+    private static final class DynamicSubscription<T> extends AbstractSubscription<T> {
+
+    }
+
+
     /**
      * Internal implementation
      * of a <a href="https://www.rfc-editor.org/rfc/rfc8639#section-2.4">dynamic subscription</a>.
      */
-    private final class DynSubscription extends AbstractRestconfStreamSubscription {
+    private final class DynSubscription<T> extends AbstractRestconfStreamSubscription {
+
+
         private final Set<Rfc8639Subscriber<?>> receivers = ConcurrentHashMap.newKeySet();
+
+        // FIXME: not quite, we have:
+        //        - a strong RestconfStream connection
+        //        - a strong encoding (and hence RestconfStream.getFactory() connection
+        //        we then:
+        //        - update filter as needed
+        //        - filter-and-forward events to receivers
 
         // FIXME: rework in terms of SubscriptionFilter, FilterExpression and
         //        EventFilterFactory.newFilter(FilterExpression)
         private @Nullable EventStreamFilter filter;
         private @Nullable String filterName;
 
-        DynSubscription(final Uint32 id, final QName encoding, final String streamName, final String receiverName,
-                final TransportSession session, final @Nullable EventStreamFilter filter,
+        DynSubscription(final Uint32 id, final QName encoding, final RestconfStream<?> stream,
+                final String receiverName, final TransportSession session, final @Nullable EventStreamFilter filter,
                 final @Nullable String filterName, final @Nullable Instant stopTime) {
-            super(id, encoding, streamName, receiverName, session, stopTime);
+            super(id, encoding, stream, receiverName, session, stopTime);
             this.filter = filter;
             this.filterName = filterName;
         }
@@ -135,15 +203,6 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
         @NonNullByDefault
         private void addReceiver(final ServerRequest<Registration> request, final Sender sender,
                 final State receiverState) {
-            final var streamName = streamName();
-            final var stream = streams.get(streamName);
-            if (stream == null) {
-                // TODO: this should never happen, really
-                LOG.debug("Stream '{}' not found", streamName);
-                request.failWith(new RequestException("Subscription stream not found"));
-                return;
-            }
-
             final var session = request.session();
             if (session == null) {
                 request.failWith(new RequestException("This endpoint does not support dynamic subscriptions"));
@@ -152,8 +211,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
             final Rfc8639Subscriber<?> newSubscriber;
             try {
-                newSubscriber = stream.addSubscriber(sender, encoding(),
-                    newReceiverName(session.description(), request.principal()), filter(), receiverState);
+                newSubscriber = stream.addSubscriber(sender,
+                    newReceiverName(session.description(), request.principal()),
+                    encoding(), filter(), receiverState);
             } catch (UnsupportedEncodingException e) {
                 request.failWith(new RequestException(e));
                 return;
@@ -686,13 +746,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         final var id = Uint32.fromIntBits(prevDynamicId.incrementAndGet());
         final var receiverName = newReceiverName(session.description(), request.principal());
+        final var subscription = new DynSubscription(id, encoding, stream, receiverName, session,
+            filterImpl, filterName, stopTime);
 
         Futures.addCallback(createSubscription(id, streamName, encoding, receiverName, stopTime),
             new FutureCallback<>() {
                 @Override
                 public void onSuccess(final Void result) {
-                    final var subscription = new DynSubscription(id, encoding, streamName, receiverName, session,
-                        filterImpl, filterName, stopTime);
                     subscriptions.put(id, subscription);
                     if (stopTime != null) {
                         initiateStopTime(id, stopTime);
