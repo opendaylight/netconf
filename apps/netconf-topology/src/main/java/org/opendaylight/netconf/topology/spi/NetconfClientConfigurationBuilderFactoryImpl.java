@@ -17,6 +17,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
@@ -138,16 +139,20 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         switch (credentials) {
             case LoginPwUnencrypted unencrypted -> {
                 final var loginPassword = unencrypted.getLoginPasswordUnencrypted();
-                sshParamsBuilder.setClientIdentity(loginPasswordIdentity(
-                    loginPassword.getUsername(), loginPassword.getPassword()));
+                final var username = loginPassword.getUsername();
+                final var password = loginPassword.getPassword();
+                checkLoginPassword(username, password);
+                sshParamsBuilder.setClientIdentity(loginPasswordIdentity(username, password));
             }
             case LoginPw loginPw -> {
                 final var loginPassword = loginPw.getLoginPassword();
                 final var username = loginPassword.getUsername();
+                final var password = loginPassword.getPassword();
+                checkLoginPassword(username, password);
 
                 final byte[] plainBytes;
                 try {
-                    plainBytes = encryptionService.decrypt(loginPassword.getPassword());
+                    plainBytes = encryptionService.decrypt(password);
                 } catch (GeneralSecurityException e) {
                     throw new IllegalStateException("Failed to decrypt password", e);
                 }
@@ -171,6 +176,7 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
                         .build())
                     .build());
             }
+            case null -> throw new IllegalArgumentException("Missing credentials");
             default -> throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
         }
 
@@ -242,12 +248,27 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             .build();
     }
 
-    private static ClientIdentity loginPasswordIdentity(final String username, final String password) {
+    /**
+     * Check that login-password credentials have both a username and a password.
+     *
+     * <p>Both are optional in the model. Without them there is nothing to authenticate with.
+     *
+     * @param username the username
+     * @param password the password, encrypted or not
+     * @throws IllegalArgumentException if the username or the password is missing
+     */
+    private static void checkLoginPassword(final @Nullable String username, final @Nullable Object password) {
+        checkArgument(username != null, "Login-password credentials are missing username");
+        checkArgument(password != null, "Login-password credentials are missing password");
+    }
+
+    private static ClientIdentity loginPasswordIdentity(final @NonNull String username,
+            final @NonNull String password) {
         return new ClientIdentityBuilder()
-            .setUsername(requireNonNull(username, "username is undefined"))
+            .setUsername(username)
             .setPassword(new PasswordBuilder()
                 .setPasswordType(new CleartextPasswordBuilder()
-                    .setCleartextPassword(requireNonNull(password, "password is undefined"))
+                    .setCleartextPassword(password)
                     .build())
                 .build())
             .build();

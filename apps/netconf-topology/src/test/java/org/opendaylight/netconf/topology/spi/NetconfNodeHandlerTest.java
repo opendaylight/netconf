@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -31,6 +32,7 @@ import java.net.InetSocketAddress;
 import java.security.KeyPairGenerator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.eclipse.jdt.annotation.Nullable;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -67,6 +69,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.KeyAuthBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.LoginPwUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.key.auth.KeyBasedBuilder;
@@ -398,6 +401,20 @@ class NetconfNodeHandlerTest {
     }
 
     @Test
+    void failToConnectWithoutCredentials() throws Exception {
+        final var noCredentialsHandler = credentialsHandler(clientFactory, null, Uint32.ONE);
+        final var captor = ArgumentCaptor.forClass(Throwable.class);
+        doNothing().when(delegate).onDeviceFailed(captor.capture());
+        noCredentialsHandler.connect();
+
+        // the configuration is rejected before any client is created
+        final var ex = assertInstanceOf(IllegalArgumentException.class, captor.getValue());
+        assertEquals("Missing credentials", ex.getMessage());
+        verify(clientFactory, never()).createClient(any(NetconfClientConfiguration.class),
+            any(SSHNegotiatedAlgListener.class));
+    }
+
+    @Test
     void backoffMillisValueTest() {
         // Prepare environment.
         final var minBackoffMillis = 20000L;
@@ -466,6 +483,16 @@ class NetconfNodeHandlerTest {
 
     private NetconfNodeHandler keyAuthHandler(final NetconfClientFactory factory, final String keyId,
             final Uint32 maxConnectionAttempts) {
+        return credentialsHandler(factory, new KeyAuthBuilder()
+            .setKeyBased(new KeyBasedBuilder()
+                .setUsername("testuser")
+                .setKeyId(keyId)
+                .build())
+            .build(), maxConnectionAttempts);
+    }
+
+    private NetconfNodeHandler credentialsHandler(final NetconfClientFactory factory,
+            final @Nullable Credentials credentials, final Uint32 maxConnectionAttempts) {
         return new NetconfNodeHandler(factory, netconfTimer, BASE_SCHEMAS, schemaManager, schemaAssembler,
             new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, sslContextFactoryProvider),
             deviceActionFactory, delegate, DEVICE_ID, NODE_ID, new NetconfNodeBuilder()
@@ -484,12 +511,7 @@ class NetconfNodeHandlerTest {
                 .setConnectionTimeoutMillis(Uint32.valueOf(1000))
                 .setMaxBackoffMillis(Uint32.valueOf(1000))
                 .setBackoffJitter(Decimal64.valueOf("0.0"))
-                .setCredentials(new KeyAuthBuilder()
-                    .setKeyBased(new KeyBasedBuilder()
-                        .setUsername("testuser")
-                        .setKeyId(keyId)
-                        .build())
-                    .build())
+                .setCredentials(credentials)
                 .build(),
             null, AbstractNetconfTopology.defaultSshParams(), null);
     }

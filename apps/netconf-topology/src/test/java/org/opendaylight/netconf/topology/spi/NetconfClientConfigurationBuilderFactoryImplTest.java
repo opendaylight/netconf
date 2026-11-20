@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import io.netty.handler.ssl.SslContext;
 import java.security.KeyPairGenerator;
@@ -48,8 +49,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.re
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.connection.parameters.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.KeyAuthBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.LoginPwBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.LoginPwUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.key.auth.KeyBasedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.login.pw.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev251205.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev251205.netconf.node.augment.NetconfNodeBuilder;
@@ -279,6 +282,53 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
     @Test
     void noHost() {
         assertThrows(NoSuchElementException.class, () -> createConfig(nodeBuilder.setHost(null).build()));
+    }
+
+    @Test
+    void testNoCredentials() {
+        final var node = nodeBuilder.setTcpOnly(false).setCredentials(null).build();
+        final var ex = assertThrows(IllegalArgumentException.class, () -> createConfig(node));
+        assertEquals("Missing credentials", ex.getMessage());
+    }
+
+    @Test
+    void testLoginPasswordWithoutUsername() {
+        final var node = nodeBuilder.setTcpOnly(false)
+            .setCredentials(new LoginPwUnencryptedBuilder()
+                .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
+                    .setPassword("test-password")
+                    .build())
+                .build())
+            .build();
+        final var ex = assertThrows(IllegalArgumentException.class, () -> createConfig(node));
+        assertEquals("Login-password credentials are missing username", ex.getMessage());
+    }
+
+    @Test
+    void testLoginPasswordWithoutPassword() {
+        final var node = nodeBuilder.setTcpOnly(false)
+            .setCredentials(new LoginPwUnencryptedBuilder()
+                .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
+                    .setUsername("test-user")
+                    .build())
+                .build())
+            .build();
+        final var ex = assertThrows(IllegalArgumentException.class, () -> createConfig(node));
+        assertEquals("Login-password credentials are missing password", ex.getMessage());
+    }
+
+    @Test
+    void testEncryptedLoginPasswordWithoutPassword() {
+        final var node = nodeBuilder.setTcpOnly(false)
+            .setCredentials(new LoginPwBuilder()
+                .setLoginPassword(new LoginPasswordBuilder()
+                    .setUsername("test-user")
+                    .build())
+                .build())
+            .build();
+        final var ex = assertThrows(IllegalArgumentException.class, () -> createConfig(node));
+        assertEquals("Login-password credentials are missing password", ex.getMessage());
+        verifyNoInteractions(encryptionService);
     }
 
     private NetconfClientConfiguration createConfig(final NetconfNode netconfNode) {
