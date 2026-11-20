@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "44517d75_f02a6b35",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T08:47:27Z",
+      "side": 1,
+      "message": "Yes, it changes here. Before, the key was looked up through\nCredentialProvider while building the client config, and a missing\nkey failed the device immediately with \"No keypair found\". Now\ntransport-ssh looks it up in createClient(), and a missing key is\nretried. I added the WARN log because that path logged only at DEBUG.\n\nWe can remove \"Report the last failure when giving up connecting\"\nif you want. As its commit message says, it shows why the connection\nfailed not only in the log, but also in the device\u0027s\nconnected-message. Before, the device showed this for a missing key,\nand the new approach loses it:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/126831/9/apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandlerTest.java#370",
+      "parentUuid": "48b3d6c9_11ac3372",
+      "revId": "034eea54cb9475d23686678bcb7fad5428332bfd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc7f55f8_dfbdba7b",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-18T10:44:55Z",
       "side": 1,
       "message": "needs to be rebased",
+      "revId": "034eea54cb9475d23686678bcb7fad5428332bfd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d9ccd92_dd76ddfe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T08:47:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc7f55f8_dfbdba7b",
       "revId": "034eea54cb9475d23686678bcb7fad5428332bfd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4d4a285_c7fc73cc",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T08:47:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3abcf72e_d631c31e",
+      "revId": "034eea54cb9475d23686678bcb7fad5428332bfd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "258138dc_ae59ed03",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-11-19T15:38:49Z",
       "side": 1,
       "message": "bad formatting ... key",
+      "revId": "034eea54cb9475d23686678bcb7fad5428332bfd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "204946b4_4c506cf4",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T08:47:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "258138dc_ae59ed03",
       "revId": "034eea54cb9475d23686678bcb7fad5428332bfd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e84f57f3_4e4f744f",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T08:47:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0b370e5_88a6c80f",
+      "revId": "034eea54cb9475d23686678bcb7fad5428332bfd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b3d9343_6b3044d4",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-11-19T15:38:49Z",
       "side": 1,
       "message": "this code seems to be duplicated in #keyBasedNode() method",
+      "revId": "034eea54cb9475d23686678bcb7fad5428332bfd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4bc10625_4f7f80b5",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImplTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-20T08:47:27Z",
+      "side": 1,
+      "message": "Thanks, done.",
+      "parentUuid": "8b3d9343_6b3044d4",
       "revId": "034eea54cb9475d23686678bcb7fad5428332bfd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
