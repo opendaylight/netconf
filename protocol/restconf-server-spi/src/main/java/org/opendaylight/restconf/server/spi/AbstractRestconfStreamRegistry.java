@@ -20,7 +20,10 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.errorprone.annotations.concurrent.GuardedBy;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.security.Principal;
 import java.time.Duration;
@@ -49,7 +52,6 @@ import org.opendaylight.restconf.server.spi.RestconfStream.Source;
 import org.opendaylight.restconf.server.spi.RestconfStream.Subscription;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionFilter;
 import org.opendaylight.restconf.server.spi.RestconfStream.SubscriptionState;
-import org.opendaylight.restconf.server.spi.Subscriber.Rfc8639Subscriber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeJson$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.EncodeXml$I;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
@@ -99,19 +101,135 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     }
 
     /**
+     * A {@link Subscriber} established via the <a href="https://www.rfc-editor.org/rfc/rfc8639#section-2.6">RFC8639</a>
+     * mechanism.
+     *
+     * @param <T> event type
+     */
+    private static final class Rfc8639Subscriber<T> implements Subscriber<T> {
+        private static final Logger LOG = LoggerFactory.getLogger(Rfc8639Subscriber.class);
+        private static final VarHandle EER_VH;
+        private static final VarHandle SER_VH;
+
+        static {
+            final var lookup = MethodHandles.lookup();
+            try {
+                EER_VH = lookup.findVarHandle(Rfc8639Subscriber.class, "excludedEventRecords", long.class);
+                SER_VH = lookup.findVarHandle(Rfc8639Subscriber.class, "sentEventRecords", long.class);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new ExceptionInInitializerError(e);
+            }
+        }
+
+        private final @NonNull EventFormatter<T> formatter;
+        private final @NonNull Sender sender;
+        private final @NonNull String receiverName;
+
+        private @NonNull EventStreamFilter filter;
+        private State receiverState;
+        @SuppressFBWarnings(value = "UUF_UNUSED_FIELD")
+        private long excludedEventRecords;
+        @SuppressFBWarnings(value = "UUF_UNUSED_FIELD")
+        private long sentEventRecords;
+
+        Rfc8639Subscriber(final Sender sender, final EventFormatter<T> formatter,
+                final @Nullable EventStreamFilter filter, final String receiverName, final State receiverState) {
+            this.sender = requireNonNull(sender);
+            this.formatter = requireNonNull(formatter);
+            this.filter = filter != null ? filter : AcceptingEventFilter.instance();
+            this.receiverName = requireNonNull(receiverName);
+            this.receiverState = requireNonNull(receiverState);
+        }
+
+        @Override
+        public EventFormatter<T> formatter() {
+            return formatter;
+        }
+
+        @Override
+        public EventStreamFilter filter() {
+            return filter;
+        }
+
+        void setFilter(final EventStreamFilter newFilter) {
+            filter = requireNonNull(newFilter);
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * <p>This implementation sends data only if receiver state is {@code Active}, otherwise data is not send.
+         */
+        @Override
+        public void sendDataMessage(final @Nullable String data) {
+            if (receiverState() == Receiver.State.Active) {
+                LOG.debug("Receiver {} is active, sending data", receiverName);
+                sendMessage(data);
+            } else {
+                LOG.debug("Receiver {} is not Active, sending data blocked", receiverName);
+            }
+        }
+
+        /**
+         * This method sends data regardless of subscription state.
+         *
+         * @param data Data to send.
+         */
+        private void sendMessage(final @Nullable String data) {
+            final VarHandle vh;
+            if (data != null) {
+                sender.sendDataMessage(data);
+                vh = SER_VH;
+            } else {
+                vh = EER_VH;
+            }
+            vh.getAndAdd(this, 1L);
+        }
+
+        @Override
+        public void endOfStream() {
+            sender.endOfStream();
+        }
+
+        String receiverName() {
+            return receiverName;
+        }
+
+        State receiverState() {
+            return receiverState;
+        }
+
+        Uint64 excludedEventRecords() {
+            return readCounter(EER_VH);
+        }
+
+        Uint64 sentEventRecords() {
+            return readCounter(SER_VH);
+        }
+
+        private Uint64 readCounter(final VarHandle vh) {
+            return Uint64.fromLongBits((long) vh.getAcquire(this));
+        }
+
+        void setReceiverState(final State newState) {
+            receiverState = requireNonNull(newState);
+        }
+    }
+
+    /**
      * Internal implementation
      * of a <a href="https://www.rfc-editor.org/rfc/rfc8639#section-2.4">dynamic subscription</a>.
      */
-    private final class DynSubscription extends AbstractRestconfStreamSubscription {
-        private final Set<Rfc8639Subscriber<?>> receivers = ConcurrentHashMap.newKeySet();
-        private final RestconfStream<?> stream;
+    private final class DynSubscription<T> extends AbstractRestconfStreamSubscription {
+        private final Set<Rfc8639Subscriber<T>> receivers = ConcurrentHashMap.newKeySet();
+        private final RestconfStream<T> stream;
 
         // FIXME: rework in terms of SubscriptionFilter, FilterExpression and
         //        EventFormatterFactory.newFilter(FilterExpression)
         private @Nullable EventStreamFilter filter;
         private @Nullable String filterName;
 
-        DynSubscription(final Uint32 id, final QName encoding, final RestconfStream<?> stream,
+        DynSubscription(final Uint32 id, final QName encoding, final RestconfStream<T> stream,
                 final String receiverName, final TransportSession session, final @Nullable EventStreamFilter filter,
                 final @Nullable String filterName, final @Nullable Instant stopTime) {
             super(id, encoding, stream.name(), receiverName, session, stopTime);
@@ -143,10 +261,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 return;
             }
 
-            final Rfc8639Subscriber<?> newSubscriber;
+            final Rfc8639Subscriber<T> newSubscriber;
             try {
-                newSubscriber = stream.addSubscriber(sender, encoding(),
-                    newReceiverName(session.description(), request.principal()), filter(), receiverState);
+                newSubscriber = stream.addSubscriber(new Rfc8639Subscriber<>(sender,
+                    stream.getFactory(encoding()).getFormatter(TextParameters.EMPTY), filter(),
+                    newReceiverName(session.description(), request.principal()), receiverState));
             } catch (UnsupportedEncodingException e) {
                 request.failWith(new RequestException(e));
                 return;
@@ -172,15 +291,15 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 @Override
                 public void onFailure(final Throwable cause) {
                     receivers.remove(newSubscriber);
-                    newSubscriber.close();
+                    stream.removeSubscriber(newSubscriber);
                     request.failWith(new RequestException(cause));
                 }
             }, MoreExecutors.directExecutor());
         }
 
-        private void removeReceiver(final Rfc8639Subscriber<?> subscriber) {
+        private void removeReceiver(final Rfc8639Subscriber<T> subscriber) {
             receivers.remove(subscriber);
-            subscriber.close();
+            stream.removeSubscriber(subscriber);
             updateOperationalDatastore();
         }
 
@@ -491,7 +610,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      */
     private final AtomicInteger prevDynamicId = new AtomicInteger(Integer.MAX_VALUE);
     private final ConcurrentHashMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Uint32, DynSubscription> subscriptions = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Uint32, DynSubscription<?>> subscriptions = new ConcurrentHashMap<>();
     private final ReentrantLock filterLock = new ReentrantLock(true);
     private final AtomicReference<ImmutableMap<String, EventStreamFilter>> filters =
         new AtomicReference<>(ImmutableMap.of());
@@ -679,7 +798,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         final var id = Uint32.fromIntBits(prevDynamicId.incrementAndGet());
         final var receiverName = newReceiverName(session.description(), request.principal());
-        final var subscription = new DynSubscription(id, encoding, stream, receiverName, session, filterImpl,
+        final var subscription = new DynSubscription<>(id, encoding, stream, receiverName, session, filterImpl,
             filterName, stopTime);
 
         Futures.addCallback(createSubscription(id, streamName, encoding, receiverName, stopTime),
