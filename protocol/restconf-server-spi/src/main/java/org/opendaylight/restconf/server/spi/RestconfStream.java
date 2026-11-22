@@ -36,16 +36,12 @@ import org.opendaylight.netconf.databind.subtree.SubtreeFilter;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.TransportSession;
-import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry.EventStreamFilter;
-import org.opendaylight.restconf.server.spi.Subscriber.Rfc8040Subscriber;
-import org.opendaylight.restconf.server.spi.Subscriber.Rfc8639Subscriber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Encoding;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.Filters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.filters.StreamFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.FilterSpec;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamSubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.stream.filter.elements.filter.spec.StreamXpathFilter;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.subscribed.notifications.rev190909.subscriptions.subscription.receivers.Receiver.State;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.Xpath10;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.databind.DatabindContext;
@@ -706,21 +702,13 @@ public sealed class RestconfStream<T> permits LegacyRestconfStream {
         return addSubscriber(new Rfc8040Subscriber<>(this, handler, formatter, filter));
     }
 
-    @NonNullByDefault
-    @Nullable Rfc8639Subscriber<T> addSubscriber(final Sender handler, final QName encoding, final String receiverName,
-            final @Nullable EventStreamFilter filter, final State state) throws UnsupportedEncodingException {
-        return addSubscriber(new Rfc8639Subscriber<>(this, handler,
-            getFactory(encoding).getFormatter(TextParameters.EMPTY),
-            filter != null ? filter : AcceptingEventFilter.instance(), receiverName, state));
-    }
-
-    private <S extends Subscriber<T>> @Nullable S addSubscriber(final @NonNull S subscriber) {
+    final <S extends Subscriber<T>> @Nullable S addSubscriber(final @NonNull S subscriber) {
         var observed = acquireSubscribers();
         while (observed != null) {
             final var next = observed.add(subscriber);
             final var witness = (Subscribers<T>) SUBSCRIBERS_VH.compareAndExchangeRelease(this, observed, next);
             if (witness == observed) {
-                LOG.debug("Subscriber {} is added.", subscriber.sender());
+                LOG.debug("Subscriber {} is added.", subscriber);
                 if (observed instanceof Subscribers.Empty) {
                     // We have became non-empty, start the source
                     startSource();
