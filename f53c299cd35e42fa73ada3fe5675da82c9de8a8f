@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8c779954_45a7811c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-23T15:33:33Z",
+      "side": 1,
+      "message": "It looks like to much logic implemented, I would expect, maybe, reuse of chunked response logic... can you describe what we do similar way, what is different?",
+      "revId": "f53c299cd35e42fa73ada3fe5675da82c9de8a8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b31f8bc9_a7d3f706",
         "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/PipeliningTest.java",
         "patchSetId": 7
