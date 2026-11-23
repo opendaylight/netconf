@@ -2240,6 +2240,13 @@ this is the inbound counterpart of *http1-chunk-size*, which sizes outbound resp
 *http-request-body-max-size* — Maximum size in bytes of an aggregated request body. A larger request is rejected
 with '413 Content Too Large'. Applies to HTTP/1.1, HTTP/2 and HTTP/3 alike.
 
+On HTTP/2 and HTTP/3 this limit applies per stream: 100 concurrent streams at the default
+256 KiB limit can retain 25 MiB of aggregated bodies per connection, plus overhead.
+On HTTP/1.1 authenticated clients can queue an unbounded number of pipelined
+requests, each retaining up to this body limit while an earlier request is in flight.
+Bodies are aggregated before authentication. This per-request limit does not bound
+total memory per connection; increasing it can increase retained memory.
+
 *http2-max-frame-size* — Maximum HTTP/2 frame payload size in bytes this server is willing to accept from the client.
 Valid values are 16384-16777215.
 
