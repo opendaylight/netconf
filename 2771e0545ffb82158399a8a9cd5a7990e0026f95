@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "311ee20d_c9c3abe1",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/StreamingRequestE2ETest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-23T21:43:34Z",
+      "side": 1,
+      "message": "REQUEST_TIMEOUT gives each chunked POST a 10-second deadline. The disconnect test also uses a raw socket, and its connect and write calls fall outside that deadline. @Timeout(20) covers the whole test method, including those calls and client cleanup. I added that distinction to the class Javadoc.",
+      "parentUuid": "ae592178_85812ce7",
+      "revId": "2771e0545ffb82158399a8a9cd5a7990e0026f95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce4611c3_0d9bdf4d",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-23T16:03:27Z",
       "side": 1,
       "message": "IMO that\u0027s too detailed? This package is for E2E higher level testing..",
+      "revId": "2771e0545ffb82158399a8a9cd5a7990e0026f95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25d7c23f_66d70815",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/StreamingRequestE2ETest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-23T21:43:34Z",
+      "side": 1,
+      "message": "Agreed. I removed the thread inspection",
+      "parentUuid": "ce4611c3_0d9bdf4d",
       "revId": "2771e0545ffb82158399a8a9cd5a7990e0026f95",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
