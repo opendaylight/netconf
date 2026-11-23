@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb3ee539_a3cf2679",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcherTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-23T15:30:29Z",
+      "side": 0,
+      "message": "just removed?",
+      "revId": "d6517acb65eb635561c1d7919017d1e18df048bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
