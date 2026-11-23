@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f03160d6_9ceab93d",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/RestconfStreamingLifecycleTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-23T15:58:10Z",
+      "side": 1,
+      "message": "what do we test?",
+      "revId": "95d8b93060fd7f15a6b8cd3c6db043f4dffcf404",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
