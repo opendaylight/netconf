@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6562e7a9_c0707e81",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/RequestBodyInputStream.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-23T15:19:14Z",
+      "side": 1,
+      "message": "IDK, seems weird to hide some values behind Lifecycle, is there a reason for it?",
+      "revId": "d6517acb65eb635561c1d7919017d1e18df048bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "efa1f127_4fc0caf5",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/RequestBodyInputStream.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-23T15:19:14Z",
+      "side": 1,
+      "message": "usually, we have:\nfirst sentence\nempty line\n\u003cp\u003eparagraph",
+      "revId": "d6517acb65eb635561c1d7919017d1e18df048bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee8e5b22_bd14dfcb",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerRequestExecutor.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-23T15:19:14Z",
+      "side": 1,
+      "message": "why do we need stream id? IIRC when streaming output it was managed internally by Netty?",
+      "revId": "d6517acb65eb635561c1d7919017d1e18df048bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc641276_1ae427b0",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/RequestBodyInputStreamTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-23T15:19:14Z",
+      "side": 1,
+      "message": "can you document a need for timeout?",
+      "revId": "d6517acb65eb635561c1d7919017d1e18df048bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92aa83a9_d12d023d",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/RequestBodyInputStreamTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-23T15:19:14Z",
+      "side": 1,
+      "message": "can you document what do we test here?",
+      "revId": "d6517acb65eb635561c1d7919017d1e18df048bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f3f2a42_e1bdc465",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/ServerRequestExecutorTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-23T15:19:14Z",
+      "side": 1,
+      "message": "can we switch to use @Mock annotations?",
+      "revId": "d6517acb65eb635561c1d7919017d1e18df048bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
