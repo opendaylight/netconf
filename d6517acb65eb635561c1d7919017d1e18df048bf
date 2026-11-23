@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3901d66e_5ed14326",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/RequestBodyInputStream.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-23T20:46:59Z",
+      "side": 1,
+      "message": "Lifecycle groups the four states that carry no data, so each can be an enum constant shared by all streams. Failed and Interrupted carry the cause for a particular stream and use it to create a fresh exception on each read or append. The grouping is intentional, but I agree the name is unclear. Lifecycle sounds like it should cover all six states. `NormalState` would make the distinction clearer.",
+      "parentUuid": "6562e7a9_c0707e81",
+      "revId": "d6517acb65eb635561c1d7919017d1e18df048bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "efa1f127_4fc0caf5",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-23T15:19:14Z",
       "side": 1,
       "message": "usually, we have:\nfirst sentence\nempty line\n\u003cp\u003eparagraph",
+      "revId": "d6517acb65eb635561c1d7919017d1e18df048bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23ea44df_e81cefad",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/RequestBodyInputStream.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-23T20:46:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "efa1f127_4fc0caf5",
       "revId": "d6517acb65eb635561c1d7919017d1e18df048bf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fdb9601a_fba89942",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerRequestExecutor.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-23T20:46:59Z",
+      "side": 1,
+      "message": "Yes, Netty managed it for RESTCONF HTTP/2 response internally. The HTTP/1.1 request-body path has no stream id of its own. streamId was already in RequestContext before this patch. The executor preserves it across asynchronous completion because HTTPServerSession.respond() copies it into the response headers when present. This patch adds only body to the record",
+      "parentUuid": "ee8e5b22_bd14dfcb",
+      "revId": "d6517acb65eb635561c1d7919017d1e18df048bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc641276_1ae427b0",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-11-23T15:19:14Z",
       "side": 1,
       "message": "can you document a need for timeout?",
+      "revId": "d6517acb65eb635561c1d7919017d1e18df048bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2453ca1_7d673404",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/RequestBodyInputStreamTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-23T20:46:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc641276_1ae427b0",
       "revId": "d6517acb65eb635561c1d7919017d1e18df048bf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1918309_17b640a8",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/RequestBodyInputStreamTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-23T20:46:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "92aa83a9_d12d023d",
+      "revId": "d6517acb65eb635561c1d7919017d1e18df048bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1f3f2a42_e1bdc465",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-11-23T15:19:14Z",
       "side": 1,
       "message": "can we switch to use @Mock annotations?",
+      "revId": "d6517acb65eb635561c1d7919017d1e18df048bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcfcdeea_45995273",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/ServerRequestExecutorTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-23T20:46:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f3f2a42_e1bdc465",
       "revId": "d6517acb65eb635561c1d7919017d1e18df048bf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
