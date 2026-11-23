@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f3d0af0_d9c4b5de",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseStreamHandler.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-23T09:15:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9d25fb2_ce12baa7",
+      "revId": "c4da4c638fedcadbe4a8585ab53742b9835ea404",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "91b249db_b77eb599",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "df24fc98_9d309eaa",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseStreamHandler.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-23T09:15:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91b249db_b77eb599",
+      "revId": "c4da4c638fedcadbe4a8585ab53742b9835ea404",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2e18a9b2_cb31af32",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-11-19T13:57:24Z",
       "side": 1,
       "message": "This reuses the server\u0027s request-body limit (256 KiB) as the client\u0027s SSE line limit. With default fragmentation the server sends a whole notification as one line, so any notification over 256 KiB now closes the stream and the listener only sees onStreamEnd(). Could we use a dedicated, larger (or configurable) client limit instead of HTTPServerLimits.DEFAULT?",
+      "revId": "c4da4c638fedcadbe4a8585ab53742b9835ea404",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d566838e_f6c3b80c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseStreamHandler.java",
+        "patchSetId": 39
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-23T09:15:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e18a9b2_cb31af32",
       "revId": "c4da4c638fedcadbe4a8585ab53742b9835ea404",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
