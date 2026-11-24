@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8f09add_5082b6fc",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActor.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-24T08:12:57Z",
+      "side": 1,
+      "message": "added a receive timeout of 2× actorResponseWaitTime",
+      "parentUuid": "4a7d4280_3c186ee1",
+      "revId": "e7f3d84de5e9119cc48d8c8f7c017206b602835c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "52795d3a_d4b1bff8",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-19T13:09:19Z",
       "side": 1,
       "message": "Since we\u0027re rewriting every branch of this if-else chain anyway, how about finally replacing it with a switch?",
+      "revId": "e7f3d84de5e9119cc48d8c8f7c017206b602835c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba9f2c11_397632a3",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActor.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-24T08:12:57Z",
+      "side": 1,
+      "message": "done in the follow-up https://git.opendaylight.org/gerrit/c/netconf/+/127720, as it have nothing to do with this task",
+      "parentUuid": "52795d3a_d4b1bff8",
       "revId": "e7f3d84de5e9119cc48d8c8f7c017206b602835c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b37443a_b617131f",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActor.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-24T08:12:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89e3c39d_91578281",
+      "revId": "e7f3d84de5e9119cc48d8c8f7c017206b602835c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b7bb642b_8b1607fb",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3dad508_7e70acd7",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActorTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-24T08:12:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b7bb642b_8b1607fb",
+      "revId": "e7f3d84de5e9119cc48d8c8f7c017206b602835c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c40f05fa_566ae1b2",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-11-19T13:09:19Z",
       "side": 1,
       "message": "Actually the name doesn\u0027t match the logic. The actor stops after \"issuing the operation\", not after the reply. Can we utilize an incomplete SettableFuture that asserts termination before completing it, and then the reply? Just something for consideration.",
+      "revId": "e7f3d84de5e9119cc48d8c8f7c017206b602835c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77da955b_acf8ebff",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActorTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-24T08:12:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c40f05fa_566ae1b2",
       "revId": "e7f3d84de5e9119cc48d8c8f7c017206b602835c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
