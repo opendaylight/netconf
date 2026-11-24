@@ -222,6 +222,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      */
     private final class DynSubscription<T> extends AbstractRestconfStreamSubscription {
         private final Set<Rfc8639Subscriber<T>> receivers = ConcurrentHashMap.newKeySet();
+        private final EventFormatterFactory<T> factory;
         private final RestconfStream<T> stream;
 
         // FIXME: rework in terms of SubscriptionFilter, FilterExpression and
@@ -231,11 +232,13 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         DynSubscription(final Uint32 id, final QName encoding, final RestconfStream<T> stream,
                 final String receiverName, final TransportSession session, final @Nullable EventStreamFilter filter,
-                final @Nullable String filterName, final @Nullable Instant stopTime) {
+                final @Nullable String filterName, final @Nullable Instant stopTime)
+                    throws UnsupportedEncodingException {
             super(id, encoding, stream.name(), receiverName, session, stopTime);
             this.stream = stream;
             this.filter = filter;
             this.filterName = filterName;
+            factory = stream.getFactory(encoding);
         }
 
         @Override
@@ -261,16 +264,9 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 return;
             }
 
-            final Rfc8639Subscriber<T> newSubscriber;
-            try {
-                newSubscriber = stream.addSubscriber(new Rfc8639Subscriber<>(sender,
-                    stream.getFactory(encoding()).getFormatter(TextParameters.EMPTY), filter(),
-                    newReceiverName(session.description(), request.principal()), receiverState));
-            } catch (UnsupportedEncodingException e) {
-                request.failWith(new RequestException(e));
-                return;
-            }
-
+            final var newSubscriber = stream.addSubscriber(new Rfc8639Subscriber<>(sender,
+                factory.getFormatter(TextParameters.EMPTY), filter,
+                newReceiverName(session.description(), request.principal()), receiverState));
             if (newSubscriber == null) {
                 request.failWith(new RequestException("Subscription stream terminated"));
                 return;
@@ -798,8 +794,14 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         final var id = Uint32.fromIntBits(prevDynamicId.incrementAndGet());
         final var receiverName = newReceiverName(session.description(), request.principal());
-        final var subscription = new DynSubscription<>(id, encoding, stream, receiverName, session, filterImpl,
-            filterName, stopTime);
+        final DynSubscription<?> subscription;
+        try {
+            subscription = new DynSubscription<>(id, encoding, stream, receiverName, session, filterImpl,
+                filterName, stopTime);
+        } catch (UnsupportedEncodingException e) {
+            request.failWith(new RequestException(e));
+            return;
+        }
 
         Futures.addCallback(createSubscription(id, streamName, encoding, receiverName, stopTime),
             new FutureCallback<>() {
