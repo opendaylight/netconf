@@ -106,7 +106,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      *
      * @param <T> event type
      */
-    private static final class Rfc8639Subscriber<T> implements Subscriber<T> {
+    private static final class Rfc8639Subscriber<T> {
         private static final Logger LOG = LoggerFactory.getLogger(Rfc8639Subscriber.class);
         private static final VarHandle EER_VH;
         private static final VarHandle SER_VH;
@@ -121,38 +121,18 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             }
         }
 
-        private final @NonNull EventFormatter<T> formatter;
         private final @NonNull Sender sender;
         private final @NonNull String receiverName;
-
-        private @NonNull EventStreamFilter filter;
         private State receiverState;
         @SuppressFBWarnings(value = "UUF_UNUSED_FIELD")
         private long excludedEventRecords;
         @SuppressFBWarnings(value = "UUF_UNUSED_FIELD")
         private long sentEventRecords;
 
-        Rfc8639Subscriber(final Sender sender, final EventFormatter<T> formatter,
-                final @Nullable EventStreamFilter filter, final String receiverName, final State receiverState) {
+        Rfc8639Subscriber(final Sender sender, final String receiverName, final State receiverState) {
             this.sender = requireNonNull(sender);
-            this.formatter = requireNonNull(formatter);
-            this.filter = filter != null ? filter : AcceptingEventFilter.instance();
             this.receiverName = requireNonNull(receiverName);
             this.receiverState = requireNonNull(receiverState);
-        }
-
-        @Override
-        public EventFormatter<T> formatter() {
-            return formatter;
-        }
-
-        @Override
-        public EventStreamFilter filter() {
-            return filter;
-        }
-
-        void setFilter(final EventStreamFilter newFilter) {
-            filter = requireNonNull(newFilter);
         }
 
         /**
@@ -220,7 +200,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
      * Internal implementation
      * of a <a href="https://www.rfc-editor.org/rfc/rfc8639#section-2.4">dynamic subscription</a>.
      */
-    private final class DynSubscription<T> extends AbstractRestconfStreamSubscription {
+    private final class DynSubscription<T> extends AbstractRestconfStreamSubscription implements Subscriber<T> {
         private final Set<Rfc8639Subscriber<T>> receivers = ConcurrentHashMap.newKeySet();
         private final RestconfStream<T> stream;
 
@@ -264,7 +244,6 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             final Rfc8639Subscriber<T> newSubscriber;
             try {
                 newSubscriber = stream.addSubscriber(new Rfc8639Subscriber<>(sender,
-                    stream.getFactory(encoding()).getFormatter(TextParameters.EMPTY), filter(),
                     newReceiverName(session.description(), request.principal()), receiverState));
             } catch (UnsupportedEncodingException e) {
                 request.failWith(new RequestException(e));
