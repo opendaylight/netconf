@@ -86,9 +86,10 @@ jobs:
       mvn_version: "3.9.6"
       mvn_profiles: "docker"
       mvn_phases: "clean install"
-      # Gate on Grype findings only when the change touches a
-      # dependency; report them as warnings otherwise.
-      grype_gate_when: "dependencies-changed"
+      # odlparent already attaches a CycloneDX BOM to every module, and
+      # the root makeAggregateBom skips this aggregator because it sets
+      # maven.deploy.skip, failing the step. This also drops Grype.
+      sbom_enabled: false
       build_timeout_minutes: 60
     secrets:
       # Adds the opendaylight-snapshots repository profile, as the
