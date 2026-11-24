@@ -34,6 +34,24 @@
       "parentUuid": "79d1025f_39657f47",
       "revId": "02faa57431df8eb27fe52e01c949b279974b9b6c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fac0408_f420fe03",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/netconf/ActorProxyNetconfServiceFacade.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-24T08:15:24Z",
+      "side": 1,
+      "message": "This is best effort only. Candidate locks first and sends edit-config only after the lock reply. So if the timeout hits while the master is still waiting for the lock, the cancel can reach the device before the edit-config. The FIXME notes that, and the full cleanup stays with NETCONF-1709",
+      "parentUuid": "5f789466_92ce8da5",
+      "revId": "02faa57431df8eb27fe52e01c949b279974b9b6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
