@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcc4adf7_fc9f507b",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-24T08:07:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a78afc6_fde1ad46",
+      "revId": "ba1f15eca8bb49ed76515020c8311605a5c84ea8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c22ab0cc_ef9fbb12",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-11-19T11:43:55Z",
       "side": 1,
       "message": "can be just List",
+      "revId": "ba1f15eca8bb49ed76515020c8311605a5c84ea8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88a3f01a_1cdf39a6",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-24T08:07:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c22ab0cc_ef9fbb12",
       "revId": "ba1f15eca8bb49ed76515020c8311605a5c84ea8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "39e4d2a3_0691650e",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-24T08:07:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe2200a0_717cab03",
+      "revId": "ba1f15eca8bb49ed76515020c8311605a5c84ea8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "934db030_0ede55e8",
@@ -82,6 +136,24 @@
       "writtenOn": "2026-11-19T11:43:55Z",
       "side": 1,
       "message": "If the ask times out (5 s by default) the device now ends up with no mount point at all, while the session stays up so NetconfDevice never reconnects. Before, the mount existed and worked once the actor caught up. Could we either retry the ask or at least mark the device as failed via datastoreAdapter.setDeviceAsFailed() here, so the operator sees it?",
+      "revId": "ba1f15eca8bb49ed76515020c8311605a5c84ea8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a98788e_2b1f5076",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-24T08:07:22Z",
+      "side": 1,
+      "message": "If the ask fails or registering the mount throws, the device is now reported as failed via datastoreAdapter.setDeviceAsFailed() so the operator can see it has no mount point",
+      "parentUuid": "934db030_0ede55e8",
       "revId": "ba1f15eca8bb49ed76515020c8311605a5c84ea8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -103,6 +175,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e09a9871_5d957a48",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-24T08:07:22Z",
+      "side": 1,
+      "message": "Held notifications are now published outside the lock",
+      "parentUuid": "8cde8491_74f97ce8",
+      "revId": "ba1f15eca8bb49ed76515020c8311605a5c84ea8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a0238533_6ade892d",
@@ -116,6 +206,24 @@
       "writtenOn": "2026-11-19T11:43:55Z",
       "side": 1,
       "message": "The ProxyDOMDataBroker requests could probably use this guard as well: NewReadTransactionRequest at line 144 still replies Success(null), and the write/read-write requests reply with an NPE from deviceDataBroker. Should they get the same NotMasterException guard (checking deviceDataBroker, like AskForMasterMountPoint does), so all master-only requests behave alike?",
+      "revId": "ba1f15eca8bb49ed76515020c8311605a5c84ea8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "608e95b9_23e86995",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfNodeActor.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-24T08:07:22Z",
+      "side": 1,
+      "message": "NewReadTransactionRequest, NewWriteTransactionRequest and NewReadWriteTransactionRequest now reply with NotMasterException when deviceDataBroker is null",
+      "parentUuid": "a0238533_6ade892d",
       "revId": "ba1f15eca8bb49ed76515020c8311605a5c84ea8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -137,6 +245,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "088da316_ddc67084",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacadeTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-24T08:07:22Z",
+      "side": 1,
+      "message": "Added testMasterInitFailureMarksDeviceFailed",
+      "parentUuid": "26dafa6f_effface9",
+      "revId": "ba1f15eca8bb49ed76515020c8311605a5c84ea8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "93e494a2_a8cfd598",
@@ -150,6 +276,24 @@
       "writtenOn": "2026-11-19T11:43:55Z",
       "side": 1,
       "message": "When is this actor stopped?",
+      "revId": "ba1f15eca8bb49ed76515020c8311605a5c84ea8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bfb4e580_e6759376",
+        "filename": "apps/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacadeTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2026-11-24T08:07:22Z",
+      "side": 1,
+      "message": "It is now stopped in a finally block at the end of the test",
+      "parentUuid": "93e494a2_a8cfd598",
       "revId": "ba1f15eca8bb49ed76515020c8311605a5c84ea8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
