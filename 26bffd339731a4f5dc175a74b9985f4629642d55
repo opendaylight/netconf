@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90a4cc68_b53e2947",
+        "filename": "tests/libraries/aaa_shiro_config.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-24T07:21:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d67eaa33_bcd5246b",
+      "revId": "26bffd339731a4f5dc175a74b9985f4629642d55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db4fdc81_e6e1be7c",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-19T11:20:45Z",
       "side": 1,
       "message": "execute_karaf_command always uses KarafShell\u0027s 30 s prompt timeout, and feature:install blocks until the JAX-RS stack is resolved and started; on a slow CI node that can exceed 30 s and verify\u003dTrue then fails the suite setup.",
+      "revId": "26bffd339731a4f5dc175a74b9985f4629642d55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0658dff5_879b1330",
+        "filename": "tests/libraries/jaxrs_restconf.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-24T07:21:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db4fdc81_e6e1be7c",
       "revId": "26bffd339731a4f5dc175a74b9985f4629642d55",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b4c828f_8c838bfd",
+        "filename": "tests/suites/OAuth/test_oauth_proxy_header.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-24T07:21:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23e14bab_643c3cfa",
+      "revId": "26bffd339731a4f5dc175a74b9985f4629642d55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "63919983_a39d57a9",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-11-19T11:20:45Z",
       "side": 1,
       "message": "oauth_proxy_header.py:78 says a live reload isn\u0027t reliable proof a filter-chain change was picked up, and the suite restarts Karaf for that reason, yet this override (and its revert in the finalizer) relies only on the live reload. Could we confirm it by polling a wrong-role request until it returns 403 (and 401 after the revert), or move the 403 tests into their own class with a restart-based setup?",
+      "revId": "26bffd339731a4f5dc175a74b9985f4629642d55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf848476_57249adb",
+        "filename": "tests/suites/OAuth/test_oauth_proxy_header.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-24T07:21:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "63919983_a39d57a9",
       "revId": "26bffd339731a4f5dc175a74b9985f4629642d55",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
