@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bfd17f1_f654fd99",
+        "filename": "tests/libraries/infra.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-24T07:19:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5bcb504c_ef877076",
+      "revId": "0b97b0c4e74264fac2a5f01bcbb06683e6c3a856",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "58ba3375_6900593e",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-19T10:12:54Z",
       "side": 1,
       "message": "If Karaf\u0027s shutdown hangs (Pekko leave, a blocked Blueprint container), this raises after 60 s and leaves the old JVM running, so the restart fails and later tests hit a half-dead instance. Could we fall back to stop_process_by_pid(pid, gracefully\u003dFalse) when the graceful stop times out?",
+      "revId": "0b97b0c4e74264fac2a5f01bcbb06683e6c3a856",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1f1db2a_3b1f4172",
+        "filename": "tests/libraries/infra.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-24T07:19:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "58ba3375_6900593e",
       "revId": "0b97b0c4e74264fac2a5f01bcbb06683e6c3a856",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
