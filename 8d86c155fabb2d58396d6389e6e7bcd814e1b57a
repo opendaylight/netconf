@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f3b7b66_032e293f",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2026-11-24T12:54:05Z",
+      "side": 1,
+      "message": "this end up being used by HTTPScheme",
+      "revId": "8d86c155fabb2d58396d6389e6e7bcd814e1b57a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
