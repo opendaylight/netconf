@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "59583471_3ea3c505",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-24T09:46:31Z",
+      "side": 1,
+      "message": "Both paths use Netty’s HttpContent and LastHttpContent and expose the body to application code as a Java stream. The request path also reuses the existing PendingRequest.execute(..., InputStream) contract, so RESTCONF can read a\nchunked body through the same API it uses for an aggregated body. \n\nThe difference is who produces the bytes and who can wait. On output, application code writes to ResponseBodyOutputStream, which forms chunks. ResponseWriter can make the producer wait when the outbound queue is full. On input, Netty has already decoded the chunks. The event loop delivers them to RequestBodyInputStream, and the request worker can wait in read() for the next bytes. Reusing the writer’s blocking queue here could block the event loop. \n\nMost of the new logic handles request ownership. For example, RESTCONF can finish a request while the client is still uploading it. We need to release unread buffers, discard later chunks through LastHttpContent, and then handle the next request on the same connection.",
+      "parentUuid": "8c779954_45a7811c",
+      "revId": "f53c299cd35e42fa73ada3fe5675da82c9de8a8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b31f8bc9_a7d3f706",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-23T15:30:29Z",
       "side": 1,
       "message": "i++ is good enough",
+      "revId": "f53c299cd35e42fa73ada3fe5675da82c9de8a8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "102d89c4_742e15bf",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/PipeliningTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-24T09:46:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b31f8bc9_a7d3f706",
       "revId": "f53c299cd35e42fa73ada3fe5675da82c9de8a8f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "49ae448b_b0727224",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/RestconfStreamingLifecycleTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-24T09:46:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fecf6388_884a5625",
+      "revId": "f53c299cd35e42fa73ada3fe5675da82c9de8a8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "001ecc38_a1b94781",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "327a3f6b_da71de2b",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-24T09:46:31Z",
+      "side": 1,
+      "message": "streamingSupported was a temporary switch while HTTPServerSession could only consume FullHttpRequest. This patch adds support for StreamingHttpRequest, so the session can now handle eligible chunked requests.",
+      "parentUuid": "001ecc38_a1b94781",
+      "revId": "f53c299cd35e42fa73ada3fe5675da82c9de8a8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "07d9e829_6b9b6aae",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-11-23T15:30:29Z",
       "side": 1,
       "message": "what do we test?",
+      "revId": "f53c299cd35e42fa73ada3fe5675da82c9de8a8f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e0c4093_5a78524c",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1StreamingTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2026-11-24T09:46:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07d9e829_6b9b6aae",
       "revId": "f53c299cd35e42fa73ada3fe5675da82c9de8a8f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
