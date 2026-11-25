@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b7dc98b_696c6c43",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/RequestBodyInputStream.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-25T13:34:37Z",
+      "side": 1,
+      "message": "Semicolon where it should not be.\nRequestBodyInputStream.java: 34, 210, 212, 213, 362\nServerRequestExecutor.java:136",
+      "range": {
+        "startLine": 30,
+        "startChar": 10,
+        "endLine": 30,
+        "endChar": 11
+      },
+      "revId": "e41f71dcd5ebf00df9a66645527f2e239da635a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "987cdbcf_3267caf1",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/RequestBodyInputStream.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-25T13:34:37Z",
+      "side": 1,
+      "message": "Javadoc instead of inline comment for method documentation.",
+      "revId": "e41f71dcd5ebf00df9a66645527f2e239da635a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "105579f8_3f026fa6",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ServerRequestExecutor.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-25T13:34:37Z",
+      "side": 1,
+      "message": "first sentence\nempty line\n\u003cp\u003eparagraph",
+      "revId": "e41f71dcd5ebf00df9a66645527f2e239da635a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbadc40b_19af8b17",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/RequestBodyInputStreamTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-25T13:34:37Z",
+      "side": 1,
+      "message": "var?\nRequestBodyInputStream.java:286, 305, 308, 326;\nRequestBodyInputStreamTest.java:40, 47, 49, 62, 167, 212",
+      "range": {
+        "startLine": 47,
+        "startChar": 20,
+        "endLine": 47,
+        "endChar": 23
+      },
+      "revId": "e41f71dcd5ebf00df9a66645527f2e239da635a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
