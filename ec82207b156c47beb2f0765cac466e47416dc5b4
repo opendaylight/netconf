@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c1c724f_de9983b3",
+        "filename": "protocol/restconf-server/src/main/java/org/opendaylight/restconf/server/RestconfSession.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-25T13:34:45Z",
+      "side": 1,
+      "message": "Please move this method at bottom of this class.",
+      "revId": "ec82207b156c47beb2f0765cac466e47416dc5b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
