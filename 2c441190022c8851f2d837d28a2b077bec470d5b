@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8661cda4_1732c3f9",
+        "filename": "protocol/restconf-server/src/test/java/org/opendaylight/restconf/server/RestconfStreamingLifecycleTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-25T13:34:54Z",
+      "side": 1,
+      "message": "Can be in one line.",
+      "revId": "2c441190022c8851f2d837d28a2b077bec470d5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33f21cf6_7724bc39",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-25T13:34:54Z",
+      "side": 1,
+      "message": "first sentence\nempty line\n\u003cp\u003eparagraph",
+      "revId": "2c441190022c8851f2d837d28a2b077bec470d5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "505a5561_ecb29efc",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-25T13:34:54Z",
+      "side": 1,
+      "message": "Also when an exception is thrown? exceptionCaught() sets it through markClosing() without rejecting any request.",
+      "revId": "2c441190022c8851f2d837d28a2b077bec470d5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ffd7ca20_3c08ef5c",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/Http1RequestDispatcher.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-25T13:34:54Z",
+      "side": 1,
+      "message": "var?",
+      "range": {
+        "startLine": 311,
+        "startChar": 13,
+        "endLine": 311,
+        "endChar": 17
+      },
+      "revId": "2c441190022c8851f2d837d28a2b077bec470d5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
