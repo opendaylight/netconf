@@ -90,7 +90,7 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
         // try to publish ToasterRestocked notification
         publishService().putNotification(new DOMNotificationEvent.Rfc6020(TOASTER_RESTOCKED_NOTIFICATION, EVENT_TIME));
         // verify ToasterRestocked notification is received
-        JSONAssert.assertEquals(String.format("""
+        JSONAssert.assertEquals("""
             {
               "ietf-restconf:notification": {
                 "event-time": "%s",
@@ -98,12 +98,12 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
                   "amountOfBread": 1
                 }
               }
-            }""", FORMATTED_EVENT_TIME), listener.readNext(), JSONCompareMode.STRICT);
+            }""".formatted(FORMATTED_EVENT_TIME), listener.readNext(), JSONCompareMode.STRICT);
 
         // suspend subscription
         subscription.suspendSubscription(InsufficientResources.QNAME);
         // verify subscription-suspended notification is received
-        JSONAssert.assertEquals(String.format("""
+        JSONAssert.assertEquals("""
             {
               "ietf-restconf:notification" : {
                 "ietf-subscribed-notifications:subscription-suspended" : {
@@ -111,7 +111,7 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
                   "reason" : "ietf-subscribed-notifications:insufficient-resources",
                 }
               }
-            }""", subscriptionId), listener.readNext(), JSONCompareMode.LENIENT);
+            }""".formatted(subscriptionId), listener.readNext(), JSONCompareMode.LENIENT);
 
         // try to publish ToasterRestocked notification
         publishService().putNotification(new DOMNotificationEvent.Rfc6020(TOASTER_RESTOCKED_NOTIFICATION, EVENT_TIME));
@@ -119,12 +119,17 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
         assertNull(listener.readNext());
 
         // resume subscription by invoking modify subscription RPC
-        final var modifyInput = String.format("""
+        final var modifyInput = """
             <input xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications">
               <id>%s</id>
               <stream-subtree-filter><toasterRestocked xmlns="http://netconfcentral.org/ns/toaster"/></stream-subtree-filter>
+<<<<<<< HEAD   (18b60f Document Netty RESTCONF request limits)
             </input>""", subscriptionId);
         final var modifyResponse = invokeRequestKeepClient(streamClient, HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
+=======
+            </input>""".formatted(subscriptionId);
+        final var modifyResponse = invokeRequestKeepClient(HttpMethod.POST, MODIFY_SUBSCRIPTION_URI,
+>>>>>>> CHANGE (c3cd1e Use String.formatted() in restconf-it)
             MediaTypes.APPLICATION_YANG_DATA_XML, modifyInput, MediaTypes.APPLICATION_YANG_DATA_JSON);
         assertEquals(HttpResponseStatus.NO_CONTENT, modifyResponse.status());
 
@@ -132,19 +137,19 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
         Awaitility.await().atMost(1, TimeUnit.SECONDS).until(listener::readNext, Objects::nonNull);
 
         // verify subscription-resumed notification is received
-        JSONAssert.assertEquals(String.format("""
+        JSONAssert.assertEquals("""
             {
               "ietf-restconf:notification" : {
                 "ietf-subscribed-notifications:subscription-resumed" : {
                   "id" : %s,
                 }
               }
-            }""", subscriptionId), listener.readNext(), JSONCompareMode.LENIENT);
+            }""".formatted(subscriptionId), listener.readNext(), JSONCompareMode.LENIENT);
 
         // try to publish ToasterRestocked notification
         publishService().putNotification(new DOMNotificationEvent.Rfc6020(TOASTER_RESTOCKED_NOTIFICATION, EVENT_TIME));
         // verify ToasterRestocked notification is received
-        JSONAssert.assertEquals(String.format("""
+        JSONAssert.assertEquals("""
             {
               "ietf-restconf:notification": {
                 "event-time": "%s",
@@ -152,7 +157,7 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
                   "amountOfBread": 1
                 }
               }
-            }""", FORMATTED_EVENT_TIME), listener.readNext(), JSONCompareMode.STRICT);
+            }""".formatted(FORMATTED_EVENT_TIME), listener.readNext(), JSONCompareMode.STRICT);
     }
 
     @Test
@@ -177,7 +182,7 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
         // suspend subscription
         subscription.suspendSubscription(InsufficientResources.QNAME);
         // verify subscription-suspended notification is received
-        JSONAssert.assertEquals(String.format("""
+        JSONAssert.assertEquals("""
             {
               "ietf-restconf:notification" : {
                 "ietf-subscribed-notifications:subscription-suspended" : {
@@ -185,7 +190,7 @@ class SubscriptionSuspensionTest extends AbstractNotificationSubscriptionTest {
                   "reason" : "ietf-subscribed-notifications:insufficient-resources",
                 }
               }
-            }""", subscriptionId), listener.readNext(), JSONCompareMode.LENIENT);
+            }""".formatted(subscriptionId), listener.readNext(), JSONCompareMode.LENIENT);
 
         //try to  suspend subscription that is already suspended
         subscription.suspendSubscription(InsufficientResources.QNAME);
