@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c2d15a6_536c7f28",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-26T12:42:15Z",
+      "side": 1,
+      "message": "This fixes null credentials, but loginPasswordIdentity() at line 245 still uses requireNonNull for username and password. A login-password-unencrypted container with only a username is valid YANG and still throws NullPointerException past lockedConnect, so the node stays \"connecting\" and the rest of the listener batch is skipped. Could we throw IllegalArgumentException there too (and check the encrypted password before decrypt)?",
+      "revId": "dece4e10bfdc4f0062a58e5931f640e440c0053f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bee9f2a9_5104be93",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImplTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-26T12:42:15Z",
+      "side": 1,
+      "message": "This shows the factory throws IllegalArgumentException, but the fix the message describes is in NetconfNodeHandler, which must catch it and fail the device. Could we add a NetconfNodeHandlerTest case with null credentials that verifies delegate.onDeviceFailed gets \"Missing credentials\" and createClient is never called?",
+      "revId": "dece4e10bfdc4f0062a58e5931f640e440c0053f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
