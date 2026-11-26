@@ -71,6 +71,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a53df247_e88af8b6",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfDataTreeServiceActor.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-26T12:14:26Z",
+      "side": 1,
+      "message": "I didn\u0027t see the other commit which does that..",
+      "parentUuid": "52795d3a_d4b1bff8",
+      "revId": "e7f3d84de5e9119cc48d8c8f7c017206b602835c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "89e3c39d_91578281",
