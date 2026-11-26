@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f222acbf_877b4b20",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseStreamHandler.java",
+        "patchSetId": 40
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-26T12:03:10Z",
+      "side": 1,
+      "message": "Netty\u0027s HTTP/2 codec delivers every interim 1xx (except 101) as a FullHttpResponse, and the HTTP/3 codec does so for 100. With this arm a 103 Early Hints or 100 Continue now sets errorStatus and immediately fails the start, where the old code ignored it and started on the following 200. Could interim responses be skipped first, for example a case guarded by codeClass() \u003d\u003d INFORMATIONAL?",
+      "revId": "d083be11a4846b9c97fedbe3f73a013fdd2c68e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "699d5d22_3a3814ee",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/SseStreamHandler.java",
+        "patchSetId": 40
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-26T12:03:10Z",
+      "side": 1,
+      "message": "This fixes split lines for HTTP/2 and HTTP/3, but ClientHttp1SseHandler.onContent (line 122) still calls processChunks on each HttpContent separately, so a long notification over HTTP/1 is still corrupted. Could the line buffering move into a small reusable class that the HTTP/1 handler also uses, or is HTTP/1 a planned follow-up?",
+      "revId": "d083be11a4846b9c97fedbe3f73a013fdd2c68e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
