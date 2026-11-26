@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dfb3fd3_6b34c345",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-26T12:27:10Z",
+      "side": 1,
+      "message": "Pekko\u0027s ask future completes on the thread that sends the reply, and NetconfNodeActor replies from inside handleReceive. So whenComplete runs the mount registration and the held-notification publishing on the master actor\u0027s own thread. A mount listener that reads from the new mount then waits on this busy actor and times out. Could this use whenCompleteAsync(..., actorSystem.dispatcher()) instead?",
+      "revId": "6bbbe91fdd1a04a86e32e92f6cb10a9198a31716",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9fc9a49_1a629a63",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-26T12:27:10Z",
+      "side": 1,
+      "message": "this helper is only used once. Can be inlined",
+      "revId": "6bbbe91fdd1a04a86e32e92f6cb10a9198a31716",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
