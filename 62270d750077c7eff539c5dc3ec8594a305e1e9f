@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75843251_8c36da8b",
+        "filename": "tests/libraries/aaa_shiro_config.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-26T11:05:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8a5975c_19db6979",
+      "revId": "62270d750077c7eff539c5dc3ec8594a305e1e9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a14cb6b4_f2d74cd4",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8a46467_b3f3e46b",
+        "filename": "tests/libraries/jaxrs_restconf.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-26T11:05:14Z",
+      "side": 1,
+      "message": "Done. I added a class-scoped jaxrs_restconf_endpoint fixture in the root conftest.py that installs odl-restconf-nb-jaxrs only if it isn\u0027t already installed. In that case it registers a finalizer before the install that uninstalls it again, and it leaves a preinstalled feature alone, since something else put it there. suite_setup depends on the fixture, so the Shiro configuration is restored over JAX-RS before JAX-RS is uninstalled.",
+      "parentUuid": "a14cb6b4_f2d74cd4",
+      "revId": "62270d750077c7eff539c5dc3ec8594a305e1e9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "059fb56a_2921a5ff",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-11-26T10:14:56Z",
       "side": 1,
       "message": "The default limits (4096/128/128, default allowed-chars) already return 200 for this request, so this test and the other three \"_exact\" / accepts tests still pass if the new value never takes effect. Could each one first apply the rejecting value and poll for 401, then apply the exact value and poll for 200, so the 200 can only come from the new setting?",
+      "revId": "62270d750077c7eff539c5dc3ec8594a305e1e9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b608114_01713de7",
+        "filename": "tests/suites/OAuth/test_oauth_proxy_header.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 8907
+      },
+      "writtenOn": "2026-11-26T11:05:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "059fb56a_2921a5ff",
       "revId": "62270d750077c7eff539c5dc3ec8594a305e1e9f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
