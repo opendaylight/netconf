@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de8e6d71_70a4c552",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyNetconfDataTreeService.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-26T12:23:50Z",
+      "side": 1,
+      "message": "This cancel is discard-changes plus unlock on the device-wide candidate, and nothing orders it against later requests. A client that retries right after the timeout error can have its edit discarded between its edit-config and its commit, and the retry is then reported as successful. The previous patch removed the idle-timeout cancel for this same reason. Should this be left to NETCONF-1709 instead? If so, drop the proxy-side cancel, this cancelIfEditTimedOut(), the callback inProxyNetconfDataTreeService.edit and keep the FIXME in ActorProxyNetconfServiceFacade",
+      "revId": "2647a43cd023154418b521bc29421c88a8e93bf2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
