@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30193589_bd51b4f8",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeSshAuthSettings.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-26T11:27:01Z",
+      "side": 1,
+      "message": "This replaces applyTo() and also changes CallHomeSshSessionContext and the createContext() signature, which breaks external implementations on a 12.0.3 service release. Is an API change acceptable on this branch, or should the chain wait for the next major? This needs to be verified. Also make sure to add a mention about this API change in the release where this lands.",
+      "revId": "48c37456a3d6e0671c0d21e458d09ec9872f9dbe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
