@@ -67,6 +67,97 @@
       "message": "recheck",
       "revId": "c20fa69e1f6b7f40b36fef05ea525ff618414380",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b50846ab_2a99c9c2",
+        "filename": "apps/restconf-it/src/test/java/org/opendaylight/restconf/it/server/StreamingRequestE2ETest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-26T08:36:44Z",
+      "side": 1,
+      "message": "Can be in one line.",
+      "revId": "c20fa69e1f6b7f40b36fef05ea525ff618414380",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99879e94_049ce904",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1StreamingIntegrationTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-26T08:36:44Z",
+      "side": 1,
+      "message": "Please use var. Fix this in the whole patch.",
+      "revId": "c20fa69e1f6b7f40b36fef05ea525ff618414380",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5afbe21_797887aa",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1StreamingIntegrationTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-26T08:36:44Z",
+      "side": 1,
+      "message": "Please move this method below the test methods.",
+      "revId": "c20fa69e1f6b7f40b36fef05ea525ff618414380",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b50bedeb_a471dd16",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1StreamingPipelineTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-26T08:36:44Z",
+      "side": 1,
+      "message": "Please import HttpObjectAggregator and use {@link HttpObjectAggregator} here instead of the fully qualified name",
+      "range": {
+        "startLine": 60,
+        "startChar": 11,
+        "endLine": 60,
+        "endChar": 38
+      },
+      "revId": "c20fa69e1f6b7f40b36fef05ea525ff618414380",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "952d5b49_15f293b3",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/Http1StreamingPipelineTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-26T08:36:44Z",
+      "side": 1,
+      "message": "This class builds the same server pipeline as Http1StreamingIntegrationTest (HTTPScheme.initializeServerPipeline() plus PipelinedHTTPServerSession), only fed by EmbeddedChannel.writeInbound() instead of a socket. Several scenarios are tested in both, e.g. clientDisconnectWakesBlockedConsumer vs clientDisconnectFailsPendingUpload, or chunkedBodyOverLimitIsRejectedWith413 vs chunkedUploadOverLimitIsRejectedWith413. What does each class cover that the other does not? If the difference is only the transport, could the duplicated scenarios stay in one of them?",
+      "revId": "c20fa69e1f6b7f40b36fef05ea525ff618414380",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
