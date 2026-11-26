@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8a5975c_19db6979",
+        "filename": "tests/libraries/aaa_shiro_config.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-26T10:14:56Z",
+      "side": 1,
+      "message": "restart_karaf picks the instance by cwd, which defaults to \"opendaylight\", so passing only host here restarts the standalone directory regardless of which node was written to. Could this either take and forward a cwd, or drop host and state it is standalone-only?",
+      "revId": "62270d750077c7eff539c5dc3ec8594a305e1e9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a14cb6b4_f2d74cd4",
+        "filename": "tests/libraries/jaxrs_restconf.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-26T10:14:56Z",
+      "side": 1,
+      "message": "Leaving odl-restconf-nb-jaxrs installed (plus the two restarts) means CRUD, APIDOCS and the rest see a different Karaf depending on whether this suite was selected. Could the suite uninstall it in its finalizer when it was the one that installed it, or be ordered last in SuiteOrder?",
+      "revId": "62270d750077c7eff539c5dc3ec8594a305e1e9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "059fb56a_2921a5ff",
+        "filename": "tests/suites/OAuth/test_oauth_proxy_header.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 8324
+      },
+      "writtenOn": "2026-11-26T10:14:56Z",
+      "side": 1,
+      "message": "The default limits (4096/128/128, default allowed-chars) already return 200 for this request, so this test and the other three \"_exact\" / accepts tests still pass if the new value never takes effect. Could each one first apply the rejecting value and poll for 401, then apply the exact value and poll for 200, so the 200 can only come from the new setting?",
+      "revId": "62270d750077c7eff539c5dc3ec8594a305e1e9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
