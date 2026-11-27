@@ -16,6 +16,24 @@
       "message": "Only the message of the last failure survives here, so its type, stack trace and any wrapped cause are lost. Async failures are logged only at DEBUG, so at INFO nothing else records them. Could ConnectGivenUpException take the Throwable as its cause, with null for the \"Device disconnected\" case? The connected-message would stay the same.",
       "revId": "49cfc9534cdf91c0320699d03ead4ebc423062f6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42386ae3_91c1dcf6",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-27T15:40:00Z",
+      "side": 1,
+      "message": "Done, ConnectGivenUpException now carries the last failure.",
+      "parentUuid": "4e4c538c_abc8d831",
+      "revId": "49cfc9534cdf91c0320699d03ead4ebc423062f6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
