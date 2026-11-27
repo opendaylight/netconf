@@ -16,6 +16,24 @@
       "message": "username is just as optional as key-id in key-based, and without it the transport throws \"Client parameters are missing username\" on every attempt. The node then retries forever with an empty connected-message instead of failing at once like a missing key-id. Could we check username here the same way and throw IllegalArgumentException?",
       "revId": "b0bc3bb7e6acaca9879f0dfccebc201099d5df00",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63145433_64234f11",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-27T15:39:55Z",
+      "side": 1,
+      "message": "Done, a missing username now throws IllegalArgumentException.",
+      "parentUuid": "5a2f1829_d8ed88a5",
+      "revId": "b0bc3bb7e6acaca9879f0dfccebc201099d5df00",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
