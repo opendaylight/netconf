@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff89dcc4_170aa59c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-27T08:26:33Z",
+      "side": 1,
+      "message": "org.opentest4j.AssertionFailedError: UpgradeEvent was not released by CleartextUpgradeHandler \u003d\u003d\u003e expected: \u003c1\u003e but was: \u003c2\u003e",
+      "revId": "e40f6dbe8796386656f88421ebc25a380b76d33a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
