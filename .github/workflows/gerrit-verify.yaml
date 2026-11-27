@@ -101,7 +101,7 @@ jobs:
     permissions:
       contents: read
     # yamllint disable-line rule:line-length
-    uses: lfreleng-actions/generic-workflows/.github/workflows/tox-verify.yaml@55a94482efee5f27ebb2de3e7f6c05339f02fad9 # v0.8.1
+    uses: lfreleng-actions/generic-workflows/.github/workflows/tox-verify.yaml@7b5720020b61b6aead324badce794089cc2ae208 # v0.8.2
     with:
       gerrit_refspec: ${{ inputs.GERRIT_REFSPEC }}
       gerrit_project: ${{ inputs.GERRIT_PROJECT }}
@@ -116,7 +116,7 @@ jobs:
     permissions:
       contents: read
     # yamllint disable-line rule:line-length
-    uses: lfreleng-actions/generic-workflows/.github/workflows/linting-verify.yaml@55a94482efee5f27ebb2de3e7f6c05339f02fad9 # v0.8.1
+    uses: lfreleng-actions/generic-workflows/.github/workflows/linting-verify.yaml@7b5720020b61b6aead324badce794089cc2ae208 # v0.8.2
     with:
       gerrit_refspec: ${{ inputs.GERRIT_REFSPEC }}
       gerrit_project: ${{ inputs.GERRIT_PROJECT }}
