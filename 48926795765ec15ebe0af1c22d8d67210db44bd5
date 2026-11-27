@@ -34,6 +34,24 @@
       "message": "Please reformat according to (at least for public methods): https://docs.opendaylight.org/en/latest/contributor-guides/coding-guidelines/coding-guidelines-java.html#javadoc-paragraph-p-tag-should-be-preceded-with-an-empty-line\n\nFirst sentence\nempty line\n\u003cp\u003eParagraph",
       "revId": "48926795765ec15ebe0af1c22d8d67210db44bd5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d224f35_7841e942",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 9231
+      },
+      "writtenOn": "2026-11-27T11:30:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "674d4358_26164bcf",
+      "revId": "48926795765ec15ebe0af1c22d8d67210db44bd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
