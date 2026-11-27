@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6683c094_510324b4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-27T08:30:09Z",
+      "side": 1,
+      "message": "Needs to be adapted for 9.0.x\u0027s https://lf-opendaylight.atlassian.net/browse/NETCONF-1679",
+      "revId": "81fb6511311ad00e05997f33152e597d4864a759",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
