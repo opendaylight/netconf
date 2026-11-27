@@ -32,7 +32,6 @@ jobs:
       fail-fast: false
       matrix:
         GERRIT_BRANCH:
-          - "10.0.x"
           - "11.0.x"
           - "9.0.x"
     concurrency:
