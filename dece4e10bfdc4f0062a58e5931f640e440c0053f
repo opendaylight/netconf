@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b6caa2c_3d36ff1a",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-27T15:45:07Z",
+      "side": 1,
+      "message": "Thanks. Done, a missing username or password now throws IllegalArgumentException, and the encrypted password is checked before decrypt().",
+      "parentUuid": "9c2d15a6_536c7f28",
+      "revId": "dece4e10bfdc4f0062a58e5931f640e440c0053f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bee9f2a9_5104be93",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-11-26T12:42:15Z",
       "side": 1,
       "message": "This shows the factory throws IllegalArgumentException, but the fix the message describes is in NetconfNodeHandler, which must catch it and fail the device. Could we add a NetconfNodeHandlerTest case with null credentials that verifies delegate.onDeviceFailed gets \"Missing credentials\" and createClient is never called?",
+      "revId": "dece4e10bfdc4f0062a58e5931f640e440c0053f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73c8f463_e223741d",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImplTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2026-11-27T15:45:07Z",
+      "side": 1,
+      "message": "Done, added a NetconfNodeHandlerTest case and tests for a missing username or password.",
+      "parentUuid": "bee9f2a9_5104be93",
       "revId": "dece4e10bfdc4f0062a58e5931f640e440c0053f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
