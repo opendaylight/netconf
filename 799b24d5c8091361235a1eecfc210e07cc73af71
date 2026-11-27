@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "799b24d5c8091361235a1eecfc210e07cc73af71",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bac0ad3b_570e39fd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2026-11-27T08:23:30Z",
+      "side": 1,
+      "message": "SUCCESS: https://github.com/opendaylight/netconf/actions/runs/45960596476",
+      "revId": "799b24d5c8091361235a1eecfc210e07cc73af71",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
