@@ -77,7 +77,7 @@ jobs:
       contents: read
       pull-requests: read # repository-metadata-action queries PR data
     # yamllint disable-line rule:line-length
-    uses: lfreleng-actions/java-workflows/.github/workflows/maven-build-test.yaml@535e49d8407dc4dbca224c8f389716208fbee155 # v0.8.1
+    uses: lfreleng-actions/java-workflows/.github/workflows/maven-build-test.yaml@7ad325b5bf20482ccbec7fa2f916d5087ce92147 # v0.8.2
     with:
       gerrit_refspec: ${{ inputs.GERRIT_REFSPEC }}
       gerrit_project: ${{ inputs.GERRIT_PROJECT }}
@@ -86,10 +86,9 @@ jobs:
       mvn_version: "3.9.6"
       mvn_profiles: "docker"
       mvn_phases: "clean install"
-      # odlparent already attaches a CycloneDX BOM to every module, and
-      # the root makeAggregateBom skips this aggregator because it sets
-      # maven.deploy.skip, failing the step. This also drops Grype.
-      sbom_enabled: false
+      # Report Grype findings without failing the job until the
+      # existing ones are triaged.
+      grype_permit_fail: true
       build_timeout_minutes: 60
     secrets:
       # Adds the opendaylight-snapshots repository profile, as the
